@@ -1,0 +1,6 @@
+# don't ever lint node_modules
+node_modules/
+# don't lint next output (make sure it's set to your correct build folder name)
+.next/
+# do not lint .idea
+.idea/

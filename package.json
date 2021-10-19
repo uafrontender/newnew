@@ -1,0 +1,29 @@
+{
+  "name": "newnew",
+  "version": "0.1.0",
+  "description": "NewNew Backend API",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "1.6.2",
+    "next": "11.1.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-redux": "7.2.5",
+    "styled-components": "5.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "17.0.30",
+    "@types/react-redux": "7.1.19",
+    "@types/styled-components": "5.1.15",
+    "eslint": "8.0.1",
+    "eslint-config-next": "11.1.2",
+    "prettier": "2.4.1",
+    "typescript": "4.4.4"
+  }
+}
