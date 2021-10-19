@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { loadStateLS, saveStateLS } from '../../utils/localStorage'
 import { AppThunk } from '../store'
 
 // This slice will be responsible for major UI state data:
@@ -17,7 +16,7 @@ export interface UIStateInterface {
 }
 
 const defaultUIState: UIStateInterface = {
-  colorMode: loadStateLS<'light' | 'dark'>('colorMode') ?? 'light',
+  colorMode: 'light',
 }
 
 export const uiSlice = createSlice({
@@ -39,8 +38,6 @@ export const uiSlice = createSlice({
 // export const toggleColorModeWithLS = (): AppThunk => async (dispatch, getState) => {
 export const toggleColorModeWithLS = (): AppThunk => (dispatch, getState) => {
   let { ui } = getState()
-
-  saveStateLS('colorMode', ui.colorMode === 'dark' ? 'light' : 'dark')
   dispatch(_setColorMode(ui.colorMode === 'dark' ? 'light' : 'dark'))
 }
 
