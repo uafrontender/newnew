@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.6.2",
-    "next": "11.1.2",
     "newnew-api": "github:newnewinc/newnew-api#master",
+    "next": "11.1.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "7.2.5",
@@ -22,9 +22,9 @@
     "@types/react": "17.0.30",
     "@types/react-redux": "7.1.19",
     "@types/styled-components": "5.1.15",
+    "@typescript-eslint/eslint-plugin": "5.1.0",
     "eslint": "8.0.1",
     "eslint-config-next": "11.1.2",
-    "prettier": "2.4.1",
     "typescript": "4.4.4"
   }
 }
