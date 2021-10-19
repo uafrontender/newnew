@@ -2,7 +2,7 @@ import { createGlobalStyle } from 'styled-components'
 
 // TODO: Implement CSS resets, main colors and fonts in GlobalStyles
 interface GlobalStylesInterface {
-    darkMode: boolean
+  darkMode: boolean
 }
 
 const GlobalStyle = createGlobalStyle<GlobalStylesInterface>`
@@ -12,4 +12,4 @@ const GlobalStyle = createGlobalStyle<GlobalStylesInterface>`
   }
 `
 
-export default GlobalStyle;
+export default GlobalStyle
