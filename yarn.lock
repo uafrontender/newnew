@@ -2317,9 +2317,9 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-"newnew-api@https://github.com/NewNewInc/newnew-api.git":
+"newnew-api@github:newnewinc/newnew-api#master":
   version "1.0.0"
-  resolved "https://github.com/NewNewInc/newnew-api.git#bfc03ce6dbcfa0802bac6d0687c1dc00dae235a1"
+  resolved "git+ssh://git@github.com/newnewinc/newnew-api.git#bfc03ce6dbcfa0802bac6d0687c1dc00dae235a1"
   dependencies:
     change-case "^4.1.2"
     protobufjs "^6.11.2"
