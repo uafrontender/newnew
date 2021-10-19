@@ -16,12 +16,12 @@ const Home: NextPage = () => {
         <button
           onClick={() => dispatch(_setColorMode(colorMode === 'dark' ? 'light' : 'dark'))}
         >
-          Toggle dark mode
+          Toggle dark mode 
         </button>
         <button
           onClick={() => dispatch(toggleColorModeWithLS())}
         >
-          Toggle dark mode using thunk with LS
+          Toggle dark mode using thunk 
         </button>
         <div>
           <Link href="/test">
