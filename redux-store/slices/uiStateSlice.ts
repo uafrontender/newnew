@@ -12,11 +12,11 @@ import { AppThunk } from '../store'
 // maybe we could use something similar for the user "tutorials"?
 // NB!
 
-export interface UIState {
+export interface UIStateInterface {
   colorMode: 'light' | 'dark'
 }
 
-const defaultUIState: UIState = {
+const defaultUIState: UIStateInterface = {
   colorMode: loadStateLS<'light' | 'dark'>('colorMode') ?? 'light',
 }
 
