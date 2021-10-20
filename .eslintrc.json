@@ -8,6 +8,17 @@
     "airbnb",
     "airbnb/hooks"
   ],
+  "rules": {
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [
+          ".jsx",
+          ".tsx"
+        ]
+      }
+    ]
+  },
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
