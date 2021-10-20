@@ -1,28 +1,32 @@
-import isBroswer from './isBrowser'
+import isBroswer from './isBrowser';
 
 export const loadStateLS = <Type>(stateKey: string): Type | null => {
   try {
-    if (!isBroswer()) return null
-
-    const serializedState = localStorage.getItem(stateKey)
-
-    if (serializedState === null) {
-      return null
+    if (!isBroswer()) {
+      return null;
     }
 
-    return JSON.parse(serializedState) as Type
+    const serializedState = localStorage.getItem(stateKey);
+
+    if (serializedState === null) {
+      return null;
+    }
+
+    return JSON.parse(serializedState) as Type;
   } catch (err) {
-    return null
+    return null;
   }
-}
+};
 
-export const saveStateLS = (stateKey: string, stateValue: any) => {
+export const saveStateLS = (stateKey: string, stateValue: any): any => {
   try {
-    if (!isBroswer()) return null
+    if (!isBroswer()) {
+      return null;
+    }
 
-    const serializedState = JSON.stringify(stateValue)
+    const serializedState = JSON.stringify(stateValue);
 
-    localStorage.setItem(stateKey, serializedState)
+    localStorage.setItem(stateKey, serializedState);
   } catch (err) {
     console.error(err)
   }

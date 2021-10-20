@@ -1,7 +1,6 @@
-import type { NextPage } from 'next'
+import type { NextPage } from 'next';
 
 const Test: NextPage = () => {
-
   return (
     <div>
       <main>
@@ -10,7 +9,7 @@ const Test: NextPage = () => {
         </h1>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Test
+export default Test;

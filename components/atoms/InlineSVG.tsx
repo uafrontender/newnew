@@ -13,7 +13,7 @@ export const InlineSvg = (props: InlineSvgInterface): JSX.Element => {
     svg,
     fill,
     width,
-    height,
+    height
   } = props;
 
   return <SvgHolder
@@ -27,7 +27,7 @@ export const InlineSvg = (props: InlineSvgInterface): JSX.Element => {
 InlineSvg.defaultProps = {
   fill: 'white',
   width: '100%',
-  height: '100%',
+  height: '100%'
 };
 
 interface SvgHolderInterface {
@@ -40,17 +40,17 @@ interface SvgHolderInterface {
 }
 
 const SvgHolder = styled.div<SvgHolderInterface>`
-	width: ${props => props.width};
+  width: ${props => props.width};
   height: ${props => props.height};
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-	svg {
-		width: 100%;
-		height: auto;
-		${props => props.fill ? `fill: ${props.fill};` : ''}
-	}
+  svg {
+    width: 100%;
+    height: auto;
+    ${props => !!props.fill && `fill: ${props.fill};`}
+  }
 `;
 
 export default InlineSvg;

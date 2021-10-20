@@ -1,5 +1,5 @@
-import type { NextPage } from 'next'
-import Link from 'next/link'
+import type { NextPage } from 'next';
+import Link from 'next/link';
 import { toggleColorModeWithLS, _setColorMode } from '../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 
@@ -9,7 +9,7 @@ import SVGVercel from '../public/vercel.svg';
 
 const Home: NextPage = () => {
   const dispatch = useAppDispatch();
-  const { colorMode } = useAppSelector(state => state.ui)
+  const { colorMode } = useAppSelector(state => state.ui);
 
   return (
     <div>
@@ -40,7 +40,7 @@ const Home: NextPage = () => {
         </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

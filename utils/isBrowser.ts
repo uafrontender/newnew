@@ -1,3 +1,3 @@
-const isBroswer = () => typeof window !== 'undefined'
+const isBroswer = (): boolean => typeof window !== 'undefined';
 
-export default isBroswer
+export default isBroswer;
