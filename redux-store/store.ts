@@ -1,3 +1,3 @@
 // TODO: initialize Redux store
 
-export default {}
+export default {};
