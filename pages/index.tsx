@@ -19,7 +19,7 @@ const Home: NextPage = () => {
     <div>
       <main>
         <h1>
-          {t('welcome')}
+          {t('welcome', {NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME})}
         </h1>
         <div>
           <Link href="/" locale="en">
