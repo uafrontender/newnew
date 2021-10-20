@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AppThunk } from '../store'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AppThunk } from '../store';
 
 // This slice will be responsible for major UI state data:
 // the app' color mode; are some global, app-wide components
@@ -12,22 +12,22 @@ import { AppThunk } from '../store'
 // NB!
 
 export interface UIStateInterface {
-  colorMode: 'light' | 'dark'
+  colorMode: 'light' | 'dark';
 }
 
 const defaultUIState: UIStateInterface = {
-  colorMode: 'light',
-}
+  colorMode: 'light'
+};
 
 export const uiSlice = createSlice({
   name: 'uiState',
   initialState: defaultUIState,
   reducers: {
     _setColorMode(state, { payload }: PayloadAction<'light' | 'dark'>) {
-      state.colorMode = payload
-    },
-  },
-})
+      state.colorMode = payload;
+    }
+  }
+});
 
 // An example of a thunk function, to keep logic not related to state out of the reducers;
 // Thunks for asynchronous operations can be also generated using a special method
@@ -37,10 +37,10 @@ export const uiSlice = createSlice({
 // E.g.
 // export const toggleColorModeWithLS = (): AppThunk => async (dispatch, getState) => {
 export const toggleColorModeWithLS = (): AppThunk => (dispatch, getState) => {
-  let { ui } = getState()
-  dispatch(_setColorMode(ui.colorMode === 'dark' ? 'light' : 'dark'))
-}
+  let { ui } = getState();
+  dispatch(_setColorMode(ui.colorMode === 'dark' ? 'light' : 'dark'));
+};
 
-export const { _setColorMode } = uiSlice.actions
+export const { _setColorMode } = uiSlice.actions;
 
-export default uiSlice.reducer
+export default uiSlice.reducer;

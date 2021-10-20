@@ -1,15 +1,18 @@
-import type { AppProps } from 'next/app'
-
-import { PersistGate } from 'redux-persist/integration/react'
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { ReactElement } from 'react';
+import type { AppProps } from 'next/app';
 
 // Global CSS configurations
-import GlobalStyle from "../styles/globalStyles";
+import GlobalStyle from '../styles/globalStyles';
 
 // Redux store and provider
-import store, { persistor } from '../redux-store/store'
-import { Provider } from 'react-redux'
+import store, { persistor } from '../redux-store/store';
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({
+  Component,
+  pageProps
+}: AppProps): ReactElement {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -19,4 +22,5 @@ function MyApp({ Component, pageProps }: AppProps) {
     </Provider>
   );
 }
-export default MyApp
+
+export default MyApp;
