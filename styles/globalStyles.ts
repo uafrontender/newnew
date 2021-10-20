@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle } from 'styled-components';
 
 // TODO: Implement CSS resets, main colors and fonts in GlobalStyles
 interface GlobalStylesInterface {
@@ -7,9 +7,9 @@ interface GlobalStylesInterface {
 
 const GlobalStyle = createGlobalStyle<GlobalStylesInterface>`
   body {
-    color: ${props => (props.darkMode ? 'white' : 'black')};
-    background-color: ${props => (props.darkMode ? 'black' : 'white')};
+    color: ${(props) => (props.darkMode ? 'white' : 'black')};
+    background-color: ${(props) => (props.darkMode ? 'black' : 'white')};
   }
-`
+`;
 
-export default GlobalStyle
+export default GlobalStyle;
