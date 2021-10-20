@@ -1,22 +1,22 @@
 {
-  env: {
-    browser: true,
-    es6: true,
-    node: true,
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
   },
-  extends: [
-    'airbnb',
-    'airbnb/hooks'
+  "extends": [
+    "airbnb",
+    "airbnb/hooks"
   ],
-  globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
   },
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 2017,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2017
   },
-  plugins: [
-    '@typescript-eslint'
-  ],
-};
+  "plugins": [
+    "@typescript-eslint"
+  ]
+}
