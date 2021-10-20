@@ -2,6 +2,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ReactElement } from 'react';
 import type { AppProps } from 'next/app';
+import { appWithTranslation } from 'next-i18next';
 
 // Global CSS configurations
 import GlobalStyle from '../styles/globalStyles';
@@ -23,4 +24,4 @@ function MyApp({
   );
 }
 
-export default MyApp;
+export default appWithTranslation(MyApp);

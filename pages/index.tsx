@@ -1,13 +1,17 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import { toggleColorModeWithLS, _setColorMode } from '../redux-store/slices/uiStateSlice';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { toggleColorModeWithLS, _setColorMode } from '../redux-store/slices/uiStateSlice';
 
 import InlineSVG from '../components/atoms/InlineSVG';
 
 import SVGVercel from '../public/vercel.svg';
 
 const Home: NextPage = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { colorMode } = useAppSelector(state => state.ui);
 
@@ -15,8 +19,18 @@ const Home: NextPage = () => {
     <div>
       <main>
         <h1>
-          Welcome to NewNew!
+          {t('welcome')}
         </h1>
+        <div>
+          <Link href="/" locale="en">
+            <a>English</a>
+          </Link>
+        </div>
+        <div>
+          <Link href="/" locale="fr">
+            <a>French</a>
+          </Link>
+        </div>
         <InlineSVG
           svg={SVGVercel}
           fill={colorMode === 'dark' ? 'white' : 'black'}
@@ -44,3 +58,16 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export async function getStaticProps(context: { locale: string }): Promise<any> {
+  const translationContext = await serverSideTranslations(
+    context.locale,
+    ['common']
+  );
+
+  return {
+    props: {
+      ...translationContext
+    }
+  };
+}
