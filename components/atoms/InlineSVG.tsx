@@ -9,9 +9,9 @@ interface InlineSvgInterface {
 }
 
 interface SvgHolderInterface {
-  fill: string,
-  width: string,
-  height: string,
+  fill?: string,
+  width?: string,
+  height?: string,
   dangerouslySetInnerHTML: {
     __html: string
   }

@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+// TODO: adjust eslint no-param-reassign for Slices
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from '../store';
 
@@ -16,18 +18,22 @@ export interface UIStateInterface {
 }
 
 const defaultUIState: UIStateInterface = {
-  colorMode: 'light'
+  colorMode: 'light',
 };
 
 export const uiSlice = createSlice({
   name: 'uiState',
   initialState: defaultUIState,
   reducers: {
-    _setColorMode(state, { payload }: PayloadAction<'light' | 'dark'>) {
+    setColorMode(state, { payload }: PayloadAction<'light' | 'dark'>) {
       state.colorMode = payload;
-    }
-  }
+    },
+  },
 });
+
+export const { setColorMode } = uiSlice.actions;
+
+// Thunks
 
 // An example of a thunk function, to keep logic not related to state out of the reducers;
 // Thunks for asynchronous operations can be also generated using a special method
@@ -37,10 +43,8 @@ export const uiSlice = createSlice({
 // E.g.
 // export const toggleColorModeWithLS = (): AppThunk => async (dispatch, getState) => {
 export const toggleColorModeWithLS = (): AppThunk => (dispatch, getState) => {
-  let { ui } = getState();
-  dispatch(_setColorMode(ui.colorMode === 'dark' ? 'light' : 'dark'));
+  const { ui } = getState();
+  dispatch(setColorMode(ui.colorMode === 'dark' ? 'light' : 'dark'));
 };
-
-export const { _setColorMode } = uiSlice.actions;
 
 export default uiSlice.reducer;

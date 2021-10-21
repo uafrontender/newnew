@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { _setColorMode, toggleColorModeWithLS } from '../redux-store/slices/uiStateSlice';
+import { setColorMode, toggleColorModeWithLS } from '../redux-store/slices/uiStateSlice';
 
 import InlineSVG from '../components/atoms/InlineSVG';
 
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
         <button
           type="button"
           onClick={() => dispatch(
-            _setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
+            setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
           )}
         >
           Toggle dark mode
