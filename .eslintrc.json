@@ -9,6 +9,20 @@
     "airbnb/hooks"
   ],
   "rules": {
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": [
+      "error"
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
     "react/jsx-filename-extension": [
       "error",
       {
@@ -21,7 +35,8 @@
   },
   "globals": {
     "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
+    "SharedArrayBuffer": "readonly",
+    "JSX": true
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -29,5 +44,17 @@
   },
   "plugins": [
     "@typescript-eslint"
-  ]
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    },
+    "extensions": [
+      ".js",
+      ".jsx",
+      ".mjs",
+      ".ts",
+      ".tsx"
+    ]
+  }
 }

@@ -1,10 +1,14 @@
+import React from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { toggleColorModeWithLS, _setColorMode } from '../redux-store/slices/uiStateSlice';
+import {
+  toggleColorModeWithLS,
+  _setColorMode,
+} from '../redux-store/slices/uiStateSlice';
 
 import InlineSVG from '../components/atoms/InlineSVG';
 
@@ -13,22 +17,22 @@ import SVGVercel from '../public/vercel.svg';
 const Home: NextPage = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { colorMode } = useAppSelector(state => state.ui);
+  const { colorMode } = useAppSelector((state) => state.ui);
 
   return (
     <div>
       <main>
         <h1>
-          {t('welcome', {NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME})}
+          {t('welcome', { NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME })}
         </h1>
         <div>
-          <Link href="/" locale="en">
-            <a>English</a>
+          <Link href="/" locale="en" passHref>
+            <a href="#en">English</a>
           </Link>
         </div>
         <div>
-          <Link href="/" locale="fr">
-            <a>French</a>
+          <Link href="/" locale="fr" passHref>
+            <a href="#fr">French</a>
           </Link>
         </div>
         <InlineSVG
@@ -38,18 +42,22 @@ const Home: NextPage = () => {
           height="100px"
         />
         <button
-          onClick={() => dispatch(_setColorMode(colorMode === 'dark' ? 'light' : 'dark'))}
+          type="button"
+          onClick={() => dispatch(
+            _setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
+          )}
         >
           Toggle dark mode
         </button>
         <button
+          type="button"
           onClick={() => dispatch(toggleColorModeWithLS())}
         >
           Toggle dark mode using thunk
         </button>
         <div>
-          <Link href="/test">
-            <a>Link to test page</a>
+          <Link href="/test" passHref={}>
+            <a href="#test">Link to test page</a>
           </Link>
         </div>
       </main>
@@ -62,12 +70,12 @@ export default Home;
 export async function getStaticProps(context: { locale: string }): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale,
-    ['common']
+    ['common'],
   );
 
   return {
     props: {
-      ...translationContext
-    }
+      ...translationContext,
+    },
   };
 }
