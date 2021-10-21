@@ -3,32 +3,10 @@ import styled from 'styled-components';
 
 interface InlineSvgInterface {
   svg: string,
-  fill: string,
-  width: string,
-  height: string,
+  fill?: string,
+  width?: string,
+  height?: string,
 }
-
-export const InlineSvg = (props: InlineSvgInterface): JSX.Element => {
-  const {
-    svg,
-    fill,
-    width,
-    height
-  } = props;
-
-  return <SvgHolder
-    fill={fill}
-    width={width}
-    height={height}
-    dangerouslySetInnerHTML={{ __html: svg }}
-  />;
-};
-
-InlineSvg.defaultProps = {
-  fill: 'white',
-  width: '100%',
-  height: '100%'
-};
 
 interface SvgHolderInterface {
   fill: string,
@@ -40,8 +18,8 @@ interface SvgHolderInterface {
 }
 
 const SvgHolder = styled.div<SvgHolderInterface>`
-  width: ${props => props.width};
-  height: ${props => props.height};
+  width: ${(props) => props.width};
+  height: ${(props) => props.height};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,8 +27,32 @@ const SvgHolder = styled.div<SvgHolderInterface>`
   svg {
     width: 100%;
     height: auto;
-    ${props => !!props.fill && `fill: ${props.fill};`}
+    ${(props) => !!props.fill && `fill: ${props.fill};`}
   }
 `;
+
+export const InlineSvg = (props: InlineSvgInterface): JSX.Element => {
+  const {
+    svg,
+    fill,
+    width,
+    height,
+  } = props;
+
+  return (
+    <SvgHolder
+      fill={fill}
+      width={width}
+      height={height}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  );
+};
+
+InlineSvg.defaultProps = {
+  fill: 'white',
+  width: '100%',
+  height: '100%',
+};
 
 export default InlineSvg;

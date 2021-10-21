@@ -1,6 +1,9 @@
+/* eslint-disable react/jsx-props-no-spreading */
+
+import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { ReactElement } from 'react';
+
 import type { AppProps } from 'next/app';
 import { appWithTranslation } from 'next-i18next';
 
@@ -12,7 +15,7 @@ import store, { persistor } from '../redux-store/store';
 
 function MyApp({
   Component,
-  pageProps
+  pageProps,
 }: AppProps): ReactElement {
   return (
     <Provider store={store}>
