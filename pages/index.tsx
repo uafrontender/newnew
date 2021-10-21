@@ -5,10 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import {
-  toggleColorModeWithLS,
-  _setColorMode,
-} from '../redux-store/slices/uiStateSlice';
+import { _setColorMode, toggleColorModeWithLS } from '../redux-store/slices/uiStateSlice';
 
 import InlineSVG from '../components/atoms/InlineSVG';
 
@@ -56,7 +53,7 @@ const Home: NextPage = () => {
           Toggle dark mode using thunk
         </button>
         <div>
-          <Link href="/test" passHref={}>
+          <Link href="/test">
             <a href="#test">Link to test page</a>
           </Link>
         </div>
