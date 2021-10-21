@@ -18,16 +18,17 @@ export const loadStateLS = <Type>(stateKey: string): Type | null => {
   }
 };
 
-export const saveStateLS = (stateKey: string, stateValue: any): any => {
+export const saveStateLS = (stateKey: string, stateValue: any): boolean => {
   try {
     if (!isBroswer()) {
-      return null;
+      return false;
     }
 
     const serializedState = JSON.stringify(stateValue);
 
     localStorage.setItem(stateKey, serializedState);
+    return true;
   } catch (err) {
-    console.error(err)
+    return false;
   }
-}
+};

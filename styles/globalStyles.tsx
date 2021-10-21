@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 import { useAppSelector } from '../redux-store/store';
@@ -20,7 +20,7 @@ const GlobalStyleInner = createGlobalStyle<GlobalStylesInterface>`
 `;
 
 const GlobalStyle = (): ReactElement => {
-  const { colorMode } = useAppSelector(state => state.ui);
+  const { colorMode } = useAppSelector((state) => state.ui);
 
   return <GlobalStyleInner colorMode={colorMode} />;
 };
