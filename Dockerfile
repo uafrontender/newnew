@@ -15,7 +15,7 @@ WORKDIR /app
 COPY ./package.json ./
 COPY ./package-lock.json ./
 RUN apk add --no-cache git
-RUN npm ci
+RUN npm ci --include=dev
 COPY . ./
 RUN npm run build
 
