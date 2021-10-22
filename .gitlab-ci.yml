@@ -39,10 +39,6 @@ variables:
   # the below variable is used by `./bin/build-and-push-image-to-ecr`
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
 
-image: docker:latest
-services:
-  - docker:dind
-
 stages:
   - build
   - deploy
@@ -52,9 +48,13 @@ build:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: build
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - bin/build-and-push-image-to-ecr
-    - bin/upload-assets-to-s3
+    - echo "Build"
+#    - ./bin/build-and-push-image-to-ecr
+#    - ./bin/upload-assets-to-s3
 
 # deploy docker image to amazon ecs. Reference:
 # https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs
@@ -62,5 +62,9 @@ deploy:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - bin/ecs update-task-definition
+    - echo "Deploy"
+#    - ./bin/ecs update-task-definition
