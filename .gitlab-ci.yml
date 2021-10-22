@@ -48,9 +48,15 @@ build:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: build
-  image: docker:latest
+  image:
+    name: amazon/aws-cli
+    entrypoint: [ "" ]
   services:
     - docker:dind
+  before_script:
+    - amazon-linux-extras install docker
+    - aws --version
+    - docker --version
   script:
     - ./bin/build-and-push-image-to-ecr.sh
     - ./bin/upload-assets-to-s3.sh
@@ -61,8 +67,14 @@ deploy:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: deploy
-  image: docker:latest
+  image:
+    name: amazon/aws-cli
+    entrypoint: [ "" ]
   services:
     - docker:dind
+  before_script:
+    - amazon-linux-extras install docker
+    - aws --version
+    - docker --version
   script:
     - ./bin/ecs.sh update-task-definition
