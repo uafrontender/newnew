@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "1.6.2",
     "next": "11.1.2",
     "next-i18next": "8.9.0",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com:newnewinc/newnew-api#master",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "7.2.5",
