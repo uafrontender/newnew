@@ -5,9 +5,9 @@
 #  - https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker
 #  - https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#using-docker-caching
 #
-set -euxo pipefail
+echo "Starting ./bin/build-and-push-image-to-ecr.sh"
 
-echo "Starting ./bin/build-and-push-image-to-ecr"
+set -euxo pipefail
 
 # validate presence of these vars:
 : "${CI_APPLICATION_REPOSITORY}"
@@ -25,4 +25,4 @@ docker build --build-arg "NEXT_JS_ASSET_URL=$NEXT_JS_ASSET_URL" --cache-from "$C
 docker push "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
 docker push "$CI_APPLICATION_REPOSITORY:latest"
 
-echo "Finished ./bin/build-and-push-image-to-ecr"
+echo "Finished ./bin/build-and-push-image-to-ecr.sh"

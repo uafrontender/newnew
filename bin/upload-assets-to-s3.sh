@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-echo "Starting ./bin/upload-assets-to-s3"
+echo "Starting ./bin/upload-assets-to-s3.sh"
 
 # validate presence of these vars:
 : "${CI_APPLICATION_REPOSITORY}"
@@ -37,4 +37,4 @@ aws s3 sync --no-progress $LOCAL_ASSET_PATH "s3://$CI_AWS_S3_BUCKET" --cache-con
 
 rm -r $LOCAL_ASSET_PATH
 
-echo "Finished ./bin/upload-assets-to-s3"
+echo "Finished ./bin/upload-assets-to-s3.sh"
