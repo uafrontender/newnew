@@ -5,9 +5,10 @@
 #  - https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker
 #  - https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#using-docker-caching
 #
-echo "Starting ./bin/build-and-push-image-to-ecr.sh"
 
 set -euxo pipefail
+
+echo "Starting ./bin/build-and-push-image-to-ecr.sh"
 
 # validate presence of these vars:
 : "${CI_APPLICATION_REPOSITORY}"

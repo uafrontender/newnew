@@ -13,7 +13,6 @@
 #  - uses a custom docker image that includes the `aws` command line tools and `docker`. See https://github.com/saltycrane/aws-cli-and-docker
 #
 variables:
-  NODE_IMAGE: node:16.11.1-alpine
   # When using dind service, we need to instruct docker to talk with
   # the daemon started inside of the service. The daemon is available
   # with a network connection instead of the default
@@ -39,6 +38,10 @@ variables:
   # the below variable is used by `./bin/build-and-push-image-to-ecr`
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
 
+image: docker:latest
+services:
+  - docker:dind
+
 stages:
   - build
   - deploy
@@ -48,15 +51,6 @@ build:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: build
-  image:
-    name: amazon/aws-cli
-    entrypoint: [ "" ]
-  services:
-    - docker:dind
-  before_script:
-    - amazon-linux-extras install docker
-    - aws --version
-    - docker --version
   script:
     - ./bin1/build-and-push-image-to-ecr.sh
     - ./bin1/upload-assets-to-s3.sh
@@ -67,14 +61,5 @@ deploy:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: deploy
-  image:
-    name: amazon/aws-cli
-    entrypoint: [ "" ]
-  services:
-    - docker:dind
-  before_script:
-    - amazon-linux-extras install docker
-    - aws --version
-    - docker --version
   script:
     - ./bin1/ecs.sh update-task-definition
