@@ -47,12 +47,12 @@ build:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: build
-  image: docker:latest
+  image: saltycrane/aws-cli-and-docker
   services:
     - docker:dind
   script:
-    - ./bin/build-and-push-image-to-ecr.sh
-    - ./bin/upload-assets-to-s3.sh
+    - ./bin/build-and-push-image-to-ecr
+    - ./bin/upload-assets-to-s3
 
 # deploy docker image to amazon ecs. Reference:
 # https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs
@@ -60,8 +60,8 @@ deploy:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   stage: deploy
-  image: docker:latest
+  image: saltycrane/aws-cli-and-docker
   services:
     - docker:dind
   script:
-    - ./bin1/ecs.sh update-task-definition
+    - ./bin/ecs update-task-definition
