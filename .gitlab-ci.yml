@@ -58,8 +58,8 @@ build:
     - aws --version
     - docker --version
   script:
-    - ./bin/build-and-push-image-to-ecr.sh
-    - ./bin/upload-assets-to-s3.sh
+    - ./bin1/build-and-push-image-to-ecr.sh
+    - ./bin1/upload-assets-to-s3.sh
 
 # deploy docker image to amazon ecs. Reference:
 # https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs
@@ -77,4 +77,4 @@ deploy:
     - aws --version
     - docker --version
   script:
-    - ./bin/ecs.sh update-task-definition
+    - ./bin1/ecs.sh update-task-definition
