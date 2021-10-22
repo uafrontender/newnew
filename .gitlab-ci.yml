@@ -40,27 +40,8 @@ variables:
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
 
 stages:
-  - test
   - build
   - deploy
-
-# test code before merge
-test:
-  rules:
-    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-  stage: test
-  image: ${NODE_IMAGE}
-  interruptible: true
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - .eslintcache/
-      - node_modules/
-    policy: pull-push
-  before_script:
-    - yarn install
-  script:
-    - yarn lint
 
 # build docker image, push image to amazon ecr, and upload static assets to amazon s3
 build:
