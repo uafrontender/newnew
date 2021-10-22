@@ -52,6 +52,8 @@ build:
   services:
     - docker:dind
   script:
+    - ls
+    - cd ./bin && ls
     - echo "Build"
 #    - ./bin/build-and-push-image-to-ecr
 #    - ./bin/upload-assets-to-s3
