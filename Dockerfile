@@ -14,6 +14,7 @@ WORKDIR /app
 # https://semaphoreci.com/docs/docker/docker-layer-caching.html
 COPY ./package.json ./
 COPY ./yarn.lock ./
+RUN apk add --no-cache git
 RUN rm -rf node_modules && yarn install --frozen-lockfile
 COPY . ./
 RUN yarn build
