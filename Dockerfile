@@ -14,13 +14,13 @@ WORKDIR /app
 # https://semaphoreci.com/docs/docker/docker-layer-caching.html
 COPY ./package.json ./
 COPY ./yarn.lock ./
-CMD echo "Docker before yarn install"
+RUN echo "Before remove"
 RUN rm -rf node_modules && yarn install --frozen-lockfile
 COPY . ./
 RUN yarn build
 
 EXPOSE 3000
 
-CMD echo "Docker started success"
+RUN echo "Docker started success"
 
 CMD ["yarn", "start"]
