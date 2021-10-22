@@ -15,7 +15,7 @@ WORKDIR /app
 COPY ./package.json ./
 COPY ./yarn.lock ./
 RUN apk add --no-cache git
-RUN rm -rf node_modules && yarn install --frozen-lockfile
+RUN rm -rf node_modules && yarn install
 COPY . ./
 RUN yarn build
 
