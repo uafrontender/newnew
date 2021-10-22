@@ -1,0 +1,169 @@
+#!/bin/bash -e
+# copied from https://gitlab.com/gitlab-org/cloud-deploy/-/blob/ef0f7f8d27177b6f74fea1c29183ba5272249fad/aws/src/bin/ecs
+
+update_task_definition() {
+  ensure_params
+
+  # Resolve application image location.
+  local image_repository
+  local image_tag
+  local new_image_name
+  local task
+  local current_container_definitions
+  local new_container_definitions
+  local new_task_definition
+  local new_task_revision
+  local args=()
+  local service_task_count
+
+  local -A register_task_def_args=( \
+    ['task-role-arn']='taskRoleArn' \
+    ['execution-role-arn']='executionRoleArn' \
+    ['network-mode']='networkMode' \
+    ['cpu']='cpu' \
+    ['memory']='memory' \
+    ['pid-mode']='pidMode' \
+    ['ipc-mode']='ipcMode' \
+    ['proxy-configuration']='proxyConfiguration' \
+    ['volumes']='volumes' \
+    ['placement-constraints']='placementConstraints' \
+    ['requires-compatibilities']='requiresCompatibilities' \
+    ['inference-accelerators']='inferenceAccelerators' \
+  )
+
+  # The following CI variables are defined in the Auto Build template (https://gitlab.com/gitlab-org/gitlab-foss/blob/master/lib/gitlab/ci/templates/Jobs/Build.gitlab-ci.yml).
+  if [[ -z "$CI_COMMIT_TAG" ]]; then
+    image_repository=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+    image_tag=${CI_APPLICATION_TAG:-$CI_COMMIT_SHA}
+  else
+    image_repository=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+    image_tag=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+  fi
+
+  new_image_name="${image_repository}:${image_tag}"
+
+  if [[ -z "$CI_AWS_ECS_TASK_DEFINITION_FILE" ]]; then
+    register_task_definition_from_remote
+  else
+    register_task_definition_from_file
+  fi
+
+  new_task_definition=$(aws ecs register-task-definition "${args[@]}")
+  new_task_revision=$(read_task "$new_task_definition" 'revision')
+  new_task_definition_family=$(read_task "$new_task_definition" 'family')
+
+  # Making sure that we at least have one running task (even if desiredCount gets updated again with new task definition below)
+  service_task_count=$(aws ecs describe-services --cluster "$CI_AWS_ECS_CLUSTER" --services "$CI_AWS_ECS_SERVICE" --query "services[0].desiredCount")
+
+  if [[ $service_task_count == 0 ]]; then
+    aws ecs update-service --cluster "$CI_AWS_ECS_CLUSTER" --service "$CI_AWS_ECS_SERVICE" --desired-count 1
+  fi
+
+  # Update ECS service with newly created task defintion revision.
+  aws ecs update-service \
+            --cluster "$CI_AWS_ECS_CLUSTER" \
+            --service "$CI_AWS_ECS_SERVICE" \
+            --task-definition "$new_task_definition_family":"$new_task_revision"
+
+  return 0
+}
+
+stop_task() {
+  ensure_params_for_stop
+
+  local current_tasks
+
+  current_tasks=$(aws ecs list-tasks --cluster "$CI_AWS_ECS_CLUSTER" --service-name "$CI_AWS_ECS_SERVICE" --query "taskArns")
+
+  if [[ $current_tasks != "null" ]]; then
+    for task in $(echo "$current_tasks" | jq -r '.[]'); do
+      aws ecs stop-task --cluster "$CI_AWS_ECS_CLUSTER" --task "$task" --reason 'Stopping GitLab review app'
+    done
+
+    # Remove capability for the service to spin up new services automatically, after previous one(s) stopped.
+    aws ecs update-service --cluster "$CI_AWS_ECS_CLUSTER" --service "$CI_AWS_ECS_SERVICE" --desired-count 0
+  fi
+}
+
+read_task() {
+  local val
+
+  val=$(echo "$1" | jq -r ".taskDefinition.$2")
+
+  if [ "$val" == "null" ];then
+    val=$(echo "$1" | jq -r ".$2")
+  fi
+
+  if [ "$val" != "null" ];then
+    echo -n "${val}"
+  fi
+}
+
+register_task_definition_from_file() {
+  ensure_service_if_fargate "$(cat "$CI_AWS_ECS_TASK_DEFINITION_FILE")"
+
+  args+=("--cli-input-json" "file://${CI_AWS_ECS_TASK_DEFINITION_FILE}")
+}
+
+register_task_definition_from_remote() {
+  task=$(aws ecs describe-task-definition --task-definition "$CI_AWS_ECS_TASK_DEFINITION")
+
+  ensure_service_if_fargate "$task"
+
+  current_container_definitions=$(read_task "$task" 'containerDefinitions')
+  new_container_definitions=$(echo "$current_container_definitions" | jq --arg val "$new_image_name" '.[0].image = $val')
+
+  args+=("--family" "${CI_AWS_ECS_TASK_DEFINITION}")
+  args+=("--container-definitions" "${new_container_definitions}")
+
+  for option in "${!register_task_def_args[@]}"; do
+    value=$(read_task "$task" "${register_task_def_args[$option]}")
+    if [ -n "$value" ];then
+      args+=("--${option}" "${value}")
+    fi
+  done
+}
+
+ensure_params() {
+  ensure_params_base
+
+  if [ -z "$CI_AWS_ECS_TASK_DEFINITION" ] && [ -z "$CI_AWS_ECS_TASK_DEFINITION_FILE" ]; then
+    echo "Please set up a CI_AWS_ECS_TASK_DEFINITION variable to your CI job with the name of your AWS ECS task definition as a value. Alternatively, you can set up a CI_AWS_ECS_TASK_DEFINITION_FILE variable to input a task definition JSON object."
+    echo "Documentation: https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs"
+    exit 1
+  fi
+}
+
+ensure_params_for_stop() {
+  ensure_params_base
+}
+
+ensure_params_base() {
+  if [ -z "$CI_AWS_ECS_CLUSTER" ]; then
+    echo "Please set up a CI_AWS_ECS_CLUSTER variable to your CI job with the name of the AWS ECS cluster your are targetting."
+    exit 1
+  fi
+
+  if [ -z "$CI_AWS_ECS_SERVICE" ]; then
+    echo "Please set up a CI_AWS_ECS_SERVICE variable to your CI job with the name of the service your AWS ECS cluster uses."
+    exit 1
+  fi
+}
+
+ensure_service_if_fargate() {
+  local service_launch_type
+
+  service_launch_type=$(read_task "$1" "${register_task_def_args['requires-compatibilities']}")
+
+  if [ "$AUTO_DEVOPS_PLATFORM_TARGET" == "FARGATE" ] && ! [[ "$service_launch_type" =~ "FARGATE" ]]; then
+    echo "Compatibility error: the ECS service you are targeting is not a FARGATE launch type."
+    exit 1
+  fi
+}
+
+option=$1
+case $option in
+  update-task-definition) update_task_definition ;;
+  stop-task) stop_task ;;
+  *) exit 1 ;;
+esac

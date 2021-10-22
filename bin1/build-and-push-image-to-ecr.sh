@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# References (build):
+#  - https://www.youtube.com/watch?v=jg9sUceyGaQ
+#  - https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker
+#  - https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#using-docker-caching
+#
+echo "Starting ./bin/build-and-push-image-to-ecr.sh"
+
+set -euxo pipefail
+
+# validate presence of these vars:
+: "${CI_APPLICATION_REPOSITORY}"
+: "${CI_APPLICATION_TAG}"
+: "${NEXT_JS_ASSET_URL}"
+
+# log in to the amazon ecr docker registry
+aws ecr get-login-password | docker login --username AWS --password-stdin "$ECR_HOST"
+
+# build docker image
+docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
+docker build --build-arg "NEXT_JS_ASSET_URL=$NEXT_JS_ASSET_URL" --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -t "$CI_APPLICATION_REPOSITORY:latest" .
+
+# push image to amazon ecr
+docker push "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+docker push "$CI_APPLICATION_REPOSITORY:latest"
+
+echo "Finished ./bin/build-and-push-image-to-ecr.sh"
