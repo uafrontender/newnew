@@ -52,8 +52,8 @@ build:
   services:
     - docker:dind
   script:
-    - sudo ./bin/build-and-push-image-to-ecr.sh
-    - sudo ./bin/upload-assets-to-s3.sh
+    - ./bin/build-and-push-image-to-ecr.sh
+    - ./bin/upload-assets-to-s3.sh
 
 # deploy docker image to amazon ecs. Reference:
 # https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs
@@ -65,4 +65,4 @@ deploy:
   services:
     - docker:dind
   script:
-    - sudo ./bin/ecs.sh update-task-definition
+    - ./bin/ecs.sh update-task-definition
