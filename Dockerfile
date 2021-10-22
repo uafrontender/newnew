@@ -13,12 +13,12 @@ WORKDIR /app
 # Run `npm ci` before adding app code for better Docker caching
 # https://semaphoreci.com/docs/docker/docker-layer-caching.html
 COPY ./package.json ./
-COPY ./yarn.lock ./
+COPY ./package-lock.json ./
 RUN apk add --no-cache git
-RUN rm -rf node_modules && yarn install
+RUN npm ci
 COPY . ./
-RUN yarn build
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
