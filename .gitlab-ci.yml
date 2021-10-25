@@ -22,7 +22,8 @@ variables:
   #
   # The 'docker' hostname is the alias of the service container as described at
   # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services.
-  DOCKER_HOST: tcp://docker:2375
+  BRANCH_ENV: "$CI_COMMIT_REF_NAME"
+  DOCKER_HOST: "tcp://docker:2375"
   DOCKER_TLS_CERTDIR: ""
   # AWS_DEFAULT_REGION (and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY configured in the gitlab UI) are used by the AWS CLI which are used by `./bin/build-and-push-image-to-ecr`, `./bin/upload-assets-to-s3`, and `./bin/ecs`
   AWS_DEFAULT_REGION: "us-east-2"
@@ -30,11 +31,11 @@ variables:
   CI_APPLICATION_REPOSITORY: "$ECR_HOST/web"
   CI_APPLICATION_TAG: "$CI_PIPELINE_IID"
   # the below variable is used by `./bin/upload-assets-to-s3`
-  CI_AWS_S3_BUCKET: "web-aws-ecr-ecs-gitlab-ci-cd"
+  CI_AWS_S3_BUCKET: "web-$CI_COMMIT_REF_NAME-aws-ecr-ecs-gitlab-ci-cd"
   # the below variables are used by `./bin/ecs`
   CI_AWS_ECS_CLUSTER: "web"
-  CI_AWS_ECS_SERVICE: "web"
-  CI_AWS_ECS_TASK_DEFINITION: "web"
+  CI_AWS_ECS_SERVICE: "web-$CI_COMMIT_REF_NAME"
+  CI_AWS_ECS_TASK_DEFINITION: "web-$CI_COMMIT_REF_NAME"
   # the below variable is used by `./bin/build-and-push-image-to-ecr`
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
 
