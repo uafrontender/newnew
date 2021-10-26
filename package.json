@@ -20,10 +20,12 @@
     "next": "11.1.2",
     "next-i18next": "8.9.0",
     "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com:newnewinc/newnew-api#master",
+    "protobufjs": "6.11.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "7.2.5",
     "redux-persist": "6.0.0",
+    "socket.io-client": "4.3.2",
     "styled-components": "5.3.3"
   },
   "devDependencies": {
