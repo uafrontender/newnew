@@ -1,4 +1,4 @@
-FROM node:16.11.1-alpine
+FROM node:14.17.0-alpine
 
 # The value of `NEXT_JS_ASSET_URL` is passed in using the `--build-arg` option
 # of the `docker build` command run in `.gitlab-ci.yml`. It is used like an

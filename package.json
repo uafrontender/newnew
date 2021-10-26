@@ -18,7 +18,7 @@
     "test:mobile"
   ],
   "engines": {
-    "node": ">= 16 < 17"
+    "node": ">= 14 < 15"
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.6.2",
