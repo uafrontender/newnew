@@ -8,10 +8,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "cypress run --browser chrome",
+    "test:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
     "e2e": "cypress open"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test",
+    "test:mobile"
   ],
   "engines": {
     "node": ">= 16 < 17"
