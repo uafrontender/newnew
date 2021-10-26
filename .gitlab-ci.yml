@@ -65,10 +65,6 @@ install:
   stage: build
   script:
     - npm ci --include=dev
-    # check Cypress binary path and cached versions
-    - npx cypress cache path
-    - npx cypress cache list
-    # lint code
     - npm run lint
 
 ui-chrome:
@@ -78,7 +74,7 @@ ui-chrome:
   stage: test
   script:
     - npm run dev & npx wait-on http://localhost:3000
-    - npx cypress run --browser chrome --group "UI - Chrome"
+    - npx cypress run --browser chrome
 
 ui-chrome-mobile:
   rules:
@@ -87,7 +83,7 @@ ui-chrome-mobile:
   stage: test
   script:
     - npm run dev & npx wait-on http://localhost:3000
-    - npx cypress run --browser chrome --group "UI - Chrome - Mobile" --config "viewportWidth=375,viewportHeight=667"
+    - npx cypress run --browser chrome --config "viewportWidth=375,viewportHeight=667"
 
 # build docker image, push image to amazon ecr, and upload static assets to amazon s3
 build-aws:
