@@ -13,16 +13,21 @@ import GlobalStyle from '../styles/globalStyles';
 // Redux store and provider
 import store, { persistor } from '../redux-store/store';
 
+// Socket context
+// import SocketContextProvider from '../contexts/socketContext';
+
 function MyApp({
   Component,
   pageProps,
 }: AppProps): ReactElement {
   return (
     <Provider store={store}>
+      {/* <SocketContextProvider> */}
       <PersistGate loading={null} persistor={persistor}>
         <GlobalStyle />
         <Component {...pageProps} />
       </PersistGate>
+      {/* </SocketContextProvider> */}
     </Provider>
   );
 }
