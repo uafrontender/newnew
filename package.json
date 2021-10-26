@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "cypress run --browser chrome",
-    "test:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
+    "test": "cypress run --browser firefox",
+    "test:mobile": "cypress run --browser firefox --config \"viewportWidth=375,viewportHeight=667\"",
     "e2e": "cypress open"
   },
   "pre-commit": [
