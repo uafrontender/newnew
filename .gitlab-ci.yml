@@ -59,7 +59,7 @@ cache:
 test:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-  image: cypress/browsers:node16.5.0-chrome94-ff93
+  image: cypress/browsers:node14.17.0-chrome91-ff89
   stage: test
   script:
     - npm ci --include=dev
