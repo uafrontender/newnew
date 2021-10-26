@@ -38,11 +38,38 @@ variables:
   CI_AWS_ECS_TASK_DEFINITION: "web-$CI_COMMIT_REF_NAME"
   # the below variable is used by `./bin/build-and-push-image-to-ecr`
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
 
 stages:
-  - test
   - build
-  - deploy
+  - test
+  - build-aws
+  - deploy-aws
+
+# Cache using branch name
+# https://gitlab.com/help/ci/caching/index.md
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .cache/*
+    - cache/Cypress
+    - node_modules
+    - .next
+
+# Install NPM dependencies and Cypress
+install:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  image: cypress/browsers:node16.5.0-chrome94-ff93
+  stage: build
+  script:
+    - npm ci --include=dev
+    # check Cypress binary path and cached versions
+    - npx cypress cache path
+    - npx cypress cache list
+    # lint code
+    - npm run lint
 
 ui-chrome:
   rules:
@@ -52,7 +79,7 @@ ui-chrome:
   parallel: 5
   script:
     - npm run dev && npx wait-on http://localhost:3000
-    - npx cypress run --record --parallel --browser chrome --group "UI - Chrome"
+    - npx cypress run --parallel --browser chrome --group "UI - Chrome"
 
 ui-chrome-mobile:
   rules:
@@ -62,13 +89,13 @@ ui-chrome-mobile:
   parallel: 5
   script:
     - npm run dev && npx wait-on http://localhost:3000
-    - npx cypress run --record --parallel --browser chrome --group "UI - Chrome - Mobile" --config "viewportWidth=375,viewportHeight=667"
+    - npx cypress run --parallel --browser chrome --group "UI - Chrome - Mobile" --config "viewportWidth=375,viewportHeight=667"
 
 # build docker image, push image to amazon ecr, and upload static assets to amazon s3
-build:
+build-aws:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-  stage: build
+  stage: build-aws
   image: saltycrane/aws-cli-and-docker
   services:
     - docker:dind
@@ -78,10 +105,10 @@ build:
 
 # deploy docker image to amazon ecs. Reference:
 # https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs
-deploy:
+deploy-aws:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-  stage: deploy
+  stage: deploy-aws
   image: saltycrane/aws-cli-and-docker
   services:
     - docker:dind
