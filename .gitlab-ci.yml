@@ -40,8 +40,29 @@ variables:
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
 
 stages:
+  - test
   - build
   - deploy
+
+ui-chrome:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  image: cypress/browsers:node16.5.0-chrome94-ff93
+  stage: test
+  parallel: 5
+  script:
+    - npm run dev && npx wait-on http://localhost:3000
+    - npx cypress run --record --parallel --browser chrome --group "UI - Chrome"
+
+ui-chrome-mobile:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  image: cypress/browsers:node16.5.0-chrome94-ff93
+  stage: test
+  parallel: 5
+  script:
+    - npm run dev && npx wait-on http://localhost:3000
+    - npx cypress run --record --parallel --browser chrome --group "UI - Chrome - Mobile" --config "viewportWidth=375,viewportHeight=667"
 
 # build docker image, push image to amazon ecr, and upload static assets to amazon s3
 build:
