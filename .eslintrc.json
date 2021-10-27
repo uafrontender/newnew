@@ -9,6 +9,9 @@
     "airbnb/hooks"
   ],
   "rules": {
+    "react/jsx-props-no-spreading": ["error", {
+      "exceptions": ["img", "button"]
+    }],
     "no-use-before-define": "off",
     "react/prop-types": "off",
     "@typescript-eslint/no-unused-vars": [

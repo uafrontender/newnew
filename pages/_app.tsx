@@ -8,7 +8,7 @@ import type { AppProps } from 'next/app';
 import { appWithTranslation } from 'next-i18next';
 
 // Global CSS configurations
-import GlobalStyle from '../styles/globalStyles';
+import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
 import store, { persistor } from '../redux-store/store';
@@ -24,8 +24,9 @@ function MyApp({
     <Provider store={store}>
       {/* <SocketContextProvider> */}
       <PersistGate loading={null} persistor={persistor}>
-        <GlobalStyle />
-        <Component {...pageProps} />
+        <GlobalTheme>
+          <Component {...pageProps} />
+        </GlobalTheme>
       </PersistGate>
       {/* </SocketContextProvider> */}
     </Provider>
