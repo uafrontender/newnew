@@ -47,13 +47,13 @@ stages:
   - deploy
 
 # Cache using branch name
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - .cache/*
-    - cache/Cypress
-    - node_modules
-    - .next
+# cache:
+#  key: ${CI_COMMIT_REF_SLUG}
+#  paths:
+#    - .cache/*
+#    - cache/Cypress
+#    - node_modules
+#    - .next
 
 # Test using Cypress tests
 test:
