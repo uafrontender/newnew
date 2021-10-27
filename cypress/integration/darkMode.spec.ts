@@ -18,7 +18,7 @@ context('Application with DarkMode feature', () => {
       cy.log(`Darkmode should be ${i === 0 ? 'disabled' : 'enabled'}`);
 
       cy.get('body')
-        .should('have.css', 'background-color', i === 0 ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)');
+        .should('have.css', 'background-color', i === 0 ? 'rgb(11, 10, 19)' : 'rgb(255, 255, 255)');
     }
   });
 });

@@ -1,28 +1,39 @@
-import React, { ReactElement } from 'react';
+// import React, { ReactElement } from 'react';
 import { createGlobalStyle } from 'styled-components';
 
-import { useAppSelector } from '../redux-store/store';
+// import { useAppSelector } from '../redux-store/store';
 
-// TODO: Implement CSS resets, main colors and fonts in GlobalStyles
-interface GlobalStylesInterface {
-  colorMode: 'light' | 'dark';
-}
+// TODO: finalize CSS resets & general light/dark mode configs
+const GlobalStyle = createGlobalStyle`
+    /* CSS resets */
+  /* Make box-sizing: border-box default to all document */
+  html {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
 
-const GlobalStyleInner = createGlobalStyle<GlobalStylesInterface>`
+  *, *:before, *:after {
+    -webkit-box-sizing: inherit;
+    -moz-box-sizing: inherit;
+    box-sizing: inherit;
+  }
+
+  /* Remove default margins & paddings */
+  *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+  }
+    /* General light/dark mode configs */
   body {
-    color: ${({ colorMode }) => (colorMode === 'dark' ? 'white' : 'black')};
-    background-color: ${({ colorMode }) => (colorMode === 'dark' ? 'black' : 'white')};
+    color: ${({ theme }) => theme.colorsThemed.onSurface};
+    background-color: ${({ theme }) => theme.colorsThemed.appBgColor};
   }
 
   a {
-    color: ${({ colorMode }) => (colorMode === 'dark' ? 'lightblue' : 'initial')};
+    color: ${({ theme }) => theme.colorsThemed.onSurface};
   }
+
 `;
-
-const GlobalStyle = (): ReactElement => {
-  const { colorMode } = useAppSelector((state) => state.ui);
-
-  return <GlobalStyleInner colorMode={colorMode} />;
-};
 
 export default GlobalStyle;
