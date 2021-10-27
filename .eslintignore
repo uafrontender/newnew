@@ -4,3 +4,5 @@ node_modules/
 .next/
 # do not lint .idea
 .idea/
+# don not lint cypress
+cypress/
