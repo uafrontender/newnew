@@ -5,14 +5,14 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 // Redux
-import { useAppSelector, useAppDispatch } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 // API
-import { sendVerificationEmail, signInWithEmail } from '../../api/endpoints/auth';
+import { signInWithEmail } from '../../api/endpoints/auth';
 
 // Components
 // import BasicButton from '../atoms/BasicButton';
@@ -75,11 +75,12 @@ const SCodeVerificationMenu = styled.div`
     font-size: 14px;
     line-height: 18px;
 
-    color: ${({ theme }) => theme.colors.secondaryGray};
+    color: ${({ theme }) => theme.colors.baseLight700};
   }
 
   ${({ theme }) => theme.media.tablet} {
     /* Logo */
+
     & > div:nth-child(2) {
       margin-top: 288px;
     }
@@ -165,7 +166,7 @@ const STimeExpired = styled.div`
     background-color: transparent;
     border: transparent;
 
-    color: ${({ theme }) => theme.colors.accentBlue};
+    color: ${({ theme }) => theme.colors.brand2700};
 
     font-size: inherit;
     font-weight: bold;
