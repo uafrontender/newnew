@@ -7,6 +7,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 
+import Headline from '../components/atoms/Headline';
 import InlineSVG from '../components/atoms/InlineSVG';
 import GeneralTemplate from '../components/templates/General';
 
@@ -19,9 +20,9 @@ const Home: NextPage = () => {
 
   return (
     <GeneralTemplate>
-      <h1>
+      <Headline>
         {t('welcome', { NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME })}
-      </h1>
+      </Headline>
       <div>
         <Link href="/" locale="en" passHref>
           <a href="#en">English</a>
