@@ -6,13 +6,15 @@ export interface IUserStateInterface {
   loggedIn: boolean;
   lastName: string;
   firstName: string;
+  signupEmailInput: string;
 }
 
 const defaultUIState: IUserStateInterface = {
   role: 'creator',
-  loggedIn: true,
+  loggedIn: false,
   lastName: '',
   firstName: '',
+  signupEmailInput: '',
 };
 
 export const userSlice: Slice<IUserStateInterface> = createSlice({
@@ -22,10 +24,14 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setUser(state, { payload }: PayloadAction<IUserStateInterface>) {
       state = payload;
     },
+    setSignupEmailInput(state, { payload }: PayloadAction<string>) {
+      state.signupEmailInput = payload;
+    },
   },
 });
 
 export const {
+  setSignupEmailInput,
   setUser,
 } = userSlice.actions;
 

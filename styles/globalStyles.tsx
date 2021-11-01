@@ -1,10 +1,14 @@
 // import React, { ReactElement } from 'react';
 import { createGlobalStyle } from 'styled-components';
 
-// import { useAppSelector } from '../redux-store/store';
+// Fonts
+import fonts from './fonts';
 
 // TODO: finalize CSS resets & general light/dark mode configs
 const GlobalStyle = createGlobalStyle`
+    /* Imports */
+    ${fonts}
+
     /* CSS resets */
   /* Make box-sizing: border-box default to all document */
   html {
@@ -24,6 +28,13 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+
+  /* Fonts */
+  *, *:before, *:after {
+    font-family: Gilroy, Arial, Helvetica, sans-serif;
+  }
+
+
     /* General light/dark mode configs */
   body {
     color: ${({ theme }) => theme.colorsThemed.onSurface};

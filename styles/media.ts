@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+const customMediaQuery = (minWidth: number) => `@media (min-width: ${minWidth}px)`;
 
 interface ISIZES {
   desktop: number;
@@ -22,63 +22,31 @@ export const sizes: ISIZES = {
   mobile: 0,
 };
 
-const mobile = (arg: any): any => css`
-  @media (min-width: ${sizes.mobile}px) {
-    ${css(arg)};
-  }
-`;
+const mobile = customMediaQuery(sizes.mobile);
 
-const mobileS = (arg: any): any => css`
-  @media (min-width: ${sizes.mobileS}px) {
-    ${css(arg)};
-  }
-`;
+const mobileS = customMediaQuery(sizes.mobileS);
 
-const mobileM = (arg: any): any => css`
-  @media (min-width: ${sizes.mobileM}px) {
-    ${css(arg)};
-  }
-`;
+const mobileM = customMediaQuery(sizes.mobileM);
 
-const mobileL = (arg: any): any => css`
-  @media (min-width: ${sizes.mobileL}px) {
-    ${css(arg)};
-  }
-`;
+const mobileL = customMediaQuery(sizes.mobileL);
 
-const tablet = (arg: any): any => css`
-  @media (min-width: ${sizes.tablet}px) {
-    ${css(arg)};
-  }
-`;
+const tablet = customMediaQuery(sizes.tablet);
 
-const laptop = (arg: any): any => css`
-  @media (min-width: ${sizes.laptop}px) {
-    ${css(arg)};
-  }
-`;
+const laptop = customMediaQuery(sizes.laptop);
 
-const laptopL = (arg: any): any => css`
-  @media (min-width: ${sizes.laptopL}px) {
-    ${css(arg)};
-  }
-`;
+const laptopL = customMediaQuery(sizes.laptopL);
 
-const desktop = (arg: any): any => css`
-  @media (min-width: ${sizes.desktop}px) {
-    ${css(arg)};
-  }
-`;
+const desktop = customMediaQuery(sizes.desktop);
 
 export interface IMedia {
-  mobile: (arg: any) => any;
-  mobileS: (arg: any) => any;
-  mobileM: (arg: any) => any;
-  mobileL: (arg: any) => any;
-  tablet: (arg: any) => any;
-  laptop: (arg: any) => any;
-  laptopL: (arg: any) => any;
-  desktop: (arg: any) => any;
+  mobile: string;
+  mobileS: string;
+  mobileM: string;
+  mobileL: string;
+  tablet: string;
+  laptop: string;
+  laptopL: string;
+  desktop: string;
 }
 
 const media: IMedia = {

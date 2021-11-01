@@ -15,6 +15,7 @@ declare module 'styled-components' {
       accentGreen: string;
       accentPink: string;
       newnewYellow: string;
+      secondaryGray: string;
     },
     // Theme-dependant colors
     colorsThemed: {
@@ -24,6 +25,7 @@ declare module 'styled-components' {
       surfaceActive: string;
       onSurface: string;
       onSurfaceActive: string;
+      alertRed: string;
       appLogoMobile: string;
       navigationBgColor: string;
       mobileNavigation: string;
@@ -33,6 +35,7 @@ declare module 'styled-components' {
       small: string,
       medium: string,
       large: string,
+      xxxLarge: string,
     },
     shadows: {
       mediumBlue: string;
