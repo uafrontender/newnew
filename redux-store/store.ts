@@ -9,7 +9,9 @@ import {
 // React-persist
 import storage from 'redux-persist/lib/storage';
 import persistStore from 'redux-persist/lib/persistStore';
-import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
+import {
+  FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE,
+} from 'redux-persist';
 
 // Import reducers
 import uiReducer from './slices/uiStateSlice';
@@ -26,8 +28,11 @@ const rootPersistConfig = {
 const uiPersistConfig = {
   key: 'ui',
   storage,
-  whitelist: ['colorMode'],
+  whitelist: [
+    'colorMode',
+  ],
 };
+
 const userPersistConfig = {
   key: 'user',
   storage,
