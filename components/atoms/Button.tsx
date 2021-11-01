@@ -45,13 +45,13 @@ interface ISButton {
 }
 
 const SButton = styled.button<ISButton>`
-  color: ${(props) => props.theme.colors[props.filled ? 'primaryWhite' : 'primaryDark']};
-  border: 1px solid ${(props) => props.theme.colors.primaryDark};
+  color: ${(props) => props.theme.colors[props.filled ? 'baseLight0' : 'brand1900']};
+  border: 1px solid ${(props) => props.theme.colors.brand1900};
   cursor: pointer;
   padding: 16px 24px;
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
   font-size: 14px;
   white-space: nowrap;
   border-radius: 4px;
-  background-color: ${(props) => props.theme.colors[props.filled ? 'primaryDark' : 'primaryWhite']};;
+  background-color: ${(props) => props.theme.colors[props.filled ? 'brand1900' : 'baseLight0']};;
 `;
