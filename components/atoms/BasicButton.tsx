@@ -18,7 +18,7 @@ const SBasicButton = styled.button<ISBasicButton>`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border: transparent;
 
-  color: ${({ theme }) => theme.colors.primaryWhite};
+  color: ${({ theme }) => theme.colors.baseLight0};
   background: ${({ theme }) => theme.gradients.blue};
 
   cursor: pointer;
