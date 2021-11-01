@@ -1,0 +1,28 @@
+{
+  "goBackBtn": "Go back",
+  "heading": {
+    "sign_in": "Connectez-vous",
+    "sign_in_to": "Connectez-vous pour",
+    "reasons": {
+      "comment": "commenter",
+      "bid": "bid"
+    },
+    "subheading": "We'll sign you in or create an account."
+  },
+  "signupOptions": {
+    "google": "Continue with Google",
+    "apple": "Continue with Apple ID",
+    "facebook": "Continue with Facebook",
+    "twitter": "Continue with Twitter",
+    "moreOptionsBtn": "Show more options",
+    "or_continue_with": "or continue with",
+    "email": "Email",
+    "signInBtn": "Sign In"
+  },
+  "legalDisclaimer": {
+    "main_text": "Legal disclaimer comes here and links to",
+    "privacy_policy_terms": "Privacy Policy Terms",
+    "and": "and",
+    "community_guidelines": "Community Guidelines"
+  }
+}

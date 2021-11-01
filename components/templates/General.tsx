@@ -90,11 +90,11 @@ const SContent = styled.main`
   padding-top: 48px;
   background-color: ${(props) => props.theme.colorsThemed.appBgColor};
 
-  ${(props) => props.theme.media.tablet`
-      padding-top: 74px;
-  `}
+  ${({ theme }) => theme.media.tablet} {
+    padding-top: 74px;
+  }
 
-  ${(props) => props.theme.media.laptop`
-      padding-top: 88px;
-  `}
+  ${({ theme }) => theme.media.laptop} {
+    padding-top: 88px;
+  }
 `;

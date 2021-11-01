@@ -5,7 +5,7 @@ context('Application with DarkMode feature', () => {
 
   it('uses by default the bright mode', () => {
     cy.get('body')
-      .should('have.css', 'background-color', 'rgb(242, 242, 242)');
+      .should('have.css', 'background-color', 'rgb(255, 255, 255)');
   });
 
   it('can toggle the darkMode', () => {
@@ -18,7 +18,7 @@ context('Application with DarkMode feature', () => {
       cy.log(`Darkmode should be ${i === 0 ? 'disabled' : 'enabled'}`);
 
       cy.get('body')
-        .should('have.css', 'background-color', i === 0 ? 'rgb(11, 10, 19)' : 'rgb(242, 242, 242)');
+        .should('have.css', 'background-color', i === 0 ? 'rgb(11, 10, 19)' : 'rgb(255, 255, 255)');
     }
   });
 });
