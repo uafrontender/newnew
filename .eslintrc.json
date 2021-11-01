@@ -9,19 +9,16 @@
     "airbnb/hooks"
   ],
   "rules": {
-    "react/jsx-props-no-spreading": ["error", {
-      "exceptions": ["img", "button"]
-    }],
-    "no-use-before-define": "off",
     "react/prop-types": "off",
+    "no-use-before-define": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "react/jsx-props-no-spreading": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-unused-vars": [
       2,
       {
-          "args": "none"
+        "args": "none"
       }
-  ],
-    "@typescript-eslint/no-use-before-define": [
-      "error"
     ],
     "import/extensions": [
       "error",

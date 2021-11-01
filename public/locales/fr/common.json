@@ -1,3 +1,19 @@
 {
-  "welcome": "Bienvenue sur {{NEXT_PUBLIC_APP_NAME}}!"
+  "welcome": "Bienvenue sur {{NEXT_PUBLIC_APP_NAME}}!",
+  "mobile-bottom-navigation-add": "Ajouter",
+  "mobile-bottom-navigation-home": "Accueil",
+  "mobile-bottom-navigation-share": "Partager",
+  "mobile-bottom-navigation-dashboard": "Tableau de bord",
+  "mobile-bottom-navigation-notifications": "Notifications",
+  "navigation-notifications": "Notifications",
+  "navigation-dm": "DM",
+  "navigation-share": "Partager",
+  "navigation-my-balance": "Mon solde",
+  "navigation-profile": "Profil",
+  "button-new-post": "NOUVEAU POST",
+  "button-create": "CRÉER",
+  "button-login-in": "LOG IN",
+  "button-sign-up": "INSCRIVEZ-VOUS",
+  "button-dashboard": "TABLEAU DE BORD",
+  "button-create-on-new-new": "CRÉER SUR NEWNEW"
 }
