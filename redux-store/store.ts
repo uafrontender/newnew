@@ -1,59 +1,71 @@
-import {
-  configureStore, combineReducers, ThunkAction, Action,
-} from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import {
+  combineReducers,
+  configureStore,
+  ReducerFromReducersMapObject,
+  StateFromReducersMapObject,
+} from '@reduxjs/toolkit';
 
 // React-persist
-import {
-  persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
-} from 'redux-persist';
-import persistStore from 'redux-persist/lib/persistStore';
 import storage from 'redux-persist/lib/storage';
+import persistStore from 'redux-persist/lib/persistStore';
+import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 
 // Import reducers
 import uiReducer from './slices/uiStateSlice';
+import userReducer from './slices/userStateSlice';
 
 // Persisted reducer configs
 // Root
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['ui'],
+  blacklist: ['ui', 'user'],
 };
-// UI
+
 const uiPersistConfig = {
   key: 'ui',
   storage,
   whitelist: ['colorMode'],
 };
+const userPersistConfig = {
+  key: 'user',
+  storage,
+};
 
-const rootReducer = combineReducers({
+const reducers = {
   ui: persistReducer(uiPersistConfig, uiReducer),
-});
+  user: persistReducer(userPersistConfig, userReducer),
+};
 
-const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
+const initStore = (preloadedState: any) => {
+  const persistedReducer = persistReducer(rootPersistConfig, combineReducers(reducers));
 
-const store = configureStore({
-  reducer: persistedReducer,
-  devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
-  middleware: (getDefaultMiddleware) => (
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    })
-  ),
-});
+  const store = configureStore({
+    preloadedState,
+    reducer: persistedReducer,
+    devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
+    middleware: (getDefaultMiddleware) => (
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      })
+    ),
+  });
 
-export const persistor = persistStore(store);
+  const persistor = persistStore(store);
 
-export type AppDispatch = typeof store.dispatch
-export type RootState = ReturnType<typeof store.getState>
-export type AppThunk<ReturnType = void> =
-ThunkAction<ReturnType, RootState, unknown, Action<string>>
+  return {
+    store,
+    persistor,
+  };
+};
 
-// Used in application instead of regular `useDispatch` and `useSelector` to support correct typings
+export type RootState = StateFromReducersMapObject<typeof reducers>
+export type AppDispatch = ReducerFromReducersMapObject<typeof reducers>
+
 export const useAppDispatch = (): any => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export default store;
+export default initStore;
