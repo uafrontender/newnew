@@ -9,6 +9,7 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name'> = {
     small: '8px',
     medium: '16px',
     large: '24px',
+    xxxLarge: '48px',
   },
   fontSizes: {
     mobileBottomNavigation: '10px',
@@ -20,6 +21,7 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name'> = {
     accentGreen: '#0FF34F',
     accentPink: '#FF1D6A',
     newnewYellow: '#FFE604',
+    secondaryGray: '#9D9EAF',
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
@@ -33,12 +35,13 @@ export const lightTheme: DefaultTheme = {
   ...basicTheme,
   name: 'light',
   colorsThemed: {
-    appBgColor: '#F2F2F2',
+    appBgColor: '#FFFFFF',
     appTextColor: '#0B0A13',
     surface: 'rgba(241, 243, 249, 0.6)',
     surfaceActive: '#4285F4',
     onSurface: '#0B0A13',
     onSurfaceActive: '#FFFFFF',
+    alertRed: '#FF3333',
     appLogoMobile: '#011415',
     navigationBgColor: '#FFFFFF',
     mobileNavigation: '#828282',
@@ -56,6 +59,7 @@ export const darkTheme: DefaultTheme = {
     surfaceActive: '#FFFFFF',
     onSurface: '#FFFFFF',
     onSurfaceActive: '#0B0A13',
+    alertRed: '#E83030',
     appLogoMobile: '#FFFFFF',
     navigationBgColor: '#0B0A13',
     mobileNavigation: '#828282',
