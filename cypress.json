@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://localhost:3000",
-  "projectId": "nenewcypresstesting",
+  "projectId": "y15nfq",
   "integrationFolder": "cypress/integration",
   "nodeVersion": "system",
   "viewportHeight": 1000,

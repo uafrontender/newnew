@@ -42,7 +42,7 @@ variables:
   CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
 
 stages:
-#  - test
+  #  - test
   - build
   - deploy
 
@@ -65,8 +65,8 @@ stages:
 #    - npm ci --include=dev
 #    - npm run lint
 #    - npm run dev & npx wait-on http://localhost:3000
-#    - npm run test
-#    - npm run test:mobile
+#    - npm run test -- --record
+#    - npm run test:mobile -- --record
 
 # Build docker image, push image to amazon ecr, and upload static assets to amazon s3
 build:
