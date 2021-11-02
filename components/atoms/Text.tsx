@@ -36,22 +36,26 @@ const SText = styled.p<IText>`
 `;
 
 const SText1 = styled(SText)`
-  ${({ theme }) => theme.media.tablet} {
+  font-size: 16px;
+  line-height: 24px;
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 24px;
     line-height: 32px;
   }
 `;
 
 const SText2 = styled(SText)`
-  ${({ theme }) => theme.media.tablet} {
+  font-size: 14px;
+  line-height: 20px;
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 16px;
     line-height: 24px;
   }
 `;
 
 const SText3 = styled(SText)`
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 14px;
-    line-height: 20px;
-  }
+  font-size: 14px;
+  line-height: 20px;
 `;
