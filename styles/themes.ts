@@ -97,7 +97,8 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name'> = {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
   },
   gradients: {
-    blue: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
   },
 };
 

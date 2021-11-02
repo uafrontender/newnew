@@ -19,7 +19,7 @@ const SBasicButton = styled.button<ISBasicButton>`
   border: transparent;
 
   color: ${({ theme }) => theme.colors.baseLight0};
-  background: ${({ theme }) => theme.gradients.blue};
+  background: ${({ theme }) => theme.gradients.blueDiagonal};
 
   cursor: pointer;
   transition: .2s linear;

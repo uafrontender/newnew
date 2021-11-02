@@ -111,7 +111,8 @@ declare module 'styled-components' {
       mediumBlue: string;
     },
     gradients: {
-      blue: string;
+      blueDiagonal: string;
+      blueHorizontal: string;
     },
     fontSizes: {
       mobileBottomNavigation: string;

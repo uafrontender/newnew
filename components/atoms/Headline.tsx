@@ -35,16 +35,32 @@ export default Headline;
 const SH1 = styled.h1`
   font-weight: bold;
 
+  font-size: 32px;
+  line-height: 40px;
+
   ${({ theme }) => theme.media.tablet} {
+    font-size: 40px;
+    line-height: 48px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 56px;
-    line-height: 68px;
+    line-height: 64px;
   }
 `;
 
 const SH2 = styled.h2`
   font-weight: bold;
 
+  font-size: 28px;
+  line-height: 36px;
+
   ${({ theme }) => theme.media.tablet} {
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 48px;
     line-height: 56px;
   }
@@ -53,7 +69,15 @@ const SH2 = styled.h2`
 const SH3 = styled.h3`
   font-weight: bold;
 
+  font-size: 24px;
+  line-height: 32px;
+
   ${({ theme }) => theme.media.tablet} {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 40px;
     line-height: 48px;
   }
@@ -62,7 +86,15 @@ const SH3 = styled.h3`
 const SH4 = styled.h4`
   font-weight: bold;
 
+  font-size: 20px;
+  line-height: 28px;
+
   ${({ theme }) => theme.media.tablet} {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 32px;
     line-height: 40px;
   }
@@ -71,7 +103,15 @@ const SH4 = styled.h4`
 const SH5 = styled.h5`
   font-weight: bold;
 
+  font-size: 18px;
+  line-height: 26px;
+
   ${({ theme }) => theme.media.tablet} {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
     font-size: 24px;
     line-height: 32px;
   }
@@ -80,8 +120,16 @@ const SH5 = styled.h5`
 const SH6 = styled.h6`
   font-weight: bold;
 
+  font-size: 16px;
+  line-height: 24px;
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 20px;
-    line-height: 24px;
+    line-height: 28px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
+    font-size: 20px;
+    line-height: 28px;
   }
 `;
