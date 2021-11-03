@@ -8,6 +8,9 @@ declare module 'styled-components' {
     name: string;
     media: IMedia;
     // Theme-agnostic colors
+    width: {
+      maxContentWidth: string,
+    };
     colors: {
       baseLight900: string,
       baseLight800: string,
@@ -98,12 +101,25 @@ declare module 'styled-components' {
     colorsThemed: {
       appBgColor: string;
       appTextColor: string;
+      appIcon: string;
+      appButtonPrimary: string;
+      appButtonPrimaryBG: string;
+      appButtonSecondary: string;
+      appButtonSecondaryBG: string;
       surface: string;
       surfaceActive: string;
       onSurface: string;
       onSurfaceActive: string;
-      appLogoMobile: string;
+      alertRed: string;
       navigationBgColor: string;
+      topNavigation: string;
+      topNavigationActive: string;
+      bottomNavigation: string;
+      bottomNavigationActive: string;
+      mobileNavigationIcon: string;
+      mobileNavigationActiveIcon: string;
+      searchInput: string;
+      searchInputPlaceholder: string;
       mobileNavigation: string;
       mobileNavigationActive: string;
       grayscale: {
