@@ -15,9 +15,11 @@ export const TopNavigation: React.FC<ITopNavigation> = () => {
 
   return (
     <SContainer>
-      {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode) && <MobileTopNavigation />}
-      {['tablet'].includes(resizeMode) && <TabletTopNavigation />}
-      {['laptop', 'laptopL', 'desktop'].includes(resizeMode) && <DesktopTopNavigation />}
+      <SContent>
+        {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode) && <MobileTopNavigation />}
+        {['tablet'].includes(resizeMode) && <TabletTopNavigation />}
+        {['laptop', 'laptopL', 'desktop'].includes(resizeMode) && <DesktopTopNavigation />}
+      </SContent>
     </SContainer>
   );
 };
@@ -30,4 +32,9 @@ const SContainer = styled.nav`
   width: 100vw;
   position: fixed;
   background-color: ${(props) => props.theme.colorsThemed.navigationBgColor};
+`;
+
+const SContent = styled.nav`
+  margin: auto;
+  max-width: ${(props) => props.theme.width.maxContentWidth};
 `;

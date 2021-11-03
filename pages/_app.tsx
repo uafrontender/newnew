@@ -2,6 +2,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import type { AppProps } from 'next/app';
 import App from 'next/app';
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { appWithTranslation } from 'next-i18next';
@@ -64,17 +65,24 @@ const MyApp = (props: IMyApp): ReactElement => {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
-    <Provider store={store}>
-      {/* <SocketContextProvider> */}
-      <PersistGate loading={null} persistor={persistor}>
-        <ResizeMode>
-          <GlobalTheme>
-            { getLayout(<Component {...pageProps} />) }
-          </GlobalTheme>
-        </ResizeMode>
-      </PersistGate>
-      {/* </SocketContextProvider> */}
-    </Provider>
+    <>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta name="robots" content="noindex" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+      </Head>
+      <Provider store={store}>
+        {/* <SocketContextProvider> */}
+        <PersistGate loading={null} persistor={persistor}>
+          <ResizeMode>
+            <GlobalTheme>
+              { getLayout(<Component {...pageProps} />) }
+            </GlobalTheme>
+          </ResizeMode>
+        </PersistGate>
+        {/* </SocketContextProvider> */}
+      </Provider>
+    </>
   );
 };
 

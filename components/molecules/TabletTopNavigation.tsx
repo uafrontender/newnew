@@ -6,13 +6,15 @@ import styled, { useTheme } from 'styled-components';
 
 import Button from '../atoms/Button';
 import InlineSVG from '../atoms/InlineSVG';
+import UserAvatar from './UserAvatar';
+import SearchInput from '../atoms/SearchInput';
+import TopNavigationItem from './TopNavigationItem';
 
 import { useAppSelector } from '../../redux-store/store';
 
-import menuIcon from '../../public/images/svg/tablet-top-navigation-menu.svg';
-import userIcon from '../../public/images/svg/mobile-top-navigation-person.svg';
+import menuIcon from '../../public/images/svg/icons/outlined/Menu.svg';
+import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 import tabletLogo from '../../public/images/svg/tablet-logo.svg';
-import searchIcon from '../../public/images/svg/mobile-top-navigation-search.svg';
 
 interface ITabletTopNavigation {
 }
@@ -22,24 +24,17 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
   const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
 
-  const handleSearchClick = () => {
-    router.push('/sign-in');
-  };
-  const handleUserClick = () => {
-    router.push('/sign-in');
-  };
   const handleMenuClick = () => {
-    router.push('/sign-in');
-  };
-  const handleNewPostClick = () => {
-    router.push('/sign-in');
   };
   const handleCreateClick = () => {
-    router.push('/sign-in');
+  };
+  const handleUserClick = () => {
+    router.push('/profile');
   };
   const handleSignInClick = () => {
-    router.push('/sign-in');
+    router.push('/sign-up');
   };
   const handleSignUpClick = () => {
     router.push('/sign-up');
@@ -49,100 +44,140 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
     <SContainer>
       <Link href="/">
         <a>
-          <InlineSVG
-            svg={tabletLogo}
-            fill={theme.colorsThemed.appLogoMobile}
-            width="152px"
-            height="32px"
-          />
+          {user.loggedIn ? (
+            <InlineSVG
+              svg={mobileLogo}
+              fill={theme.colorsThemed.appIcon}
+              width="48px"
+              height="48px"
+            />
+          ) : (
+            <InlineSVG
+              svg={tabletLogo}
+              fill={theme.colorsThemed.appIcon}
+              width="152px"
+              height="48px"
+            />
+          )}
         </a>
       </Link>
       <SRightBlock>
         {user.loggedIn && (
           <>
-            <Link href="/notifications" passHref>
-              <NavItem>
-                {t('navigation-notifications')}
-              </NavItem>
-            </Link>
-            <Link href="/direct-messages" passHref>
-              <NavItem>
-                {t('navigation-dm')}
-              </NavItem>
-            </Link>
+            <SItemWithMargin>
+              <TopNavigationItem
+                item={{
+                  url: '/notifications',
+                  key: 'notifications',
+                  counter: user.notificationsCount,
+                }}
+              />
+            </SItemWithMargin>
+            <SItemWithMargin>
+              <TopNavigationItem
+                item={{
+                  url: '/direct-messages',
+                  key: 'direct-messages',
+                  counter: user.directMessagesCount,
+                }}
+              />
+            </SItemWithMargin>
             {user.role === 'creator' ? (
-              <Link href="/share" passHref>
-                <NavItem>
-                  {t('navigation-share')}
-                </NavItem>
-              </Link>
+              <SItemWithMargin>
+                <TopNavigationItem
+                  item={{
+                    url: '/share',
+                    key: 'share',
+                  }}
+                />
+              </SItemWithMargin>
             ) : (
-              <Link href="/my-balance" passHref>
-                <NavItem>
-                  {t('navigation-my-balance')}
-                  <br />
-                  $120
-                </NavItem>
-              </Link>
+              <SItemWithMargin>
+                <TopNavigationItem
+                  item={{
+                    url: '/my-balance',
+                    key: 'my-balance',
+                    value: user.walletBalance,
+                  }}
+                />
+              </SItemWithMargin>
             )}
           </>
         )}
-        <InlineSVG
-          clickable
-          svg={searchIcon}
-          fill={theme.colorsThemed.mobileNavigationActive}
-          width="24px"
-          height="24px"
-          onClick={handleSearchClick}
-        />
-        {user.loggedIn ? (
+        <SItemWithMargin>
+          <SearchInput />
+        </SItemWithMargin>
+        {!globalSearchActive && (
           <>
-            {user.role === 'creator' ? (
+            {user.loggedIn ? (
               <>
-                <Button
-                  filled
-                  title={t('button-new-post')}
-                  onClick={handleNewPostClick}
-                />
-                <InlineSVG
-                  clickable
-                  svg={menuIcon}
-                  fill={theme.colorsThemed.mobileNavigationActive}
-                  width="32px"
-                  height="32px"
-                  onClick={handleMenuClick}
-                />
+                {user.role === 'creator' ? (
+                  <>
+                    <SItemWithMargin>
+                      <Button
+                        bs={theme.shadows.mediumBlue}
+                        bg={theme.gradients.blueDiagonal}
+                        onClick={handleCreateClick}
+                      >
+                        {t('button-create-decision')}
+                      </Button>
+                    </SItemWithMargin>
+                    <SItemWithMargin>
+                      <Button
+                        iconOnly
+                        onClick={handleMenuClick}
+                      >
+                        <InlineSVG
+                          svg={menuIcon}
+                          fill={theme.colorsThemed.appIcon}
+                          width="24px"
+                          height="24px"
+                        />
+                      </Button>
+                    </SItemWithMargin>
+                  </>
+                ) : (
+                  <>
+                    <SItemWithMargin>
+                      <Button
+                        bs={theme.shadows.mediumBlue}
+                        bg={theme.gradients.blueDiagonal}
+                        onClick={handleCreateClick}
+                      >
+                        {t('button-create')}
+                      </Button>
+                    </SItemWithMargin>
+                    <SItemWithMargin>
+                      <UserAvatar
+                        user={user}
+                        onClick={handleUserClick}
+                      />
+                    </SItemWithMargin>
+                  </>
+                )}
               </>
             ) : (
               <>
-                <Button
-                  filled
-                  title={t('button-create')}
-                  onClick={handleCreateClick}
-                />
-                <InlineSVG
-                  clickable
-                  svg={userIcon}
-                  fill={theme.colorsThemed.mobileNavigationActive}
-                  width="32px"
-                  height="32px"
-                  onClick={handleUserClick}
-                />
+                <SItemWithMargin>
+                  <Button
+                    bg={theme.colorsThemed.appButtonSecondaryBG}
+                    onClick={handleSignInClick}
+                    titleColor={theme.colorsThemed.appButtonSecondary}
+                  >
+                    {t('button-login-in')}
+                  </Button>
+                </SItemWithMargin>
+                <SItemWithMargin>
+                  <Button
+                    bs={theme.shadows.mediumBlue}
+                    bg={theme.gradients.blueDiagonal}
+                    onClick={handleSignUpClick}
+                  >
+                    {t('button-sign-up')}
+                  </Button>
+                </SItemWithMargin>
               </>
             )}
-          </>
-        ) : (
-          <>
-            <Button
-              outline
-              title={t('button-login-in')}
-              onClick={handleSignInClick}
-            />
-            <Button
-              filled
-              title={t('button-sign-up')}
-              onClick={handleSignUpClick}
-            />
           </>
         )}
       </SRightBlock>
@@ -163,17 +198,12 @@ const SRightBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
-  a,
-  div,
-  button {
-    margin-left: 24px;
-  }
 `;
 
-const NavItem = styled.a`
-  font-size: 14px;
-  text-align: end;
-  line-height: 18px;
-  text-decoration: none;
+const SItemWithMargin = styled.div`
+  margin-left: 24px;
+
+  a {
+    text-decoration: none;
+  }
 `;

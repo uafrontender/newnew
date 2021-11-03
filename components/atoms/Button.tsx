@@ -1,31 +1,25 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
 interface IButton {
-  title: string,
-  filled?: boolean,
+  id?: string,
+  bs?: string,
+  bg?: string,
   onClick: () => any,
-  outline?: boolean,
-  disabled?: boolean,
+  iconOnly?: boolean,
+  children: ReactNode,
+  titleColor?: string,
 }
 
 export const Button: React.FC<IButton> = (props) => {
   const {
-    title,
-    filled,
-    outline,
-    onClick,
-    disabled,
+    children,
+    ...rest
   } = props;
 
   return (
-    <SButton
-      filled={filled}
-      outline={outline}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {title}
+    <SButton {...rest}>
+      {children}
     </SButton>
   );
 };
@@ -33,25 +27,28 @@ export const Button: React.FC<IButton> = (props) => {
 export default Button;
 
 Button.defaultProps = {
-  filled: false,
-  outline: false,
-  disabled: false,
+  id: '',
+  bs: '',
+  bg: '',
+  iconOnly: false,
+  titleColor: '',
 };
 
-interface ISButton {
-  filled?: boolean,
-  outline?: boolean,
-  disabled?: boolean,
-}
-
-const SButton = styled.button<ISButton>`
-  color: ${(props) => props.theme.colors[props.filled ? 'baseLight0' : 'brand1900']};
-  border: 1px solid ${(props) => props.theme.colors.brand1900};
+const SButton = styled.button<IButton>`
+  color: ${(props) => (props.titleColor ? props.titleColor : props.theme.colorsThemed.appButtonPrimary)};
   cursor: pointer;
-  padding: 16px 24px;
-  opacity: ${(props) => (props.disabled ? 0.5 : 1)};
+  border: none;
+  outline: none;
+  padding: ${(props) => (props.iconOnly ? '8px' : '12px 24px')};
   font-size: 14px;
+  background: ${(props) => (props.bg ? props.bg : props.theme.colorsThemed.appButtonPrimaryBG)};
+  line-height: 24px;
+  font-weight: bold;
   white-space: nowrap;
-  border-radius: 4px;
-  background-color: ${(props) => props.theme.colors[props.filled ? 'brand1900' : 'baseLight0']};;
+  border-radius: ${(props) => (props.iconOnly ? '12px' : '16px')};
+
+  ${(props) => !!props.bs && `box-shadow: ${props.bs};`}
+  ${({ theme }) => theme.media.tablet} {
+    padding: ${(props) => (props.iconOnly ? '12px' : '12px 24px')};
+  }
 `;
