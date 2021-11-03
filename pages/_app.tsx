@@ -1,6 +1,7 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import type { AppProps } from 'next/app';
 import App from 'next/app';
+import type { NextPage } from 'next';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { appWithTranslation } from 'next-i18next';
@@ -19,8 +20,14 @@ import isBroswer from '../utils/isBrowser';
 // Socket context
 // import SocketContextProvider from '../contexts/socketContext';
 
+// interface for shared layouts
+export type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
 interface IMyApp extends AppProps {
   uaString: string;
+  Component: NextPageWithLayout;
 }
 
 const MyApp = (props: IMyApp): ReactElement => {
@@ -29,6 +36,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     pageProps,
     uaString,
   } = props;
+
   const ua: UserAgent = useUserAgent(uaString || (isBroswer() ? window?.navigator?.userAgent : ''));
   const getInitialResizeMode = () => {
     let resizeMode = 'mobile';
@@ -52,13 +60,16 @@ const MyApp = (props: IMyApp): ReactElement => {
     },
   });
 
+  // Shared layouts
+  const getLayout = Component.getLayout ?? ((page) => page);
+
   return (
     <Provider store={store}>
       {/* <SocketContextProvider> */}
       <PersistGate loading={null} persistor={persistor}>
         <ResizeMode>
           <GlobalTheme>
-            <Component {...pageProps} />
+            { getLayout(<Component {...pageProps} />) }
           </GlobalTheme>
         </ResizeMode>
       </PersistGate>
