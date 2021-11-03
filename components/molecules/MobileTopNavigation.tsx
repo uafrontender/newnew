@@ -1,11 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
+import Button from '../atoms/Button';
 import InlineSVG from '../atoms/InlineSVG';
+import UserAvatar from './UserAvatar';
+import SearchInput from '../atoms/SearchInput';
 
-import userIcon from '../../public/images/svg/mobile-top-navigation-person.svg';
-import searchIcon from '../../public/images/svg/mobile-top-navigation-search.svg';
+import { useAppSelector } from '../../redux-store/store';
+
+import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 
 interface IMobileTopNavigation {
@@ -13,8 +18,14 @@ interface IMobileTopNavigation {
 
 export const MobileTopNavigation: React.FC<IMobileTopNavigation> = () => {
   const theme = useTheme();
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
 
-  const handleSearchClick = () => {
+  const handleUserClick = () => {
+    router.push('/profile');
+  };
+  const handleSignInClick = () => {
+    router.push('/sign-up');
   };
 
   return (
@@ -23,31 +34,37 @@ export const MobileTopNavigation: React.FC<IMobileTopNavigation> = () => {
         <a>
           <InlineSVG
             svg={mobileLogo}
-            fill={theme.colorsThemed.appLogoMobile}
-            width="35px"
-            height="24px"
+            fill={theme.colorsThemed.appIcon}
+            width="40px"
+            height="40px"
           />
         </a>
       </Link>
       <SRightBlock>
-        <InlineSVG
-          clickable
-          svg={searchIcon}
-          fill={theme.colorsThemed.mobileNavigationActive}
-          width="24px"
-          height="24px"
-          onClick={handleSearchClick}
-        />
-        <Link href="/sign-in">
-          <a>
-            <InlineSVG
-              svg={userIcon}
-              fill={theme.colorsThemed.mobileNavigationActive}
-              width="24px"
-              height="24px"
+        <SItemWithMargin>
+          <SearchInput />
+        </SItemWithMargin>
+        <SItemWithMargin>
+          {user.loggedIn ? (
+            <UserAvatar
+              user={user}
+              onClick={handleUserClick}
             />
-          </a>
-        </Link>
+          ) : (
+            <Button
+              iconOnly
+              bg={theme.gradients.blueDiagonal}
+              onClick={handleSignInClick}
+            >
+              <InlineSVG
+                svg={userIcon}
+                fill={theme.colors.baseLight0}
+                width="20px"
+                height="20px"
+              />
+            </Button>
+          )}
+        </SItemWithMargin>
       </SRightBlock>
     </SContainer>
   );
@@ -56,8 +73,9 @@ export const MobileTopNavigation: React.FC<IMobileTopNavigation> = () => {
 export default MobileTopNavigation;
 
 const SContainer = styled.nav`
-  padding: 12px 16px;
   display: flex;
+  padding: 8px 16px;
+  position: relative;
   align-items: center;
   justify-content: space-between;
 `;
@@ -66,8 +84,8 @@ const SRightBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+`;
 
-  div {
-    margin-left: 24px;
-  }
+const SItemWithMargin = styled.div`
+  margin-left: 12px;
 `;

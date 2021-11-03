@@ -11,7 +11,7 @@ context('Application with DarkMode feature', () => {
   it('can toggle the darkMode', () => {
     // consequentially enable and disable the dark mode
     for (let i = 0; i < 2; i++) {
-      cy.get('button[type="button"]')
+      cy.get('button[id="dark-mode-button"]')
         .first()
         .click();
 

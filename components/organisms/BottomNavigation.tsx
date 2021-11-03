@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
-import Item from '../molecules/BottomNavigationItem';
+import Item, { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 
 interface IBottomNavigation {
-  collection: object[];
+  collection: TBottomNavigationItem[];
 }
 
 export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
@@ -30,7 +30,7 @@ const SContainer = styled.nav`
   left: 0;
   width: 100vw;
   bottom: 0;
-  padding: 0 8px;
+  padding: 0 2px;
   display: flex;
   position: fixed;
   align-items: center;
