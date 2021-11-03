@@ -86,6 +86,13 @@ declare module 'styled-components' {
       brand5200: string,
       brand5100: string,
       brand550: string,
+
+      social: {
+        google: string;
+        facebook: string;
+        twitter: string;
+        apple: string;
+      }
     },
     // Theme-dependant colors
     colorsThemed: {
@@ -95,11 +102,28 @@ declare module 'styled-components' {
       surfaceActive: string;
       onSurface: string;
       onSurfaceActive: string;
-      alertRed: string;
       appLogoMobile: string;
       navigationBgColor: string;
       mobileNavigation: string;
       mobileNavigationActive: string;
+      grayscale: {
+        background1: string;
+        background2: string;
+        outlines: string;
+      },
+      text: {
+        primary: string;
+        secondary: string;
+        tertiary: string;
+      },
+      accent: {
+        blue: string;
+        pink: string;
+        yellow: string;
+        green: string;
+        error: string;
+        success: string;
+      },
     },
     borderRadius: {
       small: string,

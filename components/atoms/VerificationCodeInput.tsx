@@ -33,7 +33,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     if (!errorBordersShown) {
       return theme.name === 'light' ? '#DFE2EC' : '#36374A';
     }
-    return theme.colorsThemed.alertRed;
+    return theme.colorsThemed.accent.error;
   }};
 
     width: 52px;

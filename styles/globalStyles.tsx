@@ -38,7 +38,7 @@ const GlobalStyle = createGlobalStyle`
     /* General light/dark mode configs */
   body {
     color: ${({ theme }) => theme.colorsThemed.onSurface};
-    background-color: ${({ theme }) => theme.colorsThemed.appBgColor};
+    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
   }
 
   a {

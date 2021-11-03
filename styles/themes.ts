@@ -92,6 +92,13 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name'> = {
     brand5200: '#9EFAA1',
     brand5100: '#C8FDC7',
     brand550: '#E9FFE9',
+
+    social: {
+      google: '#4285F4',
+      facebook: '#1877F2',
+      twitter: '#1DA1F2',
+      apple: '#000000',
+    },
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
@@ -112,11 +119,28 @@ export const lightTheme: DefaultTheme = {
     surfaceActive: '#4285F4',
     onSurface: basicTheme.colors.brand1900,
     onSurfaceActive: basicTheme.colors.baseLight0,
-    alertRed: '#FF3333',
     appLogoMobile: '#011415',
     navigationBgColor: basicTheme.colors.baseLight0,
     mobileNavigation: '#828282',
     mobileNavigationActive: '#4F4F4F',
+    grayscale: {
+      background1: '#FFFFFF',
+      background2: '#F1F3F9',
+      outlines: '#E5E9F1',
+    },
+    text: {
+      primary: '#2C2C33',
+      secondary: '#8B99B2',
+      tertiary: '#B0BACD',
+    },
+    accent: {
+      blue: '#1D6AFF',
+      pink: '#FF1D6A',
+      yellow: '#FFE604',
+      green: '#0FF34F',
+      error: '#F12C46',
+      success: '#15B981',
+    },
   },
 };
 
@@ -130,10 +154,27 @@ export const darkTheme: DefaultTheme = {
     surfaceActive: basicTheme.colors.baseLight0,
     onSurface: basicTheme.colors.baseLight0,
     onSurfaceActive: basicTheme.colors.brand1900,
-    alertRed: '#E83030',
     appLogoMobile: basicTheme.colors.baseLight0,
     navigationBgColor: basicTheme.colors.brand1900,
     mobileNavigation: '#828282',
     mobileNavigationActive: '#4F4F4F',
+    grayscale: {
+      background1: '#0B0A13',
+      background2: '#14151F',
+      outlines: '#272835',
+    },
+    text: {
+      primary: '#FFFFFF',
+      secondary: '#586070',
+      tertiary: '#434956',
+    },
+    accent: {
+      blue: '#1D6AFF',
+      pink: '#FF1D6A',
+      yellow: '#FFE604',
+      green: '#0FF34F',
+      error: '#E8354D',
+      success: '#12A573',
+    },
   },
 };

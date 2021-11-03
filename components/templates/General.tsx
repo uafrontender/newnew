@@ -88,7 +88,7 @@ const SContent = styled.main`
   color: ${(props) => props.theme.colorsThemed.appTextColor};
   height: 100%;
   padding-top: 48px;
-  background-color: ${(props) => props.theme.colorsThemed.appBgColor};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 
   ${({ theme }) => theme.media.tablet} {
     padding-top: 74px;

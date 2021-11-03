@@ -106,7 +106,7 @@ const SCodeVerificationMenu = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.xxxLarge};
     border-style: 1px transparent solid;
 
-    background-color: ${({ theme }) => (theme.name === 'light' ? '#F6F8FB' : theme.colorsThemed.surface)};
+    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
 
     /* Logo */
     & > div:nth-child(2) {
@@ -155,7 +155,7 @@ interface ISTimeoutDiv {
 
 const STimeoutDiv = styled.div<ISTimeoutDiv>`
   color: ${({ isAlertColor, theme }) => {
-    if (isAlertColor) return theme.colorsThemed.alertRed;
+    if (isAlertColor) return theme.colorsThemed.accent.error;
     return theme.colorsThemed.onSurface;
   }};
 `;
@@ -177,7 +177,7 @@ const STimeExpired = styled.div`
 
 const SErrorDiv = styled.div`
   font-weight: bold;
-  color: ${({ theme }) => theme.colorsThemed.alertRed};
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
 `;
 
 const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () => {
