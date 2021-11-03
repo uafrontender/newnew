@@ -7,30 +7,47 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "cypress run --browser chrome",
+    "test:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
+    "e2e": "cypress open"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test",
+    "test:mobile"
   ],
   "engines": {
     "node": ">= 16 < 17"
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.6.2",
+    "lodash": "4.17.21",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com:newnewinc/newnew-api#master",
     "next": "11.1.2",
     "next-i18next": "8.9.0",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com:newnewinc/newnew-api#master",
+    "next-useragent": "2.8.0",
+    "protobufjs": "6.11.2",
     "react": "17.0.2",
+    "react-apple-signin-auth": "1.0.4",
+    "react-countup": "6.0.0",
     "react-dom": "17.0.2",
-    "react-redux": "7.2.5",
+    "react-redux": "7.2.6",
     "redux-persist": "6.0.0",
-    "styled-components": "5.3.3"
+    "resize-observer-polyfill": "1.5.1",
+    "socket.io-client": "4.3.2",
+    "styled-components": "5.3.3",
+    "validator": "13.6.0"
   },
   "devDependencies": {
-    "@types/react": "17.0.31",
+    "@types/lodash": "4.14.176",
+    "@types/react": "17.0.33",
     "@types/react-redux": "7.1.20",
     "@types/styled-components": "5.1.15",
-    "@typescript-eslint/eslint-plugin": "5.1.0",
+    "@types/validator": "13.6.5",
+    "@typescript-eslint/eslint-plugin": "5.2.0",
+    "cypress": "8.5.0",
+    "dotenv": "10.0.0",
     "eslint": "7.32.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-next": "11.1.2",

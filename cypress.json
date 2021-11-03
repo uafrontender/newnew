@@ -1,0 +1,12 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "projectId": "y15nfq",
+  "integrationFolder": "cypress/integration",
+  "nodeVersion": "system",
+  "viewportHeight": 1000,
+  "viewportWidth": 1280,
+  "retries": {
+    "runMode": 2,
+    "openMode": 1
+  }
+}

@@ -1,3 +1,18 @@
 {
-  "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!"
+  "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
+  "mobile-bottom-navigation-add": "Create",
+  "mobile-bottom-navigation-home": "Home",
+  "mobile-bottom-navigation-share": "Share",
+  "mobile-bottom-navigation-dashboard": "Dashboard",
+  "mobile-bottom-navigation-notifications": "Notifications",
+  "mobile-top-navigation-notifications": "Notifications{{counter}}",
+  "mobile-top-navigation-direct-messages": "DMs{{counter}}",
+  "mobile-top-navigation-share": "Share",
+  "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
+  "button-create-decision": "Create decision",
+  "button-create": "Create",
+  "button-login-in": "Log in",
+  "button-sign-up": "Sign up",
+  "button-dashboard": "Dashboard",
+  "button-create-on-newnew": "Create on NewNew"
 }
