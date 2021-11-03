@@ -1,14 +1,8 @@
 // import React, { ReactElement } from 'react';
 import { createGlobalStyle } from 'styled-components';
 
-// Fonts
-import fonts from './fonts';
-
 // TODO: finalize CSS resets & general light/dark mode configs
 const GlobalStyle = createGlobalStyle`
-    /* Imports */
-    ${fonts}
-
     /* CSS resets */
   /* Make box-sizing: border-box default to all document */
   html {
