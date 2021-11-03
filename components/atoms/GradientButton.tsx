@@ -1,12 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface ISBasicButton {
+type TGradientButton = React.ComponentPropsWithoutRef<'button'>;
+
+const GradientButton: React.FunctionComponent<TGradientButton> = ({ children, ...rest }) => (
+  <SGradientButton
+    {...rest}
+  >
+    { children }
+  </SGradientButton>
+);
+
+export default GradientButton;
+
+interface ISGradientButton {
   hoverBgColor?: string;
   hoverContentColor?: string;
 }
 
-const SBasicButton = styled.button<ISBasicButton>`
+const SGradientButton = styled.button<ISGradientButton>`
   display: block;
 
   font-weight: bold;
@@ -47,15 +59,3 @@ const SBasicButton = styled.button<ISBasicButton>`
     line-height: 24px;
   }
 `;
-
-type TBasicButton = React.ComponentPropsWithoutRef<'button'>;
-
-const BasicButton: React.FunctionComponent<TBasicButton> = ({ children, ...rest }) => (
-  <SBasicButton
-    {...rest}
-  >
-    { children }
-  </SBasicButton>
-);
-
-export default BasicButton;

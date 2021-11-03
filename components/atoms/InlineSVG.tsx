@@ -31,6 +31,7 @@ export const InlineSvg: React.FC<IInlineSvg> = (props) => {
       onClick={onClick}
       clickable={clickable}
       dangerouslySetInnerHTML={{ __html: svg }}
+      {...props}
     />
   );
 };

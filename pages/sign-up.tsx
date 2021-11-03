@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -7,11 +7,12 @@ import { useRouter } from 'next/dist/client/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppSelector } from '../redux-store/store';
 
+import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
 import SignupMenu from '../components/organisms/SignupMenu';
 
 // Sign up reasons
-export const signupReasons = ['comment', 'bid'] as const;
+export const signupReasons = ['comment', 'bid', 'subscribe'] as const;
 export type SignupReason = typeof signupReasons[number];
 
 interface ISignup {
@@ -31,7 +32,7 @@ const Signup: NextPage<ISignup> = ({
   }, [loggedIn, router]);
 
   return (
-    <AuthLayout>
+    <>
       <Head>
         <title>{ t('meta.title') }</title>
         <meta name="description" content={t('meta.description')} />
@@ -39,6 +40,14 @@ const Signup: NextPage<ISignup> = ({
       <SignupMenu
         reason={reason ?? undefined}
       />
+    </>
+  );
+};
+
+(Signup as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AuthLayout>
+      { page }
     </AuthLayout>
   );
 };

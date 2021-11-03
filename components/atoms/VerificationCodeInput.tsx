@@ -10,64 +10,6 @@ interface IVerficationInput {
   onComplete: (completeCode: string) => void;
 }
 
-interface ISVerficationInput {
-  errorBordersShown?: boolean;
-}
-
-const SVerficationInput = styled.div<ISVerficationInput>`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-
-  padding-top: 24px;
-  padding-bottom: 24px;
-
-  input {
-    display: block;
-
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-    border-width: 1.5px;
-    border-style: solid;
-    border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      return theme.name === 'light' ? '#DFE2EC' : '#36374A';
-    }
-    return theme.colorsThemed.accent.error;
-  }};
-
-    width: 52px;
-    height: 72px;
-
-    padding: 16px;
-
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 40px;
-
-    color: ${({ theme }) => theme.colorsThemed.onSurface};
-    background: transparent;
-
-    &:read-only {
-      outline: none;
-      cursor: default;
-
-      pointer-events:none;
-
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-  }
-`;
-
-SVerficationInput.defaultProps = {
-  errorBordersShown: undefined,
-};
-
 const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
   length,
   initialValue,
@@ -80,7 +22,9 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
   const wrapperRef = useRef<HTMLDivElement>();
 
   const handleSlotInput = (e: React.ChangeEvent<HTMLInputElement>, slot: number) => {
+    e.preventDefault();
     const newValue = e.target.value;
+    // if (/[^1-9]/.test(newValue)) return;
     if (/[^1-9]/.test(newValue)) return;
 
     const workingCode = [...code];
@@ -139,6 +83,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
 
   return (
     <>
+      {/* Allows tabbing to the input */}
       <input
         style={{
           position: 'absolute',
@@ -147,6 +92,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
           height: 0,
         }}
         aria-roledescription="Confirmation code input"
+        autoComplete="false"
         onFocus={(e) => {
           if (!disabled) wrapperRef?.current?.click();
           e.preventDefault();
@@ -159,7 +105,10 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
           wrapperRef.current = el!!;
         }}
         onClick={(e) => {
+          if (error) return;
+
           e.stopPropagation();
+
           const lastEmpty = code.findIndex((el) => el === '');
 
           if (lastEmpty !== -1) {
@@ -172,10 +121,12 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
         {code.map((symbol, i) => (
           <input
             key={i}
+            name="email-verification"
             inputMode="numeric"
             maxLength={1}
             value={symbol}
             tabIndex={-1}
+            autoComplete="off"
             // We need this one to be focused once page opens
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={!code[0].length && i === 0}
@@ -207,3 +158,64 @@ VerficationCodeInput.defaultProps = {
 };
 
 export default VerficationCodeInput;
+
+interface ISVerficationInput {
+  errorBordersShown?: boolean;
+}
+
+const SVerficationInput = styled.div<ISVerficationInput>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+
+  padding-top: 24px;
+  padding-bottom: 24px;
+
+  input {
+    display: block;
+
+    text-align: center;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-width: 1.5px;
+    border-style: solid;
+    border-color: ${({ theme, errorBordersShown }) => {
+    if (!errorBordersShown) {
+      // NB! Temp
+      return theme.colorsThemed.grayscale.outlines;
+    }
+    return theme.colorsThemed.accent.error;
+  }};
+
+    width: 52px;
+    height: 72px;
+
+    padding: 16px;
+
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 40px;
+
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+    background: transparent;
+
+    &:read-only {
+      outline: none;
+      cursor: default;
+
+      pointer-events:none;
+
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  }
+`;
+
+SVerficationInput.defaultProps = {
+  errorBordersShown: undefined,
+};
