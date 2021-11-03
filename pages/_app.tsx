@@ -1,30 +1,102 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
-import React, { ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
+import type { AppProps } from 'next/app';
+import App from 'next/app';
+import type { NextPage } from 'next';
+import Head from 'next/head';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-
-import type { AppProps } from 'next/app';
 import { appWithTranslation } from 'next-i18next';
+import { UserAgent, useUserAgent } from 'next-useragent';
 
 // Global CSS configurations
-import GlobalStyle from '../styles/globalStyles';
+import ResizeMode from '../HOC/ResizeMode';
+import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
-import store, { persistor } from '../redux-store/store';
+import createStore from '../redux-store/store';
+import { defaultUIState } from '../redux-store/slices/uiStateSlice';
 
-function MyApp({
-  Component,
-  pageProps,
-}: AppProps): ReactElement {
-  return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <GlobalStyle />
-        <Component {...pageProps} />
-      </PersistGate>
-    </Provider>
-  );
+import isBroswer from '../utils/isBrowser';
+
+// Socket context
+// import SocketContextProvider from '../contexts/socketContext';
+
+// interface for shared layouts
+export type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode
 }
 
-export default appWithTranslation(MyApp);
+interface IMyApp extends AppProps {
+  uaString: string;
+  Component: NextPageWithLayout;
+}
+
+const MyApp = (props: IMyApp): ReactElement => {
+  const {
+    Component,
+    pageProps,
+    uaString,
+  } = props;
+
+  const ua: UserAgent = useUserAgent(uaString || (isBroswer() ? window?.navigator?.userAgent : ''));
+  const getInitialResizeMode = () => {
+    let resizeMode = 'mobile';
+
+    if (ua.isTablet) {
+      resizeMode = 'tablet';
+    } else if (ua.isDesktop) {
+      resizeMode = 'laptop';
+    }
+
+    return resizeMode;
+  };
+
+  const {
+    store,
+    persistor,
+  } = createStore({
+    ui: {
+      ...defaultUIState,
+      resizeMode: getInitialResizeMode(),
+    },
+  });
+
+  // Shared layouts
+  const getLayout = Component.getLayout ?? ((page) => page);
+
+  return (
+    <>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta name="robots" content="noindex" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+      </Head>
+      <Provider store={store}>
+        {/* <SocketContextProvider> */}
+        <PersistGate loading={null} persistor={persistor}>
+          <ResizeMode>
+            <GlobalTheme>
+              { getLayout(<Component {...pageProps} />) }
+            </GlobalTheme>
+          </ResizeMode>
+        </PersistGate>
+        {/* </SocketContextProvider> */}
+      </Provider>
+    </>
+  );
+};
+
+// @ts-ignore
+const MyAppWithTranslation = appWithTranslation(MyApp);
+
+// @ts-ignore
+MyAppWithTranslation.getInitialProps = async (appContext: any) => {
+  const appProps = await App.getInitialProps(appContext);
+
+  return {
+    ...appProps,
+    uaString: appContext.ctx?.req?.headers?.['user-agent'],
+  };
+};
+
+export default MyAppWithTranslation;

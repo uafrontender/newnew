@@ -38,12 +38,37 @@ variables:
   CI_AWS_ECS_TASK_DEFINITION: "web-$CI_COMMIT_REF_NAME"
   # the below variable is used by `./bin/build-and-push-image-to-ecr`
   NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
 
 stages:
+  #  - test
   - build
   - deploy
 
-# build docker image, push image to amazon ecr, and upload static assets to amazon s3
+# Cache using branch name
+# cache:
+#  key: ${CI_COMMIT_REF_SLUG}
+#  paths:
+#    - .cache/*
+#    - cache/Cypress
+#    - node_modules
+#    - .next
+
+# Test using Cypress tests
+#test:
+#  rules:
+#    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+#  image: cypress/browsers:node16.5.0-chrome94-ff93
+#  stage: test
+#  script:
+#    - npm ci --include=dev
+#    - npm run lint
+#    - npm run dev & npx wait-on http://localhost:3000
+#    - npm run test -- --record
+#    - npm run test:mobile -- --record
+
+# Build docker image, push image to amazon ecr, and upload static assets to amazon s3
 build:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
@@ -55,8 +80,7 @@ build:
     - ./bin/build-and-push-image-to-ecr
     - ./bin/upload-assets-to-s3
 
-# deploy docker image to amazon ecs. Reference:
-# https://docs.gitlab.com/ee/ci/cloud_deployment/#deploy-your-application-to-the-aws-elastic-container-service-ecs
+# Deploy docker image to amazon ecs
 deploy:
   rules:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'

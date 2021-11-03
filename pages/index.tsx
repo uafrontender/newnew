@@ -1,64 +1,86 @@
-import React from 'react';
-import type { NextPage } from 'next';
+import React, { useCallback } from 'react';
 import Link from 'next/link';
+import { useTheme } from 'styled-components';
+import type { NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
+import { setColorMode } from '../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { setColorMode, toggleColorModeWithLS } from '../redux-store/slices/uiStateSlice';
+import { setUserLoggedIn, setUserRole, setUserAvatar } from '../redux-store/slices/userStateSlice';
 
-import InlineSVG from '../components/atoms/InlineSVG';
-
-import SVGVercel from '../public/vercel.svg';
+import Button from '../components/atoms/Button';
+import Headline from '../components/atoms/Headline';
+import GeneralTemplate from '../components/templates/General';
 
 const Home: NextPage = () => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const { colorMode } = useAppSelector((state) => state.ui);
 
+  const handleToggleDarkMode = useCallback(() => {
+    dispatch(
+      setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
+    );
+  }, [dispatch, colorMode]);
+  const handleToggleUserRole = useCallback(() => {
+    dispatch(setUserRole(user.role ? '' : 'creator'));
+  }, [dispatch, user.role]);
+  const handleToggleUserLoggedIn = useCallback(() => {
+    dispatch(setUserLoggedIn(!user.loggedIn));
+  }, [dispatch, user.loggedIn]);
+  const handleToggleUserAvatar = useCallback(() => {
+    dispatch(setUserAvatar(user.avatar ? '' : 'https://randomuser.me/api/portraits/women/21.jpg'));
+  }, [dispatch, user.avatar]);
+
   return (
-    <div>
-      <main>
-        <h1>
-          {t('welcome', { NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME })}
-        </h1>
-        <div>
-          <Link href="/" locale="en" passHref>
-            <a href="#en">English</a>
-          </Link>
-        </div>
-        <div>
-          <Link href="/" locale="fr" passHref>
-            <a href="#fr">French</a>
-          </Link>
-        </div>
-        <InlineSVG
-          svg={SVGVercel}
-          fill={colorMode === 'dark' ? 'white' : 'black'}
-          width="100px"
-          height="100px"
-        />
-        <button
-          type="button"
-          onClick={() => dispatch(
-            setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
-          )}
-        >
-          Toggle dark mode
-        </button>
-        <button
-          type="button"
-          onClick={() => dispatch(toggleColorModeWithLS())}
-        >
-          Toggle dark mode using thunk
-        </button>
-        <div>
-          <Link href="/test">
-            <a href="#test">Link to test page</a>
-          </Link>
-        </div>
-      </main>
-    </div>
+    <GeneralTemplate>
+      <Headline>
+        {t('welcome', { NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME })}
+      </Headline>
+      <div>
+        <Link href="/" locale="en" passHref>
+          <a href="#en">English</a>
+        </Link>
+      </div>
+      <div>
+        <Link href="/" locale="fr" passHref>
+          <a href="#fr">French</a>
+        </Link>
+      </div>
+      <Button
+        id="dark-mode-button"
+        bg={theme.gradients.blueDiagonal}
+        onClick={handleToggleDarkMode}
+      >
+        Toggle dark mode
+      </Button>
+      <Button
+        bg={theme.gradients.blueDiagonal}
+        onClick={handleToggleUserLoggedIn}
+      >
+        Toggle user loggedIn
+      </Button>
+      <Button
+        bg={theme.gradients.blueDiagonal}
+        onClick={handleToggleUserRole}
+      >
+        Toggle user role
+      </Button>
+      <Button
+        bg={theme.gradients.blueDiagonal}
+        onClick={handleToggleUserAvatar}
+      >
+        Toggle user avatar
+      </Button>
+      <div>
+        <Link href="/test">
+          <a href="#test">Link to test page</a>
+        </Link>
+      </div>
+    </GeneralTemplate>
   );
 };
 
