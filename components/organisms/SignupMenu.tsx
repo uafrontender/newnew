@@ -1,3 +1,4 @@
+// Temp disabled until backend is in place
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
@@ -19,210 +20,25 @@ import { sendVerificationEmail } from '../../api/endpoints/auth';
 import { SignupReason } from '../../pages/sign-up';
 
 // Components
-import InlineSvg from '../atoms/InlineSVG';
-import TextInput from '../atoms/TextInput';
-import BasicButton from '../atoms/BasicButton';
+import Headline from '../atoms/Headline';
+import Text from '../atoms/Text';
+import SignInBackButton from '../molecules/signup/SignInBackButton';
 import TextWithLine from '../atoms/TextWithLine';
-import SignInButton from '../molecules/SignInButton';
+import SignInTextInput from '../atoms/SignInTextInput';
+import GradientButton from '../atoms/GradientButton';
+import SignInButton from '../molecules/signup/SignInButton';
 
 // Icons
-// import BackButtonIcon from '../../public/icon-back-temp.svg';
-import BackButtonIcon from '../../public/icon-back-temp2.svg';
-import ArrowDownIcon from '../../public/icon-arrow-down.svg';
-import ArrowDownIconLight from '../../public/icon-arrow-down-light.svg';
-import AppleIcon from '../../public/icon-apple.svg';
-import GoogleIcon from '../../public/icon-google.svg';
-import TwitterIcon from '../../public/icon-twitter.svg';
-import FacebookIcon from '../../public/icon-facebook.svg';
-import FacebookIconLight from '../../public/icon-facebook-light.svg';
+import AppleIcon from '../../public/images/svg/auth/icon-apple.svg';
+import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
+import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
+import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
+import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
+import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
 
 export interface ISignupMenu {
   reason?: SignupReason
 }
-
-const SSignupMenu = styled.div<{ isLoading?: boolean }>`
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  display: flex;
-  height: 100%;
-  width: 100%;
-
-  /* Temporary */
-  /* background-color: #F2F2F2; */
-
-
-  cursor: ${({ isLoading }) => (isLoading ? 'wait' : 'default')};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 50%
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
-    width: 45%;
-  }
-`;
-
-const SMenuWrapper = styled.div`
-  position: relative;
-
-
-  height: 100%;
-  width: 100%;
-
-  padding: 16px;
-
-  /* No select for whole menu */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  h1 {
-    margin-top: 140px;
-    margin-bottom: 24px;
-
-    text-align: center;
-
-    font-style: normal;
-    font-weight: bold;
-    font-size: 32px;
-    line-height: 40px;
-  }
-
-  h4 {
-    display: none;
-  }
-
-  & > div {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  p {
-    margin-top: 24px;
-    padding-bottom: 32px;
-
-    text-align: center;
-
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 16px;
-
-    color: ${({ theme }) => (theme.name === 'light' ? '#949DB7' : 'rgba(115, 117, 140, 0.7)')};
-
-    a {
-      text-decoration: none;
-      color: ${({ theme }) => (theme.name === 'light' ? theme.colorsThemed.onSurface : 'rgba(115, 117, 140, 1)')}
-    }
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    max-width: 360px;
-
-    h1 {
-      margin-top: 12px;
-
-      text-align: left;
-      margin-bottom: 8px;
-    }
-
-    h4 {
-      display: block;
-      margin-bottom: 24px;
-    }
-
-    & > div {
-      gap: 16px;
-    }
-
-    p {
-      text-align: left;
-      font-size: 14px;
-      line-height: 20px;
-    }
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
-    h1 {
-      margin-top: 20vh;
-    }
-  }
-`;
-
-const SBackButton = styled.button`
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  width: fit-content;
-  height: fit-content;
-  padding: 8px;
-
-  color: ${({ theme }) => theme.colorsThemed.onSurface};
-  background-color: transparent;
-  border: transparent;
-
-  cursor: pointer;
-
-  & path {
-    fill: ${({ theme }) => theme.colorsThemed.onSurface};
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    position: static;
-
-    margin-top: 20vh;
-    padding: 0;
-
-    font-weight: bold;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
-    display: none;
-  }
-`;
-
-const SContinueWithSpan = styled.span`
-  width: fit-content;
-  padding-left: 16px;
-  padding-right: 16px;
-
-  text-align: center;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: ${({ theme }) => (theme.name === 'light' ? '#949DB7' : 'rgba(115, 117, 140, 0.7)')};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-  }
-`;
-
-const SErrorDiv = styled.div`
-  text-align: center;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: ${({ theme }) => theme.colorsThemed.accent.error};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-  }
-`;
 
 const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   const theme = useTheme();
@@ -232,12 +48,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
-  // Show more options
-  const [bottomSectionOpen, setBottomSectionOpen] = useState(false);
-
-  // Email inut
+  // Email input
   const [emailInput, setEmailInput] = useState(signupEmailInput ?? '');
-  // Validity of input
   const [emailInputValid, setEmailInputValid] = useState(false);
 
   // Loading of email submission
@@ -281,93 +93,81 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       isLoading={isSubmitLoading}
     >
       <SMenuWrapper>
-        <SBackButton
+        <SSignInBackButton
           onClick={() => router.back()}
         >
-          <InlineSvg
-            svg={BackButtonIcon}
-            width="24px"
-            height="24px"
-          />
           {t('goBackBtn')}
-        </SBackButton>
-        <h1>
+        </SSignInBackButton>
+        <SHeadline
+          variant={3}
+        >
           {reason ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}` : t('heading.sign_in')}
-        </h1>
-        <h4>
+        </SHeadline>
+        <SSubheading variant={2} weight={600}>
           {t('heading.subheading')}
-        </h4>
+        </SSubheading>
         <div>
           <SignInButton
             svg={GoogleIcon}
+            hoverBgColor={theme.colors.social.google}
             onClick={() => {}}
           >
             {t('signupOptions.google')}
           </SignInButton>
-          <SignInButton
+          {/* <SignInButton
             svg={AppleIcon}
             hoverBgColor="#000"
             hoverContentColor="#FFF"
             onClick={() => {}}
           >
             {t('signupOptions.apple')}
-          </SignInButton>
+          </SignInButton> */}
+          <AppleSignInButton
+            label={t('signupOptions.apple')}
+          />
           <SignInButton
             svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
+            hoverSvg={FacebookIconLight}
+            hoverBgColor={theme.colors.social.facebook}
             onClick={() => {}}
           >
             {t('signupOptions.facebook')}
           </SignInButton>
+          <SignInButton
+            svg={TwitterIcon}
+            hoverBgColor={theme.colors.social.twitter}
+            onClick={() => {}}
+          >
+            {t('signupOptions.twitter')}
+          </SignInButton>
+          <TextWithLine
+            lineColor={theme.colorsThemed.text.secondary}
+            innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
+          />
           {
-            !bottomSectionOpen ? (
-              <SignInButton
-                title="Show more options"
-                svg={theme.name === 'dark' ? ArrowDownIconLight : ArrowDownIcon}
-                hoverBgColor={theme.name === 'dark' ? '#000' : undefined}
-                hoverContentColor={theme.name === 'dark' ? '#FFF' : undefined}
-                onClick={() => setBottomSectionOpen(true)}
-              >
-                {t('signupOptions.moreOptionsBtn')}
-              </SignInButton>
-            ) : (
-              <>
-                <SignInButton
-                  svg={TwitterIcon}
-                  onClick={() => {}}
-                >
-                  {t('signupOptions.twitter')}
-                </SignInButton>
-                <TextWithLine
-                  lineColor={theme.name === 'light' ? '#949DB7' : 'rgba(115, 117, 140, 0.7)'}
-                  innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
-                />
-                {
-                  submitError ? <SErrorDiv>{ t(`errors.${submitError}`) }</SErrorDiv> : null
-                }
-                <TextInput
-                  name="email"
-                  type="email"
-                  autoComplete="true"
-                  value={emailInput}
-                  isValid={emailInputValid}
-                  disabled={isSubmitLoading}
-                  onFocus={() => {
-                    if (submitError) setSubmitError('');
-                  }}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder={t('signupOptions.email')}
-                />
-                <BasicButton
-                  disabled={!emailInputValid || isSubmitLoading}
-                  onClick={() => handleSubmitEmail()}
-                >
-                  {t('signupOptions.signInBtn')}
-                </BasicButton>
-              </>
-            )
+            submitError ? <SErrorDiv>{ t(`errors.${submitError}`) }</SErrorDiv> : null
           }
+          <SignInTextInput
+            name="email"
+            type="email"
+            autoComplete="true"
+            value={emailInput}
+            isValid={emailInputValid}
+            disabled={isSubmitLoading}
+            onFocus={() => {
+              if (submitError) setSubmitError('');
+            }}
+            onChange={(e) => setEmailInput(e.target.value)}
+            placeholder={t('signupOptions.email')}
+          />
+          <GradientButton
+            disabled={!emailInputValid || isSubmitLoading}
+            onClick={() => handleSubmitEmail()}
+          >
+            {t('signupOptions.signInBtn')}
+          </GradientButton>
         </div>
-        <p>
+        <SLegalText>
           {t('legalDisclaimer.main_text')}
           <br />
           <Link href="/">
@@ -379,10 +179,189 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           <Link href="/">
             <a href="/" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
           </Link>
-        </p>
+        </SLegalText>
       </SMenuWrapper>
     </SSignupMenu>
   );
 };
 
 export default SignupMenu;
+
+const SSignupMenu = styled.div<{ isLoading?: boolean }>`
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  display: flex;
+  height: 100%;
+  width: 100%;
+
+  cursor: ${({ isLoading }) => (isLoading ? 'wait' : 'default')};
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 50%
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    width: 45%;
+  }
+`;
+
+const SMenuWrapper = styled.div`
+  position: relative;
+
+  height: 100%;
+  width: 100%;
+
+  padding: 16px;
+
+  /* No select for whole menu */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    max-width: 360px;
+
+    & > div {
+      gap: 16px;
+    }
+  }
+`;
+
+const SSignInBackButton = styled(SignInBackButton)`
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: fit-content;
+
+  padding: 8px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.appBgColor};
+
+  ${({ theme }) => theme.media.tablet} {
+    position: static;
+
+    width: fit-content;
+
+    margin-top: 142px;
+    padding: 0;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    display: none;
+  }
+`;
+
+const SHeadline = styled(Headline)`
+  margin-top: 108px;
+  margin-bottom: 24px;
+
+  text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 12px;
+    margin-bottom: 8px;
+
+    text-align: left;
+
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    margin-top: 140px;
+
+    font-size: 32px;
+    line-height: 40px;
+  }
+`;
+
+const SSubheading = styled(Text)`
+  display: none;
+
+  // NB! Temp
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  ${({ theme }) => theme.media.tablet} {
+    display: block;
+    margin-bottom: 24px;
+
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    line-height: 24px;
+  }
+`;
+
+const SContinueWithSpan = styled.span`
+  width: fit-content;
+  padding-left: 8px;
+  padding-right: 8px;
+
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+
+  // NB! Temp
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+  }
+`;
+
+const SErrorDiv = styled.div`
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+  }
+`;
+
+const SLegalText = styled(Text)`
+  margin-top: 24px;
+  padding-bottom: 32px;
+
+  text-align: center;
+
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+
+  // NB! Temp
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  a {
+    text-decoration: none;
+    font-weight: 600;
+    // NB! Temp
+    color: ${({ theme }) => (theme.name === 'light' ? 'rgba(115, 117, 140, 1)' : 'rgba(115, 117, 140, 1)')}
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+    font-size: 14px;
+    line-height: 20px;
+  }
+`;

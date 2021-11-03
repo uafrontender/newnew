@@ -5,183 +5,35 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { signInWithEmail } from '../../api/endpoints/auth';
 
 // Components
-// import BasicButton from '../atoms/BasicButton';
-import InlineSvg from '../atoms/InlineSVG';
+import Headline from '../atoms/Headline';
+import SignInBackButton from '../molecules/signup/SignInBackButton';
 import VerficationCodeInput from '../atoms/VerificationCodeInput';
 
-// Icons
-// import BackButtonIcon from '../../public/icon-back-temp.svg';
-import BackButtonIcon from '../../public/icon-back-temp2.svg';
-import NewnewLogoBlue from '../../public/newnew-logo-blue.svg';
-import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
-import isBroswer from '../../utils/isBrowser';
+// Utils
 import secondsToString from '../../utils/secondsToHMS';
+import isBroswer from '../../utils/isBrowser';
 import sleep from '../../utils/sleep';
+import Text from '../atoms/Text';
+import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 export interface ICodeVerificationMenu {
-
+  expirationTime: number;
 }
 
-const SCodeVerificationMenu = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-
-  height: 100%;
-  width: 100%;
-
-  text-align: center;
-
-
-  transition: .3s ease-in-out;
-
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  /* Logo */
-  & > div:nth-child(2)  {
-    margin-top: 164px;
-  }
-
-  h1 {
-    margin-top: 36px;
-
-    font-weight: bold;
-    font-size: 24px;
-    line-height: 32px;
-  }
-
-  h4 {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 18px;
-
-    color: ${({ theme }) => theme.colors.baseLight700};
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    /* Logo */
-
-    & > div:nth-child(2) {
-      margin-top: 288px;
-    }
-
-    h1 {
-      font-size: 36px;
-      line-height: 44px;
-    }
-
-    h4 {
-      font-size: 16px;
-      line-height: 20px;
-    }
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
-    top: calc(50% - 224px);
-    left: calc(50% - 304px);
-
-    width: 608px;
-    height: 448px;
-
-    border-radius: ${({ theme }) => theme.borderRadius.xxxLarge};
-    border-style: 1px transparent solid;
-
-    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
-
-    /* Logo */
-    & > div:nth-child(2) {
-      margin-top: 74px;
-    }
-  }
-`;
-
-const SBackButton = styled.button`
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  width: fit-content;
-  height: fit-content;
-  padding: 8px;
-
-  color: ${({ theme }) => theme.colorsThemed.onSurface};
-  background-color: transparent;
-  border: transparent;
-
-  cursor: pointer;
-
-  & path {
-    fill: ${({ theme }) => theme.colorsThemed.onSurface};
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-weight: bold;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
-    display: none;
-  }
-`;
-
-interface ISTimeoutDiv {
-  isAlertColor: boolean;
-}
-
-const STimeoutDiv = styled.div<ISTimeoutDiv>`
-  color: ${({ isAlertColor, theme }) => {
-    if (isAlertColor) return theme.colorsThemed.accent.error;
-    return theme.colorsThemed.onSurface;
-  }};
-`;
-
-const STimeExpired = styled.div`
-
-  button {
-    background-color: transparent;
-    border: transparent;
-
-    color: ${({ theme }) => theme.colors.brand2700};
-
-    font-size: inherit;
-    font-weight: bold;
-
-    cursor: pointer;
-  }
-`;
-
-const SErrorDiv = styled.div`
-  font-weight: bold;
-  color: ${({ theme }) => theme.colorsThemed.accent.error};
-`;
-
-const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () => {
-  const theme = useTheme();
+const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
+  expirationTime,
+}) => {
   const router = useRouter();
   const { t } = useTranslation('verify-email');
 
@@ -197,7 +49,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () 
   const [isResendCodeLoading, setIsResendCodeLoading] = useState(false);
 
   // Timer
-  const [timerSeconds, setTimerSeconds] = useState(60);
+  const [timerSeconds, setTimerSeconds] = useState(expirationTime);
   const [timerActive, setTimerActive] = useState(false);
   const interval = useRef<number>();
 
@@ -207,6 +59,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () 
       setSubmitError('');
       setIsSigninWithEmailLoading(true);
 
+      // NB! Temp
       await sleep(2000);
 
       const signInRequest = new newnewapi.EmailSignInRequest({
@@ -253,7 +106,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () 
 
       setIsResendCodeLoading(false);
       setCodeInital(new Array(6).join('.').split('.'));
-      setTimerSeconds(60);
+      setTimerSeconds(expirationTime);
       setTimerActive(true);
     } catch (err: any) {
       setIsResendCodeLoading(false);
@@ -298,7 +151,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () 
 
   return (
     <SCodeVerificationMenu
-      onClick={() => {
+      onClick={(e) => {
         if (submitError) {
           handleTryAgain();
         }
@@ -307,29 +160,22 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () 
       <SBackButton
         onClick={() => router.back()}
       >
-        <InlineSvg
-          svg={BackButtonIcon}
-          width="24px"
-          height="24px"
-        />
-        <span>
-          {t('goBackBtn')}
-        </span>
+        {t('goBackBtn')}
       </SBackButton>
-      <InlineSvg
-        svg={NewnewLogoBlue}
-        width="64px"
-        height="64px"
+      <AnimatedLogoEmailVerification
+        isLoading={isSigninWithEmailLoading || isResendCodeLoading}
       />
-      <h1>
+      <SHeadline
+        variant={3}
+      >
         { t('heading.heading') }
-      </h1>
-      <h4>
+      </SHeadline>
+      <SSubheading variant={2} weight={600}>
         {t('heading.subheading')}
-        {' '}
+        <br />
         {/* NB! Temp */}
         {signupEmailInput.length > 0 ? signupEmailInput : 'email@email.com'}
-      </h4>
+      </SSubheading>
       <VerficationCodeInput
         initialValue={codeInitial}
         length={6}
@@ -368,15 +214,171 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = () 
           </SErrorDiv>
         ) : null
       }
-      {
-        isSigninWithEmailLoading || isResendCodeLoading ? (
-          <div>
-            Spinner placeholder
-          </div>
-        ) : null
-      }
     </SCodeVerificationMenu>
   );
 };
 
+CodeVerificationMenu.defaultProps = {
+  expirationTime: 60,
+};
+
 export default CodeVerificationMenu;
+
+const SCodeVerificationMenu = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  height: 100%;
+  width: 100%;
+
+  text-align: center;
+
+  transition: width height .3s ease-in-out;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  ${({ theme }) => theme.media.laptopL} {
+    top: calc(50% - 224px);
+    left: calc(50% - 304px);
+
+    width: 608px;
+    height: 448px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.xxxLarge};
+    border-style: 1px transparent solid;
+
+    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  }
+`;
+
+const SBackButton = styled(SignInBackButton)`
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: fit-content;
+
+  padding: 8px;
+
+
+  ${({ theme }) => theme.media.tablet} {
+    width: fit-content;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    display: none;
+  }
+`;
+
+const SHeadline = styled(Headline)`
+  margin-top: 24px;
+
+  text-align: center;
+
+  // NB! Temp
+  color: ${({ theme }) => (theme.name === 'light' ? theme.colorsThemed.text.secondary : theme.colorsThemed.text.primary)};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    font-size: 32px;
+    line-height: 40px;
+  }
+`;
+
+const SSubheading = styled(Text)`
+  margin-top: 8px;
+
+  font-size: 14px;
+  line-height: 18px;
+
+  // NB! Temp
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    line-height: 24px;
+  }
+`;
+
+interface ISTimeoutDiv {
+  isAlertColor: boolean;
+}
+
+const STimeoutDiv = styled.div<ISTimeoutDiv>`
+  font-size: 15px;
+  line-height: 24px;
+
+  // NB! Temp
+  color: ${({ isAlertColor, theme }) => {
+    if (isAlertColor) return theme.colorsThemed.accent.error;
+    return theme.colorsThemed.text.secondary;
+  }};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+  }
+`;
+
+const STimeExpired = styled(Text)`
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+
+  // NB! Temp
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+  }
+
+  button {
+    background-color: transparent;
+    border: transparent;
+
+    // NB! Temp
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+    font-size: inherit;
+    font-weight: bold;
+
+    cursor: pointer;
+  }
+`;
+
+const SErrorDiv = styled(Text)`
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: bold;
+
+  // NB! Temp
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    line-height: 24px;
+  }
+`;
