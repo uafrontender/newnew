@@ -20,7 +20,7 @@ const STextInput = styled.input<ISTextInput>`
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       return (theme.name === 'light' ? '#DFE2EC' : '#36374A');
-    } return (theme.colorsThemed.alertRed);
+    } return (theme.colorsThemed.accent.error);
   }};
 
   color: ${({ theme }) => theme.colorsThemed.onSurface};

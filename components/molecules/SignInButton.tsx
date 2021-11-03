@@ -17,7 +17,7 @@ const ButtonStyled = styled.button<ButtonStyledInterface>`
   padding: 16px 20px 16px 22%;
 
   color: ${({ theme }) => theme.colorsThemed.onSurface};
-  background-color: ${({ theme }) => theme.colorsThemed.surface};
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
 
   ${({ theme, hoverBgColor, hoverContentColor }) => (hoverBgColor
     ? css`& path {

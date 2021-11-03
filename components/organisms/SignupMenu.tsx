@@ -204,7 +204,7 @@ const SContinueWithSpan = styled.span`
   line-height: 20px;
 
   color: ${({ theme }) => (theme.name === 'light' ? '#949DB7' : 'rgba(115, 117, 140, 0.7)')};
-  background-color: ${({ theme }) => theme.colorsThemed.appBgColor};
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
@@ -217,7 +217,7 @@ const SErrorDiv = styled.div`
   font-size: 14px;
   line-height: 20px;
 
-  color: ${({ theme }) => theme.colorsThemed.alertRed};
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
