@@ -13,6 +13,7 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 // NB!
 
 export type TColorMode = 'light' | 'dark';
+export type TGlobalSearchActive = true | false;
 export type TResizeMode =
   'mobile'
   | 'mobileS'
@@ -26,11 +27,13 @@ export type TResizeMode =
 export interface UIStateInterface {
   colorMode: TColorMode;
   resizeMode: TResizeMode;
+  globalSearchActive: TGlobalSearchActive;
 }
 
 export const defaultUIState: UIStateInterface = {
   colorMode: 'light',
   resizeMode: 'mobile',
+  globalSearchActive: false,
 };
 
 export const uiSlice: Slice<UIStateInterface> = createSlice({
@@ -43,12 +46,16 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     setResizeMode(state, { payload }: PayloadAction<TResizeMode>) {
       state.resizeMode = payload;
     },
+    setGlobalSearchActive(state, { payload }: PayloadAction<TGlobalSearchActive>) {
+      state.globalSearchActive = payload;
+    },
   },
 });
 
 export const {
   setColorMode,
   setResizeMode,
+  setGlobalSearchActive,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

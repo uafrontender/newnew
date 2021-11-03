@@ -33,10 +33,7 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html translate="no">
-        <Head>
-          <meta name="robots" content="noindex" />
-          <meta name="charSet" content="utf-8" />
-        </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />
