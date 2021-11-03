@@ -24,13 +24,13 @@ const STextWithLine = styled.div<ISTextWithLine>`
 
   &:before {
     border-bottom: 1px solid;
-    border-bottom-color: ${({ theme }) => (theme.name === 'light' ? '#949DB7' : 'rgba(115, 117, 140, 0.7)')};
+    border-bottom-color: ${({ theme }) => theme.colorsThemed.text.secondary};
     content: "";
 
     margin: 0 auto;
     position: absolute;
     top: 45%; left: 0; right: 0;
-    width: 90%;
+    width: 100%;
     z-index: -1;
   }
 `;
