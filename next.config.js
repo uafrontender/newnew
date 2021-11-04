@@ -16,4 +16,17 @@ module.exports = {
   images: {
     domains: ['randomuser.me'],
   },
+  async headers() {
+    return [
+      {
+        source: '/fonts/:path',
+        headers: [
+          {
+            key: 'Cache-control',
+            value: 'public, immutable, max-age=31536000',
+          },
+        ],
+      },
+    ];
+  },
 };

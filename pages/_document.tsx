@@ -34,6 +34,7 @@ export default class MyDocument extends Document {
     return (
       <Html translate="no">
         <Head>
+          <link href="/fonts/font-gilroy.css" rel="stylesheet" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-Thin.otf" as="font" type="font/otf" crossOrigin="anonymous" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-ThinItalic.otf" as="font" type="font/otf" crossOrigin="anonymous" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-UltraLight.otf" as="font" type="font/otf" crossOrigin="anonymous" />
@@ -54,7 +55,6 @@ export default class MyDocument extends Document {
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-BlackItalic.otf" as="font" type="font/otf" crossOrigin="anonymous" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-Heavy.otf" as="font" type="font/otf" crossOrigin="anonymous" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-HeavyItalic.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-          <link href="/fonts/font-styles.css" rel="stylesheet" />
         </Head>
         <body>
           <Main />
