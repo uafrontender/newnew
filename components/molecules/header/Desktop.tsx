@@ -4,20 +4,20 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Button from '../atoms/Button';
-import InlineSVG from '../atoms/InlineSVG';
-import UserAvatar from './UserAvatar';
-import SearchInput from '../atoms/SearchInput';
-import TopNavigationItem from './TopNavigationItem';
+import Button from '../../atoms/Button';
+import InlineSVG from '../../atoms/InlineSVG';
+import UserAvatar from '../UserAvatar';
+import SearchInput from '../../atoms/SearchInput';
+import NavigationItem from '../NavigationItem';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppSelector } from '../../../redux-store/store';
 
-import tabletLogo from '../../public/images/svg/tablet-logo.svg';
+import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
 
-interface IDesktopTopNavigation {
+interface IDesktop {
 }
 
-export const DesktopTopNavigation: React.FC<IDesktopTopNavigation> = () => {
+export const Desktop: React.FC<IDesktop> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -54,7 +54,7 @@ export const DesktopTopNavigation: React.FC<IDesktopTopNavigation> = () => {
         {user.loggedIn && (
           <>
             <SItemWithMargin>
-              <TopNavigationItem
+              <NavigationItem
                 item={{
                   url: '/notifications',
                   key: 'notifications',
@@ -63,7 +63,7 @@ export const DesktopTopNavigation: React.FC<IDesktopTopNavigation> = () => {
               />
             </SItemWithMargin>
             <SItemWithMargin>
-              <TopNavigationItem
+              <NavigationItem
                 item={{
                   url: '/direct-messages',
                   key: 'direct-messages',
@@ -73,7 +73,7 @@ export const DesktopTopNavigation: React.FC<IDesktopTopNavigation> = () => {
             </SItemWithMargin>
             {user.role === 'creator' ? (
               <SItemWithMargin>
-                <TopNavigationItem
+                <NavigationItem
                   item={{
                     url: '/share',
                     key: 'share',
@@ -82,7 +82,7 @@ export const DesktopTopNavigation: React.FC<IDesktopTopNavigation> = () => {
               </SItemWithMargin>
             ) : (
               <SItemWithMargin>
-                <TopNavigationItem
+                <NavigationItem
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
@@ -172,16 +172,16 @@ export const DesktopTopNavigation: React.FC<IDesktopTopNavigation> = () => {
   );
 };
 
-export default DesktopTopNavigation;
+export default Desktop;
 
-const SContainer = styled.nav`
+const SContainer = styled.div`
   display: flex;
   padding: 16px 96px;
   align-items: center;
   justify-content: space-between;
 `;
 
-const SRightBlock = styled.div`
+const SRightBlock = styled.nav`
   display: flex;
   align-items: center;
   justify-content: flex-end;
