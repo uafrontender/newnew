@@ -14,5 +14,20 @@
   "button-login-in": "Log in",
   "button-sign-up": "Sign up",
   "button-dashboard": "Dashboard",
-  "button-create-on-newnew": "Create on NewNew"
+  "button-create-on-newnew": "Create on NewNew",
+  "footer-top-title": "NewNew",
+  "footer-center-title": "Community",
+  "footer-bottom-title": "Social",
+  "footer-about": "About",
+  "footer-press": "Press",
+  "footer-jobs": "Jobs",
+  "footer-help": "Help",
+  "footer-faq": "FAQs",
+  "footer-how-it-works": "How it works",
+  "footer-guidelines": "Guidelines",
+  "footer-accessibility": "Accessibility",
+  "footer-suggest-a-feature": "Suggest a feature",
+  "footer-inc": "© NewNew Inc",
+  "footer-terms": "Terms",
+  "footer-privacy": "Privacy"
 }

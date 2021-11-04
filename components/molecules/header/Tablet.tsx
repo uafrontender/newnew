@@ -4,22 +4,22 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Button from '../atoms/Button';
-import InlineSVG from '../atoms/InlineSVG';
-import UserAvatar from './UserAvatar';
-import SearchInput from '../atoms/SearchInput';
-import TopNavigationItem from './TopNavigationItem';
+import Button from '../../atoms/Button';
+import InlineSVG from '../../atoms/InlineSVG';
+import UserAvatar from '../UserAvatar';
+import SearchInput from '../../atoms/SearchInput';
+import NavigationItem from '../NavigationItem';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppSelector } from '../../../redux-store/store';
 
-import menuIcon from '../../public/images/svg/icons/outlined/Menu.svg';
-import mobileLogo from '../../public/images/svg/mobile-logo.svg';
-import tabletLogo from '../../public/images/svg/tablet-logo.svg';
+import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
+import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
 
-interface ITabletTopNavigation {
+interface ITablet {
 }
 
-export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
+export const Tablet: React.FC<ITablet> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -65,7 +65,7 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
         {user.loggedIn && (
           <>
             <SItemWithMargin>
-              <TopNavigationItem
+              <NavigationItem
                 item={{
                   url: '/notifications',
                   key: 'notifications',
@@ -74,7 +74,7 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
               />
             </SItemWithMargin>
             <SItemWithMargin>
-              <TopNavigationItem
+              <NavigationItem
                 item={{
                   url: '/direct-messages',
                   key: 'direct-messages',
@@ -84,7 +84,7 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
             </SItemWithMargin>
             {user.role === 'creator' ? (
               <SItemWithMargin>
-                <TopNavigationItem
+                <NavigationItem
                   item={{
                     url: '/share',
                     key: 'share',
@@ -93,7 +93,7 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
               </SItemWithMargin>
             ) : (
               <SItemWithMargin>
-                <TopNavigationItem
+                <NavigationItem
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
@@ -185,16 +185,16 @@ export const TabletTopNavigation: React.FC<ITabletTopNavigation> = () => {
   );
 };
 
-export default TabletTopNavigation;
+export default Tablet;
 
-const SContainer = styled.nav`
+const SContainer = styled.div`
   display: flex;
   padding: 12px 32px;
   align-items: center;
   justify-content: space-between;
 `;
 
-const SRightBlock = styled.div`
+const SRightBlock = styled.nav`
   display: flex;
   align-items: center;
   justify-content: flex-end;
