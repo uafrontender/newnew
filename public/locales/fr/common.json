@@ -14,5 +14,20 @@
   "button-login-in": "Connectez-vous",
   "button-sign-up": "Inscrivez-vous",
   "button-dashboard": "Tableau de bord",
-  "button-create-on-newnew": "Créer sur NewNew"
+  "button-create-on-newnew": "Créer sur NewNew",
+  "footer-top-title": "NouveauNouveau",
+  "footer-center-title": "Communauté",
+  "footer-bottom-title": "Social",
+  "footer-about": "À propos",
+  "footer-press": "Press",
+  "footer-jobs": "Emplois",
+  "footer-help": "Aide",
+  "footer-faq": "FAQ",
+  "footer-how-it-works": "Comment ça marche",
+  "footer-guidelines": "Lignes directrices",
+  "footer-accessibility": "Accessibilité",
+  "footer-suggest-a-feature": "Suggérer une fonctionnalité",
+  "footer-inc": "© NewNew Inc",
+  "footer-terms": "Termes",
+  "footer-privacy": "Confidentialité"
 }

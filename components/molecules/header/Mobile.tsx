@@ -3,20 +3,20 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
-import Button from '../atoms/Button';
-import InlineSVG from '../atoms/InlineSVG';
-import UserAvatar from './UserAvatar';
-import SearchInput from '../atoms/SearchInput';
+import Button from '../../atoms/Button';
+import InlineSVG from '../../atoms/InlineSVG';
+import UserAvatar from '../UserAvatar';
+import SearchInput from '../../atoms/SearchInput';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppSelector } from '../../../redux-store/store';
 
-import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
-import mobileLogo from '../../public/images/svg/mobile-logo.svg';
+import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.svg';
+import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 
-interface IMobileTopNavigation {
+interface IMobile {
 }
 
-export const MobileTopNavigation: React.FC<IMobileTopNavigation> = () => {
+export const Mobile: React.FC<IMobile> = () => {
   const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -70,9 +70,9 @@ export const MobileTopNavigation: React.FC<IMobileTopNavigation> = () => {
   );
 };
 
-export default MobileTopNavigation;
+export default Mobile;
 
-const SContainer = styled.nav`
+const SContainer = styled.div`
   display: flex;
   padding: 8px 16px;
   position: relative;
@@ -80,7 +80,7 @@ const SContainer = styled.nav`
   justify-content: space-between;
 `;
 
-const SRightBlock = styled.div`
+const SRightBlock = styled.nav`
   display: flex;
   align-items: center;
   justify-content: flex-end;

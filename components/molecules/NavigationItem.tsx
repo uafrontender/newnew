@@ -8,18 +8,18 @@ import { useTranslation } from 'next-i18next';
 import Text from '../atoms/Text';
 import Indicator from '../atoms/Indicator';
 
-export type TTopNavigationItem = {
+export type TNavigationItem = {
   key: string,
   url: string,
   value?: number,
   counter?: number,
 }
 
-export interface ITopNavigationItem {
-  item: TTopNavigationItem;
+export interface INavigationItem {
+  item: TNavigationItem;
 }
 
-export const TopNavigationItem: React.FC<ITopNavigationItem> = (props) => {
+export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const { item } = props;
   const { t } = useTranslation();
   const router = useRouter();
@@ -60,7 +60,7 @@ export const TopNavigationItem: React.FC<ITopNavigationItem> = (props) => {
   );
 };
 
-export default TopNavigationItem;
+export default NavigationItem;
 
 interface ISNavItem {
   active: boolean;

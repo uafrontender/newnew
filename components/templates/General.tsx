@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
-import TopNavigation from '../organisms/TopNavigation';
+import Footer from '../organisms/Footer';
+import Header from '../organisms/Header';
 import BottomNavigation from '../organisms/BottomNavigation';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -83,10 +84,11 @@ export const General: React.FC<IGeneral> = (props) => {
 
   return (
     <SContainer>
-      <TopNavigation />
+      <Header />
       <SContent>
         {children}
       </SContent>
+      <Footer />
       {resizeMode.includes('mobile') && (
         <BottomNavigation collection={bottomNavigation} />
       )}
@@ -99,21 +101,34 @@ export default General;
 const SContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  margin: auto;
-  max-width: ${(props) => props.theme.width.maxContentWidth};
-`;
-
-const SContent = styled.main`
-  color: ${(props) => props.theme.colorsThemed.appTextColor};
-  height: 100%;
+  display: flex;
+  overflow-y: auto;
   padding-top: 56px;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
+  padding-bottom: 56px;
+  flex-direction: column;
+  justify-content: space-between;
 
   ${({ theme }) => theme.media.tablet} {
     padding-top: 72px;
+    padding-bottom: 0;
   }
 
   ${({ theme }) => theme.media.laptop} {
     padding-top: 80px;
+  }
+`;
+
+const SContent = styled.main`
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 16px;
+  max-width: ${(props) => props.theme.width.maxContentWidth};
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 32px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    padding: 40px 96px;
   }
 `;

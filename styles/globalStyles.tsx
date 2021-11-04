@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 
 // TODO: finalize CSS resets & general light/dark mode configs
 const GlobalStyle = createGlobalStyle`
-    /* CSS resets */
+  /* CSS resets */
   /* Make box-sizing: border-box default to all document */
   html {
     -webkit-box-sizing: border-box;
@@ -28,8 +28,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: Gilroy, Arial, Helvetica, sans-serif;
   }
 
-
-    /* General light/dark mode configs */
+  /* General light/dark mode configs */
   body {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
@@ -38,7 +37,6 @@ const GlobalStyle = createGlobalStyle`
   a {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
-
 `;
 
 export default GlobalStyle;
