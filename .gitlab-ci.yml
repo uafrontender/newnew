@@ -75,9 +75,11 @@ build:
       when: never
     - if: '$CI_COMMIT_BRANCH == "development"'
       when: manual
+      allow_failure: true
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
+  needs: []
   stage: build
   image: saltycrane/aws-cli-and-docker
   services:
@@ -93,9 +95,11 @@ deploy:
       when: never
     - if: '$CI_COMMIT_BRANCH == "development"'
       when: manual
+      allow_failure: true
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
+  needs: ["build"]
   stage: deploy
   image: saltycrane/aws-cli-and-docker
   services:

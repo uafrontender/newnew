@@ -29,5 +29,17 @@
   "footer-suggest-a-feature": "Suggérer une fonctionnalité",
   "footer-inc": "© NewNew Inc",
   "footer-terms": "Termes",
-  "footer-privacy": "Confidentialité"
+  "footer-privacy": "Confidentialité",
+  "dd-language-title-en": "Anglais",
+  "dd-language-title-fr": "French",
+  "dd-language-subTitle-en": "États-Unis",
+  "dd-language-subTitle-fr": "France",
+  "selected-language-title-en": "English (US)",
+  "selected-language-title-fr": "French (FR)",
+  "dd-currency-title-usd": "Dollar des États-Unis",
+  "dd-currency-title-eur": "Euro",
+  "dd-currency-subTitle-usd": "USD - $",
+  "dd-currency-subTitle-eur": "EUR - €",
+  "selected-currency-title-usd": "USD",
+  "selected-currency-title-eur": "EUR"
 }

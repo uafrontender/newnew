@@ -88,6 +88,7 @@ interface ISContainer {
 
 const SContainer = styled.a<ISContainer>`
   width: ${(props) => props.width};
+  margin: 0 8px;
   padding: 8px 2px;
   display: flex;
   align-items: center;
