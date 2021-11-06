@@ -79,7 +79,6 @@ build:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
-      allow_failure: true
   needs: []
   stage: build
   image: saltycrane/aws-cli-and-docker
@@ -100,7 +99,6 @@ deploy:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
-      allow_failure: true
   needs: ["build"]
   stage: deploy
   image: saltycrane/aws-cli-and-docker
