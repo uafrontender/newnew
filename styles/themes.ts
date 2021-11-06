@@ -105,6 +105,7 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name'> = {
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
+    mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
   },
   gradients: {
     blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
@@ -139,6 +140,10 @@ export const lightTheme: DefaultTheme = {
     searchInputPlaceholder: basicTheme.colors.baseLight300,
     mobileNavigation: '#828282',
     mobileNavigationActive: '#4F4F4F',
+    footerBackground: basicTheme.colors.baseLight50,
+    footerButtonBackground: basicTheme.colors.baseLight0,
+    footerDDSelectedBackground: basicTheme.colors.baseLight50,
+    footerDDItemColor: basicTheme.colors.baseLight500,
     grayscale: {
       background1: '#FFFFFF',
       background2: '#F1F3F9',
@@ -187,6 +192,10 @@ export const darkTheme: DefaultTheme = {
     searchInputPlaceholder: basicTheme.colors.baseLight800,
     mobileNavigation: '#828282',
     mobileNavigationActive: '#4F4F4F',
+    footerBackground: basicTheme.colors.brand1900,
+    footerButtonBackground: basicTheme.colors.baseDark900,
+    footerDDSelectedBackground: basicTheme.colors.baseDark800,
+    footerDDItemColor: basicTheme.colors.baseLight400,
     grayscale: {
       background1: '#0B0A13',
       background2: '#14151F',
