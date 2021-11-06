@@ -1,9 +1,12 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
+import { DEFAULT_CURRENCY } from '../../constants/general';
+
 export interface IUserStateInterface {
   role: string;
   avatar: string;
+  currency: string;
   loggedIn: boolean;
   lastName: string;
   firstName: string;
@@ -16,6 +19,7 @@ export interface IUserStateInterface {
 const defaultUIState: IUserStateInterface = {
   role: '',
   avatar: '',
+  currency: DEFAULT_CURRENCY,
   loggedIn: false,
   lastName: 'Dou',
   firstName: 'John',
@@ -41,6 +45,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setUserAvatar(state, { payload }: PayloadAction<string>) {
       state.avatar = payload;
     },
+    setUserCurrency(state, { payload }: PayloadAction<string>) {
+      state.currency = payload;
+    },
   },
 });
 
@@ -48,6 +55,7 @@ export const {
   setUserRole,
   setUserAvatar,
   setUserLoggedIn,
+  setUserCurrency,
   setSignupEmailInput,
 } = userSlice.actions;
 
