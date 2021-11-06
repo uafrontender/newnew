@@ -122,6 +122,10 @@ declare module 'styled-components' {
       searchInputPlaceholder: string;
       mobileNavigation: string;
       mobileNavigationActive: string;
+      footerBackground: string;
+      footerButtonBackground: string;
+      footerDDSelectedBackground: string;
+      footerDDItemColor: string;
       grayscale: {
         background1: string;
         background2: string;
@@ -149,6 +153,7 @@ declare module 'styled-components' {
     },
     shadows: {
       mediumBlue: string;
+      mediumGrey: string;
     },
     gradients: {
       blueDiagonal: string;

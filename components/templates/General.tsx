@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 
 import Footer from '../organisms/Footer';
@@ -12,11 +12,13 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 interface IGeneral {
   children: React.ReactNode;
 }
+let scrollPosition: number = 0;
 
 export const General: React.FC<IGeneral> = (props) => {
   const { children } = props;
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { overlay, resizeMode } = useAppSelector((state) => state.ui);
+  const containerRef: any = useRef();
 
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
@@ -82,8 +84,27 @@ export const General: React.FC<IGeneral> = (props) => {
     return bottomNavigationShadow;
   }, [user.loggedIn, user.notificationsCount, user.role]);
 
+  useEffect(() => {
+    containerRef.current.style.overflow = overlay ? 'hidden' : 'visible';
+
+    if (overlay) {
+      scrollPosition = window ? window.scrollY : 0;
+
+      containerRef.current.style.cssText = `
+          top: -${scrollPosition}px;
+          left: 0px;
+          right: 0px;
+          position: fixed;
+       `;
+    } else {
+      containerRef.current.style.cssText = '';
+      window.scroll(0, scrollPosition || 0);
+      scrollPosition = 0;
+    }
+  }, [overlay]);
+
   return (
-    <SContainer>
+    <SContainer ref={containerRef}>
       <Header />
       <SContent>
         {children}

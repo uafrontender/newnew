@@ -4,6 +4,8 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import InlineSvg from '../atoms/InlineSVG';
+import ChangeLanguage from '../atoms/ChangeLanguage';
+import ChangeCurrency from '../atoms/ChangeCurrency';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -110,8 +112,8 @@ export const Footer: React.FC<IFooter> = () => {
               {t('footer-bottom-title')}
             </SBlockTitle>
             <SBlockRow>
-              <Link href="/insta" passHref>
-                <SSvgHolder>
+              <Link href="https://www.instagram.com" passHref>
+                <SSvgHolder target="_blank">
                   <InlineSvg
                     svg={instagramIcon}
                     fill={theme.colorsThemed.text.secondary}
@@ -120,8 +122,8 @@ export const Footer: React.FC<IFooter> = () => {
                   />
                 </SSvgHolder>
               </Link>
-              <Link href="/twitter" passHref>
-                <SSvgHolder>
+              <Link href="https://twitter.com" passHref>
+                <SSvgHolder target="_blank">
                   <InlineSvg
                     svg={twitterIcon}
                     fill={theme.colorsThemed.text.secondary}
@@ -130,8 +132,8 @@ export const Footer: React.FC<IFooter> = () => {
                   />
                 </SSvgHolder>
               </Link>
-              <Link href="/tiktok" passHref>
-                <SSvgHolder>
+              <Link href="https://twitter.com" passHref>
+                <SSvgHolder target="_blank">
                   <InlineSvg
                     svg={tiktokIcon}
                     fill={theme.colorsThemed.text.secondary}
@@ -144,21 +146,31 @@ export const Footer: React.FC<IFooter> = () => {
           </SBlock>
         </STopContent>
         <SSeparator />
-        <SBlockRow>
-          <SBottomBlockOption>
-            {t('footer-inc')}
-          </SBottomBlockOption>
-          <Link href="/terms" passHref>
+        <SBlockBottomRow>
+          <SLeftBlock>
             <SBottomBlockOption>
-              {t('footer-terms')}
+              {t('footer-inc')}
             </SBottomBlockOption>
-          </Link>
-          <Link href="/privacy" passHref>
-            <SBottomBlockOption>
-              {t('footer-privacy')}
-            </SBottomBlockOption>
-          </Link>
-        </SBlockRow>
+            <Link href="/terms" passHref>
+              <SBottomBlockOption>
+                {t('footer-terms')}
+              </SBottomBlockOption>
+            </Link>
+            <Link href="/privacy" passHref>
+              <SBottomBlockOption>
+                {t('footer-privacy')}
+              </SBottomBlockOption>
+            </Link>
+          </SLeftBlock>
+          <SRightBlock>
+            <SRightBlockItemHolder>
+              <ChangeLanguage />
+            </SRightBlockItemHolder>
+            <SRightBlockItemHolder>
+              <ChangeCurrency />
+            </SRightBlockItemHolder>
+          </SRightBlock>
+        </SBlockBottomRow>
       </SContent>
     </SContainer>
   );
@@ -167,7 +179,7 @@ export const Footer: React.FC<IFooter> = () => {
 export default Footer;
 
 const SContainer = styled.footer`
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background2};
+  background-color: ${(props) => props.theme.colorsThemed.footerBackground};
 `;
 
 const SContent = styled.div`
@@ -239,6 +251,17 @@ const SBlockRow = styled.div`
   flex-direction: row;
 `;
 
+const SBlockBottomRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    align-items: center;
+    flex-direction: row;
+  }
+`;
+
 const SBottomBlockOption = styled.a`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   font-size: 14px;
@@ -263,5 +286,34 @@ const SIconHolder = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     right: 96px;
+  }
+`;
+
+const SLeftBlock = styled.div`
+  order: 2;
+
+  ${(props) => props.theme.media.tablet} {
+    order: 1;
+  }
+`;
+
+const SRightBlock = styled.div`
+  order: 1;
+  display: flex;
+  margin-bottom: 24px;
+
+  ${(props) => props.theme.media.tablet} {
+    order: 2;
+    margin-bottom: 0;
+    justify-content: flex-end;
+  }
+`;
+
+const SRightBlockItemHolder = styled.div`
+  margin-right: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 16px;
+    margin-right: 0;
   }
 `;

@@ -40,16 +40,6 @@ const Home: NextPage = () => {
       <Headline>
         {t('welcome', { NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME })}
       </Headline>
-      <div>
-        <Link href="/" locale="en" passHref>
-          <a href="#en">English</a>
-        </Link>
-      </div>
-      <div>
-        <Link href="/" locale="fr" passHref>
-          <a href="#fr">French</a>
-        </Link>
-      </div>
       <Button
         id="dark-mode-button"
         bg={theme.gradients.blueDiagonal}
