@@ -18,7 +18,7 @@ context('Application with i18n enabled', () => {
     const anyNonDefaultLocale: string = locales.filter((n: string) => n !== defaultLocale)[0];
 
     // find the welcoming text using the default locale
-    cy.get('main > h1')
+    cy.get('h1')
       .invoke('text')
       .then((welcomeText) => {
         welcomeTextDefaultLocale = welcomeText;
@@ -29,7 +29,7 @@ context('Application with i18n enabled', () => {
     cy.visit(`${Cypress.env('NEXT_PUBLIC_APP_URL')}/${anyNonDefaultLocale}`);
 
     // check the the welcoming text has changed
-    cy.get('main > h1')
+    cy.get('h1')
       .invoke('text')
       .then((welcomeText) => {
         expect(welcomeText)
