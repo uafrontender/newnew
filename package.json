@@ -26,6 +26,7 @@
     "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com:newnewinc/newnew-api#master",
     "next": "11.1.2",
     "next-i18next": "8.9.0",
+    "next-redux-wrapper": "7.0.5",
     "next-useragent": "2.8.0",
     "protobufjs": "6.11.2",
     "react": "17.0.2",

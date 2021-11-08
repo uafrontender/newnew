@@ -1,22 +1,18 @@
+/* eslint-disable no-underscore-dangle */
 import React, { ReactElement, ReactNode } from 'react';
 import type { AppProps } from 'next/app';
-import App from 'next/app';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Provider } from 'react-redux';
+import { useStore } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { appWithTranslation } from 'next-i18next';
-import { UserAgent, useUserAgent } from 'next-useragent';
 
 // Global CSS configurations
 import ResizeMode from '../HOC/ResizeMode';
 import GlobalTheme from '../styles/ThemeProvider';
 
 // Redux store and provider
-import createStore from '../redux-store/store';
-import { defaultUIState } from '../redux-store/slices/uiStateSlice';
-
-import isBroswer from '../utils/isBrowser';
+import { EnhancedStoreWithPersistor, wrapper } from '../redux-store/store';
 
 // Socket context
 // import SocketContextProvider from '../contexts/socketContext';
@@ -27,7 +23,6 @@ export type NextPageWithLayout = NextPage & {
 }
 
 interface IMyApp extends AppProps {
-  uaString: string;
   Component: NextPageWithLayout;
 }
 
@@ -35,31 +30,9 @@ const MyApp = (props: IMyApp): ReactElement => {
   const {
     Component,
     pageProps,
-    uaString,
   } = props;
 
-  const ua: UserAgent = useUserAgent(uaString || (isBroswer() ? window?.navigator?.userAgent : ''));
-  const getInitialResizeMode = () => {
-    let resizeMode = 'mobile';
-
-    if (ua.isTablet) {
-      resizeMode = 'tablet';
-    } else if (ua.isDesktop) {
-      resizeMode = 'laptop';
-    }
-
-    return resizeMode;
-  };
-
-  const {
-    store,
-    persistor,
-  } = createStore({
-    ui: {
-      ...defaultUIState,
-      resizeMode: getInitialResizeMode(),
-    },
-  });
+  const store = useStore();
 
   // Shared layouts
   const getLayout = Component.getLayout ?? ((page) => page);
@@ -71,17 +44,15 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="robots" content="noindex" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
-      <Provider store={store}>
-        {/* <SocketContextProvider> */}
-        <PersistGate loading={null} persistor={persistor}>
-          <ResizeMode>
-            <GlobalTheme>
-              { getLayout(<Component {...pageProps} />) }
-            </GlobalTheme>
-          </ResizeMode>
-        </PersistGate>
-        {/* </SocketContextProvider> */}
-      </Provider>
+      {/* <SocketContextProvider> */}
+      <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
+        <ResizeMode>
+          <GlobalTheme>
+            { getLayout(<Component {...pageProps} />) }
+          </GlobalTheme>
+        </ResizeMode>
+      </PersistGate>
+      {/* </SocketContextProvider> */}
     </>
   );
 };
@@ -89,14 +60,4 @@ const MyApp = (props: IMyApp): ReactElement => {
 // @ts-ignore
 const MyAppWithTranslation = appWithTranslation(MyApp);
 
-// @ts-ignore
-MyAppWithTranslation.getInitialProps = async (appContext: any) => {
-  const appProps = await App.getInitialProps(appContext);
-
-  return {
-    ...appProps,
-    uaString: appContext.ctx?.req?.headers?.['user-agent'],
-  };
-};
-
-export default MyAppWithTranslation;
+export default wrapper.withRedux(MyAppWithTranslation);

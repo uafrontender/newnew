@@ -23,10 +23,10 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
   const { loggedIn, signupEmailInput } = useAppSelector((state) => state.user);
   const router = useRouter();
 
-  // Temporary commented out for development purposes
-  /* useEffect(() => {
-    if (loggedIn || !signupEmailInput) router.push('/');
-  }, [loggedIn, signupEmailInput, router]); */
+  // Redirect if the user is logged in
+  // useEffect(() => {
+  //   if (loggedIn) router.push('/');
+  // }, [loggedIn, router]);
 
   return (
     <>
