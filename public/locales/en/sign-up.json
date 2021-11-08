@@ -30,7 +30,7 @@
     "community_guidelines": "Community Guidelines"
   },
   "errors": {
-    "email_invalid": "Please, enter a valid email",
+    "email_invalid": "Invalid email address. Please check it.",
     "generic_error": "An error occurred",
     "Failed to fetch": "Failed to submit"
   }

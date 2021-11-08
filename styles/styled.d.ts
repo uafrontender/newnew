@@ -89,13 +89,6 @@ declare module 'styled-components' {
       brand5200: string,
       brand5100: string,
       brand550: string,
-
-      social: {
-        google: string;
-        facebook: string;
-        twitter: string;
-        apple: string;
-      }
     },
     // Theme-dependant colors
     colorsThemed: {
@@ -129,12 +122,20 @@ declare module 'styled-components' {
       grayscale: {
         background1: string;
         background2: string;
-        outlines: string;
+        // Used for an initial state.
+        outlines1: string;
+        // Used for both hover and focus states.
+        outlines2: string;
       },
       text: {
+        // Used for both links and titles.
         primary: string;
+        // Used for body copy text.
         secondary: string;
+        // Used for initial copy of inputs.
         tertiary: string;
+        // Used for initial state of text buttons.
+        quaternary: string;
       },
       accent: {
         blue: string;
@@ -143,6 +144,28 @@ declare module 'styled-components' {
         green: string;
         error: string;
         success: string;
+      },
+      social: {
+        google: {
+          main: string;
+          hover: string;
+          pressed: string;
+        },
+        facebook: {
+          main: string;
+          hover: string;
+          pressed: string;
+        },
+        twitter: {
+          main: string;
+          hover: string;
+          pressed: string;
+        },
+        apple: {
+          main: string;
+          hover: string;
+          pressed: string;
+        },
       },
     },
     borderRadius: {
@@ -153,6 +176,7 @@ declare module 'styled-components' {
     },
     shadows: {
       mediumBlue: string;
+      intenseBlue: string;
       mediumGrey: string;
     },
     gradients: {
