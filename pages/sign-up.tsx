@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
@@ -27,9 +29,10 @@ const Signup: NextPage<ISignup> = ({
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
-  useEffect(() => {
-    if (loggedIn) router.push('/');
-  }, [loggedIn, router]);
+  // Redirect if the user is logged in
+  // useEffect(() => {
+  //   if (loggedIn) router.push('/');
+  // }, [loggedIn, router]);
 
   return (
     <>
