@@ -74,7 +74,7 @@ export default Mobile;
 
 const SContainer = styled.div`
   display: flex;
-  padding: 8px 16px;
+  padding: 8px 0;
   position: relative;
   align-items: center;
   justify-content: space-between;

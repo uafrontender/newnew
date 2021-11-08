@@ -176,7 +176,7 @@ export default Desktop;
 
 const SContainer = styled.div`
   display: flex;
-  padding: 16px 96px;
+  padding: 16px 0;
   align-items: center;
   justify-content: space-between;
 `;

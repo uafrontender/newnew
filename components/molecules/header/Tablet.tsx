@@ -189,7 +189,7 @@ export default Tablet;
 
 const SContainer = styled.div`
   display: flex;
-  padding: 12px 32px;
+  padding: 12px 0;
   align-items: center;
   justify-content: space-between;
 `;
