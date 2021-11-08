@@ -26,13 +26,13 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
 
   return (
     <SAuthLayout>
-      <STestElement
+      {/* <STestElement
         translated={router.pathname.includes('verify-email')}
       >
         <h4>
           Placeholder
         </h4>
-      </STestElement>
+      </STestElement> */}
       {
         !router.pathname.includes('verify-email') ? (
           <HomeLogoButton

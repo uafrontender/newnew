@@ -95,16 +95,10 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name'> = {
     brand5200: '#9EFAA1',
     brand5100: '#C8FDC7',
     brand550: '#E9FFE9',
-
-    social: {
-      google: '#4285F4',
-      facebook: '#1877F2',
-      twitter: '#1DA1F2',
-      apple: '#000000',
-    },
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
+    intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
   },
   gradients: {
@@ -147,12 +141,14 @@ export const lightTheme: DefaultTheme = {
     grayscale: {
       background1: '#FFFFFF',
       background2: '#F1F3F9',
-      outlines: '#E5E9F1',
+      outlines1: '#E5E9F1',
+      outlines2: '#8B99B2',
     },
     text: {
       primary: '#2C2C33',
       secondary: '#8B99B2',
       tertiary: '#B0BACD',
+      quaternary: '#646E81',
     },
     accent: {
       blue: '#1D6AFF',
@@ -161,6 +157,28 @@ export const lightTheme: DefaultTheme = {
       green: '#0FF34F',
       error: '#F12C46',
       success: '#15B981',
+    },
+    social: {
+      google: {
+        main: '#4285F4',
+        hover: '#4285F4',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #4285F4',
+      },
+      facebook: {
+        main: '#1877F2',
+        hover: '#1877F2',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1877F2',
+      },
+      twitter: {
+        main: '#1DA1F2',
+        hover: '#1DA1F2',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1DA1F2',
+      },
+      apple: {
+        main: '#000000',
+        hover: '#000000',
+        pressed: 'linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), #000000',
+      },
     },
   },
 };
@@ -199,12 +217,14 @@ export const darkTheme: DefaultTheme = {
     grayscale: {
       background1: '#0B0A13',
       background2: '#14151F',
-      outlines: '#272835',
+      outlines1: '#272835',
+      outlines2: '#6A6A7B',
     },
     text: {
       primary: '#FFFFFF',
       secondary: '#586070',
       tertiary: '#434956',
+      quaternary: '#9BA2B1',
     },
     accent: {
       blue: '#1D6AFF',
@@ -213,6 +233,28 @@ export const darkTheme: DefaultTheme = {
       green: '#0FF34F',
       error: '#E8354D',
       success: '#12A573',
+    },
+    social: {
+      google: {
+        main: '#4285F4',
+        hover: '#4285F4',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #4285F4',
+      },
+      facebook: {
+        main: '#1877F2',
+        hover: '#1877F2',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1877F2',
+      },
+      twitter: {
+        main: '#1DA1F2',
+        hover: '#1DA1F2',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1DA1F2',
+      },
+      apple: {
+        main: '#000000',
+        hover: '#000000',
+        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #FFFFFF',
+      },
     },
   },
 };
