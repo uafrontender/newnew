@@ -5,7 +5,7 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
-import styled, { css, keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 // Redux
@@ -17,7 +17,7 @@ import { signInWithEmail } from '../../api/endpoints/auth';
 
 // Components
 import Headline from '../atoms/Headline';
-import SignInBackButton from '../molecules/signup/SignInBackButton';
+import GoBackButton from '../molecules/GoBackButton';
 import VerficationCodeInput from '../atoms/VerificationCodeInput';
 
 // Utils
@@ -159,9 +159,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     >
       <SBackButton
         onClick={() => router.back()}
-      >
-        {t('goBackBtn')}
-      </SBackButton>
+      />
       <AnimatedLogoEmailVerification
         isLoading={isSigninWithEmailLoading || isResendCodeLoading}
       />
@@ -262,7 +260,7 @@ const SCodeVerificationMenu = styled.div`
   }
 `;
 
-const SBackButton = styled(SignInBackButton)`
+const SBackButton = styled(GoBackButton)`
   position: absolute;
   top: 0;
   left: 0;
@@ -288,7 +286,7 @@ const SHeadline = styled(Headline)`
   text-align: center;
 
   // NB! Temp
-  color: ${({ theme }) => (theme.name === 'light' ? theme.colorsThemed.text.secondary : theme.colorsThemed.text.primary)};
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 36px;
@@ -355,13 +353,20 @@ const STimeExpired = styled(Text)`
     background-color: transparent;
     border: transparent;
 
-    // NB! Temp
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-
     font-size: inherit;
-    font-weight: bold;
+    font-weight: 500;
+
+
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 
     cursor: pointer;
+
+    &:hover, &:focus {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+      transition: .2s ease;
+    }
   }
 `;
 
