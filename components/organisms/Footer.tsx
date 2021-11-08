@@ -222,7 +222,7 @@ const SBlock = styled.div`
 const SSeparator = styled.div`
   margin-top: 12px;
   margin-bottom: 24px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.grayscale.outlines};
+  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.grayscale.outlines1};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 36px;
