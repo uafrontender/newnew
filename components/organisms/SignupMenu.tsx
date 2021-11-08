@@ -1,7 +1,7 @@
 // Temp disabled until backend is in place
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
@@ -11,7 +11,7 @@ import isEmail from 'validator/lib/isEmail';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
-import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
+import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail } from '../../api/endpoints/auth';
@@ -29,13 +29,17 @@ import SignInTextInput from '../atoms/SignInTextInput';
 import PrimaryLargeButton from '../atoms/PrimaryLargeButton';
 import SignInButton from '../molecules/signup/SignInButton';
 
+import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
+
 // Icons
 import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
+
+import AppleIcon from '../../public/images/svg/auth/icon-apple.svg';
 import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
-import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
+import sleep from '../../utils/sleep';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -75,12 +79,19 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
       dispatch(setSignupEmailInput(emailInput));
       setIsSubmitLoading(false);
+
       router.push('/verify-email');
     } catch (err: any) {
       setIsSubmitLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
     }
   };
+
+  // NB! Testing only
+  const handleLogInTest = useCallback(() => {
+    dispatch(setUserLoggedIn(true));
+    router.push('/', undefined, { shallow: true });
+  }, [dispatch, router]);
 
   // Check if email is valid
   useEffect(() => {
@@ -112,19 +123,31 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             svg={GoogleIcon}
             hoverBgColor={theme.colorsThemed.social.google.hover}
             pressedBgColor={theme.colorsThemed.social.google.pressed}
-            onClick={() => {}}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.google')}
           </SignInButton>
-          <AppleSignInButton
+          {/* <AppleSignInButton
             label={t('signupOptions.apple')}
-          />
+          /> */}
+          <SignInButton
+            svg={AppleIcon}
+            hoverBgColor="#000"
+            hoverContentColor="#FFF"
+            pressedBgColor={theme.colorsThemed.social.apple.pressed}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
+          >
+            {t('signupOptions.apple')}
+          </SignInButton>
           <SignInButton
             svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
             hoverSvg={FacebookIconLight}
             hoverBgColor={theme.colorsThemed.social.facebook.hover}
             pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-            onClick={() => {}}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.facebook')}
           </SignInButton>
@@ -132,7 +155,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             svg={TwitterIcon}
             hoverBgColor={theme.colorsThemed.social.twitter.hover}
             pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-            onClick={() => {}}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.twitter')}
           </SignInButton>

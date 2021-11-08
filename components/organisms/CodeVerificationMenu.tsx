@@ -10,7 +10,7 @@ import { useTranslation } from 'next-i18next';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
+import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { signInWithEmail } from '../../api/endpoints/auth';
@@ -62,19 +62,25 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       // NB! Temp
       await sleep(2000);
 
-      const signInRequest = new newnewapi.EmailSignInRequest({
+      if (completeCode !== '123456') throw new Error('Request failed');
+
+      /* const signInRequest = new newnewapi.EmailSignInRequest({
         emailAddress: signupEmailInput,
         verificationCode: completeCode,
       });
 
       const { data, error } = await signInWithEmail(signInRequest);
 
-      if (!data || !error) throw new Error(error?.message ?? 'Request failed');
+      if (!data || !error) throw new Error(error?.message ?? 'Request failed'); */
 
       // Clean up email state, sign in the user with the response & redirect home
-      dispatch(setSignupEmailInput(''));
+      setTimerActive(false);
 
       setIsSigninWithEmailLoading(false);
+
+      dispatch(setSignupEmailInput(''));
+      dispatch(setUserLoggedIn(true));
+
       router.push('/');
     } catch (err: any) {
       setIsSigninWithEmailLoading(false);
@@ -82,6 +88,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       setTimerActive(true);
     }
   },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   [
     setIsSigninWithEmailLoading,
     setSubmitError,
@@ -134,6 +141,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     timerSeconds,
     setTimerActive,
     setSubmitError,
+    setCodeInital,
   ]);
 
   useEffect(() => {
