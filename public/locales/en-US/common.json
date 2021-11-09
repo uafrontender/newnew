@@ -1,5 +1,5 @@
 {
-  "welcome": "Bienvenue dans {{NEXT_PUBLIC_APP_NAME}} !",
+  "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
   "mobile-bottom-navigation-add": "Create",
   "mobile-bottom-navigation-home": "Home",
   "mobile-bottom-navigation-share": "Share",
