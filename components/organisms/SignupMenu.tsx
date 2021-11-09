@@ -280,7 +280,7 @@ const SSignInBackButton = styled(GoBackButton)`
 
   padding: 8px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.appBgColor};
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
   ${({ theme }) => theme.media.tablet} {
     position: static;

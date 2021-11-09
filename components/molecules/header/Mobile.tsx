@@ -12,6 +12,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.svg';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
+import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
 
 interface IMobile {
 }
@@ -32,12 +33,21 @@ export const Mobile: React.FC<IMobile> = () => {
     <SContainer>
       <Link href="/">
         <a>
-          <InlineSVG
-            svg={mobileLogo}
-            fill={theme.colorsThemed.appIcon}
-            width="40px"
-            height="40px"
-          />
+          {user.loggedIn ? (
+            <InlineSVG
+              svg={mobileLogo}
+              fill={theme.colorsThemed.text.primary}
+              width="40px"
+              height="40px"
+            />
+          ) : (
+            <InlineSVG
+              svg={tabletLogo}
+              fill={theme.colorsThemed.text.primary}
+              width="127px"
+              height="40px"
+            />
+          )}
         </a>
       </Link>
       <SRightBlock>
@@ -58,7 +68,7 @@ export const Mobile: React.FC<IMobile> = () => {
             >
               <InlineSVG
                 svg={userIcon}
-                fill={theme.colors.baseLight0}
+                fill={theme.colorsThemed.text.primary}
                 width="20px"
                 height="20px"
               />

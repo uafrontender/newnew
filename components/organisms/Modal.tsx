@@ -49,7 +49,8 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   overflow: hidden;
   position: fixed;
   transition: height ease 0.5s;
-  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
 `;
 
 export default Modal;

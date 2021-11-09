@@ -38,6 +38,7 @@ export const ChangeCurrency: React.FC<IChangeCurrency> = () => {
   const renderItem = (item: string) => {
     const handleItemClick = () => {
       dispatch(setUserCurrency(item));
+      handleCloseClick();
     };
 
     return (
@@ -105,7 +106,7 @@ const SContent = styled.div`
   cursor: pointer;
   padding: 12px 24px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;
 
 const STitle = styled.div`
@@ -128,10 +129,11 @@ const SListHolder = styled.div<ISListHolder>`
   overflow: auto;
   position: absolute;
   min-width: 160px;
+  box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   transition: all ease 0.5s;
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -148,10 +150,11 @@ const SItemHolder = styled.div<ISItemHolder>`
   margin: 12px 12px 0;
   padding: 12px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed[props.selected ? 'footerDDSelectedBackground' : 'footerButtonBackground']};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale[props.selected ? 'background2' : 'background1']};
 `;
 
 const SItemTitle = styled(Text)`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   text-align: center;
   font-weight: 600;
   white-space: nowrap;
@@ -163,7 +166,7 @@ const SItemTitle = styled(Text)`
 `;
 
 const SItemSubTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.footerDDItemColor};
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
   text-align: center;
   font-weight: 600;
   white-space: nowrap;
@@ -193,7 +196,7 @@ const SMobileList = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;
 
 const SCancelItemHolder = styled.div`
@@ -201,7 +204,7 @@ const SCancelItemHolder = styled.div`
   margin: 4px 0 0;
   padding: 16px 32px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;
 
 const SCancelItemTitleHolder = styled.div`
