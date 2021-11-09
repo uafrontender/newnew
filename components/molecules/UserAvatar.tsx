@@ -33,7 +33,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       >
         <InlineSVG
           svg={userIcon}
-          fill={theme.colorsThemed.appIcon}
+          fill={theme.colorsThemed.text.primary}
           width={isMobile ? '20px' : '24px'}
           height={isMobile ? '20px' : '24px'}
         />

@@ -30,12 +30,12 @@ interface ISIndicator {
 }
 
 const SIndicator = styled.div<ISIndicator>`
-  color: ${(props) => props.theme.colors.baseLight0};
-  border: 3px solid ${(props) => props.theme.colorsThemed.appBgColor};
+  color: ${(props) => props.theme.colors.white};
+  border: 3px solid ${(props) => props.theme.colorsThemed.grayscale.background1};
   padding: ${(props) => (props.bigCounter ? '3px 4px' : '3px 6px')};
   font-size: 10px;
   font-weight: bold;
   border-radius: 16px;
   letter-spacing: 0.02em;
-  background-color: ${(props) => props.theme.colors.brand3500};
+  background-color: ${(props) => props.theme.colorsThemed.accent.pink};
 `;

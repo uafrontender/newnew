@@ -1,10 +1,14 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import styled from 'styled-components';
 
+import Row from '../atoms/Grid/Row';
+import Col from '../atoms/Grid/Col';
 import Footer from '../organisms/Footer';
 import Header from '../organisms/Header';
+import Container from '../atoms/Grid/Container';
 import BottomNavigation from '../organisms/BottomNavigation';
 
+import { useOverlay } from '../../utils/hooks/useOverlay';
 import { useAppSelector } from '../../redux-store/store';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
@@ -12,13 +16,12 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 interface IGeneral {
   children: React.ReactNode;
 }
-let scrollPosition: number = 0;
 
 export const General: React.FC<IGeneral> = (props) => {
   const { children } = props;
   const user = useAppSelector((state) => state.user);
-  const { overlay, resizeMode } = useAppSelector((state) => state.ui);
-  const containerRef: any = useRef();
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const wrapperRef: any = useRef();
 
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
@@ -84,42 +87,31 @@ export const General: React.FC<IGeneral> = (props) => {
     return bottomNavigationShadow;
   }, [user.loggedIn, user.notificationsCount, user.role]);
 
-  useEffect(() => {
-    containerRef.current.style.overflow = overlay ? 'hidden' : 'visible';
-
-    if (overlay) {
-      scrollPosition = window ? window.scrollY : 0;
-
-      containerRef.current.style.cssText = `
-          top: -${scrollPosition}px;
-          left: 0px;
-          right: 0px;
-          position: fixed;
-       `;
-    } else {
-      containerRef.current.style.cssText = '';
-      window.scroll(0, scrollPosition || 0);
-      scrollPosition = 0;
-    }
-  }, [overlay]);
+  useOverlay(wrapperRef);
 
   return (
-    <SContainer ref={containerRef}>
+    <SWrapper ref={wrapperRef}>
       <Header />
       <SContent>
-        {children}
+        <Container>
+          <Row>
+            <Col>
+              {children}
+            </Col>
+          </Row>
+        </Container>
       </SContent>
       <Footer />
       {resizeMode.includes('mobile') && (
         <BottomNavigation collection={bottomNavigation} />
       )}
-    </SContainer>
+    </SWrapper>
   );
 };
 
 export default General;
 
-const SContainer = styled.div`
+const SWrapper = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -140,16 +132,13 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.main`
-  width: 100%;
-  margin: 0 auto;
-  padding: 40px 16px;
-  max-width: ${(props) => props.theme.width.maxContentWidth};
+  padding: 40px 0;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 32px;
+    padding: 32px 0;
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 40px 96px;
+    padding: 40px 0;
   }
 `;

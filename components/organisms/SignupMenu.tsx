@@ -1,7 +1,7 @@
 // Temp disabled until backend is in place
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
@@ -11,7 +11,7 @@ import isEmail from 'validator/lib/isEmail';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
-import { setSignupEmailInput } from '../../redux-store/slices/userStateSlice';
+import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail } from '../../api/endpoints/auth';
@@ -20,21 +20,26 @@ import { sendVerificationEmail } from '../../api/endpoints/auth';
 import { SignupReason } from '../../pages/sign-up';
 
 // Components
+import InlineSvg from '../atoms/InlineSVG';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
-import SignInBackButton from '../molecules/signup/SignInBackButton';
+import GoBackButton from '../molecules/GoBackButton';
 import TextWithLine from '../atoms/TextWithLine';
 import SignInTextInput from '../atoms/SignInTextInput';
-import GradientButton from '../atoms/GradientButton';
+import PrimaryLargeButton from '../atoms/PrimaryLargeButton';
 import SignInButton from '../molecules/signup/SignInButton';
 
+import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
+
 // Icons
+import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
+
 import AppleIcon from '../../public/images/svg/auth/icon-apple.svg';
 import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
-import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
+import sleep from '../../utils/sleep';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -74,12 +79,19 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
       dispatch(setSignupEmailInput(emailInput));
       setIsSubmitLoading(false);
+
       router.push('/verify-email');
     } catch (err: any) {
       setIsSubmitLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
     }
   };
+
+  // NB! Testing only
+  const handleLogInTest = useCallback(() => {
+    dispatch(setUserLoggedIn(true));
+    router.push('/', undefined, { shallow: true });
+  }, [dispatch, router]);
 
   // Check if email is valid
   useEffect(() => {
@@ -109,34 +121,42 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         <div>
           <SignInButton
             svg={GoogleIcon}
-            hoverBgColor={theme.colors.social.google}
-            onClick={() => {}}
+            hoverBgColor={theme.colorsThemed.social.google.hover}
+            pressedBgColor={theme.colorsThemed.social.google.pressed}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.google')}
           </SignInButton>
-          {/* <SignInButton
+          {/* <AppleSignInButton
+            label={t('signupOptions.apple')}
+          /> */}
+          <SignInButton
             svg={AppleIcon}
             hoverBgColor="#000"
             hoverContentColor="#FFF"
-            onClick={() => {}}
+            pressedBgColor={theme.colorsThemed.social.apple.pressed}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.apple')}
-          </SignInButton> */}
-          <AppleSignInButton
-            label={t('signupOptions.apple')}
-          />
+          </SignInButton>
           <SignInButton
             svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
             hoverSvg={FacebookIconLight}
-            hoverBgColor={theme.colors.social.facebook}
-            onClick={() => {}}
+            hoverBgColor={theme.colorsThemed.social.facebook.hover}
+            pressedBgColor={theme.colorsThemed.social.facebook.pressed}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.facebook')}
           </SignInButton>
           <SignInButton
             svg={TwitterIcon}
-            hoverBgColor={theme.colors.social.twitter}
-            onClick={() => {}}
+            hoverBgColor={theme.colorsThemed.social.twitter.hover}
+            pressedBgColor={theme.colorsThemed.social.twitter.pressed}
+            // onClick={() => {}}
+            onClick={handleLogInTest}
           >
             {t('signupOptions.twitter')}
           </SignInButton>
@@ -144,9 +164,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             lineColor={theme.colorsThemed.text.secondary}
             innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
           />
-          {
-            submitError ? <SErrorDiv>{ t(`errors.${submitError}`) }</SErrorDiv> : null
-          }
           <SignInTextInput
             name="email"
             type="email"
@@ -159,13 +176,28 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             }}
             onChange={(e) => setEmailInput(e.target.value)}
             placeholder={t('signupOptions.email')}
+            errorCaption={t('errors.email_invalid')}
           />
-          <GradientButton
-            disabled={!emailInputValid || isSubmitLoading}
+          {
+            submitError ? (
+              <SErrorDiv>
+                <InlineSvg
+                  svg={AlertIcon}
+                  width="16px"
+                  height="16px"
+                />
+                { t(`errors.${submitError}`) }
+              </SErrorDiv>
+            ) : null
+          }
+          <PrimaryLargeButton
+            disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
             onClick={() => handleSubmitEmail()}
           >
-            {t('signupOptions.signInBtn')}
-          </GradientButton>
+            <span>
+              {t('signupOptions.signInBtn')}
+            </span>
+          </PrimaryLargeButton>
         </div>
         <SLegalText>
           {t('legalDisclaimer.main_text')}
@@ -238,7 +270,7 @@ const SMenuWrapper = styled.div`
   }
 `;
 
-const SSignInBackButton = styled(SignInBackButton)`
+const SSignInBackButton = styled(GoBackButton)`
   position: fixed;
   top: 0;
   left: 0;
@@ -248,7 +280,7 @@ const SSignInBackButton = styled(SignInBackButton)`
 
   padding: 8px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.appBgColor};
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
   ${({ theme }) => theme.media.tablet} {
     position: static;
@@ -327,12 +359,20 @@ const SContinueWithSpan = styled.span`
 `;
 
 const SErrorDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
   text-align: center;
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
@@ -349,14 +389,21 @@ const SLegalText = styled(Text)`
   font-size: 12px;
   line-height: 16px;
 
-  // NB! Temp
+
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   a {
     text-decoration: none;
     font-weight: 600;
-    // NB! Temp
-    color: ${({ theme }) => (theme.name === 'light' ? 'rgba(115, 117, 140, 1)' : 'rgba(115, 117, 140, 1)')}
+
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+
+    &:hover, &:focus {
+      outline: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+      transition: .2s ease;
+    }
   }
 
   ${({ theme }) => theme.media.tablet} {
