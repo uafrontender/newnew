@@ -91,7 +91,7 @@ export const Footer: React.FC<IFooter> = () => {
                   <a>
                     <InlineSvg
                       svg={mobileLogo}
-                      fill={theme.colorsThemed.appIcon}
+                      fill={theme.colorsThemed.text.primary}
                       width="48px"
                       height="48px"
                     />
@@ -188,7 +188,7 @@ export const Footer: React.FC<IFooter> = () => {
 export default Footer;
 
 const SWrapper = styled.footer`
-  background-color: ${(props) => props.theme.colorsThemed.footerBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background2};
 `;
 
 const SContent = styled.div`

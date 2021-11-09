@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 interface ICaption {
   weight?: 600 | 700;
-  variant?: 1 | 2;
+  variant?: 1 | 2 | 3;
   children: React.ReactNode;
 }
 
@@ -17,6 +17,7 @@ const Caption: React.FC<ICaption> = (props) => {
   const components = {
     1: SCaption1,
     2: SCaption2,
+    3: SCaption3,
   };
   const Component = components[variant ?? 1];
 
@@ -35,11 +36,16 @@ const SCaption = styled.p<ICaption>`
 `;
 
 const SCaption1 = styled(SCaption)`
+  font-size: 16px;
+  line-height: 20px;
+`;
+
+const SCaption2 = styled(SCaption)`
   font-size: 12px;
   line-height: 16px;
 `;
 
-const SCaption2 = styled(SCaption)`
+const SCaption3 = styled(SCaption)`
   font-size: 10px;
   line-height: 12px;
 `;
