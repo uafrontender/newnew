@@ -8,7 +8,6 @@ import Row from '../atoms/Grid/Row';
 import Container from '../atoms/Grid/Container';
 import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
-import ChangeCurrency from '../atoms/ChangeCurrency';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -171,9 +170,6 @@ export const Footer: React.FC<IFooter> = () => {
                 <SRightBlock>
                   <SRightBlockItemHolder>
                     <ChangeLanguage />
-                  </SRightBlockItemHolder>
-                  <SRightBlockItemHolder>
-                    <ChangeCurrency />
                   </SRightBlockItemHolder>
                 </SRightBlock>
               </SBlockBottomRow>

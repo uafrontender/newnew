@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "title": "Email verification",
+    "description": "Verify email"
+  },
+  "goBackBtn": "Go back",
+  "heading": {
+    "heading": "Email verification",
+    "subheading": "Please, enter a code we’ve sent you to"
+  },
+  "timeExpired": {
+    "not_receieved": "Didn’t receive a code?",
+    "resendBtn": "Resend code"
+  },
+  "errors": {
+    "invalidCode": "Invalid code. Check the code and try again"
+  }
+}
