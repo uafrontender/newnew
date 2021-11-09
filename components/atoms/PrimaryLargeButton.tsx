@@ -99,9 +99,9 @@ const SPrimaryLargeButton = styled.button<ISPrimaryLargeButton>`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border: transparent;
 
-  color: ${({ theme }) => theme.colors.baseLight0};
+  // NB! Temp
+  color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.gradients.blueDiagonal};
-
   cursor: pointer;
   transition: .2s linear;
 
@@ -127,8 +127,8 @@ const SPrimaryLargeButton = styled.button<ISPrimaryLargeButton>`
     transform: scale(0);
     transform-origin: center;
 
-    background: ${({ theme }) => theme.colors.brand2800};
-
+    // NB! Temp
+    background: ${({ theme }) => theme.colors.blue};
     content: '';
   }
 

@@ -47,14 +47,14 @@ export const Tablet: React.FC<ITablet> = () => {
           {user.loggedIn ? (
             <InlineSVG
               svg={mobileLogo}
-              fill={theme.colorsThemed.appIcon}
+              fill={theme.colorsThemed.text.primary}
               width="48px"
               height="48px"
             />
           ) : (
             <InlineSVG
               svg={tabletLogo}
-              fill={theme.colorsThemed.appIcon}
+              fill={theme.colorsThemed.text.primary}
               width="152px"
               height="48px"
             />
@@ -129,7 +129,7 @@ export const Tablet: React.FC<ITablet> = () => {
                       >
                         <InlineSVG
                           svg={menuIcon}
-                          fill={theme.colorsThemed.appIcon}
+                          fill={theme.colorsThemed.text.primary}
                           width="24px"
                           height="24px"
                         />
@@ -160,9 +160,9 @@ export const Tablet: React.FC<ITablet> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    bg={theme.colorsThemed.appButtonSecondaryBG}
+                    bg={theme.colorsThemed.grayscale.background2}
                     onClick={handleSignInClick}
-                    titleColor={theme.colorsThemed.appButtonSecondary}
+                    titleColor={theme.colorsThemed.text.primary}
                   >
                     {t('button-login-in')}
                   </Button>

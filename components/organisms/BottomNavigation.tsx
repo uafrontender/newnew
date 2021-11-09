@@ -36,5 +36,5 @@ const SContainer = styled.nav`
   position: fixed;
   align-items: center;
   justify-content: space-around;
-  background-color: ${(props) => props.theme.colorsThemed.navigationBgColor};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;

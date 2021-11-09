@@ -52,8 +52,16 @@ export const SearchInput: React.FC<ISearchInput> = () => {
     }
   };
 
-  useOnClickEsc(inputRef, handleSearchClose);
-  useOnClickOutside(inputRef, handleSearchClose);
+  useOnClickEsc(inputRef, () => {
+    if (globalSearchActive) {
+      handleSearchClose();
+    }
+  });
+  useOnClickOutside(inputRef, () => {
+    if (globalSearchActive) {
+      handleSearchClose();
+    }
+  });
 
   return (
     <SContainer ref={inputRef}>
@@ -63,7 +71,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
       >
         <InlineSVG
           svg={searchIcon}
-          fill={theme.colorsThemed.appIcon}
+          fill={theme.colorsThemed.text.primary}
           width={isMobile ? '20px' : '24px'}
           height={isMobile ? '20px' : '24px'}
         />
@@ -73,7 +81,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
           <InlineSVG
             clickable
             svg={searchIcon}
-            fill={theme.colorsThemed.appIcon}
+            fill={theme.colorsThemed.text.primary}
             width="24px"
             height="24px"
             onClick={handleSubmit}
@@ -88,7 +96,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
           <InlineSVG
             clickable
             svg={closeIcon}
-            fill={theme.colorsThemed.appIcon}
+            fill={theme.colorsThemed.text.primary}
             width="24px"
             height="24px"
             onClick={handleCloseIconClick}
@@ -115,12 +123,12 @@ const SInputWrapper = styled.div<ISearchInput>`
   top: 50%;
   left: 12px;
   right: 12px;
-  border: 1.5px solid ${(props) => props.theme.colorsThemed.appTextColor};
+  border: 1.5px solid ${(props) => props.theme.colorsThemed.grayscale.outlines2};
   padding: 8px 12px;
   display: flex;
   position: absolute;
   transform: translateY(-50%);
-  background: ${(props) => props.theme.colorsThemed.appBgColor};
+  background: ${(props) => props.theme.colorsThemed.grayscale.background1};
   border-radius: 12px;
   justify-content: space-between;
   
@@ -138,7 +146,7 @@ const SInputWrapper = styled.div<ISearchInput>`
 `;
 
 const SInput = styled.input`
-  color: ${(props) => props.theme.colorsThemed.searchInput};
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
   border: none;
   margin: 0 8px;
@@ -149,6 +157,6 @@ const SInput = styled.input`
   line-height: 24px;
 
   ::placeholder {
-    color: ${(props) => props.theme.colorsThemed.searchInputPlaceholder};
+    color: ${(props) => props.theme.colorsThemed.text.quaternary};
   }
 `;
