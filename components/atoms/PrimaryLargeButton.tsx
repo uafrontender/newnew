@@ -17,8 +17,8 @@ const PrimaryLargeButton: React.FunctionComponent<TPrimaryLargeButton> = ({
   const [rippleOrigin, setRippleOrigin] = useState<{x: string, y: string}>({ x: '50%', y: '50%' });
   const [isRippling, setIsRippling] = useState(false);
 
-  const handleClick = useMemo(() => debounce(onClick!!, 400), [onClick]);
-  const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 300),
+  const handleClick = useMemo(() => debounce(onClick!!, 900), [onClick]);
+  const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 750),
     [setIsRippling]);
 
   return (
@@ -162,9 +162,8 @@ const SPrimaryLargeButton = styled.button<ISPrimaryLargeButton>`
 
   ${({ isRippling }) => (isRippling ? css`
     &::before {
-      animation-duration: .3s;
+      animation-duration: .9s;
       animation-fill-mode: forwards;
-      animation-delay: 0s;
       animation-name: ${RippleAnimation};
     }
   ` : null)}
