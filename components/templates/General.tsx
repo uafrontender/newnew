@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import styled from 'styled-components';
 
 import Row from '../atoms/Grid/Row';
@@ -8,6 +8,7 @@ import Header from '../organisms/Header';
 import Container from '../atoms/Grid/Container';
 import BottomNavigation from '../organisms/BottomNavigation';
 
+import { useOverlay } from '../../utils/hooks/useOverlay';
 import { useAppSelector } from '../../redux-store/store';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
@@ -16,15 +17,10 @@ interface IGeneral {
   children: React.ReactNode;
 }
 
-let scrollPosition: number = 0;
-
 export const General: React.FC<IGeneral> = (props) => {
   const { children } = props;
   const user = useAppSelector((state) => state.user);
-  const {
-    overlay,
-    resizeMode,
-  } = useAppSelector((state) => state.ui);
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const wrapperRef: any = useRef();
 
   const bottomNavigation = useMemo(() => {
@@ -91,24 +87,7 @@ export const General: React.FC<IGeneral> = (props) => {
     return bottomNavigationShadow;
   }, [user.loggedIn, user.notificationsCount, user.role]);
 
-  useEffect(() => {
-    wrapperRef.current.style.overflow = overlay ? 'hidden' : 'visible';
-
-    if (overlay) {
-      scrollPosition = window ? window.scrollY : 0;
-
-      wrapperRef.current.style.cssText = `
-          top: -${scrollPosition}px;
-          left: 0px;
-          right: 0px;
-          position: fixed;
-       `;
-    } else {
-      wrapperRef.current.style.cssText = '';
-      window.scroll(0, scrollPosition || 0);
-      scrollPosition = 0;
-    }
-  }, [overlay]);
+  useOverlay(wrapperRef);
 
   return (
     <SWrapper ref={wrapperRef}>
