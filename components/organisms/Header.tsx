@@ -39,5 +39,5 @@ const SWrapper = styled.header`
   width: 100vw;
   z-index: 1;
   position: fixed;
-  background-color: ${(props) => props.theme.colorsThemed.navigationBgColor};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;

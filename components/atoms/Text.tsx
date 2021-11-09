@@ -39,6 +39,11 @@ const SText1 = styled(SText)`
   font-size: 16px;
   line-height: 24px;
 
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
   ${({ theme }) => theme.media.desktop} {
     font-size: 24px;
     line-height: 32px;
@@ -49,6 +54,11 @@ const SText2 = styled(SText)`
   font-size: 14px;
   line-height: 20px;
 
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
   ${({ theme }) => theme.media.desktop} {
     font-size: 16px;
     line-height: 24px;
@@ -58,4 +68,14 @@ const SText2 = styled(SText)`
 const SText3 = styled(SText)`
   font-size: 14px;
   line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;
