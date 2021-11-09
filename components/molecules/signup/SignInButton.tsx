@@ -26,8 +26,8 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   const [rippleOrigin, setRippleOrigin] = useState<{x: string, y: string}>({ x: '50%', y: '50%' });
   const [isRippling, setIsRippling] = useState(false);
 
-  const handleClick = useMemo(() => debounce(onClick!!, 400), [onClick]);
-  const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 300),
+  const handleClick = useMemo(() => debounce(onClick!!, 900), [onClick]);
+  const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 750),
     [setIsRippling]);
 
   return (
@@ -73,6 +73,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
       onMouseUpCapture={handleRestoreRippling}
       onTouchStart={(e) => {
         if (disabled) return;
+        setHovered(false);
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.touches[0].clientX - rect.left;
         const y = e.touches[0].clientY - rect.top;
@@ -184,7 +185,7 @@ const SSignInButton = styled.button<SISignInButton>`
   user-select: none;
 
 
-  &:hover:enabled, &:focus-visible:enabled {
+  &:hover:enabled, &:focus:enabled {
   background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
     if (hoverBgColor && hoverContentColor) {
       return theme.name === 'light' ? hoverBgColor : hoverContentColor;
@@ -214,9 +215,8 @@ const SSignInButton = styled.button<SISignInButton>`
 
   ${({ isRippling }) => (isRippling ? css`
     &::before {
-      animation-duration: .3s;
+      animation-duration: .9s;
       animation-fill-mode: forwards;
-      animation-delay: 0s;
       animation-name: ${RippleAnimation};
     }
   ` : null)}
