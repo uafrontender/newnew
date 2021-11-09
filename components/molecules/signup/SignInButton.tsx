@@ -1,4 +1,6 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback, useMemo, useRef, useState,
+} from 'react';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -30,6 +32,80 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 750),
     [setIsRippling]);
 
+  const handleEnableHovered = useCallback(() => {
+    if (disabled) return;
+    setHovered(true);
+  },
+  [disabled, setHovered]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (disabled) return;
+    if (!focused) setHovered(false);
+  },
+  [disabled, focused, setHovered]);
+
+  const handleFocusCapture = useCallback(() => {
+    if (disabled) return;
+    setHovered(true);
+    setFocused(true);
+  },
+  [disabled, setFocused, setHovered]);
+
+  const handleBlurCapture = useCallback(() => {
+    if (disabled) return;
+    setHovered(false);
+    setFocused(false);
+    setIsRippling(false);
+  },
+  [disabled, setFocused, setHovered]);
+
+  const handleSetRippleOnMouseDown = useCallback((
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    if (disabled) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setRippleOrigin({ x: `${x}px`, y: `${y}px` });
+    setIsRippling(true);
+  },
+  [
+    disabled,
+    setRippleOrigin,
+    setIsRippling,
+  ]);
+
+  const handleSetRippleOnTouchStart = useCallback((
+    e: React.TouchEvent<HTMLButtonElement>,
+  ) => {
+    if (disabled) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    setRippleOrigin({ x: `${x}px`, y: `${y}px` });
+    setIsRippling(true);
+  },
+  [
+    disabled,
+    setRippleOrigin,
+    setIsRippling,
+  ]);
+
+  const handleSetRippleOnKeyDown = useCallback((
+    e: React.KeyboardEvent<HTMLButtonElement>,
+  ) => {
+    if (disabled) return;
+    if (e.key === 'Enter') {
+      setRippleOrigin({ x: '50%', y: '50%' });
+      setIsRippling(true);
+    }
+  },
+  [
+    disabled,
+    setRippleOrigin,
+    setIsRippling,
+  ]);
+
   return (
     <SSignInButton
       disabled={disabled}
@@ -39,53 +115,16 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
       elementWidth={ref.current?.getBoundingClientRect().width ?? 800}
       rippleOrigin={rippleOrigin}
       isRippling={isRippling}
-      onMouseOver={() => {
-        if (disabled) return;
-        setHovered(true);
-      }}
-      onMouseLeave={() => {
-        if (disabled) return;
-        if (!focused) setHovered(false);
-      }}
-      onTouchStartCapture={() => {
-        if (disabled) return;
-        setHovered(true);
-      }}
-      onFocusCapture={() => {
-        if (disabled) return;
-        setHovered(true);
-        setFocused(true);
-      }}
-      onBlurCapture={() => {
-        if (disabled) return;
-        setHovered(false);
-        setFocused(false);
-        setIsRippling(false);
-      }}
-      onMouseDown={(e) => {
-        if (disabled) return;
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setRippleOrigin({ x: `${x}px`, y: `${y}px` });
-        setIsRippling(true);
-      }}
+      onMouseOver={handleEnableHovered}
+      onTouchStartCapture={handleEnableHovered}
+      onFocusCapture={handleFocusCapture}
+      onBlurCapture={handleBlurCapture}
+      onMouseDown={handleSetRippleOnMouseDown}
+      onTouchStart={handleSetRippleOnTouchStart}
+      onKeyDownCapture={handleSetRippleOnKeyDown}
+      onMouseLeave={handleMouseLeave}
       onMouseUpCapture={handleRestoreRippling}
-      onTouchStart={(e) => {
-        if (disabled) return;
-        setHovered(false);
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.touches[0].clientX - rect.left;
-        const y = e.touches[0].clientY - rect.top;
-        setRippleOrigin({ x: `${x}px`, y: `${y}px` });
-        setIsRippling(true);
-      }}
       onTouchEndCapture={handleRestoreRippling}
-      onKeyDownCapture={() => {
-        if (disabled) return;
-        setRippleOrigin({ x: '50%', y: '50%' });
-        setIsRippling(true);
-      }}
       onKeyUpCapture={handleRestoreRippling}
       onClick={handleClick}
       {...rest}
