@@ -35,13 +35,13 @@ Button.defaultProps = {
 };
 
 const SButton = styled.button<IButton>`
-  color: ${(props) => (props.titleColor ? props.titleColor : props.theme.colorsThemed.appButtonPrimary)};
+  color: ${(props) => (props.titleColor ? props.titleColor : props.theme.colors.white)};
   cursor: pointer;
   border: none;
   outline: none;
   padding: ${(props) => (props.iconOnly ? '8px' : '12px 24px')};
   font-size: 14px;
-  background: ${(props) => (props.bg ? props.bg : props.theme.colorsThemed.appButtonPrimaryBG)};
+  background: ${(props) => (props.bg ? props.bg : props.theme.colorsThemed.grayscale.background2)};
   line-height: 24px;
   font-weight: bold;
   white-space: nowrap;

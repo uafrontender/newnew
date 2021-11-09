@@ -86,8 +86,8 @@ const SH3 = styled.h3`
 const SH4 = styled.h4`
   font-weight: bold;
 
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 22px;
+  line-height: 30px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 28px;
@@ -103,8 +103,8 @@ const SH4 = styled.h4`
 const SH5 = styled.h5`
   font-weight: bold;
 
-  font-size: 18px;
-  line-height: 26px;
+  font-size: 20px;
+  line-height: 28px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 24px;
@@ -120,8 +120,8 @@ const SH5 = styled.h5`
 const SH6 = styled.h6`
   font-weight: bold;
 
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 18px;
+  line-height: 26px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 20px;

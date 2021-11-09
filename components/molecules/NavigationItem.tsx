@@ -67,7 +67,7 @@ interface ISNavItem {
 }
 
 const SNavItem = styled(Text)<ISNavItem>`
-  color: ${(props) => props.theme.colorsThemed[props.active ? 'topNavigationActive' : 'topNavigation']};
+  color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
   position: relative;
 `;
 

@@ -62,7 +62,7 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
           <InlineSVG
             key={item.key}
             svg={icons?.[active ? 'filled' : 'outlined']?.[item.key]}
-            fill={theme.colorsThemed[active ? 'mobileNavigationActiveIcon' : 'mobileNavigationIcon']}
+            fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
             width="24px"
             height="24px"
           />
@@ -102,7 +102,7 @@ interface ISTitle {
 }
 
 const SCaption = styled(Caption)<ISTitle>`
-  color: ${(props) => props.theme.colorsThemed[props.active ? 'bottomNavigationActive' : 'bottomNavigation']};
+  color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
   width: 100%;
   overflow: hidden;
   margin-top: 4px;

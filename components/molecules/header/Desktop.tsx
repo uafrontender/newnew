@@ -44,7 +44,7 @@ export const Desktop: React.FC<IDesktop> = () => {
         <a>
           <InlineSVG
             svg={tabletLogo}
-            fill={theme.colorsThemed.appIcon}
+            fill={theme.colorsThemed.text.primary}
             width="152px"
             height="32px"
           />
@@ -102,9 +102,9 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    bg={theme.colorsThemed.appButtonSecondaryBG}
+                    bg={theme.colorsThemed.grayscale.background2}
                     onClick={handleDashboardClick}
-                    titleColor={theme.colorsThemed.appButtonSecondary}
+                    titleColor={theme.colorsThemed.text.primary}
                   >
                     {t('button-dashboard')}
                   </Button>
@@ -149,9 +149,9 @@ export const Desktop: React.FC<IDesktop> = () => {
           <>
             <SItemWithMargin>
               <Button
-                bg={theme.colorsThemed.appButtonSecondaryBG}
+                bg={theme.colorsThemed.grayscale.background2}
                 onClick={handleSignInClick}
-                titleColor={theme.colorsThemed.appButtonSecondary}
+                titleColor={theme.colorsThemed.text.primary}
               >
                 {t('button-login-in')}
               </Button>
@@ -176,7 +176,7 @@ export default Desktop;
 
 const SContainer = styled.div`
   display: flex;
-  padding: 16px 96px;
+  padding: 16px 0;
   align-items: center;
   justify-content: space-between;
 `;

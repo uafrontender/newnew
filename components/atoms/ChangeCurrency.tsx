@@ -6,9 +6,9 @@ import Text from './Text';
 import Modal from '../organisms/Modal';
 import Caption from './Caption';
 
-import { useOnClickEsc } from '../../utils/clickEsc';
+import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
 import { setUserCurrency } from '../../redux-store/slices/userStateSlice';
-import { useOnClickOutside } from '../../utils/clickOutside';
+import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import { SUPPORTED_CURRENCIES } from '../../constants/general';
@@ -38,6 +38,7 @@ export const ChangeCurrency: React.FC<IChangeCurrency> = () => {
   const renderItem = (item: string) => {
     const handleItemClick = () => {
       dispatch(setUserCurrency(item));
+      handleCloseClick();
     };
 
     return (
@@ -49,7 +50,7 @@ export const ChangeCurrency: React.FC<IChangeCurrency> = () => {
         <SItemTitle variant={3}>
           {t(`dd-currency-title-${item}`)}
         </SItemTitle>
-        <SItemSubTitle variant={1}>
+        <SItemSubTitle variant={2}>
           {t(`dd-currency-subTitle-${item}`)}
         </SItemSubTitle>
       </SItemHolder>
@@ -78,7 +79,7 @@ export const ChangeCurrency: React.FC<IChangeCurrency> = () => {
             </SMobileList>
             <SCancelItemHolder onClick={handleCloseClick}>
               <SCancelItemTitleHolder>
-                Close
+                {t('button-cancel')}
               </SCancelItemTitleHolder>
             </SCancelItemHolder>
           </SMobileListContainer>
@@ -105,7 +106,7 @@ const SContent = styled.div`
   cursor: pointer;
   padding: 12px 24px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;
 
 const STitle = styled.div`
@@ -128,10 +129,11 @@ const SListHolder = styled.div<ISListHolder>`
   overflow: auto;
   position: absolute;
   min-width: 160px;
+  box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   transition: all ease 0.5s;
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -148,10 +150,11 @@ const SItemHolder = styled.div<ISItemHolder>`
   margin: 12px 12px 0;
   padding: 12px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed[props.selected ? 'footerDDSelectedBackground' : 'footerButtonBackground']};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale[props.selected ? 'background2' : 'background1']};
 `;
 
 const SItemTitle = styled(Text)`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   text-align: center;
   font-weight: 600;
   white-space: nowrap;
@@ -163,7 +166,7 @@ const SItemTitle = styled(Text)`
 `;
 
 const SItemSubTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.footerDDItemColor};
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
   text-align: center;
   font-weight: 600;
   white-space: nowrap;
@@ -178,6 +181,7 @@ const SMobileListContainer = styled.div<ISListHolder>`
   width: 100%;
   bottom: ${(props) => (props.focused ? 0 : '-100vh')};
   height: 100%;
+  padding: 16px;
   display: flex;
   position: relative;
   transition: bottom ease 0.5s;
@@ -193,7 +197,7 @@ const SMobileList = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;
 
 const SCancelItemHolder = styled.div`
@@ -201,7 +205,7 @@ const SCancelItemHolder = styled.div`
   margin: 4px 0 0;
   padding: 16px 32px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.footerButtonBackground};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
 `;
 
 const SCancelItemTitleHolder = styled.div`

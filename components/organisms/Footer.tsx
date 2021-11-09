@@ -3,9 +3,11 @@ import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
+import Col from '../atoms/Grid/Col';
+import Row from '../atoms/Grid/Row';
+import Container from '../atoms/Grid/Container';
 import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
-import ChangeCurrency from '../atoms/ChangeCurrency';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -78,122 +80,123 @@ export const Footer: React.FC<IFooter> = () => {
   );
 
   return (
-    <SContainer>
-      <SContent>
-        <SIconHolder>
-          <Link href="/">
-            <a>
-              <InlineSvg
-                svg={mobileLogo}
-                fill={theme.colorsThemed.appIcon}
-                width="48px"
-                height="48px"
-              />
-            </a>
-          </Link>
-        </SIconHolder>
-        <STopContent>
-          <SBlock>
-            <SBlockTitle>
-              {t('footer-top-title')}
-            </SBlockTitle>
-            {topItems.map(renderItem)}
-          </SBlock>
-          {isMobile && <SSeparator />}
-          <SBlock>
-            <SBlockTitle>
-              {t('footer-center-title')}
-            </SBlockTitle>
-            {centerItems.map(renderItem)}
-          </SBlock>
-          {isMobile && <SSeparator />}
-          <SBlock>
-            <SBlockTitle>
-              {t('footer-bottom-title')}
-            </SBlockTitle>
-            <SBlockRow>
-              <Link href="https://www.instagram.com" passHref>
-                <SSvgHolder target="_blank">
-                  <InlineSvg
-                    svg={instagramIcon}
-                    fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SSvgHolder>
-              </Link>
-              <Link href="https://twitter.com" passHref>
-                <SSvgHolder target="_blank">
-                  <InlineSvg
-                    svg={twitterIcon}
-                    fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SSvgHolder>
-              </Link>
-              <Link href="https://twitter.com" passHref>
-                <SSvgHolder target="_blank">
-                  <InlineSvg
-                    svg={tiktokIcon}
-                    fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SSvgHolder>
-              </Link>
-            </SBlockRow>
-          </SBlock>
-        </STopContent>
-        <SSeparator />
-        <SBlockBottomRow>
-          <SLeftBlock>
-            <SBottomBlockOption>
-              {t('footer-inc')}
-            </SBottomBlockOption>
-            <Link href="/terms" passHref>
-              <SBottomBlockOption>
-                {t('footer-terms')}
-              </SBottomBlockOption>
-            </Link>
-            <Link href="/privacy" passHref>
-              <SBottomBlockOption>
-                {t('footer-privacy')}
-              </SBottomBlockOption>
-            </Link>
-          </SLeftBlock>
-          <SRightBlock>
-            <SRightBlockItemHolder>
-              <ChangeLanguage />
-            </SRightBlockItemHolder>
-            <SRightBlockItemHolder>
-              <ChangeCurrency />
-            </SRightBlockItemHolder>
-          </SRightBlock>
-        </SBlockBottomRow>
-      </SContent>
-    </SContainer>
+    <SWrapper>
+      <Container>
+        <Row>
+          <Col>
+            <SContent>
+              <SIconHolder>
+                <Link href="/">
+                  <a>
+                    <InlineSvg
+                      svg={mobileLogo}
+                      fill={theme.colorsThemed.text.primary}
+                      width="48px"
+                      height="48px"
+                    />
+                  </a>
+                </Link>
+              </SIconHolder>
+              <STopContent>
+                <SBlock>
+                  <SBlockTitle>
+                    {t('footer-top-title')}
+                  </SBlockTitle>
+                  {topItems.map(renderItem)}
+                </SBlock>
+                {isMobile && <SSeparator />}
+                <SBlock>
+                  <SBlockTitle>
+                    {t('footer-center-title')}
+                  </SBlockTitle>
+                  {centerItems.map(renderItem)}
+                </SBlock>
+                {isMobile && <SSeparator />}
+                <SBlock>
+                  <SBlockTitle>
+                    {t('footer-bottom-title')}
+                  </SBlockTitle>
+                  <SBlockRow>
+                    <Link href="https://www.instagram.com" passHref>
+                      <SSvgHolder target="_blank">
+                        <InlineSvg
+                          svg={instagramIcon}
+                          fill={theme.colorsThemed.text.secondary}
+                          width="20px"
+                          height="20px"
+                        />
+                      </SSvgHolder>
+                    </Link>
+                    <Link href="https://twitter.com" passHref>
+                      <SSvgHolder target="_blank">
+                        <InlineSvg
+                          svg={twitterIcon}
+                          fill={theme.colorsThemed.text.secondary}
+                          width="20px"
+                          height="20px"
+                        />
+                      </SSvgHolder>
+                    </Link>
+                    <Link href="https://twitter.com" passHref>
+                      <SSvgHolder target="_blank">
+                        <InlineSvg
+                          svg={tiktokIcon}
+                          fill={theme.colorsThemed.text.secondary}
+                          width="20px"
+                          height="20px"
+                        />
+                      </SSvgHolder>
+                    </Link>
+                  </SBlockRow>
+                </SBlock>
+              </STopContent>
+              <SSeparator />
+              <SBlockBottomRow>
+                <SLeftBlock>
+                  <SBottomBlockOption>
+                    {t('footer-inc')}
+                  </SBottomBlockOption>
+                  <Link href="/terms" passHref>
+                    <SBottomBlockOption>
+                      {t('footer-terms')}
+                    </SBottomBlockOption>
+                  </Link>
+                  <Link href="/privacy" passHref>
+                    <SBottomBlockOption>
+                      {t('footer-privacy')}
+                    </SBottomBlockOption>
+                  </Link>
+                </SLeftBlock>
+                <SRightBlock>
+                  <SRightBlockItemHolder>
+                    <ChangeLanguage />
+                  </SRightBlockItemHolder>
+                </SRightBlock>
+              </SBlockBottomRow>
+            </SContent>
+          </Col>
+        </Row>
+      </Container>
+    </SWrapper>
   );
 };
 
 export default Footer;
 
-const SContainer = styled.footer`
-  background-color: ${(props) => props.theme.colorsThemed.footerBackground};
+const SWrapper = styled.footer`
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.background2};
 `;
 
 const SContent = styled.div`
-  margin: 0 auto;
-  padding: 32px 16px;
+  padding: 32px 0;
   position: relative;
-  max-width: ${(props) => props.theme.width.maxContentWidth};
 
   ${(props) => props.theme.media.tablet} {
-    padding: 32px;
+    padding: 32px 0;
   }
 
   ${(props) => props.theme.media.laptop} {
-    padding: 32px 96px;
+    padding: 32px 0;
   }
 `;
 
@@ -222,7 +225,7 @@ const SBlock = styled.div`
 const SSeparator = styled.div`
   margin-top: 12px;
   margin-bottom: 24px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.grayscale.outlines};
+  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.grayscale.outlines1};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 36px;

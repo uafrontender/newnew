@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
+import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
+
 import InlineSvg from '../../atoms/InlineSVG';
+import RippleAnimation from '../../atoms/RippleAnimation';
 
 type TSignInButton = React.ComponentPropsWithoutRef<'button'> & {
   svg: string;
@@ -8,19 +11,83 @@ type TSignInButton = React.ComponentPropsWithoutRef<'button'> & {
   title?: string;
   hoverBgColor?: string;
   hoverContentColor?: string;
+  pressedBgColor: string;
 }
 
 const SignInButton: React.FunctionComponent<TSignInButton> = ({
-  title, svg, hoverSvg, children, ...rest
+  title, svg, hoverSvg, children, onClick, disabled, ...rest
 }) => {
   const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  // Element ref
+  const ref = useRef<HTMLButtonElement>();
+
+  const [rippleOrigin, setRippleOrigin] = useState<{x: string, y: string}>({ x: '50%', y: '50%' });
+  const [isRippling, setIsRippling] = useState(false);
+
+  const handleClick = useMemo(() => debounce(onClick!!, 900), [onClick]);
+  const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 750),
+    [setIsRippling]);
 
   return (
     <SSignInButton
-      onMouseOver={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onTouchStart={() => setHovered(true)}
-      onTouchEnd={() => setHovered(false)}
+      disabled={disabled}
+      ref={(el) => {
+        ref.current = el!!;
+      }}
+      elementWidth={ref.current?.getBoundingClientRect().width ?? 800}
+      rippleOrigin={rippleOrigin}
+      isRippling={isRippling}
+      onMouseOver={() => {
+        if (disabled) return;
+        setHovered(true);
+      }}
+      onMouseLeave={() => {
+        if (disabled) return;
+        if (!focused) setHovered(false);
+      }}
+      onTouchStartCapture={() => {
+        if (disabled) return;
+        setHovered(true);
+      }}
+      onFocusCapture={() => {
+        if (disabled) return;
+        setHovered(true);
+        setFocused(true);
+      }}
+      onBlurCapture={() => {
+        if (disabled) return;
+        setHovered(false);
+        setFocused(false);
+        setIsRippling(false);
+      }}
+      onMouseDown={(e) => {
+        if (disabled) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setRippleOrigin({ x: `${x}px`, y: `${y}px` });
+        setIsRippling(true);
+      }}
+      onMouseUpCapture={handleRestoreRippling}
+      onTouchStart={(e) => {
+        if (disabled) return;
+        setHovered(false);
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        setRippleOrigin({ x: `${x}px`, y: `${y}px` });
+        setIsRippling(true);
+      }}
+      onTouchEndCapture={handleRestoreRippling}
+      onKeyDownCapture={() => {
+        if (disabled) return;
+        setRippleOrigin({ x: '50%', y: '50%' });
+        setIsRippling(true);
+      }}
+      onKeyUpCapture={handleRestoreRippling}
+      onClick={handleClick}
       {...rest}
     >
       <InlineSvg
@@ -40,6 +107,7 @@ SignInButton.defaultProps = {
   hoverSvg: undefined,
   hoverBgColor: undefined,
   hoverContentColor: undefined,
+  onClick: () => {},
 };
 
 export default SignInButton;
@@ -47,9 +115,19 @@ export default SignInButton;
 interface SISignInButton {
   hoverBgColor?: string;
   hoverContentColor?: string;
+  pressedBgColor: string;
+  elementWidth: number;
+  isRippling: boolean;
+  rippleOrigin: {
+    x: string;
+    y: string;
+  };
 }
 
 const SSignInButton = styled.button<SISignInButton>`
+  position: relative;
+  overflow: hidden;
+
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -66,12 +144,34 @@ const SSignInButton = styled.button<SISignInButton>`
       fill: ${theme.name === 'light' ? hoverBgColor : hoverContentColor};
   };` : null)};
 
+  &::before {
+    position: absolute;
+    top: ${({ rippleOrigin, elementWidth }) => `calc(${rippleOrigin.y} - ${elementWidth}px)`};
+    left: ${({ rippleOrigin, elementWidth }) => `calc(${rippleOrigin.x} - ${elementWidth}px)`};
+
+    border-radius: 50%;
+
+    width: ${({ elementWidth }) => elementWidth * 2}px;
+    height: ${({ elementWidth }) => elementWidth * 2}px;
+
+    transform: scale(0);
+    transform-origin: center;
+
+    background: ${({ pressedBgColor }) => pressedBgColor};
+
+    content: '';
+  }
+
   span {
     margin-left: 16px;
 
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
+  }
+
+  div, span {
+    z-index: 1;
   }
 
   cursor: pointer;
@@ -85,14 +185,14 @@ const SSignInButton = styled.button<SISignInButton>`
   user-select: none;
 
 
-  &:hover:enabled {
-    background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
+  &:hover:enabled, &:focus:enabled {
+  background-color: ${({ theme, hoverBgColor, hoverContentColor }) => {
     if (hoverBgColor && hoverContentColor) {
       return theme.name === 'light' ? hoverBgColor : hoverContentColor;
     } return hoverBgColor;
   }};
 
-    color: ${({ theme, hoverBgColor, hoverContentColor }) => {
+  color: ${({ theme, hoverBgColor, hoverContentColor }) => {
     if (hoverBgColor && hoverContentColor) {
       return theme.name === 'light' ? hoverContentColor : hoverBgColor;
     } return 'white';
@@ -106,12 +206,20 @@ const SSignInButton = styled.button<SISignInButton>`
   }};
   }
 
-    transition: .2s linear;
+    transition: .15s linear;
   }
 
   &:focus {
     outline: transparent;
   }
+
+  ${({ isRippling }) => (isRippling ? css`
+    &::before {
+      animation-duration: .9s;
+      animation-fill-mode: forwards;
+      animation-name: ${RippleAnimation};
+    }
+  ` : null)}
 
   &:disabled {
     opacity: .5;
@@ -120,7 +228,12 @@ const SSignInButton = styled.button<SISignInButton>`
     transition: .2s linear;
   }
 
+  ${({ theme }) => theme.media.mobileL} {
+    padding-left: 33%;
+  }
+
   ${({ theme }) => theme.media.tablet} {
+
     padding-left: 16px;
 
     span {
