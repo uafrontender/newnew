@@ -4,8 +4,8 @@ import styled, { useTheme } from 'styled-components';
 import Button from './Button';
 import InlineSVG from './InlineSVG';
 
-import useOnClickEsc from '../../utils/clickEsc';
-import useOnClickOutside from '../../utils/clickOutside';
+import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
+import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';

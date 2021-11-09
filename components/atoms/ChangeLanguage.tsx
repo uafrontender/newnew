@@ -7,9 +7,9 @@ import Text from './Text';
 import Modal from '../organisms/Modal';
 import Caption from './Caption';
 
-import { useOnClickEsc } from '../../utils/clickEsc';
+import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
 import { useAppSelector } from '../../redux-store/store';
-import { useOnClickOutside } from '../../utils/clickOutside';
+import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
@@ -52,7 +52,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
         <SItemTitle variant={3}>
           {t(`dd-language-title-${item}`)}
         </SItemTitle>
-        <SItemSubTitle variant={1}>
+        <SItemSubTitle variant={2}>
           {t(`dd-language-subTitle-${item}`)}
         </SItemSubTitle>
       </SItemHolder>
@@ -81,7 +81,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
             </SMobileList>
             <SCancelItemHolder onClick={handleCloseClick}>
               <SCancelItemTitleHolder>
-                Close
+                {t('button-cancel')}
               </SCancelItemTitleHolder>
             </SCancelItemHolder>
           </SMobileListContainer>
@@ -183,6 +183,7 @@ const SMobileListContainer = styled.div<ISListHolder>`
   width: 100%;
   bottom: ${(props) => (props.focused ? 0 : '-100vh')};
   height: 100%;
+  padding: 16px;
   display: flex;
   position: relative;
   transition: bottom ease 0.5s;
