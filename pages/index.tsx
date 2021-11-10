@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import Link from 'next/link';
-import { useTheme } from 'styled-components';
 import type { NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -14,7 +13,6 @@ import Headline from '../components/atoms/Headline';
 import GeneralTemplate from '../components/templates/General';
 
 const Home: NextPage = () => {
-  const theme = useTheme();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -42,25 +40,23 @@ const Home: NextPage = () => {
       </Headline>
       <Button
         id="dark-mode-button"
-        bg={theme.gradients.blueDiagonal}
         onClick={handleToggleDarkMode}
       >
         Toggle dark mode
       </Button>
       <Button
-        bg={theme.gradients.blueDiagonal}
+        view="secondary"
         onClick={handleToggleUserLoggedIn}
       >
         Toggle user loggedIn
       </Button>
       <Button
-        bg={theme.gradients.blueDiagonal}
+        view="tertiary"
         onClick={handleToggleUserRole}
       >
         Toggle user role
       </Button>
       <Button
-        bg={theme.gradients.blueDiagonal}
         onClick={handleToggleUserAvatar}
       >
         Toggle user avatar

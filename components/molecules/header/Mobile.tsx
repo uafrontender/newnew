@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
@@ -28,28 +27,35 @@ export const Mobile: React.FC<IMobile> = () => {
   const handleSignInClick = () => {
     router.push('/sign-up');
   };
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      window.location.reload();
+    } else {
+      router.push('/', '/');
+    }
+  };
 
   return (
     <SContainer>
-      <Link href="/">
-        <a>
-          {user.loggedIn ? (
-            <InlineSVG
-              svg={mobileLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="40px"
-              height="40px"
-            />
-          ) : (
-            <InlineSVG
-              svg={tabletLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="127px"
-              height="40px"
-            />
-          )}
-        </a>
-      </Link>
+      {user.loggedIn ? (
+        <InlineSVG
+          clickable
+          svg={mobileLogo}
+          fill={theme.colorsThemed.text.primary}
+          width="40px"
+          height="40px"
+          onClick={handleLogoClick}
+        />
+      ) : (
+        <InlineSVG
+          clickable
+          svg={tabletLogo}
+          fill={theme.colorsThemed.text.primary}
+          width="127px"
+          height="40px"
+          onClick={handleLogoClick}
+        />
+      )}
       <SRightBlock>
         <SItemWithMargin>
           <SearchInput />
@@ -63,7 +69,7 @@ export const Mobile: React.FC<IMobile> = () => {
           ) : (
             <Button
               iconOnly
-              bg={theme.gradients.blueDiagonal}
+              view="secondary"
               onClick={handleSignInClick}
             >
               <InlineSVG

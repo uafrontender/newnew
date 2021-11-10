@@ -69,6 +69,28 @@ export const lightTheme: DefaultTheme = {
         pressed: 'linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), #000000',
       },
     },
+    button: {
+      color: {
+        primary: '#FFFFFF',
+        secondary: '#2C2C33',
+        tertiary: '#2C2C33',
+      },
+      background: {
+        primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        secondary: '#F1F3F9',
+        tertiary: '#FFFFFF',
+      },
+      ripple: {
+        primary: '#2955EC',
+        secondary: '#DFE3F1',
+        tertiary: '#DFE3F1',
+      },
+      hover: {
+        primary: '#2955EC',
+        secondary: '#DFE3F1',
+        tertiary: '#DFE3F1',
+      },
+    },
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
@@ -127,6 +149,28 @@ export const darkTheme: DefaultTheme = {
         main: '#000000',
         hover: '#000000',
         pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #FFFFFF',
+      },
+    },
+    button: {
+      color: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+        tertiary: '#FFFFFF',
+      },
+      background: {
+        primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        secondary: '#14151F',
+        tertiary: '#0B0A13',
+      },
+      ripple: {
+        primary: '#2955EC',
+        secondary: '#21222C',
+        tertiary: '#21222C',
+      },
+      hover: {
+        primary: '#21222C',
+        secondary: '#21222C',
+        tertiary: '#21222C',
       },
     },
   },
