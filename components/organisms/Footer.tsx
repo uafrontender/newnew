@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -27,6 +28,7 @@ type TItem = {
 export const Footer: React.FC<IFooter> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const topItems: TItem[] = [
@@ -71,6 +73,13 @@ export const Footer: React.FC<IFooter> = () => {
   ];
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      window.location.reload();
+    } else {
+      router.push('/', '/');
+    }
+  };
   const renderItem = (item: TItem) => (
     <Link key={item.key} href={item.url} passHref>
       <SBlockOption>
@@ -86,16 +95,14 @@ export const Footer: React.FC<IFooter> = () => {
           <Col>
             <SContent>
               <SIconHolder>
-                <Link href="/">
-                  <a>
-                    <InlineSvg
-                      svg={mobileLogo}
-                      fill={theme.colorsThemed.text.primary}
-                      width="48px"
-                      height="48px"
-                    />
-                  </a>
-                </Link>
+                <InlineSvg
+                  clickable
+                  svg={mobileLogo}
+                  fill={theme.colorsThemed.text.primary}
+                  width="48px"
+                  height="48px"
+                  onClick={handleLogoClick}
+                />
               </SIconHolder>
               <STopContent>
                 <SBlock>
