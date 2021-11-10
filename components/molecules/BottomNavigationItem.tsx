@@ -68,7 +68,7 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
           />
           {!!item.counter && (
             <SIndicatorContainer>
-              <Indicator counter={item.counter} />
+              <Indicator minified counter={item.counter} />
             </SIndicatorContainer>
           )}
         </SSVGContainer>
@@ -116,7 +116,7 @@ const SSVGContainer = styled.div`
 `;
 
 const SIndicatorContainer = styled.div`
-  top: -10px;
-  left: 35%;
+  top: -1px;
+  right: -1px;
   position: absolute;
 `;

@@ -26,7 +26,7 @@ import Text from '../atoms/Text';
 import GoBackButton from '../molecules/GoBackButton';
 import TextWithLine from '../atoms/TextWithLine';
 import SignInTextInput from '../atoms/SignInTextInput';
-import PrimaryLargeButton from '../atoms/PrimaryLargeButton';
+import Button from '../atoms/Button';
 import SignInButton from '../molecules/signup/SignInButton';
 
 import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
@@ -190,14 +190,14 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
               </SErrorDiv>
             ) : null
           }
-          <PrimaryLargeButton
+          <Button
             disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
             onClick={() => handleSubmitEmail()}
           >
             <span>
               {t('signupOptions.signInBtn')}
             </span>
-          </PrimaryLargeButton>
+          </Button>
         </div>
         <SLegalText>
           {t('legalDisclaimer.main_text')}
