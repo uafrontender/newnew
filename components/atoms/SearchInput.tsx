@@ -67,6 +67,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
     <SContainer ref={inputRef}>
       <Button
         iconOnly
+        view="secondary"
         onClick={handleSearchClick}
       >
         <InlineSVG
@@ -121,9 +122,10 @@ const SContainer = styled.div`
 
 const SInputWrapper = styled.div<ISearchInput>`
   top: 50%;
-  left: 12px;
-  right: 12px;
+  left: 0;
+  right: 0;
   border: 1.5px solid ${(props) => props.theme.colorsThemed.grayscale.outlines2};
+  z-index: 3;
   padding: 8px 12px;
   display: flex;
   position: absolute;

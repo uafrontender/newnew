@@ -67,6 +67,28 @@ declare module 'styled-components' {
           pressed: string;
         },
       },
+      button: {
+        color: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+        },
+        background: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+        },
+        ripple: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+        },
+        hover: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+        },
+      },
     },
     shadows: {
       mediumBlue: string,

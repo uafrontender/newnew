@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -39,28 +38,35 @@ export const Tablet: React.FC<ITablet> = () => {
   const handleSignUpClick = () => {
     router.push('/sign-up');
   };
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      window.location.reload();
+    } else {
+      router.push('/', '/');
+    }
+  };
 
   return (
     <SContainer>
-      <Link href="/">
-        <a>
-          {user.loggedIn ? (
-            <InlineSVG
-              svg={mobileLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="48px"
-              height="48px"
-            />
-          ) : (
-            <InlineSVG
-              svg={tabletLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="152px"
-              height="48px"
-            />
-          )}
-        </a>
-      </Link>
+      {user.loggedIn ? (
+        <InlineSVG
+          clickable
+          svg={mobileLogo}
+          fill={theme.colorsThemed.text.primary}
+          width="48px"
+          height="48px"
+          onClick={handleLogoClick}
+        />
+      ) : (
+        <InlineSVG
+          clickable
+          svg={tabletLogo}
+          fill={theme.colorsThemed.text.primary}
+          width="152px"
+          height="48px"
+          onClick={handleLogoClick}
+        />
+      )}
       <SRightBlock>
         {user.loggedIn && (
           <>
@@ -115,8 +121,6 @@ export const Tablet: React.FC<ITablet> = () => {
                   <>
                     <SItemWithMargin>
                       <Button
-                        bs={theme.shadows.mediumBlue}
-                        bg={theme.gradients.blueDiagonal}
                         onClick={handleCreateClick}
                       >
                         {t('button-create-decision')}
@@ -140,8 +144,6 @@ export const Tablet: React.FC<ITablet> = () => {
                   <>
                     <SItemWithMargin>
                       <Button
-                        bs={theme.shadows.mediumBlue}
-                        bg={theme.gradients.blueDiagonal}
                         onClick={handleCreateClick}
                       >
                         {t('button-create')}
@@ -160,17 +162,14 @@ export const Tablet: React.FC<ITablet> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    bg={theme.colorsThemed.grayscale.background2}
+                    view="secondary"
                     onClick={handleSignInClick}
-                    titleColor={theme.colorsThemed.text.primary}
                   >
                     {t('button-login-in')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <Button
-                    bs={theme.shadows.mediumBlue}
-                    bg={theme.gradients.blueDiagonal}
                     onClick={handleSignUpClick}
                   >
                     {t('button-sign-up')}
