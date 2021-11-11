@@ -71,10 +71,9 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
     <SContainer ref={ref}>
       <Button
         view="tertiary"
-        // noRipple
+        onClick={handleChangeLanguageClick}
         debounceClickMs={300}
         debounceRestoreMs={500}
-        onClick={handleChangeLanguageClick}
       >
         {t(`selected-language-title-${locale}`)}
       </Button>

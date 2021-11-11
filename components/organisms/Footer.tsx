@@ -253,7 +253,6 @@ const SBlockOption = styled.a`
   font-weight: bold;
   line-height: 24px;
   margin-bottom: 12px;
-  text-decoration: none;
 `;
 
 const SBlockRow = styled.div`
@@ -278,7 +277,6 @@ const SBottomBlockOption = styled.a`
   font-weight: bold;
   line-height: 24px;
   margin-right: 24px;
-  text-decoration: none;
 `;
 
 const SSvgHolder = styled.a`

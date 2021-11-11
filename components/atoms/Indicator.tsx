@@ -4,7 +4,7 @@ import CountUp from 'react-countup';
 
 export interface IIndicator {
   counter: number,
-  minified: boolean,
+  minified?: boolean,
 }
 
 export const Indicator: React.FC<IIndicator> = (props) => {

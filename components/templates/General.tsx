@@ -8,7 +8,8 @@ import Header from '../organisms/Header';
 import Container from '../atoms/Grid/Container';
 import BottomNavigation from '../organisms/BottomNavigation';
 
-import { useOverlay } from '../../utils/hooks/useOverlay';
+import useOverlay from '../../utils/hooks/useOverlay';
+import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
@@ -88,6 +89,7 @@ export const General: React.FC<IGeneral> = (props) => {
   }, [user.loggedIn, user.notificationsCount, user.role]);
 
   useOverlay(wrapperRef);
+  useScrollPosition(wrapperRef);
 
   return (
     <SWrapper ref={wrapperRef}>

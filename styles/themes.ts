@@ -100,6 +100,8 @@ export const lightTheme: DefaultTheme = {
   gradients: {
     blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    heroNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
+    heroNotificationsTablet: 'linear-gradient(360deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
   },
 };
 
@@ -182,5 +184,7 @@ export const darkTheme: DefaultTheme = {
   gradients: {
     blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    heroNotifications: 'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
+    heroNotificationsTablet: 'linear-gradient(360deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
   },
 };

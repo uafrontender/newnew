@@ -98,6 +98,8 @@ declare module 'styled-components' {
     gradients: {
       blueDiagonal: string,
       blueHorizontal: string,
+      heroNotifications: string,
+      heroNotificationsTablet: string,
     },
     borderRadius: {
       small: string,
