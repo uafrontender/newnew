@@ -1,37 +1,37 @@
 {
   "meta": {
-    "title": "Sign in",
-    "description": "Sign up to Newnew!"
+    "title": "FR Sign in",
+    "description": "FR Sign up to Newnew!"
   },
-  "goBackBtn": "Go back",
+  "goBackBtn": "FR Go back",
   "heading": {
-    "sign_in": "Sign in",
-    "sign_in_to": "Sign in to",
+    "sign_in": "FR Sign in",
+    "sign_in_to": "FR Sign in to",
     "reasons": {
-      "comment": "comment",
-      "bid": "bid"
+      "comment": "FR comment",
+      "bid": "FR bid"
     },
-    "subheading": "We'll sign you in or create an account."
+    "subheading": "FR We'll sign you in or create an account."
   },
   "signupOptions": {
-    "google": "Continue with Google",
-    "apple": "Continue with Apple ID",
-    "facebook": "Continue with Facebook",
-    "twitter": "Continue with Twitter",
-    "moreOptionsBtn": "Show more options",
-    "or_continue_with": "or continue with",
-    "email": "Email",
-    "signInBtn": "Sign In"
+    "google": "FR Continue with Google",
+    "apple": "FR Continue with Apple ID",
+    "facebook": "FR Continue with Facebook",
+    "twitter": "FR Continue with Twitter",
+    "moreOptionsBtn": "FR Show more options",
+    "or_continue_with": "FR or continue with",
+    "email": "FR Email",
+    "signInBtn": "FR Sign In"
   },
   "legalDisclaimer": {
-    "main_text": "Legal disclaimer comes here and links to",
-    "privacy_policy_terms": "Privacy Policy Terms",
-    "and": "and",
-    "community_guidelines": "Community Guidelines"
+    "main_text": "FR Legal disclaimer comes here and links to",
+    "privacy_policy_terms": "FR Privacy Policy Terms",
+    "and": "FR and",
+    "community_guidelines": "FR Community Guidelines"
   },
   "errors": {
-    "email_invalid": "Invalid email address. Please check it.",
-    "generic_error": "An error occurred",
-    "Failed to fetch": "Failed to submit"
+    "email_invalid": "FR Invalid email address. Please check it.",
+    "generic_error": "FR An error occurred",
+    "Failed to fetch": "FR Failed to submit"
   }
 }

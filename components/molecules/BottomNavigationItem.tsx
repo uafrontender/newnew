@@ -93,7 +93,6 @@ const SContainer = styled.a<ISContainer>`
   display: flex;
   align-items: center;
   flex-direction: column;
-  text-decoration: none;
   justify-content: center;
 `;
 

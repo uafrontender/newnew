@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import Link from 'next/link';
 import type { NextPage } from 'next';
-import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
@@ -9,11 +8,11 @@ import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import { setUserLoggedIn, setUserRole, setUserAvatar } from '../redux-store/slices/userStateSlice';
 
 import Button from '../components/atoms/Button';
-import Headline from '../components/atoms/Headline';
+import TopSection from '../components/organisms/home/TopSection';
+import HeroSection from '../components/organisms/home/HeroSection';
 import GeneralTemplate from '../components/templates/General';
 
 const Home: NextPage = () => {
-  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { colorMode } = useAppSelector((state) => state.ui);
@@ -35,9 +34,8 @@ const Home: NextPage = () => {
 
   return (
     <GeneralTemplate>
-      <Headline>
-        {t('welcome', { NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME })}
-      </Headline>
+      {!user.loggedIn && <HeroSection />}
+      <TopSection />
       <Button
         id="dark-mode-button"
         onClick={handleToggleDarkMode}
@@ -45,13 +43,11 @@ const Home: NextPage = () => {
         Toggle dark mode
       </Button>
       <Button
-        view="secondary"
         onClick={handleToggleUserLoggedIn}
       >
         Toggle user loggedIn
       </Button>
       <Button
-        view="tertiary"
         onClick={handleToggleUserRole}
       >
         Toggle user role
@@ -75,7 +71,7 @@ export default Home;
 export async function getStaticProps(context: { locale: string }): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale,
-    ['common'],
+    ['common', 'home'],
   );
 
   return {

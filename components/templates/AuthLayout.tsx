@@ -86,8 +86,6 @@ const SHomeLogoButton = styled(Container)`
 
       margin: 12px 0;
 
-      text-decoration: none;
-
       cursor: pointer;
     }
   }

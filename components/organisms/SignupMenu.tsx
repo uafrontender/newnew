@@ -393,7 +393,6 @@ const SLegalText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   a {
-    text-decoration: none;
     font-weight: 600;
 
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
