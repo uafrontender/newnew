@@ -119,6 +119,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <UserAvatar
+                    withClick
                     user={user}
                     onClick={handleUserClick}
                   />
@@ -133,6 +134,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <UserAvatar
+                    withClick
                     user={user}
                     onClick={handleUserClick}
                   />
@@ -179,8 +181,4 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 24px;
-
-  a {
-    text-decoration: none;
-  }
 `;

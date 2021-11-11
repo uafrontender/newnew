@@ -30,7 +30,7 @@ const SContainer = styled.nav`
   left: 0;
   width: 100vw;
   bottom: 0;
-  z-index: 1;
+  z-index: 10;
   padding: 0 2px;
   display: flex;
   position: fixed;
