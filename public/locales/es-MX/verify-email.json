@@ -1,18 +1,18 @@
 {
   "meta": {
-    "title": "Email verification",
-    "description": "Verify email"
+    "title": "ES Email verification",
+    "description": "ES Verify email"
   },
-  "goBackBtn": "Go back",
+  "goBackBtn": "ES Go back",
   "heading": {
-    "heading": "Email verification",
-    "subheading": "Please, enter a code we’ve sent you to"
+    "heading": "ES Email verification",
+    "subheading": "ES Please, enter a code we’ve sent you to"
   },
   "timeExpired": {
-    "not_receieved": "Didn’t receive a code?",
-    "resendBtn": "Resend code"
+    "not_receieved": "ES Didn’t receive a code?",
+    "resendBtn": "ES Resend code"
   },
   "errors": {
-    "invalidCode": "Invalid code. Check the code and try again"
+    "invalidCode": "ES Invalid code. Check the code and try again"
   }
 }

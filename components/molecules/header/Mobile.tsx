@@ -63,6 +63,7 @@ export const Mobile: React.FC<IMobile> = () => {
         <SItemWithMargin>
           {user.loggedIn ? (
             <UserAvatar
+              withClick
               user={user}
               onClick={handleUserClick}
             />
