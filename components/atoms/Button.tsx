@@ -8,7 +8,7 @@ type TButton = React.ComponentPropsWithoutRef<'button'>;
 
 interface IButton {
   size?: 'sm' | 'lg',
-  view?: 'primary' | 'secondary' | 'tertiary',
+  view?: 'primary' | 'secondary' | 'tertiary' | 'transparent',
   iconOnly?: boolean,
   noRipple?: boolean,
   debounceClickMs?: number,
@@ -112,7 +112,7 @@ export default Button;
 
 interface ISButton {
   size?: 'sm' | 'lg';
-  view?: 'primary' | 'secondary' | 'tertiary';
+  view?: 'primary' | 'secondary' | 'tertiary' | 'transparent';
   iconOnly?: boolean;
   hoverBgColor?: string;
   hoverContentColor?: string;
