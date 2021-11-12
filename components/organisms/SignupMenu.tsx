@@ -11,7 +11,9 @@ import isEmail from 'validator/lib/isEmail';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
-import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import {
+  setCredentialsData, setSignupEmailInput, setUserData, setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail } from '../../api/endpoints/auth';
@@ -40,6 +42,7 @@ import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
 import sleep from '../../utils/sleep';
+import dateToTimestamp from '../../utils/dateToTimestamp';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -89,7 +92,35 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
   // NB! Testing only
   const handleLogInTest = useCallback(() => {
+    const mockResponse = new newnewapi.SignInResponse({
+      me: {
+        username: 'johndoe12345',
+        displayName: 'John',
+        email: 'johndoe@test.com',
+        avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
+        id: 12345,
+        options: {
+          isCreator: false,
+        },
+      },
+      credential: {
+        accessToken: '12345',
+        refreshToken: '12345',
+        expiresAt: dateToTimestamp(new Date()),
+      },
+      status: 1,
+    });
+
+    dispatch(setUserData(mockResponse.me));
+
+    dispatch(setCredentialsData({
+      accessToken: mockResponse.credential?.accessToken,
+      refreshToken: mockResponse.credential?.refreshToken,
+      expiresAt: mockResponse.credential?.expiresAt?.seconds,
+    }));
+
     dispatch(setUserLoggedIn(true));
+
     router.push('/', undefined, { shallow: true });
   }, [dispatch, router]);
 
