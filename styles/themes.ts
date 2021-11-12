@@ -15,6 +15,7 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name' | 'gradients' | 'sh
   },
   borderRadius: {
     small: '8px',
+    smallLg: '12px',
     medium: '16px',
     large: '24px',
     xxxLarge: '48px',
@@ -32,6 +33,7 @@ export const lightTheme: DefaultTheme = {
       backgroundT: 'transparent',
       outlines1: '#E5E9F1',
       outlines2: '#8B99B2',
+      numbers: '#E5E9F1',
     },
     text: {
       primary: '#2C2C33',
@@ -120,6 +122,7 @@ export const darkTheme: DefaultTheme = {
       backgroundT: 'rgba(11, 10, 19, 0.65)',
       outlines1: '#272835',
       outlines2: '#6A6A7B',
+      numbers: 'rgba(255, 255, 255, 0.06)',
     },
     text: {
       primary: '#FFFFFF',
