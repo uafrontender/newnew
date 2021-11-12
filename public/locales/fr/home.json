@@ -4,5 +4,12 @@
   "hero-block-sign-in": "FR Sign in",
   "hero-block-explore": "FR Explore",
   "hero-block-explore-now": "FR Explore now",
-  "top-block-title": "FR Top 10 in {{country}}"
+  "top-block-title": "FR Top 10 in {{country}}",
+  "ac-block-title": "FR Live Auctions",
+  "mc-block-title": "FR Top Multiple Choices",
+  "cf-block-title": "FR Top Crowdfunding",
+  "biggest-block-title": "FR Biggest of All Time",
+  "button-show-more": "FR See more",
+  "button-amount-in-bids": "FR {{amount}} in bids",
+  "card-time-left": "FR {{time}} left"
 }

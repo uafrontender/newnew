@@ -129,6 +129,7 @@ export const Tablet: React.FC<ITablet> = () => {
                     <SItemWithMargin>
                       <Button
                         iconOnly
+                        size="lg"
                         onClick={handleMenuClick}
                       >
                         <InlineSVG

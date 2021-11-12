@@ -26,6 +26,7 @@ declare module 'styled-components' {
         outlines1: string;
         // Used for both hover and focus states.
         outlines2: string;
+        numbers: string;
       },
       text: {
         // Used for both links and titles.
@@ -107,6 +108,7 @@ declare module 'styled-components' {
     },
     borderRadius: {
       small: string,
+      smallLg: string,
       medium: string,
       large: string,
       xxxLarge: string,
