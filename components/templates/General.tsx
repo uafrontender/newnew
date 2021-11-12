@@ -92,7 +92,7 @@ export const General: React.FC<IGeneral> = (props) => {
   useScrollPosition(wrapperRef);
 
   return (
-    <SWrapper ref={wrapperRef}>
+    <SWrapper ref={wrapperRef} {...props}>
       <Header />
       <SContent>
         <Container>

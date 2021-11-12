@@ -2,15 +2,19 @@ import React, { useCallback } from 'react';
 import Link from 'next/link';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { newnewapi } from 'newnew-api';
 
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import { setUserLoggedIn, setUserRole, setUserAvatar } from '../redux-store/slices/userStateSlice';
+import {
+  setUserLoggedIn, setUserRole, setUserAvatar, setUserData, setCredentialsData,
+} from '../redux-store/slices/userStateSlice';
 
 import Button from '../components/atoms/Button';
 import TopSection from '../components/organisms/home/TopSection';
 import HeroSection from '../components/organisms/home/HeroSection';
 import GeneralTemplate from '../components/templates/General';
+import dateToTimestamp from '../utils/dateToTimestamp';
 
 const Home: NextPage = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +30,50 @@ const Home: NextPage = () => {
     dispatch(setUserRole(user.role ? '' : 'creator'));
   }, [dispatch, user.role]);
   const handleToggleUserLoggedIn = useCallback(() => {
+    const mockResponse = new newnewapi.SignInResponse({
+      me: {
+        username: 'johndoe12345',
+        displayName: 'John',
+        email: 'johndoe@test.com',
+        avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
+        id: 12345,
+        options: {
+          isCreator: false,
+        },
+      },
+      credential: {
+        accessToken: '12345',
+        refreshToken: '12345',
+        expiresAt: dateToTimestamp(new Date()),
+      },
+      status: 1,
+    });
+
+    if (!user.loggedIn) {
+      dispatch(setUserData(mockResponse.me));
+      dispatch(setCredentialsData({
+        accessToken: mockResponse.credential?.accessToken,
+        refreshToken: mockResponse.credential?.refreshToken,
+        expiresAt: mockResponse.credential?.expiresAt?.seconds,
+      }));
+    } else {
+      dispatch(setUserData({
+        username: '',
+        displayName: '',
+        email: '',
+        avatarUrl: '',
+        id: null,
+        options: {
+          isCreator: false,
+        },
+      }));
+      dispatch(setCredentialsData({
+        accessToken: '',
+        refreshToken: '',
+        expiresAt: '',
+      }));
+    }
+
     dispatch(setUserLoggedIn(!user.loggedIn));
   }, [dispatch, user.loggedIn]);
   const handleToggleUserAvatar = useCallback(() => {
