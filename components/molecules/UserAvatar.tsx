@@ -24,6 +24,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
     radius,
     onClick,
     withClick,
+    ...rest
   } = props;
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -35,6 +36,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       <Button
         iconOnly
         onClick={onClick}
+        {...rest}
       >
         <InlineSVG
           svg={userIcon}
@@ -47,7 +49,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   }
 
   return (
-    <SContainer radius={radius ?? 'xxxLarge'} onClick={onClick} withClick={withClick ?? false}>
+    <SContainer {...rest} radius={radius ?? 'xxxLarge'} onClick={onClick} withClick={withClick ?? false}>
       <Image
         src={user.avatar}
         alt="User avatar"
@@ -77,11 +79,15 @@ const SContainer = styled.div<ISContainer>`
   width: 36px;
   height: 36px;
   overflow: hidden;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: ${(props) => props.theme.borderRadius[props.radius]};
 
   ${(props) => props.withClick && css`cursor: pointer;`}
   ${(props) => props.theme.media.tablet} {
     width: 48px;
     height: 48px;
+    min-width: 48px;
+    min-height: 48px;
   }
 `;

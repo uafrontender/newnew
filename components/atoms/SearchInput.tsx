@@ -67,6 +67,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
     <SContainer ref={inputRef}>
       <Button
         iconOnly
+        size="lg"
         view="secondary"
         onClick={handleSearchClick}
       >
