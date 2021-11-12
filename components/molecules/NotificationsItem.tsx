@@ -13,7 +13,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
 
   return (
     <SWrapper>
-      <UserAvatar
+      <SUserAvatar
         user={{
           avatar: item.bidUser.avatar,
         }}
@@ -44,7 +44,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
           decision.
         </SSubTitle>
       </SCenterContent>
-      <UserAvatar
+      <SUserAvatar
         user={{
           avatar: item.bidForUser.avatar,
         }}
@@ -92,4 +92,20 @@ const SBidRate = styled.span`
 
 const SLinkTitle = styled.span`
   color: ${(props) => props.theme.colorsThemed.accent.blue};
+`;
+
+const SUserAvatar = styled(UserAvatar)`
+  ${(props) => props.theme.media.tablet} {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+  }
 `;

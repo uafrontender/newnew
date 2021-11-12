@@ -11,6 +11,7 @@ interface IButton {
   view?: 'primary' | 'secondary' | 'tertiary' | 'transparent',
   iconOnly?: boolean,
   noRipple?: boolean,
+  noShadow?: boolean,
   debounceClickMs?: number,
   debounceRestoreMs?: number,
 }
@@ -102,6 +103,7 @@ Button.defaultProps = {
   view: 'primary',
   iconOnly: false,
   noRipple: false,
+  noShadow: false,
   debounceClickMs: 800,
   debounceRestoreMs: 750,
   onClick: () => {
@@ -114,6 +116,7 @@ interface ISButton {
   size?: 'sm' | 'lg';
   view?: 'primary' | 'secondary' | 'tertiary' | 'transparent';
   iconOnly?: boolean;
+  noShadow?: boolean;
   hoverBgColor?: string;
   hoverContentColor?: string;
   elementWidth: number;
@@ -158,7 +161,7 @@ const SButton = styled.button<ISButton>`
 
   ${(props) => {
     if (props.iconOnly) {
-      return css`padding: 12px;`;
+      return css`padding: ${props.size === 'sm' ? '8px' : '12px'};`;
     }
 
     if (props.size === 'sm') {
@@ -172,9 +175,9 @@ const SButton = styled.button<ISButton>`
     return '';
   }};
 
-  ${(props) => (props.size === 'lg' ? css`min-width: 343px;` : '')}
+  ${(props) => (props.size === 'lg' && !props.iconOnly ? css`min-width: 343px;` : '')}
 
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  border-radius: ${(props) => props.theme.borderRadius[props.size === 'sm' ? 'smallLg' : 'medium']};
   border: transparent;
 
   // NB! Temp
@@ -223,7 +226,7 @@ const SButton = styled.button<ISButton>`
   }
 
   ${(props) => {
-    if (props.view === 'primary') {
+    if (props.view === 'primary' && !props.noShadow) {
       return css`
         &:focus:enabled {
           outline: none;
