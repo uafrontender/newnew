@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
@@ -133,21 +133,23 @@ export const Card: React.FC<ICard> = (props) => {
 
   return (
     <SWrapperOutside onClick={handleItemClick}>
-      <SImageHolderOutside>
-        <Image src={item.url} objectFit="cover" layout="fill" />
-        <STopContent>
-          {!isDesktop && (
-            <Button iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
-              <InlineSVG
-                svg={moreIcon}
-                fill={theme.colors.white}
-                width="20px"
-                height="20px"
-              />
-            </Button>
-          )}
-        </STopContent>
-      </SImageHolderOutside>
+      <SImageBG>
+        <SImageHolderOutside id="animatedPart">
+          <Image src={item.url} objectFit="cover" layout="fill" />
+          <STopContent>
+            {!isDesktop && (
+              <Button iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
+                <InlineSVG
+                  svg={moreIcon}
+                  fill={theme.colors.white}
+                  width="20px"
+                  height="20px"
+                />
+              </Button>
+            )}
+          </STopContent>
+        </SImageHolderOutside>
+      </SImageBG>
       <SBottomContentOutside>
         <SBottomStart>
           <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
@@ -155,9 +157,14 @@ export const Card: React.FC<ICard> = (props) => {
             {item.title}
           </STextOutside>
         </SBottomStart>
-        <SBottomEnd>
+        <SBottomEnd type={item.type}>
           <SButton onClick={handleBidClick} noShadow>
-            {t('button-amount-in-bids', { amount: '$ 300' })}
+            {t(`button-card-${item.type}`, {
+              votes: item.votes,
+              total: item.total,
+              backed: item.backed,
+              amount: `$ ${item.amount}`,
+            })}
           </SButton>
           <SCaption variant={2}>
             {t('card-time-left', { time: '24h 40m' })}
@@ -311,6 +318,12 @@ const SWrapperOutside = styled.div<ISWrapper>`
   position: relative;
   flex-direction: column;
 
+  :hover {
+    #animatedPart {
+      transform: translate(10px, -10px);
+    }
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: 200px;
   }
@@ -320,20 +333,34 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 `;
 
-const SImageHolderOutside = styled.div`
+const SImageBG = styled.div`
   width: 100%;
   height: 564px;
-  padding: 16px;
   position: relative;
+  background-color: ${(props) => props.theme.colorsThemed.accent.blue};
 
   ${(props) => props.theme.media.tablet} {
     height: 300px;
-    overflow: hidden;
     border-radius: ${(props) => props.theme.borderRadius.medium};
   }
 
   ${(props) => props.theme.media.laptop} {
     height: 336px;
+  }
+`;
+
+const SImageHolderOutside = styled.div`
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  position: absolute;
+  transition: all ease 0.5s;
+
+  ${(props) => props.theme.media.tablet} {
+    overflow: hidden;
+    border-radius: ${(props) => props.theme.borderRadius.medium};
   }
 `;
 
@@ -367,11 +394,31 @@ const SBottomStart = styled.div`
   }
 `;
 
-const SBottomEnd = styled.div`
+interface ISBottomEnd {
+  type: 'ac' | 'mc' | 'cf',
+}
+
+const SBottomEnd = styled.div<ISBottomEnd>`
   display: flex;
-  align-items: center;
-  flex-direction: row;
+  align-items: ${(props) => (props.type === 'cf' ? 'flex-end' : 'center')};
+  flex-direction: ${(props) => (props.type === 'cf' ? 'column' : 'row')};
   justify-content: space-between;
+
+  ${(props) => props.type === 'cf' && css`
+    button {
+      width: 100%;
+    }
+
+    p {
+      margin-top: 16px;
+    }
+
+    ${props.theme.media.tablet} {
+      p {
+        margin-top: 12px;
+      }
+    }
+  `}
 `;
 
 const SButton = styled(Button)`
