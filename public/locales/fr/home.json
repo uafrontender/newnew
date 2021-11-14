@@ -10,6 +10,11 @@
   "cf-block-title": "FR Top Crowdfunding",
   "biggest-block-title": "FR Biggest of All Time",
   "button-show-more": "FR See more",
-  "button-amount-in-bids": "FR {{amount}} in bids",
-  "card-time-left": "FR {{time}} left"
+  "button-show-more-creator": "FR See more from creator",
+  "button-creator-on-the-rise": "FR Creator on the rise",
+  "button-card-ac": "FR {{amount}} in bids",
+  "button-card-mc": "FR {{votes}} votes",
+  "button-card-cf": "FR {{amount}} of {{total}} backers",
+  "card-time-left": "FR {{time}} left",
+  "for-you-block-title": "FR For you"
 }
