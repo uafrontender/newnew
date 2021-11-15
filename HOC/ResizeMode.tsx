@@ -1,4 +1,6 @@
-import React, { MutableRefObject, useCallback, useEffect, useRef } from 'react';
+import React, {
+  MutableRefObject, useCallback, useEffect, useRef,
+} from 'react';
 import _map from 'lodash/map';
 import styled from 'styled-components';
 import ResizeObserver from 'resize-observer-polyfill';
