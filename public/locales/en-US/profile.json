@@ -18,5 +18,11 @@
       "more": "More",
       "sendMessage": "Send message"
     }
+  },
+  "EditProfileMenu": {
+    "goBackBtn": "Edit profile",
+    "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
+    "saveButton": "Save changes",
+    "cancelButton": "Cancel"
   }
 }

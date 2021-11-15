@@ -131,6 +131,9 @@ const SButton = styled.button<ISButton>`
   position: relative;
   overflow: hidden;
 
+  /* Fix Safari bug */
+  z-index: 0;
+
   display: flex;
   justify-content: center;
   align-items: center;
