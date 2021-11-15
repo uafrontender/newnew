@@ -48,12 +48,23 @@ const SProfileBackground = styled.div<ISProfileBackground>`
 
   #profileBackgroundSvg{
     position: absolute;
+    z-index: -10;
+    width: 0px;
+    height: 0px;
   }
 
-  &::before {
+  &:before {
+    display: block;
+    content: '';
+
+    z-index: 2;
+
     position: absolute;
-    bottom: -1px;
+    bottom: 0px;
+    left: 0px;
     left: calc(50% - 188px);
+
+    transform: translateY(1px);
 
     background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
 
@@ -61,8 +72,6 @@ const SProfileBackground = styled.div<ISProfileBackground>`
     height: 160px;
 
     clip-path: url(#profileBackgroundSvgClipPath);
-
-    content: '';
   }
 
   ${(props) => props.theme.media.tablet} {
