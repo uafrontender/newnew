@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
@@ -9,8 +10,12 @@ import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
+import ScrollArrow from '../../atoms/ScrollArrow';
 
+import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
+
+const SCROLL_STEP = 5;
 
 interface ICardSection {
   url: string,
@@ -30,6 +35,10 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   } = props;
   const { t } = useTranslation('home');
   const router = useRouter();
+  const ref: any = useRef();
+  const [listScroll, setListScroll] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -42,13 +51,37 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   }
 
   const renderItem = (item: any, index: number) => (
-    <SItemWrapper key={`${item.id}-${title}`}>
+    <SItemWrapper key={`${url}-${item.id}`} name={`top-section-${url}-${index}`}>
       <Card item={item} index={index + 1} />
     </SItemWrapper>
   );
   const handleUserClick = () => {
     router.push(url);
   };
+  const handleLeftClick = () => {
+    setListScroll(listScroll - SCROLL_STEP);
+  };
+  const handleRightClick = () => {
+    setListScroll(listScroll + SCROLL_STEP);
+  };
+
+  const {
+    renderLeftArrow,
+    renderRightArrow,
+  } = useHoverArrows(ref);
+
+  useEffect(() => {
+    scroller.scrollTo(`top-section-${url}-${listScroll}`, {
+      offset: -32,
+      smooth: true,
+      duration: 500,
+      horizontal: true,
+      containerId: `${url}-scrollContainer`,
+    });
+
+    setCanScrollLeft(listScroll !== 0);
+    setCanScrollRight(listScroll < collection.length - SCROLL_STEP);
+  }, [url, listScroll, collection]);
 
   return (
     <SWrapper>
@@ -78,9 +111,29 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
           </Link>
         )}
       </STopWrapper>
-      <SListWrapper>
-        {collectionToRender.map(renderItem)}
-      </SListWrapper>
+      <SListContainer ref={ref}>
+        <SListWrapper id={`${url}-scrollContainer`}>
+          {collectionToRender.map(renderItem)}
+        </SListWrapper>
+        {!isMobile && (
+          <>
+            {canScrollLeft && (
+              <ScrollArrow
+                active={renderLeftArrow}
+                position="left"
+                handleClick={handleLeftClick}
+              />
+            )}
+            {canScrollRight && (
+              <ScrollArrow
+                active={renderRightArrow}
+                position="right"
+                handleClick={handleRightClick}
+              />
+            )}
+          </>
+        )}
+      </SListContainer>
       {renderShowMore && (
         <SButtonHolder>
           <Link href={url}>
@@ -116,6 +169,10 @@ const SWrapper = styled.section`
   }
 `;
 
+const SListContainer = styled.div`
+  position: relative;
+`;
+
 const SListWrapper = styled.div`
   left: -16px;
   width: 100vw;
@@ -142,7 +199,11 @@ const SListWrapper = styled.div`
   }
 `;
 
-const SItemWrapper = styled.div`
+interface ISItemWrapper {
+  name: string;
+}
+
+const SItemWrapper = styled.div<ISItemWrapper>`
   margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {

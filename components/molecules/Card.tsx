@@ -87,10 +87,13 @@ export const Card: React.FC<ICard> = (props) => {
     router.push('/profile');
   };
   const handleMoreClick = () => {
+    router.push('/post-detailed');
   };
   const handleItemClick = () => {
+    router.push('/post-detailed');
   };
   const handleBidClick = () => {
+    router.push('/post-detailed');
   };
 
   if (type === 'inside') {
@@ -318,14 +321,14 @@ const SWrapperOutside = styled.div<ISWrapper>`
   position: relative;
   flex-direction: column;
 
-  :hover {
-    #animatedPart {
-      transform: translate(10px, -10px);
-    }
-  }
-
   ${(props) => props.theme.media.tablet} {
     width: 200px;
+
+    :hover {
+      #animatedPart {
+        transform: translate(10px, -10px);
+      }
+    }
   }
 
   ${(props) => props.theme.media.laptop} {
