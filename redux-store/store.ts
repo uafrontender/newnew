@@ -1,5 +1,3 @@
-import { AppContext } from 'next/app';
-import { UserAgent, parse } from 'next-useragent';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import {
   combineReducers,
@@ -17,11 +15,12 @@ import {
 } from 'redux-persist';
 
 // Next-wrapper
-import { createWrapper, Context } from 'next-redux-wrapper';
+import { createWrapper } from 'next-redux-wrapper';
 
 // Import reducers
-import uiReducer, { defaultUIState, TResizeMode } from './slices/uiStateSlice';
+import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
+
 import isBroswer from '../utils/isBrowser';
 
 // Persisted reducer configs
@@ -59,34 +58,12 @@ export type EnhancedStoreWithPersistor = EnhancedStore & {
   __persistor: any
 }
 
-const makeStore = (context: Context) => {
-  // Getting ua string from context
-  const uaString = (context as AppContext).ctx?.req?.headers?.['user-agent'];
-
-  const ua: UserAgent = parse(uaString || (isBroswer() ? window?.navigator?.userAgent : ''));
-  const getInitialResizeMode = () => {
-    let resizeMode = 'mobile';
-
-    if (ua.isTablet) {
-      resizeMode = 'tablet';
-    } else if (ua.isDesktop) {
-      resizeMode = 'laptop';
-    }
-
-    return resizeMode;
-  };
-
+const makeStore = () => {
   if (!isBroswer()) {
     // If not client, create store
     return configureStore({
       reducer: combinedReducer,
       devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
-      preloadedState: {
-        ui: {
-          ...defaultUIState,
-          resizeMode: getInitialResizeMode() as TResizeMode,
-        },
-      },
       middleware: (getDefaultMiddleware) => (
         getDefaultMiddleware({
           serializableCheck: {
