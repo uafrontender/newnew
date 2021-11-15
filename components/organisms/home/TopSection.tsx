@@ -9,6 +9,8 @@ import ScrollArrow from '../../atoms/ScrollArrow';
 
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 
+import { SCROLL_TOP_10 } from '../../../constants/timings';
+
 const SCROLL_STEP = 3;
 
 interface ITopSection {
@@ -44,8 +46,8 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   useEffect(() => {
     scroller.scrollTo(`top-section-${listScroll}`, {
       offset: -32,
-      smooth: true,
-      duration: 500,
+      smooth: 'easeInOutQuart',
+      duration: SCROLL_TOP_10,
       horizontal: true,
       containerId: 'topScrollContainer',
     });

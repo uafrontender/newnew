@@ -1,4 +1,5 @@
 import React from 'react';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -14,6 +15,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface ITablet {
 }
@@ -40,7 +43,11 @@ export const Tablet: React.FC<ITablet> = () => {
   };
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      window.location.reload();
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
     } else {
       router.push('/', '/');
     }

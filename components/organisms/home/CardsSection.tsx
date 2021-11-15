@@ -15,6 +15,8 @@ import ScrollArrow from '../../atoms/ScrollArrow';
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
 
+import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
+
 const SCROLL_STEP = 5;
 
 interface ICardSection {
@@ -73,8 +75,8 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   useEffect(() => {
     scroller.scrollTo(`top-section-${url}-${listScroll}`, {
       offset: -32,
-      smooth: true,
-      duration: 500,
+      smooth: 'easeInOutQuart',
+      duration: SCROLL_CARDS_SECTIONS,
       horizontal: true,
       containerId: `${url}-scrollContainer`,
     });

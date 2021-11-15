@@ -11,6 +11,7 @@ import BottomNavigation from '../organisms/BottomNavigation';
 import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
+import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 
@@ -90,6 +91,7 @@ export const General: React.FC<IGeneral> = (props) => {
 
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
+  useRefreshOnScrollTop();
 
   return (
     <SWrapper ref={wrapperRef} {...props} id="generalScrollContainer">

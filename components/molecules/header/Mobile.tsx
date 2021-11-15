@@ -1,4 +1,5 @@
 import React from 'react';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
@@ -12,6 +13,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.svg';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface IMobile {
 }
@@ -29,7 +32,11 @@ export const Mobile: React.FC<IMobile> = () => {
   };
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      window.location.reload();
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
     } else {
       router.push('/', '/');
     }

@@ -17,7 +17,7 @@ export const Header: React.FC<IHeader> = () => {
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   return (
-    <SWrapper>
+    <SWrapper name="top-reload">
       <Container>
         <Row>
           <Col>
@@ -33,7 +33,11 @@ export const Header: React.FC<IHeader> = () => {
 
 export default Header;
 
-const SWrapper = styled.header`
+interface ISWrapper {
+  name: string;
+}
+
+const SWrapper = styled.header<ISWrapper>`
   top: 0;
   left: 0;
   width: 100vw;
