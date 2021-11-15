@@ -105,6 +105,8 @@ declare module 'styled-components' {
       mediumGrey: string,
     },
     gradients: {
+      arrowLeft: string,
+      arrowRight: string,
       blueDiagonal: string,
       blueHorizontal: string,
       heroNotifications: string,
