@@ -82,23 +82,15 @@ const SStyledButton = styled.button`
 
 
   cursor: pointer;
-  transition: .3s ease-in-out;
 
   svg {
     path:first-child {
       fill: ${({ theme }) => theme.colorsThemed.text.quaternary};
-      transition: .3s ease-in-out;
     }
   }
 
   &:focus, &:hover {
     outline: none;
-
-    svg {
-      path:first-child {
-        fill: ${({ theme }) => theme.colorsThemed.text.primary};
-      }
-    }
   }
 `;
 

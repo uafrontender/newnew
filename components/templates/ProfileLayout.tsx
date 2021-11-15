@@ -184,7 +184,7 @@ const SGeneral = styled(General)`
   position: relative;
 
   header {
-    z-index: 2;
+    z-index: 5;
   }
 
   @media (max-width: 768px) {
