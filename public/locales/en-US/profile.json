@@ -15,7 +15,8 @@
     },
     "buttons": {
       "favorites": "Favorites",
-      "more": "More"
+      "more": "More",
+      "sendMessage": "Send message"
     }
   }
 }

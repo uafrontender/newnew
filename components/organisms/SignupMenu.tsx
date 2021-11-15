@@ -233,14 +233,18 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         <SLegalText>
           {t('legalDisclaimer.main_text')}
           <br />
-          <Link href="/">
-            <a href="/" target="_blank">{t('legalDisclaimer.privacy_policy_terms')}</a>
+          <Link href="/privacy-policy">
+            <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
+          </Link>
+          {', '}
+          <Link href="/terms-and-conditions">
+            <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
           </Link>
           {' '}
           {t('legalDisclaimer.and')}
           {' '}
-          <Link href="/">
-            <a href="/" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
+          <Link href="/community-guidelines">
+            <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
           </Link>
         </SLegalText>
       </SMenuWrapper>
