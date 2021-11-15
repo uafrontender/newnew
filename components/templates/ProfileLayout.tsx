@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -40,6 +40,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const router = useRouter();
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
+  const handleClickSendMessage = useCallback(() => {
+    if (!curentUser.loggedIn) {
+      router.push('/sign-up?reason=subscribe');
+    }
+  }, [curentUser, router]);
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
@@ -140,6 +147,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               />
             </Button>
           </SShareDiv>
+          {user.options?.isCreator
+            ? (
+              <Button
+                style={{
+                  marginBottom: '16px',
+                }}
+                onClick={handleClickSendMessage}
+              >
+                { t('ProfileLayout.buttons.sendMessage') }
+              </Button>
+            ) : null}
           <SBioText>
             {/* {user.bio} */}
             Lorem ipsum dolor sit amet, consectetur adipiscing elit,

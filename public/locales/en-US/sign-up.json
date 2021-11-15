@@ -9,7 +9,8 @@
     "sign_in_to": "Sign in to",
     "reasons": {
       "comment": "comment",
-      "bid": "bid"
+      "bid": "bid",
+      "subscribe": "subscribe"
     },
     "subheading": "We'll sign you in or create an account."
   },
@@ -25,7 +26,8 @@
   },
   "legalDisclaimer": {
     "main_text": "Legal disclaimer comes here and links to",
-    "privacy_policy_terms": "Privacy Policy Terms",
+    "privacy_policy": "Privacy Policy",
+    "terms": "Terms",
     "and": "and",
     "community_guidelines": "Community Guidelines"
   },
