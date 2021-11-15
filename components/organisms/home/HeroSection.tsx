@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
@@ -73,6 +74,12 @@ export const HeroSection = () => {
     router.push('/sign-up');
   };
   const handleExploreClick = () => {
+    scroller.scrollTo('topSection', {
+      offset: -100,
+      smooth: true,
+      duration: 500,
+      containerId: 'generalScrollContainer',
+    });
   };
   const renderItem = (item: any) => (
     <SNotificationItemHolder key={item.id}>
