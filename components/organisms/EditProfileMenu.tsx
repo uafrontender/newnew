@@ -13,6 +13,8 @@ import InlineSvg from '../atoms/InlineSVG';
 // Icons
 import CancelIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import Button from '../atoms/Button';
+import DisplaynameInput from '../atoms/DisplayNameInput';
+import UsernameInput from '../atoms/UsernameInput';
 
 interface IEditProfileMenu {
   wasModified: boolean;
@@ -95,10 +97,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           </SGoBackButtonDesktop>
         )}
       <SInputsWrapper>
-        <input
+        <DisplaynameInput
           type="text"
           value={dataInEdit.displayName}
+          placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
+          isValid={dataInEdit.displayName.length > 0}
           onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
+        />
+        <UsernameInput
+          type="text"
+          value={dataInEdit.username}
+          frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
+          placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+          isValid={dataInEdit.username.length > 0}
+          onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
         />
       </SInputsWrapper>
       <SControlsWrapper>
@@ -184,6 +196,17 @@ const SGoBackButtonDesktop = styled.button`
 
 const SInputsWrapper = styled.div`
   flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-left: 16px;
+  padding-right: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 `;
 
 const SControlsWrapper = styled.div`
@@ -195,5 +218,4 @@ const SControlsWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
   }
-
 `;
