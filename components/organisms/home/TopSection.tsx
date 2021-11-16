@@ -8,10 +8,15 @@ import Headline from '../../atoms/Headline';
 import ScrollArrow from '../../atoms/ScrollArrow';
 
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
+import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TOP_10 } from '../../../constants/timings';
 
-const SCROLL_STEP = 3;
+const SCROLL_STEP = {
+  mobile: 1,
+  tablet: 2,
+  desktop: 3,
+};
 
 interface ITopSection {
   collection: {}[],
@@ -21,10 +26,20 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const { collection } = props;
   const { t } = useTranslation('home');
   const ref: any = useRef();
+  const scrollContainerRef: any = useRef();
   const [listScroll, setListScroll] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const country = 'USA';
+  let scrollStep = SCROLL_STEP.desktop;
+
+  if (['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode)) {
+    scrollStep = SCROLL_STEP.mobile;
+  } else if (resizeMode === 'tablet') {
+    scrollStep = SCROLL_STEP.tablet;
+  }
 
   const renderItem = (item: any, index: number) => (
     <SItemWrapper key={item.id} name={`top-section-${index}`}>
@@ -32,10 +47,56 @@ export const TopSection: React.FC<ITopSection> = (props) => {
     </SItemWrapper>
   );
   const handleLeftClick = () => {
-    setListScroll(listScroll - SCROLL_STEP);
+    setListScroll(listScroll - scrollStep);
   };
   const handleRightClick = () => {
-    setListScroll(listScroll + SCROLL_STEP);
+    setListScroll(listScroll + scrollStep);
+  };
+  let pos = {
+    x: 0,
+    left: 0,
+  };
+  let timeout: any;
+
+  const mouseDownHandler = (e: any) => {
+    timeout = setTimeout(() => {
+      scrollContainerRef.current.style.cursor = 'grabbing';
+      scrollContainerRef.current.style.userSelect = 'none';
+      e.target.style.cursor = 'grabbing';
+      e.target.style.userSelect = 'none';
+      e.target.addEventListener('click', (event: any) => event.stopImmediatePropagation(), { capture: true, once: true });
+    }, 150);
+
+    pos = {
+      x: e.clientX,
+      left: scrollContainerRef.current.scrollLeft,
+    };
+  };
+  const mouseMoveHandler = (e: any) => {
+    if (scrollContainerRef.current.style.cursor === 'grabbing') {
+      const dx = e.clientX - pos.x;
+      scrollContainerRef.current.scrollLeft = pos.left - dx;
+    }
+  };
+  const mouseUpHandler = (e: any) => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+
+    if (e.clientX > pos.x) {
+      if (canScrollLeft) {
+        handleLeftClick();
+      }
+    } else if (e.clientX < pos.x) {
+      if (canScrollRight) {
+        handleRightClick();
+      }
+    }
+
+    scrollContainerRef.current.style.cursor = 'grab';
+    scrollContainerRef.current.style.removeProperty('user-select');
+    e.target.style.cursor = 'pointer';
+    e.target.removeEventListener('click', (event: any) => event.stopImmediatePropagation(), { capture: true, once: true });
   };
 
   const {
@@ -53,8 +114,8 @@ export const TopSection: React.FC<ITopSection> = (props) => {
     });
 
     setCanScrollLeft(listScroll !== 0);
-    setCanScrollRight(listScroll < collection.length - SCROLL_STEP);
-  }, [listScroll, collection]);
+    setCanScrollRight(listScroll < collection.length - scrollStep);
+  }, [listScroll, collection, scrollStep]);
 
   return (
     <SWrapper name="topSection">
@@ -62,7 +123,13 @@ export const TopSection: React.FC<ITopSection> = (props) => {
         {t('top-block-title', { country })}
       </Headline>
       <SListContainer ref={ref}>
-        <SListWrapper id="topScrollContainer">
+        <SListWrapper
+          id="topScrollContainer"
+          ref={scrollContainerRef}
+          onMouseUp={mouseUpHandler}
+          onMouseDown={mouseDownHandler}
+          onMouseMove={mouseMoveHandler}
+        >
           {collection.map(renderItem)}
         </SListWrapper>
         {canScrollLeft && (
@@ -109,6 +176,7 @@ const SListContainer = styled.div`
 const SListWrapper = styled.div`
   left: -16px;
   width: 100vw;
+  cursor: grab;
   display: flex;
   padding: 0 8px;
   position: relative;

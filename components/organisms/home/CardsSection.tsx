@@ -17,7 +17,10 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 
-const SCROLL_STEP = 5;
+const SCROLL_STEP = {
+  tablet: 3,
+  desktop: 5,
+};
 
 interface ICardSection {
   url: string,
@@ -46,10 +49,15 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
 
   let collectionToRender = collection;
   let renderShowMore = false;
+  let scrollStep = SCROLL_STEP.desktop;
 
   if (isMobile && collection.length > 3) {
     renderShowMore = true;
     collectionToRender = collection.slice(0, 3);
+  }
+
+  if (resizeMode === 'tablet') {
+    scrollStep = SCROLL_STEP.tablet;
   }
 
   const renderItem = (item: any, index: number) => (
@@ -61,10 +69,10 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     router.push(url);
   };
   const handleLeftClick = () => {
-    setListScroll(listScroll - SCROLL_STEP);
+    setListScroll(listScroll - scrollStep);
   };
   const handleRightClick = () => {
-    setListScroll(listScroll + SCROLL_STEP);
+    setListScroll(listScroll + scrollStep);
   };
 
   const {
@@ -82,8 +90,8 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     });
 
     setCanScrollLeft(listScroll !== 0);
-    setCanScrollRight(listScroll < collection.length - SCROLL_STEP);
-  }, [url, listScroll, collection]);
+    setCanScrollRight(listScroll < collection.length - scrollStep);
+  }, [url, listScroll, collection, scrollStep]);
 
   return (
     <SWrapper>

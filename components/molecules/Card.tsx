@@ -109,7 +109,7 @@ export const Card: React.FC<ICard> = (props) => {
           </SNumberImageHolder>
         )}
         <SImageHolder>
-          <Image src={item.url} objectFit="cover" layout="fill" />
+          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <SImageMask />
           <STopContent>
             {!isDesktop && (
@@ -138,7 +138,7 @@ export const Card: React.FC<ICard> = (props) => {
     <SWrapperOutside onClick={handleItemClick}>
       <SImageBG>
         <SImageHolderOutside id="animatedPart">
-          <Image src={item.url} objectFit="cover" layout="fill" />
+          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <STopContent>
             {!isDesktop && (
               <Button iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
