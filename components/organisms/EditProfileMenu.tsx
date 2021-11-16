@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { isEqual } from 'lodash';
+import validator from 'validator';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -13,8 +14,9 @@ import InlineSvg from '../atoms/InlineSVG';
 // Icons
 import CancelIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import Button from '../atoms/Button';
-import DisplaynameInput from '../atoms/DisplayNameInput';
-import UsernameInput from '../atoms/UsernameInput';
+import DisplaynameInput from '../atoms/profile/DisplayNameInput';
+import UsernameInput from '../atoms/profile/UsernameInput';
+import BioTextarea from '../atoms/profile/BioTextarea';
 
 interface IEditProfileMenu {
   wasModified: boolean;
@@ -29,6 +31,11 @@ type ModalMenuUserData = Omit<newnewapi.Me, 'toJSON' | 'email' | 'options' | 'id
     bio: string;
     backgroundUrl: string;
   }
+
+type TFormErrors = {
+  displaynameError?: string;
+  usernameError?: string;
+};
 
 const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   wasModified,
@@ -46,6 +53,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     backgroundUrl: '',
     ...user.userData!!,
   });
+  const [isDataValid, setIsDataValid] = useState(false);
+  const [formErrors, setFormErrors] = useState<TFormErrors>({
+    displaynameError: '',
+    usernameError: '',
+  });
 
   const handleUpdateDataInEdit = useCallback((
     key: keyof ModalMenuUserData,
@@ -57,6 +69,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   },
   [dataInEdit, setDataInEdit]);
 
+  // Check if data was modified
   useEffect(() => {
     // Temp
     const initialData: ModalMenuUserData = {
@@ -71,6 +84,31 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       handleSetWasModified(true);
     }
   }, [dataInEdit, user.userData, handleSetWasModified]);
+
+  // Check fields validity
+  useEffect(() => {
+    const isUsernameValid = dataInEdit.username.length >= 8
+      && dataInEdit.username.length <= 15
+      && validator.isAlphanumeric(dataInEdit.username)
+      && validator.isLowercase(dataInEdit.username);
+    const isDisplaynameValid = dataInEdit.displayName.length > 0;
+
+    if (!isDisplaynameValid || !isUsernameValid) {
+      setFormErrors((errors) => {
+        const errorsWorking = { ...errors };
+        errorsWorking.usernameError = isUsernameValid ? '' : 'Wrong input';
+        errorsWorking.displaynameError = isDisplaynameValid ? '' : 'Wrong input';
+        return errorsWorking;
+      });
+      setIsDataValid(false);
+    } else {
+      setFormErrors({
+        usernameError: '',
+        displaynameError: '',
+      });
+      setIsDataValid(true);
+    }
+  }, [dataInEdit]);
 
   return (
     <SEditProfileMenu
@@ -101,16 +139,31 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           type="text"
           value={dataInEdit.displayName}
           placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
-          isValid={dataInEdit.displayName.length > 0}
+          isValid={!formErrors.displaynameError}
           onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
         />
         <UsernameInput
           type="text"
           value={dataInEdit.username}
+          popupCaption={(
+            <UsernamePopupList
+              points={[
+                t('EditProfileMenu.inputs.username.points.1'),
+                t('EditProfileMenu.inputs.username.points.2'),
+                t('EditProfileMenu.inputs.username.points.3'),
+              ]}
+            />
+          )}
           frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
           placeholder={t('EditProfileMenu.inputs.username.placeholder')}
-          isValid={dataInEdit.username.length > 0}
+          isValid={!formErrors.usernameError}
           onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
+        />
+        <BioTextarea
+          maxChars={150}
+          value={dataInEdit.bio}
+          placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+          onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
         />
       </SInputsWrapper>
       <SControlsWrapper>
@@ -124,7 +177,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </Button>
           ) : null}
         <Button
-          disabled={!wasModified}
+          disabled={!wasModified || !isDataValid}
           style={{
             width: isMobile ? '100%' : 'initial',
           }}
@@ -217,5 +270,50 @@ const SControlsWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     justify-content: space-between;
     align-items: center;
+  }
+`;
+
+const UsernamePopupList = ({ points } : { points: string[] }) => (
+  <SUsernamePopupList>
+    {points.map((p) => (
+      <div key={p}>
+        { p }
+      </div>
+    ))}
+  </SUsernamePopupList>
+);
+
+const SUsernamePopupList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #FFFFFF;
+
+  div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    &:before {
+      content: '';
+      display: block;
+
+      position: relative;
+      top: -1px;
+
+      width: 13px;
+      height: 13px;
+      margin-right: 4px;
+
+      border-radius: 50%;
+      border-width: 1.5px;
+      border-style: solid;
+      border-color: ${({ theme }) => theme.colorsThemed.text.secondary};
+    }
   }
 `;

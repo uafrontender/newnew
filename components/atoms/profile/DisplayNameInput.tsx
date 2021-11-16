@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import InlineSvg from './InlineSVG';
 
-import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
-
-type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
+type TDisplayNameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
-  frequencyCaption: string;
 }
 
-const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
+const DisplaynameInput: React.FunctionComponent<TDisplayNameInput> = ({
   value,
-  frequencyCaption,
   isValid,
   onChange,
   onFocus,
@@ -20,8 +15,8 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   const [errorBordersShown, setErrorBordersShown] = useState(false);
 
   return (
-    <SWrapper>
-      <SUsernameInput
+    <>
+      <SDisplaynameInput
         value={value}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
@@ -38,67 +33,21 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         }}
         {...rest}
       />
-      <SCaptionDiv>
-        { frequencyCaption }
-      </SCaptionDiv>
-      <SStyledButton
-        onClick={() => {}}
-      >
-        <InlineSvg
-          svg={AlertIcon}
-          width="24px"
-          height="24px"
-        />
-      </SStyledButton>
-    </SWrapper>
+    </>
   );
 };
 
-UsernameInput.defaultProps = {
+DisplaynameInput.defaultProps = {
   isValid: undefined,
 };
 
-export default UsernameInput;
+export default DisplaynameInput;
 
-const SWrapper = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-`;
-
-const SStyledButton = styled.button`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-
-  display: flex;
-
-  border: transparent;
-  width: fit-content;
-  height: fit-content;
-
-  background: transparent;
-  box-shadow: none;
-
-
-  cursor: pointer;
-
-  svg {
-    path:first-child {
-      fill: ${({ theme }) => theme.colorsThemed.text.quaternary};
-    }
-  }
-
-  &:focus, &:hover {
-    outline: none;
-  }
-`;
-
-interface ISUsernameInput {
+interface ISDisplaynameInput {
   errorBordersShown?: boolean
 }
 
-const SUsernameInput = styled.input<ISUsernameInput>`
+const SDisplaynameInput = styled.input<ISDisplaynameInput>`
   display: block;
 
   font-weight: 500;
@@ -106,7 +55,7 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   line-height: 24px;
 
   padding: 12px 20px 12px 20px;
-  padding-right: 32px;
+  margin-bottom: 16px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
@@ -118,7 +67,7 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background3};;
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background3};
 
   &::placeholder {
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
@@ -140,23 +89,4 @@ const SUsernameInput = styled.input<ISUsernameInput>`
     } return (theme.colorsThemed.accent.error);
   }};
   }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
-const SCaptionDiv = styled.div`
-  text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  padding-left: 20px;
-  margin-bottom: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-
-  margin-top: 6px;
 `;
