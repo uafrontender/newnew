@@ -43,6 +43,7 @@ import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
 import sleep from '../../utils/sleep';
 import dateToTimestamp from '../../utils/dateToTimestamp';
+import FacebookSignInButton from '../molecules/signup/FacebookSignInBtn';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -172,7 +173,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           >
             {t('signupOptions.apple')}
           </SignInButton>
-          <SignInButton
+          {/* <SignInButton
             svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
             hoverSvg={FacebookIconLight}
             hoverBgColor={theme.colorsThemed.social.facebook.hover}
@@ -181,7 +182,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             onClick={handleLogInTest}
           >
             {t('signupOptions.facebook')}
-          </SignInButton>
+          </SignInButton> */}
+          <FacebookSignInButton
+            label={t('signupOptions.facebook')}
+          />
           <SignInButton
             svg={TwitterIcon}
             hoverBgColor={theme.colorsThemed.social.twitter.hover}

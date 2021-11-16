@@ -70,3 +70,13 @@ export const signInWithGoogle = (
   'post',
   payload,
 );
+
+export const signInWithFacebook = (
+  payload: newnewapi.FacebookSignInRequest,
+) => fetchProtobuf<newnewapi.FacebookSignInRequest, newnewapi.SignInResponse>(
+  newnewapi.FacebookSignInRequest,
+  newnewapi.SignInResponse,
+  `${BASE_URL_AUTH}/sign_in_with_google`,
+  'post',
+  payload,
+);
