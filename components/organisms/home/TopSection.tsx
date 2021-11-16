@@ -31,6 +31,15 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+  // Dragging state
+  const [isDragging, setIsDragging] = useState(false);
+  const [clientX, setClientX] = useState<number>(0);
+  const [scrollX, setScrollX] = useState<number>(0);
+
+  // To check if we're really dragging and avoid clicks on children
+  const [wasDragged, setWasDragged] = useState(false);
+  const [mouseInitial, setMouseInitial] = useState<number>();
+
   const { resizeMode } = useAppSelector((state) => state.ui);
   const country = 'USA';
   let scrollStep = SCROLL_STEP.desktop;
@@ -43,7 +52,15 @@ export const TopSection: React.FC<ITopSection> = (props) => {
 
   const renderItem = (item: any, index: number) => (
     <SItemWrapper key={item.id} name={`top-section-${index}`}>
-      <Card type="inside" item={item} index={index + 1} />
+      <Card
+        type="inside"
+        item={item}
+        index={index + 1}
+        preventClick={wasDragged}
+        restore={() => setWasDragged(false)}
+        onMouseDownCapture={(e) => handleItemMouseDownCapture(e)}
+        onMouseLeave={handleItemMouseLeave}
+      />
     </SItemWrapper>
   );
   const handleLeftClick = () => {
@@ -52,51 +69,66 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const handleRightClick = () => {
     setListScroll(listScroll + scrollStep);
   };
-  let pos = {
-    x: 0,
-    left: 0,
-  };
-  let timeout: any;
 
   const mouseDownHandler = (e: any) => {
-    timeout = setTimeout(() => {
-      scrollContainerRef.current.style.cursor = 'grabbing';
-      scrollContainerRef.current.style.userSelect = 'none';
-      e.target.style.cursor = 'grabbing';
-      e.target.style.userSelect = 'none';
-      e.target.addEventListener('click', (event: any) => event.stopImmediatePropagation(), { capture: true, once: true });
-    }, 150);
-
-    pos = {
-      x: e.clientX,
-      left: scrollContainerRef.current.scrollLeft,
-    };
+    setIsDragging(true);
+    setScrollX(e.clientX);
+    setClientX(scrollContainerRef.current.scrollLeft);
   };
   const mouseMoveHandler = (e: any) => {
-    if (scrollContainerRef.current.style.cursor === 'grabbing') {
-      const dx = e.clientX - pos.x;
-      scrollContainerRef.current.scrollLeft = pos.left - dx;
-    }
-  };
-  const mouseUpHandler = (e: any) => {
-    if (timeout) {
-      clearTimeout(timeout);
+    if (!isDragging) {
+      return;
     }
 
-    if (e.clientX > pos.x) {
+    if (mouseInitial && e.clientX !== mouseInitial) {
+      setWasDragged(true);
+    }
+
+    scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
+    setClientX(e.clientX);
+    setScrollX(scrollX - e.clientX + clientX);
+  };
+  const mouseUpHandler = (e: any) => {
+    if (!isDragging) return;
+
+    if (e.clientX > clientX) {
       if (canScrollLeft) {
         handleLeftClick();
       }
-    } else if (e.clientX < pos.x) {
+    } else if (e.clientX < clientX) {
       if (canScrollRight) {
         handleRightClick();
       }
     }
 
-    scrollContainerRef.current.style.cursor = 'grab';
-    scrollContainerRef.current.style.removeProperty('user-select');
-    e.target.style.cursor = 'pointer';
-    e.target.removeEventListener('click', (event: any) => event.stopImmediatePropagation(), { capture: true, once: true });
+    setIsDragging(false);
+  };
+  const mouseLeaveHandler = (e: any) => {
+    if (!isDragging) return;
+
+    if (e.clientX > clientX) {
+      if (canScrollLeft) {
+        handleLeftClick();
+      }
+    } else if (e.clientX < clientX) {
+      if (canScrollRight) {
+        handleRightClick();
+      }
+    }
+
+    setIsDragging(false);
+  };
+
+  // Handlers for cards to avoid unncessary clicks
+  const handleItemMouseDownCapture = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setMouseInitial(e.clientX);
+  };
+
+  const handleItemMouseLeave = () => {
+    if (wasDragged) {
+      setWasDragged(false);
+      setMouseInitial(undefined);
+    }
   };
 
   const {
@@ -128,18 +160,19 @@ export const TopSection: React.FC<ITopSection> = (props) => {
           ref={scrollContainerRef}
           onMouseUp={mouseUpHandler}
           onMouseDown={mouseDownHandler}
+          onMouseLeave={mouseLeaveHandler}
           onMouseMove={mouseMoveHandler}
         >
           {collection.map(renderItem)}
         </SListWrapper>
-        {canScrollLeft && (
+        {!isDragging && canScrollLeft && (
           <ScrollArrow
             active={renderLeftArrow}
             position="left"
             handleClick={handleLeftClick}
           />
         )}
-        {canScrollRight && (
+        {!isDragging && canScrollRight && (
           <ScrollArrow
             active={renderRightArrow}
             position="right"
@@ -159,6 +192,14 @@ interface ISWrapper {
 
 const SWrapper = styled.section<ISWrapper>`
   padding: 0 0 48px 0;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;

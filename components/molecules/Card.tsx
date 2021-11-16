@@ -65,6 +65,10 @@ interface ICard {
   item: any;
   type?: 'inside' | 'outside';
   index: number;
+  preventClick?: boolean;
+  restore?: () => void;
+  onMouseDownCapture?: (e: any) => void;
+  onMouseLeave?: () => void;
 }
 
 export const Card: React.FC<ICard> = (props) => {
@@ -72,6 +76,10 @@ export const Card: React.FC<ICard> = (props) => {
     item,
     type,
     index,
+    preventClick,
+    restore,
+    onMouseDownCapture,
+    onMouseLeave,
   } = props;
   const { t } = useTranslation('home');
   const theme = useTheme();
@@ -98,7 +106,19 @@ export const Card: React.FC<ICard> = (props) => {
 
   if (type === 'inside') {
     return (
-      <SWrapper index={index} onClick={handleItemClick}>
+      <SWrapper
+        index={index}
+        onClick={(e) => {
+          if (preventClick) {
+            e.preventDefault();
+            restore?.();
+            return;
+          }
+          handleItemClick();
+        }}
+        onMouseDownCapture={onMouseDownCapture}
+        onMouseLeave={onMouseLeave}
+      >
         {!isMobile && (
           <SNumberImageHolder index={index}>
             <InlineSVG
@@ -135,7 +155,16 @@ export const Card: React.FC<ICard> = (props) => {
   }
 
   return (
-    <SWrapperOutside onClick={handleItemClick}>
+    <SWrapperOutside
+      onClick={(e) => {
+        if (preventClick) {
+          e.preventDefault();
+          restore?.();
+          return;
+        }
+        handleItemClick();
+      }}
+    >
       <SImageBG>
         <SImageHolderOutside id="animatedPart">
           <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
@@ -182,6 +211,10 @@ export default Card;
 
 Card.defaultProps = {
   type: 'outside',
+  preventClick: false,
+  restore: () => {},
+  onMouseDownCapture: () => {},
+  onMouseLeave: () => {},
 };
 
 interface ISWrapper {
