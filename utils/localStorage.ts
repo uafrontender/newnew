@@ -1,8 +1,8 @@
-import isBroswer from './isBrowser';
+import isBrowser from './isBrowser';
 
 export const loadStateLS = <Type>(stateKey: string): Type | null => {
   try {
-    if (!isBroswer()) {
+    if (!isBrowser()) {
       return null;
     }
 
@@ -20,7 +20,7 @@ export const loadStateLS = <Type>(stateKey: string): Type | null => {
 
 export const saveStateLS = (stateKey: string, stateValue: any): boolean => {
   try {
-    if (!isBroswer()) {
+    if (!isBrowser()) {
       return false;
     }
 
