@@ -1,0 +1,20 @@
+{
+  "hero-block-title": "Decision making\nmarketplace",
+  "hero-block-subTitle": "Vote to control the outcomes\nof other people’s lives.",
+  "hero-block-sign-in": "Sign in",
+  "hero-block-explore": "Explore",
+  "hero-block-explore-now": "Explore now",
+  "top-block-title": "Top 10 in {{country}}",
+  "ac-block-title": "Live Auctions",
+  "mc-block-title": "Top Multiple Choices",
+  "cf-block-title": "Top Crowdfunding",
+  "biggest-block-title": "Biggest of All Time",
+  "button-show-more": "See more",
+  "button-show-more-creator": "See more from creator",
+  "button-creator-on-the-rise": "Creator on the rise",
+  "button-card-ac": "{{amount}} in bids",
+  "button-card-mc": "{{votes}} votes",
+  "button-card-cf": "{{backed}} of {{total}} backers",
+  "card-time-left": "{{time}} left",
+  "for-you-block-title": "For you"
+}

@@ -1,5 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
+import { scroller } from 'react-scroll';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -16,6 +18,8 @@ import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
 import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
 import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
+import { SCROLL_TO_TOP } from '../../constants/timings';
+
 interface IFooter {
 }
 
@@ -27,6 +31,7 @@ type TItem = {
 export const Footer: React.FC<IFooter> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const topItems: TItem[] = [
@@ -71,6 +76,17 @@ export const Footer: React.FC<IFooter> = () => {
   ];
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      router.push('/', '/');
+    }
+  };
   const renderItem = (item: TItem) => (
     <Link key={item.key} href={item.url} passHref>
       <SBlockOption>
@@ -86,16 +102,14 @@ export const Footer: React.FC<IFooter> = () => {
           <Col>
             <SContent>
               <SIconHolder>
-                <Link href="/">
-                  <a>
-                    <InlineSvg
-                      svg={mobileLogo}
-                      fill={theme.colorsThemed.text.primary}
-                      width="48px"
-                      height="48px"
-                    />
-                  </a>
-                </Link>
+                <InlineSvg
+                  clickable
+                  svg={mobileLogo}
+                  fill={theme.colorsThemed.text.primary}
+                  width="48px"
+                  height="48px"
+                  onClick={handleLogoClick}
+                />
               </SIconHolder>
               <STopContent>
                 <SBlock>
@@ -246,7 +260,6 @@ const SBlockOption = styled.a`
   font-weight: bold;
   line-height: 24px;
   margin-bottom: 12px;
-  text-decoration: none;
 `;
 
 const SBlockRow = styled.div`
@@ -271,7 +284,6 @@ const SBottomBlockOption = styled.a`
   font-weight: bold;
   line-height: 24px;
   margin-right: 24px;
-  text-decoration: none;
 `;
 
 const SSvgHolder = styled.a`

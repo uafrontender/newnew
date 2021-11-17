@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 
 import Text from './Text';
 import Modal from '../organisms/Modal';
+import Button from './Button';
 import Caption from './Caption';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
@@ -68,11 +69,14 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
 
   return (
     <SContainer ref={ref}>
-      <SContent onClick={handleChangeLanguageClick}>
-        <STitle>
-          {t(`selected-language-title-${locale}`)}
-        </STitle>
-      </SContent>
+      <Button
+        view="tertiary"
+        onClick={handleChangeLanguageClick}
+        debounceClickMs={300}
+        debounceRestoreMs={500}
+      >
+        {t(`selected-language-title-${locale}`)}
+      </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused} height={ddHeight}>
@@ -102,20 +106,6 @@ export default ChangeLanguage;
 
 const SContainer = styled.div`
   position: relative;
-`;
-
-const SContent = styled.div`
-  cursor: pointer;
-  padding: 12px 24px;
-  border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
-`;
-
-const STitle = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
 `;
 
 interface ISListHolder {

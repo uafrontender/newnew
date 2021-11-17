@@ -36,6 +36,7 @@ const GlobalStyle = createGlobalStyle`
 
   a {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
+    text-decoration: none;
   }
 `;
 

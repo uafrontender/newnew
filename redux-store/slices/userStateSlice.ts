@@ -1,7 +1,13 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { newnewapi } from 'newnew-api';
 
 import { DEFAULT_CURRENCY } from '../../constants/general';
+
+export type TUserData = Omit<newnewapi.Me, 'toJSON'>;
+export type TCredentialsData = Omit<newnewapi.Credential, 'toJSON' | 'expiresAt'> & {
+  expiresAt: string;
+};
 
 export interface IUserStateInterface {
   role: string;
@@ -14,6 +20,8 @@ export interface IUserStateInterface {
   walletBalance: number;
   notificationsCount: number;
   directMessagesCount: number;
+  userData?: TUserData;
+  credentialsData?: TCredentialsData;
 }
 
 const defaultUIState: IUserStateInterface = {
@@ -48,6 +56,12 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setUserCurrency(state, { payload }: PayloadAction<string>) {
       state.currency = payload;
     },
+    setUserData(state, { payload }: PayloadAction<TUserData>) {
+      state.userData = { ...state.userData, ...payload };
+    },
+    setCredentialsData(state, { payload }: PayloadAction<TCredentialsData>) {
+      state.credentialsData = { ...state.credentialsData, ...payload };
+    },
   },
 });
 
@@ -57,6 +71,8 @@ export const {
   setUserLoggedIn,
   setUserCurrency,
   setSignupEmailInput,
+  setUserData,
+  setCredentialsData,
 } = userSlice.actions;
 
 export default userSlice.reducer;

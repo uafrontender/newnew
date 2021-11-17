@@ -1,24 +1,30 @@
 import React from 'react';
 import Image from 'next/image';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Button from '../atoms/Button';
 import InlineSVG from '../atoms/InlineSVG';
 
-import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
 import { useAppSelector } from '../../redux-store/store';
+
+import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
 
 interface IUserAvatar {
   user: {
     avatar?: string,
   },
-  onClick: () => any,
+  radius?: 'small' | 'medium' | 'large' | 'xxxLarge',
+  onClick?: () => any,
+  withClick?: boolean,
 }
 
 export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const {
     user,
+    radius,
     onClick,
+    withClick,
+    ...rest
   } = props;
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -30,6 +36,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       <Button
         iconOnly
         onClick={onClick}
+        {...rest}
       >
         <InlineSVG
           svg={userIcon}
@@ -42,7 +49,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   }
 
   return (
-    <SContainer onClick={onClick}>
+    <SContainer {...rest} radius={radius ?? 'xxxLarge'} onClick={onClick} withClick={withClick ?? false}>
       <Image
         src={user.avatar}
         alt="User avatar"
@@ -56,15 +63,31 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
 
 export default UserAvatar;
 
-const SContainer = styled.div`
+UserAvatar.defaultProps = {
+  radius: 'xxxLarge',
+  onClick: () => {
+  },
+  withClick: false,
+};
+
+interface ISContainer {
+  radius: 'small' | 'medium' | 'large' | 'xxxLarge',
+  withClick: boolean,
+}
+
+const SContainer = styled.div<ISContainer>`
   width: 36px;
   height: 36px;
-  cursor: pointer;
   overflow: hidden;
-  border-radius: 24px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: ${(props) => props.theme.borderRadius[props.radius]};
 
-  ${({ theme }) => theme.media.tablet} {
+  ${(props) => props.withClick && css`cursor: pointer;`}
+  ${(props) => props.theme.media.tablet} {
     width: 48px;
     height: 48px;
+    min-width: 48px;
+    min-height: 48px;
   }
 `;

@@ -1,18 +1,18 @@
 {
   "meta": {
-    "title": "Email verification",
-    "description": "Verify email"
+    "title": "FR Email verification",
+    "description": "FR Verify email"
   },
-  "goBackBtn": "Go back",
+  "goBackBtn": "FR Go back",
   "heading": {
-    "heading": "Email verification",
-    "subheading": "Please, enter a code we’ve sent you to"
+    "heading": "FR Email verification",
+    "subheading": "FR Please, enter a code we’ve sent you to"
   },
   "timeExpired": {
-    "not_receieved": "Didn’t receive a code?",
-    "resendBtn": "Resend code"
+    "not_receieved": "FR Didn’t receive a code?",
+    "resendBtn": "FR Resend code"
   },
   "errors": {
-    "invalidCode": "Invalid code. Check the code and try again"
+    "invalidCode": "FR Invalid code. Check the code and try again"
   }
 }

@@ -1,7 +1,12 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
+import ResizeObserver from 'resize-observer-polyfill';
 import styled, { useTheme } from 'styled-components';
 
-import Button from './Button';
 import InlineSVG from './InlineSVG';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
@@ -13,13 +18,16 @@ import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../public/images/svg/icons/outlined/Search.svg';
 
-interface ISearchInput {}
+interface ISearchInput {
+}
 
 export const SearchInput: React.FC<ISearchInput> = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
+  const inputContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
+  const [inputRightPosition, setInputRightPosition] = useState(0);
   const {
     resizeMode,
     globalSearchActive,
@@ -52,57 +60,66 @@ export const SearchInput: React.FC<ISearchInput> = () => {
     }
   };
 
-  useOnClickEsc(inputRef, () => {
+  useOnClickEsc(inputContainerRef, () => {
     if (globalSearchActive) {
       handleSearchClose();
     }
   });
-  useOnClickOutside(inputRef, () => {
+  useOnClickOutside(inputContainerRef, () => {
     if (globalSearchActive) {
       handleSearchClose();
     }
   });
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (globalSearchActive) {
+        inputRef.current?.focus();
+      } else {
+        inputRef.current?.blur();
+      }
+    }, 1000);
+  }, [globalSearchActive]);
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      // eslint-disable-next-line max-len
+      setInputRightPosition(-(window.innerWidth - inputContainerRef.current?.getBoundingClientRect()?.right - (isMobile ? 16 : 32)));
+    });
+
+    resizeObserver.observe(document.body);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isMobile]);
+
   return (
-    <SContainer ref={inputRef}>
-      <Button
-        iconOnly
-        onClick={handleSearchClick}
-      >
-        <InlineSVG
+    <SContainer ref={inputContainerRef}>
+      <SInputWrapper active={globalSearchActive} rightPosition={inputRightPosition}>
+        <SLeftInlineSVG
+          clickable
           svg={searchIcon}
           fill={theme.colorsThemed.text.primary}
           width={isMobile ? '20px' : '24px'}
           height={isMobile ? '20px' : '24px'}
+          onClick={globalSearchActive ? handleSubmit : handleSearchClick}
         />
-      </Button>
-      {globalSearchActive && (
-        <SInputWrapper>
-          <InlineSVG
-            clickable
-            svg={searchIcon}
-            fill={theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
-            onClick={handleSubmit}
-          />
-          <SInput
-            autoFocus
-            value={searchValue}
-            onChange={handleInoutChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Titles, genres, people"
-          />
-          <InlineSVG
-            clickable
-            svg={closeIcon}
-            fill={theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
-            onClick={handleCloseIconClick}
-          />
-        </SInputWrapper>
-      )}
+        <SInput
+          ref={inputRef}
+          value={searchValue}
+          onChange={handleInoutChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Titles, genres, people"
+        />
+        <SRightInlineSVG
+          clickable
+          svg={closeIcon}
+          fill={theme.colorsThemed.text.primary}
+          width={isMobile ? '20px' : '24px'}
+          height={isMobile ? '20px' : '24px'}
+          onClick={handleCloseIconClick}
+        />
+      </SInputWrapper>
     </SContainer>
   );
 };
@@ -114,34 +131,48 @@ SearchInput.defaultProps = {
 export default SearchInput;
 
 const SContainer = styled.div`
-  ${({ theme }) => theme.media.laptop} {
-    position: relative;
+  width: 36px;
+  height: 36px;
+  position: relative;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 48px;
+    height: 48px;
   }
 `;
 
-const SInputWrapper = styled.div<ISearchInput>`
+interface ISInputWrapper {
+  active: boolean;
+  rightPosition: number;
+}
+
+const SInputWrapper = styled.div<ISInputWrapper>`
   top: 50%;
-  left: 12px;
-  right: 12px;
-  border: 1.5px solid ${(props) => props.theme.colorsThemed.grayscale.outlines2};
-  padding: 8px 12px;
+  width: ${(props) => (props.active ? 'calc(100vw - 32px)' : '36px')};
+  right: ${(props) => (props.active ? props.rightPosition : 0)}px;
+  border: 1.5px solid ${(props) => (props.active ? props.theme.colorsThemed.grayscale.outlines2 : 'transparent')};
+  z-index: 3;
+  padding: 6.5px;
   display: flex;
+  overflow: hidden;
   position: absolute;
   transform: translateY(-50%);
-  background: ${(props) => props.theme.colorsThemed.grayscale.background1};
+  max-height: 100%;
+  transition: all ease 1s;
+  background: ${(props) => props.theme.colorsThemed.grayscale[props.active ? 'background1' : 'background2']};
   border-radius: 12px;
+  flex-direction: row;
   justify-content: space-between;
-  
+
   ${({ theme }) => theme.media.tablet} {
-    left: 32px;
-    right: 32px;
-    padding: 12px;
+    width: ${(props) => (props.active ? 'calc(100vw - 64px)' : '48px')};
+    padding: 10.5px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    left: unset;
     right: 0;
-    width: 420px;
+    width: ${(props) => (props.active ? '420px' : '48px')};
+    transition: all ease 0.5s;
   }
 `;
 
@@ -158,5 +189,25 @@ const SInput = styled.input`
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
+  }
+`;
+
+const SLeftInlineSVG = styled(InlineSVG)`
+  min-width: 20px;
+  min-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 24px;
+    min-height: 24px;
+  }
+`;
+
+const SRightInlineSVG = styled(InlineSVG)`
+  min-width: 20px;
+  min-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    min-width: 24px;
+    min-height: 24px;
   }
 `;

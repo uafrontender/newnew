@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -15,6 +15,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface ITablet {
 }
@@ -39,28 +41,39 @@ export const Tablet: React.FC<ITablet> = () => {
   const handleSignUpClick = () => {
     router.push('/sign-up');
   };
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      router.push('/', '/');
+    }
+  };
 
   return (
     <SContainer>
-      <Link href="/">
-        <a>
-          {user.loggedIn ? (
-            <InlineSVG
-              svg={mobileLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="48px"
-              height="48px"
-            />
-          ) : (
-            <InlineSVG
-              svg={tabletLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="152px"
-              height="48px"
-            />
-          )}
-        </a>
-      </Link>
+      {user.loggedIn ? (
+        <InlineSVG
+          clickable
+          svg={mobileLogo}
+          fill={theme.colorsThemed.text.primary}
+          width="48px"
+          height="48px"
+          onClick={handleLogoClick}
+        />
+      ) : (
+        <InlineSVG
+          clickable
+          svg={tabletLogo}
+          fill={theme.colorsThemed.text.primary}
+          width="152px"
+          height="48px"
+          onClick={handleLogoClick}
+        />
+      )}
       <SRightBlock>
         {user.loggedIn && (
           <>
@@ -107,77 +120,72 @@ export const Tablet: React.FC<ITablet> = () => {
         <SItemWithMargin>
           <SearchInput />
         </SItemWithMargin>
-        {!globalSearchActive && (
+        {user.loggedIn ? (
           <>
-            {user.loggedIn ? (
+            {user.role === 'creator' ? (
               <>
-                {user.role === 'creator' ? (
-                  <>
-                    <SItemWithMargin>
-                      <Button
-                        bs={theme.shadows.mediumBlue}
-                        bg={theme.gradients.blueDiagonal}
-                        onClick={handleCreateClick}
-                      >
-                        {t('button-create-decision')}
-                      </Button>
-                    </SItemWithMargin>
-                    <SItemWithMargin>
-                      <Button
-                        iconOnly
-                        onClick={handleMenuClick}
-                      >
-                        <InlineSVG
-                          svg={menuIcon}
-                          fill={theme.colorsThemed.text.primary}
-                          width="24px"
-                          height="24px"
-                        />
-                      </Button>
-                    </SItemWithMargin>
-                  </>
-                ) : (
-                  <>
-                    <SItemWithMargin>
-                      <Button
-                        bs={theme.shadows.mediumBlue}
-                        bg={theme.gradients.blueDiagonal}
-                        onClick={handleCreateClick}
-                      >
-                        {t('button-create')}
-                      </Button>
-                    </SItemWithMargin>
-                    <SItemWithMargin>
-                      <UserAvatar
-                        user={user}
-                        onClick={handleUserClick}
-                      />
-                    </SItemWithMargin>
-                  </>
-                )}
+                <SItemWithMargin>
+                  <Button
+                    onClick={handleCreateClick}
+                    noShadow={globalSearchActive}
+                  >
+                    {t('button-create-decision')}
+                  </Button>
+                </SItemWithMargin>
+                <SItemWithMargin>
+                  <Button
+                    iconOnly
+                    size="lg"
+                    onClick={handleMenuClick}
+                    noShadow={globalSearchActive}
+                  >
+                    <InlineSVG
+                      svg={menuIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width="24px"
+                      height="24px"
+                    />
+                  </Button>
+                </SItemWithMargin>
               </>
             ) : (
               <>
                 <SItemWithMargin>
                   <Button
-                    bg={theme.colorsThemed.grayscale.background2}
-                    onClick={handleSignInClick}
-                    titleColor={theme.colorsThemed.text.primary}
+                    onClick={handleCreateClick}
+                    noShadow={globalSearchActive}
                   >
-                    {t('button-login-in')}
+                    {t('button-create')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    bs={theme.shadows.mediumBlue}
-                    bg={theme.gradients.blueDiagonal}
-                    onClick={handleSignUpClick}
-                  >
-                    {t('button-sign-up')}
-                  </Button>
+                  <UserAvatar
+                    withClick
+                    user={user}
+                    onClick={handleUserClick}
+                  />
                 </SItemWithMargin>
               </>
             )}
+          </>
+        ) : (
+          <>
+            <SItemWithMargin>
+              <Button
+                view="secondary"
+                onClick={handleSignInClick}
+              >
+                {t('button-login-in')}
+              </Button>
+            </SItemWithMargin>
+            <SItemWithMargin>
+              <Button
+                onClick={handleSignUpClick}
+                noShadow={globalSearchActive}
+              >
+                {t('button-sign-up')}
+              </Button>
+            </SItemWithMargin>
           </>
         )}
       </SRightBlock>
@@ -202,8 +210,4 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 24px;
-
-  a {
-    text-decoration: none;
-  }
 `;
