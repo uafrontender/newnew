@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -18,6 +18,8 @@ import dashboardIconFilled from '../../public/images/svg/icons/filled/Dashboard.
 import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Dashboard.svg';
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
+
+import { SCROLL_TO_TOP } from '../../constants/timings';
 
 const icons: any = {
   outlined: {
@@ -55,28 +57,38 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
 
   const active = item.url === router.route;
 
+  const handleClick = () => {
+    if (router.pathname === '/' && item.url === '/') {
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      router.push(item.url, item.url);
+    }
+  };
+
   return (
-    <Link href={item.url} passHref>
-      <SContainer width={item.width}>
-        <SSVGContainer>
-          <InlineSVG
-            key={item.key}
-            svg={icons?.[active ? 'filled' : 'outlined']?.[item.key]}
-            fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-            width="24px"
-            height="24px"
-          />
-          {!!item.counter && (
-            <SIndicatorContainer>
-              <Indicator minified counter={item.counter} />
-            </SIndicatorContainer>
-          )}
-        </SSVGContainer>
-        <SCaption variant={2} active={active}>
-          {t(`mobile-bottom-navigation-${item.key}`)}
-        </SCaption>
-      </SContainer>
-    </Link>
+    <SContainer width={item.width} onClick={handleClick}>
+      <SSVGContainer>
+        <InlineSVG
+          key={item.key}
+          svg={icons?.[active ? 'filled' : 'outlined']?.[item.key]}
+          fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
+          width="24px"
+          height="24px"
+        />
+        {!!item.counter && (
+          <SIndicatorContainer>
+            <Indicator minified counter={item.counter} />
+          </SIndicatorContainer>
+        )}
+      </SSVGContainer>
+      <SCaption variant={2} active={active}>
+        {t(`mobile-bottom-navigation-${item.key}`)}
+      </SCaption>
+    </SContainer>
   );
 };
 
@@ -86,9 +98,10 @@ interface ISContainer {
   width: string;
 }
 
-const SContainer = styled.a<ISContainer>`
+const SContainer = styled.div<ISContainer>`
   width: ${(props) => props.width};
   margin: 0 8px;
+  cursor: pointer;
   padding: 8px 2px;
   display: flex;
   align-items: center;

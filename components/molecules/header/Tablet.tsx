@@ -1,4 +1,5 @@
 import React from 'react';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -14,6 +15,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface ITablet {
 }
@@ -40,7 +43,11 @@ export const Tablet: React.FC<ITablet> = () => {
   };
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      window.location.reload();
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
     } else {
       router.push('/', '/');
     }
@@ -113,72 +120,72 @@ export const Tablet: React.FC<ITablet> = () => {
         <SItemWithMargin>
           <SearchInput />
         </SItemWithMargin>
-        {!globalSearchActive && (
+        {user.loggedIn ? (
           <>
-            {user.loggedIn ? (
+            {user.role === 'creator' ? (
               <>
-                {user.role === 'creator' ? (
-                  <>
-                    <SItemWithMargin>
-                      <Button
-                        onClick={handleCreateClick}
-                      >
-                        {t('button-create-decision')}
-                      </Button>
-                    </SItemWithMargin>
-                    <SItemWithMargin>
-                      <Button
-                        iconOnly
-                        size="lg"
-                        onClick={handleMenuClick}
-                      >
-                        <InlineSVG
-                          svg={menuIcon}
-                          fill={theme.colorsThemed.text.primary}
-                          width="24px"
-                          height="24px"
-                        />
-                      </Button>
-                    </SItemWithMargin>
-                  </>
-                ) : (
-                  <>
-                    <SItemWithMargin>
-                      <Button
-                        onClick={handleCreateClick}
-                      >
-                        {t('button-create')}
-                      </Button>
-                    </SItemWithMargin>
-                    <SItemWithMargin>
-                      <UserAvatar
-                        withClick
-                        user={user}
-                        onClick={handleUserClick}
-                      />
-                    </SItemWithMargin>
-                  </>
-                )}
+                <SItemWithMargin>
+                  <Button
+                    onClick={handleCreateClick}
+                    noShadow={globalSearchActive}
+                  >
+                    {t('button-create-decision')}
+                  </Button>
+                </SItemWithMargin>
+                <SItemWithMargin>
+                  <Button
+                    iconOnly
+                    size="lg"
+                    onClick={handleMenuClick}
+                    noShadow={globalSearchActive}
+                  >
+                    <InlineSVG
+                      svg={menuIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width="24px"
+                      height="24px"
+                    />
+                  </Button>
+                </SItemWithMargin>
               </>
             ) : (
               <>
                 <SItemWithMargin>
                   <Button
-                    view="secondary"
-                    onClick={handleSignInClick}
+                    onClick={handleCreateClick}
+                    noShadow={globalSearchActive}
                   >
-                    {t('button-login-in')}
+                    {t('button-create')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    onClick={handleSignUpClick}
-                  >
-                    {t('button-sign-up')}
-                  </Button>
+                  <UserAvatar
+                    withClick
+                    user={user}
+                    onClick={handleUserClick}
+                  />
                 </SItemWithMargin>
               </>
             )}
+          </>
+        ) : (
+          <>
+            <SItemWithMargin>
+              <Button
+                view="secondary"
+                onClick={handleSignInClick}
+              >
+                {t('button-login-in')}
+              </Button>
+            </SItemWithMargin>
+            <SItemWithMargin>
+              <Button
+                onClick={handleSignUpClick}
+                noShadow={globalSearchActive}
+              >
+                {t('button-sign-up')}
+              </Button>
+            </SItemWithMargin>
           </>
         )}
       </SRightBlock>
