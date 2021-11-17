@@ -1,4 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
@@ -15,7 +20,12 @@ import ScrollArrow from '../../atoms/ScrollArrow';
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
 
-const SCROLL_STEP = 5;
+import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
+
+const SCROLL_STEP = {
+  tablet: 3,
+  desktop: 5,
+};
 
 interface ICardSection {
   url: string,
@@ -36,34 +46,104 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const ref: any = useRef();
+  const scrollContainerRef: any = useRef();
   const [listScroll, setListScroll] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Dragging state
+  const [isDragging, setIsDragging] = useState(false);
+  const [clientX, setClientX] = useState<number>(0);
+  const [scrollX, setScrollX] = useState<number>(0);
+
+  // To check if we're really dragging and avoid clicks on children
+  const [wasDragged, setWasDragged] = useState(false);
+  const [mouseInitial, setMouseInitial] = useState<number>(0);
+
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   let collectionToRender = collection;
   let renderShowMore = false;
+  let scrollStep = SCROLL_STEP.desktop;
 
   if (isMobile && collection.length > 3) {
     renderShowMore = true;
     collectionToRender = collection.slice(0, 3);
   }
 
-  const renderItem = (item: any, index: number) => (
-    <SItemWrapper key={`${url}-${item.id}`} name={`top-section-${url}-${index}`}>
-      <Card item={item} index={index + 1} />
-    </SItemWrapper>
-  );
+  if (resizeMode === 'tablet') {
+    scrollStep = SCROLL_STEP.tablet;
+  }
+
+  const restore = useCallback(() => setWasDragged(false), []);
   const handleUserClick = () => {
     router.push(url);
   };
   const handleLeftClick = () => {
-    setListScroll(listScroll - SCROLL_STEP);
+    setListScroll(listScroll - scrollStep);
   };
   const handleRightClick = () => {
-    setListScroll(listScroll + SCROLL_STEP);
+    setListScroll(listScroll + scrollStep);
   };
+  const mouseDownHandler = (e: any) => {
+    setIsDragging(true);
+    setClientX(e.clientX);
+    setScrollX(scrollContainerRef.current.scrollLeft);
+    setMouseInitial(e.clientX);
+  };
+  const mouseMoveHandler = (e: any) => {
+    if (!isDragging) {
+      return;
+    }
+
+    if (mouseInitial && e.clientX !== mouseInitial) {
+      setWasDragged(true);
+    }
+
+    scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
+    setClientX(e.clientX);
+    setScrollX(scrollX - e.clientX + clientX);
+  };
+  const mouseUpHandler = () => {
+    if (!isDragging) return;
+
+    if (mouseInitial < clientX) {
+      if (canScrollLeft) {
+        handleLeftClick();
+      }
+    } else if (mouseInitial > clientX) {
+      if (canScrollRight) {
+        handleRightClick();
+      }
+    }
+
+    setIsDragging(false);
+  };
+
+  // Handlers for cards to avoid unncessary clicks
+  const handleItemMouseDownCapture = useCallback((e: any) => {
+    setMouseInitial(e.clientX);
+  }, []);
+
+  const handleItemMouseLeave = useCallback(() => {
+    if (wasDragged) {
+      setWasDragged(false);
+      setMouseInitial(0);
+    }
+  }, [wasDragged]);
+  const renderItem = useCallback((item: any, index: number) => (
+    <SItemWrapper key={`${url}-${item.id}`} name={`top-section-${url}-${index}`}>
+      <Card
+        item={item}
+        index={index + 1}
+        restore={restore}
+        preventClick={wasDragged}
+        onMouseLeave={handleItemMouseLeave}
+        onMouseDownCapture={handleItemMouseDownCapture}
+      />
+    </SItemWrapper>
+  ), [handleItemMouseLeave, handleItemMouseDownCapture, restore, url, wasDragged]);
 
   const {
     renderLeftArrow,
@@ -73,15 +153,15 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   useEffect(() => {
     scroller.scrollTo(`top-section-${url}-${listScroll}`, {
       offset: -32,
-      smooth: true,
-      duration: 500,
+      smooth: 'easeInOutQuart',
+      duration: SCROLL_CARDS_SECTIONS,
       horizontal: true,
       containerId: `${url}-scrollContainer`,
     });
 
     setCanScrollLeft(listScroll !== 0);
-    setCanScrollRight(listScroll < collection.length - SCROLL_STEP);
-  }, [url, listScroll, collection]);
+    setCanScrollRight(listScroll < collection.length - scrollStep);
+  }, [url, listScroll, collection, scrollStep]);
 
   return (
     <SWrapper>
@@ -112,19 +192,26 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
         )}
       </STopWrapper>
       <SListContainer ref={ref}>
-        <SListWrapper id={`${url}-scrollContainer`}>
+        <SListWrapper
+          id={`${url}-scrollContainer`}
+          ref={scrollContainerRef}
+          onMouseUp={mouseUpHandler}
+          onMouseDown={mouseDownHandler}
+          onMouseMove={mouseMoveHandler}
+          onMouseLeave={mouseUpHandler}
+        >
           {collectionToRender.map(renderItem)}
         </SListWrapper>
         {!isMobile && (
           <>
-            {canScrollLeft && (
+            {!isDragging && canScrollLeft && (
               <ScrollArrow
                 active={renderLeftArrow}
                 position="left"
                 handleClick={handleLeftClick}
               />
             )}
-            {canScrollRight && (
+            {!isDragging && canScrollRight && (
               <ScrollArrow
                 active={renderRightArrow}
                 position="right"
@@ -160,6 +247,14 @@ CardsSection.defaultProps = {
 const SWrapper = styled.section`
   padding: 0 0 24px 0;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;
   }
@@ -176,6 +271,7 @@ const SListContainer = styled.div`
 const SListWrapper = styled.div`
   left: -16px;
   width: 100vw;
+  cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
   position: relative;

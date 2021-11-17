@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import type { NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -17,16 +17,16 @@ import {
   setUserLoggedIn, setUserRole, setUserData, setCredentialsData,
 } from '../redux-store/slices/userStateSlice';
 
-import testBG from '../public/images/test_bg_1.jpg';
-import testBG2 from '../public/images/test_bg_2.jpg';
-import testBG3 from '../public/images/test_bg_3.jpg';
-import testUser1 from '../public/images/test_user_1.jpg';
-import testUser2 from '../public/images/test_user_2.jpg';
-import testUser3 from '../public/images/test_user_3.jpg';
-import testUser4 from '../public/images/test_user_4.jpg';
-import testBGCreator1 from '../public/images/test_bg_creator_1.jpg';
-import testBGCreator2 from '../public/images/test_bg_creator_2.jpg';
-import testBGCreator3 from '../public/images/test_bg_creator_3.jpg';
+import testBG from '../public/images/mock/test_bg_1.jpg';
+import testBG2 from '../public/images/mock/test_bg_2.jpg';
+import testBG3 from '../public/images/mock/test_bg_3.jpg';
+import testUser1 from '../public/images/mock/test_user_1.jpg';
+import testUser2 from '../public/images/mock/test_user_2.jpg';
+import testUser3 from '../public/images/mock/test_user_3.jpg';
+import testUser4 from '../public/images/mock/test_user_4.jpg';
+import testBGCreator1 from '../public/images/mock/test_bg_creator_1.jpg';
+import testBGCreator2 from '../public/images/mock/test_bg_creator_2.jpg';
+import testBGCreator3 from '../public/images/mock/test_bg_creator_3.jpg';
 
 const Home: NextPage = () => {
   const { t } = useTranslation('home');
@@ -89,7 +89,7 @@ const Home: NextPage = () => {
 
     dispatch(setUserLoggedIn(!user.loggedIn));
   }, [dispatch, user.loggedIn]);
-  const collection = [
+  const collection = useMemo(() => [
     {
       id: 'randomid1',
       url: testBG,
@@ -170,8 +170,8 @@ const Home: NextPage = () => {
         avatar: testUser2,
       },
     },
-  ];
-  const collectionAC = [
+  ], []);
+  const collectionAC = useMemo(() => [
     {
       id: 'randomid1',
       url: testBG,
@@ -272,8 +272,8 @@ const Home: NextPage = () => {
         avatar: testUser2,
       },
     },
-  ];
-  const collectionMC = [
+  ], []);
+  const collectionMC = useMemo(() => [
     {
       id: 'randomid1',
       url: testBG,
@@ -374,14 +374,14 @@ const Home: NextPage = () => {
         avatar: testUser2,
       },
     },
-  ];
-  const collectionCF = [
+  ], []);
+  const collectionCF = useMemo(() => [
     {
       id: 'randomid1',
       url: testBG,
       type: 'cf',
       total: 10000,
-      backed: 1200,
+      backed: 8000,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
         avatar: testUser2,
@@ -486,8 +486,8 @@ const Home: NextPage = () => {
         avatar: testUser2,
       },
     },
-  ];
-  const collectionBiggest = [
+  ], []);
+  const collectionBiggest = useMemo(() => [
     {
       id: 'randomid1',
       url: testBG,
@@ -591,8 +591,8 @@ const Home: NextPage = () => {
         avatar: testUser2,
       },
     },
-  ];
-  const collectionCreator = [
+  ], []);
+  const collectionCreator = useMemo(() => [
     {
       id: 'randomid1',
       url: testBGCreator1,
@@ -696,7 +696,7 @@ const Home: NextPage = () => {
         avatar: testUser1,
       },
     },
-  ];
+  ], []);
 
   return (
     <GeneralTemplate>

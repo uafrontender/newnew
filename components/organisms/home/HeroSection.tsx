@@ -11,6 +11,8 @@ import NotificationItem from '../../molecules/NotificationsItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 
+import { SCROLL_EXPLORE } from '../../../constants/timings';
+
 export const HeroSection = () => {
   const { t } = useTranslation('home');
   const router = useRouter();
@@ -76,8 +78,8 @@ export const HeroSection = () => {
   const handleExploreClick = () => {
     scroller.scrollTo('topSection', {
       offset: -100,
-      smooth: true,
-      duration: 500,
+      smooth: 'easeInOutQuart',
+      duration: SCROLL_EXPLORE,
       containerId: 'generalScrollContainer',
     });
   };
