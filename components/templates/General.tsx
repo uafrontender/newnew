@@ -11,6 +11,7 @@ import BottomNavigation from '../organisms/BottomNavigation';
 import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
+import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 
@@ -21,7 +22,10 @@ interface IGeneral {
 export const General: React.FC<IGeneral> = (props) => {
   const { children } = props;
   const user = useAppSelector((state) => state.user);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const {
+    banner,
+    resizeMode,
+  } = useAppSelector((state) => state.ui);
   const wrapperRef: any = useRef();
 
   const bottomNavigation = useMemo(() => {
@@ -90,9 +94,15 @@ export const General: React.FC<IGeneral> = (props) => {
 
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
+  useRefreshOnScrollTop();
 
   return (
-    <SWrapper ref={wrapperRef} {...props} id="generalScrollContainer">
+    <SWrapper
+      id="generalScrollContainer"
+      ref={wrapperRef}
+      withBanner={!!banner?.show}
+      {...props}
+    >
       <Header />
       <SContent>
         <Container>
@@ -113,23 +123,28 @@ export const General: React.FC<IGeneral> = (props) => {
 
 export default General;
 
-const SWrapper = styled.div`
+interface ISWrapper {
+  withBanner: boolean;
+}
+
+const SWrapper = styled.div<ISWrapper>`
   width: 100vw;
   height: 100vh;
   display: flex;
   overflow-y: auto;
-  padding-top: 56px;
+  transition: all ease 0.5s;
+  padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
   flex-direction: column;
   justify-content: space-between;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-top: 72px;
+    padding-top: ${(props) => (props.withBanner ? 112 : 72)}px;
     padding-bottom: 0;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    padding-top: 80px;
+    padding-top: ${(props) => (props.withBanner ? 120 : 80)}px;
   }
 `;
 

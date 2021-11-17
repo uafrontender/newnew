@@ -1,20 +1,31 @@
-<svg width="220" height="280" viewBox="0 0 220 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-<mask id="mask0_507_1351" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="194" height="280">
-<path d="M100.142 100C126.584 100 148.838 107.974 166.903 123.922C184.968 139.608 194 161.569 194 189.804C194 218.039 184.444 240.131 165.332 256.078C146.482 272.026 123.312 280 95.8219 280C73.5681 280 53.9325 275.033 36.915 265.098C19.8974 255.163 7.59244 240.523 0 221.176L46.3401 194.118C53.1471 216.078 69.641 227.059 95.8219 227.059C109.698 227.059 120.432 223.791 128.024 217.255C135.879 210.458 139.806 201.307 139.806 189.804C139.806 178.562 136.009 169.542 128.417 162.745C120.825 155.948 110.483 152.549 97.3927 152.549H14.1377L25.1336 0H181.04V50.5882H75.4008L71.8664 100H100.142Z" fill="white"/>
-</mask>
-<g mask="url(#mask0_507_1351)">
-<circle opacity="0.3" cx="17" cy="10" r="70" fill="#36374A"/>
-<circle opacity="0.3" cx="167" cy="260" r="70" fill="#36374A"/>
-<g filter="url(#filter0_b_507_1351)">
-<path d="M100.142 100C126.584 100 148.838 107.974 166.903 123.922C184.968 139.608 194 161.569 194 189.804C194 218.039 184.444 240.131 165.332 256.078C146.482 272.026 123.312 280 95.8219 280C73.5681 280 53.9325 275.033 36.915 265.098C19.8974 255.163 7.59244 240.523 0 221.176L46.3401 194.118C53.1471 216.078 69.641 227.059 95.8219 227.059C109.698 227.059 120.432 223.791 128.024 217.255C135.879 210.458 139.806 201.307 139.806 189.804C139.806 178.562 136.009 169.542 128.417 162.745C120.825 155.948 110.483 152.549 97.3927 152.549H14.1377L25.1336 0H181.04V50.5882H75.4008L71.8664 100H100.142Z" fill="white" fill-opacity="0.06"/>
-</g>
-</g>
-<defs>
-<filter id="filter0_b_507_1351" x="-70" y="-70" width="334" height="420" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feGaussianBlur in="BackgroundImage" stdDeviation="35"/>
-<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_507_1351"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_507_1351" result="shape"/>
-</filter>
-</defs>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 220 280" style="enable-background:new 0 0 220 280;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#1B1A22;}
+	.st1{fill:url(#SVGID_1_);fill-opacity:0.7;}
+	.st2{fill:url(#SVGID_2_);fill-opacity:0.6;}
+</style>
+<path class="st0" d="M100.1,100c26.4,0,48.7,8,66.8,23.9c18.1,15.7,27.1,37.6,27.1,65.9s-9.6,50.3-28.7,66.3
+	c-18.9,15.9-42,23.9-69.5,23.9c-22.3,0-41.9-5-58.9-14.9c-17-9.9-29.3-24.6-36.9-43.9l46.3-27.1c6.8,22,23.3,32.9,49.5,32.9
+	c13.9,0,24.6-3.3,32.2-9.8c7.9-6.8,11.8-15.9,11.8-27.5c0-11.2-3.8-20.3-11.4-27.1c-7.6-6.8-17.9-10.2-31-10.2H14.1L25.1,0H181v50.6
+	H75.4L71.9,100H100.1z"/>
+<radialGradient id="SVGID_1_" cx="-391.7502" cy="640.7207" r="1" gradientTransform="matrix(-131.3542 -140.0004 -99.3371 93.2023 12383.3252 -114281.7813)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#36374A"/>
+	<stop  offset="1" style="stop-color:#1B1A22;stop-opacity:0"/>
+	<stop  offset="1" style="stop-color:#36374A;stop-opacity:0"/>
+</radialGradient>
+<path class="st1" d="M100.1,100c26.4,0,48.7,8,66.8,23.9c18.1,15.7,27.1,37.6,27.1,65.9s-9.6,50.3-28.7,66.3
+	c-18.9,15.9-42,23.9-69.5,23.9c-22.3,0-41.9-5-58.9-14.9c-17-9.9-29.3-24.6-36.9-43.9l46.3-27.1c6.8,22,23.3,32.9,49.5,32.9
+	c13.9,0,24.6-3.3,32.2-9.8c7.9-6.8,11.8-15.9,11.8-27.5c0-11.2-3.8-20.3-11.4-27.1c-7.6-6.8-17.9-10.2-31-10.2H14.1L25.1,0H181v50.6
+	H75.4L71.9,100H100.1z"/>
+<radialGradient id="SVGID_2_" cx="-385.843" cy="641.1436" r="1" gradientTransform="matrix(119.4998 117.4998 81.757 -83.1486 -6342.7939 98627.1719)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#36374A"/>
+	<stop  offset="1" style="stop-color:#36374A;stop-opacity:0"/>
+</radialGradient>
+<path class="st2" d="M100.1,100c26.4,0,48.7,8,66.8,23.9c18.1,15.7,27.1,37.6,27.1,65.9s-9.6,50.3-28.7,66.3
+	c-18.9,15.9-42,23.9-69.5,23.9c-22.3,0-41.9-5-58.9-14.9c-17-9.9-29.3-24.6-36.9-43.9l46.3-27.1c6.8,22,23.3,32.9,49.5,32.9
+	c13.9,0,24.6-3.3,32.2-9.8c7.9-6.8,11.8-15.9,11.8-27.5c0-11.2-3.8-20.3-11.4-27.1c-7.6-6.8-17.9-10.2-31-10.2H14.1L25.1,0H181v50.6
+	H75.4L71.9,100H100.1z"/>
 </svg>

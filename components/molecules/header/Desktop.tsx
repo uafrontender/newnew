@@ -1,4 +1,5 @@
 import React from 'react';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -12,6 +13,8 @@ import NavigationItem from '../NavigationItem';
 import { useAppSelector } from '../../../redux-store/store';
 
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface IDesktop {
 }
@@ -38,7 +41,11 @@ export const Desktop: React.FC<IDesktop> = () => {
   };
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      window.location.reload();
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
     } else {
       router.push('/', '/');
     }
