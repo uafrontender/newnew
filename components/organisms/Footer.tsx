@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -16,6 +17,8 @@ import mobileLogo from '../../public/images/svg/mobile-logo.svg';
 import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
 import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
 import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
+
+import { SCROLL_TO_TOP } from '../../constants/timings';
 
 interface IFooter {
 }
@@ -75,7 +78,11 @@ export const Footer: React.FC<IFooter> = () => {
 
   const handleLogoClick = () => {
     if (router.pathname === '/') {
-      window.location.reload();
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
     } else {
       router.push('/', '/');
     }
