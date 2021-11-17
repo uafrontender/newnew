@@ -1,14 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { css, useTheme } from 'styled-components';
 
-import InlineSvg from '../atoms/InlineSVG';
+import InlineSVG from '../atoms/InlineSVG';
+import Container from '../atoms/Grid/Container';
+import Col from '../atoms/Grid/Col';
+import Row from '../atoms/Grid/Row';
 
 // Icons
-import NewnewLogoDark from '../../public/images/svg/auth/logo-topbar-auth-dark.svg';
-import NewnewLogoLight from '../../public/images/svg/auth/logo-topbar-auth-light.svg';
+import tabletLogo from '../../public/images/svg/tablet-logo.svg';
 
 export interface IAuthLayout {
 
@@ -35,9 +38,7 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
       </STestElement> */}
       {
         !router.pathname.includes('verify-email') ? (
-          <HomeLogoButton
-            onClick={() => router.push('/')}
-          />
+          <HomeLogoButton />
         ) : null
       }
       { children }
@@ -47,47 +48,51 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
 
 export default AuthLayout;
 
-type THomeLogoButton = React.ComponentPropsWithoutRef<'button'>
-
-const HomeLogoButton: React.FunctionComponent<THomeLogoButton> = (props) => {
+const HomeLogoButton: React.FunctionComponent = () => {
   const theme = useTheme();
 
   return (
-    <SHomeLogoButton
-      {...props}
-    >
-      <InlineSvg
-        svg={theme.name === 'light' ? NewnewLogoLight : NewnewLogoDark}
-        width="152px"
-        height="48px"
-      />
+    <SHomeLogoButton>
+      <Row>
+        <Col>
+          <Link href="/">
+            <a>
+              <InlineSVG
+                svg={tabletLogo}
+                fill={theme.colorsThemed.text.primary}
+                width="152px"
+                height="48px"
+              />
+            </a>
+          </Link>
+        </Col>
+      </Row>
     </SHomeLogoButton>
   );
 };
 
-const SHomeLogoButton = styled.button`
+const SHomeLogoButton = styled(Container)`
   display: none;
-
 
   ${({ theme }) => theme.media.tablet} {
     display: block;
 
-    position: absolute;
-    top: 12px;
-    left: 32px;
+    position: relative;
 
-    border: transparent;
-    background: transparent;
+    height: fit-content;
 
-    cursor: pointer;
+    a {
+      position: absolute;
+
+      margin: 12px 0;
+
+      cursor: pointer;
+    }
   }
 
-  ${({ theme }) => theme.media.laptopL} {
-    top: 20px;
-    left: 20px;
-
-    & div {
-      height: 32px;
+  ${(props) => props.theme.media.laptop} {
+    a {
+      margin: 16px 0;
     }
   }
 `;

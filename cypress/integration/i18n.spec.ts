@@ -3,10 +3,6 @@ context('Application with i18n enabled', () => {
     cy.visit(Cypress.env('NEXT_PUBLIC_APP_URL'));
   });
 
-  it('has the app name displayed', () => {
-    cy.contains(Cypress.env('NEXT_PUBLIC_APP_NAME'));
-  });
-
   it('has correct default locale', () => {
     const {
       defaultLocale,

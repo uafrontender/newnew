@@ -1,5 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import Lottie from 'react-lottie';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
@@ -11,13 +12,16 @@ import SearchInput from '../../atoms/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
 
 import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.svg';
-import mobileLogo from '../../../public/images/svg/mobile-logo.svg';
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+import logoAnimation from '../../../public/animations/mobile_logo_animation.json';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface IMobile {
 }
 
 export const Mobile: React.FC<IMobile> = () => {
+  const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -28,28 +32,51 @@ export const Mobile: React.FC<IMobile> = () => {
   const handleSignInClick = () => {
     router.push('/sign-up');
   };
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      router.push('/', '/');
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoading(!loading);
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
 
   return (
     <SContainer>
-      <Link href="/">
-        <a>
-          {user.loggedIn ? (
-            <InlineSVG
-              svg={mobileLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="40px"
-              height="40px"
-            />
-          ) : (
-            <InlineSVG
-              svg={tabletLogo}
-              fill={theme.colorsThemed.text.primary}
-              width="127px"
-              height="40px"
-            />
-          )}
-        </a>
-      </Link>
+      <LogoHolder onClick={handleLogoClick}>
+        {user.loggedIn ? (
+          <Lottie
+            width={40}
+            height={40}
+            options={{
+              loop: false,
+              autoplay: true,
+              animationData: logoAnimation,
+            }}
+            isStopped={loading}
+          />
+        ) : (
+          <InlineSVG
+            svg={tabletLogo}
+            fill={theme.colorsThemed.text.primary}
+            width="127px"
+            height="40px"
+          />
+        )}
+      </LogoHolder>
       <SRightBlock>
         <SItemWithMargin>
           <SearchInput />
@@ -57,13 +84,14 @@ export const Mobile: React.FC<IMobile> = () => {
         <SItemWithMargin>
           {user.loggedIn ? (
             <UserAvatar
+              withClick
               user={user}
               onClick={handleUserClick}
             />
           ) : (
             <Button
               iconOnly
-              bg={theme.gradients.blueDiagonal}
+              view="secondary"
               onClick={handleSignInClick}
             >
               <InlineSVG
@@ -98,4 +126,8 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 12px;
+`;
+
+const LogoHolder = styled.div`
+  cursor: pointer;
 `;

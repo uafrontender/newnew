@@ -1,0 +1,22 @@
+{
+  "ProfileLayout": {
+    "headerButtons": {
+      "edit": "Edit Profile",
+      "settings": "Settings"
+    },
+    "tabs": {
+      "activelyBidding": "Actively bidding on",
+      "purchases": "My purchases",
+      "viewHistory": "My view history",
+      "subscriptions": "My subscriptions",
+      "favorites": "My favorites",
+      "userInitial": "Creator’s decisions",
+      "activity": "Activity"
+    },
+    "buttons": {
+      "favorites": "Favorites",
+      "more": "More",
+      "sendMessage": "Send message"
+    }
+  }
+}

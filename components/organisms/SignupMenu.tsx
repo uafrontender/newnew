@@ -11,7 +11,9 @@ import isEmail from 'validator/lib/isEmail';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
-import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import {
+  setCredentialsData, setSignupEmailInput, setUserData, setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail } from '../../api/endpoints/auth';
@@ -26,7 +28,7 @@ import Text from '../atoms/Text';
 import GoBackButton from '../molecules/GoBackButton';
 import TextWithLine from '../atoms/TextWithLine';
 import SignInTextInput from '../atoms/SignInTextInput';
-import PrimaryLargeButton from '../atoms/PrimaryLargeButton';
+import Button from '../atoms/Button';
 import SignInButton from '../molecules/signup/SignInButton';
 
 import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
@@ -40,6 +42,7 @@ import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
 import sleep from '../../utils/sleep';
+import dateToTimestamp from '../../utils/dateToTimestamp';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -89,7 +92,35 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
   // NB! Testing only
   const handleLogInTest = useCallback(() => {
+    const mockResponse = new newnewapi.SignInResponse({
+      me: {
+        username: 'johndoe12345',
+        displayName: 'John',
+        email: 'johndoe@test.com',
+        avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
+        id: 12345,
+        options: {
+          isCreator: false,
+        },
+      },
+      credential: {
+        accessToken: '12345',
+        refreshToken: '12345',
+        expiresAt: dateToTimestamp(new Date()),
+      },
+      status: 1,
+    });
+
+    dispatch(setUserData(mockResponse.me));
+
+    dispatch(setCredentialsData({
+      accessToken: mockResponse.credential?.accessToken,
+      refreshToken: mockResponse.credential?.refreshToken,
+      expiresAt: mockResponse.credential?.expiresAt?.seconds,
+    }));
+
     dispatch(setUserLoggedIn(true));
+
     router.push('/', undefined, { shallow: true });
   }, [dispatch, router]);
 
@@ -190,26 +221,30 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
               </SErrorDiv>
             ) : null
           }
-          <PrimaryLargeButton
+          <Button
             disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
             onClick={() => handleSubmitEmail()}
           >
             <span>
               {t('signupOptions.signInBtn')}
             </span>
-          </PrimaryLargeButton>
+          </Button>
         </div>
         <SLegalText>
           {t('legalDisclaimer.main_text')}
           <br />
-          <Link href="/">
-            <a href="/" target="_blank">{t('legalDisclaimer.privacy_policy_terms')}</a>
+          <Link href="/privacy-policy">
+            <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
+          </Link>
+          {', '}
+          <Link href="/terms-and-conditions">
+            <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
           </Link>
           {' '}
           {t('legalDisclaimer.and')}
           {' '}
-          <Link href="/">
-            <a href="/" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
+          <Link href="/community-guidelines">
+            <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
           </Link>
         </SLegalText>
       </SMenuWrapper>
@@ -393,7 +428,6 @@ const SLegalText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   a {
-    text-decoration: none;
     font-weight: 600;
 
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};

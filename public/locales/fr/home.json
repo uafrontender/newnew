@@ -1,0 +1,20 @@
+{
+  "hero-block-title": "FR Decision making\nmarketplace",
+  "hero-block-subTitle": "FR Vote to control the outcomes\nof other people’s lives.",
+  "hero-block-sign-in": "FR Sign in",
+  "hero-block-explore": "FR Explore",
+  "hero-block-explore-now": "FR Explore now",
+  "top-block-title": "FR Top 10 in {{country}}",
+  "ac-block-title": "FR Live Auctions",
+  "mc-block-title": "FR Top Multiple Choices",
+  "cf-block-title": "FR Top Crowdfunding",
+  "biggest-block-title": "FR Biggest of All Time",
+  "button-show-more": "FR See more",
+  "button-show-more-creator": "FR See more from creator",
+  "button-creator-on-the-rise": "FR Creator on the rise",
+  "button-card-ac": "FR {{amount}} in bids",
+  "button-card-mc": "FR {{votes}} votes",
+  "button-card-cf": "FR {{amount}} of {{total}} backers",
+  "card-time-left": "FR {{time}} left",
+  "for-you-block-title": "FR For you"
+}

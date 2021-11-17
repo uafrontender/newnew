@@ -200,6 +200,8 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background: transparent;
 
+    caret-color: transparent;
+
     &:read-only {
       outline: none;
       cursor: default;

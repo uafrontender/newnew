@@ -15,6 +15,7 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name' | 'gradients' | 'sh
   },
   borderRadius: {
     small: '8px',
+    smallLg: '12px',
     medium: '16px',
     large: '24px',
     xxxLarge: '48px',
@@ -32,6 +33,7 @@ export const lightTheme: DefaultTheme = {
       backgroundT: 'transparent',
       outlines1: '#E5E9F1',
       outlines2: '#8B99B2',
+      numbers: '#E5E9F1',
     },
     text: {
       primary: '#2C2C33',
@@ -69,6 +71,48 @@ export const lightTheme: DefaultTheme = {
         pressed: 'linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), #000000',
       },
     },
+    button: {
+      color: {
+        primary: '#FFFFFF',
+        secondary: '#2C2C33',
+        tertiary: '#2C2C33',
+        transparent: '#FFFFFF',
+        quaternary: '#FFFFFF',
+        primaryProgress: '#FFFFFF',
+      },
+      background: {
+        primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        secondary: '#F1F3F9',
+        tertiary: '#FFFFFF',
+        transparent: 'rgba(11, 10, 19, 0.2)',
+        quaternary: '#0B0A13',
+        primaryProgress: '#C1C9D7',
+      },
+      ripple: {
+        primary: '#2955EC',
+        secondary: '#DFE3F1',
+        tertiary: '#DFE3F1',
+        transparent: 'rgba(20, 21, 31, 0.4)',
+        quaternary: '#0B0A13',
+        primaryProgress: '#2955EC',
+      },
+      hover: {
+        primary: '#2955EC',
+        secondary: '#DFE3F1',
+        tertiary: '#DFE3F1',
+        transparent: 'rgba(20, 21, 31, 0.5)',
+        quaternary: '#0B0A13',
+        primaryProgress: '#2955EC',
+      },
+      progress: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+        tertiary: '#FFFFFF',
+        transparent: '#FFFFFF',
+        quaternary: '#FFFFFF',
+        primaryProgress: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+      },
+    },
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
@@ -76,8 +120,12 @@ export const lightTheme: DefaultTheme = {
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
   },
   gradients: {
+    arrowLeft: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+    arrowRight: 'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
     blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    heroNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
+    heroNotificationsTablet: 'linear-gradient(360deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
   },
 };
 
@@ -92,6 +140,7 @@ export const darkTheme: DefaultTheme = {
       backgroundT: 'rgba(11, 10, 19, 0.65)',
       outlines1: '#272835',
       outlines2: '#6A6A7B',
+      numbers: 'rgba(255, 255, 255, 0.06)',
     },
     text: {
       primary: '#FFFFFF',
@@ -129,6 +178,48 @@ export const darkTheme: DefaultTheme = {
         pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #FFFFFF',
       },
     },
+    button: {
+      color: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+        tertiary: '#FFFFFF',
+        transparent: '#FFFFFF',
+        quaternary: '#2C2C33',
+        primaryProgress: '#FFFFFF',
+      },
+      background: {
+        primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        secondary: '#14151F',
+        tertiary: '#0B0A13',
+        transparent: 'rgba(20, 21, 31, 0.65)',
+        quaternary: '#FFFFFF',
+        primaryProgress: '#14151F',
+      },
+      ripple: {
+        primary: '#2955EC',
+        secondary: '#21222C',
+        tertiary: '#21222C',
+        transparent: '#21222C',
+        quaternary: '#FFFFFF',
+        primaryProgress: '#2955EC',
+      },
+      hover: {
+        primary: '#21222C',
+        secondary: '#21222C',
+        tertiary: '#21222C',
+        transparent: '#21222C',
+        quaternary: '#FFFFFF',
+        primaryProgress: '#21222C',
+      },
+      progress: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+        tertiary: '#FFFFFF',
+        transparent: '#FFFFFF',
+        quaternary: '#FFFFFF',
+        primaryProgress: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+      },
+    },
   },
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
@@ -136,7 +227,11 @@ export const darkTheme: DefaultTheme = {
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
   },
   gradients: {
+    arrowLeft: 'linear-gradient(90deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
+    arrowRight: 'linear-gradient(270deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
     blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    heroNotifications: 'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
+    heroNotificationsTablet: 'linear-gradient(360deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
   },
 };

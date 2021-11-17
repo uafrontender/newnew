@@ -26,6 +26,7 @@ declare module 'styled-components' {
         outlines1: string;
         // Used for both hover and focus states.
         outlines2: string;
+        numbers: string;
       },
       text: {
         // Used for both links and titles.
@@ -67,6 +68,48 @@ declare module 'styled-components' {
           pressed: string;
         },
       },
+      button: {
+        color: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          primaryProgress: string,
+        },
+        background: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          primaryProgress: string,
+        },
+        ripple: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          primaryProgress: string,
+        },
+        hover: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          primaryProgress: string,
+        },
+        progress: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          primaryProgress: string,
+        }
+      },
     },
     shadows: {
       mediumBlue: string,
@@ -74,11 +117,16 @@ declare module 'styled-components' {
       mediumGrey: string,
     },
     gradients: {
+      arrowLeft: string,
+      arrowRight: string,
       blueDiagonal: string,
       blueHorizontal: string,
+      heroNotifications: string,
+      heroNotificationsTablet: string,
     },
     borderRadius: {
       small: string,
+      smallLg: string,
       medium: string,
       large: string,
       xxxLarge: string,

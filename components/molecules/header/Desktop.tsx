@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -13,6 +13,8 @@ import NavigationItem from '../NavigationItem';
 import { useAppSelector } from '../../../redux-store/store';
 
 import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
+
+import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface IDesktop {
 }
@@ -37,19 +39,28 @@ export const Desktop: React.FC<IDesktop> = () => {
   const handleSignUpClick = () => {
     router.push('/sign-up');
   };
+  const handleLogoClick = () => {
+    if (router.pathname === '/') {
+      scroller.scrollTo('top-reload', {
+        smooth: 'easeInOutQuart',
+        duration: SCROLL_TO_TOP,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      router.push('/', '/');
+    }
+  };
 
   return (
     <SContainer>
-      <Link href="/">
-        <a>
-          <InlineSVG
-            svg={tabletLogo}
-            fill={theme.colorsThemed.text.primary}
-            width="152px"
-            height="32px"
-          />
-        </a>
-      </Link>
+      <InlineSVG
+        clickable
+        svg={tabletLogo}
+        fill={theme.colorsThemed.text.primary}
+        width="152px"
+        height="32px"
+        onClick={handleLogoClick}
+      />
       <SRightBlock>
         {user.loggedIn && (
           <>
@@ -102,24 +113,20 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    bg={theme.colorsThemed.grayscale.background2}
+                    view="secondary"
                     onClick={handleDashboardClick}
-                    titleColor={theme.colorsThemed.text.primary}
                   >
                     {t('button-dashboard')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    bs={theme.shadows.mediumBlue}
-                    bg={theme.gradients.blueDiagonal}
-                    onClick={handleCreateClick}
-                  >
+                  <Button onClick={handleCreateClick}>
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <UserAvatar
+                    withClick
                     user={user}
                     onClick={handleUserClick}
                   />
@@ -128,16 +135,13 @@ export const Desktop: React.FC<IDesktop> = () => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button
-                    bs={theme.shadows.mediumBlue}
-                    bg={theme.gradients.blueDiagonal}
-                    onClick={handleCreateClick}
-                  >
+                  <Button onClick={handleCreateClick}>
                     {t('button-create-on-newnew')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <UserAvatar
+                    withClick
                     user={user}
                     onClick={handleUserClick}
                   />
@@ -149,19 +153,14 @@ export const Desktop: React.FC<IDesktop> = () => {
           <>
             <SItemWithMargin>
               <Button
-                bg={theme.colorsThemed.grayscale.background2}
+                view="secondary"
                 onClick={handleSignInClick}
-                titleColor={theme.colorsThemed.text.primary}
               >
                 {t('button-login-in')}
               </Button>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button
-                bs={theme.shadows.mediumBlue}
-                bg={theme.gradients.blueDiagonal}
-                onClick={handleSignUpClick}
-              >
+              <Button onClick={handleSignUpClick}>
                 {t('button-sign-up')}
               </Button>
             </SItemWithMargin>
@@ -189,8 +188,4 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 24px;
-
-  a {
-    text-decoration: none;
-  }
 `;
