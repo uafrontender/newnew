@@ -4,7 +4,7 @@ import React, {
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import isBroswer from '../../../utils/isBrowser';
+import isBrowser from '../../../utils/isBrowser';
 
 interface IProfileTabs {
   tabs: Tab[];
@@ -47,7 +47,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
   });
 
   const [containerWidth, setContainerWidth] = useState<number>(
-    isBroswer() ? window.innerWidth : 768,
+    isBrowser() ? window.innerWidth : 768,
   );
   const [tabsWidth, setTabsWidth] = useState<number>(
     tabs.length * 100,
