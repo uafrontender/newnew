@@ -2,12 +2,13 @@
 // To be truly reusable might require further tweaks.
 import React from 'react';
 import styled from 'styled-components';
+import { motion, MotionProps } from 'framer-motion';
 
-interface ISTextWithLine {
+interface ISTextWithLine extends MotionProps {
   lineColor: string;
 }
 
-const STextWithLine = styled.div<ISTextWithLine>`
+const STextWithLine = styled(motion.div)<ISTextWithLine>`
   position: relative;
 
   display: flex;
@@ -35,7 +36,7 @@ const STextWithLine = styled.div<ISTextWithLine>`
   }
 `;
 
-interface ITextWithLine {
+interface ITextWithLine extends MotionProps {
   lineColor: string;
   innerSpan: React.ComponentPropsWithoutRef<'span'>;
 }
@@ -43,9 +44,11 @@ interface ITextWithLine {
 const TextWithLine: React.FunctionComponent<ITextWithLine> = ({
   lineColor,
   innerSpan,
+  ...rest
 }) => (
   <STextWithLine
     lineColor={lineColor}
+    {...rest}
   >
     { innerSpan }
   </STextWithLine>
