@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -20,6 +20,9 @@ import ProfileTabs, { Tab } from '../molecules/profile/ProfileTabs';
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
+import Modal from '../organisms/Modal';
+import EditProfileMenu from '../organisms/EditProfileMenu';
+import isBroswer from '../../utils/isBrowser';
 
 interface IMyProfileLayout {
   tabs: Tab[];
@@ -37,6 +40,48 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
+  // Edit Profile menu
+  const [isEditProfileMenuOpen, setIsEditProfileMenuOpen] = useState(false);
+  const [wasModified, setWasModified] = useState(true);
+
+  const handleSetWasModified = useCallback((newState: boolean) => {
+    setWasModified(newState);
+  }, [setWasModified]);
+
+  const handleCloseEditProfileMenu = useCallback(() => {
+    if (isBroswer()) {
+      router.push({
+        pathname: window.location.pathname,
+        hash: undefined,
+      }, undefined, { shallow: true });
+    }
+    setIsEditProfileMenuOpen(false);
+  }, [setIsEditProfileMenuOpen, router]);
+
+  const handleOpenEditProfileMenu = () => {
+    // Allow closing with browser back button
+    if (isBroswer()) {
+      router.push({
+        pathname: window.location.pathname,
+        hash: 'edit-profile',
+      }, undefined, { shallow: true });
+    }
+    setIsEditProfileMenuOpen(true);
+  };
+
+  const handleClosePreventDiscarding = useCallback(() => {
+    if (!wasModified) {
+      handleCloseEditProfileMenu();
+      return;
+    }
+
+    // eslint-disable-next-line no-alert
+    const result = window.confirm(t('EditProfileMenu.confirmationWindow'));
+    if (result) {
+      handleCloseEditProfileMenu();
+    }
+  }, [wasModified, handleCloseEditProfileMenu, t]);
+
   // Redirect to / if user is not logged in
   useEffect(() => {
     if (!user.loggedIn) {
@@ -44,6 +89,20 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       router.push('/');
     }
   }, [router, user]);
+
+  useEffect(() => {
+    const verifyHash = () => {
+      if (!isBroswer()) return;
+
+      const { hash } = window.location;
+
+      if ((!hash || hash !== '#edit-profile') && isEditProfileMenuOpen) {
+        setIsEditProfileMenuOpen(false);
+      }
+    };
+
+    verifyHash();
+  });
 
   return (
     <SGeneral>
@@ -55,7 +114,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             view="transparent"
             size="sm"
             iconOnly={isMobileOrTablet}
-            onClick={() => {}}
+            onClick={() => handleOpenEditProfileMenu()}
           >
             <InlineSvg
               svg={EditIcon}
@@ -145,6 +204,18 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           pageType="myProfile"
           tabs={tabs}
         />
+        {/* Edit Profile modal menu */}
+        <Modal show={isEditProfileMenuOpen} onClose={handleClosePreventDiscarding}>
+          {isEditProfileMenuOpen
+            ? (
+              <EditProfileMenu
+                wasModified={wasModified}
+                handleClose={handleCloseEditProfileMenu}
+                handleSetWasModified={handleSetWasModified}
+                handleClosePreventDiscarding={handleClosePreventDiscarding}
+              />
+            ) : null}
+        </Modal>
       </SMyProfileLayout>
       { children }
     </SGeneral>
@@ -157,7 +228,7 @@ const SGeneral = styled(General)`
   position: relative;
 
   header {
-    z-index: 2;
+    z-index: 5;
   }
 
   @media (max-width: 768px) {
