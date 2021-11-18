@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
-import lottie from 'lottie-web';
+import React from 'react';
+import Lottie from 'react-lottie';
 import styled from 'styled-components';
 
-import InlineSvg from '../../atoms/InlineSVG';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 // import NewnewLogoBlue from '../../../public/images/svg/auth/newnew-logo-blue.svg';
 
@@ -12,40 +11,24 @@ interface IAnimatedLogoEmailVerification {
 
 const AnimatedLogoEmailVerification: React.FunctionComponent<IAnimatedLogoEmailVerification> = ({
   isLoading,
-}) => {
-  useEffect(() => {
-    lottie.loadAnimation({
-      container: document.querySelector('#logo')!!,
-      animationData: loadingAnimation,
-      renderer: 'svg', // "canvas", "html"
-      loop: true, // boolean
-      autoplay: false, // boolean
-    });
-  }, []);
-
-  useEffect(() => {
-    if (isLoading) {
-      lottie.play();
-    } else {
-      lottie.stop();
-    }
-  }, [isLoading]);
-
-  return (
-    <SAnimatedLogoEmailVerification
-      id="logo"
-      isLoading={isLoading}
+}) => (
+  <SAnimatedLogoEmailVerification>
+    <Lottie
+      width={64}
+      height={64}
+      options={{
+        loop: true,
+        autoplay: true,
+        animationData: loadingAnimation,
+      }}
+      isStopped={!isLoading}
     />
-  );
-};
+  </SAnimatedLogoEmailVerification>
+);
 
 export default AnimatedLogoEmailVerification;
 
-type TSAnimatedLogoEmailVerification = typeof InlineSvg & {
-  isLoading: boolean;
-}
-
-const SAnimatedLogoEmailVerification = styled.div<TSAnimatedLogoEmailVerification>`
+const SAnimatedLogoEmailVerification = styled.div`
   width: 64px;
   height: 64px;
 

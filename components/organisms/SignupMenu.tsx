@@ -160,7 +160,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             svg={GoogleIcon}
             hoverBgColor={theme.colorsThemed.social.google.hover}
             pressedBgColor={theme.colorsThemed.social.google.pressed}
-            // onClick={() => {}}
             onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
           >
             {t('signupOptions.google')}
@@ -171,7 +170,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             hoverContentColor="#FFF"
             pressedBgColor={theme.colorsThemed.social.apple.pressed}
             onClick={() => {}}
-            // onClick={handleLogInTest}
+            // onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
           >
             {t('signupOptions.apple')}
           </SignInButton>
@@ -180,7 +179,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             hoverSvg={FacebookIconLight}
             hoverBgColor={theme.colorsThemed.social.facebook.hover}
             pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-            onClick={() => {}}
+            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
           >
             {t('signupOptions.facebook')}
           </SignInButton>
@@ -188,8 +187,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             svg={TwitterIcon}
             hoverBgColor={theme.colorsThemed.social.twitter.hover}
             pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-            onClick={() => {}}
-            // onClick={handleLogInTest}
+            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
           >
             {t('signupOptions.twitter')}
           </SignInButton>
