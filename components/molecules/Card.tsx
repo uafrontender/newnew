@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -65,6 +65,10 @@ interface ICard {
   item: any;
   type?: 'inside' | 'outside';
   index: number;
+  preventClick?: boolean;
+  restore?: () => void;
+  onMouseDownCapture?: (e: any) => void;
+  onMouseLeave?: () => void;
 }
 
 export const Card: React.FC<ICard> = (props) => {
@@ -72,6 +76,10 @@ export const Card: React.FC<ICard> = (props) => {
     item,
     type,
     index,
+    preventClick,
+    restore,
+    onMouseDownCapture,
+    onMouseLeave,
   } = props;
   const { t } = useTranslation('home');
   const theme = useTheme();
@@ -89,16 +97,30 @@ export const Card: React.FC<ICard> = (props) => {
   const handleMoreClick = () => {
     router.push('/post-detailed');
   };
-  const handleItemClick = () => {
+  const handleItemClick = useCallback(() => {
     router.push('/post-detailed');
-  };
+  }, [router]);
   const handleBidClick = () => {
     router.push('/post-detailed');
   };
 
+  const onClick = useCallback((e) => {
+    if (preventClick) {
+      e.preventDefault();
+      restore?.();
+      return;
+    }
+    handleItemClick();
+  }, [handleItemClick, preventClick, restore]);
+
   if (type === 'inside') {
     return (
-      <SWrapper index={index} onClick={handleItemClick}>
+      <SWrapper
+        index={index}
+        onClick={onClick}
+        onMouseLeave={onMouseLeave}
+        onMouseDownCapture={onMouseDownCapture}
+      >
         {!isMobile && (
           <SNumberImageHolder index={index}>
             <InlineSVG
@@ -109,7 +131,7 @@ export const Card: React.FC<ICard> = (props) => {
           </SNumberImageHolder>
         )}
         <SImageHolder>
-          <Image src={item.url} objectFit="cover" layout="fill" />
+          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <SImageMask />
           <STopContent>
             {!isDesktop && (
@@ -135,10 +157,14 @@ export const Card: React.FC<ICard> = (props) => {
   }
 
   return (
-    <SWrapperOutside onClick={handleItemClick}>
+    <SWrapperOutside
+      onClick={onClick}
+      onMouseLeave={onMouseLeave}
+      onMouseDownCapture={onMouseDownCapture}
+    >
       <SImageBG>
         <SImageHolderOutside id="animatedPart">
-          <Image src={item.url} objectFit="cover" layout="fill" />
+          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <STopContent>
             {!isDesktop && (
               <Button iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
@@ -161,7 +187,14 @@ export const Card: React.FC<ICard> = (props) => {
           </STextOutside>
         </SBottomStart>
         <SBottomEnd type={item.type}>
-          <SButton onClick={handleBidClick} noShadow>
+          <SButton
+            noShadow
+            view={item.type === 'cf' ? 'primaryProgress' : 'primary'}
+            onClick={handleBidClick}
+            cardType={item.type}
+            progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
+            animateProgress={item.type === 'cf'}
+          >
             {t(`button-card-${item.type}`, {
               votes: item.votes,
               total: item.total,
@@ -182,6 +215,13 @@ export default Card;
 
 Card.defaultProps = {
   type: 'outside',
+  preventClick: false,
+  restore: () => {
+  },
+  onMouseDownCapture: () => {
+  },
+  onMouseLeave: () => {
+  },
 };
 
 interface ISWrapper {
@@ -424,8 +464,19 @@ const SBottomEnd = styled.div<ISBottomEnd>`
   `}
 `;
 
-const SButton = styled(Button)`
+interface ISButtonSpan {
+  cardType: string,
+}
+
+const SButton = styled(Button)<ISButtonSpan>`
   padding: 12px;
+  
+  span {
+    ${(props) => (props.cardType === 'cf' ? css`
+      width: 100%;
+      text-align: left;
+    ` : '')}
+  }
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;

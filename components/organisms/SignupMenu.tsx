@@ -16,7 +16,11 @@ import {
 } from '../../redux-store/slices/userStateSlice';
 
 // API
-import { sendVerificationEmail } from '../../api/endpoints/auth';
+import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
+
+// Utils
+import sleep from '../../utils/sleep';
+import dateToTimestamp from '../../utils/dateToTimestamp';
 
 // Reason for signing up type
 import { SignupReason } from '../../pages/sign-up';
@@ -31,18 +35,14 @@ import SignInTextInput from '../atoms/SignInTextInput';
 import Button from '../atoms/Button';
 import SignInButton from '../molecules/signup/SignInButton';
 
-import AppleSignInButton from '../molecules/signup/AppleSignInBtn';
-
 // Icons
 import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
-
 import AppleIcon from '../../public/images/svg/auth/icon-apple.svg';
 import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
-import sleep from '../../utils/sleep';
-import dateToTimestamp from '../../utils/dateToTimestamp';
+import isBrowser from '../../utils/isBrowser';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -90,6 +90,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
     }
   };
 
+  const handleSignupRedirect = (url: string) => {
+    if (isBrowser()) {
+      window.location.href = url;
+    }
+  };
+
   // NB! Testing only
   const handleLogInTest = useCallback(() => {
     const mockResponse = new newnewapi.SignInResponse({
@@ -98,7 +104,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         displayName: 'John',
         email: 'johndoe@test.com',
         avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
-        id: 12345,
+        userUuid: '123123',
         options: {
           isCreator: false,
         },
@@ -154,21 +160,17 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             svg={GoogleIcon}
             hoverBgColor={theme.colorsThemed.social.google.hover}
             pressedBgColor={theme.colorsThemed.social.google.pressed}
-            // onClick={() => {}}
-            onClick={handleLogInTest}
+            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
           >
             {t('signupOptions.google')}
           </SignInButton>
-          {/* <AppleSignInButton
-            label={t('signupOptions.apple')}
-          /> */}
           <SignInButton
             svg={AppleIcon}
             hoverBgColor="#000"
             hoverContentColor="#FFF"
             pressedBgColor={theme.colorsThemed.social.apple.pressed}
-            // onClick={() => {}}
-            onClick={handleLogInTest}
+            onClick={() => {}}
+            // onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
           >
             {t('signupOptions.apple')}
           </SignInButton>
@@ -177,8 +179,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             hoverSvg={FacebookIconLight}
             hoverBgColor={theme.colorsThemed.social.facebook.hover}
             pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-            // onClick={() => {}}
-            onClick={handleLogInTest}
+            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
           >
             {t('signupOptions.facebook')}
           </SignInButton>
@@ -186,8 +187,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             svg={TwitterIcon}
             hoverBgColor={theme.colorsThemed.social.twitter.hover}
             pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-            // onClick={() => {}}
-            onClick={handleLogInTest}
+            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
           >
             {t('signupOptions.twitter')}
           </SignInButton>

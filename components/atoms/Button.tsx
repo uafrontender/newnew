@@ -1,4 +1,9 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+} from 'react';
 import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -8,7 +13,10 @@ type TButton = React.ComponentPropsWithoutRef<'button'>;
 
 interface IButton {
   size?: 'sm' | 'lg',
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent',
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress',
+  progress?: number,
+  progressDelay?: number,
+  animateProgress?: boolean,
   iconOnly?: boolean,
   noRipple?: boolean,
   noShadow?: boolean,
@@ -16,17 +24,22 @@ interface IButton {
   debounceRestoreMs?: number,
 }
 
-const Button: React.FunctionComponent<IButton & TButton> = ({
-  children,
-  disabled,
-  noRipple,
-  debounceClickMs,
-  debounceRestoreMs,
-  onClick,
-  ...rest
-}) => {
+const Button: React.FunctionComponent<IButton & TButton> = (props) => {
+  const {
+    children,
+    disabled,
+    noRipple,
+    progressDelay,
+    animateProgress,
+    debounceClickMs,
+    debounceRestoreMs,
+    onClick,
+    ...rest
+  } = props;
   // Element ref
   const ref: any = useRef();
+  // Progress effect
+  const [progress, setProgress] = useState(0);
   // Ripple effect
   const [rippleOrigin, setRippleOrigin] = useState<{ x: string, y: string }>({
     x: '50%',
@@ -74,6 +87,12 @@ const Button: React.FunctionComponent<IButton & TButton> = ({
     setIsRippling(true);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setProgress(rest.progress ?? 0);
+    }, progressDelay);
+  }, [rest.progress, progressDelay]);
+
   return (
     <SButton
       ref={ref}
@@ -94,6 +113,9 @@ const Button: React.FunctionComponent<IButton & TButton> = ({
       <span>
         {children}
       </span>
+      {animateProgress && (
+        <SProgress view={rest.view} progress={progress} />
+      )}
     </SButton>
   );
 };
@@ -104,6 +126,9 @@ Button.defaultProps = {
   iconOnly: false,
   noRipple: false,
   noShadow: false,
+  progress: 0,
+  progressDelay: 1500,
+  animateProgress: false,
   debounceClickMs: 800,
   debounceRestoreMs: 750,
   onClick: () => {
@@ -114,9 +139,10 @@ export default Button;
 
 interface ISButton {
   size?: 'sm' | 'lg';
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent';
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress';
   iconOnly?: boolean;
   noShadow?: boolean;
+  progress?: number;
   hoverBgColor?: string;
   hoverContentColor?: string;
   elementWidth: number;
@@ -126,6 +152,22 @@ interface ISButton {
     y: string;
   };
 }
+
+interface ISProgress {
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress';
+  progress?: number;
+}
+
+const SProgress = styled.div<ISProgress>`
+  top: 0;
+  left: 0;
+  width: ${(props) => props.progress ?? 0}%;
+  height: 100%;
+  padding: 0;
+  position: absolute;
+  transition: width ease 1s;
+  background: ${(props) => props.theme.colorsThemed.button.progress[props.view ?? 'primary']};
+`;
 
 const SButton = styled.button<ISButton>`
   position: relative;
@@ -197,7 +239,6 @@ const SButton = styled.button<ISButton>`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
 
   &::before {
     position: absolute;

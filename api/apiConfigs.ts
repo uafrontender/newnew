@@ -69,7 +69,7 @@ ResponseType = keyof NewnewapiType>(
   url: string,
   method: Request['method'] = 'get',
   payload?: RequestType,
-  headers: Request['headers'] = new Headers(),
+  headers: any = {},
   mode: Request['mode'] = 'cors',
   credentials: Request['credentials'] = 'same-origin',
 ): Promise<APIResponse<ResponseType>> {

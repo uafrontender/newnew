@@ -5,7 +5,7 @@ type User = Omit<newnewapi.User, 'toJSON'>;
 
 const users: User[] = [
   {
-    id: 12345,
+    uuid: '12345',
     username: 'johndoe12345',
     displayName: 'John',
     avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
@@ -14,7 +14,7 @@ const users: User[] = [
     },
   },
   {
-    id: 1,
+    uuid: '1',
     username: 'unicornbabe',
     displayName: 'UnicornBabe',
     avatarUrl: 'https://randomuser.me/api/portraits/women/34.jpg',
@@ -24,7 +24,7 @@ const users: User[] = [
     },
   },
   {
-    id: 2,
+    uuid: '2',
     username: '0xa463sugardaddy8080',
     displayName: 'SugarDaddy',
     avatarUrl: 'https://randomuser.me/api/portraits/men/19.jpg',
