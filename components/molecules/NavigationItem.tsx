@@ -69,6 +69,11 @@ interface ISNavItem {
 const SNavItem = styled(Text)<ISNavItem>`
   color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
   position: relative;
+  transition: color ease 0.5s;
+
+  &:hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+  }
 `;
 
 const SIndicatorCountainer = styled.div`

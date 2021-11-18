@@ -20,6 +20,7 @@ interface IButton {
   iconOnly?: boolean,
   noRipple?: boolean,
   noShadow?: boolean,
+  noAnimateSize?: boolean,
   debounceClickMs?: number,
   debounceRestoreMs?: number,
 }
@@ -126,6 +127,7 @@ Button.defaultProps = {
   iconOnly: false,
   noRipple: false,
   noShadow: false,
+  noAnimateSize: false,
   progress: 0,
   progressDelay: 1500,
   animateProgress: false,
@@ -142,6 +144,7 @@ interface ISButton {
   view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress';
   iconOnly?: boolean;
   noShadow?: boolean;
+  noAnimateSize?: boolean,
   progress?: number;
   hoverBgColor?: string;
   hoverContentColor?: string;
@@ -315,4 +318,10 @@ const SButton = styled.button<ISButton>`
       animation-name: ${RippleAnimation};
     }
   ` : null)}
+  
+  ${(props) => (!props.noAnimateSize ? css`
+    &:active {
+      transform: scale(0.9);
+    }
+  ` : '')}
 `;

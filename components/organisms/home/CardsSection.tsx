@@ -167,13 +167,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     <SWrapper>
       <STopWrapper>
         {type === 'default' ? (
-          <Headline variant={4}>
+          <Headline animation="t01" variant={4}>
             {title}
           </Headline>
         ) : (
           <SCreatorHeadline>
             <UserAvatar user={user} withClick onClick={handleUserClick} />
-            <SHeadline variant={4}>
+            <SHeadline animation="t01" variant={4}>
               {user.username}
             </SHeadline>
             <SButton view="quaternary" onClick={handleUserClick}>
@@ -331,6 +331,11 @@ const STopWrapper = styled.div`
 
 const SCaption = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  transition: color ease 0.5s;
+  
+  &:hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+  }
 `;
 
 const SCreatorHeadline = styled.div`
