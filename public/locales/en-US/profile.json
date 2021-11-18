@@ -18,5 +18,28 @@
       "more": "More",
       "sendMessage": "Send message"
     }
+  },
+  "EditProfileMenu": {
+    "goBackBtn": "Edit profile",
+    "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
+    "saveButton": "Save changes",
+    "cancelButton": "Cancel",
+    "inputs": {
+      "displayName": {
+        "placeholder": "Nickname"
+      },
+      "username": {
+        "placeholder": "@username",
+        "frequencyCaption": "Username can be changed once a month.",
+        "points": {
+          "1": "8-15 characters length",
+          "2": "Lower case only",
+          "3": "No space and special characters"
+        }
+      },
+      "bio": {
+        "placeholder": "Bio"
+      }
+    }
   }
 }
