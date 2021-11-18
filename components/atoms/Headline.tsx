@@ -1,8 +1,10 @@
 import React from 'react';
-import styled from 'styled-components';
+import { useInView } from 'react-intersection-observer';
+import styled, { css } from 'styled-components';
 
 interface IHeadline {
   variant?: 1 | 2 | 3 | 4 | 5 | 6;
+  animation?: 't01' | undefined;
   children: React.ReactNode;
 }
 
@@ -12,6 +14,7 @@ const Headline: React.FC<IHeadline> = (props) => {
     children,
     ...rest
   } = props;
+  const { ref, inView } = useInView();
 
   const components = {
     1: SH1,
@@ -23,16 +26,22 @@ const Headline: React.FC<IHeadline> = (props) => {
   };
   const Component = components[variant ?? 1];
 
-  return <Component {...rest}>{children}</Component>;
+  return <Component {...rest} inView={inView} ref={ref}>{children}</Component>;
 };
 
 Headline.defaultProps = {
   variant: 1,
+  animation: undefined,
 };
 
 export default Headline;
 
-const SH1 = styled.h1`
+interface ISH {
+  inView: boolean;
+  animation?: 't01' | undefined;
+}
+
+const SH1 = styled.h1<ISH>`
   font-weight: bold;
 
   font-size: 32px;
@@ -47,9 +56,23 @@ const SH1 = styled.h1`
     font-size: 56px;
     line-height: 64px;
   }
+
+  ${(props) => {
+    if (props.animation === 't01') {
+      return css`
+        opacity: 0;
+        transition: opacity ease 1s;
+
+        ${props.inView ? css`
+          opacity: 1;
+        ` : ''}
+      `;
+    }
+    return '';
+  }}
 `;
 
-const SH2 = styled.h2`
+const SH2 = styled.h2<ISH>`
   font-weight: bold;
 
   font-size: 28px;
@@ -64,9 +87,23 @@ const SH2 = styled.h2`
     font-size: 48px;
     line-height: 56px;
   }
+
+  ${(props) => {
+    if (props.animation === 't01') {
+      return css`
+        opacity: 0;
+        transition: opacity ease 1s;
+
+        ${props.inView ? css`
+          opacity: 1;
+        ` : ''}
+      `;
+    }
+    return '';
+  }}
 `;
 
-const SH3 = styled.h3`
+const SH3 = styled.h3<ISH>`
   font-weight: bold;
 
   font-size: 24px;
@@ -81,9 +118,23 @@ const SH3 = styled.h3`
     font-size: 40px;
     line-height: 48px;
   }
+
+  ${(props) => {
+    if (props.animation === 't01') {
+      return css`
+        opacity: 0;
+        transition: opacity ease 1s;
+
+        ${props.inView ? css`
+          opacity: 1;
+        ` : ''}
+      `;
+    }
+    return '';
+  }}
 `;
 
-const SH4 = styled.h4`
+const SH4 = styled.h4<ISH>`
   font-weight: bold;
 
   font-size: 22px;
@@ -98,9 +149,23 @@ const SH4 = styled.h4`
     font-size: 32px;
     line-height: 40px;
   }
+
+  ${(props) => {
+    if (props.animation === 't01') {
+      return css`
+        opacity: 0;
+        transition: opacity ease 1s;
+
+        ${props.inView ? css`
+          opacity: 1;
+        ` : ''}
+      `;
+    }
+    return '';
+  }}
 `;
 
-const SH5 = styled.h5`
+const SH5 = styled.h5<ISH>`
   font-weight: bold;
 
   font-size: 20px;
@@ -115,9 +180,23 @@ const SH5 = styled.h5`
     font-size: 24px;
     line-height: 32px;
   }
+
+  ${(props) => {
+    if (props.animation === 't01') {
+      return css`
+        opacity: 0;
+        transition: opacity ease 1s;
+
+        ${props.inView ? css`
+          opacity: 1;
+        ` : ''}
+      `;
+    }
+    return '';
+  }}
 `;
 
-const SH6 = styled.h6`
+const SH6 = styled.h6<ISH>`
   font-weight: bold;
 
   font-size: 18px;
@@ -132,4 +211,18 @@ const SH6 = styled.h6`
     font-size: 20px;
     line-height: 28px;
   }
+
+  ${(props) => {
+    if (props.animation === 't01') {
+      return css`
+        opacity: 0;
+        transition: opacity ease 1s;
+
+        ${props.inView ? css`
+          opacity: 1;
+        ` : ''}
+      `;
+    }
+    return '';
+  }}
 `;

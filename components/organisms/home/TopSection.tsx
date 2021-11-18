@@ -143,7 +143,7 @@ export const TopSection: React.FC<ITopSection> = (props) => {
 
   return (
     <SWrapper name="topSection">
-      <Headline variant={4}>
+      <Headline animation="t01" variant={4}>
         {t('top-block-title', { country })}
       </Headline>
       <SListContainer ref={ref}>

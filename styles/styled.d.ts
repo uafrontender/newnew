@@ -123,6 +123,7 @@ declare module 'styled-components' {
       blueHorizontal: string,
       heroNotifications: string,
       heroNotificationsTablet: string,
+      bannerPink: string,
     },
     borderRadius: {
       small: string,
