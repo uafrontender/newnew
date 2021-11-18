@@ -2,14 +2,14 @@ import React from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 
-interface IProfileImage {
+interface IProfileImageInput {
   src: string;
 }
 
-const ProfileImage: React.FunctionComponent<IProfileImage> = ({
+const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
   src,
 }) => (
-  <SProfileImage>
+  <SProfileImageInput>
     <Image
       src={src}
       alt="User avatar"
@@ -17,12 +17,12 @@ const ProfileImage: React.FunctionComponent<IProfileImage> = ({
       height="100%"
       objectFit="cover"
     />
-  </SProfileImage>
+  </SProfileImageInput>
 );
 
-export default ProfileImage;
+export default ProfileImageInput;
 
-const SProfileImage = styled.div`
+const SProfileImageInput = styled.div`
   position: absolute;
   left: calc(50% - 48px);
   top: 112px;
