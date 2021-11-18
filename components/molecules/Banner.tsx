@@ -27,7 +27,7 @@ export const Banner: React.FC<IBanner> = () => {
 
   return (
     <SContainer active={banner?.show}>
-      <SText variant={3}>
+      <SText variant={3} weight={600}>
         {banner?.title}
       </SText>
       <SCloseIconHolder>
@@ -55,10 +55,18 @@ const SContainer = styled.div<ISContainer>`
   display: flex;
   overflow: hidden;
   position: relative;
+  animation: gradient 5s ease infinite;
   transition: all ease 0.5s;
-  background: ${(props) => props.theme.colorsThemed.accent.pink};
+  background: ${(props) => props.theme.gradients.bannerPink};
   align-items: center;
+  background-size: 300% 300%;
   justify-content: center;
+
+  @keyframes gradient {
+    0% {
+      background-position: 100% 0%;
+    }
+  }
 `;
 
 const SText = styled(Text)`

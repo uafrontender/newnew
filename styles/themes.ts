@@ -90,7 +90,7 @@ export const lightTheme: DefaultTheme = {
       },
       ripple: {
         primary: '#2955EC',
-        secondary: '#DFE3F1',
+        secondary: '#CAD0E8',
         tertiary: '#DFE3F1',
         transparent: 'rgba(20, 21, 31, 0.4)',
         quaternary: '#0B0A13',
@@ -115,7 +115,7 @@ export const lightTheme: DefaultTheme = {
     },
   },
   shadows: {
-    mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
+    mediumBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.25)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
   },
@@ -126,6 +126,7 @@ export const lightTheme: DefaultTheme = {
     blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     heroNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
     heroNotificationsTablet: 'linear-gradient(360deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
+    bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
   },
 };
 
@@ -191,7 +192,7 @@ export const darkTheme: DefaultTheme = {
         primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         secondary: '#14151F',
         tertiary: '#0B0A13',
-        transparent: 'rgba(20, 21, 31, 0.65)',
+        transparent: 'rgba(20, 21, 31, 0.2)',
         quaternary: '#FFFFFF',
         primaryProgress: '#14151F',
       },
@@ -233,5 +234,6 @@ export const darkTheme: DefaultTheme = {
     blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
     heroNotifications: 'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
     heroNotificationsTablet: 'linear-gradient(360deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
+    bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
   },
 };
