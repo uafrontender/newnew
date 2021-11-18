@@ -22,7 +22,7 @@ import VerficationCodeInput from '../atoms/VerificationCodeInput';
 
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
-import isBroswer from '../../utils/isBrowser';
+import isBrowser from '../../utils/isBrowser';
 import sleep from '../../utils/sleep';
 import Text from '../atoms/Text';
 import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
@@ -145,7 +145,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   ]);
 
   useEffect(() => {
-    if (isBroswer()) {
+    if (isBrowser()) {
       if (timerActive) {
         interval.current = window.setInterval(() => {
           setTimerSeconds((seconds) => seconds - 1);

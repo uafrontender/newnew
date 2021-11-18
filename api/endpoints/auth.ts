@@ -4,7 +4,7 @@ import {
   fetchProtobuf,
 } from '../apiConfigs';
 
-const BASE_URL_AUTH = `${BASE_URL}/auth`;
+export const BASE_URL_AUTH = `${BASE_URL}/auth`;
 
 // Email sign up
 /*
@@ -67,6 +67,26 @@ export const signInWithGoogle = (
   newnewapi.GoogleSignInRequest,
   newnewapi.SignInResponse,
   `${BASE_URL_AUTH}/sign_in_with_google`,
+  'post',
+  payload,
+);
+
+export const signInWithFacebook = (
+  payload: newnewapi.FacebookSignInRequest,
+) => fetchProtobuf<newnewapi.FacebookSignInRequest, newnewapi.SignInResponse>(
+  newnewapi.FacebookSignInRequest,
+  newnewapi.SignInResponse,
+  `${BASE_URL_AUTH}/sign_in_with_facebook`,
+  'post',
+  payload,
+);
+
+export const signInWithTwitter = (
+  payload: newnewapi.TwitterSignInRequest,
+) => fetchProtobuf<newnewapi.TwitterSignInRequest, newnewapi.SignInResponse>(
+  newnewapi.TwitterSignInRequest,
+  newnewapi.SignInResponse,
+  `${BASE_URL_AUTH}/sign_in_with_facebook`,
   'post',
   payload,
 );

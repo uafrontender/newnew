@@ -136,6 +136,7 @@ export const Tablet: React.FC<ITablet> = () => {
                   <Button
                     iconOnly
                     size="lg"
+                    view="secondary"
                     onClick={handleMenuClick}
                     noShadow={globalSearchActive}
                   >

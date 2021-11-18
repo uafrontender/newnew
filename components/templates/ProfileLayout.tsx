@@ -50,11 +50,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
-    if (curentUser.loggedIn && curentUser.userData?.id?.toString() === user.id.toString()) {
+    if (curentUser.loggedIn
+      && curentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
       // console.log('redirecting');
       router.push('/profile');
     }
-  }, [curentUser.loggedIn, curentUser.userData?.id, router, user.id]);
+  }, [curentUser.loggedIn, curentUser.userData?.userUuid, router, user.uuid]);
 
   return (
     <SGeneral>
@@ -184,7 +185,7 @@ const SGeneral = styled(General)`
   position: relative;
 
   header {
-    z-index: 2;
+    z-index: 5;
   }
 
   @media (max-width: 768px) {

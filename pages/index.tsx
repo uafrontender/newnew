@@ -49,7 +49,7 @@ const Home: NextPage = () => {
         displayName: 'John',
         email: 'johndoe@test.com',
         avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
-        id: 12345,
+        userUuid: '12345',
         options: {
           isCreator: false,
         },

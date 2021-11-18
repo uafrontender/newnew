@@ -17,7 +17,7 @@ import GlobalTheme from '../styles/ThemeProvider';
 import { setResizeMode } from '../redux-store/slices/uiStateSlice';
 import { EnhancedStoreWithPersistor, wrapper } from '../redux-store/store';
 
-import isBroswer from '../utils/isBrowser';
+import isBrowser from '../utils/isBrowser';
 
 // Socket context
 // import SocketContextProvider from '../contexts/socketContext';
@@ -38,7 +38,7 @@ const MyApp = (props: IMyApp): ReactElement => {
     pageProps,
     uaString,
   } = props;
-  const ua: UserAgent = parse(uaString || (isBroswer() ? window?.navigator?.userAgent : ''));
+  const ua: UserAgent = parse(uaString || (isBrowser() ? window?.navigator?.userAgent : ''));
   const getInitialResizeMode = () => {
     let resizeMode = 'mobile';
 
