@@ -14,7 +14,10 @@ module.exports = {
     return config;
   },
   images: {
-    domains: ['randomuser.me'],
+    domains: [
+      'randomuser.me',
+      'i.pravatar.cc',
+    ],
   },
   async headers() {
     return [
