@@ -161,21 +161,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         <SSubheading variant={2} weight={600}>
           {t('heading.subheading')}
         </SSubheading>
-        <motion.div
+        <MSContentWrapper
           variants={container}
           initial="hidden"
           animate="show"
-          style={{
-            width: '100%',
-            display: 'flex',
-          }}
         >
           <motion.div
             variants={item}
-            style={{
-              width: '100%',
-              display: 'flex',
-            }}
           >
             <SignInButton
               noRipple
@@ -189,7 +181,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
           <motion.div
             variants={item}
-            style={{ width: '100%' }}
           >
             <SignInButton
               noRipple
@@ -204,7 +195,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
           <motion.div
             variants={item}
-            style={{ width: '100%' }}
           >
             <SignInButton
               noRipple
@@ -219,7 +209,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
           <motion.div
             variants={item}
-            style={{ width: '100%' }}
           >
             <SignInButton
               noRipple
@@ -232,14 +221,16 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
               {t('signupOptions.twitter')}
             </SignInButton>
           </motion.div>
-          <TextWithLine
-            lineColor={theme.colorsThemed.text.secondary}
-            innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
-            variants={item}
-          />
           <motion.div
             variants={item}
-            style={{ width: '100%' }}
+          >
+            <TextWithLine
+              lineColor={theme.colorsThemed.text.secondary}
+              innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
+            />
+          </motion.div>
+          <motion.div
+            variants={item}
           >
             <SignInTextInput
               name="email"
@@ -270,7 +261,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           }
           <motion.div
             variants={item}
-            style={{ width: '100%' }}
           >
             <Button
               noRipple
@@ -282,7 +272,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
               </span>
             </Button>
           </motion.div>
-        </motion.div>
+        </MSContentWrapper>
         <SLegalText>
           {t('legalDisclaimer.main_text')}
           <br />
@@ -368,10 +358,18 @@ const SMenuWrapper = styled.div`
   -ms-user-select: none;
   user-select: none;
 
-  & div {
+  & > div {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    button {
+      width: 100%;
+    }
+    input {
+      width: 100%;
+    }
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -380,6 +378,24 @@ const SMenuWrapper = styled.div`
     & > div {
       gap: 16px;
     }
+  }
+`;
+
+const MSContentWrapper = styled(motion.div)`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  button {
+    width: 100%;
+  }
+  input {
+    width: 100%;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    gap: 16px;
   }
 `;
 
