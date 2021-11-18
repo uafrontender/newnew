@@ -167,6 +167,9 @@ const SSignInButton = styled.button<SISignInButton>`
   position: relative;
   overflow: hidden;
 
+  /* Fix Safari bug */
+  z-index: 0;
+
   display: flex;
   justify-content: flex-start;
   align-items: center;
