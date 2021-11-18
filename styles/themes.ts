@@ -78,6 +78,7 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#2C2C33',
         transparent: '#FFFFFF',
         quaternary: '#FFFFFF',
+        primaryProgress: '#FFFFFF',
       },
       background: {
         primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
@@ -85,6 +86,7 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#FFFFFF',
         transparent: 'rgba(11, 10, 19, 0.2)',
         quaternary: '#0B0A13',
+        primaryProgress: '#C1C9D7',
       },
       ripple: {
         primary: '#2955EC',
@@ -92,6 +94,7 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#DFE3F1',
         transparent: 'rgba(20, 21, 31, 0.4)',
         quaternary: '#0B0A13',
+        primaryProgress: '#2955EC',
       },
       hover: {
         primary: '#2955EC',
@@ -99,6 +102,15 @@ export const lightTheme: DefaultTheme = {
         tertiary: '#DFE3F1',
         transparent: 'rgba(20, 21, 31, 0.5)',
         quaternary: '#0B0A13',
+        primaryProgress: '#2955EC',
+      },
+      progress: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+        tertiary: '#FFFFFF',
+        transparent: '#FFFFFF',
+        quaternary: '#FFFFFF',
+        primaryProgress: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
       },
     },
   },
@@ -173,6 +185,7 @@ export const darkTheme: DefaultTheme = {
         tertiary: '#FFFFFF',
         transparent: '#FFFFFF',
         quaternary: '#2C2C33',
+        primaryProgress: '#FFFFFF',
       },
       background: {
         primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
@@ -180,6 +193,7 @@ export const darkTheme: DefaultTheme = {
         tertiary: '#0B0A13',
         transparent: 'rgba(20, 21, 31, 0.65)',
         quaternary: '#FFFFFF',
+        primaryProgress: '#14151F',
       },
       ripple: {
         primary: '#2955EC',
@@ -187,6 +201,7 @@ export const darkTheme: DefaultTheme = {
         tertiary: '#21222C',
         transparent: '#21222C',
         quaternary: '#FFFFFF',
+        primaryProgress: '#2955EC',
       },
       hover: {
         primary: '#21222C',
@@ -194,6 +209,15 @@ export const darkTheme: DefaultTheme = {
         tertiary: '#21222C',
         transparent: '#21222C',
         quaternary: '#FFFFFF',
+        primaryProgress: '#21222C',
+      },
+      progress: {
+        primary: '#FFFFFF',
+        secondary: '#FFFFFF',
+        tertiary: '#FFFFFF',
+        transparent: '#FFFFFF',
+        quaternary: '#FFFFFF',
+        primaryProgress: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
       },
     },
   },

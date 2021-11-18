@@ -75,6 +75,7 @@ declare module 'styled-components' {
           tertiary: string,
           quaternary: string,
           transparent: string,
+          primaryProgress: string,
         },
         background: {
           primary: string,
@@ -82,6 +83,7 @@ declare module 'styled-components' {
           tertiary: string,
           quaternary: string,
           transparent: string,
+          primaryProgress: string,
         },
         ripple: {
           primary: string,
@@ -89,6 +91,7 @@ declare module 'styled-components' {
           tertiary: string,
           quaternary: string,
           transparent: string,
+          primaryProgress: string,
         },
         hover: {
           primary: string,
@@ -96,7 +99,16 @@ declare module 'styled-components' {
           tertiary: string,
           quaternary: string,
           transparent: string,
+          primaryProgress: string,
         },
+        progress: {
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          primaryProgress: string,
+        }
       },
     },
     shadows: {

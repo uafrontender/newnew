@@ -24,8 +24,13 @@ export type TResizeMode =
   | 'laptop'
   | 'laptopL'
   | 'desktop';
+export type TBanner = {
+  show: boolean;
+  title: string;
+};
 
 export interface UIStateInterface {
+  banner: TBanner;
   overlay: TOverlay;
   colorMode: TColorMode;
   resizeMode: TResizeMode;
@@ -33,6 +38,10 @@ export interface UIStateInterface {
 }
 
 export const defaultUIState: UIStateInterface = {
+  banner: {
+    show: true,
+    title: 'Find out who will be new Iron Man',
+  },
   overlay: false,
   colorMode: 'light',
   resizeMode: 'mobile',
@@ -55,10 +64,14 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     setOverlay(state, { payload }: PayloadAction<TOverlay>) {
       state.overlay = payload;
     },
+    setBanner(state, { payload }: PayloadAction<TBanner>) {
+      state.banner = payload;
+    },
   },
 });
 
 export const {
+  setBanner,
   setOverlay,
   setColorMode,
   setResizeMode,
