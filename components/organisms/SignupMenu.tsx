@@ -169,8 +169,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             hoverBgColor="#000"
             hoverContentColor="#FFF"
             pressedBgColor={theme.colorsThemed.social.apple.pressed}
-            onClick={() => {}}
-            // onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
+            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
           >
             {t('signupOptions.apple')}
           </SignInButton>

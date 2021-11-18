@@ -54,8 +54,58 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           });
 
           res = await signInWithGoogle(requestPayload);
+        } else if (provider === 'apple') {
+          const { identityToken, userId } = router.query;
+
+          console.log(router.query);
+
+          if (!identityToken || Array.isArray(identityToken)) throw new Error('No code');
+          if (!userId || Array.isArray(userId)) throw new Error('No code');
+
+          const requestPayload = new newnewapi.AppleSignInRequest({
+            identityToken,
+            userId,
+          });
+
+          res = await signInWithApple(requestPayload);
+
+          console.log(res);
+          return;
+        } else if (provider === 'facebook') {
+          const { accessToken } = router.query;
+
+          console.log(router.query);
+
+          if (!accessToken || Array.isArray(accessToken)) throw new Error('No code');
+
+          const requestPayload = new newnewapi.FacebookSignInRequest({
+            accessToken,
+          });
+
+          res = await signInWithFacebook(requestPayload);
+
+          console.log(res);
+          return;
+        } else if (provider === 'twitter') {
+          const { oauthToken, oauthTokenSecret } = router.query;
+
+          console.log(router.query);
+
+          if (!oauthToken || Array.isArray(oauthToken)) throw new Error('No code');
+          if (!oauthTokenSecret || Array.isArray(oauthTokenSecret)) throw new Error('No code');
+
+          const requestPayload = new newnewapi.TwitterSignInRequest({
+            oauthToken,
+            oauthTokenSecret,
+          });
+
+          res = await signInWithTwitter(requestPayload);
+
+          console.log(res);
+          return;
         } else {
           console.log(`${provider} to be done.`);
+          setIsLoading(false);
           return;
         }
 
