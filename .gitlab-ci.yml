@@ -76,9 +76,19 @@ build:
     - if: '$CI_COMMIT_BRANCH == "development"'
       when: manual
       allow_failure: true
+      variables:
+        NEXT_PUBLIC_BASE_URL: "https://api-dev.newnew.co/v1"
+        NEXT_PUBLIC_SOCKET_URL: "https://api-dev.newnew.co"
     - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+      variables:
+        NEXT_PUBLIC_BASE_URL: "https://api.newnew.co/v1"
+        NEXT_PUBLIC_SOCKET_URL: "https://api.newnew.co"
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
+      variables:
+        NEXT_PUBLIC_BASE_URL: "https://api-staging.newnew.co/v1"
+        NEXT_PUBLIC_SOCKET_URL: "https://api-staging.newnew.co"
   needs: []
   stage: build
   image: saltycrane/aws-cli-and-docker

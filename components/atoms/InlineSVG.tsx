@@ -8,28 +8,19 @@ interface IInlineSvg {
   width?: string,
   height?: string,
   onClick?: () => any,
+  hoverFill?: string,
   clickable?: boolean,
 }
 
 export const InlineSvg: React.FC<IInlineSvg> = (props) => {
   const {
-    id,
     svg,
-    fill,
-    width,
-    height,
-    onClick,
-    clickable,
+    ...rest
   } = props;
 
   return (
     <SSvgHolder
-      id={id}
-      fill={fill}
-      width={width}
-      height={height}
-      onClick={onClick}
-      clickable={clickable}
+      {...rest}
       dangerouslySetInnerHTML={{ __html: svg }}
       {...props}
     />
@@ -44,21 +35,12 @@ InlineSvg.defaultProps = {
   onClick: () => {
   },
   clickable: false,
+  hoverFill: 'white',
 };
 
 export default InlineSvg;
 
-interface ISSvgHolder {
-  fill?: string,
-  width?: string,
-  height?: string,
-  clickable?: boolean,
-  dangerouslySetInnerHTML: {
-    __html: string
-  }
-}
-
-const SSvgHolder = styled.div<ISSvgHolder>`
+const SSvgHolder = styled.div<IInlineSvg>`
   width: ${(props) => props.width};
   height: ${(props) => props.height};
   display: flex;
@@ -67,8 +49,13 @@ const SSvgHolder = styled.div<ISSvgHolder>`
 
   ${(props) => !!props.clickable && 'cursor: pointer;'}
   svg {
+    fill: ${(props) => props.fill};
     width: 100%;
     height: auto;
-    ${(props) => !!props.fill && `fill: ${props.fill};`}
+    transition: fill ease 0.5s;
+
+    &:hover {
+      fill: ${(props) => props.hoverFill};
+    }
   }
 `;

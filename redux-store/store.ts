@@ -21,7 +21,7 @@ import { createWrapper } from 'next-redux-wrapper';
 import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
 
-import isBroswer from '../utils/isBrowser';
+import isBrowser from '../utils/isBrowser';
 
 // Persisted reducer configs
 // Root
@@ -59,7 +59,7 @@ export type EnhancedStoreWithPersistor = EnhancedStore & {
 }
 
 const makeStore = () => {
-  if (!isBroswer()) {
+  if (!isBrowser()) {
     // If not client, create store
     return configureStore({
       reducer: combinedReducer,
