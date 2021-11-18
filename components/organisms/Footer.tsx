@@ -138,6 +138,7 @@ export const Footer: React.FC<IFooter> = () => {
                           fill={theme.colorsThemed.text.secondary}
                           width="20px"
                           height="20px"
+                          hoverFill={theme.colorsThemed.text.primary}
                         />
                       </SSvgHolder>
                     </Link>
@@ -148,6 +149,7 @@ export const Footer: React.FC<IFooter> = () => {
                           fill={theme.colorsThemed.text.secondary}
                           width="20px"
                           height="20px"
+                          hoverFill={theme.colorsThemed.text.primary}
                         />
                       </SSvgHolder>
                     </Link>
@@ -158,6 +160,7 @@ export const Footer: React.FC<IFooter> = () => {
                           fill={theme.colorsThemed.text.secondary}
                           width="20px"
                           height="20px"
+                          hoverFill={theme.colorsThemed.text.primary}
                         />
                       </SSvgHolder>
                     </Link>
@@ -167,9 +170,9 @@ export const Footer: React.FC<IFooter> = () => {
               <SSeparator />
               <SBlockBottomRow>
                 <SLeftBlock>
-                  <SBottomBlockOption>
+                  <SBottomBlockOptionInc>
                     {t('footer-inc')}
-                  </SBottomBlockOption>
+                  </SBottomBlockOptionInc>
                   <Link href="/terms" passHref>
                     <SBottomBlockOption>
                       {t('footer-terms')}
@@ -257,9 +260,14 @@ const SBlockTitle = styled.div`
 const SBlockOption = styled.a`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   font-size: 14px;
+  transition: color ease 0.5s;
   font-weight: bold;
   line-height: 24px;
   margin-bottom: 12px;
+
+  &:hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+  }
 `;
 
 const SBlockRow = styled.div`
@@ -280,6 +288,19 @@ const SBlockBottomRow = styled.div`
 
 const SBottomBlockOption = styled.a`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-size: 14px;
+  transition: color ease 0.5s;
+  font-weight: bold;
+  line-height: 24px;
+  margin-right: 24px;
+
+  &:hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+  }
+`;
+
+const SBottomBlockOptionInc = styled.span`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
   font-size: 14px;
   font-weight: bold;
   line-height: 24px;
