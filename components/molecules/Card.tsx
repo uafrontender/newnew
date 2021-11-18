@@ -162,7 +162,7 @@ export const Card: React.FC<ICard> = (props) => {
       onMouseLeave={onMouseLeave}
       onMouseDownCapture={onMouseDownCapture}
     >
-      <SImageBG>
+      <SImageBG id="backgroundPart">
         <SImageHolderOutside id="animatedPart">
           <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <STopContent>
@@ -368,6 +368,14 @@ const SWrapperOutside = styled.div<ISWrapper>`
       #animatedPart {
         transform: translate(10px, -10px);
       }
+
+      #backgroundPart:before {
+        transform: rotate(-45deg) scale(1);
+      }
+
+      #backgroundPart:after {
+        transform: rotate(45deg) scale(1);
+      }
     }
   }
 
@@ -390,6 +398,32 @@ const SImageBG = styled.div`
   ${(props) => props.theme.media.laptop} {
     height: 336px;
   }
+
+  &:before,
+  &:after {
+    width: 10px;
+    height: 10px;
+    content: '';
+    display: block;
+    position: absolute;
+    transition: all .4s ease;
+    background-color: ${(props) => props.theme.colorsThemed.accent.blue};
+  }
+
+  &:before {
+    top: 3px;
+    left: 6px;
+    transform: rotate(-45deg) scale(0);
+    transform-origin: top left;
+  }
+
+  &:after {
+    right: 3px;
+    bottom: 6px;
+    z-index: 0;
+    transform: rotate(45deg) scale(0);
+    transform-origin: bottom right;
+  }
 `;
 
 const SImageHolderOutside = styled.div`
@@ -397,6 +431,7 @@ const SImageHolderOutside = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
   padding: 16px;
   position: absolute;
   transition: all ease 0.5s;

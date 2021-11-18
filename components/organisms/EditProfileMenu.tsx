@@ -25,7 +25,9 @@ interface IEditProfileMenu {
   handleClosePreventDiscarding: () => void;
 }
 
-type ModalMenuUserData = Omit<newnewapi.Me, 'toJSON' | 'email' | 'options' | 'id'>
+type ModalMenuUserData = Omit<
+  newnewapi.Me, 'toJSON' | 'email' | 'options' | 'id' | '_displayname' | '_email' | 'options'
+  >
   // Temp
   & {
     bio: string;
@@ -91,7 +93,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       && dataInEdit.username.length <= 15
       && validator.isAlphanumeric(dataInEdit.username)
       && validator.isLowercase(dataInEdit.username);
-    const isDisplaynameValid = dataInEdit.displayName.length > 0;
+    const isDisplaynameValid = dataInEdit && dataInEdit!!.displayName!!.length > 0;
 
     if (!isDisplaynameValid || !isUsernameValid) {
       setFormErrors((errors) => {
@@ -137,7 +139,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       <SInputsWrapper>
         <DisplaynameInput
           type="text"
-          value={dataInEdit.displayName}
+          value={dataInEdit.displayName as string}
           placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
           isValid={!formErrors.displaynameError}
           onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
