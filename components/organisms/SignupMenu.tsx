@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled, { useTheme } from 'styled-components';
+import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import isEmail from 'validator/lib/isEmail';
 
@@ -43,6 +44,7 @@ import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
 import isBrowser from '../../utils/isBrowser';
+import { T1 } from '../atoms/AnimationsText';
 
 export interface ISignupMenu {
   reason?: SignupReason
@@ -52,6 +54,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('sign-up');
+
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -143,9 +148,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
     >
       <SMenuWrapper>
         <SSignInBackButton
+          defer={isMobile ? 250 : undefined}
           onClick={() => router.back()}
         >
-          {t('goBackBtn')}
+          <span>{t('goBackBtn')}</span>
         </SSignInBackButton>
         <SHeadline
           variant={3}
@@ -155,60 +161,91 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         <SSubheading variant={2} weight={600}>
           {t('heading.subheading')}
         </SSubheading>
-        <div>
-          <SignInButton
-            svg={GoogleIcon}
-            hoverBgColor={theme.colorsThemed.social.google.hover}
-            pressedBgColor={theme.colorsThemed.social.google.pressed}
-            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
+        <MSContentWrapper
+          variants={container}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div
+            variants={item}
           >
-            {t('signupOptions.google')}
-          </SignInButton>
-          <SignInButton
-            svg={AppleIcon}
-            hoverBgColor="#000"
-            hoverContentColor="#FFF"
-            pressedBgColor={theme.colorsThemed.social.apple.pressed}
-            onClick={() => {}}
-            // onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
+            <SignInButton
+              noRipple
+              svg={GoogleIcon}
+              hoverBgColor={theme.colorsThemed.social.google.hover}
+              pressedBgColor={theme.colorsThemed.social.google.pressed}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
+            >
+              {t('signupOptions.google')}
+            </SignInButton>
+          </motion.div>
+          <motion.div
+            variants={item}
           >
-            {t('signupOptions.apple')}
-          </SignInButton>
-          <SignInButton
-            svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
-            hoverSvg={FacebookIconLight}
-            hoverBgColor={theme.colorsThemed.social.facebook.hover}
-            pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
+            <SignInButton
+              noRipple
+              svg={AppleIcon}
+              hoverBgColor="#000"
+              hoverContentColor="#FFF"
+              pressedBgColor={theme.colorsThemed.social.apple.pressed}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
+            >
+              {t('signupOptions.apple')}
+            </SignInButton>
+          </motion.div>
+          <motion.div
+            variants={item}
           >
-            {t('signupOptions.facebook')}
-          </SignInButton>
-          <SignInButton
-            svg={TwitterIcon}
-            hoverBgColor={theme.colorsThemed.social.twitter.hover}
-            pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-            onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
+            <SignInButton
+              noRipple
+              svg={theme.name === 'dark' ? FacebookIcon : FacebookIconLight}
+              hoverSvg={FacebookIconLight}
+              hoverBgColor={theme.colorsThemed.social.facebook.hover}
+              pressedBgColor={theme.colorsThemed.social.facebook.pressed}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
+            >
+              {t('signupOptions.facebook')}
+            </SignInButton>
+          </motion.div>
+          <motion.div
+            variants={item}
           >
-            {t('signupOptions.twitter')}
-          </SignInButton>
-          <TextWithLine
-            lineColor={theme.colorsThemed.text.secondary}
-            innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
-          />
-          <SignInTextInput
-            name="email"
-            type="email"
-            autoComplete="true"
-            value={emailInput}
-            isValid={emailInputValid}
-            disabled={isSubmitLoading}
-            onFocus={() => {
-              if (submitError) setSubmitError('');
-            }}
-            onChange={(e) => setEmailInput(e.target.value)}
-            placeholder={t('signupOptions.email')}
-            errorCaption={t('errors.email_invalid')}
-          />
+            <SignInButton
+              noRipple
+              svg={TwitterIcon}
+              hoverBgColor={theme.colorsThemed.social.twitter.hover}
+              pressedBgColor={theme.colorsThemed.social.twitter.pressed}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
+            >
+              {t('signupOptions.twitter')}
+            </SignInButton>
+          </motion.div>
+          <motion.div
+            variants={item}
+          >
+            <TextWithLine
+              lineColor={theme.colorsThemed.text.secondary}
+              innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
+            />
+          </motion.div>
+          <motion.div
+            variants={item}
+          >
+            <SignInTextInput
+              name="email"
+              type="email"
+              autoComplete="true"
+              value={emailInput}
+              isValid={emailInputValid}
+              disabled={isSubmitLoading}
+              onFocus={() => {
+                if (submitError) setSubmitError('');
+              }}
+              onChange={(e) => setEmailInput(e.target.value)}
+              placeholder={t('signupOptions.email')}
+              errorCaption={t('errors.email_invalid')}
+            />
+          </motion.div>
           {
             submitError ? (
               <SErrorDiv>
@@ -221,15 +258,20 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
               </SErrorDiv>
             ) : null
           }
-          <Button
-            disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
-            onClick={() => handleSubmitEmail()}
+          <motion.div
+            variants={item}
           >
-            <span>
-              {t('signupOptions.signInBtn')}
-            </span>
-          </Button>
-        </div>
+            <Button
+              noRipple
+              disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
+              onClick={() => handleSubmitEmail()}
+            >
+              <span>
+                {t('signupOptions.signInBtn')}
+              </span>
+            </Button>
+          </motion.div>
+        </MSContentWrapper>
         <SLegalText>
           {t('legalDisclaimer.main_text')}
           <br />
@@ -253,6 +295,31 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 };
 
 export default SignupMenu;
+
+// Staggering animation
+const container: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.35,
+    },
+  },
+};
+
+const item: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 25,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+    },
+  },
+};
 
 const SSignupMenu = styled.div<{ isLoading?: boolean }>`
   position: absolute;
@@ -291,9 +358,17 @@ const SMenuWrapper = styled.div`
   user-select: none;
 
   & > div {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    button {
+      width: 100%;
+    }
+    input {
+      width: 100%;
+    }
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -302,6 +377,24 @@ const SMenuWrapper = styled.div`
     & > div {
       gap: 16px;
     }
+  }
+`;
+
+const MSContentWrapper = styled(motion.div)`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  button {
+    width: 100%;
+  }
+  input {
+    width: 100%;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    gap: 16px;
   }
 `;
 
@@ -317,6 +410,18 @@ const SSignInBackButton = styled(GoBackButton)`
 
   background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
+  span {
+    display: none;
+  }
+
+  &:active {
+    & div > svg {
+      transform: scale(0.8);
+
+      transition: .2s ease-in-out;
+    }
+  }
+
   ${({ theme }) => theme.media.tablet} {
     position: static;
 
@@ -324,6 +429,18 @@ const SSignInBackButton = styled(GoBackButton)`
 
     margin-top: 142px;
     padding: 0;
+
+    span {
+      display: initial;
+    }
+
+    &:active {
+      & div > svg {
+        transform: initial;
+
+        transition: initial;
+      }
+    }
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -426,6 +543,12 @@ const SLegalText = styled(Text)`
 
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  opacity: 0;
+  animation: ${T1};
+  animation-duration: .2s;
+  animation-delay: 3s;
+  animation-fill-mode: forwards;
 
   a {
     font-weight: 600;

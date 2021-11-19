@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
+import { debounce } from 'lodash';
 
 // Components
 import InlineSvg from '../atoms/InlineSVG';
@@ -9,29 +10,37 @@ import BackButtonIcon from '../../public/images/svg/auth/icon-back.svg';
 
 interface IGoBackButton {
   children?: React.ReactNode;
+  defer?: number;
   onClick: () => void;
 }
 
 const GoBackButton: React.FunctionComponent<IGoBackButton> = ({
   children,
+  defer,
   onClick,
   ...rest
-}) => (
-  <SGoBackButton
-    onClick={onClick}
-    {...rest}
-  >
-    <InlineSvg
-      svg={BackButtonIcon}
-      width="24px"
-      height="24px"
-    />
-    { children }
-  </SGoBackButton>
-);
+}) => {
+  const handleClickDebounced = useMemo(() => debounce(onClick!!, defer ?? 0),
+    [onClick, defer]);
+
+  return (
+    <SGoBackButton
+      onClick={!defer ? onClick : handleClickDebounced}
+      {...rest}
+    >
+      <InlineSvg
+        svg={BackButtonIcon}
+        width="24px"
+        height="24px"
+      />
+      { children }
+    </SGoBackButton>
+  );
+};
 
 GoBackButton.defaultProps = {
   children: undefined,
+  defer: undefined,
 };
 
 export default GoBackButton;
@@ -64,6 +73,7 @@ const SGoBackButton = styled.button`
 
     & path {
       fill: ${({ theme }) => theme.colorsThemed.text.primary};
+      transition: .2s ease;
     }
 
     transition: .2s ease;

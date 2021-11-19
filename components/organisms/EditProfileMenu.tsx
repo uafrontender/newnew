@@ -51,7 +51,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
 
   const [dataInEdit, setDataInEdit] = useState<ModalMenuUserData>({
-    bio: '',
     backgroundUrl: '',
     ...user.userData!!,
   });
@@ -75,7 +74,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   useEffect(() => {
     // Temp
     const initialData: ModalMenuUserData = {
-      bio: '',
       backgroundUrl: '',
       ...user.userData!!,
     };

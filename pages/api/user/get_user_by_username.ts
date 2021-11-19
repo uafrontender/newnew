@@ -9,6 +9,8 @@ const users: User[] = [
     username: 'johndoe12345',
     displayName: 'John',
     avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
+    bio: 'lorem',
+    coverUrl: '/images/mock/profile-bg.png',
     options: {
       isCreator: false,
     },
@@ -18,6 +20,8 @@ const users: User[] = [
     username: 'unicornbabe',
     displayName: 'UnicornBabe',
     avatarUrl: 'https://randomuser.me/api/portraits/women/34.jpg',
+    bio: 'lorem',
+    coverUrl: '/images/mock/profile-bg.png',
     options: {
       isCreator: true,
       isVerified: true,
@@ -28,6 +32,8 @@ const users: User[] = [
     username: '0xa463sugardaddy8080',
     displayName: 'SugarDaddy',
     avatarUrl: 'https://randomuser.me/api/portraits/men/19.jpg',
+    bio: 'lorem',
+    coverUrl: '/images/mock/profile-bg.png',
     options: {
       isCreator: false,
       isVerified: true,
