@@ -86,7 +86,7 @@ export const signInWithTwitter = (
 ) => fetchProtobuf<newnewapi.TwitterSignInRequest, newnewapi.SignInResponse>(
   newnewapi.TwitterSignInRequest,
   newnewapi.SignInResponse,
-  `${BASE_URL_AUTH}/sign_in_with_facebook`,
+  `${BASE_URL_AUTH}/sign_in_with_twitter`,
   'post',
   payload,
 );
