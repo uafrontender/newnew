@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Lottie from 'react-lottie';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
+import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
@@ -12,8 +12,6 @@ import SearchInput from '../../atoms/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
 
 import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.svg';
-import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
-import logoAnimation from '../../../public/animations/mobile_logo_animation.json';
 
 import { SCROLL_TO_TOP } from '../../../constants/timings';
 
@@ -57,25 +55,7 @@ export const Mobile: React.FC<IMobile> = () => {
   return (
     <SContainer>
       <LogoHolder onClick={handleLogoClick}>
-        {user.loggedIn ? (
-          <Lottie
-            width={40}
-            height={40}
-            options={{
-              loop: false,
-              autoplay: true,
-              animationData: logoAnimation,
-            }}
-            isStopped={loading}
-          />
-        ) : (
-          <InlineSVG
-            svg={tabletLogo}
-            fill={theme.colorsThemed.text.primary}
-            width="127px"
-            height="40px"
-          />
-        )}
+        <Logo />
       </LogoHolder>
       <SRightBlock>
         <SItemWithMargin>
@@ -89,8 +69,10 @@ export const Mobile: React.FC<IMobile> = () => {
               onClick={handleUserClick}
             />
           ) : (
-            <Button
+            <SButton
               iconOnly
+              noHover
+              noRipple
               view="secondary"
               onClick={handleSignInClick}
             >
@@ -100,7 +82,7 @@ export const Mobile: React.FC<IMobile> = () => {
                 width="20px"
                 height="20px"
               />
-            </Button>
+            </SButton>
           )}
         </SItemWithMargin>
       </SRightBlock>
@@ -125,9 +107,13 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 12px;
+  margin-left: 16px;
 `;
 
 const LogoHolder = styled.div`
   cursor: pointer;
+`;
+
+const SButton = styled(Button)`
+  border-radius: 12px;
 `;

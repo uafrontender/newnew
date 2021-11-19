@@ -14,7 +14,7 @@ import dateToTimestamp from '../utils/dateToTimestamp';
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import {
-  setUserLoggedIn, setUserRole, setUserData, setCredentialsData,
+  setUserLoggedIn, setUserData, setCredentialsData,
 } from '../redux-store/slices/userStateSlice';
 
 import testBG from '../public/images/mock/test_bg_1.jpg';
@@ -39,9 +39,6 @@ const Home: NextPage = () => {
       setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
     );
   }, [dispatch, colorMode]);
-  const handleToggleUserRole = useCallback(() => {
-    dispatch(setUserRole(user.role ? '' : 'creator'));
-  }, [dispatch, user.role]);
   const handleToggleUserLoggedIn = useCallback(() => {
     const mockResponse = new newnewapi.SignInResponse({
       me: {
@@ -748,11 +745,6 @@ const Home: NextPage = () => {
         onClick={handleToggleUserLoggedIn}
       >
         Toggle user loggedIn
-      </Button>
-      <Button
-        onClick={handleToggleUserRole}
-      >
-        Toggle user role
       </Button>
     </GeneralTemplate>
   );

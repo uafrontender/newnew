@@ -34,6 +34,7 @@ export const lightTheme: DefaultTheme = {
       outlines1: '#E5E9F1',
       outlines2: '#8B99B2',
       numbers: '#E5E9F1',
+      backgroundFooter: '#F1F3F9',
     },
     text: {
       primary: '#2C2C33',
@@ -79,6 +80,7 @@ export const lightTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         quaternary: '#FFFFFF',
         primaryProgress: '#FFFFFF',
+        changeLanguage: '#2C2C33',
       },
       background: {
         primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
@@ -87,6 +89,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(11, 10, 19, 0.2)',
         quaternary: '#0B0A13',
         primaryProgress: '#C1C9D7',
+        changeLanguage: '#FFFFFF',
       },
       ripple: {
         primary: '#2955EC',
@@ -95,6 +98,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(20, 21, 31, 0.4)',
         quaternary: '#0B0A13',
         primaryProgress: '#2955EC',
+        changeLanguage: '#FFFFFF',
       },
       hover: {
         primary: '#2955EC',
@@ -103,6 +107,7 @@ export const lightTheme: DefaultTheme = {
         transparent: 'rgba(20, 21, 31, 0.5)',
         quaternary: '#0B0A13',
         primaryProgress: '#2955EC',
+        changeLanguage: '#0B0A13',
       },
       progress: {
         primary: '#FFFFFF',
@@ -111,6 +116,7 @@ export const lightTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         quaternary: '#FFFFFF',
         primaryProgress: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        changeLanguage: '#FFFFFF',
       },
     },
   },
@@ -142,6 +148,7 @@ export const darkTheme: DefaultTheme = {
       outlines1: '#272835',
       outlines2: '#6A6A7B',
       numbers: 'rgba(255, 255, 255, 0.06)',
+      backgroundFooter: '#0B0A13',
     },
     text: {
       primary: '#FFFFFF',
@@ -187,6 +194,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         quaternary: '#2C2C33',
         primaryProgress: '#FFFFFF',
+        changeLanguage: '#FFFFFF',
       },
       background: {
         primary: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
@@ -195,6 +203,7 @@ export const darkTheme: DefaultTheme = {
         transparent: 'rgba(20, 21, 31, 0.2)',
         quaternary: '#FFFFFF',
         primaryProgress: '#14151F',
+        changeLanguage: '#14151F',
       },
       ripple: {
         primary: '#2955EC',
@@ -203,6 +212,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#21222C',
         quaternary: '#FFFFFF',
         primaryProgress: '#2955EC',
+        changeLanguage: '#21222C',
       },
       hover: {
         primary: '#21222C',
@@ -211,6 +221,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#21222C',
         quaternary: '#FFFFFF',
         primaryProgress: '#21222C',
+        changeLanguage: '#21222C',
       },
       progress: {
         primary: '#FFFFFF',
@@ -219,6 +230,7 @@ export const darkTheme: DefaultTheme = {
         transparent: '#FFFFFF',
         quaternary: '#FFFFFF',
         primaryProgress: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        changeLanguage: '#FFFFFF',
       },
     },
   },
