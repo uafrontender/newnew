@@ -212,7 +212,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           >
             <SignInButton
               noRipple
-              disabled
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
