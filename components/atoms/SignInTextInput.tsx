@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import InlineSvg from './InlineSVG';
 
 import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
+import { T9 } from './AnimationsText';
 
 type TTextInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
@@ -124,6 +125,11 @@ const SErrorDiv = styled.div`
   line-height: 20px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  animation-name: ${T9};
+  animation-duration: .5s;
+  animation-delay: 0;
+  animation-fill-mode: inline;
 
   & > div {
     margin-right: 4px;

@@ -37,6 +37,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const router = useRouter();
   const { t } = useTranslation('verify-email');
 
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
@@ -166,6 +169,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       }}
     >
       <SBackButton
+        defer={isMobileOrTablet ? 250 : undefined}
         onClick={() => router.back()}
       />
       <AnimatedLogoEmailVerification
@@ -277,6 +281,14 @@ const SBackButton = styled(GoBackButton)`
   height: fit-content;
 
   padding: 8px;
+
+  &:active {
+    & div > svg {
+      transform: scale(0.8);
+
+      transition: .2s ease-in-out;
+    }
+  }
 
 
   ${({ theme }) => theme.media.tablet} {
