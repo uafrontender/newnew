@@ -8,7 +8,7 @@ interface IInlineSvg {
   width?: string,
   height?: string,
   onClick?: () => any,
-  hoverFill?: string,
+  hoverFill?: string | undefined,
   clickable?: boolean,
 }
 
@@ -35,7 +35,7 @@ InlineSvg.defaultProps = {
   onClick: () => {
   },
   clickable: false,
-  hoverFill: 'white',
+  hoverFill: undefined,
 };
 
 export default InlineSvg;
@@ -55,7 +55,7 @@ const SSvgHolder = styled.div<IInlineSvg>`
     transition: fill ease 0.5s;
 
     &:hover {
-      fill: ${(props) => props.hoverFill};
+      ${(props) => !!props.hoverFill && `fill: ${props.hoverFill};`}
     }
   }
 `;

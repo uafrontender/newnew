@@ -27,6 +27,7 @@ declare module 'styled-components' {
         // Used for both hover and focus states.
         outlines2: string;
         numbers: string;
+        backgroundFooter: string;
       },
       text: {
         // Used for both links and titles.
@@ -76,6 +77,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           primaryProgress: string,
+          changeLanguage: string,
         },
         background: {
           primary: string,
@@ -84,6 +86,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           primaryProgress: string,
+          changeLanguage: string,
         },
         ripple: {
           primary: string,
@@ -92,6 +95,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           primaryProgress: string,
+          changeLanguage: string,
         },
         hover: {
           primary: string,
@@ -100,6 +104,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           primaryProgress: string,
+          changeLanguage: string,
         },
         progress: {
           primary: string,
@@ -108,6 +113,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           primaryProgress: string,
+          changeLanguage: string,
         }
       },
     },

@@ -44,7 +44,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
           decision.
         </SSubTitle>
       </SCenterContent>
-      <SUserAvatar
+      <SUserAvatarRight
         user={{
           avatar: item.bidForUser.avatar,
         }}
@@ -95,17 +95,24 @@ const SLinkTitle = styled.span`
 `;
 
 const SUserAvatar = styled(UserAvatar)`
-  ${(props) => props.theme.media.tablet} {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
-  }
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
 
-  ${(props) => props.theme.media.tablet} {
+  ${(props) => props.theme.media.laptop} {
     width: 56px;
     height: 56px;
     min-width: 56px;
     min-height: 56px;
+  }
+`;
+
+const SUserAvatarRight = styled(SUserAvatar)`
+  ${(props) => props.theme.media.laptop} {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
   }
 `;
