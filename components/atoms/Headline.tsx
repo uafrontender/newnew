@@ -52,7 +52,7 @@ const SH1 = styled.h1<ISH>`
     line-height: 48px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 56px;
     line-height: 64px;
   }
@@ -83,7 +83,7 @@ const SH2 = styled.h2<ISH>`
     line-height: 44px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 48px;
     line-height: 56px;
   }
@@ -114,7 +114,7 @@ const SH3 = styled.h3<ISH>`
     line-height: 40px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 40px;
     line-height: 48px;
   }
@@ -145,7 +145,7 @@ const SH4 = styled.h4<ISH>`
     line-height: 36px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 32px;
     line-height: 40px;
   }
@@ -176,7 +176,7 @@ const SH5 = styled.h5<ISH>`
     line-height: 32px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 24px;
     line-height: 32px;
   }
@@ -207,7 +207,7 @@ const SH6 = styled.h6<ISH>`
     line-height: 28px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 20px;
     line-height: 28px;
   }

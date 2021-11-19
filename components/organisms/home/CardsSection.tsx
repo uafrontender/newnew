@@ -356,6 +356,7 @@ const SButton = styled(Button)`
   padding: 12px;
   font-size: 12px;
   line-height: 16px;
+  border-radius: 12px;
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;

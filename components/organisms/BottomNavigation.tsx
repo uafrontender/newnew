@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import Item, { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 
 interface IBottomNavigation {
+  visible: boolean;
   collection: TBottomNavigationItem[];
 }
 
 export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
-  const { collection } = props;
+  const { visible, collection } = props;
 
   const renderItem = useCallback((item) => (
     <Item
@@ -18,7 +19,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   ), []);
 
   return (
-    <SContainer>
+    <SContainer visible={visible}>
       {collection.map(renderItem)}
     </SContainer>
   );
@@ -26,14 +27,19 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
 
 export default BottomNavigation;
 
-const SContainer = styled.nav`
+interface ISContainer {
+  visible: boolean;
+}
+
+const SContainer = styled.nav<ISContainer>`
   left: 0;
   width: 100vw;
-  bottom: 0;
+  bottom: ${(props) => (props.visible ? 0 : '-60px')};
   z-index: 10;
   padding: 0 2px;
   display: flex;
   position: fixed;
+  transition: bottom ease 0.5s;
   align-items: center;
   justify-content: space-around;
   background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
