@@ -178,7 +178,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let bodyParsed: TAppleResponseBody;
   let idTokenDecoded: any;
 
-  if (req.method === 'POST') {
+  if (req.method === 'POST' && provider && provider === 'apple') {
     body = await getRawBody(req, {
       encoding: 'utf-8',
     });
