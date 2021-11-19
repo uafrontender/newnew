@@ -67,6 +67,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
             code,
           });
 
+          console.log(requestPayload);
+
           res = await signInWithGoogle(requestPayload);
         } else if (provider === 'fb') {
           const { code } = router.query;
@@ -76,6 +78,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           const requestPayload = new newnewapi.FacebookSignInRequest({
             code,
           });
+
+          console.log(requestPayload);
 
           res = await signInWithFacebook(requestPayload);
         } else if (provider === 'apple') {
@@ -94,6 +98,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
             identityToken: id_token,
             userId: sub,
           });
+
+          console.log(requestPayload);
 
           res = await signInWithApple(requestPayload);
         } else {
@@ -125,11 +131,12 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
-        // router.push('/');
+        router.push('/');
       } catch (err) {
         setIsLoading(false);
         console.log('Authentication failed');
         console.log(err);
+        // Temp!
         // router.push('/');
       }
     }
@@ -214,7 +221,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       provider,
-      body: bodyParsed!! ?? undefined,
+      body: bodyParsed! ?? undefined,
     },
   };
 };
