@@ -10,6 +10,7 @@ import Caption from '../atoms/Caption';
 import InlineSVG from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
 
+import { formatNumber } from '../../utils/format';
 import { useAppSelector } from '../../redux-store/store';
 
 import iconLight1 from '../../public/images/svg/numbers/1_light.svg';
@@ -135,14 +136,14 @@ export const Card: React.FC<ICard> = (props) => {
           <SImageMask />
           <STopContent>
             {!isDesktop && (
-              <Button iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
+              <SButtonIcon iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
                 <InlineSVG
                   svg={moreIcon}
                   fill={theme.colors.white}
                   width="20px"
                   height="20px"
                 />
-              </Button>
+              </SButtonIcon>
             )}
           </STopContent>
           <SBottomContent>
@@ -167,14 +168,14 @@ export const Card: React.FC<ICard> = (props) => {
           <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <STopContent>
             {!isDesktop && (
-              <Button iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
+              <SButtonIcon iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
                 <InlineSVG
                   svg={moreIcon}
                   fill={theme.colors.white}
                   width="20px"
                   height="20px"
                 />
-              </Button>
+              </SButtonIcon>
             )}
           </STopContent>
         </SImageHolderOutside>
@@ -197,8 +198,8 @@ export const Card: React.FC<ICard> = (props) => {
           >
             {t(`button-card-${item.type}`, {
               votes: item.votes,
-              total: item.total,
-              backed: item.backed,
+              total: formatNumber(item.total),
+              backed: formatNumber(item.backed),
               amount: `$ ${item.amount}`,
             })}
           </SButton>
@@ -505,8 +506,12 @@ interface ISButtonSpan {
 
 const SButton = styled(Button)<ISButtonSpan>`
   padding: 12px;
+  border-radius: 12px;
   
   span {
+    font-size: 12px;
+    line-height: 16px;
+    
     ${(props) => (props.cardType === 'cf' ? css`
       width: 100%;
       text-align: left;
@@ -515,8 +520,6 @@ const SButton = styled(Button)<ISButtonSpan>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
-    font-size: 12px;
-    line-height: 16px;
   }
 `;
 
@@ -531,4 +534,8 @@ const SUserAvatar = styled(UserAvatar)`
     min-width: 36px;
     min-height: 36px;
   }
+`;
+
+const SButtonIcon = styled(Button)`
+  border-radius: 12px;
 `;

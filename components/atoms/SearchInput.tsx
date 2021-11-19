@@ -167,6 +167,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   ${({ theme }) => theme.media.tablet} {
     width: ${(props) => (props.active ? 'calc(100vw - 64px)' : '48px')};
     padding: 10.5px;
+    border-radius: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {

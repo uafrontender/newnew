@@ -102,17 +102,17 @@ export const HeroSection = () => {
         <SButtonsHolder>
           {isMobile ? (
             <>
-              <Button onClick={handleSignInClick}>
+              <SButton noRipple noHover noShadow onClick={handleSignInClick}>
                 {t('hero-block-sign-in')}
-              </Button>
-              <Button view="secondary" onClick={handleExploreClick}>
+              </SButton>
+              <SButton noRipple noHover view="secondary" onClick={handleExploreClick}>
                 {t('hero-block-explore')}
-              </Button>
+              </SButton>
             </>
           ) : (
-            <Button onClick={handleExploreClick}>
+            <SButton onClick={handleExploreClick}>
               {t('hero-block-explore-now')}
-            </Button>
+            </SButton>
           )}
         </SButtonsHolder>
       </STopWrapper>
@@ -189,7 +189,15 @@ const SNotificationItemHolder = styled.div`
     max-width: 344px;
   }
 
-  ${(props) => props.theme.media.tablet} {
+  ${(props) => props.theme.media.laptop} {
     max-width: 608px;
+  }
+`;
+
+const SButton = styled(Button)`
+  padding: 12px 24px;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 16px;
   }
 `;

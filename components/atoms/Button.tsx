@@ -13,11 +13,12 @@ type TButton = React.ComponentPropsWithoutRef<'button'>;
 
 interface IButton {
   size?: 'sm' | 'lg',
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress',
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress' | 'changeLanguage',
   progress?: number,
   progressDelay?: number,
   animateProgress?: boolean,
   iconOnly?: boolean,
+  noHover?: boolean,
   noRipple?: boolean,
   noShadow?: boolean,
   noAnimateSize?: boolean,
@@ -124,6 +125,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
 Button.defaultProps = {
   size: 'sm',
   view: 'primary',
+  noHover: false,
   iconOnly: false,
   noRipple: false,
   noShadow: false,
@@ -141,8 +143,9 @@ export default Button;
 
 interface ISButton {
   size?: 'sm' | 'lg';
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress';
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress' | 'changeLanguage';
   iconOnly?: boolean;
+  noHover?: boolean;
   noShadow?: boolean;
   noAnimateSize?: boolean,
   progress?: number;
@@ -157,7 +160,7 @@ interface ISButton {
 }
 
 interface ISProgress {
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress';
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress' | 'changeLanguage';
   progress?: number;
 }
 
@@ -225,7 +228,7 @@ const SButton = styled.button<ISButton>`
 
   ${(props) => (props.size === 'lg' && !props.iconOnly ? css`min-width: 343px;` : '')}
 
-  border-radius: ${(props) => props.theme.borderRadius[props.size === 'sm' ? 'smallLg' : 'medium']};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
   border: transparent;
 
   // NB! Temp
@@ -285,9 +288,11 @@ const SButton = styled.button<ISButton>`
           box-shadow: ${props.theme.shadows.mediumBlue};
         }
 
-        &:hover:enabled {
-          box-shadow: ${props.theme.shadows.intenseBlue};
-        }
+        ${!props.noHover && css`
+          &:hover:enabled {
+            box-shadow: ${props.theme.shadows.intenseBlue};
+          }
+        `}
 
         &:active:enabled {
           box-shadow: ${props.theme.shadows.mediumBlue};
@@ -297,7 +302,12 @@ const SButton = styled.button<ISButton>`
 
     if (['secondary', 'tertiary'].includes(props.view ?? 'primary') && !props.isRippling) {
       return css`
-          &:hover:enabled,
+          &:hover:enabled {
+            ${!props.noHover && css`
+              outline: none;
+              background-color: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+          `}
+          }
           &:focus:enabled {
           outline: none;
 
