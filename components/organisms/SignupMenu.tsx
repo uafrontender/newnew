@@ -23,13 +23,14 @@ import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
 import { SignupReason } from '../../pages/sign-up';
 
 // Components
+import AnimatedPresence from '../atoms/AnimatedPresence';
 import InlineSvg from '../atoms/InlineSVG';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 import GoBackButton from '../molecules/GoBackButton';
 import TextWithLine from '../atoms/TextWithLine';
 import SignInTextInput from '../atoms/SignInTextInput';
-import Button from '../atoms/Button';
+import EmailSignInButton from '../molecules/signup/EmailSignInButton';
 import SignInButton from '../molecules/signup/SignInButton';
 
 // Icons
@@ -39,9 +40,6 @@ import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
-
-// Animations
-import { T1 } from '../atoms/AnimationsText';
 
 // Utils
 import isBrowser from '../../utils/isBrowser';
@@ -190,7 +188,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             variants={item}
           >
             <TextWithLine
-              lineColor={theme.colorsThemed.text.secondary}
+              lineColor={theme.colorsThemed.text.tertiary}
               innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
             />
           </motion.div>
@@ -214,47 +212,55 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
           {
             submitError ? (
-              <SErrorDiv>
-                <InlineSvg
-                  svg={AlertIcon}
-                  width="16px"
-                  height="16px"
-                />
-                { t(`errors.${submitError}`) }
-              </SErrorDiv>
+              <AnimatedPresence
+                animation="t-09"
+              >
+                <SErrorDiv>
+                  <InlineSvg
+                    svg={AlertIcon}
+                    width="16px"
+                    height="16px"
+                  />
+                  { t(`errors.${submitError}`) }
+                </SErrorDiv>
+              </AnimatedPresence>
             ) : null
           }
           <motion.div
             variants={item}
           >
-            <Button
-              noRipple
+            <EmailSignInButton
               disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
               onClick={() => handleSubmitEmail()}
             >
               <span>
                 {t('signupOptions.signInBtn')}
               </span>
-            </Button>
+            </EmailSignInButton>
           </motion.div>
         </MSContentWrapper>
-        <SLegalText>
-          {t('legalDisclaimer.main_text')}
-          <br />
-          <Link href="/privacy-policy">
-            <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
-          </Link>
-          {', '}
-          <Link href="/terms-and-conditions">
-            <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
-          </Link>
-          {' '}
-          {t('legalDisclaimer.and')}
-          {' '}
-          <Link href="/community-guidelines">
-            <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
-          </Link>
-        </SLegalText>
+        <AnimatedPresence
+          animation="t-01"
+          delay={1.1}
+        >
+          <SLegalText>
+            {t('legalDisclaimer.main_text')}
+            <br />
+            <Link href="/privacy-policy">
+              <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
+            </Link>
+            {', '}
+            <Link href="/terms-and-conditions">
+              <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
+            </Link>
+            {' '}
+            {t('legalDisclaimer.and')}
+            {' '}
+            <Link href="/community-guidelines">
+              <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
+            </Link>
+          </SLegalText>
+        </AnimatedPresence>
       </SMenuWrapper>
     </SSignupMenu>
   );
@@ -268,7 +274,7 @@ const container: Variants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.07,
     },
   },
 };
@@ -368,6 +374,7 @@ const SSignInBackButton = styled(GoBackButton)`
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 2;
 
   width: 100%;
   height: fit-content;
@@ -418,6 +425,9 @@ const SHeadline = styled(Headline)`
   margin-top: 108px;
   margin-bottom: 24px;
 
+  font-size: 22px;
+  line-height: 30px;
+
   text-align: center;
 
   ${({ theme }) => theme.media.tablet} {
@@ -426,8 +436,8 @@ const SHeadline = styled(Headline)`
 
     text-align: left;
 
-    font-size: 36px;
-    line-height: 44px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -441,7 +451,6 @@ const SHeadline = styled(Headline)`
 const SSubheading = styled(Text)`
   display: none;
 
-  // NB! Temp
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-style: normal;
@@ -451,10 +460,6 @@ const SSubheading = styled(Text)`
     margin-bottom: 24px;
 
     font-size: 16px;
-    line-height: 20px;
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
     line-height: 24px;
   }
 `;
@@ -469,8 +474,7 @@ const SContinueWithSpan = styled.span`
   font-size: 14px;
   line-height: 20px;
 
-  // NB! Temp
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
   ${({ theme }) => theme.media.tablet} {
@@ -484,18 +488,14 @@ const SErrorDiv = styled.div`
   align-items: center;
 
   text-align: center;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
 
   & > div {
     margin-right: 4px;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
   }
 `;
 
@@ -510,18 +510,12 @@ const SLegalText = styled(Text)`
   line-height: 16px;
 
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  opacity: 0;
-  animation: ${T1};
-  animation-duration: .2s;
-  animation-delay: 3s;
-  animation-fill-mode: forwards;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   a {
     font-weight: 600;
 
-    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
     &:hover, &:focus {
       outline: none;
