@@ -1,27 +1,23 @@
 // Temp disabled until backend is in place
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
-import { newnewapi } from 'newnew-api';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import isEmail from 'validator/lib/isEmail';
+import Skeleton from 'react-loading-skeleton';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
 import {
-  setCredentialsData, setSignupEmailInput, setUserData, setUserLoggedIn,
+  setSignupEmailInput,
 } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
-
-// Utils
-import sleep from '../../utils/sleep';
-import dateToTimestamp from '../../utils/dateToTimestamp';
 
 // Reason for signing up type
 import { SignupReason } from '../../pages/sign-up';
@@ -43,11 +39,15 @@ import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
-import isBrowser from '../../utils/isBrowser';
+
+// Animations
 import { T1 } from '../atoms/AnimationsText';
 
+// Utils
+import isBrowser from '../../utils/isBrowser';
+
 export interface ISignupMenu {
-  reason?: SignupReason
+  reason?: SignupReason;
 }
 
 const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
@@ -100,40 +100,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       window.location.href = url;
     }
   };
-
-  // NB! Testing only
-  const handleLogInTest = useCallback(() => {
-    const mockResponse = new newnewapi.SignInResponse({
-      me: {
-        username: 'johndoe12345',
-        displayName: 'John',
-        email: 'johndoe@test.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
-        userUuid: '123123',
-        options: {
-          isCreator: false,
-        },
-      },
-      credential: {
-        accessToken: '12345',
-        refreshToken: '12345',
-        expiresAt: dateToTimestamp(new Date()),
-      },
-      status: 1,
-    });
-
-    dispatch(setUserData(mockResponse.me));
-
-    dispatch(setCredentialsData({
-      accessToken: mockResponse.credential?.accessToken,
-      refreshToken: mockResponse.credential?.refreshToken,
-      expiresAt: mockResponse.credential?.expiresAt?.seconds,
-    }));
-
-    dispatch(setUserLoggedIn(true));
-
-    router.push('/', undefined, { shallow: true });
-  }, [dispatch, router]);
 
   // Check if email is valid
   useEffect(() => {
@@ -302,7 +268,7 @@ const container: Variants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.35,
+      staggerChildren: 0.1,
     },
   },
 };
@@ -476,7 +442,9 @@ const SSubheading = styled(Text)`
   display: none;
 
   // NB! Temp
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  font-weight: 600;
+  font-style: normal;
 
   ${({ theme }) => theme.media.tablet} {
     display: block;

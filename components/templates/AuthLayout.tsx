@@ -4,6 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { css, useTheme } from 'styled-components';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import InlineSVG from '../atoms/InlineSVG';
 import Container from '../atoms/Grid/Container';
@@ -26,23 +28,29 @@ const SAuthLayout = styled.div`
 
 const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
   const router = useRouter();
+  const theme = useTheme();
 
   return (
-    <SAuthLayout>
-      {/* <STestElement
-        translated={router.pathname.includes('verify-email')}
-      >
-        <h4>
-          Placeholder
-        </h4>
-      </STestElement> */}
-      {
-        !router.pathname.includes('verify-email') ? (
-          <HomeLogoButton />
-        ) : null
-      }
-      { children }
-    </SAuthLayout>
+    <SkeletonTheme
+      baseColor={theme.colorsThemed.grayscale.background2}
+      highlightColor={theme.colorsThemed.grayscale.background3}
+    >
+      <SAuthLayout>
+        {/* <STestElement
+          translated={router.pathname.includes('verify-email')}
+        >
+          <h4>
+            Placeholder
+          </h4>
+        </STestElement> */}
+        {
+          !router.pathname.includes('verify-email') ? (
+            <HomeLogoButton />
+          ) : null
+        }
+        { children }
+      </SAuthLayout>
+    </SkeletonTheme>
   );
 };
 

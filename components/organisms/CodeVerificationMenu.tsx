@@ -16,16 +16,16 @@ import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/u
 import { signInWithEmail } from '../../api/endpoints/auth';
 
 // Components
+import Text from '../atoms/Text';
 import Headline from '../atoms/Headline';
 import GoBackButton from '../molecules/GoBackButton';
 import VerficationCodeInput from '../atoms/VerificationCodeInput';
+import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
 import sleep from '../../utils/sleep';
-import Text from '../atoms/Text';
-import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
