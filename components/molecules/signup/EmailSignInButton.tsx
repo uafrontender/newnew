@@ -100,7 +100,7 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
   user-select: none;
 
   color: ${(props) => props.theme.colorsThemed.button.color.primary};
-  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  background: linear-gradient(300deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
 
   span {
     z-index: 1;
@@ -114,7 +114,7 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
     width: 100%;
     height: 100%;
     transition: .5s ease;
-    background: linear-gradient(155deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+    background: linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
 
     border-radius: ${(props) => props.theme.borderRadius.medium};
     border: transparent;
