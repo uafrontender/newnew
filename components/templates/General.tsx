@@ -136,7 +136,7 @@ const SWrapper = styled.div<ISWrapper>`
   height: 100vh;
   display: flex;
   overflow-y: auto;
-  transition: all ease 0.5s;
+  transition: all ease 1s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
   flex-direction: column;

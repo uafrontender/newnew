@@ -30,7 +30,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     't-02': {
       y: 0,
       opacity: 1,
-      transition: { delay: 0.5 },
+      transition: { delay: 0.5, bounce: 0 },
     },
     't-02_initial': {
       y: 100,
