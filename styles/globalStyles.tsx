@@ -26,6 +26,10 @@ const GlobalStyle = createGlobalStyle`
   /* Fonts */
   *, *:before, *:after {
     font-family: Gilroy, Arial, Helvetica, sans-serif;
+
+    font-smooth: always;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* General light/dark mode configs */
