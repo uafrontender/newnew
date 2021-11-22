@@ -51,8 +51,6 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         if (!data) throw new Error('No data');
 
-        console.log(data?.toJSON());
-
         dispatch(setUserData({
           username: data.me?.username,
           displayName: data.me?.displayName,
@@ -69,12 +67,11 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
-        // router.push('/');
+        router.push('/');
       } catch (err) {
+        // NB! Might need an error toast
         setIsLoading(false);
-        console.log('Authentication failed');
-        console.log(err);
-        // router.push('/');
+        router.push('/');
       }
     }
 

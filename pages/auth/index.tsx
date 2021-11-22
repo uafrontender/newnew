@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -67,8 +65,6 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
             code,
           });
 
-          console.log(requestPayload);
-
           res = await signInWithGoogle(requestPayload);
         } else if (provider === 'fb') {
           const { code } = router.query;
@@ -79,12 +75,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
             code,
           });
 
-          console.log(requestPayload);
-
           res = await signInWithFacebook(requestPayload);
         } else if (provider === 'apple') {
-          console.log(body);
-
           if (!body) throw new Error('No body receieved');
 
           const {
@@ -99,11 +91,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
             userId: sub,
           });
 
-          console.log(requestPayload);
-
           res = await signInWithApple(requestPayload);
         } else {
-          console.log(`${provider} not supported.`);
           throw new Error('Provider not supported');
         }
 
@@ -112,8 +101,6 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         const { data } = res!!;
 
         if (!data) throw new Error('No data');
-
-        console.log(data?.toJSON());
 
         dispatch(setUserData({
           username: data.me?.username,
@@ -133,11 +120,9 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         setIsLoading(false);
         router.push('/');
       } catch (err) {
+        // NB! Might need an error toast
         setIsLoading(false);
-        console.log('Authentication failed');
-        console.log(err);
-        // Temp!
-        // router.push('/');
+        router.push('/');
       }
     }
 
@@ -221,7 +206,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       provider,
-      body: bodyParsed! ?? undefined,
+      ...(bodyParsed! ? bodyParsed : {}),
     },
   };
 };
