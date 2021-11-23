@@ -16,16 +16,17 @@ import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/u
 import { signInWithEmail } from '../../api/endpoints/auth';
 
 // Components
+import Text from '../atoms/Text';
 import Headline from '../atoms/Headline';
 import GoBackButton from '../molecules/GoBackButton';
 import VerficationCodeInput from '../atoms/VerificationCodeInput';
+import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
 
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
 import sleep from '../../utils/sleep';
-import Text from '../atoms/Text';
-import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmailVerification';
+import AnimatedPresence from '../atoms/AnimatedPresence';
 
 export interface ICodeVerificationMenu {
   expirationTime: number;
@@ -204,24 +205,33 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           !submitError
           && !isSigninWithEmailLoading
           && !isResendCodeLoading && (
-          <STimeExpired>
-            { t('timeExpired.not_receieved') }
-            {' '}
-            <button
-              type="button"
-              onClick={() => handleResendCode()}
-            >
-              { t('timeExpired.resendBtn') }
-            </button>
-          </STimeExpired>
+          <AnimatedPresence
+            animation="t-01"
+            delay={0.3}
+          >
+            <STimeExpired>
+              { t('timeExpired.not_receieved') }
+              {' '}
+              <button
+                type="button"
+                onClick={() => handleResendCode()}
+              >
+                { t('timeExpired.resendBtn') }
+              </button>
+            </STimeExpired>
+          </AnimatedPresence>
           )
         )
       }
       {
         !isSigninWithEmailLoading && !isResendCodeLoading && submitError ? (
-          <SErrorDiv>
-            { t('errors.invalidCode') }
-          </SErrorDiv>
+          <AnimatedPresence
+            animation="t-09"
+          >
+            <SErrorDiv>
+              { t('errors.invalidCode') }
+            </SErrorDiv>
+          </AnimatedPresence>
         ) : null
       }
     </SCodeVerificationMenu>
@@ -304,13 +314,14 @@ const SHeadline = styled(Headline)`
   margin-top: 24px;
 
   text-align: center;
+  font-size: 22px;
+  line-height: 30px;
 
-  // NB! Temp
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   ${({ theme }) => theme.media.tablet} {
-    font-size: 36px;
-    line-height: 44px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -323,17 +334,12 @@ const SSubheading = styled(Text)`
   margin-top: 8px;
 
   font-size: 14px;
-  line-height: 18px;
+  line-height: 20px;
 
-  // NB! Temp
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
-    line-height: 20px;
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
     line-height: 24px;
   }
 `;
@@ -343,30 +349,32 @@ interface ISTimeoutDiv {
 }
 
 const STimeoutDiv = styled.div<ISTimeoutDiv>`
-  font-size: 15px;
-  line-height: 24px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
 
   // NB! Temp
   color: ${({ isAlertColor, theme }) => {
     if (isAlertColor) return theme.colorsThemed.accent.error;
-    return theme.colorsThemed.text.secondary;
+    return theme.colorsThemed.text.tertiary;
   }};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
+    line-height: 24px;
   }
 `;
 
 const STimeExpired = styled(Text)`
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 24px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
 
-  // NB! Temp
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
+    line-height: 24px;
   }
 
   button {
@@ -377,7 +385,7 @@ const STimeExpired = styled(Text)`
     font-weight: 500;
 
 
-    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
     cursor: pointer;
 
@@ -392,7 +400,7 @@ const STimeExpired = styled(Text)`
 
 const SErrorDiv = styled(Text)`
   font-size: 14px;
-  line-height: 18px;
+  line-height: 20px;
   font-weight: bold;
 
   // NB! Temp

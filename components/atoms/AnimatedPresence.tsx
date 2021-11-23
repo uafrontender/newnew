@@ -1,25 +1,27 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
+import { motion, AnimatePresence as FMAnimatedPresence, Variants } from 'framer-motion';
 
 interface IAnimatedWords {
   start?: boolean;
-  animation: 't-01' | 't-02' | 't-08';
+  delay?: number;
+  animation: 't-01' | 't-02' | 't-08' | 't-09';
   onAnimationEnd?: () => void;
 }
 
 export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
   const {
     start,
+    delay,
     animation,
     onAnimationEnd,
   } = props;
   let { children } = props;
 
-  const variants = {
+  const variants: Variants = {
     't-01': {
       opacity: 1,
-      transition: { delay: 0.5 },
+      transition: { delay: delay ?? 0.5 },
     },
     't-01_initial': {
       opacity: 0,
@@ -50,6 +52,20 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       opacity: 0,
     },
     't-08_exit': {
+      opacity: 0,
+    },
+    't-09': {
+      opacity: 1,
+      x: 0,
+      transition: {
+        x: { type: 'spring', stiffness: 1000 },
+        default: { duration: 2 },
+      },
+    },
+    't-09_initial': {
+      x: -10,
+    },
+    't-09_exit': {
       opacity: 0,
     },
   };
@@ -96,6 +112,7 @@ export default AnimatedPresence;
 
 AnimatedPresence.defaultProps = {
   start: true,
+  delay: undefined,
   onAnimationEnd: () => {
   },
 };

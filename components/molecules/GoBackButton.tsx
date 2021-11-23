@@ -54,7 +54,7 @@ const SGoBackButton = styled.button`
   font-size: 15px;
   line-height: 20px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
   background-color: transparent;
   border: transparent;
 
@@ -64,7 +64,7 @@ const SGoBackButton = styled.button`
     margin-right: 8px;
   }
   & path {
-    fill: ${({ theme }) => theme.colorsThemed.text.quaternary};
+    fill: ${({ theme }) => theme.colorsThemed.text.secondary};
   }
 
   &:hover, &:focus {

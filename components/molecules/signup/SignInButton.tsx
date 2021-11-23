@@ -285,7 +285,7 @@ const SSignInButton = styled.button<SISignInButton>`
   ` : null)}
 
   &:enabled:active {
-    transform: scale(.97);
+    transform: scale(.9);
     background: ${({ noRipple, pressedBgColor }) => (
     noRipple ? (
       pressedBgColor
