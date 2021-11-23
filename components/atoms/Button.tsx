@@ -1,10 +1,6 @@
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useEffect,
-} from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { debounce } from 'lodash';
+import { useInView } from 'react-intersection-observer';
 import styled, { css } from 'styled-components';
 
 import RippleAnimation from './RippleAnimation';
@@ -13,9 +9,8 @@ type TButton = React.ComponentPropsWithoutRef<'button'>;
 
 interface IButton {
   size?: 'sm' | 'lg',
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress' | 'changeLanguage',
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'blueProgress' | 'changeLanguage' | 'blue',
   progress?: number,
-  progressDelay?: number,
   animateProgress?: boolean,
   iconOnly?: boolean,
   noHover?: boolean,
@@ -31,15 +26,13 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     children,
     disabled,
     noRipple,
-    progressDelay,
     animateProgress,
     debounceClickMs,
     debounceRestoreMs,
     onClick,
     ...rest
   } = props;
-  // Element ref
-  const ref: any = useRef();
+  const { ref, inView }: { ref: any, inView: boolean } = useInView();
   // Progress effect
   const [progress, setProgress] = useState(0);
   // Ripple effect
@@ -90,10 +83,10 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    if (inView) {
       setProgress(rest.progress ?? 0);
-    }, progressDelay);
-  }, [rest.progress, progressDelay]);
+    }
+  }, [rest.progress, inView]);
 
   return (
     <SButton
@@ -131,7 +124,6 @@ Button.defaultProps = {
   noShadow: false,
   noAnimateSize: false,
   progress: 0,
-  progressDelay: 1500,
   animateProgress: false,
   debounceClickMs: 800,
   debounceRestoreMs: 750,
@@ -143,7 +135,7 @@ export default Button;
 
 interface ISButton {
   size?: 'sm' | 'lg';
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress' | 'changeLanguage';
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'blueProgress' | 'changeLanguage' | 'blue';
   iconOnly?: boolean;
   noHover?: boolean;
   noShadow?: boolean;
@@ -160,7 +152,7 @@ interface ISButton {
 }
 
 interface ISProgress {
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'primaryProgress' | 'changeLanguage';
+  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'blueProgress' | 'changeLanguage' | 'blue';
   progress?: number;
 }
 
@@ -185,6 +177,8 @@ const SButton = styled.button<ISButton>`
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  white-space: nowrap;
 
   font-weight: bold;
   font-size: 14px;
@@ -273,6 +267,7 @@ const SButton = styled.button<ISButton>`
 
   span {
     z-index: 1;
+    font-weight: 700;
   }
 
   ${(props) => {

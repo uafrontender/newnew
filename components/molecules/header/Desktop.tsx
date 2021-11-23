@@ -89,6 +89,7 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
+                    noRipple
                     view="secondary"
                     onClick={handleDashboardClick}
                   >
@@ -96,7 +97,10 @@ export const Desktop: React.FC<IDesktop> = () => {
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button onClick={handleCreateClick}>
+                  <Button
+                    noRipple
+                    onClick={handleCreateClick}
+                  >
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
@@ -111,7 +115,10 @@ export const Desktop: React.FC<IDesktop> = () => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button onClick={handleCreateClick}>
+                  <Button
+                    noRipple
+                    onClick={handleCreateClick}
+                  >
                     {t('button-create-on-newnew')}
                   </Button>
                 </SItemWithMargin>
@@ -137,7 +144,7 @@ export const Desktop: React.FC<IDesktop> = () => {
               </Button>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button onClick={handleSignUpClick}>
+              <Button noRipple onClick={handleSignUpClick}>
                 {t('button-sign-up')}
               </Button>
             </SItemWithMargin>
@@ -164,5 +171,13 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 24px;
+  margin-left: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 24px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-left: 16px;
+  }
 `;

@@ -90,7 +90,6 @@ export const Card: React.FC<ICard> = (props) => {
     colorMode,
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isDesktop = !isMobile && resizeMode !== 'tablet';
 
   const handleUserClick = () => {
     router.push('/profile');
@@ -135,20 +134,24 @@ export const Card: React.FC<ICard> = (props) => {
           <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <SImageMask />
           <STopContent>
-            {!isDesktop && (
-              <SButtonIcon iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
-                <InlineSVG
-                  svg={moreIcon}
-                  fill={theme.colors.white}
-                  width="20px"
-                  height="20px"
-                />
-              </SButtonIcon>
-            )}
+            <SButtonIcon
+              iconOnly
+              id="showMore"
+              size="sm"
+              view="transparent"
+              onClick={handleMoreClick}
+            >
+              <InlineSVG
+                svg={moreIcon}
+                fill={theme.colors.white}
+                width="20px"
+                height="20px"
+              />
+            </SButtonIcon>
           </STopContent>
           <SBottomContent>
             <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
-            <SText variant={3}>
+            <SText variant={3} weight={600}>
               {item.title}
             </SText>
           </SBottomContent>
@@ -167,30 +170,34 @@ export const Card: React.FC<ICard> = (props) => {
         <SImageHolderOutside id="animatedPart">
           <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <STopContent>
-            {!isDesktop && (
-              <SButtonIcon iconOnly size="sm" view="transparent" onClick={handleMoreClick}>
-                <InlineSVG
-                  svg={moreIcon}
-                  fill={theme.colors.white}
-                  width="20px"
-                  height="20px"
-                />
-              </SButtonIcon>
-            )}
+            <SButtonIcon
+              iconOnly
+              id="showMore"
+              size="sm"
+              view="transparent"
+              onClick={handleMoreClick}
+            >
+              <InlineSVG
+                svg={moreIcon}
+                fill={theme.colors.white}
+                width="20px"
+                height="20px"
+              />
+            </SButtonIcon>
           </STopContent>
         </SImageHolderOutside>
       </SImageBG>
       <SBottomContentOutside>
         <SBottomStart>
           <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
-          <STextOutside variant={3}>
+          <STextOutside variant={3} weight={600}>
             {item.title}
           </STextOutside>
         </SBottomStart>
         <SBottomEnd type={item.type}>
           <SButton
             noShadow
-            view={item.type === 'cf' ? 'primaryProgress' : 'primary'}
+            view={item.type === 'cf' ? 'blueProgress' : 'blue'}
             onClick={handleBidClick}
             cardType={item.type}
             progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
@@ -200,10 +207,10 @@ export const Card: React.FC<ICard> = (props) => {
               votes: item.votes,
               total: formatNumber(item.total),
               backed: formatNumber(item.backed),
-              amount: `$ ${item.amount}`,
+              amount: `$${item.amount}`,
             })}
           </SButton>
-          <SCaption variant={2}>
+          <SCaption variant={2} weight={700}>
             {t('card-time-left', { time: '24h 40m' })}
           </SCaption>
         </SBottomEnd>
@@ -266,6 +273,12 @@ const SWrapper = styled.div<ISWrapper>`
     return '406px';
   }};
     height: 384px;
+
+    :hover {
+      #showMore {
+        opacity: 1;
+      }
+    }
   }
 `;
 
@@ -367,21 +380,19 @@ const SWrapperOutside = styled.div<ISWrapper>`
 
     :hover {
       #animatedPart {
-        transform: translate(10px, -10px);
-      }
-
-      #backgroundPart:before {
-        transform: rotate(-45deg) scale(1);
-      }
-
-      #backgroundPart:after {
-        transform: rotate(45deg) scale(1);
+        transform: translateY(-10px);
       }
     }
   }
 
   ${(props) => props.theme.media.laptop} {
     width: 224px;
+
+    :hover {
+      #showMore {
+        opacity: 1;
+      }
+    }
   }
 `;
 
@@ -389,7 +400,6 @@ const SImageBG = styled.div`
   width: 100%;
   height: 564px;
   position: relative;
-  background-color: ${(props) => props.theme.colorsThemed.accent.blue};
 
   ${(props) => props.theme.media.tablet} {
     height: 300px;
@@ -398,32 +408,6 @@ const SImageBG = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     height: 336px;
-  }
-
-  &:before,
-  &:after {
-    width: 10px;
-    height: 10px;
-    content: '';
-    display: block;
-    position: absolute;
-    transition: all .4s ease;
-    background-color: ${(props) => props.theme.colorsThemed.accent.blue};
-  }
-
-  &:before {
-    top: 3px;
-    left: 6px;
-    transform: rotate(-45deg) scale(0);
-    transform-origin: top left;
-  }
-
-  &:after {
-    right: 3px;
-    bottom: 6px;
-    z-index: 0;
-    transform: rotate(45deg) scale(0);
-    transform-origin: bottom right;
   }
 `;
 
@@ -507,11 +491,12 @@ interface ISButtonSpan {
 const SButton = styled(Button)<ISButtonSpan>`
   padding: 12px;
   border-radius: 12px;
-  
+
   span {
     font-size: 12px;
+    font-weight: 700;
     line-height: 16px;
-    
+
     ${(props) => (props.cardType === 'cf' ? css`
       width: 100%;
       text-align: left;
@@ -538,4 +523,10 @@ const SUserAvatar = styled(UserAvatar)`
 
 const SButtonIcon = styled(Button)`
   border-radius: 12px;
+
+
+  ${(props) => props.theme.media.laptop} {
+    opacity: 0;
+    transition: all ease 0.5s;
+  }
 `;
