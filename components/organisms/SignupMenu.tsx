@@ -1,39 +1,36 @@
 // Temp disabled until backend is in place
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
-import { newnewapi } from 'newnew-api';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import isEmail from 'validator/lib/isEmail';
+import Skeleton from 'react-loading-skeleton';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
 import {
-  setCredentialsData, setSignupEmailInput, setUserData, setUserLoggedIn,
+  setSignupEmailInput,
 } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { sendVerificationEmail, BASE_URL_AUTH } from '../../api/endpoints/auth';
 
-// Utils
-import sleep from '../../utils/sleep';
-import dateToTimestamp from '../../utils/dateToTimestamp';
-
 // Reason for signing up type
 import { SignupReason } from '../../pages/sign-up';
 
 // Components
+import AnimatedPresence from '../atoms/AnimatedPresence';
 import InlineSvg from '../atoms/InlineSVG';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 import GoBackButton from '../molecules/GoBackButton';
 import TextWithLine from '../atoms/TextWithLine';
 import SignInTextInput from '../atoms/SignInTextInput';
-import Button from '../atoms/Button';
+import EmailSignInButton from '../molecules/signup/EmailSignInButton';
 import SignInButton from '../molecules/signup/SignInButton';
 
 // Icons
@@ -43,11 +40,12 @@ import GoogleIcon from '../../public/images/svg/auth/icon-google.svg';
 import TwitterIcon from '../../public/images/svg/auth/icon-twitter.svg';
 import FacebookIcon from '../../public/images/svg/auth/icon-facebook.svg';
 import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.svg';
+
+// Utils
 import isBrowser from '../../utils/isBrowser';
-import { T1 } from '../atoms/AnimationsText';
 
 export interface ISignupMenu {
-  reason?: SignupReason
+  reason?: SignupReason;
 }
 
 const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
@@ -100,40 +98,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       window.location.href = url;
     }
   };
-
-  // NB! Testing only
-  const handleLogInTest = useCallback(() => {
-    const mockResponse = new newnewapi.SignInResponse({
-      me: {
-        username: 'johndoe12345',
-        displayName: 'John',
-        email: 'johndoe@test.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
-        userUuid: '123123',
-        options: {
-          isCreator: false,
-        },
-      },
-      credential: {
-        accessToken: '12345',
-        refreshToken: '12345',
-        expiresAt: dateToTimestamp(new Date()),
-      },
-      status: 1,
-    });
-
-    dispatch(setUserData(mockResponse.me));
-
-    dispatch(setCredentialsData({
-      accessToken: mockResponse.credential?.accessToken,
-      refreshToken: mockResponse.credential?.refreshToken,
-      expiresAt: mockResponse.credential?.expiresAt?.seconds,
-    }));
-
-    dispatch(setUserLoggedIn(true));
-
-    router.push('/', undefined, { shallow: true });
-  }, [dispatch, router]);
 
   // Check if email is valid
   useEffect(() => {
@@ -224,7 +188,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             variants={item}
           >
             <TextWithLine
-              lineColor={theme.colorsThemed.text.secondary}
+              lineColor={theme.colorsThemed.text.tertiary}
               innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
             />
           </motion.div>
@@ -248,47 +212,55 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
           {
             submitError ? (
-              <SErrorDiv>
-                <InlineSvg
-                  svg={AlertIcon}
-                  width="16px"
-                  height="16px"
-                />
-                { t(`errors.${submitError}`) }
-              </SErrorDiv>
+              <AnimatedPresence
+                animation="t-09"
+              >
+                <SErrorDiv>
+                  <InlineSvg
+                    svg={AlertIcon}
+                    width="16px"
+                    height="16px"
+                  />
+                  { t(`errors.${submitError}`) }
+                </SErrorDiv>
+              </AnimatedPresence>
             ) : null
           }
           <motion.div
             variants={item}
           >
-            <Button
-              noRipple
+            <EmailSignInButton
               disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
               onClick={() => handleSubmitEmail()}
             >
               <span>
                 {t('signupOptions.signInBtn')}
               </span>
-            </Button>
+            </EmailSignInButton>
           </motion.div>
         </MSContentWrapper>
-        <SLegalText>
-          {t('legalDisclaimer.main_text')}
-          <br />
-          <Link href="/privacy-policy">
-            <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
-          </Link>
-          {', '}
-          <Link href="/terms-and-conditions">
-            <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
-          </Link>
-          {' '}
-          {t('legalDisclaimer.and')}
-          {' '}
-          <Link href="/community-guidelines">
-            <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
-          </Link>
-        </SLegalText>
+        <AnimatedPresence
+          animation="t-01"
+          delay={1.1}
+        >
+          <SLegalText>
+            {t('legalDisclaimer.main_text')}
+            <br />
+            <Link href="/privacy-policy">
+              <a href="/privacy-policy" target="_blank">{t('legalDisclaimer.privacy_policy')}</a>
+            </Link>
+            {', '}
+            <Link href="/terms-and-conditions">
+              <a href="/terms-and-conditions" target="_blank">{t('legalDisclaimer.terms')}</a>
+            </Link>
+            {' '}
+            {t('legalDisclaimer.and')}
+            {' '}
+            <Link href="/community-guidelines">
+              <a href="/community-guidelines" target="_blank">{t('legalDisclaimer.community_guidelines')}</a>
+            </Link>
+          </SLegalText>
+        </AnimatedPresence>
       </SMenuWrapper>
     </SSignupMenu>
   );
@@ -302,7 +274,7 @@ const container: Variants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.35,
+      staggerChildren: 0.07,
     },
   },
 };
@@ -402,6 +374,7 @@ const SSignInBackButton = styled(GoBackButton)`
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 2;
 
   width: 100%;
   height: fit-content;
@@ -452,6 +425,9 @@ const SHeadline = styled(Headline)`
   margin-top: 108px;
   margin-bottom: 24px;
 
+  font-size: 22px;
+  line-height: 30px;
+
   text-align: center;
 
   ${({ theme }) => theme.media.tablet} {
@@ -460,8 +436,8 @@ const SHeadline = styled(Headline)`
 
     text-align: left;
 
-    font-size: 36px;
-    line-height: 44px;
+    font-size: 28px;
+    line-height: 36px;
   }
 
   ${({ theme }) => theme.media.laptopL} {
@@ -475,18 +451,15 @@ const SHeadline = styled(Headline)`
 const SSubheading = styled(Text)`
   display: none;
 
-  // NB! Temp
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  font-weight: 600;
+  font-style: normal;
 
   ${({ theme }) => theme.media.tablet} {
     display: block;
     margin-bottom: 24px;
 
     font-size: 16px;
-    line-height: 20px;
-  }
-
-  ${({ theme }) => theme.media.laptopL} {
     line-height: 24px;
   }
 `;
@@ -501,8 +474,7 @@ const SContinueWithSpan = styled.span`
   font-size: 14px;
   line-height: 20px;
 
-  // NB! Temp
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
   ${({ theme }) => theme.media.tablet} {
@@ -516,18 +488,14 @@ const SErrorDiv = styled.div`
   align-items: center;
 
   text-align: center;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
 
   & > div {
     margin-right: 4px;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
   }
 `;
 
@@ -542,18 +510,12 @@ const SLegalText = styled(Text)`
   line-height: 16px;
 
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  opacity: 0;
-  animation: ${T1};
-  animation-duration: .2s;
-  animation-delay: 3s;
-  animation-fill-mode: forwards;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   a {
     font-weight: 600;
 
-    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
     &:hover, &:focus {
       outline: none;
