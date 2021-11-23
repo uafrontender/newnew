@@ -22,6 +22,7 @@ declare module 'styled-components' {
         background2: string;
         background3: string;
         backgroundT: string;
+        backgroundCookie: string;
         // Used for an initial state.
         outlines1: string;
         // Used for both hover and focus states.
@@ -126,6 +127,7 @@ declare module 'styled-components' {
       mediumBlue: string,
       intenseBlue: string,
       mediumGrey: string,
+      cookie: string,
     },
     gradients: {
       arrowLeft: string,

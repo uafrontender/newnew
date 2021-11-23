@@ -1,10 +1,11 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import styled from 'styled-components';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
 import Footer from '../organisms/Footer';
 import Header from '../organisms/Header';
+import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
 import BottomNavigation from '../organisms/BottomNavigation';
 
@@ -28,7 +29,6 @@ export const General: React.FC<IGeneral> = (props) => {
     resizeMode,
   } = useAppSelector((state) => state.ui);
   const wrapperRef: any = useRef();
-
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
       {
@@ -121,6 +121,11 @@ export const General: React.FC<IGeneral> = (props) => {
         visible={isMobile && scrollDirection !== 'down'}
         collection={bottomNavigation}
       />
+      <CookieContainer
+        bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+      >
+        <Cookie />
+      </CookieContainer>
     </SWrapper>
   );
 };
@@ -161,5 +166,23 @@ const SContent = styled.main`
 
   ${(props) => props.theme.media.laptop} {
     padding: 40px 0;
+  }
+`;
+
+interface ICookieContainer {
+  bottomNavigationVisible: boolean;
+}
+
+const CookieContainer = styled.div<ICookieContainer>`
+  left: 50%;
+  bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
+  z-index: 10;
+  position: fixed;
+  transform: translateX(-50%);
+  transition: bottom ease 0.5s;
+  pointer-events: none;
+
+  ${(props) => props.theme.media.tablet} {
+    bottom: ${(props) => (props.bottomNavigationVisible ? 80 : 24)}px;
   }
 `;
