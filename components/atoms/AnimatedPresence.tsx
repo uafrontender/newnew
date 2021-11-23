@@ -80,7 +80,6 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     <FMAnimatedPresence>
       <motion.div
         exit={`${animation}_exit`}
-        style={{ overflow: 'hidden' }}
         animate={start && animation}
         initial={`${animation}_initial`}
         variants={variants}
