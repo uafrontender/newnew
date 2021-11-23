@@ -44,7 +44,7 @@ const SText1 = styled(SText)`
     line-height: 20px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 24px;
     line-height: 32px;
   }
@@ -59,7 +59,7 @@ const SText2 = styled(SText)`
     line-height: 20px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 16px;
     line-height: 24px;
   }
@@ -74,7 +74,7 @@ const SText3 = styled(SText)`
     line-height: 18px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     font-size: 14px;
     line-height: 20px;
   }

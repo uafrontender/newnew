@@ -35,6 +35,8 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
     return (
       <Button
         iconOnly
+        size="lg"
+        view="secondary"
         onClick={onClick}
         {...rest}
       >

@@ -6,7 +6,7 @@ module.exports = {
   SUPPORTED_AUTH_PROVIDERS: [
     'google',
     'apple',
-    'facebook',
+    'fb',
     'twitter',
   ],
 };

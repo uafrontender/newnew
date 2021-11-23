@@ -1,4 +1,14 @@
-FROM node:16.5.0-alpine
+FROM nginx:alpine
+
+COPY ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+COPY ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+RUN mkdir -p /etc/nginx/auth && apk add nodejs-current && apk add --update npm
+
+COPY ./docker/nginx/auth/.htpasswd /etc/nginx/auth/.htpasswd
+
+COPY ./docker/nginx/entrypoint.sh /app/entrypoint.sh
 
 # The value of `NEXT_JS_ASSET_URL` is passed in using the `--build-arg` option
 # of the `docker build` command run in `.gitlab-ci.yml`. It is used like an
@@ -21,4 +31,6 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["sh", "/app/entrypoint.sh"]

@@ -85,7 +85,7 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
           </SIndicatorContainer>
         )}
       </SSVGContainer>
-      <SCaption variant={2} active={active}>
+      <SCaption variant={3} active={active}>
         {t(`mobile-bottom-navigation-${item.key}`)}
       </SCaption>
     </SContainer>

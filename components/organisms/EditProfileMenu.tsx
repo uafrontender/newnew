@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import { isEqual } from 'lodash';
 import validator from 'validator';
 
@@ -25,14 +26,11 @@ interface IEditProfileMenu {
   handleClosePreventDiscarding: () => void;
 }
 
-type ModalMenuUserData = Omit<
-  newnewapi.Me, 'toJSON' | 'email' | 'options' | 'id' | '_displayname' | '_email' | 'options'
-  >
-  // Temp
-  & {
-    bio: string;
-    backgroundUrl: string;
-  }
+type ModalMenuUserData = {
+  username: string;
+  displayName: string;
+  bio: string;
+}
 
 type TFormErrors = {
   displaynameError?: string;
@@ -50,10 +48,15 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const { user, ui } = useAppSelector((state) => state);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
 
+  // Image data
+  const [avatarUrl, setAvatarUrl] = useState(user.userData?.avatarUrl);
+  const [coverUrl, setCoverUrl] = useState(user.userData?.coverUrl);
+
+  // Textual data
   const [dataInEdit, setDataInEdit] = useState<ModalMenuUserData>({
-    bio: '',
-    backgroundUrl: '',
-    ...user.userData!!,
+    displayName: user.userData?.displayName ?? '',
+    username: user.userData?.username ?? '',
+    bio: user.userData?.bio ?? '',
   });
   const [isDataValid, setIsDataValid] = useState(false);
   const [formErrors, setFormErrors] = useState<TFormErrors>({
@@ -75,9 +78,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   useEffect(() => {
     // Temp
     const initialData: ModalMenuUserData = {
-      bio: '',
-      backgroundUrl: '',
-      ...user.userData!!,
+      displayName: user.userData?.displayName ?? '',
+      username: user.userData?.username ?? '',
+      bio: user.userData?.bio ?? '',
     };
 
     if (isEqual(dataInEdit, initialData)) {

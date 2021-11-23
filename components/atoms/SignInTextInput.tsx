@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import InlineSvg from './InlineSVG';
 
+import AnimatedPresence from './AnimatedPresence';
+
 import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
 
 type TTextInput = React.ComponentPropsWithoutRef<'input'> & {
@@ -40,14 +42,18 @@ const SignInTextInput: React.FunctionComponent<TTextInput> = ({
       />
       {
         errorBordersShown ? (
-          <SErrorDiv>
-            <InlineSvg
-              svg={AlertIcon}
-              width="16px"
-              height="16px"
-            />
-            { errorCaption }
-          </SErrorDiv>
+          <AnimatedPresence
+            animation="t-09"
+          >
+            <SErrorDiv>
+              <InlineSvg
+                svg={AlertIcon}
+                width="16px"
+                height="16px"
+              />
+              { errorCaption }
+            </SErrorDiv>
+          </AnimatedPresence>
         ) : null
       }
     </>
@@ -66,6 +72,8 @@ interface ISSignInTextInput {
 
 const SSignInTextInput = styled.input<ISSignInTextInput>`
   display: block;
+
+  height: 44px;
 
   font-weight: 500;
   font-size: 14px;
@@ -108,6 +116,8 @@ const SSignInTextInput = styled.input<ISSignInTextInput>`
   }
 
   ${({ theme }) => theme.media.tablet} {
+    height: 48px;
+
     font-size: 16px;
     line-height: 24px;
   }
@@ -118,18 +128,16 @@ const SErrorDiv = styled.div`
   justify-content: flex-start;
   align-items: center;
 
+  margin-top: 6px;
+
   text-align: center;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
 
   & > div {
     margin-right: 4px;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
   }
 `;
