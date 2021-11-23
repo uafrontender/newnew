@@ -69,7 +69,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const userDataBuffer = await fetch(`http://localhost:3000/api/user/get_user_by_username?username=${username}`).then((res) => res.arrayBuffer());
+  const userDataBuffer = await fetch(`http://localhost:4000/api/user/get_user_by_username?username=${username}`).then((res) => res.arrayBuffer());
 
   if (!userDataBuffer) {
     return {

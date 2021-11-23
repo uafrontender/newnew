@@ -24,15 +24,15 @@ export default ProfileImageInput;
 
 const SProfileImageInput = styled.div`
   position: absolute;
-  left: calc(50% - 48px);
-  top: 112px;
+  left: calc(50% - 42px);
+  top: 118px;
   overflow: hidden;
 
   z-index: 2;
 
   border-radius: 50%;
-  width: 96px;
-  height: 96px;
+  width: 84px;
+  height: 84px;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -43,10 +43,10 @@ const SProfileImageInput = styled.div`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
-    top: 152px;
+
   }
 
   ${(props) => props.theme.media.laptop} {
-    top: 192px;
+
   }
 `;

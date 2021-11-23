@@ -193,12 +193,13 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               />
             </Button>
           </SShareDiv>
-          <SBioText>
-            {/* {user.userData?.bio} */}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            {' '}
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </SBioText>
+          {user.userData?.bio ? (
+            <SBioText
+              variant={3}
+            >
+              { user.userData?.bio }
+            </SBioText>
+          ) : null}
         </div>
         <ProfileTabs
           pageType="myProfile"

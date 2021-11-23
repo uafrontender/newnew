@@ -18,6 +18,8 @@ import Button from '../atoms/Button';
 import DisplaynameInput from '../atoms/profile/DisplayNameInput';
 import UsernameInput from '../atoms/profile/UsernameInput';
 import BioTextarea from '../atoms/profile/BioTextarea';
+import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
+import ProfileImageInput from '../molecules/profile/ProfileImageInput';
 
 interface IEditProfileMenu {
   wasModified: boolean;
@@ -139,7 +141,15 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             />
           </SGoBackButtonDesktop>
         )}
-      <SInputsWrapper>
+      <SImageInputsWrapper>
+        <ProfileBackgroundInput
+          pictureURL={user.userData?.coverUrl}
+        />
+        <ProfileImageInput
+          src={user.userData?.avatarUrl!!}
+        />
+      </SImageInputsWrapper>
+      <STextInputsWrapper>
         <DisplaynameInput
           type="text"
           value={dataInEdit.displayName as string}
@@ -170,7 +180,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
           onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
         />
-      </SInputsWrapper>
+      </STextInputsWrapper>
       <SControlsWrapper>
         {!isMobile
           ? (
@@ -252,7 +262,16 @@ const SGoBackButtonDesktop = styled.button`
   cursor: pointer;
 `;
 
-const SInputsWrapper = styled.div`
+const SImageInputsWrapper = styled.div`
+position: relative;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+`;
+
+const STextInputsWrapper = styled.div`
   flex-grow: 1;
 
   display: flex;

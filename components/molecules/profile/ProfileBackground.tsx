@@ -48,6 +48,9 @@ const SProfileBackground = styled.div<ISProfileBackground>`
 
   #profileBackgroundSvg{
     position: absolute;
+    left: calc(50% - 188px);
+
+
     z-index: -10;
     width: 0px;
     height: 0px;
