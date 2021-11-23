@@ -5,7 +5,7 @@ import { motion, AnimatePresence as FMAnimatedPresence, Variants } from 'framer-
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
-  animation: 't-01' | 't-02' | 't-08' | 't-09' | 't-10';
+  animation: 't-01' | 't-02' | 't-08' | 't-09' | 't-10' | 'trans-06' | 'trans-06-reverse';
   onAnimationEnd?: () => void;
 }
 
@@ -92,6 +92,34 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     },
     't-10_exit': {
       x: 0,
+    },
+    'trans-06': {
+      y: 0,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.5,
+      },
+    },
+    'trans-06_initial': {
+      y: 120,
+      opacity: 0,
+    },
+    'trans-06_exit': {
+      y: 120,
+      opacity: 0,
+    },
+    'trans-06-reverse': {
+      y: 120,
+      opacity: 0,
+      transition: {},
+    },
+    'trans-06_initial-reverse': {
+      y: 0,
+      opacity: 1,
+    },
+    'trans-06_exit-reverse': {
+      y: 0,
+      opacity: 1,
     },
   };
 
