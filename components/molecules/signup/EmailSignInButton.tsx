@@ -121,7 +121,7 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
     opacity: 0;
   }
 
-  &:hover {
+  &:hover:enabled {
     &:after {
       opacity: 1;
     }
