@@ -101,15 +101,15 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       },
     },
     'trans-06_initial': {
-      y: 80,
+      y: 120,
       opacity: 0,
     },
     'trans-06_exit': {
-      y: 80,
+      y: 120,
       opacity: 0,
     },
     'trans-06-reverse': {
-      y: 80,
+      y: 120,
       opacity: 0,
       transition: {},
     },
