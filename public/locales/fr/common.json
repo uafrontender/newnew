@@ -43,6 +43,8 @@
   "dd-currency-title-eur": "FR Euro",
   "dd-currency-subTitle-usd": "FR USD - $",
   "dd-currency-subTitle-eur": "FR EUR - €",
-  "selected-currency-title-usd": "vUSD",
-  "selected-currency-title-eur": "FR EUR"
+  "selected-currency-title-usd": "FR USD",
+  "selected-currency-title-eur": "FR EUR",
+  "cookie-text": "FR We use \uD83C\uDF6A",
+  "cookie-link": "FR Learn more"
 }
