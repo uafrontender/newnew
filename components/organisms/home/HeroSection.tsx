@@ -139,15 +139,31 @@ export const HeroSection = () => {
           <SButtonsHolder>
             {isMobile ? (
               <>
-                <SButton noRipple noHover noShadow onClick={handleSignInClick}>
+                <SButton
+                  noHover
+                  noRipple
+                  noShadow
+                  onClick={handleSignInClick}
+                >
                   {t('hero-block-sign-in')}
                 </SButton>
-                <SButton noRipple noHover view="secondary" onClick={handleExploreClick}>
+                <SButton
+                  noHover
+                  noRipple
+                  noShadow
+                  view="secondary"
+                  onClick={handleExploreClick}
+                >
                   {t('hero-block-explore')}
                 </SButton>
               </>
             ) : (
-              <SButton onClick={handleExploreClick}>
+              <SButton
+                noHover
+                noShadow
+                noRipple
+                onClick={handleExploreClick}
+              >
                 {t('hero-block-explore-now')}
               </SButton>
             )}
@@ -186,7 +202,7 @@ const SHeadline = styled(Headline)`
   ${(props) => props.theme.media.tablet} {
     max-width: 320px;
   }
-  
+
   ${(props) => props.theme.media.laptop} {
     max-width: 480px;
   }
