@@ -11,13 +11,21 @@ type TSignInButton = React.ComponentPropsWithoutRef<'button'> & {
   svg: string;
   hoverSvg?: string;
   title?: string;
+  noRipple?: boolean,
   hoverBgColor?: string;
   hoverContentColor?: string;
   pressedBgColor: string;
 }
 
 const SignInButton: React.FunctionComponent<TSignInButton> = ({
-  title, svg, hoverSvg, children, onClick, disabled, ...rest
+  title,
+  svg,
+  hoverSvg,
+  noRipple,
+  children,
+  onClick,
+  disabled,
+  ...rest
 }) => {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -28,9 +36,11 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
   const [rippleOrigin, setRippleOrigin] = useState<{x: string, y: string}>({ x: '50%', y: '50%' });
   const [isRippling, setIsRippling] = useState(false);
 
-  const handleClick = useMemo(() => debounce(onClick!!, 900), [onClick]);
-  const handleRestoreRippling = useMemo(() => debounce(() => setIsRippling(false), 750),
-    [setIsRippling]);
+  const handleClick = useMemo(() => debounce(onClick!!, noRipple ? 300 : 900), [noRipple, onClick]);
+  const handleRestoreRippling = useMemo(() => debounce(() => {
+    if (noRipple) return;
+    setIsRippling(false);
+  }, 750), [noRipple, setIsRippling]);
 
   const handleEnableHovered = useCallback(() => {
     if (disabled) return;
@@ -114,7 +124,8 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
       }}
       elementWidth={ref.current?.getBoundingClientRect().width ?? 800}
       rippleOrigin={rippleOrigin}
-      isRippling={isRippling}
+      isRippling={noRipple ? false : isRippling}
+      noRipple={noRipple ?? false}
       onMouseOver={handleEnableHovered}
       onTouchStartCapture={handleEnableHovered}
       onFocusCapture={handleFocusCapture}
@@ -144,6 +155,7 @@ const SignInButton: React.FunctionComponent<TSignInButton> = ({
 SignInButton.defaultProps = {
   title: undefined,
   hoverSvg: undefined,
+  noRipple: false,
   hoverBgColor: undefined,
   hoverContentColor: undefined,
   onClick: () => {},
@@ -157,6 +169,7 @@ interface SISignInButton {
   pressedBgColor: string;
   elementWidth: number;
   isRippling: boolean;
+  noRipple: boolean;
   rippleOrigin: {
     x: string;
     y: string;
@@ -262,6 +275,23 @@ const SSignInButton = styled.button<SISignInButton>`
       animation-name: ${RippleAnimation};
     }
   ` : null)}
+
+  ${({ isRippling }) => (isRippling ? css`
+    &::before {
+      animation-duration: .9s;
+      animation-fill-mode: forwards;
+      animation-name: ${RippleAnimation};
+    }
+  ` : null)}
+
+  &:enabled:active {
+    transform: scale(.9);
+    background: ${({ noRipple, pressedBgColor }) => (
+    noRipple ? (
+      pressedBgColor
+    ) : 'initial')};
+    transition: .2s ease-in-out;
+  }
 
   &:disabled {
     opacity: .5;

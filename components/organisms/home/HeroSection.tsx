@@ -1,4 +1,9 @@
-import React from 'react';
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -7,6 +12,7 @@ import { useTranslation } from 'next-i18next';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
 import NotificationItem from '../../molecules/NotificationsItem';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -17,7 +23,12 @@ export const HeroSection = () => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const notifications = [
+
+  const [animateTitle, setAnimateTitle] = useState(false);
+  const [animateSubTitle, setAnimateSubTitle] = useState(false);
+  const [animateButton, setAnimateButton] = useState(false);
+
+  const notifications = useMemo(() => [
     {
       id: 'uniqueid-1',
       bid: 50,
@@ -70,7 +81,7 @@ export const HeroSection = () => {
         nickname: '@unicornbaby',
       },
     },
-  ];
+  ], []);
 
   const handleSignInClick = () => {
     router.push('/sign-up');
@@ -90,31 +101,74 @@ export const HeroSection = () => {
   );
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const handleTitleAnimationEnd = useCallback(() => {
+    setAnimateSubTitle(true);
+  }, []);
+  const handleSubTitleAnimationEnd = useCallback(() => {
+    setAnimateButton(true);
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setAnimateTitle(true);
+    }, 0);
+  }, []);
+
   return (
     <SWrapper>
       <STopWrapper>
-        <Headline>
-          {t('hero-block-title')}
-        </Headline>
+        <SHeadline>
+          <AnimatedPresence
+            start={animateTitle}
+            animation="t-08"
+            onAnimationEnd={handleTitleAnimationEnd}
+          >
+            {t('hero-block-title')}
+          </AnimatedPresence>
+        </SHeadline>
         <SSubTitle weight={600}>
-          {t('hero-block-subTitle')}
+          <AnimatedPresence
+            start={animateSubTitle}
+            animation="t-02"
+            onAnimationEnd={handleSubTitleAnimationEnd}
+          >
+            {t('hero-block-subTitle')}
+          </AnimatedPresence>
         </SSubTitle>
-        <SButtonsHolder>
-          {isMobile ? (
-            <>
-              <Button onClick={handleSignInClick}>
-                {t('hero-block-sign-in')}
-              </Button>
-              <Button view="secondary" onClick={handleExploreClick}>
-                {t('hero-block-explore')}
-              </Button>
-            </>
-          ) : (
-            <Button onClick={handleExploreClick}>
-              {t('hero-block-explore-now')}
-            </Button>
-          )}
-        </SButtonsHolder>
+        <AnimatedPresence start={animateButton} animation="t-01">
+          <SButtonsHolder>
+            {isMobile ? (
+              <>
+                <SButton
+                  noHover
+                  noRipple
+                  noShadow
+                  onClick={handleSignInClick}
+                >
+                  {t('hero-block-sign-in')}
+                </SButton>
+                <SButton
+                  noHover
+                  noRipple
+                  noShadow
+                  view="secondary"
+                  onClick={handleExploreClick}
+                >
+                  {t('hero-block-explore')}
+                </SButton>
+              </>
+            ) : (
+              <SButton
+                noHover
+                noShadow
+                noRipple
+                onClick={handleExploreClick}
+              >
+                {t('hero-block-explore-now')}
+              </SButton>
+            )}
+          </SButtonsHolder>
+        </AnimatedPresence>
       </STopWrapper>
       <SNotificationsList>
         <GradientMask />
@@ -142,9 +196,30 @@ const STopWrapper = styled.div`
   white-space: pre-line;
 `;
 
+const SHeadline = styled(Headline)`
+  max-width: 250px;
+
+  ${(props) => props.theme.media.tablet} {
+    max-width: 320px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    max-width: 480px;
+  }
+`;
+
 const SSubTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   margin-top: 16px;
+  max-width: 220px;
+
+  ${(props) => props.theme.media.tablet} {
+    max-width: 230px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    max-width: 340px;
+  }
 `;
 
 const SButtonsHolder = styled.div`
@@ -189,7 +264,15 @@ const SNotificationItemHolder = styled.div`
     max-width: 344px;
   }
 
-  ${(props) => props.theme.media.tablet} {
+  ${(props) => props.theme.media.laptop} {
     max-width: 608px;
+  }
+`;
+
+const SButton = styled(Button)`
+  padding: 12px 24px;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 16px;
   }
 `;

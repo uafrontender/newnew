@@ -8,9 +8,10 @@ import Header from '../organisms/Header';
 import Container from '../atoms/Grid/Container';
 import BottomNavigation from '../organisms/BottomNavigation';
 
+import { useAppSelector } from '../../redux-store/store';
 import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
-import { useAppSelector } from '../../redux-store/store';
+import useScrollDirection from '../../utils/hooks/useScrollDirection';
 import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
@@ -95,6 +96,8 @@ export const General: React.FC<IGeneral> = (props) => {
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
   useRefreshOnScrollTop();
+  const { scrollDirection } = useScrollDirection(wrapperRef);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   return (
     <SWrapper
@@ -103,7 +106,7 @@ export const General: React.FC<IGeneral> = (props) => {
       withBanner={!!banner?.show}
       {...props}
     >
-      <Header />
+      <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
       <SContent>
         <Container>
           <Row>
@@ -114,9 +117,10 @@ export const General: React.FC<IGeneral> = (props) => {
         </Container>
       </SContent>
       <Footer />
-      {resizeMode.includes('mobile') && (
-        <BottomNavigation collection={bottomNavigation} />
-      )}
+      <BottomNavigation
+        visible={isMobile && scrollDirection !== 'down'}
+        collection={bottomNavigation}
+      />
     </SWrapper>
   );
 };
@@ -132,7 +136,7 @@ const SWrapper = styled.div<ISWrapper>`
   height: 100vh;
   display: flex;
   overflow-y: auto;
-  transition: all ease 0.5s;
+  transition: all ease 1s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
   flex-direction: column;

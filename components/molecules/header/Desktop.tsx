@@ -1,27 +1,21 @@
 import React from 'react';
-import { scroller } from 'react-scroll';
+import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
 
+import Logo from '../Logo';
 import Button from '../../atoms/Button';
-import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import tabletLogo from '../../../public/images/svg/tablet-logo.svg';
-
-import { SCROLL_TO_TOP } from '../../../constants/timings';
-
 interface IDesktop {
 }
 
 export const Desktop: React.FC<IDesktop> = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -39,28 +33,10 @@ export const Desktop: React.FC<IDesktop> = () => {
   const handleSignUpClick = () => {
     router.push('/sign-up');
   };
-  const handleLogoClick = () => {
-    if (router.pathname === '/') {
-      scroller.scrollTo('top-reload', {
-        smooth: 'easeInOutQuart',
-        duration: SCROLL_TO_TOP,
-        containerId: 'generalScrollContainer',
-      });
-    } else {
-      router.push('/', '/');
-    }
-  };
 
   return (
     <SContainer>
-      <InlineSVG
-        clickable
-        svg={tabletLogo}
-        fill={theme.colorsThemed.text.primary}
-        width="152px"
-        height="32px"
-        onClick={handleLogoClick}
-      />
+      <Logo />
       <SRightBlock>
         {user.loggedIn && (
           <>
@@ -113,6 +89,7 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
+                    noRipple
                     view="secondary"
                     onClick={handleDashboardClick}
                   >
@@ -120,7 +97,10 @@ export const Desktop: React.FC<IDesktop> = () => {
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button onClick={handleCreateClick}>
+                  <Button
+                    noRipple
+                    onClick={handleCreateClick}
+                  >
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
@@ -135,7 +115,10 @@ export const Desktop: React.FC<IDesktop> = () => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button onClick={handleCreateClick}>
+                  <Button
+                    noRipple
+                    onClick={handleCreateClick}
+                  >
                     {t('button-create-on-newnew')}
                   </Button>
                 </SItemWithMargin>
@@ -153,6 +136,7 @@ export const Desktop: React.FC<IDesktop> = () => {
           <>
             <SItemWithMargin>
               <Button
+                noShadow
                 view="secondary"
                 onClick={handleSignInClick}
               >
@@ -160,7 +144,7 @@ export const Desktop: React.FC<IDesktop> = () => {
               </Button>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button onClick={handleSignUpClick}>
+              <Button noRipple onClick={handleSignUpClick}>
                 {t('button-sign-up')}
               </Button>
             </SItemWithMargin>
@@ -187,5 +171,13 @@ const SRightBlock = styled.nav`
 `;
 
 const SItemWithMargin = styled.div`
-  margin-left: 24px;
+  margin-left: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-left: 24px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-left: 16px;
+  }
 `;

@@ -27,6 +27,7 @@ declare module 'styled-components' {
         // Used for both hover and focus states.
         outlines2: string;
         numbers: string;
+        backgroundFooter: string;
       },
       text: {
         // Used for both links and titles.
@@ -70,44 +71,54 @@ declare module 'styled-components' {
       },
       button: {
         color: {
+          blue: string,
           primary: string,
           secondary: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
-          primaryProgress: string,
+          blueProgress: string,
+          changeLanguage: string,
         },
         background: {
+          blue: string,
           primary: string,
           secondary: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
-          primaryProgress: string,
+          blueProgress: string,
+          changeLanguage: string,
         },
         ripple: {
+          blue: string,
           primary: string,
           secondary: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
-          primaryProgress: string,
+          blueProgress: string,
+          changeLanguage: string,
         },
         hover: {
+          blue: string,
           primary: string,
           secondary: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
-          primaryProgress: string,
+          blueProgress: string,
+          changeLanguage: string,
         },
         progress: {
+          blue: string,
           primary: string,
           secondary: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
-          primaryProgress: string,
+          blueProgress: string,
+          changeLanguage: string,
         }
       },
     },

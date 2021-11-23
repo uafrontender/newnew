@@ -158,7 +158,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   position: absolute;
   transform: translateY(-50%);
   max-height: 100%;
-  transition: all ease 1s;
+  transition: all ease 1.75s;
   background: ${(props) => props.theme.colorsThemed.grayscale[props.active ? 'background1' : 'background2']};
   border-radius: 12px;
   flex-direction: row;
@@ -167,6 +167,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   ${({ theme }) => theme.media.tablet} {
     width: ${(props) => (props.active ? 'calc(100vw - 64px)' : '48px')};
     padding: 10.5px;
+    border-radius: 16px;
   }
 
   ${({ theme }) => theme.media.laptop} {

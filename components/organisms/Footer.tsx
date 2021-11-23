@@ -7,6 +7,7 @@ import styled, { useTheme } from 'styled-components';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
+import Caption from '../atoms/Caption';
 import Container from '../atoms/Grid/Container';
 import InlineSvg from '../atoms/InlineSVG';
 import ChangeLanguage from '../atoms/ChangeLanguage';
@@ -113,21 +114,21 @@ export const Footer: React.FC<IFooter> = () => {
               </SIconHolder>
               <STopContent>
                 <SBlock>
-                  <SBlockTitle>
+                  <SBlockTitle weight={700}>
                     {t('footer-top-title')}
                   </SBlockTitle>
                   {topItems.map(renderItem)}
                 </SBlock>
                 {isMobile && <SSeparator />}
                 <SBlock>
-                  <SBlockTitle>
+                  <SBlockTitle weight={700}>
                     {t('footer-center-title')}
                   </SBlockTitle>
                   {centerItems.map(renderItem)}
                 </SBlock>
                 {isMobile && <SSeparator />}
                 <SBlock>
-                  <SBlockTitle>
+                  <SBlockTitle weight={700}>
                     {t('footer-bottom-title')}
                   </SBlockTitle>
                   <SBlockRow>
@@ -201,7 +202,7 @@ export const Footer: React.FC<IFooter> = () => {
 export default Footer;
 
 const SWrapper = styled.footer`
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background2};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundFooter};
 `;
 
 const SContent = styled.div`
@@ -249,11 +250,8 @@ const SSeparator = styled.div`
   }
 `;
 
-const SBlockTitle = styled.div`
+const SBlockTitle = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-size: 16px;
-  line-height: 19px;
-  font-weight: bold;
   margin-bottom: 24px;
 `;
 
@@ -261,7 +259,7 @@ const SBlockOption = styled.a`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   font-size: 14px;
   transition: color ease 0.5s;
-  font-weight: bold;
+  font-weight: 600;
   line-height: 24px;
   margin-bottom: 12px;
 
@@ -290,7 +288,7 @@ const SBottomBlockOption = styled.a`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   font-size: 14px;
   transition: color ease 0.5s;
-  font-weight: bold;
+  font-weight: 600;
   line-height: 24px;
   margin-right: 24px;
 
@@ -302,7 +300,7 @@ const SBottomBlockOption = styled.a`
 const SBottomBlockOptionInc = styled.span`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   line-height: 24px;
   margin-right: 24px;
 `;
@@ -313,16 +311,8 @@ const SSvgHolder = styled.a`
 
 const SIconHolder = styled.div`
   top: 32px;
-  right: 16px;
+  right: 0;
   position: absolute;
-
-  ${(props) => props.theme.media.tablet} {
-    right: 32px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    right: 96px;
-  }
 `;
 
 const SLeftBlock = styled.div`
