@@ -28,7 +28,7 @@ const SProfileImageInput = styled.div`
   top: 118px;
   overflow: hidden;
 
-  z-index: 2;
+  z-index: 6;
 
   border-radius: 50%;
   width: 84px;
