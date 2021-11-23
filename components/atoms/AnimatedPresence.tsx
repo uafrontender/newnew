@@ -5,7 +5,7 @@ import { motion, AnimatePresence as FMAnimatedPresence, Variants } from 'framer-
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
-  animation: 't-01' | 't-02' | 't-08' | 't-09';
+  animation: 't-01' | 't-02' | 't-08' | 't-09' | 't-10';
   onAnimationEnd?: () => void;
 }
 
@@ -21,7 +21,9 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
   const variants: Variants = {
     't-01': {
       opacity: 1,
-      transition: { delay: delay ?? 0.5 },
+      transition: {
+        delay: delay ?? 0.5,
+      },
     },
     't-01_initial': {
       opacity: 0,
@@ -32,7 +34,10 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     't-02': {
       y: 0,
       opacity: 1,
-      transition: { delay: 0.5, bounce: 0 },
+      transition: {
+        delay: delay ?? 0.5,
+        bounce: 0,
+      },
     },
     't-02_initial': {
       y: 100,
@@ -45,7 +50,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     't-08': {
       opacity: 1,
       transition: {
-        staggerChildren: 0.5,
+        staggerChildren: delay ?? 0.5,
       },
     },
     't-08_initial': {
@@ -58,7 +63,10 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       opacity: 1,
       x: 0,
       transition: {
-        x: { type: 'spring', stiffness: 1000 },
+        x: {
+          type: 'spring',
+          stiffness: 1000,
+        },
         default: { duration: 2 },
       },
     },
@@ -67,6 +75,23 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     },
     't-09_exit': {
       opacity: 0,
+    },
+    't-10': {
+      x: 5,
+      transition: {
+        delay: delay ?? 0.5,
+        repeat: Infinity,
+        bounce: 0,
+        duration: 0.5,
+        repeatType: 'reverse',
+        repeatDelay: 0.5,
+      },
+    },
+    't-10_initial': {
+      x: 0,
+    },
+    't-10_exit': {
+      x: 0,
     },
   };
 

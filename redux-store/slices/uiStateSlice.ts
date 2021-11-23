@@ -40,7 +40,7 @@ export interface UIStateInterface {
 export const defaultUIState: UIStateInterface = {
   banner: {
     show: true,
-    title: 'Find out who will be new Iron Man',
+    title: 'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
   },
   overlay: false,
   colorMode: 'light',
