@@ -143,7 +143,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         )}
       <SImageInputsWrapper>
         <ProfileBackgroundInput
-          pictureURL={user.userData?.coverUrl}
+          pictureURL={user?.userData?.coverUrl ?? '/images/mock/profile-bg.png'}
         />
         <ProfileImageInput
           src={user.userData?.avatarUrl!!}
