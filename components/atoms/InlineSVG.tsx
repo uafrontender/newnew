@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface IInlineSvg {
   id?: string,
@@ -10,6 +10,7 @@ interface IInlineSvg {
   onClick?: () => any,
   hoverFill?: string | undefined,
   clickable?: boolean,
+  scaleOnClick?: boolean,
 }
 
 export const InlineSvg: React.FC<IInlineSvg> = (props) => {
@@ -36,6 +37,7 @@ InlineSvg.defaultProps = {
   },
   clickable: false,
   hoverFill: undefined,
+  scaleOnClick: false,
 };
 
 export default InlineSvg;
@@ -47,7 +49,16 @@ const SSvgHolder = styled.div<IInlineSvg>`
   align-items: center;
   justify-content: center;
 
-  ${(props) => !!props.clickable && 'cursor: pointer;'}
+  ${(props) => !!props.clickable && css`
+    cursor: pointer;
+  `}
+  ${(props) => !!props.scaleOnClick && css`
+    transition: .2s linear;
+    
+    &:active {
+      transform: scale(0.8);
+    }
+  `}
   svg {
     fill: ${(props) => props.fill};
     width: 100%;

@@ -36,7 +36,7 @@ export const Logo = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setLoading(!loading);
-    }, 2000);
+    }, 3000);
 
     return () => {
       clearInterval(interval);
@@ -54,7 +54,7 @@ export const Logo = () => {
             autoplay: true,
             animationData: logoAnimation,
           }}
-          isStopped={loading}
+          isStopped={!loading}
         />
       </SAnimationWrapper>
       <InlineSVG
