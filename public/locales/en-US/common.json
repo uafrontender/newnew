@@ -45,5 +45,7 @@
   "dd-currency-subTitle-usd": "USD - $",
   "dd-currency-subTitle-eur": "EUR - €",
   "selected-currency-title-usd": "USD",
-  "selected-currency-title-eur": "EUR"
+  "selected-currency-title-eur": "EUR",
+  "cookie-text": "We use \uD83C\uDF6A",
+  "cookie-link": "Learn more"
 }

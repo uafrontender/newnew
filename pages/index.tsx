@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
-import type { NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { NextPage, NextPageContext } from 'next';
 
 import Button from '../components/atoms/Button';
 import TopSection from '../components/organisms/home/TopSection';
@@ -28,7 +28,9 @@ import testBGCreator1 from '../public/images/mock/test_bg_creator_1.jpg';
 import testBGCreator2 from '../public/images/mock/test_bg_creator_2.jpg';
 import testBGCreator3 from '../public/images/mock/test_bg_creator_3.jpg';
 
-const Home: NextPage = () => {
+interface IHome {}
+
+const Home: NextPage<IHome> = () => {
   const { t } = useTranslation('home');
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -752,9 +754,9 @@ const Home: NextPage = () => {
 
 export default Home;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
+export async function getStaticProps(context: NextPageContext): Promise<any> {
   const translationContext = await serverSideTranslations(
-    context.locale,
+    context.locale as string,
     ['common', 'home'],
   );
 

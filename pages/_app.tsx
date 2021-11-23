@@ -6,6 +6,7 @@ import { useStore } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
+import { CookiesProvider } from 'react-cookie';
 import { parse, UserAgent } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 
@@ -65,13 +66,15 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
       {/* <SocketContextProvider> */}
-      <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
-        <ResizeMode>
-          <GlobalTheme>
-            { getLayout(<Component {...pageProps} />) }
-          </GlobalTheme>
-        </ResizeMode>
-      </PersistGate>
+      <CookiesProvider>
+        <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
+          <ResizeMode>
+            <GlobalTheme>
+              { getLayout(<Component {...pageProps} />) }
+            </GlobalTheme>
+          </ResizeMode>
+        </PersistGate>
+      </CookiesProvider>
       {/* </SocketContextProvider> */}
     </>
   );
