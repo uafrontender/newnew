@@ -31,6 +31,7 @@ export const lightTheme: DefaultTheme = {
       background2: '#F1F3F9',
       background3: '#F1F3F9',
       backgroundT: 'transparent',
+      backgroundCookie: '#FFFFFF',
       outlines1: '#E5E9F1',
       outlines2: '#8B99B2',
       numbers: '#E5E9F1',
@@ -129,6 +130,7 @@ export const lightTheme: DefaultTheme = {
     mediumBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.25)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
+    cookie: '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
   },
   gradients: {
     arrowLeft: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
@@ -150,6 +152,7 @@ export const darkTheme: DefaultTheme = {
       background2: '#14151F',
       background3: '#1B1C27',
       backgroundT: 'rgba(11, 10, 19, 0.65)',
+      backgroundCookie: '#1B1C27',
       outlines1: '#272835',
       outlines2: '#6A6A7B',
       numbers: 'rgba(255, 255, 255, 0.06)',
@@ -248,6 +251,7 @@ export const darkTheme: DefaultTheme = {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
+    cookie: '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
   },
   gradients: {
     arrowLeft: 'linear-gradient(90deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
