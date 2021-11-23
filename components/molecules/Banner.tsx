@@ -3,20 +3,26 @@ import styled, { useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import InlineSVG from '../atoms/InlineSVG';
+import AnimatedPresence from '../atoms/AnimatedPresence';
 
 import { setBanner } from '../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 
 interface IBanner {
 }
 
 export const Banner: React.FC<IBanner> = () => {
-  const { banner } = useAppSelector((state) => state.ui);
+  const {
+    banner,
+    resizeMode,
+  } = useAppSelector((state) => state.ui);
 
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const onClose = () => {
     dispatch(setBanner({
@@ -24,15 +30,30 @@ export const Banner: React.FC<IBanner> = () => {
       show: false,
     }));
   };
+  const handleBannerClick = () => {
+  };
 
   return (
-    <SContainer active={banner?.show}>
+    <SContainer active={banner?.show} onClick={handleBannerClick}>
       <SText variant={3} weight={600}>
         {banner?.title}
       </SText>
+      {!isMobile && (
+        <SIconHolder>
+          <AnimatedPresence start animation="t-10">
+            <InlineSVG
+              svg={arrowIcon}
+              fill={theme.colors.white}
+              width="24px"
+              height="24px"
+            />
+          </AnimatedPresence>
+        </SIconHolder>
+      )}
       <SCloseIconHolder>
         <InlineSVG
           clickable
+          scaleOnClick
           svg={closeIcon}
           fill={theme.colors.white}
           width="24px"
@@ -51,31 +72,59 @@ interface ISContainer {
 }
 
 const SContainer = styled.div<ISContainer>`
-  height: ${(props) => (props.active ? 40 : 0)}px;
+  top: ${(props) => (props.active ? 0 : -40)}px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  cursor: pointer;
   display: flex;
   overflow: hidden;
-  position: relative;
-  animation: gradient 5s ease infinite;
-  transition: all ease 0.5s;
-  background: ${(props) => props.theme.gradients.bannerPink};
+  position: absolute;
+  transition: all ease 1s;
+  background: ${(props) => props.theme.colorsThemed.accent.pink};
   align-items: center;
-  background-size: 300% 300%;
   justify-content: center;
 
-  @keyframes gradient {
-    0% {
-      background-position: 100% 0%;
+  &::after {
+    top: 0;
+    left: 0;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    position: absolute;
+    transform: translateX(-100%);
+    animation: shimmer 5s ease infinite;
+    background: ${(props) => props.theme.gradients.bannerPink};
+    content: '';
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
     }
   }
 `;
 
 const SText = styled(Text)`
   color: ${(props) => props.theme.colors.white};
+  z-index: 2;
+  overflow: hidden;
+  max-width: 70%;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const SIconHolder = styled.div`
+  z-index: 2;
+  margin-left: 8px;
 `;
 
 const SCloseIconHolder = styled.div`
   top: 50%;
   right: 16px;
+  z-index: 2;
   position: absolute;
   transform: translateY(-50%);
 `;

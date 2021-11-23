@@ -158,7 +158,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   position: absolute;
   transform: translateY(-50%);
   max-height: 100%;
-  transition: all ease 1s;
+  transition: all ease 1.75s;
   background: ${(props) => props.theme.colorsThemed.grayscale[props.active ? 'background1' : 'background2']};
   border-radius: 12px;
   flex-direction: row;
