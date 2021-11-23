@@ -69,7 +69,7 @@ const HomeLogoButton: React.FunctionComponent = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setLoading(!playing);
-    }, 2000);
+    }, 3000);
 
     return () => {
       clearInterval(interval);
