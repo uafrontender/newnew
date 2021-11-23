@@ -32,7 +32,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     't-02': {
       y: 0,
       opacity: 1,
-      transition: { delay: 0.5 },
+      transition: { delay: 0.5, bounce: 0 },
     },
     't-02_initial': {
       y: 100,
@@ -96,7 +96,6 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     <FMAnimatedPresence>
       <motion.div
         exit={`${animation}_exit`}
-        style={{ overflow: 'hidden' }}
         animate={start && animation}
         initial={`${animation}_initial`}
         variants={variants}

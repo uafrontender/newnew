@@ -32,9 +32,9 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const { t } = useTranslation('home');
   const ref: any = useRef();
   const scrollContainerRef: any = useRef();
-  const [listScroll, setListScroll] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
   const [isDragging, setIsDragging] = useState(false);
@@ -57,12 +57,28 @@ export const TopSection: React.FC<ITopSection> = (props) => {
 
   const restore = useCallback(() => setWasDragged(false), []);
   const handleLeftClick = () => {
-    setListScroll(listScroll - scrollStep);
+    scrollListTo(visibleListItem - scrollStep - 1);
   };
   const handleRightClick = () => {
-    setListScroll(listScroll + scrollStep);
+    scrollListTo(visibleListItem + scrollStep);
   };
+  const scrollListTo = (to: number) => {
+    let scrollTo = to;
 
+    if (to < 0) {
+      scrollTo = 0;
+    } else if (scrollTo > collection.length - 1) {
+      scrollTo = collection.length - 1;
+    }
+
+    scroller.scrollTo(`top-section-${scrollTo}`, {
+      offset: -32,
+      smooth: 'easeInOutQuart',
+      duration: SCROLL_TOP_10,
+      horizontal: true,
+      containerId: 'topScrollContainer',
+    });
+  };
   const mouseDownHandler = (e: any) => {
     setIsDragging(true);
     setClientX(e.clientX);
@@ -84,15 +100,15 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const mouseUpHandler = () => {
     if (!isDragging) return;
 
-    if (mouseInitial < clientX) {
-      if (canScrollLeft) {
-        handleLeftClick();
-      }
-    } else if (mouseInitial > clientX) {
-      if (canScrollRight) {
-        handleRightClick();
-      }
-    }
+    // if (mouseInitial < clientX) {
+    //   if (canScrollLeft) {
+    //     handleLeftClick();
+    //   }
+    // } else if (mouseInitial > clientX) {
+    //   if (canScrollRight) {
+    //     handleRightClick();
+    //   }
+    // }
 
     setIsDragging(false);
   };
@@ -129,17 +145,17 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   } = useHoverArrows(ref);
 
   useEffect(() => {
-    scroller.scrollTo(`top-section-${listScroll}`, {
-      offset: -32,
-      smooth: 'easeInOutQuart',
-      duration: SCROLL_TOP_10,
-      horizontal: true,
-      containerId: 'topScrollContainer',
-    });
+    scrollContainerRef.current.addEventListener('scroll', () => {
+      const currentScrollPosition = scrollContainerRef.current.scrollLeft;
+      const childWidth = scrollContainerRef.current.firstChild.getBoundingClientRect().width;
 
-    setCanScrollLeft(listScroll !== 0);
-    setCanScrollRight(listScroll < collection.length - scrollStep);
-  }, [listScroll, collection, scrollStep]);
+      setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
+    });
+  }, []);
+  useEffect(() => {
+    setCanScrollLeft(visibleListItem !== 0);
+    setCanScrollRight(visibleListItem < collection.length - 1);
+  }, [visibleListItem, collection]);
 
   return (
     <SWrapper name="topSection">

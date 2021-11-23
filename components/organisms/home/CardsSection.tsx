@@ -47,9 +47,9 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const router = useRouter();
   const ref: any = useRef();
   const scrollContainerRef: any = useRef();
-  const [listScroll, setListScroll] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
   const [isDragging, setIsDragging] = useState(false);
@@ -81,10 +81,27 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     router.push(url);
   };
   const handleLeftClick = () => {
-    setListScroll(listScroll - scrollStep);
+    scrollListTo(visibleListItem - scrollStep - 1);
   };
   const handleRightClick = () => {
-    setListScroll(listScroll + scrollStep);
+    scrollListTo(visibleListItem + scrollStep);
+  };
+  const scrollListTo = (to: number) => {
+    let scrollTo = to;
+
+    if (to < 0) {
+      scrollTo = 0;
+    } else if (scrollTo > collection.length - 1) {
+      scrollTo = collection.length - 1;
+    }
+
+    scroller.scrollTo(`cards-section-${url}-${scrollTo}`, {
+      offset: -32,
+      smooth: 'easeInOutQuart',
+      duration: SCROLL_CARDS_SECTIONS,
+      horizontal: true,
+      containerId: `${url}-scrollContainer`,
+    });
   };
   const mouseDownHandler = (e: any) => {
     setIsDragging(true);
@@ -108,15 +125,15 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const mouseUpHandler = () => {
     if (!isDragging) return;
 
-    if (mouseInitial < clientX) {
-      if (canScrollLeft) {
-        handleLeftClick();
-      }
-    } else if (mouseInitial > clientX) {
-      if (canScrollRight) {
-        handleRightClick();
-      }
-    }
+    // if (mouseInitial < clientX) {
+    //   if (canScrollLeft) {
+    //     handleLeftClick();
+    //   }
+    // } else if (mouseInitial > clientX) {
+    //   if (canScrollRight) {
+    //     handleRightClick();
+    //   }
+    // }
 
     setIsDragging(false);
   };
@@ -133,7 +150,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     }
   }, [wasDragged]);
   const renderItem = useCallback((item: any, index: number) => (
-    <SItemWrapper key={`${url}-${item.id}`} name={`top-section-${url}-${index}`}>
+    <SItemWrapper key={`${url}-${item.id}`} name={`cards-section-${url}-${index}`}>
       <Card
         item={item}
         index={index + 1}
@@ -151,17 +168,17 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   } = useHoverArrows(ref);
 
   useEffect(() => {
-    scroller.scrollTo(`top-section-${url}-${listScroll}`, {
-      offset: -32,
-      smooth: 'easeInOutQuart',
-      duration: SCROLL_CARDS_SECTIONS,
-      horizontal: true,
-      containerId: `${url}-scrollContainer`,
-    });
+    scrollContainerRef.current.addEventListener('scroll', () => {
+      const currentScrollPosition = scrollContainerRef.current.scrollLeft;
+      const childWidth = scrollContainerRef.current.firstChild.getBoundingClientRect().width;
 
-    setCanScrollLeft(listScroll !== 0);
-    setCanScrollRight(listScroll < collection.length - scrollStep);
-  }, [url, listScroll, collection, scrollStep]);
+      setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
+    });
+  }, []);
+  useEffect(() => {
+    setCanScrollLeft(visibleListItem !== 0);
+    setCanScrollRight(visibleListItem <= collection.length - scrollStep);
+  }, [visibleListItem, collection, scrollStep]);
 
   return (
     <SWrapper>
@@ -176,7 +193,14 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             <SHeadline animation="t01" variant={4}>
               {user.username}
             </SHeadline>
-            <SButton view="quaternary" onClick={handleUserClick}>
+            <SButton
+              noHover
+              noRipple
+              noShadow
+              noAnimateSize
+              view="quaternary"
+              onClick={handleUserClick}
+            >
               {t('button-creator-on-the-rise')}
             </SButton>
           </SCreatorHeadline>
@@ -184,7 +208,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
         {!isMobile && (
           <Link href={url}>
             <a>
-              <SCaption>
+              <SCaption weight={700}>
                 {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator')}
               </SCaption>
             </a>
@@ -332,7 +356,7 @@ const STopWrapper = styled.div`
 const SCaption = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   transition: color ease 0.5s;
-  
+
   &:hover {
     color: ${(props) => props.theme.colorsThemed.text.primary};
   }
@@ -353,14 +377,8 @@ const SHeadline = styled(Headline)`
 `;
 
 const SButton = styled(Button)`
-  padding: 12px;
+  padding: 8px;
   font-size: 12px;
   line-height: 16px;
-  border-radius: 12px;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 8px 12px;
-    font-size: 14px;
-    line-height: 24px;
-  }
+  border-radius: 16px;
 `;

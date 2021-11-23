@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
-import CountUp from 'react-countup';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
@@ -25,34 +24,18 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const router = useRouter();
 
   const active = item.url === router.route;
-  const bigCounter = (item.counter ?? 0) >= 100;
 
   return (
     <Link href={item.url}>
       <a>
-        <SNavItem variant={3} active={active}>
+        <SNavItem variant={3} active={active} weight={600}>
           {t(`mobile-top-navigation-${item.key}`, {
             value: item.value,
           })}
           {!!item.counter && (
-            <>
-              {active ? (
-                <SIndicatorCountainer>
-                  <Indicator counter={item.counter} />
-                </SIndicatorCountainer>
-              ) : (
-                <span>
-                  {' ('}
-                  <CountUp
-                    useEasing
-                    end={bigCounter ? 99 : item.counter ?? 0}
-                    duration={5}
-                  />
-                  {bigCounter ? '+' : ''}
-                  )
-                </span>
-              )}
-            </>
+            <SIndicatorCountainer>
+              <Indicator counter={item.counter} />
+            </SIndicatorCountainer>
           )}
         </SNavItem>
       </a>
@@ -77,7 +60,7 @@ const SNavItem = styled(Text)<ISNavItem>`
 `;
 
 const SIndicatorCountainer = styled.div`
-  top: -23px;
-  right: -12px;
+  top: -14px;
+  right: -8px;
   position: absolute;
 `;
