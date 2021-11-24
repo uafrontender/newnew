@@ -6,6 +6,8 @@ import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { isEqual } from 'lodash';
 import validator from 'validator';
+import Cropper from 'react-easy-crop';
+import { Area, Point } from 'react-easy-crop/types';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -21,6 +23,7 @@ import UsernameInput from '../atoms/profile/UsernameInput';
 import BioTextarea from '../atoms/profile/BioTextarea';
 import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
 import ProfileImageInput from '../molecules/profile/ProfileImageInput';
+import isImage from '../../utils/isImage';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture'
 
@@ -60,8 +63,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const { user, ui } = useAppSelector((state) => state);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
 
-  // Image data
-  const [avatarUrl, setAvatarUrl] = useState(user.userData?.avatarUrl);
+  // Cover image
   const [coverUrl, setCoverUrl] = useState(user.userData?.coverUrl);
 
   // Textual data
@@ -85,6 +87,39 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setDataInEdit({ ...workingData });
   },
   [dataInEdit, setDataInEdit]);
+
+  // Profile image
+  const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+
+  // Profile picture
+  const handleSetProfilePictureInEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+
+    if (files?.length === 1) {
+      const file = files[0];
+
+      if (!isImage(file.name)) return;
+      if ((file.size / (1024 * 1024)) > 3) return;
+
+      // Read uploaded file as data URL
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.addEventListener('load', () => {
+        if (reader.result) {
+          setAvatarUrlInEdit(reader.result as string);
+          handleSetStageToEditingProfilePicture();
+        }
+      });
+    }
+  };
+
+  const onCropComplete = useCallback(
+    (croppedArea: Area, croppedAreaPixels: Area) => {
+      console.log(croppedArea, croppedAreaPixels);
+    }, [],
+  );
 
   // Check if data was modified
   useEffect(() => {
@@ -160,7 +195,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 pictureURL={user?.userData?.coverUrl ?? '/images/mock/profile-bg.png'}
               />
               <ProfileImageInput
-                src={user.userData?.avatarUrl!!}
+                publicUrl={user.userData?.avatarUrl!!}
+                handleImageInputChange={handleSetProfilePictureInEdit}
               />
             </SImageInputsWrapper>
             <STextInputsWrapper>
@@ -236,9 +272,38 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SGoBackButtonDesktop>
             )}
-            <div>
-              hey
-            </div>
+            <SCropperWrapper>
+              {avatarUrlInEdit && (
+                <Cropper
+                  image={avatarUrlInEdit}
+                  objectFit="vertical-cover"
+                  crop={crop}
+                  cropShape="round"
+                  showGrid={false}
+                  zoom={zoom}
+                  aspect={1}
+                  style={{
+                    cropAreaStyle: {
+                      boxShadow: 'none',
+                    },
+                  }}
+                  onCropChange={setCrop}
+                  onCropComplete={onCropComplete}
+                  onZoomChange={setZoom}
+                />
+              )}
+            </SCropperWrapper>
+            <SSliderWrapper>
+              <input
+                type="range"
+                value={zoom}
+                min={1}
+                max={3}
+                step={0.1}
+                aria-labelledby="Zoom"
+                onChange={(e) => setZoom(Number(e.target.value))}
+              />
+            </SSliderWrapper>
             <SControlsWrapper>
               {!isMobile
                 ? (
@@ -364,6 +429,29 @@ const STextInputsWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding-left: 24px;
     padding-right: 24px;
+  }
+`;
+
+const SCropperWrapper = styled.div`
+  position: relative;
+  height: 420px;
+`;
+
+const SSliderWrapper = styled.div`
+  display: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    margin-top: 24px;
+    padding: 0px 24px;
+
+    input {
+      display: block;
+      width: 100%;
+    }
   }
 `;
 
