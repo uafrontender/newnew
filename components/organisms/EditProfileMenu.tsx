@@ -242,6 +242,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   </Button>
                 ) : null}
               <Button
+                withShadow
                 disabled={!wasModified || !isDataValid}
                 style={{
                   width: isMobile ? '100%' : 'initial',
@@ -315,6 +316,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   </Button>
                 ) : null}
               <Button
+                withShadow
                 style={{
                   width: isMobile ? '100%' : 'initial',
                 }}
