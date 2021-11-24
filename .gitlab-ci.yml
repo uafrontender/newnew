@@ -64,7 +64,7 @@ stages:
 #  script:
 #    - npm ci --include=dev
 #    - npm run lint
-#    - npm run dev & npx wait-on http://localhost:3000
+#    - npm run dev & npx wait-on http://localhost:4000
 #    - npm run test -- --record
 #    - npm run test:mobile -- --record
 
@@ -89,7 +89,7 @@ build:
       variables:
         NEXT_PUBLIC_BASE_URL: "https://api-staging.newnew.co/v1"
         NEXT_PUBLIC_SOCKET_URL: "https://api-staging.newnew.co"
-  needs: [ ]
+  needs: []
   stage: build
   image: saltycrane/aws-cli-and-docker
   services:
@@ -109,7 +109,7 @@ deploy:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
-  needs: [ "build" ]
+  needs: ["build"]
   stage: deploy
   image: saltycrane/aws-cli-and-docker
   services:
