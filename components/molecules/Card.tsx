@@ -137,7 +137,6 @@ export const Card: React.FC<ICard> = (props) => {
             <SButtonIcon
               iconOnly
               id="showMore"
-              size="sm"
               view="transparent"
               onClick={handleMoreClick}
             >
@@ -173,7 +172,6 @@ export const Card: React.FC<ICard> = (props) => {
             <SButtonIcon
               iconOnly
               id="showMore"
-              size="sm"
               view="transparent"
               onClick={handleMoreClick}
             >
@@ -196,18 +194,17 @@ export const Card: React.FC<ICard> = (props) => {
         </SBottomStart>
         <SBottomEnd type={item.type}>
           <SButton
-            noShadow
             view={item.type === 'cf' ? 'blueProgress' : 'blue'}
             onClick={handleBidClick}
             cardType={item.type}
             progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
-            animateProgress={item.type === 'cf'}
+            withProgress={item.type === 'cf'}
           >
             {t(`button-card-${item.type}`, {
               votes: item.votes,
               total: formatNumber(item.total),
               backed: formatNumber(item.backed),
-              amount: `$${item.amount}`,
+              amount: `$${formatNumber(item.amount)}`,
             })}
           </SButton>
           <SCaption variant={2} weight={700}>
@@ -522,8 +519,8 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SButtonIcon = styled(Button)`
+  padding: 8px;
   border-radius: 12px;
-
 
   ${(props) => props.theme.media.laptop} {
     opacity: 0;

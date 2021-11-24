@@ -10,6 +10,7 @@ import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
+import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
@@ -28,19 +29,19 @@ const SCROLL_STEP = {
 };
 
 interface ICardSection {
-  url: string,
   user?: any,
   type?: 'default' | 'creator'
   title?: string,
+  category: string,
   collection: {}[],
 }
 
 export const CardsSection: React.FC<ICardSection> = (props) => {
   const {
-    url,
     user,
     type,
     title,
+    category,
     collection,
   } = props;
   const { t } = useTranslation('home');
@@ -78,7 +79,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
 
   const restore = useCallback(() => setWasDragged(false), []);
   const handleUserClick = () => {
-    router.push(url);
+    router.push(`/${category}`);
   };
   const handleLeftClick = () => {
     scrollListTo(visibleListItem - scrollStep - 1);
@@ -95,12 +96,12 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       scrollTo = collection.length - 1;
     }
 
-    scroller.scrollTo(`cards-section-${url}-${scrollTo}`, {
+    scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
       offset: -32,
       smooth: 'easeInOutQuart',
       duration: SCROLL_CARDS_SECTIONS,
       horizontal: true,
-      containerId: `${url}-scrollContainer`,
+      containerId: `${category}-scrollContainer`,
     });
   };
   const mouseDownHandler = (e: any) => {
@@ -150,7 +151,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     }
   }, [wasDragged]);
   const renderItem = useCallback((item: any, index: number) => (
-    <SItemWrapper key={`${url}-${item.id}`} name={`cards-section-${url}-${index}`}>
+    <SItemWrapper key={`${category}-${item.id}`} name={`cards-section-${category}-${index}`}>
       <Card
         item={item}
         index={index + 1}
@@ -160,7 +161,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
         onMouseDownCapture={handleItemMouseDownCapture}
       />
     </SItemWrapper>
-  ), [handleItemMouseLeave, handleItemMouseDownCapture, restore, url, wasDragged]);
+  ), [handleItemMouseLeave, handleItemMouseDownCapture, restore, category, wasDragged]);
 
   const {
     renderLeftArrow,
@@ -188,25 +189,18 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             {title}
           </Headline>
         ) : (
-          <SCreatorHeadline>
-            <UserAvatar user={user} withClick onClick={handleUserClick} />
+          <SCreatorHeadline onClick={handleUserClick}>
+            <UserAvatar user={user} />
             <SHeadline animation="t01" variant={4}>
               {user.username}
             </SHeadline>
-            <SButton
-              noHover
-              noRipple
-              noShadow
-              noAnimateSize
-              view="quaternary"
-              onClick={handleUserClick}
-            >
+            <Tag>
               {t('button-creator-on-the-rise')}
-            </SButton>
+            </Tag>
           </SCreatorHeadline>
         )}
         {!isMobile && (
-          <Link href={url}>
+          <Link href={`/search?category=${category}`}>
             <a>
               <SCaption weight={700}>
                 {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator')}
@@ -217,7 +211,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       </STopWrapper>
       <SListContainer ref={ref}>
         <SListWrapper
-          id={`${url}-scrollContainer`}
+          id={`${category}-scrollContainer`}
           ref={scrollContainerRef}
           onMouseUp={mouseUpHandler}
           onMouseDown={mouseDownHandler}
@@ -247,7 +241,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       </SListContainer>
       {renderShowMore && (
         <SButtonHolder>
-          <Link href={url}>
+          <Link href={`/search?category=${category}`}>
             <a>
               <Button size="lg" view="secondary">
                 {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator')}
@@ -363,6 +357,7 @@ const SCaption = styled(Caption)`
 `;
 
 const SCreatorHeadline = styled.div`
+  cursor: pointer;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -374,11 +369,4 @@ const SHeadline = styled(Headline)`
   ${(props) => props.theme.media.tablet} {
     margin: 0 16px;
   }
-`;
-
-const SButton = styled(Button)`
-  padding: 8px;
-  font-size: 12px;
-  line-height: 16px;
-  border-radius: 16px;
 `;
