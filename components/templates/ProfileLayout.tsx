@@ -66,9 +66,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         {/* Favorites and more options buttons */}
         <SFavoritesButton
           view="transparent"
-          size="sm"
           iconOnly
-          noRipple
           onClick={() => {}}
         >
           <InlineSvg
@@ -81,9 +79,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         </SFavoritesButton>
         <SMoreButton
           view="transparent"
-          size="sm"
           iconOnly
-          noRipple
           onClick={() => {}}
         >
           <InlineSvg
@@ -113,7 +109,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SShareDiv>
             <Button
               view="tertiary"
-              size="sm"
               iconOnly
               style={{
                 paddingTop: '8px',
@@ -133,7 +128,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             </Button>
             <Button
               view="tertiary"
-              size="sm"
               iconOnly
               style={{
                 padding: '8px',
@@ -151,6 +145,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {user.options?.isCreator
             ? (
               <Button
+                withShadow
                 style={{
                   marginBottom: '16px',
                 }}

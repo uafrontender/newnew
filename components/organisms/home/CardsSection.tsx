@@ -10,6 +10,7 @@ import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
+import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
@@ -188,21 +189,14 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             {title}
           </Headline>
         ) : (
-          <SCreatorHeadline>
-            <UserAvatar user={user} withClick onClick={handleUserClick} />
+          <SCreatorHeadline onClick={handleUserClick}>
+            <UserAvatar user={user} />
             <SHeadline animation="t01" variant={4}>
               {user.username}
             </SHeadline>
-            <SButton
-              noHover
-              noRipple
-              noShadow
-              noAnimateSize
-              view="quaternary"
-              onClick={handleUserClick}
-            >
+            <Tag>
               {t('button-creator-on-the-rise')}
-            </SButton>
+            </Tag>
           </SCreatorHeadline>
         )}
         {!isMobile && (
@@ -363,6 +357,7 @@ const SCaption = styled(Caption)`
 `;
 
 const SCreatorHeadline = styled.div`
+  cursor: pointer;
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -374,11 +369,4 @@ const SHeadline = styled(Headline)`
   ${(props) => props.theme.media.tablet} {
     margin: 0 16px;
   }
-`;
-
-const SButton = styled(Button)`
-  padding: 8px;
-  font-size: 12px;
-  line-height: 16px;
-  border-radius: 16px;
 `;

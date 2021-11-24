@@ -49,8 +49,18 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   overflow: hidden;
   position: fixed;
   transition: height ease 0.5s;
-  backdrop-filter: blur(16px);
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
+  -webkit-backdrop-filter: blur(16px);
+
+  ::before {
+    width: 100%;
+    height: 100%;
+    content: '';
+    z-index: -1;
+    position: absolute;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
 `;
 
 export default Modal;

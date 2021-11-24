@@ -29,6 +29,7 @@ declare module 'styled-components' {
         outlines2: string;
         numbers: string;
         backgroundFooter: string;
+        backgroundHeader: string;
       },
       text: {
         // Used for both links and titles.
@@ -68,6 +69,14 @@ declare module 'styled-components' {
           main: string;
           hover: string;
           pressed: string;
+        },
+      },
+      tag: {
+        color: {
+          primary: string,
+        },
+        background: {
+          primary: string,
         },
       },
       button: {
@@ -111,6 +120,16 @@ declare module 'styled-components' {
           blueProgress: string,
           changeLanguage: string,
         },
+        active: {
+          blue: string,
+          primary: string,
+          secondary: string,
+          tertiary: string,
+          quaternary: string,
+          transparent: string,
+          blueProgress: string,
+          changeLanguage: string,
+        },
         progress: {
           blue: string,
           primary: string,
@@ -120,7 +139,7 @@ declare module 'styled-components' {
           transparent: string,
           blueProgress: string,
           changeLanguage: string,
-        }
+        },
       },
     },
     shadows: {

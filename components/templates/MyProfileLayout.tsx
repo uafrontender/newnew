@@ -112,7 +112,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         >
           <Button
             view="transparent"
-            size="sm"
             iconOnly={isMobileOrTablet}
             onClick={() => handleOpenEditProfileMenu()}
           >
@@ -125,7 +124,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           </Button>
           <Button
             view="transparent"
-            size="sm"
             iconOnly={isMobileOrTablet}
             onClick={() => {}}
           >
@@ -158,7 +156,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           <SShareDiv>
             <Button
               view="tertiary"
-              size="sm"
               iconOnly
               style={{
                 paddingTop: '8px',
@@ -178,7 +175,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             </Button>
             <Button
               view="tertiary"
-              size="sm"
               iconOnly
               style={{
                 padding: '8px',
