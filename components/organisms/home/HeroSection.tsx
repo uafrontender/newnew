@@ -140,17 +140,13 @@ export const HeroSection = () => {
             {isMobile ? (
               <>
                 <SButton
-                  noHover
-                  noRipple
-                  noShadow
+                  withShrink
                   onClick={handleSignInClick}
                 >
                   {t('hero-block-sign-in')}
                 </SButton>
                 <SButton
-                  noHover
-                  noRipple
-                  noShadow
+                  withShrink
                   view="secondary"
                   onClick={handleExploreClick}
                 >
@@ -159,9 +155,9 @@ export const HeroSection = () => {
               </>
             ) : (
               <SButton
-                noHover
-                noShadow
-                noRipple
+                withShrink
+                withRipple
+                withShadow
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}
