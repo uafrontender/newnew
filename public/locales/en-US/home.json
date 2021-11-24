@@ -16,5 +16,6 @@
   "button-card-mc": "{{votes}} votes",
   "button-card-cf": "{{backed}} of {{total}} backers",
   "card-time-left": "{{time}} left",
-  "for-you-block-title": "For you"
+  "for-you-block-title": "For you",
+  "filter-title": "Sort"
 }

@@ -6,29 +6,26 @@ import styled, { css } from 'styled-components';
 import RippleAnimation from './RippleAnimation';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
+type TView = 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'blue' | 'blueProgress' | 'transparent' | 'changeLanguage';
+type TSize = 'sm' | 'lg';
 
 interface IButton {
-  size?: 'sm' | 'lg',
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'blueProgress' | 'changeLanguage' | 'blue',
+  size?: TSize,
+  view?: TView,
   progress?: number,
-  animateProgress?: boolean,
   iconOnly?: boolean,
-  noHover?: boolean,
-  noRipple?: boolean,
-  noShadow?: boolean,
-  noAnimateSize?: boolean,
-  debounceClickMs?: number,
-  debounceRestoreMs?: number,
+  withShadow?: boolean,
+  withRipple?: boolean,
+  withShrink?: boolean,
+  withProgress?: boolean,
 }
 
 const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   const {
     children,
     disabled,
-    noRipple,
-    animateProgress,
-    debounceClickMs,
-    debounceRestoreMs,
+    withRipple,
+    withProgress,
     onClick,
     ...rest
   } = props;
@@ -42,17 +39,17 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   });
   const [isRippling, setIsRippling] = useState(false);
 
-  const handleClickDebounced = useMemo(() => debounce(onClick!!, debounceClickMs ?? 800),
-    [onClick, debounceClickMs]);
+  const handleClickDebounced = useMemo(() => debounce(onClick!!, 800),
+    [onClick]);
   const handleRestoreRippling = useMemo(() => debounce(() => {
-    if (noRipple) return;
+    if (!withRipple) return;
     setIsRippling(false);
-  }, debounceRestoreMs ?? 750),
-  [noRipple, setIsRippling, debounceRestoreMs]);
+  }, 750),
+  [withRipple, setIsRippling]);
 
   const handleOnBlurCapture = () => setIsRippling(false);
   const handleOnMouseDown = (e: any) => {
-    if (disabled || noRipple) return;
+    if (disabled || !withRipple) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -63,7 +60,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     setIsRippling(true);
   };
   const handleOnTouchStart = (e: any) => {
-    if (disabled || noRipple) return;
+    if (disabled || !withRipple) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.touches[0].clientX - rect.left;
     const y = e.touches[0].clientY - rect.top;
@@ -74,7 +71,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     setIsRippling(true);
   };
   const handleOnKeyDownCapture = () => {
-    if (disabled || noRipple) return;
+    if (disabled || !withRipple) return;
     setRippleOrigin({
       x: '50%',
       y: '50%',
@@ -91,10 +88,12 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   return (
     <SButton
       ref={ref}
-      onClick={noRipple ? onClick : handleClickDebounced}
+      onClick={!withRipple ? onClick : handleClickDebounced}
       disabled={disabled}
-      isRippling={noRipple ? false : isRippling}
+      withRipple={withRipple}
+      isRippling={!withRipple ? false : isRippling}
       onMouseDown={handleOnMouseDown}
+      withProgress={withProgress}
       rippleOrigin={rippleOrigin}
       onTouchStart={handleOnTouchStart}
       elementWidth={ref.current?.getBoundingClientRect()?.width ?? 800}
@@ -108,7 +107,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
       <span>
         {children}
       </span>
-      {animateProgress && (
+      {withProgress && (
         <SProgress view={rest.view} progress={progress} />
       )}
     </SButton>
@@ -118,15 +117,12 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
 Button.defaultProps = {
   size: 'sm',
   view: 'primary',
-  noHover: false,
-  iconOnly: false,
-  noRipple: false,
-  noShadow: false,
-  noAnimateSize: false,
   progress: 0,
-  animateProgress: false,
-  debounceClickMs: 800,
-  debounceRestoreMs: 750,
+  iconOnly: false,
+  withShadow: false,
+  withShrink: false,
+  withRipple: false,
+  withProgress: false,
   onClick: () => {
   },
 };
@@ -134,15 +130,13 @@ Button.defaultProps = {
 export default Button;
 
 interface ISButton {
-  size?: 'sm' | 'lg';
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'blueProgress' | 'changeLanguage' | 'blue';
+  size?: TSize;
+  view?: TView;
   iconOnly?: boolean;
-  noHover?: boolean;
-  noShadow?: boolean;
-  noAnimateSize?: boolean,
-  progress?: number;
-  hoverBgColor?: string;
-  hoverContentColor?: string;
+  withShadow?: boolean;
+  withShrink?: boolean;
+  withRipple?: boolean;
+  withProgress?: boolean;
   elementWidth: number;
   isRippling: boolean;
   rippleOrigin: {
@@ -152,7 +146,7 @@ interface ISButton {
 }
 
 interface ISProgress {
-  view?: 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'transparent' | 'blueProgress' | 'changeLanguage' | 'blue';
+  view?: TView;
   progress?: number;
 }
 
@@ -175,57 +169,30 @@ const SButton = styled.button<ISButton>`
   z-index: 0;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   
   white-space: nowrap;
 
-  font-weight: bold;
   font-size: 14px;
   line-height: 24px;
+  font-weight: bold;
 
   ${({ theme }) => theme.media.tablet} {
-    ${(props) => {
-    if (props.size === 'sm') {
-      return css`
-        font-size: 14px;
-        line-height: 24px;
-      `;
-    }
-
-    if (props.size === 'lg') {
-      return css`
-      font-size: 16px;
-      line-height: 24px;
-    `;
-    }
-
-    return '';
-  }}
+    font-size: ${(props) => (props.size === 'lg' ? 16 : 14)}px;
   }
 
-  ${(props) => {
-    if (props.iconOnly) {
-      return css`padding: ${props.size === 'sm' ? '8px' : '12px'};`;
-    }
+  ${(props) => (props.size === 'sm' ? css`
+    padding: ${props.iconOnly ? '12px' : '12px 24px'}
+  ` : css`
+    padding: ${props.iconOnly ? '16px' : '16px 24px'}
+  `)};
 
-    if (props.size === 'sm') {
-      return css`padding: 12px 24px;`;
-    }
+  ${(props) => (props.size === 'lg' && !props.iconOnly && css`min-width: 343px;`)}
 
-    if (props.size === 'lg') {
-      return css`padding: 16px 20px;`;
-    }
-
-    return '';
-  }};
-
-  ${(props) => (props.size === 'lg' && !props.iconOnly ? css`min-width: 343px;` : '')}
-
-  border-radius: ${(props) => props.theme.borderRadius.medium};
   border: transparent;
+  border-radius: ${(props) => props.theme.borderRadius.medium};
 
-  // NB! Temp
   color: ${(props) => props.theme.colorsThemed.button.color[props.view ?? 'primary']};
   background: ${(props) => props.theme.colorsThemed.button.background[props.view ?? 'primary']};
 
@@ -240,21 +207,51 @@ const SButton = styled.button<ISButton>`
   -ms-user-select: none;
   user-select: none;
 
-  &::before {
+  ${(props) => props.withShadow && css`
+    box-shadow: ${props.theme.shadows.mediumBlue};
+  `}
+
+  &:active:enabled {
+    outline: none;
+    background: ${(props) => props.theme.colorsThemed.button.active[props.view ?? 'primary']};
+    
+    ${(props) => props.withShadow && css`
+      box-shadow: none;
+    `}
+  }
+  
+  &:focus:enabled,
+  &:hover:enabled {
+    outline: none;
+    background: ${(props) => props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+
+    ${(props) => props.withShadow && css`
+      box-shadow: ${props.theme.shadows.intenseBlue};
+    `}
+  }
+  
+  &:disabled {
+    cursor: default;
+    opacity: .5;
+    outline: none;
+  }
+
+  span {
+    z-index: 1;
+    font-weight: 700;
+  }
+  
+  ${(props) => props.withRipple && css`
+    &::before {
     position: absolute;
-    top: ${({
-    rippleOrigin,
-    elementWidth,
-  }) => `calc(${rippleOrigin.y} - ${elementWidth}px)`};
-    left: ${({
-    rippleOrigin,
-    elementWidth,
-  }) => `calc(${rippleOrigin.x} - ${elementWidth}px)`};
+    
+    top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
+    left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
 
     border-radius: 50%;
 
-    width: ${({ elementWidth }) => elementWidth * 2}px;
-    height: ${({ elementWidth }) => elementWidth * 2}px;
+    width: ${props.elementWidth * 2}px;
+    height: ${props.elementWidth * 2}px;
 
     transform: scale(0);
     transform-origin: center;
@@ -262,74 +259,19 @@ const SButton = styled.button<ISButton>`
     // NB! Temp
     content: '';
 
-    background: ${(props) => props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
-  }
+    background: ${props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
 
-  span {
-    z-index: 1;
-    font-weight: 700;
-  }
-
-  ${(props) => {
-    if (props.view === 'primary' && !props.noShadow) {
-      return css`
-        &:focus:enabled {
-          outline: none;
-
-          box-shadow: ${props.theme.shadows.mediumBlue};
-        }
-
-        &:enabled {
-          box-shadow: ${props.theme.shadows.mediumBlue};
-        }
-
-        ${!props.noHover && css`
-          &:hover:enabled {
-            box-shadow: ${props.theme.shadows.intenseBlue};
-          }
-        `}
-
-        &:active:enabled {
-          box-shadow: ${props.theme.shadows.mediumBlue};
-        }
-      `;
-    }
-
-    if (['secondary', 'tertiary'].includes(props.view ?? 'primary') && !props.isRippling) {
-      return css`
-          &:hover:enabled {
-            ${!props.noHover && css`
-              outline: none;
-              background-color: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
-          `}
-          }
-          &:focus:enabled {
-          outline: none;
-
-          background-color: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
-        }
-      `;
-    }
-
-    return '';
-  }}
-  &:disabled {
-    opacity: .5;
-
-    cursor: default;
-  }
-
-  ${({ isRippling }) => (isRippling ? css`
-    &::before {
+    ${(props.isRippling && css`
       animation-duration: .9s;
       animation-fill-mode: forwards;
       animation-name: ${RippleAnimation};
-    }
-  ` : null)}
+  `)}
+  }
+  `}
   
-  ${(props) => (!props.noAnimateSize ? css`
+  ${(props) => (props.withShrink && css`
     &:active {
       transform: scale(0.9);
     }
-  ` : '')}
+  `)}
 `;

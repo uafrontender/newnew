@@ -71,8 +71,7 @@ export const Mobile: React.FC<IMobile> = () => {
           ) : (
             <SButton
               iconOnly
-              noHover
-              noRipple
+              withShrink
               view="secondary"
               onClick={handleSignInClick}
             >
@@ -123,5 +122,6 @@ const LogoHolder = styled.div`
 `;
 
 const SButton = styled(Button)`
+  padding: 8px;
   border-radius: 12px;
 `;
