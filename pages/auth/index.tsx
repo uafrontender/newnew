@@ -79,6 +79,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         } else if (provider === 'apple') {
           if (!body) throw new Error('No body receieved');
 
+          console.log(body);
+
           const {
             id_token, sub,
           } = body;
@@ -121,6 +123,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         router.push('/');
       } catch (err) {
         // NB! Might need an error toast
+        console.log(err);
         setIsLoading(false);
         router.push('/');
       }

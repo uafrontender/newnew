@@ -36,32 +36,33 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const theme = useTheme();
 
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const curentUser = useAppSelector((state) => state.user);
+  const currentUser = useAppSelector((state) => state.user);
   const router = useRouter();
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(() => {
-    if (!curentUser.loggedIn) {
+    if (!currentUser.loggedIn) {
       router.push('/sign-up?reason=subscribe');
     }
-  }, [curentUser, router]);
+  }, [currentUser, router]);
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
-    if (curentUser.loggedIn
-      && curentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
+    if (currentUser.loggedIn
+      && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
       // console.log('redirecting');
       router.push('/profile');
     }
-  }, [curentUser.loggedIn, curentUser.userData?.userUuid, router, user.uuid]);
+  }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
 
   return (
     <SGeneral>
       <SProfileLayout>
         <ProfileBackground
-          pictureURL="/images/mock/profile-bg.png"
+          // Temp
+          pictureURL={user.coverUrl ?? '/images/mock/profile-bg.png'}
         />
         {/* Favorites and more options buttons */}
         <SFavoritesButton
@@ -159,12 +160,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 { t('ProfileLayout.buttons.sendMessage') }
               </Button>
             ) : null}
-          <SBioText>
-            {/* {user.bio} */}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            {' '}
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </SBioText>
+          {user.bio ? (
+            <SBioText
+              variant={3}
+            >
+              {user.bio}
+            </SBioText>
+          ) : null}
         </div>
         {user.options?.isCreator // && !user.options?.isPrivate
           ? (

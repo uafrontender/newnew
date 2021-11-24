@@ -20,7 +20,10 @@
     }
   },
   "EditProfileMenu": {
-    "goBackBtn": "Edit profile",
+    "goBackBtn": {
+      "general": "Edit profile",
+      "profilePicture": "Edit Profile Image"
+    },
     "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
     "saveButton": "Save changes",
     "cancelButton": "Cancel",

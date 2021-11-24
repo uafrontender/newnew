@@ -28,7 +28,7 @@ const SProfileImage = styled.div`
   top: 112px;
   overflow: hidden;
 
-  z-index: 2;
+  z-index: 4;
 
   border-radius: 50%;
   width: 96px;
