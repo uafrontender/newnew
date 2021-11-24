@@ -94,7 +94,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 <SItemWithMargin>
                   <Button
                     onClick={handleCreateClick}
-                    noShadow={globalSearchActive}
+                    withShadow={!globalSearchActive}
                   >
                     {t('button-create-decision')}
                   </Button>
@@ -102,10 +102,8 @@ export const Tablet: React.FC<ITablet> = () => {
                 <SItemWithMargin>
                   <Button
                     iconOnly
-                    size="lg"
                     view="secondary"
                     onClick={handleMenuClick}
-                    noShadow={globalSearchActive}
                   >
                     <InlineSVG
                       svg={menuIcon}
@@ -121,7 +119,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 <SItemWithMargin>
                   <Button
                     onClick={handleCreateClick}
-                    noShadow={globalSearchActive}
+                    withShadow={!globalSearchActive}
                   >
                     {t('button-create')}
                   </Button>
@@ -148,9 +146,9 @@ export const Tablet: React.FC<ITablet> = () => {
             </SItemWithMargin>
             <SItemWithMargin>
               <Button
-                noRipple
+                withShrink
                 onClick={handleSignUpClick}
-                noShadow={globalSearchActive}
+                withShadow={!globalSearchActive}
               >
                 {t('button-sign-up')}
               </Button>
