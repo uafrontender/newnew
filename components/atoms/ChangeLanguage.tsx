@@ -70,11 +70,8 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   return (
     <SContainer ref={ref}>
       <Button
-        noRipple
         view="changeLanguage"
         onClick={handleChangeLanguageClick}
-        debounceClickMs={300}
-        debounceRestoreMs={500}
       >
         {t(`selected-language-title-${locale}`)}
       </Button>
@@ -126,7 +123,7 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -143,7 +140,7 @@ const SItemHolder = styled.div<ISItemHolder>`
   margin: 12px 12px 0;
   padding: 12px;
   border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale[props.selected ? 'background2' : 'background1']};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale[props.selected ? 'backgroundDDSelected' : 'backgroundDD']};
 `;
 
 const SItemTitle = styled(Text)`

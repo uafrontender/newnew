@@ -56,5 +56,15 @@ const SWrapper = styled.header<ISWrapper>`
   position: fixed;
   transition: all ease 1s;
   padding-top: ${(props) => (props.withBanner ? '40px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
+  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundHeader};
+  
+  ::before {
+    width: 100%;
+    height: ${(props) => (props.withBanner ? 'calc(100% - 40px)' : '100%')};
+    content: '';
+    z-index: -1;
+    position: absolute;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 `;
