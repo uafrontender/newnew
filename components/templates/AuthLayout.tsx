@@ -1,22 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styled, { css, useTheme } from 'styled-components';
-import Lottie from 'react-lottie';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import InlineSVG from '../atoms/InlineSVG';
 import Container from '../atoms/Grid/Container';
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
-
-// Icons
-import logoText from '../../public/images/svg/logo_text.svg';
-import { useAppSelector } from '../../redux-store/store';
-import logoAnimation from '../../public/animations/mobile_logo_animation.json';
+import Logo from '../molecules/Logo';
 
 export interface IAuthLayout {
 
@@ -59,54 +52,15 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
 
 export default AuthLayout;
 
-const HomeLogoButton: React.FunctionComponent = () => {
-  const theme = useTheme();
-  const [playing, setLoading] = useState(false);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLoading(!playing);
-    }, 3000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  });
-
-  return (
-    <SHomeLogoButton>
-      <Row>
-        <Col>
-          <Link href="/">
-            <a>
-              <SAnimationWrapper>
-                <Lottie
-                  width={isMobile ? 55 : 65}
-                  height={isMobile ? 45 : 60}
-                  options={{
-                    loop: false,
-                    autoplay: true,
-                    animationData: logoAnimation,
-                  }}
-                  isStopped={playing}
-                />
-              </SAnimationWrapper>
-              <InlineSVG
-                svg={logoText}
-                fill={theme.colorsThemed.text.primary}
-                width={isMobile ? '81px' : '94px'}
-                height={isMobile ? '21px' : '21px'}
-              />
-            </a>
-          </Link>
-        </Col>
-      </Row>
-    </SHomeLogoButton>
-  );
-};
+const HomeLogoButton: React.FunctionComponent = () => (
+  <SHomeLogoButton>
+    <Row>
+      <Col>
+        <Logo />
+      </Col>
+    </Row>
+  </SHomeLogoButton>
+);
 
 const SHomeLogoButton = styled(Container)`
   display: none;
@@ -115,41 +69,12 @@ const SHomeLogoButton = styled(Container)`
     display: block;
 
     position: relative;
-
-    a {
-      position: absolute;
-
-      margin: 12px 0px;
-
-      width: 127px;
-      height: 40px;
-
-      display: flex;
-      position: relative;
-      align-items: center;
-      justify-content: flex-end;
-
-      cursor: pointer;
-
-      ${(props) => props.theme.media.tablet} {
-        width: 152px;
-        height: 48px;
-      }
-    }
+    margin: 12px 0px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    a {
-      margin: 16px 0;
-    }
+    margin: 16px 0;
   }
-`;
-
-const SAnimationWrapper = styled.div`
-  top: 50%;
-  left: -8px;
-  position: absolute;
-  transform: translateY(-50%);
 `;
 
 // Instead of this component we're likely to have a ThreeJS Canvas

@@ -1,34 +1,51 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 interface IProfileBackgroundInput {
-  pictureURL: string;
+  pictureURL?: string;
 }
 
 const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> = ({
   pictureURL,
-}) => (
-  <SProfileBackgroundInput
-    pictureURL={pictureURL}
-  >
-    <svg
-      id="profileBackgroundInputSvg"
-    >
-      <clipPath
-        id="profileBackgroundInputSvgClipPath"
-      >
-        <path
-          d="M 188 96 C 158.12 96 133.02261 116.47611 125.97461 144.16211 C 124.03137 151.79512 118.28764 158.38873 110.80469 159.73438 L 265.19531 159.73438 C 257.71289 158.38873 251.96863 151.79512 250.02539 144.16211 C 242.97739 116.47611 217.88 96 188 96 z "
+}) => {
+  const { t } = useTranslation('profile');
+
+  return (
+    <SProfileBackgroundInput>
+      <SFrame>
+        <svg
+          id="profileBackgroundInputSvg"
+        >
+          <clipPath
+            id="profileBackgroundInputSvgClipPath"
+          >
+            <path
+              d="M 188 96 C 158.12 96 133.02261 116.47611 125.97461 144.16211 C 124.03137 151.79512 118.28764 158.38873 110.80469 159.73438 L 265.19531 159.73438 C 257.71289 158.38873 251.96863 151.79512 250.02539 144.16211 C 242.97739 116.47611 217.88 96 188 96 z "
+            />
+          </clipPath>
+        </svg>
+      </SFrame>
+      {pictureURL ? (
+        <img
+          alt="Profile background"
+          src={pictureURL}
         />
-      </clipPath>
-    </svg>
-  </SProfileBackgroundInput>
-);
+      ) : null}
+    </SProfileBackgroundInput>
+  );
+};
+
+ProfileBackgroundInput.defaultProps = {
+  pictureURL: undefined,
+};
 
 export default ProfileBackgroundInput;
 
 interface ISProfileBackgroundInput {
-  pictureURL: string;
+
 }
 
 const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
@@ -37,44 +54,39 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
 
   width: 100%;
   height: 160px;
-  margin-bottom: 72px;
+  margin-bottom: 62px;
 
-  background-image: ${({ pictureURL }) => `url('${pictureURL}')`};
-  background-position: center;
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
 
-  #profileBackgroundInputSvg{
-    position: absolute;
-    z-index: -10;
-    width: 0px;
-    height: 0px;
+
+
+  ${(props) => props.theme.media.tablet} {
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
+`;
 
-  &:before {
-    display: block;
-    content: '';
+const SFrame = styled.div`
+  z-index: 5;
 
-    z-index: 2;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  transform: translateY(10px) translateX(calc(50vw - 188px)) scale(0.9);
 
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    left: calc(50% - 188px);
+  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
-    transform: translateY(1px);
+  width: 376px;
+  height: 160px;
 
-    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  clip-path: url(#profileBackgroundInputSvgClipPath);
 
-    width: 376px;
-    height: 160px;
-
-    clip-path: url(#profileBackgroundInputSvgClipPath);
+  #profileBackgroundInputSvg {
+    width: 100%;
+    height: 100%;
   }
 
   ${(props) => props.theme.media.tablet} {
-    height: 200px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    height: 240px;
+    transform: scale(0.9) translateY(10px) translateX(calc(211px - 188px));
   }
 `;
