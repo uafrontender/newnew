@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { motion } from 'framer-motion';
 import { isEqual } from 'lodash';
 import validator from 'validator';
 
@@ -21,11 +22,16 @@ import BioTextarea from '../atoms/profile/BioTextarea';
 import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
 import ProfileImageInput from '../molecules/profile/ProfileImageInput';
 
+export type TEditingStage = 'edit-general' | 'edit-profile-picture'
+
 interface IEditProfileMenu {
+  stage: TEditingStage,
   wasModified: boolean;
   handleClose: () => void;
   handleSetWasModified: (newState: boolean) => void;
   handleClosePreventDiscarding: () => void;
+  handleSetStageToEditingProfilePicture: () => void;
+  handleSetStageToEditingGeneral: () => void;
 }
 
 type ModalMenuUserData = {
@@ -40,13 +46,17 @@ type TFormErrors = {
 };
 
 const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
+  stage,
   wasModified,
   handleClose,
   handleSetWasModified,
   handleClosePreventDiscarding,
+  handleSetStageToEditingProfilePicture,
+  handleSetStageToEditingGeneral,
 }) => {
-  const { t } = useTranslation('profile');
   const theme = useTheme();
+  const { t } = useTranslation('profile');
+
   const { user, ui } = useAppSelector((state) => state);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
 
@@ -119,94 +129,165 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   return (
     <SEditProfileMenu
+      initial={!isMobile ? MInitial : undefined}
+      animate={!isMobile ? MAnimation : undefined}
       onClick={(e) => e.stopPropagation()}
     >
-      {isMobile
+      {stage === 'edit-general'
         ? (
-          <SGoBackButtonMobile
-            onClick={handleClosePreventDiscarding}
-          >
-            { t('EditProfileMenu.goBackBtn') }
-          </SGoBackButtonMobile>
+          <>
+            {isMobile ? (
+              <SGoBackButtonMobile
+                onClick={handleClosePreventDiscarding}
+              >
+                { t('EditProfileMenu.goBackBtn.general') }
+              </SGoBackButtonMobile>
+            ) : (
+              <SGoBackButtonDesktop
+                onClick={handleClosePreventDiscarding}
+              >
+                <div>{ t('EditProfileMenu.goBackBtn.general') }</div>
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width="24px"
+                  height="24px"
+                />
+              </SGoBackButtonDesktop>
+            )}
+            <SImageInputsWrapper onDoubleClick={() => handleSetStageToEditingProfilePicture()}>
+              <ProfileBackgroundInput
+                pictureURL={user?.userData?.coverUrl ?? '/images/mock/profile-bg.png'}
+              />
+              <ProfileImageInput
+                src={user.userData?.avatarUrl!!}
+              />
+            </SImageInputsWrapper>
+            <STextInputsWrapper>
+              <DisplaynameInput
+                type="text"
+                value={dataInEdit.displayName as string}
+                placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
+                isValid={!formErrors.displaynameError}
+                onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
+              />
+              <UsernameInput
+                type="text"
+                value={dataInEdit.username}
+                popupCaption={(
+                  <UsernamePopupList
+                    points={[
+                      t('EditProfileMenu.inputs.username.points.1'),
+                      t('EditProfileMenu.inputs.username.points.2'),
+                      t('EditProfileMenu.inputs.username.points.3'),
+                    ]}
+                  />
+                )}
+                frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
+                placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+                isValid={!formErrors.usernameError}
+                onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
+              />
+              <BioTextarea
+                maxChars={150}
+                value={dataInEdit.bio}
+                placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+                onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
+              />
+            </STextInputsWrapper>
+            <SControlsWrapper>
+              {!isMobile
+                ? (
+                  <Button
+                    view="secondary"
+                    onClick={handleClose}
+                  >
+                    { t('EditProfileMenu.cancelButton') }
+                  </Button>
+                ) : null}
+              <Button
+                disabled={!wasModified || !isDataValid}
+                style={{
+                  width: isMobile ? '100%' : 'initial',
+                }}
+              >
+                { t('EditProfileMenu.saveButton') }
+              </Button>
+            </SControlsWrapper>
+          </>
         ) : (
-          <SGoBackButtonDesktop
-            onClick={handleClosePreventDiscarding}
-          >
-            <div>{ t('EditProfileMenu.goBackBtn') }</div>
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SGoBackButtonDesktop>
+          <>
+            {isMobile ? (
+              <SGoBackButtonMobile
+                onClick={handleSetStageToEditingGeneral}
+              >
+                { t('EditProfileMenu.goBackBtn.profilePicture') }
+              </SGoBackButtonMobile>
+            ) : (
+              <SGoBackButtonDesktop
+                onClick={handleSetStageToEditingGeneral}
+              >
+                <div>{ t('EditProfileMenu.goBackBtn.profilePicture') }</div>
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width="24px"
+                  height="24px"
+                />
+              </SGoBackButtonDesktop>
+            )}
+            <div>
+              hey
+            </div>
+            <SControlsWrapper>
+              {!isMobile
+                ? (
+                  <Button
+                    view="secondary"
+                    onClick={handleSetStageToEditingGeneral}
+                  >
+                    { t('EditProfileMenu.cancelButton') }
+                  </Button>
+                ) : null}
+              <Button
+                style={{
+                  width: isMobile ? '100%' : 'initial',
+                }}
+              >
+                { t('EditProfileMenu.saveButton') }
+              </Button>
+            </SControlsWrapper>
+          </>
         )}
-      <SImageInputsWrapper>
-        <ProfileBackgroundInput
-          pictureURL={user?.userData?.coverUrl ?? '/images/mock/profile-bg.png'}
-        />
-        <ProfileImageInput
-          src={user.userData?.avatarUrl!!}
-        />
-      </SImageInputsWrapper>
-      <STextInputsWrapper>
-        <DisplaynameInput
-          type="text"
-          value={dataInEdit.displayName as string}
-          placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
-          isValid={!formErrors.displaynameError}
-          onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
-        />
-        <UsernameInput
-          type="text"
-          value={dataInEdit.username}
-          popupCaption={(
-            <UsernamePopupList
-              points={[
-                t('EditProfileMenu.inputs.username.points.1'),
-                t('EditProfileMenu.inputs.username.points.2'),
-                t('EditProfileMenu.inputs.username.points.3'),
-              ]}
-            />
-          )}
-          frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
-          placeholder={t('EditProfileMenu.inputs.username.placeholder')}
-          isValid={!formErrors.usernameError}
-          onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
-        />
-        <BioTextarea
-          maxChars={150}
-          value={dataInEdit.bio}
-          placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
-          onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
-        />
-      </STextInputsWrapper>
-      <SControlsWrapper>
-        {!isMobile
-          ? (
-            <Button
-              view="secondary"
-              onClick={handleClose}
-            >
-              { t('EditProfileMenu.cancelButton') }
-            </Button>
-          ) : null}
-        <Button
-          disabled={!wasModified || !isDataValid}
-          style={{
-            width: isMobile ? '100%' : 'initial',
-          }}
-        >
-          { t('EditProfileMenu.saveButton') }
-        </Button>
-      </SControlsWrapper>
     </SEditProfileMenu>
   );
 };
 
 export default EditProfileMenu;
 
-const SEditProfileMenu = styled.div`
+const MInitial = {
+  opacity: 0,
+  y: 1000,
+};
+
+const MAnimation = {
+  opacity: 1,
+  y: 0,
+  transition: {
+    opacity: {
+      duration: 0.1,
+      delay: 0.1,
+    },
+    y: {
+      type: 'spring',
+      stiffness: 60,
+      delay: 0.2,
+    },
+    default: { duration: 2 },
+  },
+};
+
+const SEditProfileMenu = styled(motion.div)`
   position: relative;
   overflow-y: auto;
 

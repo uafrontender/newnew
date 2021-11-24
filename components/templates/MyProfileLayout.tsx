@@ -21,7 +21,7 @@ import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import Modal from '../organisms/Modal';
-import EditProfileMenu from '../organisms/EditProfileMenu';
+import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 import isBroswer from '../../utils/isBrowser';
 
 interface IMyProfileLayout {
@@ -42,6 +42,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   // Edit Profile menu
   const [isEditProfileMenuOpen, setIsEditProfileMenuOpen] = useState(false);
+  const [editingStage, setEditingStage] = useState<TEditingStage>('edit-general');
   const [wasModified, setWasModified] = useState(true);
 
   const handleSetWasModified = useCallback((newState: boolean) => {
@@ -66,7 +67,28 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         hash: 'edit-profile',
       }, undefined, { shallow: true });
     }
+    setEditingStage('edit-general');
     setIsEditProfileMenuOpen(true);
+  };
+
+  const handleSetStageToEditingProfilePicture = () => {
+    if (isBroswer()) {
+      router.push({
+        pathname: window.location.pathname,
+        hash: 'edit-profile-image',
+      }, undefined, { shallow: true });
+    }
+    setEditingStage('edit-profile-picture');
+  };
+
+  const handleSetStageToEditingGeneral = () => {
+    if (isBroswer()) {
+      router.push({
+        pathname: window.location.pathname,
+        hash: 'edit-profile',
+      }, undefined, { shallow: true });
+    }
+    setEditingStage('edit-general');
   };
 
   const handleClosePreventDiscarding = useCallback(() => {
@@ -90,19 +112,22 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [router, user]);
 
+  // Allow back button behavior
   useEffect(() => {
-    const verifyHash = () => {
-      if (!isBroswer()) return;
-
+    const verify = () => {
       const { hash } = window.location;
-
-      if ((!hash || hash !== '#edit-profile') && isEditProfileMenuOpen) {
+      if (!hash) {
         setIsEditProfileMenuOpen(false);
+      } else if (hash === '#edit-profile') {
+        setEditingStage('edit-general');
       }
     };
 
-    verifyHash();
-  });
+    router.events.on('hashChangeComplete', verify);
+
+    return () => router.events.off('hashChangeComplete', verify);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SGeneral>
@@ -207,14 +232,21 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           tabs={tabs}
         />
         {/* Edit Profile modal menu */}
-        <Modal show={isEditProfileMenuOpen} onClose={handleClosePreventDiscarding}>
+        <Modal
+          transitionSpeed={isMobileOrTablet ? 0.5 : 0}
+          show={isEditProfileMenuOpen}
+          onClose={handleClosePreventDiscarding}
+        >
           {isEditProfileMenuOpen
             ? (
               <EditProfileMenu
+                stage={editingStage}
                 wasModified={wasModified}
                 handleClose={handleCloseEditProfileMenu}
                 handleSetWasModified={handleSetWasModified}
                 handleClosePreventDiscarding={handleClosePreventDiscarding}
+                handleSetStageToEditingProfilePicture={handleSetStageToEditingProfilePicture}
+                handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
               />
             ) : null}
         </Modal>
