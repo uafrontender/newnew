@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../redux-store/store';
 
 interface IModal {
   show: boolean;
+  transitionSpeed?: number;
   onClose: () => void;
   children: ReactNode;
 }
@@ -15,6 +16,7 @@ interface IModal {
 const Modal: React.FC<IModal> = (props) => {
   const {
     show,
+    transitionSpeed,
     onClose,
     children,
   } = props;
@@ -26,7 +28,11 @@ const Modal: React.FC<IModal> = (props) => {
 
   if (isBrowser()) {
     return ReactDOM.createPortal(
-      <StyledModalOverlay show={show} onClick={onClose}>
+      <StyledModalOverlay
+        show={show}
+        transitionSpeed={transitionSpeed ?? 0.5}
+        onClick={onClose}
+      >
         {children}
       </StyledModalOverlay>,
       document.getElementById('modal-root') as HTMLElement,
@@ -38,6 +44,7 @@ const Modal: React.FC<IModal> = (props) => {
 
 interface IStyledModalOverlay {
   show: boolean;
+  transitionSpeed?: number;
 }
 
 const StyledModalOverlay = styled.div<IStyledModalOverlay>`
@@ -48,7 +55,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   z-index: 10;
   overflow: hidden;
   position: fixed;
-  transition: height ease 0.5s;
+  transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
   backdrop-filter: blur(16px);
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
 `;

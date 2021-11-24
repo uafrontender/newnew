@@ -1,7 +1,7 @@
 import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import isBrowser from '../../../utils/isBrowser';
@@ -64,7 +64,16 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
 
   const [activeTab, setActiveTab] = useState(findActiveTab(tabs, router.pathname, pageType));
 
+  const [activeTabIndicator, setActiveTabIndicator] = useState<{
+    width: number;
+    left: number;
+  }>({
+    width: 0,
+    left: 0,
+  });
+
   const profileTabsRef = useRef<HTMLDivElement>();
+  const profileTabsContainerRef = useRef<HTMLDivElement>();
   const tabRefs = useRef<HTMLButtonElement[]>(new Array(tabs.length));
 
   // Route change
@@ -227,12 +236,17 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
   }, [tabs.length]);
 
   useEffect(() => {
+    let timeout: any;
+
     const updateContainerWidth = () => {
-      setContainerWidth(profileTabsRef.current?.getBoundingClientRect().width!!);
-      setWindowSize({
-        width: window.innerWidth ?? 0,
-        height: window.innerHeight ?? 0,
-      });
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setContainerWidth(profileTabsRef.current?.getBoundingClientRect().width!!);
+        setWindowSize({
+          width: window.innerWidth ?? 0,
+          height: window.innerHeight ?? 0,
+        });
+      }, 1000);
     };
 
     window.addEventListener('resize', updateContainerWidth);
@@ -255,7 +269,14 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
       setPosLeft((curr) => curr + windowSize.width - boundingRect.right - 12);
       setPrevLeft((curr) => curr + windowSize.width - boundingRect.right - 12);
     }
-  }, [activeTab, windowSize, setPrevLeft, setPosLeft]);
+
+    setActiveTabIndicator((current) => ({
+      ...current,
+      width: boundingRect.width ?? 0,
+      left: (boundingRect.left - profileTabsContainerRef.current?.getBoundingClientRect()?.left!!)
+        ?? 0,
+    }));
+  }, [activeTab, windowSize, setPrevLeft, setPosLeft, setActiveTabIndicator]);
 
   useEffect(() => {
     if (!shouldDrag) setPosLeft(0);
@@ -280,6 +301,9 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
       onMouseLeave={handleMouseUp}
     >
       <STabsContainer
+        ref={(el) => {
+          profileTabsContainerRef.current = el!!;
+        }}
         style={{
           transform: `translateX(${posLeft}px`,
         }}
@@ -302,6 +326,12 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
             { t(`ProfileLayout.tabs.${tab.nameToken}`) }
           </STab>
         ))}
+        <SActiveTabIndicator
+          style={{
+            width: activeTabIndicator.width,
+            left: activeTabIndicator.left,
+          }}
+        />
       </STabsContainer>
     </SProfileTabs>
   );
@@ -359,25 +389,34 @@ const STab = styled.button<{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+`;
 
-  &::before {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-
-    opacity: ${({ activeTab }) => (activeTab ? 1 : 0)};
-    transform: ${({ activeTab }) => (activeTab ? 'scaleX(1)' : 'scaleX(0)')};
-    transform-origin: center;
-
-    height: 4px;
-    width: 100%;
-
-    border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
-    border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
-    background: ${({ theme }) => theme.gradients.blueHorizontal};
-
-    transition: .2s ease-in-out;
-
-    content: '';
+const IndicatorInitialAnimation = keyframes`
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+`;
+
+const SActiveTabIndicator = styled.div`
+  position: absolute;
+  bottom: 0;
+
+  height: 4px;
+  width: 0px;
+
+  opacity: 0;
+
+  animation-duration: 1s;
+  animation-delay: .3s;
+  animation-fill-mode: forwards;
+  animation-name: ${IndicatorInitialAnimation};
+
+  border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
+  border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
+  background: ${({ theme }) => theme.gradients.blueHorizontal};
+
+  transition: .45s ease-in-out;
 `;
