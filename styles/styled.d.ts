@@ -22,6 +22,8 @@ declare module 'styled-components' {
         background2: string;
         background3: string;
         backgroundT: string;
+        backgroundDD: string;
+        backgroundDDSelected: string;
         backgroundCookie: string;
         // Used for an initial state.
         outlines1: string;
