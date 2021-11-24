@@ -64,7 +64,7 @@ const SWrapper = styled.header<ISWrapper>`
     content: '';
     z-index: -1;
     position: absolute;
-    backdrop-filter: blur(50px);
+    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(50px);
   }
 `;
