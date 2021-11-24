@@ -89,7 +89,6 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    noRipple
                     view="secondary"
                     onClick={handleDashboardClick}
                   >
@@ -98,7 +97,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <Button
-                    noRipple
+                    withShadow
                     onClick={handleCreateClick}
                   >
                     {t('button-create-decision')}
@@ -116,7 +115,8 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    noRipple
+                    withShadow
+                    withShrink
                     onClick={handleCreateClick}
                   >
                     {t('button-create-on-newnew')}
@@ -136,7 +136,6 @@ export const Desktop: React.FC<IDesktop> = () => {
           <>
             <SItemWithMargin>
               <Button
-                noShadow
                 view="secondary"
                 onClick={handleSignInClick}
               >
@@ -144,7 +143,11 @@ export const Desktop: React.FC<IDesktop> = () => {
               </Button>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button noRipple onClick={handleSignUpClick}>
+              <Button
+                withShrink
+                withShadow
+                onClick={handleSignUpClick}
+              >
                 {t('button-sign-up')}
               </Button>
             </SItemWithMargin>
