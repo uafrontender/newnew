@@ -70,7 +70,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   // Temp URL
-  const userDataBuffer = await fetch(`http://localhost:3000/api/user/get_user_by_username?username=${username}`).then((res) => res.arrayBuffer());
+  const userDataBuffer = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/user/get_user_by_username?username=${username}`).then((res) => res.arrayBuffer());
 
   if (!userDataBuffer) {
     return {
