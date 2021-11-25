@@ -48,7 +48,6 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
         user={{
           avatar: item.bidForUser.avatar,
         }}
-        radius="small"
       />
     </SWrapper>
   );
@@ -109,6 +108,8 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SUserAvatarRight = styled(SUserAvatar)`
+  border-radius: 8px;
+  
   ${(props) => props.theme.media.laptop} {
     width: 72px;
     height: 72px;

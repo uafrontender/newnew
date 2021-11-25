@@ -13,7 +13,6 @@ interface IUserAvatar {
   user: {
     avatar?: string,
   },
-  radius?: 'small' | 'medium' | 'large' | 'xxxLarge',
   onClick?: () => any,
   withClick?: boolean,
 }
@@ -21,7 +20,6 @@ interface IUserAvatar {
 export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const {
     user,
-    radius,
     onClick,
     withClick,
     ...rest
@@ -33,10 +31,9 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
 
   if (!user.avatar) {
     return (
-      <Button
+      <SButton
         iconOnly
-        size="lg"
-        view="secondary"
+        view="quaternary"
         onClick={onClick}
         {...rest}
       >
@@ -46,12 +43,16 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
           width={isMobile ? '20px' : '24px'}
           height={isMobile ? '20px' : '24px'}
         />
-      </Button>
+      </SButton>
     );
   }
 
   return (
-    <SContainer {...rest} radius={radius ?? 'xxxLarge'} onClick={onClick} withClick={withClick ?? false}>
+    <SContainer
+      {...rest}
+      onClick={onClick}
+      withClick={withClick ?? false}
+    >
       <Image
         src={user.avatar}
         alt="User avatar"
@@ -66,14 +67,12 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
 export default UserAvatar;
 
 UserAvatar.defaultProps = {
-  radius: 'xxxLarge',
+  withClick: false,
   onClick: () => {
   },
-  withClick: false,
 };
 
 interface ISContainer {
-  radius: 'small' | 'medium' | 'large' | 'xxxLarge',
   withClick: boolean,
 }
 
@@ -83,7 +82,7 @@ const SContainer = styled.div<ISContainer>`
   overflow: hidden;
   min-width: 36px;
   min-height: 36px;
-  border-radius: ${(props) => props.theme.borderRadius[props.radius]};
+  border-radius: 18px;
 
   ${(props) => props.withClick && css`cursor: pointer;`}
   ${(props) => props.theme.media.tablet} {
@@ -91,5 +90,16 @@ const SContainer = styled.div<ISContainer>`
     height: 48px;
     min-width: 48px;
     min-height: 48px;
+    border-radius: 24px;
+  }
+`;
+
+const SButton = styled(Button)`
+  padding: 8px;
+  border-radius: 12px;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 12px;
+    border-radius: 16px;
   }
 `;

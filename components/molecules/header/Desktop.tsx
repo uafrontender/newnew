@@ -18,6 +18,7 @@ export const Desktop: React.FC<IDesktop> = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const handleCreateClick = () => {
   };
@@ -38,7 +39,7 @@ export const Desktop: React.FC<IDesktop> = () => {
     <SContainer>
       <Logo />
       <SRightBlock>
-        {user.loggedIn && (
+        {user.loggedIn && !globalSearchActive && (
           <>
             <SItemWithMargin>
               <NavigationItem
@@ -46,15 +47,6 @@ export const Desktop: React.FC<IDesktop> = () => {
                   url: '/notifications',
                   key: 'notifications',
                   counter: user.notificationsCount,
-                }}
-              />
-            </SItemWithMargin>
-            <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/direct-messages',
-                  key: 'direct-messages',
-                  counter: user.directMessagesCount,
                 }}
               />
             </SItemWithMargin>
@@ -89,7 +81,7 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    view="secondary"
+                    view="quaternary"
                     onClick={handleDashboardClick}
                   >
                     {t('button-dashboard')}
@@ -98,6 +90,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 <SItemWithMargin>
                   <Button
                     withShadow
+                    view="primaryGrad"
                     onClick={handleCreateClick}
                   >
                     {t('button-create-decision')}
@@ -115,8 +108,10 @@ export const Desktop: React.FC<IDesktop> = () => {
               <>
                 <SItemWithMargin>
                   <Button
+                    withDim
                     withShadow
                     withShrink
+                    view="primaryGrad"
                     onClick={handleCreateClick}
                   >
                     {t('button-create-on-newnew')}
@@ -136,7 +131,7 @@ export const Desktop: React.FC<IDesktop> = () => {
           <>
             <SItemWithMargin>
               <Button
-                view="secondary"
+                view="quaternary"
                 onClick={handleSignInClick}
               >
                 {t('button-login-in')}
@@ -144,8 +139,10 @@ export const Desktop: React.FC<IDesktop> = () => {
             </SItemWithMargin>
             <SItemWithMargin>
               <Button
+                withDim
                 withShrink
                 withShadow
+                view="primaryGrad"
                 onClick={handleSignUpClick}
               >
                 {t('button-sign-up')}

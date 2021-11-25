@@ -83,12 +83,13 @@ export const HeroSection = () => {
     },
   ], []);
 
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const handleSignInClick = () => {
     router.push('/sign-up');
   };
   const handleExploreClick = () => {
     scroller.scrollTo('topSection', {
-      offset: -100,
+      offset: isMobile ? -20 : -100,
       smooth: 'easeInOutQuart',
       duration: SCROLL_EXPLORE,
       containerId: 'generalScrollContainer',
@@ -99,7 +100,6 @@ export const HeroSection = () => {
       <NotificationItem item={item} />
     </SNotificationItemHolder>
   );
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const handleTitleAnimationEnd = useCallback(() => {
     setAnimateSubTitle(true);
@@ -140,12 +140,15 @@ export const HeroSection = () => {
             {isMobile ? (
               <>
                 <SButton
+                  withDim
                   withShrink
+                  view="primaryGrad"
                   onClick={handleSignInClick}
                 >
                   {t('hero-block-sign-in')}
                 </SButton>
                 <SButton
+                  withDim
                   withShrink
                   view="secondary"
                   onClick={handleExploreClick}
@@ -158,6 +161,7 @@ export const HeroSection = () => {
                 withShrink
                 withRipple
                 withShadow
+                view="primaryGrad"
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}
@@ -225,6 +229,10 @@ const SButtonsHolder = styled.div`
 
   button {
     margin-right: 16px;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 32px;
   }
 `;
 

@@ -242,7 +242,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       {renderShowMore && (
         <SButtonHolder>
           <Link href={`/search?category=${category}`}>
-            <a>
+            <a style={{ width: '100%' }}>
               <Button size="lg" view="secondary">
                 {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator')}
               </Button>
@@ -263,7 +263,7 @@ CardsSection.defaultProps = {
 };
 
 const SWrapper = styled.section`
-  padding: 0 0 24px 0;
+  padding: 24px 0;
 
   /* No select */
   -webkit-touch-callout: none;

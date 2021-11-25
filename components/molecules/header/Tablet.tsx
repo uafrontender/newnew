@@ -53,15 +53,6 @@ export const Tablet: React.FC<ITablet> = () => {
                 }}
               />
             </SItemWithMargin>
-            <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/direct-messages',
-                  key: 'direct-messages',
-                  counter: user.directMessagesCount,
-                }}
-              />
-            </SItemWithMargin>
             {user.role === 'creator' ? (
               <SItemWithMargin>
                 <NavigationItem
@@ -93,6 +84,7 @@ export const Tablet: React.FC<ITablet> = () => {
               <>
                 <SItemWithMargin>
                   <Button
+                    view="primaryGrad"
                     onClick={handleCreateClick}
                     withShadow={!globalSearchActive}
                   >
@@ -102,7 +94,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 <SItemWithMargin>
                   <Button
                     iconOnly
-                    view="secondary"
+                    view="quaternary"
                     onClick={handleMenuClick}
                   >
                     <InlineSVG
@@ -118,6 +110,7 @@ export const Tablet: React.FC<ITablet> = () => {
               <>
                 <SItemWithMargin>
                   <Button
+                    view="primaryGrad"
                     onClick={handleCreateClick}
                     withShadow={!globalSearchActive}
                   >
@@ -138,7 +131,7 @@ export const Tablet: React.FC<ITablet> = () => {
           <>
             <SItemWithMargin>
               <Button
-                view="secondary"
+                view="quaternary"
                 onClick={handleSignInClick}
               >
                 {t('button-login-in')}
@@ -146,7 +139,9 @@ export const Tablet: React.FC<ITablet> = () => {
             </SItemWithMargin>
             <SItemWithMargin>
               <Button
+                withDim
                 withShrink
+                view="primaryGrad"
                 onClick={handleSignUpClick}
                 withShadow={!globalSearchActive}
               >
