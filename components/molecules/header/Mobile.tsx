@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -15,7 +15,6 @@ interface IMobile {
 }
 
 export const Mobile: React.FC<IMobile> = () => {
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -37,16 +36,6 @@ export const Mobile: React.FC<IMobile> = () => {
       router.push('/', '/');
     }
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLoading(!loading);
-    }, 2000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  });
 
   return (
     <SContainer>
