@@ -5,7 +5,7 @@ import React, {
   useCallback,
 } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import InlineSVG from './InlineSVG';
 
@@ -169,7 +169,14 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   flex-direction: row;
   justify-content: space-between;
   
-  ${(props) => !props.active && 'cursor: pointer;'}
+  ${(props) => !props.active && css`
+    cursor: pointer;
+    background: ${(props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary)};
+
+    :hover {
+      background: ${(props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary)};
+    }
+  `}
 
   ${({ theme }) => theme.media.tablet} {
     width: ${(props) => (props.active ? 'calc(100vw - 64px)' : '48px')};
@@ -180,8 +187,9 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   ${({ theme }) => theme.media.laptop} {
     right: 0;
     width: ${(props) => (props.active ? '420px' : '48px')};
+
     background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary)};
-    
+
     :hover {
       background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary)};
     }
