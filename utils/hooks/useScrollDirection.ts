@@ -4,7 +4,7 @@ export const useScrollDirection = (ref: any) => {
   const [scrollDirection, setScrollDirection] = useState('');
 
   useEffect(() => {
-    const threshold = 0;
+    const threshold = 10;
     let lastScrollY = ref.current?.scrollTop;
     let ticking = false;
 
@@ -15,6 +15,7 @@ export const useScrollDirection = (ref: any) => {
         ticking = false;
         return;
       }
+
       setScrollDirection(scrollY > lastScrollY ? 'down' : 'up');
       lastScrollY = scrollY > 0 ? scrollY : 0;
       ticking = false;

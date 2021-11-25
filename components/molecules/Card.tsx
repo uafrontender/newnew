@@ -194,7 +194,9 @@ export const Card: React.FC<ICard> = (props) => {
         </SBottomStart>
         <SBottomEnd type={item.type}>
           <SButton
-            view={item.type === 'cf' ? 'blueProgress' : 'blue'}
+            withDim
+            withShrink
+            view={item.type === 'cf' ? 'primaryProgress' : 'primary'}
             onClick={handleBidClick}
             cardType={item.type}
             progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
