@@ -95,7 +95,11 @@ export const SearchInput: React.FC<ISearchInput> = () => {
 
   return (
     <SContainer ref={inputContainerRef}>
-      <SInputWrapper active={globalSearchActive} rightPosition={inputRightPosition}>
+      <SInputWrapper
+        active={globalSearchActive}
+        onClick={globalSearchActive ? () => {} : handleSearchClick}
+        rightPosition={inputRightPosition}
+      >
         <SLeftInlineSVG
           clickable
           svg={searchIcon}
@@ -143,6 +147,7 @@ const SContainer = styled.div`
 
 interface ISInputWrapper {
   active: boolean;
+  onClick: () => void;
   rightPosition: number;
 }
 
@@ -158,11 +163,13 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   position: absolute;
   transform: translateY(-50%);
   max-height: 100%;
-  transition: all ease 1.75s;
+  transition: all ease 0.5s;
   background: ${(props) => props.theme.colorsThemed.grayscale[props.active ? 'background1' : 'background2']};
   border-radius: 12px;
   flex-direction: row;
   justify-content: space-between;
+  
+  ${(props) => !props.active && 'cursor: pointer;'}
 
   ${({ theme }) => theme.media.tablet} {
     width: ${(props) => (props.active ? 'calc(100vw - 64px)' : '48px')};
@@ -173,7 +180,11 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   ${({ theme }) => theme.media.laptop} {
     right: 0;
     width: ${(props) => (props.active ? '420px' : '48px')};
-    transition: all ease 0.5s;
+    background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary)};
+    
+    :hover {
+      background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary)};
+    }
   }
 `;
 

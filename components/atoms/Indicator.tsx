@@ -43,11 +43,10 @@ interface ISIndicator {
 
 const SIndicator = styled.div<ISIndicator>`
   color: ${(props) => props.theme.colors.white};
-  height: 23px;
-  border: 3px solid ${(props) => props.theme.colorsThemed.grayscale.background1};
   display: flex;
   padding: ${(props) => (props.bigCounter ? '3px 4px' : '3px 6px')};
   font-size: 10px;
+  line-height: 12px;
   font-weight: bold;
   align-items: center;
   border-radius: 16px;

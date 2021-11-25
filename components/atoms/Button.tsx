@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useMemo, useState, useEffect } from 'react';
 import { debounce } from 'lodash';
 import { useInView } from 'react-intersection-observer';
@@ -6,7 +7,7 @@ import styled, { css } from 'styled-components';
 import RippleAnimation from './RippleAnimation';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView = 'primary' | 'secondary' | 'tertiary' | 'quaternary' | 'blue' | 'blueProgress' | 'transparent' | 'changeLanguage';
+type TView = 'primary' | 'primaryGrad' | 'primaryProgress' | 'secondary' | 'tertiary' | 'quaternary' | 'changeLanguage' | 'transparent';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
@@ -14,6 +15,7 @@ interface IButton {
   view?: TView,
   progress?: number,
   iconOnly?: boolean,
+  withDim?: boolean,
   withShadow?: boolean,
   withRipple?: boolean,
   withShrink?: boolean,
@@ -117,6 +119,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
 Button.defaultProps = {
   size: 'sm',
   view: 'primary',
+  withDim: false,
   progress: 0,
   iconOnly: false,
   withShadow: false,
@@ -133,6 +136,7 @@ interface ISButton {
   size?: TSize;
   view?: TView;
   iconOnly?: boolean;
+  withDim?: boolean;
   withShadow?: boolean;
   withShrink?: boolean;
   withRipple?: boolean;
@@ -272,6 +276,12 @@ const SButton = styled.button<ISButton>`
   ${(props) => (props.withShrink && css`
     &:active {
       transform: scale(0.9);
+    }
+  `)}
+
+  ${(props) => (props.withDim && css`
+    &:active {
+      opacity: 0.5;
     }
   `)}
 `;
