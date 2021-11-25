@@ -147,6 +147,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             ? (
               <Button
                 withShadow
+                view="primaryGrad"
                 style={{
                   marginBottom: '16px',
                 }}
