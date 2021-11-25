@@ -12,6 +12,7 @@ const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name' | 'gradients' | 'sh
     white: '#FFFFFF',
     black: '#000000',
     blue: '#2955EC',
+    dark: '#0B0A13',
   },
   borderRadius: {
     small: '8px',
