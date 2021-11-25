@@ -29,13 +29,15 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
     <Link href={item.url}>
       <a>
         <SNavItem variant={3} active={active} weight={600}>
-          {t(`mobile-top-navigation-${item.key}`, {
-            value: item.value,
-          })}
+          <div className="navText">
+            {t(`mobile-top-navigation-${item.key}`, {
+              value: item.value,
+            })}
+          </div>
           {!!item.counter && (
-            <SIndicatorCountainer>
+            <SIndicatorContainer bigCounter={item.counter > 9}>
               <Indicator counter={item.counter} />
-            </SIndicatorCountainer>
+            </SIndicatorContainer>
           )}
         </SNavItem>
       </a>
@@ -50,17 +52,36 @@ interface ISNavItem {
 }
 
 const SNavItem = styled(Text)<ISNavItem>`
-  color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
-  position: relative;
-  transition: color ease 0.5s;
-
+  display: flex;
+  padding: 12px;
+  align-items: center;
+  flex-direction: row;
+  
   &:hover {
+    .navText {
+      opacity: 1;
+    }
+  }
+  
+  .navText {
     color: ${(props) => props.theme.colorsThemed.text.primary};
+    opacity: 0.5;
+    transition: opacity ease 0.5s;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 12px 6px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    padding: 12px;
   }
 `;
 
-const SIndicatorCountainer = styled.div`
-  top: -14px;
-  right: -8px;
-  position: absolute;
+interface ISIndicatorContainer {
+  bigCounter: boolean;
+}
+
+const SIndicatorContainer = styled.div<ISIndicatorContainer>`
+  margin-left: ${(props) => (props.bigCounter ? '6px' : '10px')};
 `;
