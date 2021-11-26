@@ -638,11 +638,12 @@ const Search: NextPage = () => {
   ], []);
 
   const collections: any = {
+    'for-you': collectionBiggest,
     ac: collectionAC,
     mc: collectionMC,
     cf: collectionCF,
     biggest: collectionBiggest,
-    creator: collectionCreator,
+    bellapoarch: collectionCreator,
   };
 
   useEffect(() => {
