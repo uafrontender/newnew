@@ -66,6 +66,8 @@ interface ICard {
   item: any;
   type?: 'inside' | 'outside';
   index: number;
+  width?: string;
+  height?: string;
   preventClick?: boolean;
   restore?: () => void;
   onMouseDownCapture?: (e: any) => void;
@@ -77,6 +79,8 @@ export const Card: React.FC<ICard> = (props) => {
     item,
     type,
     index,
+    width,
+    height,
     preventClick,
     restore,
     onMouseDownCapture,
@@ -149,7 +153,11 @@ export const Card: React.FC<ICard> = (props) => {
             </SButtonIcon>
           </STopContent>
           <SBottomContent>
-            <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
+            <SUserAvatar
+              withClick
+              user={item.user}
+              onClick={handleUserClick}
+            />
             <SText variant={3} weight={600}>
               {item.title}
             </SText>
@@ -161,11 +169,15 @@ export const Card: React.FC<ICard> = (props) => {
 
   return (
     <SWrapperOutside
+      width={width}
       onClick={onClick}
       onMouseLeave={onMouseLeave}
       onMouseDownCapture={onMouseDownCapture}
     >
-      <SImageBG id="backgroundPart">
+      <SImageBG
+        id="backgroundPart"
+        height={height}
+      >
         <SImageHolderOutside id="animatedPart">
           <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
           <STopContent>
@@ -222,6 +234,8 @@ export default Card;
 
 Card.defaultProps = {
   type: 'outside',
+  width: '',
+  height: '',
   preventClick: false,
   restore: () => {
   },
@@ -233,6 +247,7 @@ Card.defaultProps = {
 
 interface ISWrapper {
   index?: number;
+  width?: string;
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -368,15 +383,13 @@ const SText = styled(Text)`
 `;
 
 const SWrapperOutside = styled.div<ISWrapper>`
-  width: 100vw;
+  width: ${(props) => props.width};
   cursor: pointer;
   display: flex;
   position: relative;
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
-    width: 200px;
-
     :hover {
       #animatedPart {
         transform: translateY(-10px);
@@ -385,8 +398,6 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: 224px;
-
     :hover {
       #showMore {
         opacity: 1;
@@ -395,18 +406,17 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 `;
 
-const SImageBG = styled.div`
+interface ISImageBG {
+  height?: string;
+}
+
+const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  height: 564px;
+  height: ${(props) => props.height};
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
-    height: 300px;
     border-radius: ${(props) => props.theme.borderRadius.medium};
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    height: 336px;
   }
 `;
 

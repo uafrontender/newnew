@@ -206,6 +206,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           && !isSigninWithEmailLoading
           && !isResendCodeLoading && (
           <AnimatedPresence
+            animateWhenInView={false}
             animation="t-01"
             delay={0.3}
           >
@@ -226,6 +227,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       {
         !isSigninWithEmailLoading && !isResendCodeLoading && submitError ? (
           <AnimatedPresence
+            animateWhenInView={false}
             animation="t-09"
           >
             <SErrorDiv>

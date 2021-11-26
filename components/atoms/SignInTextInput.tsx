@@ -43,6 +43,7 @@ const SignInTextInput: React.FunctionComponent<TTextInput> = ({
       {
         errorBordersShown ? (
           <AnimatedPresence
+            animateWhenInView={false}
             animation="t-09"
           >
             <SErrorDiv>
