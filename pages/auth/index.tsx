@@ -104,12 +104,15 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
 
         if (!data) throw new Error('No data');
 
+        console.log(res.data);
+
         dispatch(setUserData({
           username: data.me?.username,
           displayName: data.me?.displayName,
           email: data.me?.email,
           avatarUrl: data.me?.avatarUrl,
           userUuid: data.me?.userUuid,
+          bio: data.me?.bio,
           options: data.me?.options,
         }));
         dispatch(setCredentialsData({

@@ -1,19 +1,22 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import InlineSvg from '../InlineSVG';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import AnimatedPresence from '../AnimatedPresence';
 
 type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   popupCaption: ReactElement;
   frequencyCaption: string;
+  errorCaption: string;
 }
 
 const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   value,
   popupCaption,
   frequencyCaption,
+  errorCaption,
   isValid,
   onChange,
   onFocus,
@@ -21,6 +24,12 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
 }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (focused) return;
+    if (isValid) setErrorBordersShown(false);
+  }, [focused, isValid]);
 
   return (
     <SWrapper>
@@ -29,7 +38,9 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         errorBordersShown={errorBordersShown}
         onChange={onChange}
         onBlur={() => {
-          if (!isValid) {
+          setIsPopupVisible(false);
+          setFocused(false);
+          if (!isValid && errorCaption) {
             setErrorBordersShown(true);
           } else {
             setErrorBordersShown(false);
@@ -37,10 +48,28 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         }}
         onFocus={(e) => {
           if (onFocus) onFocus(e);
+          setFocused(true);
+          setIsPopupVisible(true);
           setErrorBordersShown(false);
         }}
         {...rest}
       />
+      {
+        errorBordersShown ? (
+          <AnimatedPresence
+            animation="t-09"
+          >
+            <SErrorDiv>
+              <InlineSvg
+                svg={AlertIcon}
+                width="16px"
+                height="16px"
+              />
+              { errorCaption }
+            </SErrorDiv>
+          </AnimatedPresence>
+        ) : null
+      }
       <SPopup
         isVisible={isPopupVisible}
       >
@@ -49,12 +78,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
       <SCaptionDiv>
         { frequencyCaption }
       </SCaptionDiv>
-      <SStyledButton
-        onMouseEnter={() => setIsPopupVisible(true)}
-        onMouseLeave={() => setIsPopupVisible(false)}
-        onFocus={() => setIsPopupVisible(true)}
-        onBlur={() => setIsPopupVisible(false)}
-      >
+      <SStyledButton>
         <InlineSvg
           svg={AlertIcon}
           width="24px"
@@ -196,4 +220,23 @@ const SCaptionDiv = styled.div`
   color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 
   margin-top: 6px;
+`;
+
+const SErrorDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
 `;
