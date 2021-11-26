@@ -1,12 +1,14 @@
-/* eslint-disable react/no-array-index-key */
 import React from 'react';
+import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence as FMAnimatedPresence, Variants } from 'framer-motion';
 
+export type TAnimation = 't-01' | 't-02' | 't-08' | 't-09' | 't-10' | 'trans-06' | 'trans-06-reverse';
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
-  animation: 't-01' | 't-02' | 't-08' | 't-09' | 't-10' | 'trans-06' | 'trans-06-reverse';
+  animation: TAnimation;
   onAnimationEnd?: () => void;
+  animateWhenInView?: boolean;
 }
 
 export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
@@ -14,9 +16,17 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     start,
     delay,
     animation,
+    animateWhenInView,
     onAnimationEnd,
   } = props;
   let { children } = props;
+  const { ref, inView } = useInView();
+
+  let startAnimation = start;
+
+  if (animateWhenInView) {
+    startAnimation = start && inView;
+  }
 
   const variants: Variants = {
     't-01': {
@@ -35,16 +45,16 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       y: 0,
       opacity: 1,
       transition: {
+        ease: 'easeInOut',
         delay: delay ?? 0.5,
-        bounce: 0,
       },
     },
     't-02_initial': {
-      y: 100,
+      y: 50,
       opacity: 0,
     },
     't-02_exit': {
-      y: 100,
+      y: 50,
       opacity: 0,
     },
     't-08': {
@@ -148,8 +158,9 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
   return (
     <FMAnimatedPresence>
       <motion.div
+        ref={ref}
         exit={`${animation}_exit`}
-        animate={start && animation}
+        animate={startAnimation && animation}
         initial={`${animation}_initial`}
         variants={variants}
         onAnimationComplete={onAnimationEnd}
@@ -165,6 +176,7 @@ export default AnimatedPresence;
 AnimatedPresence.defaultProps = {
   start: true,
   delay: undefined,
+  animateWhenInView: true,
   onAnimationEnd: () => {
   },
 };

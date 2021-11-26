@@ -35,6 +35,7 @@ export const Cookie = () => {
 
   return (
     <AnimatedPresence
+      animateWhenInView={false}
       start={animateCookie}
       animation={animationDirection === 'down' ? 'trans-06-reverse' : 'trans-06'}
       onAnimationEnd={handleAnimationEnd}

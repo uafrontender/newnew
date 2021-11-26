@@ -1,7 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
 
 import Card from '../../molecules/Card';
+
+import { useAppSelector } from '../../../redux-store/store';
 
 interface IList {
   category: string;
@@ -13,12 +16,16 @@ export const List: React.FC<IList> = (props) => {
     category,
     collection,
   } = props;
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const renderItem = (item: any, index: number) => (
     <SItemWrapper key={`${category}-${item.id}`}>
       <Card
         item={item}
         index={index + 1}
+        width="100%"
+        height={isMobile ? '564px' : '336px'}
       />
     </SItemWrapper>
   );
@@ -44,6 +51,7 @@ const SListWrapper = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     left: -32px;
+    width: calc(100% + 70px);
     padding: 24px 24px 0 24px;
   }
 
@@ -55,13 +63,20 @@ const SListWrapper = styled.div`
 `;
 
 const SItemWrapper = styled.div`
+  width: 100vw;
   margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {
-    margin: 0 8px;
+    width: calc(33% - 16px);
+    margin: 0 8px 24px 8px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    margin: 0 16px;
+    width: calc(25% - 32px);
+    margin: 0 16px 32px 16px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    width: calc(20% - 32px);
   }
 `;

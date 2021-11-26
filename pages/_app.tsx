@@ -70,7 +70,7 @@ const MyApp = (props: IMyApp): ReactElement => {
         <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
           <ResizeMode>
             <GlobalTheme>
-              { getLayout(<Component {...pageProps} />) }
+              {getLayout(<Component {...pageProps} />)}
             </GlobalTheme>
           </ResizeMode>
         </PersistGate>
