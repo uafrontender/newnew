@@ -233,10 +233,12 @@ const SBlock = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     min-width: 128px;
+    margin-right: 16px;
   }
 
   ${(props) => props.theme.media.laptop} {
     min-width: 224px;
+    margin-right: 32px;
   }
 `;
 
@@ -270,6 +272,7 @@ const SBlockOption = styled.a`
 
 const SBlockRow = styled.div`
   display: flex;
+  margin-bottom: 12px;
   flex-direction: row;
 `;
 
