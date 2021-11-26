@@ -248,7 +248,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         displayName: dataInEdit.displayName,
         ...(dataInEdit.username !== user.userData?.username
           ? { username: dataInEdit.username } : {}),
-        ...(dataInEdit.bio ? { bio: dataInEdit.bio } : {}),
+        ...(dataInEdit.bio !== user.userData?.bio
+          ? { bio: dataInEdit.bio } : {}),
       });
 
       console.log(payload);
@@ -273,7 +274,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
     }
   }, [
-    setIsLoading, dataInEdit, handleClose, user.credentialsData, dispatch, user.userData?.username,
+    setIsLoading, dataInEdit, handleClose, user.credentialsData, dispatch,
+    user.userData?.username, user.userData?.bio,
   ]);
 
   // Profile image
