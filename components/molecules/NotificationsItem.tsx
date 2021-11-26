@@ -98,12 +98,14 @@ const SUserAvatar = styled(UserAvatar)`
   height: 32px;
   min-width: 32px;
   min-height: 32px;
+  border-radius: 16px;
 
   ${(props) => props.theme.media.laptop} {
     width: 56px;
     height: 56px;
     min-width: 56px;
     min-height: 56px;
+    border-radius: 28px;
   }
 `;
 
@@ -115,5 +117,6 @@ const SUserAvatarRight = styled(SUserAvatar)`
     height: 72px;
     min-width: 72px;
     min-height: 72px;
+    border-radius: 16px;
   }
 `;

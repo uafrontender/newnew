@@ -27,15 +27,17 @@ export const Header: React.FC<IHeader> = (props) => {
       withBanner={!!banner.show}
     >
       <Banner />
-      <Container>
-        <Row>
-          <Col>
-            {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode) && <Mobile />}
-            {['tablet'].includes(resizeMode) && <Tablet />}
-            {['laptop', 'laptopL', 'desktop'].includes(resizeMode) && <Desktop />}
-          </Col>
-        </Row>
-      </Container>
+      <SContentWrapper>
+        <Container>
+          <Row>
+            <Col>
+              {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode) && <Mobile />}
+              {['tablet'].includes(resizeMode) && <Tablet />}
+              {['laptop', 'laptopL', 'desktop'].includes(resizeMode) && <Desktop />}
+            </Col>
+          </Row>
+        </Container>
+      </SContentWrapper>
     </SWrapper>
   );
 };
@@ -49,18 +51,22 @@ interface ISWrapper {
 }
 
 const SWrapper = styled.header<ISWrapper>`
-  top: ${(props) => (props.visible ? 0 : `${props.withBanner ? '-96px' : '-56px'}`)};
+  top: ${(props) => (props.visible ? `${props.withBanner ? 0 : '-40px'}` : `${props.withBanner ? '-96px' : '-56px'}`)};
   left: 0;
   width: 100vw;
   z-index: 10;
   position: fixed;
   transition: all ease 1s;
-  padding-top: ${(props) => (props.withBanner ? '40px' : '0px')};
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundHeader};
-  
+`;
+
+const SContentWrapper = styled.div`
+  width: 100%;
+  position: relative;
+
   ::before {
     width: 100%;
-    height: ${(props) => (props.withBanner ? 'calc(100% - 40px)' : '100%')};
+    height: 100%;
     content: '';
     z-index: -1;
     position: absolute;

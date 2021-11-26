@@ -1,11 +1,12 @@
+/* eslint-disable no-nested-ternary */
 import React, {
   useRef,
   useState,
   useEffect,
   useCallback,
 } from 'react';
-import Link from 'next/link';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -17,6 +18,7 @@ import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
 import ScrollArrow from '../../atoms/ScrollArrow';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
@@ -63,6 +65,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   let collectionToRender = collection;
   let renderShowMore = false;
@@ -155,18 +158,31 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       <Card
         item={item}
         index={index + 1}
+        width={isMobile ? '100vw' : isTablet ? '200px' : '224px'}
+        height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
         restore={restore}
         preventClick={wasDragged}
         onMouseLeave={handleItemMouseLeave}
         onMouseDownCapture={handleItemMouseDownCapture}
       />
     </SItemWrapper>
-  ), [handleItemMouseLeave, handleItemMouseDownCapture, restore, category, wasDragged]);
+  ), [
+    restore,
+    isTablet,
+    category,
+    isMobile,
+    wasDragged,
+    handleItemMouseLeave,
+    handleItemMouseDownCapture,
+  ]);
 
   const {
     renderLeftArrow,
     renderRightArrow,
   } = useHoverArrows(ref);
+  const handleSeeMoreCLick = () => {
+    router.push(`/search?category=${category}`);
+  };
 
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
@@ -182,31 +198,44 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   }, [visibleListItem, collection, scrollStep]);
 
   return (
-    <SWrapper>
+    <SWrapper
+      name={category}
+      layoutId={category}
+      transition={{
+        ease: 'easeInOut',
+        duration: 1,
+      }}
+    >
       <STopWrapper>
         {type === 'default' ? (
-          <Headline animation="t01" variant={4}>
+          <Headline
+            variant={4}
+            animation="t-01"
+          >
             {title}
           </Headline>
         ) : (
-          <SCreatorHeadline onClick={handleUserClick}>
-            <UserAvatar user={user} />
-            <SHeadline animation="t01" variant={4}>
-              {user.username}
-            </SHeadline>
-            <Tag>
-              {t('button-creator-on-the-rise')}
-            </Tag>
-          </SCreatorHeadline>
+          <AnimatedPresence
+            animation="t-01"
+          >
+            <SCreatorHeadline onClick={handleUserClick}>
+              <UserAvatar user={user} />
+              <SHeadline variant={4}>
+                {user.username}
+              </SHeadline>
+              <Tag>
+                {t('button-creator-on-the-rise')}
+              </Tag>
+            </SCreatorHeadline>
+          </AnimatedPresence>
         )}
         {!isMobile && (
-          <Link href={`/search?category=${category}`}>
-            <a>
-              <SCaption weight={700}>
-                {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator')}
-              </SCaption>
-            </a>
-          </Link>
+          <SCaption
+            weight={700}
+            onClick={handleSeeMoreCLick}
+          >
+            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator')}
+          </SCaption>
         )}
       </STopWrapper>
       <SListContainer ref={ref}>
@@ -241,13 +270,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       </SListContainer>
       {renderShowMore && (
         <SButtonHolder>
-          <Link href={`/search?category=${category}`}>
-            <a style={{ width: '100%' }}>
-              <Button size="lg" view="secondary">
-                {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator')}
-              </Button>
-            </a>
-          </Link>
+          <Button
+            size="lg"
+            view="secondary"
+            onClick={handleSeeMoreCLick}
+          >
+            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator')}
+          </Button>
         </SButtonHolder>
       )}
     </SWrapper>
@@ -262,7 +291,11 @@ CardsSection.defaultProps = {
   title: '',
 };
 
-const SWrapper = styled.section`
+interface ISWrapper {
+  name: string;
+}
+
+const SWrapper = styled(motion.section)<ISWrapper>`
   padding: 24px 0;
 
   /* No select */
@@ -349,6 +382,7 @@ const STopWrapper = styled.div`
 
 const SCaption = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  cursor: pointer;
   transition: color ease 0.5s;
 
   &:hover {
