@@ -213,6 +213,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           {
             submitError ? (
               <AnimatedPresence
+                animateWhenInView={false}
                 animation="t-09"
               >
                 <SErrorDiv>
@@ -240,6 +241,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
         </MSContentWrapper>
         <AnimatedPresence
+          animateWhenInView={false}
           animation="t-01"
           delay={1.1}
         >
