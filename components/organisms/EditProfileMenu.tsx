@@ -9,7 +9,9 @@ import validator from 'validator';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
 
+// Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { setUserData } from '../../redux-store/slices/userStateSlice';
 
 // Components
 import Button from '../atoms/Button';
@@ -29,7 +31,8 @@ import ZoomInIcon from '../../public/images/svg/icons/outlined/Plus.svg';
 // Utils
 import isImage from '../../utils/isImage';
 import getCroppedImg from '../../utils/cropImage';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
+import ProfileImageCropper from '../molecules/profile/ProfileImageCropper';
+import ProfileImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture'
 
@@ -355,49 +358,15 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   />
                 </SGoBackButtonDesktop>
               )}
-              <SCropperWrapper
-                x={crop.x}
-                y={crop.y}
+              <ProfileImageCropper
+                crop={crop}
                 zoom={zoom}
-                pseudoWidth={originalImageWidth}
-                pseudoHeight={originalImageHeight}
-                // style={{
-                //   '--pseudo-x': crop.x,
-                //   '--pseudo-y': crop.y,
-                //   '--pseudo-zoom': zoom,
-                // }}
-              >
-                {avatarUrlInEdit && (
-                  <Cropper
-                    image={avatarUrlInEdit}
-                    objectFit="vertical-cover"
-                    crop={crop}
-                    cropSize={{
-                      height: 280,
-                      width: 280,
-                    }}
-                    cropShape="round"
-                    showGrid={false}
-                    zoom={zoom}
-                    aspect={1}
-                    classes={{
-                      containerClassName: 'cropper-container',
-                      mediaClassName: 'cropper-media',
-                      cropAreaClassName: 'cropper-cropArea',
-                    }}
-                    style={{
-                      // containerStyle: {
-                      //   '--pseudo-x': crop.x,
-                      //   '--pseudo-y': crop.y,
-                      //   '--pseudo-zoom': zoom,
-                      // },
-                    }}
-                    onCropChange={setCrop}
-                    onCropComplete={onCropComplete}
-                    onZoomChange={setZoom}
-                  />
-                )}
-              </SCropperWrapper>
+                avatarUrlInEdit={avatarUrlInEdit}
+                originalImageWidth={originalImageWidth}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
               <SSliderWrapper>
                 <Button
                   iconOnly
@@ -413,13 +382,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                     height="24px"
                   />
                 </Button>
-                <input
-                  type="range"
+                <ProfileImageZoomSlider
                   value={zoom}
                   min={1}
                   max={3}
                   step={0.1}
-                  aria-labelledby="Zoom"
+                  ariaLabel="Zoom"
                   onChange={(e) => setZoom(Number(e.target.value))}
                 />
                 <Button
@@ -437,26 +405,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   />
                 </Button>
               </SSliderWrapper>
-              <SControlsWrapper>
-                {!isMobile
-                  ? (
-                    <Button
-                      view="secondary"
-                      onClick={handleSetStageToEditingGeneralUnsetPicture}
-                    >
-                      { t('EditProfileMenu.cancelButton') }
-                    </Button>
-                  ) : null}
+              <SControlsWrapperPicture>
+                <Button
+                  view="secondary"
+                  onClick={handleSetStageToEditingGeneralUnsetPicture}
+                >
+                  { t('EditProfileMenu.cancelButton') }
+                </Button>
                 <Button
                   withShadow
-                  style={{
-                    width: isMobile ? '100%' : 'initial',
-                  }}
                   onClick={completeImageCrop}
                 >
                   { t('EditProfileMenu.saveButton') }
                 </Button>
-              </SControlsWrapper>
+              </SControlsWrapperPicture>
             </motion.div>
           )}
       </AnimatePresence>
@@ -568,79 +530,6 @@ const STextInputsWrapper = styled.div`
   }
 `;
 
-const SCropperWrapper = styled.div<{
-  x: number,
-  y: number,
-  zoom: number,
-  pseudoWidth: number,
-  pseudoHeight: number,
-}>`
-  position: relative;
-  height: 420px;
-
-  .cropper-container {
-
-    overflow: hidden;
-
-    &:before {
-      content: '';
-      position: absolute;
-      /* transform: translate(var(--pseudo-x)px, var(--pseudo-y)px) scale(var(--pseudo-zoom)); */
-
-      transform: ${({ x, y, zoom }) => `translate(${x}px, ${y}px) scale(${zoom})`};
-
-      width: ${({ pseudoWidth }) => `${pseudoWidth}px`};
-      height: ${({ pseudoHeight }) => `${pseudoHeight}px`};
-
-      /* width: ${({ pseudoWidth }) => `${pseudoWidth}px`}; */
-      height: 100%;
-
-      outline: ${({ theme }) => `999em solid ${theme.colorsThemed.grayscale.background1}`};
-
-      /* background: black; */
-
-      z-index: 12;
-    }
-
-  }
-
-  .cropper-media {
-
-  }
-
-  .cropper-cropArea {
-    border: transparent;
-    box-shadow: none;
-
-    border: 1px solid black;
-
-    outline: ${({ theme }) => `999em solid ${theme.colors.dark}`};
-    opacity: 0.45;
-  }
-`;
-
-const sfds = {
-  cropAreaStyle: {
-    boxShadow: 'none',
-    // color: theme.colors.dark,
-    border: 'transparent',
-    // outline: `999em solid ${theme.colors.dark}`,
-    // opacity: 0.45,
-    zIndex: 1,
-  },
-  mediaStyle: {
-    // backgroundColor: '#FFFFFF',
-    // fiter: `${theme.colorsThemed.grayscale.background1}`,
-    // filter: 'grayscale(20%)',
-    zIndex: 1,
-  },
-  containerStyle: {
-    // zIndex: 2,
-    // backgroundColor: theme.colorsThemed.grayscale.background1,
-    overflow: 'hidden',
-  },
-};
-
 const SSliderWrapper = styled.div`
   display: none;
 
@@ -666,46 +555,7 @@ const SSliderWrapper = styled.div`
     }
 
     input {
-      -webkit-appearance: none;
-      display: block;
-
-      height: 48px;
-      width: 100%;
-
       margin: 0px 12px;
-
-      &:focus {
-        outline: none;
-      }
-
-      &::-webkit-slider-runnable-track {
-        height: 4px;
-        border-radius: ${({ theme }) => theme.borderRadius.medium};
-        border-color: transparent;
-        background: ${({ theme }) => theme.colorsThemed.grayscale.outlines1};
-      }
-
-      &::-webkit-slider-thumb {
-        -webkit-appearance: none;
-
-        height: 16px;
-        width: 16px;
-        border-radius: 48px;
-        background: ${({ theme }) => theme.colorsThemed.text.primary};
-        cursor: pointer;
-
-        margin-top: -7px;
-
-        transition: .1s ease-in-out;
-      }
-
-      &:focus::-webkit-slider-runnable-track {
-
-      }
-
-      &:hover::-webkit-slider-thumb {
-        transform: scale(1.2);
-      }
     }
   }
 `;
@@ -719,6 +569,14 @@ const SControlsWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
   }
+`;
+
+const SControlsWrapperPicture = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px;
 `;
 
 const UsernamePopupList = ({ points } : { points: string[] }) => (

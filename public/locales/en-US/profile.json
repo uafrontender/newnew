@@ -27,6 +27,7 @@
     "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
     "saveButton": "Save changes",
     "cancelButton": "Cancel",
+    "dragToReposition": "Drag to reposition image",
     "inputs": {
       "displayName": {
         "placeholder": "Nickname"
