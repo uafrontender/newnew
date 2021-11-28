@@ -1,63 +1,65 @@
 import React, { useRef, useState } from 'react';
-import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import styled, { useTheme } from 'styled-components';
 
 import Text from './Text';
 import Modal from '../organisms/Modal';
 import Button from './Button';
-import Caption from './Caption';
+import Headline from './Headline';
+import InlineSVG from './InlineSVG';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
 import { useAppSelector } from '../../redux-store/store';
 import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
-import { SUPPORTED_LANGUAGES } from '../../constants/general';
+import arrowDown from '../../public/images/svg/icons/filled/ArrowDown.svg';
 
-interface IChangeLanguage {
+interface IChangeCollectionType {
+  options: any;
+  selected: string;
+  onChange: (newCategory: string) => void;
 }
 
-export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
-  const { t } = useTranslation();
-  const ref: any = useRef();
+export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => {
   const {
-    push,
-    locale,
-    pathname,
-  } = useRouter();
+    options,
+    selected,
+    onChange,
+  } = props;
+  const theme = useTheme();
+  const { t } = useTranslation('home');
+  const ref: any = useRef();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const options = SUPPORTED_LANGUAGES;
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 58 : 60)) + 24;
+  const ddHeight = (options.length > 6 ? 300 : options.length * (isTablet ? 50 : 52)) + 16;
 
-  const handleChangeLanguageClick = () => {
+  const handleChangeCollectionTypeClick = () => {
     setFocused(!focused);
   };
   const handleCloseClick = () => {
     setFocused(false);
   };
-  const renderItem = (item: string) => {
+  const renderItem = (item: any) => {
+    const isSelected = item.key === selected;
     const handleItemClick = () => {
-      push(pathname, pathname, { locale: item });
+      handleCloseClick();
+      onChange(item.key);
     };
 
     return (
       <SButton
-        key={`change-language-${item}`}
-        view={item === locale ? 'modalSecondarySelected' : 'modalSecondary'}
+        key={`change-collection-type-${item}`}
+        view={isSelected ? 'modalSecondarySelected' : 'modalSecondary'}
         onClick={handleItemClick}
-        selected={item === locale}
+        selected={isSelected}
       >
         <SItemTitle variant={3} weight={600}>
-          {t(`dd-language-title-${item}`)}
+          {t(`${item.key}-block-title`)}
         </SItemTitle>
-        <SItemSubTitle variant={2} weight={600}>
-          {t(`dd-language-subTitle-${item}`)}
-        </SItemSubTitle>
       </SButton>
     );
   };
@@ -71,12 +73,18 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
 
   return (
     <SContainer ref={ref}>
-      <Button
-        view="changeLanguage"
-        onClick={handleChangeLanguageClick}
-      >
-        {t(`selected-language-title-${locale}`)}
-      </Button>
+      <SWrapper onClick={handleChangeCollectionTypeClick}>
+        <Headline variant={4}>
+          {t(`${selected}-block-title`)}
+        </Headline>
+        <SInlineSVG
+          svg={arrowDown}
+          fill={theme.colorsThemed.text.primary}
+          width="32px"
+          height="32px"
+          focused={focused}
+        />
+      </SWrapper>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
@@ -103,10 +111,17 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   );
 };
 
-export default ChangeLanguage;
+export default ChangeCollectionType;
 
 const SContainer = styled.div`
   position: relative;
+`;
+
+const SWrapper = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 interface ISListHolder {
@@ -115,37 +130,21 @@ interface ISListHolder {
 }
 
 const SListHolder = styled.div<ISListHolder>`
+  top: 52px;
   left: 0;
   height: ${(props) => (props.focused ? `${props.height}px` : '0px')};
-  bottom: 52px;
-  padding: ${(props) => (props.focused ? '12px' : '0 12px')};
-  z-index: 1;
+  z-index: 2;
+  padding: ${(props) => (props.focused ? '8px' : '0px 8px')};
   overflow: hidden;
   position: absolute;
   transition: all ease 0.5s;
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
-  padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
-
-  ${(props) => props.theme.media.tablet} {
-    left: unset;
-    right: 0;
-  }
 `;
 
 const SItemTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
-  text-align: center;
-  white-space: nowrap;
-
-  ${(props) => props.theme.media.tablet} {
-    text-align: start;
-  }
-`;
-
-const SItemSubTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: nowrap;
 
@@ -186,10 +185,10 @@ interface ISButton {
 
 const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
-  padding: 12px;
+  padding: 16px 32px;
 
   ${(props) => props.theme.media.tablet} {
-    min-width: 136px;
+    min-width: 200px;
     justify-content: flex-start;
   }
 `;
@@ -197,4 +196,15 @@ const SButton = styled(Button)<ISButton>`
 const SCancelButton = styled(Button)`
   padding: 16px 32px;
   margin-top: 4px;
+`;
+
+interface ISInlineSVG {
+  focused: boolean;
+}
+
+const SInlineSVG = styled(InlineSVG)<ISInlineSVG>`
+  z-index: 1;
+  transform: rotate(${(props) => (props.focused ? '180deg' : '0deg')});
+  transition: all ease 0.5s;
+  margin-left: 4px;
 `;

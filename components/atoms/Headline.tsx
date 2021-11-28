@@ -60,6 +60,7 @@ interface ISH {
 }
 
 const SH1 = styled.h1<ISH>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: bold;
 
   font-size: 32px;
@@ -77,6 +78,7 @@ const SH1 = styled.h1<ISH>`
 `;
 
 const SH2 = styled.h2<ISH>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: bold;
 
   font-size: 28px;
@@ -94,6 +96,7 @@ const SH2 = styled.h2<ISH>`
 `;
 
 const SH3 = styled.h3<ISH>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: bold;
 
   font-size: 24px;
@@ -111,6 +114,7 @@ const SH3 = styled.h3<ISH>`
 `;
 
 const SH4 = styled.h4<ISH>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: bold;
 
   font-size: 22px;
@@ -128,6 +132,7 @@ const SH4 = styled.h4<ISH>`
 `;
 
 const SH5 = styled.h5<ISH>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: bold;
 
   font-size: 20px;
@@ -145,6 +150,7 @@ const SH5 = styled.h5<ISH>`
 `;
 
 const SH6 = styled.h6<ISH>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: bold;
 
   font-size: 18px;

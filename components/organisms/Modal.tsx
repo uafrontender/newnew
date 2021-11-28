@@ -30,8 +30,8 @@ const Modal: React.FC<IModal> = (props) => {
     return ReactDOM.createPortal(
       <StyledModalOverlay
         show={show}
-        transitionSpeed={transitionSpeed ?? 0.5}
         onClick={onClose}
+        transitionSpeed={transitionSpeed ?? 0.5}
       >
         {children}
       </StyledModalOverlay>,

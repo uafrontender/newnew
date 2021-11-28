@@ -107,7 +107,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // Redirect to / if user is not logged in
   useEffect(() => {
     if (!user.loggedIn) {
-      // console.log('redirecting');
       router.push('/');
     }
   }, [router, user]);
