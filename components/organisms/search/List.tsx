@@ -50,9 +50,9 @@ const SListWrapper = styled.div`
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    left: -32px;
-    width: calc(100% + 70px);
-    padding: 24px 24px 0 24px;
+    left: -8px;
+    width: calc(100% + 26px);
+    padding: 24px 0 0 0;
   }
 
   ${(props) => props.theme.media.laptop} {
