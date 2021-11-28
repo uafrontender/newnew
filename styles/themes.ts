@@ -26,6 +26,9 @@ export const lightTheme: DefaultTheme = {
   ...basicTheme,
   name: 'light',
   colorsThemed: {
+    statusBar: {
+      background: '#fffefe', // #FFFFFF not working on ios
+    },
     grayscale: {
       background1: '#FFFFFF',
       background2: '#F1F3F9',
@@ -164,6 +167,9 @@ export const darkTheme: DefaultTheme = {
   ...basicTheme,
   name: 'dark',
   colorsThemed: {
+    statusBar: {
+      background: '#0B0A13',
+    },
     grayscale: {
       background1: '#0B0A13',
       background2: '#14151F',
@@ -176,7 +182,7 @@ export const darkTheme: DefaultTheme = {
       outlines2: '#6A6A7B',
       numbers: 'rgba(255, 255, 255, 0.06)',
       backgroundFooter: '#0B0A13',
-      backgroundHeader: 'rgba(11, 10, 19, 0.9);',
+      backgroundHeader: 'rgba(11, 10, 19, 0.9)',
     },
     text: {
       primary: '#FFFFFF',

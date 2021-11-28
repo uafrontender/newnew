@@ -17,6 +17,9 @@ declare module 'styled-components' {
       blue: string,
     };
     colorsThemed: {
+      statusBar: {
+        background: string;
+      },
       grayscale: {
         background1: string;
         background2: string;

@@ -51,7 +51,7 @@ interface ISWrapper {
 }
 
 const SWrapper = styled.header<ISWrapper>`
-  top: ${(props) => (props.visible ? `${props.withBanner ? 0 : '-40px'}` : `${props.withBanner ? '-96px' : '-56px'}`)};
+  top: ${(props) => (props.visible ? `${props.withBanner ? 0 : '-40px'}` : '-96px')};
   left: 0;
   width: 100vw;
   z-index: 10;

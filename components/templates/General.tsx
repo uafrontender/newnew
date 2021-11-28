@@ -1,6 +1,7 @@
 import React, { useRef, useMemo } from 'react';
-import styled from 'styled-components';
+import Head from 'next/head';
 import { useCookies } from 'react-cookie';
+import styled, { useTheme } from 'styled-components';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -29,6 +30,7 @@ export const General: React.FC<IGeneral> = (props) => {
     banner,
     resizeMode,
   } = useAppSelector((state) => state.ui);
+  const theme = useTheme();
   const [cookies] = useCookies();
   const wrapperRef: any = useRef();
   const bottomNavigation = useMemo(() => {
@@ -108,6 +110,9 @@ export const General: React.FC<IGeneral> = (props) => {
       withBanner={!!banner?.show}
       {...props}
     >
+      <Head>
+        <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
+      </Head>
       <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
       <SContent>
         <Container>
