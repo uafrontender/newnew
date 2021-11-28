@@ -34,6 +34,7 @@ Caption.defaultProps = {
 export default Caption;
 
 const SCaption = styled.p<ICaption>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: ${(props) => props.weight};
 `;
 

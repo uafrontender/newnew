@@ -17,5 +17,17 @@
   "button-card-cf": "{{backed}} of {{total}} backers",
   "card-time-left": "{{time}} left",
   "for-you-block-title": "For you",
-  "filter-title": "Sort"
+  "sort-title": "Sort",
+  "button-show-results": "Show results",
+  "button-cancel": "Cancel",
+  "sort-title-option-bid": "Bid",
+  "sort-title-option-bid-lowest": "Lowest",
+  "sort-title-option-bid-highest": "Highest",
+  "sort-title-option-time": "Time",
+  "sort-title-option-time-ending-soon": "Ending soonest",
+  "sort-title-option-time-newest": "Newest",
+  "sort-title-option-time-oldest": "Oldest",
+  "sort-title-option-numbers-of-bids": "Numbers of bids",
+  "sort-title-option-numbers-of-bids-fewest": "Fewest",
+  "sort-title-option-numbers-of-bids-most-first": "Most first"
 }
