@@ -1,5 +1,6 @@
 import React, { useRef, useMemo } from 'react';
 import styled from 'styled-components';
+import { useCookies } from 'react-cookie';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -28,6 +29,7 @@ export const General: React.FC<IGeneral> = (props) => {
     banner,
     resizeMode,
   } = useAppSelector((state) => state.ui);
+  const [cookies] = useCookies();
   const wrapperRef: any = useRef();
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
@@ -121,6 +123,11 @@ export const General: React.FC<IGeneral> = (props) => {
         visible={isMobile && scrollDirection !== 'down'}
         collection={bottomNavigation}
       />
+      <SortingContainer
+        id="sorting-container"
+        withCookie={cookies.accepted !== 'true'}
+        bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+      />
       <CookieContainer
         bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
       >
@@ -184,5 +191,24 @@ const CookieContainer = styled.div<ICookieContainer>`
 
   ${(props) => props.theme.media.tablet} {
     bottom: ${(props) => (props.bottomNavigationVisible ? 80 : 24)}px;
+  }
+`;
+
+interface ISortingContainer {
+  withCookie: boolean;
+  bottomNavigationVisible: boolean;
+}
+
+const SortingContainer = styled.div<ISortingContainer>`
+  left: 50%;
+  bottom: ${(props) => (props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`)}px;
+  z-index: 10;
+  position: fixed;
+  transform: translateX(-50%);
+  transition: bottom ease 0.5s;
+  pointer-events: none;
+
+  ${(props) => props.theme.media.tablet} {
+    bottom: -100px;
   }
 `;
