@@ -25,6 +25,13 @@ const Modal: React.FC<IModal> = (props) => {
   useEffect(() => {
     dispatch(setOverlay(show));
   }, [show, dispatch]);
+  useEffect(() => {
+    const blurredBody = document.getElementById('__next');
+
+    if (blurredBody) {
+      blurredBody.classList.toggle('blurred', show);
+    }
+  }, [show]);
 
   if (isBrowser()) {
     return ReactDOM.createPortal(
@@ -55,12 +62,18 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   z-index: 10;
   overflow: hidden;
   position: fixed;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
 
   ::before {
+    top: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    height: 100%;
+    bottom: 0;
+    height: 100vh;
     content: '';
     z-index: -1;
     position: absolute;
