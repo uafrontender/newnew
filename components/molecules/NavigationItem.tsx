@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import _map from 'lodash/map';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
+import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../atoms/Text';
@@ -22,8 +24,22 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const { item } = props;
   const { t } = useTranslation();
   const router = useRouter();
+  const [cookies, setCookie] = useCookies();
 
   const active = item.url === router.route;
+  const cookieKey = `${item.key}-${item.counter}`;
+
+  const handleAnimationEnd = () => {
+    setCookie(cookieKey, true);
+  };
+
+  useEffect(() => {
+    _map(cookies, (value, key) => {
+      if (key.includes(item.key) && key !== cookieKey) {
+        setCookie(key, '');
+      }
+    });
+  }, [cookieKey, cookies, item.counter, item.key, setCookie]);
 
   return (
     <Link href={item.url}>
@@ -36,7 +52,11 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
           </div>
           {!!item.counter && (
             <SIndicatorContainer bigCounter={item.counter > 9}>
-              <Indicator counter={item.counter} />
+              <Indicator
+                counter={item.counter}
+                animate={!cookies[cookieKey]}
+                onAnimationEnd={handleAnimationEnd}
+              />
             </SIndicatorContainer>
           )}
         </SNavItem>

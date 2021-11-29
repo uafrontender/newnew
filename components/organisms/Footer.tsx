@@ -208,14 +208,6 @@ const SWrapper = styled.footer`
 const SContent = styled.div`
   padding: 32px 0;
   position: relative;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 32px 0;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    padding: 32px 0;
-  }
 `;
 
 const STopContent = styled.div`
