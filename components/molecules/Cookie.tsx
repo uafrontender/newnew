@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import InlineSVG from '../atoms/InlineSVG';
-import AnimatedPresence from '../atoms/AnimatedPresence';
+import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
@@ -14,16 +14,26 @@ export const Cookie = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();
+  const [animation, setAnimation] = useState('trans-06');
   const [animateCookie, setAnimateCookie] = useState(false);
-  const [animationDirection, setAnimationDirection] = useState('up');
 
   const handleClose = () => {
-    setAnimationDirection('down');
+    setAnimation('trans-06-reverse');
     setAnimateCookie(true);
     setCookie('accepted', true);
   };
   const handleAnimationEnd = () => {
     setAnimateCookie(false);
+  };
+  const handleMouseOver = () => {
+    setAnimation('o-11');
+    setAnimateCookie(true);
+  };
+  const handleMouseLeave = () => {
+    if (animation === 'o-11') {
+      setAnimation('o-11-reverse');
+      setAnimateCookie(true);
+    }
   };
 
   useEffect(() => {
@@ -36,12 +46,15 @@ export const Cookie = () => {
 
   return (
     <AnimatedPresence
-      animateWhenInView={false}
       start={animateCookie}
-      animation={animationDirection === 'down' ? 'trans-06-reverse' : 'trans-06'}
+      animation={animation as TAnimation}
       onAnimationEnd={handleAnimationEnd}
+      animateWhenInView={false}
     >
-      <SContainer>
+      <SContainer
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
+      >
         <SText>
           {t('cookie-text')}
         </SText>
@@ -74,6 +87,7 @@ export const Cookie = () => {
 export default Cookie;
 
 const SContainer = styled.div`
+  margin: 10px;
   display: flex;
   padding: 12px 12px 12px 20px;
   box-shadow: ${(props) => props.theme.shadows.cookie};

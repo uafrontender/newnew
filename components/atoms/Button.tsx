@@ -211,17 +211,9 @@ const SButton = styled.button<ISButton>`
   -ms-user-select: none;
   user-select: none;
 
-  ${(props) => props.withShadow && css`
-    box-shadow: ${props.theme.shadows.mediumBlue};
-  `}
-
   &:active:enabled {
     outline: none;
     background: ${(props) => props.theme.colorsThemed.button.active[props.view ?? 'primary']};
-    
-    ${(props) => props.withShadow && css`
-      box-shadow: none;
-    `}
   }
   
   &:focus:enabled,

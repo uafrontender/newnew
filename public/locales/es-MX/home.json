@@ -10,7 +10,7 @@
   "cf-block-title": "ES Top Crowdfunding",
   "biggest-block-title": "ES Biggest of All Time",
   "button-show-more": "ES See more",
-  "button-show-more-creator": "ES See more from creator",
+  "button-show-more-creator": "ES See more from {{name}}",
   "button-creator-on-the-rise": "ES Creator on the rise",
   "button-card-ac": "ES {{amount}} in bids",
   "button-card-mc": "ES {{votes}} votes",

@@ -11,7 +11,7 @@ import { useAppSelector } from '../../redux-store/store';
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
 import logoText from '../../public/images/svg/logo_text.svg';
-import logoAnimation from '../../public/animations/mobile_logo_animation.json';
+import logoAnimation from '../../public/animations/mobile_logo.json';
 
 export const Logo = () => {
   const [loading, setLoading] = useState(false);
