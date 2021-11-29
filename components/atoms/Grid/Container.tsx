@@ -5,7 +5,6 @@ export const SContainer = styled.div`
   height: 100%;
   margin: 0 auto;
   padding: 0;
-  max-width: ${(props) => props.theme.width.maxContentWidth}px;
   transition: all ease 0.5s;
 
   ${(props) => props.theme.media.tablet} {
