@@ -285,12 +285,12 @@ const SSignInButton = styled.button<SISignInButton>`
   ` : null)}
 
   &:enabled:active {
-    transform: scale(.9);
+    transform: scale(0.9);
     background: ${({ noRipple, pressedBgColor }) => (
     noRipple ? (
       pressedBgColor
     ) : 'initial')};
-    transition: .2s ease-in-out;
+    transition: .2s linear;
   }
 
   &:disabled {

@@ -133,10 +133,6 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
     box-shadow: ${(props) => props.theme.shadows.mediumBlue};
   }
 
-  &:enabled {
-    box-shadow: ${(props) => props.theme.shadows.mediumBlue};
-  }
-
   &:hover:enabled {
     box-shadow: ${(props) => props.theme.shadows.intenseBlue};
   }
