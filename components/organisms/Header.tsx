@@ -56,7 +56,7 @@ const SWrapper = styled.header<ISWrapper>`
   width: 100vw;
   z-index: 10;
   position: fixed;
-  transition: all ease 1s;
+  transition: all ease 0.5s;
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundHeader};
 `;
 
