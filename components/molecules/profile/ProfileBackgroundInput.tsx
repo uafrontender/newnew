@@ -1,20 +1,64 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { Area, Point } from 'react-easy-crop/types';
+
+import ProfileBackgroundCropper from './ProfileBackgroundCropper';
+import Button from '../../atoms/Button';
+import InlineSvg from '../../atoms/InlineSVG';
+
+import BinIcon from '../../../public/images/svg/icons/filled/Trash.svg';
 
 interface IProfileBackgroundInput {
-  pictureURL?: string;
+  originalPictureUrl?: string;
+  pictureInEditUrl?: string;
+  crop: Point;
+  zoom: number;
+  originalImageWidth: number;
+  handleSetPictureInEdit: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleUnsetPictureInEdit: () => void;
+  onCropChange: (location: Point) => void;
+  onCropComplete: ((croppedArea: Area, croppedAreaPixels: Area) => void) | undefined;
+  onZoomChange: ((zoom: number) => void) | undefined;
 }
 
 const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> = ({
-  pictureURL,
+  originalPictureUrl,
+  pictureInEditUrl,
+  zoom,
+  crop,
+  originalImageWidth,
+  handleSetPictureInEdit,
+  handleUnsetPictureInEdit,
+  onCropChange,
+  onCropComplete,
+  onZoomChange,
 }) => {
   const { t } = useTranslation('profile');
 
+  const [mobileCropWidth, setMobileCropWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    const resetMobileCropWidth = () => {
+      const newValue = containerRef.current?.getBoundingClientRect().width ?? 0;
+      setMobileCropWidth(newValue);
+    };
+
+    window.addEventListener('resize', resetMobileCropWidth);
+
+    return () => window.removeEventListener('resize', resetMobileCropWidth);
+  }, []);
+
   return (
-    <SProfileBackgroundInput>
+    <SProfileBackgroundInput
+      ref={(el) => {
+        containerRef.current = el!!;
+      }}
+    >
       <SFrame>
         <svg
           id="profileBackgroundInputSvg"
@@ -28,18 +72,53 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
           </clipPath>
         </svg>
       </SFrame>
-      {pictureURL ? (
-        <img
-          alt="Profile background"
-          src={pictureURL}
-        />
-      ) : null}
+      {pictureInEditUrl ? (
+        originalPictureUrl === pictureInEditUrl ? (
+          <>
+            <SOriginalImgDiv
+              pictureUrl={originalPictureUrl}
+            />
+            <SDeleteImgButton
+              iconOnly
+              onClick={() => {
+                handleUnsetPictureInEdit();
+              }}
+            >
+              <InlineSvg
+                svg={BinIcon}
+                width="20px"
+                height="20px"
+                fill="#FFFFFF"
+              />
+            </SDeleteImgButton>
+          </>
+        ) : (
+          <ProfileBackgroundCropper
+            pictureUrlInEdit={pictureInEditUrl!!}
+            crop={crop}
+            zoom={zoom}
+            originalImageWidth={originalImageWidth}
+            mobileCropWidth={mobileCropWidth}
+            onCropChange={onCropChange}
+            onCropComplete={onCropComplete}
+            onZoomChange={onZoomChange}
+          />
+        )
+      ) : (
+        <SLabel>
+          <SImageInput
+            type="file"
+            onChange={handleSetPictureInEdit}
+          />
+        </SLabel>
+      )}
     </SProfileBackgroundInput>
   );
 };
 
 ProfileBackgroundInput.defaultProps = {
-  pictureURL: undefined,
+  originalPictureUrl: undefined,
+  pictureInEditUrl: undefined,
 };
 
 export default ProfileBackgroundInput;
@@ -66,6 +145,20 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
   }
 `;
 
+const SOriginalImgDiv = styled.div<{
+  pictureUrl: string;
+}>`
+  position: relative;
+  overflow: hidden;
+
+  width: 100%;
+  height: 100%;
+
+  background-image: ${({ pictureUrl }) => `url('${pictureUrl}')`};
+  background-position: center;
+
+`;
+
 const SFrame = styled.div`
   z-index: 5;
 
@@ -89,4 +182,23 @@ const SFrame = styled.div`
   ${(props) => props.theme.media.tablet} {
     transform: scale(0.9) translateY(10px) translateX(calc(211px - 188px));
   }
+`;
+
+const SLabel = styled.label`
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  cursor: pointer;
+`;
+
+const SImageInput = styled.input`
+  display: none;
+`;
+
+const SDeleteImgButton = styled(Button)`
+  position: absolute;
+
+  right: 12px;
+  bottom: 12px;
 `;

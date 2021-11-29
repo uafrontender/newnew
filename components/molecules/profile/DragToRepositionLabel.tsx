@@ -7,14 +7,20 @@ import MoveIcon from '../../../public/images/svg/icons/filled/Move.svg';
 
 interface IDragToRepositionLabel {
   text: string;
+  top?: string;
+  customZ?: number;
   isPressed: boolean;
 }
 
 const DragToRepositionLabel: React.FunctionComponent<IDragToRepositionLabel> = ({
   text,
+  top,
+  customZ,
   isPressed,
 }) => (
   <SDraToRepositionLabel
+    top={top ?? undefined}
+    customZ={customZ ?? undefined}
     isPressed={isPressed}
   >
     <InlineSvg
@@ -29,13 +35,20 @@ const DragToRepositionLabel: React.FunctionComponent<IDragToRepositionLabel> = (
   </SDraToRepositionLabel>
 );
 
+DragToRepositionLabel.defaultProps = {
+  top: undefined,
+  customZ: undefined,
+};
+
 export default DragToRepositionLabel;
 
 const SDraToRepositionLabel = styled.div<{
   isPressed: boolean;
+  top?: string;
+  customZ?: number;
 }>`
   position: absolute;
-  top: calc(50% - 20px);
+  top: ${({ top }) => (top || 'calc(50% - 20px)')};
   left: calc(50% - 113px);
 
   display: flex;
@@ -51,7 +64,7 @@ const SDraToRepositionLabel = styled.div<{
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   padding: 8px 16px;
 
-  z-index: 12;
+  z-index: ${({ customZ }) => customZ ?? 12};
 
   cursor: move;
   transition: transform .2s ease-in-out;

@@ -97,7 +97,6 @@ const SProfileImageInput = styled.label<{
 
 const SImageInput = styled.input`
   display: none;
-
 `;
 
 const SEditIcon = styled(InlineSvg)`

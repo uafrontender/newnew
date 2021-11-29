@@ -35,6 +35,8 @@ const SSlider = styled.input.attrs({ type: 'range' })`
   -webkit-appearance: none;
   display: block;
 
+  background-color: transparent;
+
   height: 48px;
   width: 100%;
 
