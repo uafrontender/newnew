@@ -52,7 +52,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
 
     return (
       <SButton
-        key={`change-collection-type-${item}`}
+        key={`change-collection-type-${item.key}`}
         view={isSelected ? 'modalSecondarySelected' : 'modalSecondary'}
         onClick={handleItemClick}
         selected={isSelected}
