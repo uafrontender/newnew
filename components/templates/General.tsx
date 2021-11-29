@@ -187,7 +187,7 @@ interface ICookieContainer {
 
 const CookieContainer = styled.div<ICookieContainer>`
   left: 50%;
-  bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
+  bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
   z-index: 10;
   position: fixed;
   transform: translateX(-50%);

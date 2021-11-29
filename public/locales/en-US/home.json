@@ -10,7 +10,7 @@
   "cf-block-title": "Top Crowdfunding",
   "biggest-block-title": "Biggest of All Time",
   "button-show-more": "See more",
-  "button-show-more-creator": "See more from creator",
+  "button-show-more-creator": "See more from {{name}}",
   "button-creator-on-the-rise": "Creator on the rise",
   "button-card-ac": "{{amount}} in bids",
   "button-card-mc": "{{votes}} votes",
