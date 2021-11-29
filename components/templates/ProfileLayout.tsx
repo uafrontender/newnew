@@ -52,7 +52,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   useEffect(() => {
     if (currentUser.loggedIn
       && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
-      // console.log('redirecting');
       router.push('/profile');
     }
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);

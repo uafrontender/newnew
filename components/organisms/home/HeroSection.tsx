@@ -135,7 +135,10 @@ export const HeroSection = () => {
             {t('hero-block-subTitle')}
           </AnimatedPresence>
         </SSubTitle>
-        <AnimatedPresence start={animateButton} animation="t-01">
+        <AnimatedPresence
+          start={animateButton}
+          animation="t-01"
+        >
           <SButtonsHolder>
             {isMobile ? (
               <>

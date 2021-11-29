@@ -8,6 +8,7 @@ import InlineSVG from '../atoms/InlineSVG';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
 
 export const Cookie = () => {
   const theme = useTheme();
@@ -35,6 +36,7 @@ export const Cookie = () => {
 
   return (
     <AnimatedPresence
+      animateWhenInView={false}
       start={animateCookie}
       animation={animationDirection === 'down' ? 'trans-06-reverse' : 'trans-06'}
       onAnimationEnd={handleAnimationEnd}
@@ -43,6 +45,11 @@ export const Cookie = () => {
         <SText>
           {t('cookie-text')}
         </SText>
+        <SInlineSVG
+          svg={cookieIcon}
+          width="20px"
+          height="20px"
+        />
         <Link href="/cookies">
           <a>
             <STextLink>
@@ -68,7 +75,7 @@ export default Cookie;
 
 const SContainer = styled.div`
   display: flex;
-  padding: 12px 20px;
+  padding: 12px 12px 12px 20px;
   box-shadow: ${(props) => props.theme.shadows.cookie};
   background: ${(props) => props.theme.colorsThemed.grayscale.backgroundCookie};
   align-items: center;
@@ -83,6 +90,7 @@ const SText = styled.div`
   font-weight: bold;
   line-height: 24px;
   white-space: nowrap;
+  margin-right: 2px;
 `;
 
 const STextLink = styled.div`
@@ -98,4 +106,9 @@ const STextLink = styled.div`
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;
   }
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  top: -1px;
+  position: relative;
 `;

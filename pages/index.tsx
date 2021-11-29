@@ -5,8 +5,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { NextPage, NextPageContext } from 'next';
 
 import Button from '../components/atoms/Button';
-import CardsSection from '../components/organisms/home/CardsSection';
 import HomeLayout from '../components/templates/HomeLayout';
+import TopSection from '../components/organisms/home/TopSection';
+import HeroSection from '../components/organisms/home/HeroSection';
+import CardsSection from '../components/organisms/home/CardsSection';
 
 import dateToTimestamp from '../utils/dateToTimestamp';
 import { setColorMode } from '../redux-store/slices/uiStateSlice';
@@ -86,6 +88,88 @@ const Home: NextPage = () => {
 
     dispatch(setUserLoggedIn(!user.loggedIn));
   }, [dispatch, user.loggedIn]);
+  const collection = useMemo(() => [
+    {
+      id: 'randomid1',
+      url: testBG,
+      title: 'Want a new tattoo. Where should I get it? 🙈',
+      user: {
+        avatar: testUser2,
+      },
+    },
+    {
+      id: 'randomid2',
+      url: testBG2,
+      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
+      user: {
+        avatar: testUser3,
+      },
+    },
+    {
+      id: 'randomi3',
+      url: testBG3,
+      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
+      user: {
+        avatar: testUser4,
+      },
+    },
+    {
+      id: 'randomid4',
+      url: testBG,
+      title: 'Want a new tattoo. Where should I get it? 🙈',
+      user: {
+        avatar: testUser2,
+      },
+    },
+    {
+      id: 'randomid5',
+      url: testBG2,
+      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
+      user: {
+        avatar: testUser3,
+      },
+    },
+    {
+      id: 'randomi6',
+      url: testBG3,
+      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
+      user: {
+        avatar: testUser4,
+      },
+    },
+    {
+      id: 'randomid7',
+      url: testBG,
+      title: 'Want a new tattoo. Where should I get it? 🙈',
+      user: {
+        avatar: testUser2,
+      },
+    },
+    {
+      id: 'randomid8',
+      url: testBG2,
+      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
+      user: {
+        avatar: testUser3,
+      },
+    },
+    {
+      id: 'randomi9',
+      url: testBG3,
+      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
+      user: {
+        avatar: testUser4,
+      },
+    },
+    {
+      id: 'randomid10',
+      url: testBG,
+      title: 'Want a new tattoo. Where should I get it? 🙈',
+      user: {
+        avatar: testUser2,
+      },
+    },
+  ], []);
   const collectionAC = useMemo(() => [
     {
       id: 'randomid1',
@@ -615,6 +699,8 @@ const Home: NextPage = () => {
 
   return (
     <>
+      {!user.loggedIn && <HeroSection />}
+      <TopSection collection={collection} />
       {user.loggedIn && (
         <CardsSection
           title={t('for-you-block-title')}

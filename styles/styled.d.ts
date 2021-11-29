@@ -18,6 +18,9 @@ declare module 'styled-components' {
       dark: string,
     };
     colorsThemed: {
+      statusBar: {
+        background: string;
+      },
       grayscale: {
         background1: string;
         background2: string;
@@ -88,6 +91,8 @@ declare module 'styled-components' {
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
@@ -98,6 +103,8 @@ declare module 'styled-components' {
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
@@ -108,6 +115,8 @@ declare module 'styled-components' {
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
@@ -118,6 +127,8 @@ declare module 'styled-components' {
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,

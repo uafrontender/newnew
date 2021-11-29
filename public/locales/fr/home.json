@@ -16,5 +16,18 @@
   "button-card-mc": "FR {{votes}} votes",
   "button-card-cf": "FR {{amount}} of {{total}} backers",
   "card-time-left": "FR {{time}} left",
-  "for-you-block-title": "FR For you"
+  "for-you-block-title": "FR For you",
+  "sort-title": "FR Sort",
+  "button-show-results": "FR Show results",
+  "button-cancel": "FR Cancel",
+  "sort-title-option-bid": "FR Bid",
+  "sort-title-option-bid-lowest": "FR Lowest",
+  "sort-title-option-bid-highest": "FR Highest",
+  "sort-title-option-time": "FR Time",
+  "sort-title-option-time-ending-soon": "FR Ending soonest",
+  "sort-title-option-time-newest": "FR Newest",
+  "sort-title-option-time-oldest": "FR Oldest",
+  "sort-title-option-numbers-of-bids": "FR Numbers of bids",
+  "sort-title-option-numbers-of-bids-fewest": "FR Fewest",
+  "sort-title-option-numbers-of-bids-most-first": "FR Most first"
 }

@@ -5,6 +5,7 @@ import React, {
   useCallback,
 } from 'react';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
 
@@ -158,8 +159,18 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   }, [visibleListItem, collection]);
 
   return (
-    <SWrapper name="topSection">
-      <Headline animation="t01" variant={4}>
+    <SWrapper
+      name="topSection"
+      layoutId="topSection"
+      transition={{
+        ease: 'easeInOut',
+        duration: 1,
+      }}
+    >
+      <Headline
+        variant={4}
+        animation="t-01"
+      >
         {t('top-block-title', { country })}
       </Headline>
       <SListContainer ref={ref}>
@@ -198,7 +209,7 @@ interface ISWrapper {
   name: string;
 }
 
-const SWrapper = styled.section<ISWrapper>`
+const SWrapper = styled(motion.section)<ISWrapper>`
   padding: 0 0 48px 0;
 
   /* No select */

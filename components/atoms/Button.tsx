@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import RippleAnimation from './RippleAnimation';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView = 'primary' | 'primaryGrad' | 'primaryProgress' | 'secondary' | 'tertiary' | 'quaternary' | 'changeLanguage' | 'transparent';
+type TView = 'primary' | 'primaryGrad' | 'primaryProgress' | 'secondary' | 'modalSecondary' | 'modalSecondarySelected' | 'tertiary' | 'quaternary' | 'changeLanguage' | 'transparent';
 type TSize = 'sm' | 'lg';
 
 interface IButton {

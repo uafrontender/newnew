@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface ICaption {
   weight?: 600 | 700;
   variant?: 1 | 2 | 3;
+  onClick?: () => void;
   children: React.ReactNode;
 }
 
@@ -27,11 +28,13 @@ const Caption: React.FC<ICaption> = (props) => {
 Caption.defaultProps = {
   weight: 600,
   variant: 1,
+  onClick: () => {},
 };
 
 export default Caption;
 
 const SCaption = styled.p<ICaption>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: ${(props) => props.weight};
 `;
 
