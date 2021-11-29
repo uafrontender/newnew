@@ -188,7 +188,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             variants={item}
           >
             <TextWithLine
-              lineColor={theme.colorsThemed.text.tertiary}
+              lineColor={theme.colorsThemed.grayscale.outlines1}
               innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
             />
           </motion.div>
@@ -472,16 +472,12 @@ const SContinueWithSpan = styled.span`
   padding-right: 8px;
 
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-  }
 `;
 
 const SErrorDiv = styled.div`
