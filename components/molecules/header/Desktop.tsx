@@ -172,12 +172,4 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
-
-  ${(props) => props.theme.media.tablet} {
-    margin-left: 24px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-left: 16px;
-  }
 `;

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Lottie from 'react-lottie';
 import styled from 'styled-components';
 
 import Text from '../atoms/Text';
 
-import checkBoxAnim from '../../public/animations/mobile_logo_animation.json';
+import checkBoxAnim from '../../public/animations/checkbox.json';
 
 interface ICheckBox {
   label: string;
@@ -18,17 +18,27 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
     selected,
     handleChange,
   } = props;
+  const ref: any = useRef();
+
+  useEffect(() => {
+    if (selected) {
+      ref.current.anim.setSegment(0, 23);
+      ref.current.anim.play();
+    } else {
+      ref.current.anim.setSegment(1, 1);
+    }
+  }, [selected]);
 
   return (
     <SWrapper onClick={handleChange}>
       <SAnimation>
         <Lottie
+          ref={ref}
           width={24}
           height={24}
-          direction={selected ? 1 : -1}
           options={{
             loop: false,
-            autoplay: true,
+            autoplay: false,
             animationData: checkBoxAnim,
           }}
         />
