@@ -503,7 +503,7 @@ const SLegalText = styled(Text)`
 
   text-align: center;
 
-  font-weight: 500;
+  font-weight: 600;
   font-size: 12px;
   line-height: 16px;
 
