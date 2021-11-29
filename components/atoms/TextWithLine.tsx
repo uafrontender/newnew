@@ -38,8 +38,6 @@ const STextWithLine = styled.div<ISTextWithLine>`
 
   span {
     display: block;
-
-    color: ${({ lineColor }) => lineColor};
   }
 
   &:before {
