@@ -1,8 +1,18 @@
 import React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { motion, AnimatePresence as FMAnimatedPresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
 
-export type TAnimation = 't-01' | 't-02' | 't-08' | 't-09' | 't-10' | 'trans-06' | 'trans-06-reverse';
+export type TAnimation =
+  't-01'
+  | 't-02'
+  | 't-08'
+  | 't-09'
+  | 't-10'
+  | 'trans-06'
+  | 'trans-06-reverse'
+  | 'o-11'
+  | 'o-11-reverse';
+
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
@@ -20,7 +30,10 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     onAnimationEnd,
   } = props;
   let { children } = props;
-  const { ref, inView } = useInView();
+  const {
+    ref,
+    inView,
+  } = useInView();
 
   let startAnimation = start;
 
@@ -28,7 +41,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     startAnimation = start && inView;
   }
 
-  const variants: Variants = {
+  const variants: any = {
     't-01': {
       opacity: 1,
       transition: {
@@ -46,7 +59,9 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       opacity: 1,
       transition: {
         ease: 'easeInOut',
+        type: 'spring',
         delay: delay ?? 0.5,
+        bounce: 0,
       },
     },
     't-02_initial': {
@@ -107,15 +122,17 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       y: 0,
       opacity: 1,
       transition: {
+        type: 'spring',
         delay: delay ?? 0.5,
+        bounce: 0.5,
       },
     },
     'trans-06_initial': {
-      y: 120,
+      y: 20,
       opacity: 0,
     },
     'trans-06_exit': {
-      y: 120,
+      y: 20,
       opacity: 0,
     },
     'trans-06-reverse': {
@@ -129,6 +146,38 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     },
     'trans-06_exit-reverse': {
       y: 0,
+      opacity: 1,
+    },
+    'o-11': {
+      y: -5,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-11_initial': {
+      y: 0,
+      opacity: 1,
+    },
+    'o-11_exit': {
+      y: 0,
+      opacity: 1,
+    },
+    'o-11-reverse': {
+      y: 0,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-11_initial-reverse': {
+      y: -5,
+      opacity: 1,
+    },
+    'o-11_exit-reverse': {
+      y: -5,
       opacity: 1,
     },
   };
