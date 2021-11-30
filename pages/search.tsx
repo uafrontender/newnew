@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
@@ -19,10 +19,6 @@ import testBG3 from '../public/images/mock/test_bg_3.jpg';
 import testUser2 from '../public/images/mock/test_user_2.jpg';
 import testUser3 from '../public/images/mock/test_user_3.jpg';
 import testUser4 from '../public/images/mock/test_user_4.jpg';
-import testBGCreator1 from '../public/images/mock/test_bg_creator_1.jpg';
-import testUser1 from '../public/images/mock/test_user_1.jpg';
-import testBGCreator2 from '../public/images/mock/test_bg_creator_2.jpg';
-import testBGCreator3 from '../public/images/mock/test_bg_creator_3.jpg';
 
 const Search: NextPage = () => {
   const router = useRouter();
@@ -531,111 +527,6 @@ const Search: NextPage = () => {
       },
     },
   ], []);
-  const collectionCreator = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 300,
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBGCreator2,
-      type: 'mc',
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      votes: 200,
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBGCreator3,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 4500,
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBGCreator2,
-      type: 'mc',
-      votes: 100,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBGCreator3,
-      type: 'cf',
-      total: 20000,
-      backed: 2340,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 3450,
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBGCreator2,
-      type: 'mc',
-      votes: 120,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBGCreator3,
-      type: 'cf',
-      total: 230,
-      backed: 3500,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        avatar: testUser1,
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 230,
-      user: {
-        avatar: testUser1,
-      },
-    },
-  ], []);
 
   const collections: any = {
     'for-you': collectionBiggest,
@@ -643,7 +534,6 @@ const Search: NextPage = () => {
     mc: collectionMC,
     cf: collectionCF,
     biggest: collectionBiggest,
-    bellapoarch: collectionCreator,
   };
 
   useEffect(() => {
@@ -659,11 +549,11 @@ const Search: NextPage = () => {
       <TopSection collection={collection} />
       <SWrapper
         name={category}
+        layoutId={category}
         transition={{
           ease: 'easeInOut',
-          duration: 1,
+          duration: 0.7,
         }}
-        layoutId={category}
       >
         <TitleBlock />
         <SListContainer>
@@ -677,7 +567,7 @@ const Search: NextPage = () => {
   );
 };
 
-(Search as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(Search as NextPageWithLayout).getLayout = function getLayout(page: React.ReactElement) {
   return (
     <HomeLayout>
       {page}

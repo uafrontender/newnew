@@ -7,7 +7,17 @@ import styled, { css } from 'styled-components';
 import RippleAnimation from './RippleAnimation';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView = 'primary' | 'primaryGrad' | 'primaryProgress' | 'secondary' | 'modalSecondary' | 'modalSecondarySelected' | 'tertiary' | 'quaternary' | 'changeLanguage' | 'transparent';
+type TView =
+  'primary'
+  | 'primaryGrad'
+  | 'primaryProgress'
+  | 'secondary'
+  | 'modalSecondary'
+  | 'modalSecondarySelected'
+  | 'tertiary'
+  | 'quaternary'
+  | 'changeLanguage'
+  | 'transparent';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
@@ -31,7 +41,10 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     onClick,
     ...rest
   } = props;
-  const { ref, inView }: { ref: any, inView: boolean } = useInView();
+  const {
+    ref,
+    inView,
+  }: { ref: any, inView: boolean } = useInView();
   // Progress effect
   const [progress, setProgress] = useState(0);
   // Ripple effect
@@ -175,7 +188,7 @@ const SButton = styled.button<ISButton>`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   white-space: nowrap;
 
   font-size: 14px;
@@ -211,21 +224,44 @@ const SButton = styled.button<ISButton>`
   -ms-user-select: none;
   user-select: none;
 
+  // for gradient button background animation on hover
+  ${(props) => props.view === 'primaryGrad' && css`
+    :after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+      opacity: 0;
+      z-index: 1;
+      position: absolute;
+      background: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+      transition: opacity 0.2s linear;
+    }
+  `}
   &:active:enabled {
     outline: none;
     background: ${(props) => props.theme.colorsThemed.button.active[props.view ?? 'primary']};
   }
-  
+
   &:focus:enabled,
   &:hover:enabled {
     outline: none;
-    background: ${(props) => props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+
+    ${(props) => (props.view === 'primaryGrad' ? css`
+      // for gradient button background animation on hover
+      :after {
+        opacity: 1;
+      }
+    ` : css`
+      background: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+    `)}
 
     ${(props) => props.withShadow && css`
       box-shadow: ${props.theme.shadows.intenseBlue};
     `}
   }
-  
+
   &:disabled {
     cursor: default;
     opacity: .5;
@@ -233,38 +269,40 @@ const SButton = styled.button<ISButton>`
   }
 
   span {
-    z-index: 1;
+    z-index: 3;
     font-weight: 700;
   }
-  
+
   ${(props) => props.withRipple && css`
     &::before {
-    position: absolute;
-    
-    top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
-    left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
+      position: absolute;
 
-    border-radius: 50%;
+      top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
+      left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
 
-    width: ${props.elementWidth * 2}px;
-    height: ${props.elementWidth * 2}px;
+      border-radius: 50%;
 
-    transform: scale(0);
-    transform-origin: center;
+      z-index: 2;
+      
+      width: ${props.elementWidth * 2}px;
+      height: ${props.elementWidth * 2}px;
 
-    // NB! Temp
-    content: '';
+      transform: scale(0);
+      transform-origin: center;
 
-    background: ${props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
+      // NB! Temp
+      content: '';
 
-    ${(props.isRippling && css`
-      animation-duration: .9s;
-      animation-fill-mode: forwards;
-      animation-name: ${RippleAnimation};
-  `)}
-  }
+      background: ${props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
+
+      ${(props.isRippling && css`
+        animation-duration: .9s;
+        animation-fill-mode: forwards;
+        animation-name: ${RippleAnimation};
+      `)}
+    }
   `}
-  
+
   ${(props) => (props.withShrink && css`
     &:active {
       transform: scale(0.9);

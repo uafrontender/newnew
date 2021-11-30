@@ -114,7 +114,7 @@ export const lightTheme: DefaultTheme = {
       },
       hover: {
         primary: '#1D6AFF',
-        primaryGrad: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        primaryGrad: 'linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         primaryProgress: '#C1C9D7',
         secondary: '#E2E7F3',
         modalSecondary: '#F1F3F9',
@@ -255,7 +255,7 @@ export const darkTheme: DefaultTheme = {
       },
       hover: {
         primary: '#1D6AFF',
-        primaryGrad: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        primaryGrad: 'linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         primaryProgress: '#14151F',
         secondary: '#1E1F29',
         modalSecondary: '#1E1F29',
