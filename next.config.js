@@ -17,6 +17,7 @@ module.exports = {
     domains: [
       'randomuser.me',
       'i.pravatar.cc',
+      'd3hqmhx7uxxlrw.cloudfront.net',
     ],
   },
   async headers() {

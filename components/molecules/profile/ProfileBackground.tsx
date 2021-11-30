@@ -25,6 +25,11 @@ const ProfileBackground: React.FunctionComponent<IProfileBackground> = ({
         </clipPath>
       </svg>
     </SFrame>
+    <img
+      src={pictureURL}
+      alt="Profile cover"
+      draggable={false}
+    />
     <SButtonsContainer>
       { children }
     </SButtonsContainer>
@@ -45,8 +50,12 @@ const SProfileBackground = styled.div<ISProfileBackground>`
   height: 160px;
   margin-bottom: 72px;
 
-  background-image: ${({ pictureURL }) => `url('${pictureURL}')`};
-  background-position: center;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    vertical-align: inherit;
+  }
 
   ${(props) => props.theme.media.tablet} {
     height: 200px;
@@ -58,7 +67,7 @@ const SProfileBackground = styled.div<ISProfileBackground>`
 `;
 
 const SFrame = styled.div`
-  z-index: 4;
+  z-index: 5;
 
   position: absolute;
   bottom: 0px;
@@ -80,7 +89,7 @@ const SFrame = styled.div`
   ${(props) => props.theme.media.tablet} {
     left: calc(50% - 188px);
 
-    transform: translateY(1px);
+    transform: translateY(1px) translateZ(1px);
   }
 `;
 
