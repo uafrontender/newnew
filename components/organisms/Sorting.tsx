@@ -1,14 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Text from '../atoms/Text';
 import Modal from './Modal';
 import Button from '../atoms/Button';
 import Caption from '../atoms/Caption';
 import Headline from '../atoms/Headline';
-import CheckBox from '../molecules/CheckBox';
+import SortItem from '../molecules/SortItem';
 import InlineSVG from '../atoms/InlineSVG';
 import SortIconAnimated from '../atoms/SortIconAnimated';
 import AnimatedPresence from '../atoms/AnimatedPresence';
@@ -36,7 +40,6 @@ export const Sorting: React.FC<ISorting> = (props) => {
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [localSelected, setLocalSelected] = useState({});
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -51,79 +54,46 @@ export const Sorting: React.FC<ISorting> = (props) => {
 
   ddHeight += 16;
 
-  const handleToggleSortingClick = () => {
+  const handleToggleSortingClick = useCallback(() => {
     setFocused(!focused);
-  };
-  const handleCloseClick = () => {
+  }, [focused]);
+  const handleCloseClick = useCallback(() => {
     setFocused(false);
-    setLocalSelected(selected);
-  };
-  const renderItemOption = (option: any, index: number, parentOption: any) => {
-    let optionSelected: boolean = false;
-
-    // @ts-ignore
-    if (localSelected[parentOption.key] === option.key) {
-      optionSelected = true;
-    }
-
-    const handleChange = (e: any) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const newSelected = {
-        ...localSelected,
-      };
-
-      if (optionSelected) {
-        // @ts-ignore
-        delete newSelected[parentOption.key];
-      } else {
-        // @ts-ignore
-        newSelected[parentOption.key] = option.key;
-      }
-
-      if (isMobile) {
-        setLocalSelected(newSelected);
-      } else {
-        onChange(newSelected);
-      }
+  }, []);
+  const handleChange = useCallback((itemKey: string, parentKey: string) => {
+    const newSelected: any = {
+      ...selected,
     };
 
-    return (
-      <SItemOptionWrapper
-        key={`change-language-${parentOption.key}-${option.key}`}
-      >
-        <CheckBox
-          label={t(`sort-title-option-${parentOption.key}-${option.key}`)}
-          selected={optionSelected}
-          handleChange={handleChange}
-        />
-      </SItemOptionWrapper>
-    );
-  };
-  const renderItem = (item: any, index: number) => {
+    if (newSelected[parentKey] === itemKey) {
+      // @ts-ignore
+      delete newSelected[parentKey];
+    } else {
+      // @ts-ignore
+      newSelected[parentKey] = itemKey;
+    }
+
+    onChange(newSelected);
+  }, [selected, onChange]);
+  const renderItem = useCallback((item: any, index: number) => {
     const isLast = index !== options.length - 1;
 
     return (
       <SItemWrapper
-        key={`change-language-${item.key}`}
+        key={`sort-item-${item.key}`}
       >
-        <SItemHolder>
-          <SItemTitle variant={3} weight={600}>
-            {t(`sort-title-option-${item.key}`)}
-          </SItemTitle>
-          {item.options.map(
-            (option: any, optIndex: number) => renderItemOption(option, optIndex, item),
-          )}
-        </SItemHolder>
+        <SortItem
+          item={item}
+          selected={selected}
+          handleChange={handleChange}
+        />
         {isLast && <SSeparator />}
       </SItemWrapper>
     );
-  };
-  const handleSubmit = () => {
-    onChange(localSelected);
+  }, [handleChange, selected, options.length]);
+  const handleSubmit = useCallback(() => {
     setFocused(false);
-  };
+  }, []);
 
   useOnClickEsc(ref, handleCloseClick);
   useOnClickOutside(ref, () => {
@@ -137,9 +107,6 @@ export const Sorting: React.FC<ISorting> = (props) => {
       setAnimate(true);
     }, 0);
   }, []);
-  useEffect(() => {
-    setLocalSelected(selected);
-  }, [selected]);
 
   const content = (
     <SWrapper ref={ref}>
@@ -298,15 +265,8 @@ const SListHolder = styled.div<ISListHolder>`
   }
 `;
 
-const SItemHolder = styled.div``;
-
 const SItemWrapper = styled.div`
   min-width: 200px;
-`;
-
-const SItemTitle = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  padding: 8px;
 `;
 
 interface ISMobileListContainer {
@@ -358,16 +318,6 @@ const SSeparator = styled.div`
   ${(props) => props.theme.media.tablet} {
     left: 0;
     width: 100%;
-  }
-`;
-
-const SItemOptionWrapper = styled.div`
-  cursor: pointer;
-  padding: 8px 8px 8px 0;
-  border-radius: 12px;
-  
-  :hover {
-    background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
   }
 `;
 

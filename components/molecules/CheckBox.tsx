@@ -27,7 +27,7 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
     } else {
       ref.current.anim.setSegment(1, 1);
     }
-  }, [selected]);
+  }, [ref, selected]);
 
   return (
     <SWrapper onClick={handleChange}>
