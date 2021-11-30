@@ -48,6 +48,7 @@ const Home: NextPage = () => {
         displayName: 'John',
         email: 'johndoe@test.com',
         avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
+        coverUrl: '/images/mock/profile-bg.png',
         userUuid: '12345',
         options: {
           isCreator: false,
@@ -74,6 +75,7 @@ const Home: NextPage = () => {
         displayName: '',
         email: '',
         avatarUrl: '',
+        coverUrl: '',
         id: null,
         options: {
           isCreator: false,

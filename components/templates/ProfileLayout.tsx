@@ -61,7 +61,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       <SProfileLayout>
         <ProfileBackground
           // Temp
-          pictureURL={user.coverUrl ?? ''}
+          pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
         />
         {/* Favorites and more options buttons */}
         <SFavoritesButton

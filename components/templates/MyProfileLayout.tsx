@@ -133,7 +133,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       <SMyProfileLayout>
         <ProfileBackground
           // Temp
-          pictureURL={user?.userData?.coverUrl ?? ''}
+          pictureURL={user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'}
         >
           <Button
             view="transparent"
