@@ -56,7 +56,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
       {pictureUrlInEdit && (
         <Cropper
           image={pictureUrlInEdit}
-          objectFit="vertical-cover"
+          objectFit="horizontal-cover"
           crop={crop}
           cropSize={{
             height: 160,
@@ -65,7 +65,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
           cropShape="rect"
           showGrid={false}
           zoom={zoom}
-          aspect={1280 / 240}
+          aspect={1}
           classes={{
             containerClassName: 'cropper-container',
             mediaClassName: 'cropper-media',

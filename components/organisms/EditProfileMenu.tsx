@@ -224,7 +224,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME,
         value,
       );
-    } else if (key === 'username') {
+    } else if (key === 'username' && value !== user.userData?.username) {
       validateTextViaAPIDebounced(
         newnewapi.ValidateTextRequest.Kind.USERNAME,
         value,
@@ -236,44 +236,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       );
     }
   },
-  [dataInEdit, setDataInEdit, validateTextViaAPIDebounced, setIsDataValid]);
-
-  const handleUpdateTextualDataAndCover = useCallback(async () => {
-    try {
-      setIsLoading(true);
-
-      const payload = new newnewapi.UpdateMeRequest({
-        displayName: dataInEdit.displayName,
-        ...(dataInEdit.username !== user.userData?.username
-          ? { username: dataInEdit.username } : {}),
-        ...(dataInEdit.bio !== user.userData?.bio
-          ? { bio: dataInEdit.bio } : {}),
-      });
-
-      console.log(payload);
-
-      const res = await updateMe(
-        payload,
-        user.credentialsData?.accessToken!!,
-      );
-
-      if (!res.data || res.error) throw new Error('Request failed');
-
-      dispatch(setUserData({
-        username: res.data.me?.username,
-        displayName: res.data.me?.displayName,
-        bio: res.data.me?.bio,
-      }));
-
-      setIsLoading(false);
-      handleClose();
-    } catch (err) {
-      console.error(err);
-      setIsLoading(false);
-    }
-  }, [
-    setIsLoading, dataInEdit, handleClose, user.credentialsData, dispatch,
-    user.userData?.username, user.userData?.bio,
+  [
+    dataInEdit, user.userData?.username,
+    setDataInEdit, validateTextViaAPIDebounced, setIsDataValid,
   ]);
 
   // Cover image
@@ -283,16 +248,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
 
-  const handleSetBackgroundPictureInEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = e.target;
-
+  const handleSetBackgroundPictureInEdit = (files: FileList | null) => {
     if (files?.length === 1) {
       const file = files[0];
 
+      // Return if file is not an image
       if (!isImage(file.name)) return;
-      // if ((file.size / (1024 * 1024)) > 3) return;
-
-      // Check aspect ratio!
+      // Return if original image is larger than 10 Mb
+      // if ((file.size / (1024 * 1024)) > 10) return;
 
       // Read uploaded file as data URL
       const reader = new FileReader();
@@ -317,52 +280,103 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const handleUnsetPictureInEdit = () => setCoverUrlInEdit('');
 
   const handleCoverImageCropChange = (location: Point) => {
-    // console.log(location);
-
-    // if (location.x < originalCoverImageWidth) return;
-
     setCropCoverImage(location);
   };
 
-  // Important!!!
   const onCropCompleteCoverImage = useCallback(
-    async (croppedAreaPercentages: Area, croppedAreaPixels: Area) => {
+    (_, croppedAreaPixels: Area) => {
       setCroppedAreaCoverImage(croppedAreaPixels);
+    }, [],
+  );
 
-      // Temp
-      const croppedModified = { ...croppedAreaPixels };
+  // Update textual data and cover URL
+  const handleUpdateTextualDataAndCover = useCallback(async () => {
+    try {
+      setIsLoading(true);
 
-      croppedModified.width = 1280;
-      croppedModified.height = 240;
-      croppedModified.x = 1280 * (croppedAreaPixels.x / croppedAreaPixels.width);
-      croppedModified.y = 240 * (croppedAreaPixels.y / croppedAreaPixels.height);
+      // In case cover image was updated
+      let croppedCoverImage: File;
+      let newCoverImgURL;
 
-      console.log(`croppedAreaPixels: ${JSON.stringify(croppedAreaPixels)}`);
-      console.log(`croppedAreaPercentages: ${JSON.stringify(croppedAreaPercentages)}`);
-      console.log(`croppedModified: ${JSON.stringify(croppedModified)}`);
-      const croppedImageAsIs = await getCroppedImg(
-        coverUrlInEdit!!,
-        croppedAreaPixels,
-        0,
+      if (coverUrlInEdit && (coverUrlInEdit !== user.userData?.coverUrl)) {
+        croppedCoverImage = await getCroppedImg(
+          coverUrlInEdit,
+          croppedAreaCoverImage!!,
+          0,
+          'coverImage.png',
+        );
+
+        // API request would be here
+        const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+          filename: croppedCoverImage.name,
+        });
+
+        const res = await getImageUploadUrl(
+          imageUrlPayload,
+          user.credentialsData?.accessToken!!,
+        );
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
+
+        console.log(res.data);
+
+        const uploadResponse = await fetch(
+          res.data.uploadUrl,
+          {
+            method: 'PUT',
+            body: croppedCoverImage,
+            headers: {
+              'Content-Type': 'image/png',
+            },
+          },
+        );
+
+        if (!uploadResponse.ok) throw new Error('Upload failed');
+
+        newCoverImgURL = res.data.publicUrl;
+      }
+
+      const payload = new newnewapi.UpdateMeRequest({
+        displayName: dataInEdit.displayName,
+        bio: dataInEdit.bio,
+        // Send username only if it was updated
+        ...(dataInEdit.username !== user.userData?.username
+          ? { username: dataInEdit.username } : {}),
+        // Update cover image, if it was updated
+        ...(newCoverImgURL ? { coverUrl: newCoverImgURL } : {}),
+        // Delete cover image, if it was deleted and no new image provided
+        ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
+      });
+
+      console.log(payload);
+
+      const res = await updateMe(
+        payload,
+        user.credentialsData?.accessToken!!,
       );
-      console.log('as is: ');
 
-      console.log(URL.createObjectURL(croppedImageAsIs));
+      if (!res.data || res.error) throw new Error('Request failed');
 
-      const croppedImageModifed = await getCroppedImg(
-        coverUrlInEdit!!,
-        croppedModified,
-        0,
-      );
-      console.log('modified: ');
-
-      console.log(URL.createObjectURL(croppedImageModifed));
+      console.log(res.data.me);
 
       dispatch(setUserData({
-        coverUrl: URL.createObjectURL(croppedImageAsIs),
+        username: res.data.me?.username,
+        displayName: res.data.me?.displayName,
+        bio: res.data.me?.bio,
+        ...(newCoverImgURL ? { coverUrl: res.data.me?.coverUrl } : {}),
       }));
-    }, [coverUrlInEdit, dispatch],
-  );
+
+      setIsLoading(false);
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+    }
+  }, [
+    setIsLoading, handleClose, user.credentialsData, dispatch,
+    dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
+    user.userData?.username, user.userData?.coverUrl,
+  ]);
 
   // Profile image
   const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
@@ -370,6 +384,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const [cropProfileImage, setCropProfileImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] = useState<Area>();
   const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [updateProfileImageLoading, setUpdateProfileImageLoading] = useState(false);
 
   // Profile picture
   const handleSetProfilePictureInEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -432,28 +447,26 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }, [],
   );
 
-  const completeProfileImageCrop = useCallback(async () => {
+  const completeProfileImageCropAndSave = useCallback(async () => {
     try {
+      setUpdateProfileImageLoading(true);
       const croppedImage = await getCroppedImg(
         avatarUrlInEdit,
-        croppedAreaProfileImage,
+        croppedAreaProfileImage!!,
         0,
       );
-      console.log('done', { croppedImage });
 
-      console.log(URL.createObjectURL(croppedImage));
-
-      // API request would be here
-      const emptyPayload = new newnewapi.EmptyRequest({});
+      // Get upload and public URLs
+      const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+        filename: croppedImage.name,
+      });
 
       const res = await getImageUploadUrl(
-        emptyPayload,
+        imageUrlPayload,
         user.credentialsData?.accessToken!!,
       );
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
-
-      console.log(res.data);
 
       const uploadResponse = await fetch(
         res.data.uploadUrl,
@@ -468,13 +481,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (!uploadResponse.ok) throw new Error('Upload failed');
 
-      console.log(uploadResponse);
-
       const updateMePayload = new newnewapi.UpdateMeRequest({
         avatarUrl: res.data.publicUrl,
       });
-
-      console.log(updateMePayload);
 
       const updateMeRes = await updateMe(
         updateMePayload,
@@ -489,8 +498,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         avatarUrl: updateMeRes.data.me?.avatarUrl,
       }));
 
+      setUpdateProfileImageLoading(false);
       handleSetStageToEditingGeneral();
     } catch (e) {
+      setUpdateProfileImageLoading(false);
       console.error(e);
     }
   }, [
@@ -499,6 +510,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     user.userData, user.credentialsData,
   ]);
 
+  // Effects
   // Check if data was modified
   useEffect(() => {
     // Temp
@@ -539,6 +551,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsDataValid(true);
     }
   }, [dataInEdit]);
+
+  // Set and unset form errors
   useEffect(() => {
     if (Object.values(formErrors).some((v) => v !== '')) {
       setIsDataValid(false);
@@ -764,13 +778,15 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <SControlsWrapperPicture>
                 <Button
                   view="secondary"
+                  disabled={updateProfileImageLoading}
                   onClick={handleSetStageToEditingGeneralUnsetPicture}
                 >
                   { t('EditProfileMenu.cancelButton') }
                 </Button>
                 <Button
                   withShadow
-                  onClick={completeProfileImageCrop}
+                  disabled={updateProfileImageLoading}
+                  onClick={completeProfileImageCropAndSave}
                 >
                   { t('EditProfileMenu.saveButton') }
                 </Button>

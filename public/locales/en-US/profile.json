@@ -29,6 +29,9 @@
     "cancelButton": "Cancel",
     "dragToReposition": "Drag to reposition image",
     "inputs": {
+      "coverImage": {
+        "changeCoverImage": "Change cover image"
+      },
       "displayName": {
         "placeholder": "Nickname",
         "errors": {

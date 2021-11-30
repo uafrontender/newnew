@@ -61,7 +61,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       <SProfileLayout>
         <ProfileBackground
           // Temp
-          pictureURL={user.coverUrl ?? '/images/mock/profile-bg.png'}
+          pictureURL={user.coverUrl ?? ''}
         />
         {/* Favorites and more options buttons */}
         <SFavoritesButton
@@ -182,7 +182,7 @@ const SGeneral = styled(General)`
   position: relative;
 
   header {
-    z-index: 5;
+    z-index: 6;
   }
 
   @media (max-width: 768px) {

@@ -79,8 +79,6 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         } else if (provider === 'apple') {
           if (!body) throw new Error('No body receieved');
 
-          console.log(body);
-
           const {
             id_token, sub,
           } = body;
@@ -104,13 +102,12 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
 
         if (!data) throw new Error('No data');
 
-        console.log(res.data);
-
         dispatch(setUserData({
           username: data.me?.username,
           displayName: data.me?.displayName,
           email: data.me?.email,
           avatarUrl: data.me?.avatarUrl,
+          coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
           bio: data.me?.bio,
           options: data.me?.options,

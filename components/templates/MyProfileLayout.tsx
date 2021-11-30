@@ -133,7 +133,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       <SMyProfileLayout>
         <ProfileBackground
           // Temp
-          pictureURL={user?.userData?.coverUrl ?? '/images/mock/profile-bg.png'}
+          pictureURL={user?.userData?.coverUrl ?? ''}
         >
           <Button
             view="transparent"
@@ -257,7 +257,7 @@ const SGeneral = styled(General)`
   position: relative;
 
   header {
-    z-index: 5;
+    z-index: 6;
   }
 
   @media (max-width: 768px) {

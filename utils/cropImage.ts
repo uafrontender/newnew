@@ -1,3 +1,5 @@
+import { Area } from 'react-easy-crop/types';
+
 const createImage = (url: string) => new Promise((resolve, reject) => {
   const image = new Image();
   image.addEventListener('load', () => resolve(image));
@@ -11,13 +13,15 @@ function getRadianAngle(degreeValue: number) {
 }
 
 /**
- * This function was adapted from the one in the ReadMe of https://github.com/DominicTobias/react-image-crop
- * @param {File} image - Image File url
- * @param {Object} pixelCrop - pixelCrop Object provided by react-easy-crop
+ * This function was adapted from https://github.com/DominicTobias/react-image-crop
+ * @param {string} imageSrc - Image url string
+ * @param {Area} pixelCrop - pixelCrop Object provided by react-easy-crop
  * @param {number} rotation - optional rotation parameter
+ * @param {string} filename - optional file name parameter
  */
 export default async function getCroppedImg(
-  imageSrc: string, pixelCrop: any, rotation = 0,
+  imageSrc: string, pixelCrop: Area, rotation = 0,
+  filename = 'avatarImage.png',
 ): Promise<File> {
   const image: HTMLImageElement = await createImage(imageSrc) as HTMLImageElement;
   const canvas = document.createElement('canvas');
@@ -55,21 +59,11 @@ export default async function getCroppedImg(
     Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y),
   );
 
-  // As Base64 string
-  // return canvas.toDataURL('image/jpeg');
-
-  // As a blob
-  // return new Promise((resolve) => {
-  //   canvas.toBlob((file) => {
-  //     resolve(URL.createObjectURL(file));
-  //   }, 'image/jpeg');
-  // });
-
-  // As a file
+  // Return as a file
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
       if (!blob) throw new Error('Error saving image as file');
-      const file = new File([blob], 'avatar.png', {
+      const file = new File([blob], filename, {
         type: 'image/png',
       });
       resolve(file);
