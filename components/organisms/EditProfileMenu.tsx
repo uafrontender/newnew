@@ -481,7 +481,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
 
-      // Temp
+      // Update Redux state
       dispatch(setUserData({
         ...user.userData,
         avatarUrl: updateMeRes.data.me?.avatarUrl,
