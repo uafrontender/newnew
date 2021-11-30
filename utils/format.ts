@@ -1,12 +1,19 @@
-export const formatNumber = (n: number = 0) => {
-  if (n.toString().length <= 3) {
-    return n;
+export const formatNumber = (value: number = 0, rounded: boolean = false) => new Intl
+  .NumberFormat('en', {
+    minimumFractionDigits: rounded ? 0 : 2,
+  })
+  .format(value || 0);
+
+export const formatString = (value: string = '', ellipsis: boolean = false, maxLength: number = 11) => {
+  if (value.length <= maxLength) {
+    return value;
   }
 
-  return n
-    .toFixed(2)
-    .replace('.', ',')
-    .replace(/\d{3}(?=(\d{3})*,)/g, (s) => `.${s}`)
-    .split(',')[0]
-    .replace('.', ',');
+  let formatted = value.slice(0, maxLength);
+
+  if (ellipsis) {
+    formatted += '...';
+  }
+
+  return formatted;
 };

@@ -45,6 +45,7 @@
     "react-scroll": "1.8.4",
     "redux-persist": "6.0.0",
     "resize-observer-polyfill": "1.5.1",
+    "sharp": "0.29.3",
     "socket.io-client": "4.3.2",
     "styled-components": "5.3.3",
     "validator": "13.6.0"

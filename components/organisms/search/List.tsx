@@ -1,8 +1,10 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
 import Card from '../../molecules/Card';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -16,19 +18,51 @@ export const List: React.FC<IList> = (props) => {
     category,
     collection,
   } = props;
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const renderItem = (item: any, index: number) => (
-    <SItemWrapper key={`${category}-${item.id}`}>
-      <Card
-        item={item}
-        index={index + 1}
-        width="100%"
-        height={isMobile ? '564px' : '336px'}
-      />
-    </SItemWrapper>
-  );
+  const renderItem = (item: any, index: number) => {
+    const handleItemClick = () => {
+      router.push('/post-detailed');
+    };
+
+    if (index < 5) {
+      return (
+        <SItemWrapper
+          key={`${category}-${item.id}`}
+          onClick={handleItemClick}
+        >
+          <Card
+            item={item}
+            index={index + 1}
+            width="100%"
+            height={isMobile ? '564px' : '336px'}
+          />
+        </SItemWrapper>
+      );
+    }
+
+    return (
+      <SItemWrapper
+        key={`${category}-${item.id}`}
+        onClick={handleItemClick}
+      >
+        <AnimatedPresence
+          start
+          animation="t-01"
+          animateWhenInView={false}
+        >
+          <Card
+            item={item}
+            index={index + 1}
+            width="100%"
+            height={isMobile ? '564px' : '336px'}
+          />
+        </AnimatedPresence>
+      </SItemWrapper>
+    );
+  };
 
   return (
     <SListWrapper>
