@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import CheckBox from './CheckBox';
@@ -31,7 +32,7 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
   }, [handleChange, item.key, parent.key]);
 
   return (
-    <CheckBox
+    <SCheckBox
       label={t(`sort-title-option-${parent.key}-${item.key}`)}
       selected={selected}
       handleChange={onChange}
@@ -40,3 +41,12 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
 };
 
 export default SortItemOption;
+
+const SCheckBox = styled(CheckBox)`
+  padding: 8px 8px 8px 0;
+  border-radius: 12px;
+
+  :hover {
+    background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
+  }
+`;

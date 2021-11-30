@@ -17,10 +17,13 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
     label,
     selected,
     handleChange,
+    ...rest
   } = props;
   const ref: any = useRef();
 
   useEffect(() => {
+    ref.current.anim.stop();
+
     if (selected) {
       ref.current.anim.setSegment(0, 23);
       ref.current.anim.play();
@@ -30,7 +33,7 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
   }, [ref, selected]);
 
   return (
-    <SWrapper onClick={handleChange}>
+    <SWrapper onClick={handleChange} {...rest}>
       <SAnimation>
         <Lottie
           ref={ref}
@@ -57,6 +60,7 @@ CheckBox.defaultProps = {
 };
 
 const SWrapper = styled.div`
+  cursor: pointer;
   display: flex;
   align-items: center;
   flex-direction: row;

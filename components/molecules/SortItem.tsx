@@ -65,12 +65,4 @@ const SItemTitle = styled(Text)`
   padding: 8px;
 `;
 
-const SItemOptionWrapper = styled.div`
-  cursor: pointer;
-  padding: 8px 8px 8px 0;
-  border-radius: 12px;
-
-  :hover {
-    background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
-  }
-`;
+const SItemOptionWrapper = styled.div``;
