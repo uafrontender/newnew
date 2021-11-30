@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
 import styled from 'styled-components';
 
 import EditIcon from '../../../public/images/svg/icons/filled/Edit.svg';
@@ -24,12 +23,11 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
       onMouseLeave={() => setPressed(false)}
     >
       { publicUrl ? (
-        <Image
+        <img
           src={publicUrl}
           alt="User avatar"
           width="100%"
           height="100%"
-          objectFit="cover"
           draggable={false}
         />
       ) : <div />}
@@ -97,7 +95,6 @@ const SProfileImageInput = styled.label<{
 
 const SImageInput = styled.input`
   display: none;
-
 `;
 
 const SEditIcon = styled(InlineSvg)`

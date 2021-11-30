@@ -418,5 +418,7 @@ const SActiveTabIndicator = styled.div`
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) => theme.gradients.blueHorizontal};
 
-  transition: .45s ease-in-out;
+  transition: opacity .45s ease-in-out;
+
+  transition: left .25s linear;
 `;

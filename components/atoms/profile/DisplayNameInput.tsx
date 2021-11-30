@@ -1,26 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import InlineSvg from '../InlineSVG';
+
+import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import AnimatedPresence from '../AnimatedPresence';
 
 type TDisplayNameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
+  errorCaption: string;
 }
 
 const DisplaynameInput: React.FunctionComponent<TDisplayNameInput> = ({
   value,
   isValid,
+  errorCaption,
   onChange,
   onFocus,
   ...rest
 }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (focused) return;
+    if (isValid) setErrorBordersShown(false);
+  }, [focused, isValid]);
 
   return (
-    <>
+    <SWrapper>
       <SDisplaynameInput
         value={value}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
         onBlur={() => {
+          setFocused(false);
           if (!isValid) {
             setErrorBordersShown(true);
           } else {
@@ -29,11 +42,28 @@ const DisplaynameInput: React.FunctionComponent<TDisplayNameInput> = ({
         }}
         onFocus={(e) => {
           if (onFocus) onFocus(e);
+          setFocused(true);
           setErrorBordersShown(false);
         }}
         {...rest}
       />
-    </>
+      {
+        errorBordersShown ? (
+          <AnimatedPresence
+            animation="t-09"
+          >
+            <SErrorDiv>
+              <InlineSvg
+                svg={AlertIcon}
+                width="16px"
+                height="16px"
+              />
+              { errorCaption }
+            </SErrorDiv>
+          </AnimatedPresence>
+        ) : null
+      }
+    </SWrapper>
   );
 };
 
@@ -42,6 +72,12 @@ DisplaynameInput.defaultProps = {
 };
 
 export default DisplaynameInput;
+
+const SWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+`;
 
 interface ISDisplaynameInput {
   errorBordersShown?: boolean
@@ -55,7 +91,6 @@ const SDisplaynameInput = styled.input<ISDisplaynameInput>`
   line-height: 24px;
 
   padding: 12px 20px 12px 20px;
-  margin-bottom: 16px;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   border-width: 1.5px;
@@ -88,5 +123,24 @@ const SDisplaynameInput = styled.input<ISDisplaynameInput>`
       return theme.colorsThemed.grayscale.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
+  }
+`;
+
+const SErrorDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
   }
 `;

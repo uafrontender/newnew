@@ -56,7 +56,9 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           displayName: data.me?.displayName,
           email: data.me?.email,
           avatarUrl: data.me?.avatarUrl,
+          coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
+          bio: data.me?.bio,
           options: data.me?.options,
         }));
         dispatch(setCredentialsData({
