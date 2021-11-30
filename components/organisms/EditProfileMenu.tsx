@@ -1,29 +1,42 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { motion } from 'framer-motion';
-import { isEqual } from 'lodash';
+import { AnimatePresence, motion } from 'framer-motion';
+import { debounce, isEqual } from 'lodash';
 import validator from 'validator';
-import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
 
-import { useAppSelector } from '../../redux-store/store';
+// Redux
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { setUserData } from '../../redux-store/slices/userStateSlice';
 
 // Components
-import GoBackButton from '../molecules/GoBackButton';
+import Button from '../atoms/Button';
 import InlineSvg from '../atoms/InlineSVG';
+import GoBackButton from '../molecules/GoBackButton';
+import BioTextarea from '../atoms/profile/BioTextarea';
+import UsernameInput from '../atoms/profile/UsernameInput';
+import DisplaynameInput from '../atoms/profile/DisplayNameInput';
+import ProfileImageInput from '../molecules/profile/ProfileImageInput';
+import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
 
 // Icons
 import CancelIcon from '../../public/images/svg/icons/outlined/Close.svg';
-import Button from '../atoms/Button';
-import DisplaynameInput from '../atoms/profile/DisplayNameInput';
-import UsernameInput from '../atoms/profile/UsernameInput';
-import BioTextarea from '../atoms/profile/BioTextarea';
-import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
-import ProfileImageInput from '../molecules/profile/ProfileImageInput';
+import ZoomOutIcon from '../../public/images/svg/icons/outlined/Minus.svg';
+import ZoomInIcon from '../../public/images/svg/icons/outlined/Plus.svg';
+
+// Utils
 import isImage from '../../utils/isImage';
+import getCroppedImg from '../../utils/cropImage';
+import ProfileImageCropper from '../molecules/profile/ProfileImageCropper';
+import ProfileImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
+import { updateMe, validateEditProfileTextFields } from '../../api/endpoints/user';
+import { getImageUploadUrl } from '../../api/endpoints/upload';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture'
 
@@ -46,6 +59,39 @@ type ModalMenuUserData = {
 type TFormErrors = {
   displaynameError?: string;
   usernameError?: string;
+  bioError?: string;
+};
+
+const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
+  let errorMsg = 'generic';
+
+  switch (status) {
+    case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
+      errorMsg = 'tooLong';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
+      errorMsg = 'tooShort';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.INVALID_CHARACTER: {
+      errorMsg = 'invalidChar';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
+      errorMsg = 'innappropriate';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.USERNAME_TAKEN: {
+      errorMsg = 'taken';
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+
+  return errorMsg;
 };
 
 const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
@@ -60,11 +106,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const theme = useTheme();
   const { t } = useTranslation('profile');
 
+  const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
 
-  // Cover image
-  const [coverUrl, setCoverUrl] = useState(user.userData?.coverUrl);
+  // Common
+  const [isLoading, setIsLoading] = useState(false);
 
   // Textual data
   const [dataInEdit, setDataInEdit] = useState<ModalMenuUserData>({
@@ -72,26 +119,261 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     username: user.userData?.username ?? '',
     bio: user.userData?.bio ?? '',
   });
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [isDataValid, setIsDataValid] = useState(false);
   const [formErrors, setFormErrors] = useState<TFormErrors>({
     displaynameError: '',
     usernameError: '',
+    bioError: '',
   });
+
+  const validateTextViaAPI = useCallback(async (
+    kind: newnewapi.ValidateTextRequest.Kind,
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        kind,
+        text,
+      });
+
+      const res = await validateEditProfileTextFields(
+        payload,
+        user.credentialsData?.accessToken!!,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (kind === newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME) {
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.displaynameError = errorSwitch(res.data?.status!!);
+            return errorsWorking;
+          });
+        } else {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.displaynameError = '';
+            return errorsWorking;
+          });
+        }
+      } else if (kind === newnewapi.ValidateTextRequest.Kind.USERNAME) {
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.usernameError = errorSwitch(res.data?.status!!);
+            return errorsWorking;
+          });
+        } else {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.usernameError = '';
+            return errorsWorking;
+          });
+        }
+      } else if (kind === newnewapi.ValidateTextRequest.Kind.BIO) {
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.bioError = errorSwitch(res.data?.status!!);
+            return errorsWorking;
+          });
+        } else {
+          setFormErrors((errors) => {
+            const errorsWorking = { ...errors };
+            errorsWorking.bioError = '';
+            return errorsWorking;
+          });
+        }
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+    }
+  }, [user.credentialsData?.accessToken, setFormErrors]);
+
+  const validateTextViaAPIDebounced = useMemo(() => debounce((
+    kind: newnewapi.ValidateTextRequest.Kind,
+    text: string,
+  ) => {
+    validateTextViaAPI(kind, text);
+  }, 400),
+  [validateTextViaAPI]);
 
   const handleUpdateDataInEdit = useCallback((
     key: keyof ModalMenuUserData,
     value: any,
   ) => {
+    setIsDataValid(false);
+
     const workingData = { ...dataInEdit };
     workingData[key] = value;
     setDataInEdit({ ...workingData });
+
+    if (key === 'displayName') {
+      validateTextViaAPIDebounced(
+        newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME,
+        value,
+      );
+    } else if (key === 'username' && value !== user.userData?.username) {
+      validateTextViaAPIDebounced(
+        newnewapi.ValidateTextRequest.Kind.USERNAME,
+        value,
+      );
+    } else if (key === 'bio') {
+      validateTextViaAPIDebounced(
+        newnewapi.ValidateTextRequest.Kind.BIO,
+        value,
+      );
+    }
   },
-  [dataInEdit, setDataInEdit]);
+  [
+    dataInEdit, user.userData?.username,
+    setDataInEdit, validateTextViaAPIDebounced, setIsDataValid,
+  ]);
+
+  // Cover image
+  const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
+  const [originalCoverImageWidth, setOriginalCoverImageWidth] = useState(0);
+  const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
+  const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
+  const [zoomCoverImage, setZoomCoverImage] = useState(1);
+
+  const handleSetBackgroundPictureInEdit = (files: FileList | null) => {
+    if (files?.length === 1) {
+      const file = files[0];
+
+      // Return if file is not an image
+      if (!isImage(file.name)) return;
+      // Return if original image is larger than 10 Mb
+      // if ((file.size / (1024 * 1024)) > 10) return;
+
+      // Read uploaded file as data URL
+      const reader = new FileReader();
+      const img = new Image();
+      reader.readAsDataURL(file);
+      reader.addEventListener('load', () => {
+        if (reader.result) {
+          setCoverUrlInEdit(reader.result as string);
+
+          img.src = reader.result as string;
+
+          // eslint-disable-next-line func-names
+          img.addEventListener('load', function () {
+            // eslint-disable-next-line react/no-this-in-sfc
+            setOriginalCoverImageWidth(this.width);
+          });
+        }
+      });
+    }
+  };
+
+  const handleUnsetPictureInEdit = () => setCoverUrlInEdit('');
+
+  const handleCoverImageCropChange = (location: Point) => {
+    setCropCoverImage(location);
+  };
+
+  const onCropCompleteCoverImage = useCallback(
+    (_, croppedAreaPixels: Area) => {
+      setCroppedAreaCoverImage(croppedAreaPixels);
+    }, [],
+  );
+
+  // Update textual data and cover URL
+  const handleUpdateTextualDataAndCover = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      // In case cover image was updated
+      let croppedCoverImage: File;
+      let newCoverImgURL;
+
+      if (coverUrlInEdit && (coverUrlInEdit !== user.userData?.coverUrl)) {
+        croppedCoverImage = await getCroppedImg(
+          coverUrlInEdit,
+          croppedAreaCoverImage!!,
+          0,
+          'coverImage.png',
+        );
+
+        // API request would be here
+        const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+          filename: croppedCoverImage.name,
+        });
+
+        const res = await getImageUploadUrl(
+          imageUrlPayload,
+          user.credentialsData?.accessToken!!,
+        );
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
+
+        const uploadResponse = await fetch(
+          res.data.uploadUrl,
+          {
+            method: 'PUT',
+            body: croppedCoverImage,
+            headers: {
+              'Content-Type': 'image/png',
+            },
+          },
+        );
+
+        if (!uploadResponse.ok) throw new Error('Upload failed');
+
+        newCoverImgURL = res.data.publicUrl;
+      }
+
+      const payload = new newnewapi.UpdateMeRequest({
+        displayName: dataInEdit.displayName,
+        bio: dataInEdit.bio,
+        // Send username only if it was updated
+        ...(dataInEdit.username !== user.userData?.username
+          ? { username: dataInEdit.username } : {}),
+        // Update cover image, if it was updated
+        ...(newCoverImgURL ? { coverUrl: newCoverImgURL } : {}),
+        // Delete cover image, if it was deleted and no new image provided
+        ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
+      });
+
+      const res = await updateMe(
+        payload,
+        user.credentialsData?.accessToken!!,
+      );
+
+      if (!res.data || res.error) throw new Error('Request failed');
+
+      dispatch(setUserData({
+        username: res.data.me?.username,
+        displayName: res.data.me?.displayName,
+        bio: res.data.me?.bio,
+        coverUrl: res.data.me?.coverUrl,
+      }));
+
+      setIsLoading(false);
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+    }
+  }, [
+    setIsLoading, handleClose, user.credentialsData, dispatch,
+    dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
+    user.userData?.username, user.userData?.coverUrl,
+  ]);
 
   // Profile image
   const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
-  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
+  const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
+  const [cropProfileImage, setCropProfileImage] = useState<Point>({ x: 0, y: 0 });
+  const [croppedAreaProfileImage, setCroppedAreaProfileImage] = useState<Area>();
+  const [zoomProfileImage, setZoomProfileImage] = useState(1);
+  const [updateProfileImageLoading, setUpdateProfileImageLoading] = useState(false);
 
   // Profile picture
   const handleSetProfilePictureInEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,26 +383,123 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const file = files[0];
 
       if (!isImage(file.name)) return;
-      if ((file.size / (1024 * 1024)) > 3) return;
+      // if ((file.size / (1024 * 1024)) > 3) return;
 
       // Read uploaded file as data URL
       const reader = new FileReader();
+      const img = new Image();
       reader.readAsDataURL(file);
       reader.addEventListener('load', () => {
         if (reader.result) {
           setAvatarUrlInEdit(reader.result as string);
           handleSetStageToEditingProfilePicture();
+
+          img.src = reader.result as string;
+
+          // eslint-disable-next-line func-names
+          img.addEventListener('load', function () {
+            // eslint-disable-next-line react/no-this-in-sfc
+            setOriginalProfileImageWidth(this.width);
+          });
         }
       });
     }
   };
 
-  const onCropComplete = useCallback(
-    (croppedArea: Area, croppedAreaPixels: Area) => {
-      console.log(croppedArea, croppedAreaPixels);
+  const handleSetStageToEditingGeneralUnsetPicture = () => {
+    handleSetStageToEditingGeneral();
+    setAvatarUrlInEdit('');
+    setZoomProfileImage(1);
+  };
+
+  const handleZoomOutProfileImage = () => {
+    if (zoomProfileImage <= 1) return;
+
+    setZoomProfileImage((z) => {
+      if (zoomProfileImage - 0.2 <= 1) return 1;
+      return z - 0.2;
+    });
+  };
+
+  const handleZoomInProfileImage = () => {
+    if (zoomProfileImage >= 3) return;
+
+    setZoomProfileImage((z) => {
+      if (zoomProfileImage + 0.2 >= 3) return 3;
+      return z + 0.2;
+    });
+  };
+
+  const onCropCompleteProfileImage = useCallback(
+    (_, croppedAreaPixels: Area) => {
+      setCroppedAreaProfileImage(croppedAreaPixels);
     }, [],
   );
 
+  const completeProfileImageCropAndSave = useCallback(async () => {
+    try {
+      setUpdateProfileImageLoading(true);
+      const croppedImage = await getCroppedImg(
+        avatarUrlInEdit,
+        croppedAreaProfileImage!!,
+        0,
+      );
+
+      // Get upload and public URLs
+      const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
+        filename: croppedImage.name,
+      });
+
+      const res = await getImageUploadUrl(
+        imageUrlPayload,
+        user.credentialsData?.accessToken!!,
+      );
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
+
+      const uploadResponse = await fetch(
+        res.data.uploadUrl,
+        {
+          method: 'PUT',
+          body: croppedImage,
+          headers: {
+            'Content-Type': 'image/png',
+          },
+        },
+      );
+
+      if (!uploadResponse.ok) throw new Error('Upload failed');
+
+      const updateMePayload = new newnewapi.UpdateMeRequest({
+        avatarUrl: res.data.publicUrl,
+      });
+
+      const updateMeRes = await updateMe(
+        updateMePayload,
+        user.credentialsData?.accessToken!!,
+      );
+
+      if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
+
+      // Update Redux state
+      dispatch(setUserData({
+        ...user.userData,
+        avatarUrl: updateMeRes.data.me?.avatarUrl,
+      }));
+
+      setUpdateProfileImageLoading(false);
+      handleSetStageToEditingGeneral();
+    } catch (e) {
+      setUpdateProfileImageLoading(false);
+      console.error(e);
+    }
+  }, [
+    croppedAreaProfileImage,
+    avatarUrlInEdit, handleSetStageToEditingGeneral, dispatch,
+    user.userData, user.credentialsData,
+  ]);
+
+  // Effects
   // Check if data was modified
   useEffect(() => {
     // Temp
@@ -130,12 +509,12 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       bio: user.userData?.bio ?? '',
     };
 
-    if (isEqual(dataInEdit, initialData)) {
+    if (isEqual(dataInEdit, initialData) && isEqual(coverUrlInEdit, user.userData?.coverUrl)) {
       handleSetWasModified(false);
     } else {
       handleSetWasModified(true);
     }
-  }, [dataInEdit, user.userData, handleSetWasModified]);
+  }, [dataInEdit, user.userData, handleSetWasModified, coverUrlInEdit]);
 
   // Check fields validity
   useEffect(() => {
@@ -148,8 +527,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (!isDisplaynameValid || !isUsernameValid) {
       setFormErrors((errors) => {
         const errorsWorking = { ...errors };
-        errorsWorking.usernameError = isUsernameValid ? '' : 'Wrong input';
-        errorsWorking.displaynameError = isDisplaynameValid ? '' : 'Wrong input';
+        errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
+        errorsWorking.displaynameError = isDisplaynameValid ? '' : 'generic';
         return errorsWorking;
       });
       setIsDataValid(false);
@@ -162,172 +541,248 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
   }, [dataInEdit]);
 
+  // Set and unset form errors
+  useEffect(() => {
+    if (Object.values(formErrors).some((v) => v !== '')) {
+      setIsDataValid(false);
+    } else {
+      const isUsernameValid = dataInEdit.username.length >= 8
+        && dataInEdit.username.length <= 15
+        && validator.isAlphanumeric(dataInEdit.username)
+        && validator.isLowercase(dataInEdit.username);
+      const isDisplaynameValid = dataInEdit && dataInEdit!!.displayName!!.length > 0;
+
+      if (!isDisplaynameValid || !isUsernameValid) {
+        setFormErrors((errors) => {
+          const errorsWorking = { ...errors };
+          errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
+          errorsWorking.displaynameError = isDisplaynameValid ? '' : 'generic';
+          return errorsWorking;
+        });
+        setIsDataValid(false);
+      } else {
+        setIsDataValid(true);
+      }
+    }
+  }, [formErrors, dataInEdit]);
+
   return (
     <SEditProfileMenu
-      initial={!isMobile ? MInitial : undefined}
-      animate={!isMobile ? MAnimation : undefined}
+      initial={MInitial}
+      animate={MAnimation}
       onClick={(e) => e.stopPropagation()}
     >
-      {stage === 'edit-general'
-        ? (
-          <>
-            {isMobile ? (
-              <SGoBackButtonMobile
-                onClick={handleClosePreventDiscarding}
-              >
-                { t('EditProfileMenu.goBackBtn.general') }
-              </SGoBackButtonMobile>
-            ) : (
-              <SGoBackButtonDesktop
-                onClick={handleClosePreventDiscarding}
-              >
-                <div>{ t('EditProfileMenu.goBackBtn.general') }</div>
-                <InlineSvg
-                  svg={CancelIcon}
-                  fill={theme.colorsThemed.text.primary}
-                  width="24px"
-                  height="24px"
-                />
-              </SGoBackButtonDesktop>
-            )}
-            <SImageInputsWrapper onDoubleClick={() => handleSetStageToEditingProfilePicture()}>
-              <ProfileBackgroundInput
-                pictureURL={user?.userData?.coverUrl ?? '/images/mock/profile-bg.png'}
-              />
-              <ProfileImageInput
-                publicUrl={user.userData?.avatarUrl!!}
-                handleImageInputChange={handleSetProfilePictureInEdit}
-              />
-            </SImageInputsWrapper>
-            <STextInputsWrapper>
-              <DisplaynameInput
-                type="text"
-                value={dataInEdit.displayName as string}
-                placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
-                isValid={!formErrors.displaynameError}
-                onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
-              />
-              <UsernameInput
-                type="text"
-                value={dataInEdit.username}
-                popupCaption={(
-                  <UsernamePopupList
-                    points={[
-                      t('EditProfileMenu.inputs.username.points.1'),
-                      t('EditProfileMenu.inputs.username.points.2'),
-                      t('EditProfileMenu.inputs.username.points.3'),
-                    ]}
+      <AnimatePresence>
+        {stage === 'edit-general'
+          ? (
+            <motion.div
+              key="edit-general"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {isMobile ? (
+                <SGoBackButtonMobile
+                  onClick={handleClosePreventDiscarding}
+                >
+                  { t('EditProfileMenu.goBackBtn.general') }
+                </SGoBackButtonMobile>
+              ) : (
+                <SGoBackButtonDesktop
+                  onClick={handleClosePreventDiscarding}
+                >
+                  <div>{ t('EditProfileMenu.goBackBtn.general') }</div>
+                  <InlineSvg
+                    svg={CancelIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width="24px"
+                    height="24px"
                   />
-                )}
-                frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
-                placeholder={t('EditProfileMenu.inputs.username.placeholder')}
-                isValid={!formErrors.usernameError}
-                onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
-              />
-              <BioTextarea
-                maxChars={150}
-                value={dataInEdit.bio}
-                placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
-                onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
-              />
-            </STextInputsWrapper>
-            <SControlsWrapper>
-              {!isMobile
-                ? (
-                  <Button
-                    view="secondary"
-                    onClick={handleClose}
-                  >
-                    { t('EditProfileMenu.cancelButton') }
-                  </Button>
-                ) : null}
-              <Button
-                withShadow
-                view="primaryGrad"
-                disabled={!wasModified || !isDataValid}
-                style={{
-                  width: isMobile ? '100%' : 'initial',
-                }}
-              >
-                { t('EditProfileMenu.saveButton') }
-              </Button>
-            </SControlsWrapper>
-          </>
-        ) : (
-          <>
-            {isMobile ? (
-              <SGoBackButtonMobile
-                onClick={handleSetStageToEditingGeneral}
-              >
-                { t('EditProfileMenu.goBackBtn.profilePicture') }
-              </SGoBackButtonMobile>
-            ) : (
-              <SGoBackButtonDesktop
-                onClick={handleSetStageToEditingGeneral}
-              >
-                <div>{ t('EditProfileMenu.goBackBtn.profilePicture') }</div>
-                <InlineSvg
-                  svg={CancelIcon}
-                  fill={theme.colorsThemed.text.primary}
-                  width="24px"
-                  height="24px"
-                />
-              </SGoBackButtonDesktop>
-            )}
-            <SCropperWrapper>
-              {avatarUrlInEdit && (
-                <Cropper
-                  image={avatarUrlInEdit}
-                  objectFit="vertical-cover"
-                  crop={crop}
-                  cropShape="round"
-                  showGrid={false}
-                  zoom={zoom}
-                  aspect={1}
-                  style={{
-                    cropAreaStyle: {
-                      boxShadow: 'none',
-                    },
-                  }}
-                  onCropChange={setCrop}
-                  onCropComplete={onCropComplete}
-                  onZoomChange={setZoom}
-                />
+                </SGoBackButtonDesktop>
               )}
-            </SCropperWrapper>
-            <SSliderWrapper>
-              <input
-                type="range"
-                value={zoom}
-                min={1}
-                max={3}
-                step={0.1}
-                aria-labelledby="Zoom"
-                onChange={(e) => setZoom(Number(e.target.value))}
+              <SImageInputsWrapper>
+                <ProfileBackgroundInput
+                  originalPictureUrl={user?.userData?.coverUrl ?? ''}
+                  pictureInEditUrl={coverUrlInEdit ?? ''}
+                  crop={cropCoverImage}
+                  zoom={zoomCoverImage}
+                  originalImageWidth={originalCoverImageWidth}
+                  handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
+                  handleUnsetPictureInEdit={handleUnsetPictureInEdit}
+                  onCropChange={handleCoverImageCropChange}
+                  onCropComplete={onCropCompleteCoverImage}
+                  onZoomChange={setZoomCoverImage}
+                />
+                <ProfileImageInput
+                  publicUrl={user.userData?.avatarUrl!!}
+                  handleImageInputChange={handleSetProfilePictureInEdit}
+                />
+              </SImageInputsWrapper>
+              <STextInputsWrapper>
+                <DisplaynameInput
+                  type="text"
+                  value={dataInEdit.displayName as string}
+                  placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
+                  errorCaption={t(`EditProfileMenu.inputs.displayName.errors.${formErrors.displaynameError}`)}
+                  isValid={!formErrors.displaynameError}
+                  onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
+                />
+                <UsernameInput
+                  type="text"
+                  value={dataInEdit.username}
+                  popupCaption={(
+                    <UsernamePopupList
+                      points={[
+                        {
+                          text: t('EditProfileMenu.inputs.username.points.1'),
+                          isValid: dataInEdit.username ? (
+                            dataInEdit.username.length >= 8 && dataInEdit.username.length <= 15
+                          ) : false,
+                        },
+                        {
+                          text: t('EditProfileMenu.inputs.username.points.2'),
+                          isValid: dataInEdit.username ? (
+                            validator.isLowercase(dataInEdit.username)
+                          ) : false,
+                        },
+                        {
+                          text: t('EditProfileMenu.inputs.username.points.3'),
+                          isValid: dataInEdit.username ? (
+                            validator.isAlphanumeric(dataInEdit.username)
+                          ) : false,
+                        },
+                      ]}
+                    />
+                  )}
+                  frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
+                  errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`)}
+                  placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+                  isValid={!formErrors.usernameError}
+                  onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
+                />
+                <BioTextarea
+                  maxChars={150}
+                  value={dataInEdit.bio}
+                  placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+                  errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.bioError}`)}
+                  isValid={!formErrors.bioError}
+                  onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
+                />
+              </STextInputsWrapper>
+              <SControlsWrapper>
+                {!isMobile
+                  ? (
+                    <Button
+                      view="secondary"
+                      onClick={handleClose}
+                    >
+                      { t('EditProfileMenu.cancelButton') }
+                    </Button>
+                  ) : null}
+                <Button
+                  withShadow
+                  disabled={!wasModified || !isDataValid || isAPIValidateLoading || isLoading}
+                  style={{
+                    width: isMobile ? '100%' : 'initial',
+                  }}
+                  onClick={() => handleUpdateTextualDataAndCover()}
+                >
+                  { t('EditProfileMenu.saveButton') }
+                </Button>
+              </SControlsWrapper>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="edit-picture"
+              initial={{ x: 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
+              exit={{ x: 300, opacity: 0 }}
+            >
+              {isMobile ? (
+                <SGoBackButtonMobile
+                  onClick={handleSetStageToEditingGeneralUnsetPicture}
+                >
+                  { t('EditProfileMenu.goBackBtn.profilePicture') }
+                </SGoBackButtonMobile>
+              ) : (
+                <SGoBackButtonDesktop
+                  onClick={handleSetStageToEditingGeneralUnsetPicture}
+                >
+                  <div>{ t('EditProfileMenu.goBackBtn.profilePicture') }</div>
+                  <InlineSvg
+                    svg={CancelIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width="24px"
+                    height="24px"
+                  />
+                </SGoBackButtonDesktop>
+              )}
+              <ProfileImageCropper
+                crop={cropProfileImage}
+                zoom={zoomProfileImage}
+                avatarUrlInEdit={avatarUrlInEdit}
+                originalImageWidth={originalProfileImageWidth}
+                onCropChange={setCropProfileImage}
+                onCropComplete={onCropCompleteProfileImage}
+                onZoomChange={setZoomProfileImage}
               />
-            </SSliderWrapper>
-            <SControlsWrapper>
-              {!isMobile
-                ? (
-                  <Button
-                    view="secondary"
-                    onClick={handleSetStageToEditingGeneral}
-                  >
-                    { t('EditProfileMenu.cancelButton') }
-                  </Button>
-                ) : null}
-              <Button
-                withShadow
-                view="primaryGrad"
-                style={{
-                  width: isMobile ? '100%' : 'initial',
-                }}
-              >
-                { t('EditProfileMenu.saveButton') }
-              </Button>
-            </SControlsWrapper>
-          </>
-        )}
+              <SSliderWrapper>
+                <Button
+                  iconOnly
+                  size="sm"
+                  view="transparent"
+                  disabled={zoomProfileImage <= 1}
+                  onClick={handleZoomOutProfileImage}
+                >
+                  <InlineSvg
+                    svg={ZoomOutIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width="24px"
+                    height="24px"
+                  />
+                </Button>
+                <ProfileImageZoomSlider
+                  value={zoomProfileImage}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  ariaLabel="Zoom"
+                  onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+                />
+                <Button
+                  iconOnly
+                  size="sm"
+                  view="transparent"
+                  disabled={zoomProfileImage >= 3}
+                  onClick={handleZoomInProfileImage}
+                >
+                  <InlineSvg
+                    svg={ZoomInIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width="24px"
+                    height="24px"
+                  />
+                </Button>
+              </SSliderWrapper>
+              <SControlsWrapperPicture>
+                <Button
+                  view="secondary"
+                  disabled={updateProfileImageLoading}
+                  onClick={handleSetStageToEditingGeneralUnsetPicture}
+                >
+                  { t('EditProfileMenu.cancelButton') }
+                </Button>
+                <Button
+                  withShadow
+                  disabled={updateProfileImageLoading}
+                  onClick={completeProfileImageCropAndSave}
+                >
+                  { t('EditProfileMenu.saveButton') }
+                </Button>
+              </SControlsWrapperPicture>
+            </motion.div>
+          )}
+      </AnimatePresence>
     </SEditProfileMenu>
   );
 };
@@ -436,11 +891,6 @@ const STextInputsWrapper = styled.div`
   }
 `;
 
-const SCropperWrapper = styled.div`
-  position: relative;
-  height: 420px;
-`;
-
 const SSliderWrapper = styled.div`
   display: none;
 
@@ -452,9 +902,21 @@ const SSliderWrapper = styled.div`
     margin-top: 24px;
     padding: 0px 24px;
 
+    button {
+      background: transparent;
+
+      &:hover:enabled {
+        background: transparent;
+        cursor: pointer;
+      }
+      &:focus:enabled {
+        background: transparent;
+        cursor: pointer;
+      }
+    }
+
     input {
-      display: block;
-      width: 100%;
+      margin: 0px 12px;
     }
   }
 `;
@@ -467,18 +929,73 @@ const SControlsWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     justify-content: space-between;
     align-items: center;
+
+    margin-bottom: 8px;
   }
 `;
 
-const UsernamePopupList = ({ points } : { points: string[] }) => (
+const SControlsWrapperPicture = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 8px;
+  }
+`;
+
+type TUsernamePopupListItem = {
+  text: string;
+  isValid: boolean;
+}
+
+const UsernamePopupList = ({ points } : { points: TUsernamePopupListItem[] }) => (
   <SUsernamePopupList>
     {points.map((p) => (
-      <div key={p}>
-        { p }
-      </div>
+      <SUsernamePopupListItem
+        key={p.text}
+        isValid={p.isValid}
+      >
+        { p.text }
+      </SUsernamePopupListItem>
     ))}
   </SUsernamePopupList>
 );
+
+const SUsernamePopupListItem = styled.div<{
+  isValid: boolean;
+}>`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  &:before {
+    content: '✓';
+    color: ${({ isValid }) => (isValid ? '#FFFFFF' : 'transparent')};
+    font-size: 8px;
+    text-align: center;
+    line-height: 13px;
+    display: block;
+
+    position: relative;
+    top: -1px;
+
+    width: 13px;
+    height: 13px;
+    margin-right: 4px;
+
+    border-radius: 50%;
+    border-width: 1.5px;
+    border-style: solid;
+    border-color: ${({ theme, isValid }) => (isValid ? 'transparent' : theme.colorsThemed.text.secondary)};
+
+    background-color: ${({ theme, isValid }) => (isValid ? theme.colorsThemed.accent.success : 'transparent')};
+
+    transition: .2s ease-in-out;
+  }
+`;
 
 const SUsernamePopupList = styled.div`
   display: flex;
@@ -490,27 +1007,4 @@ const SUsernamePopupList = styled.div`
   line-height: 16px;
 
   color: #FFFFFF;
-
-  div {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    &:before {
-      content: '';
-      display: block;
-
-      position: relative;
-      top: -1px;
-
-      width: 13px;
-      height: 13px;
-      margin-right: 4px;
-
-      border-radius: 50%;
-      border-width: 1.5px;
-      border-style: solid;
-      border-color: ${({ theme }) => theme.colorsThemed.text.secondary};
-    }
-  }
 `;

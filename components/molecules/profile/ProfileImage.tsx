@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import styled from 'styled-components';
 
 interface IProfileImage {
@@ -10,12 +9,12 @@ const ProfileImage: React.FunctionComponent<IProfileImage> = ({
   src,
 }) => (
   <SProfileImage>
-    <Image
+    <img
       src={src}
       alt="User avatar"
       width="100%"
       height="100%"
-      objectFit="cover"
+      draggable={false}
     />
   </SProfileImage>
 );
@@ -28,7 +27,7 @@ const SProfileImage = styled.div`
   top: 112px;
   overflow: hidden;
 
-  z-index: 4;
+  z-index: 5;
 
   border-radius: 50%;
   width: 96px;
