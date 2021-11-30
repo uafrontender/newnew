@@ -158,7 +158,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       <Card
         item={item}
         index={index + 1}
-        width={isMobile ? '100vw' : isTablet ? '200px' : '224px'}
+        width={isMobile ? '100vw' : '12.5vw'}
         height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
         restore={restore}
         preventClick={wasDragged}

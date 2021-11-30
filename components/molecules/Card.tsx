@@ -412,7 +412,7 @@ interface ISImageBG {
 
 const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  height: ${(props) => props.height};
+  padding: 75% 0;
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
