@@ -1,10 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
@@ -21,6 +16,7 @@ import ScrollArrow from '../../atoms/ScrollArrow';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
+import { formatString } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
@@ -55,13 +51,10 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
-  const [isDragging, setIsDragging] = useState(false);
   const [clientX, setClientX] = useState<number>(0);
   const [scrollX, setScrollX] = useState<number>(0);
-
-  // To check if we're really dragging and avoid clicks on children
-  const [wasDragged, setWasDragged] = useState(false);
-  const [mouseInitial, setMouseInitial] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -80,7 +73,6 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     scrollStep = SCROLL_STEP.tablet;
   }
 
-  const restore = useCallback(() => setWasDragged(false), []);
   const handleUserClick = () => {
     router.push(`/${category}`);
   };
@@ -108,80 +100,63 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     });
   };
   const mouseDownHandler = (e: any) => {
-    setIsDragging(true);
+    setMouseIsDown(true);
     setClientX(e.clientX);
     setScrollX(scrollContainerRef.current.scrollLeft);
-    setMouseInitial(e.clientX);
   };
   const mouseMoveHandler = (e: any) => {
-    if (!isDragging) {
+    if (!mouseIsDown) {
       return;
-    }
-
-    if (mouseInitial && e.clientX !== mouseInitial) {
-      setWasDragged(true);
     }
 
     scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
     setClientX(e.clientX);
     setScrollX(scrollX - e.clientX + clientX);
+    setIsDragging(true);
   };
   const mouseUpHandler = () => {
-    if (!isDragging) return;
+    setMouseIsDown(false);
 
-    // if (mouseInitial < clientX) {
-    //   if (canScrollLeft) {
-    //     handleLeftClick();
-    //   }
-    // } else if (mouseInitial > clientX) {
-    //   if (canScrollRight) {
-    //     handleRightClick();
-    //   }
-    // }
-
-    setIsDragging(false);
+    if (isDragging) {
+      setTimeout(() => {
+        setIsDragging(false);
+      }, 0);
+    }
   };
 
-  // Handlers for cards to avoid unncessary clicks
-  const handleItemMouseDownCapture = useCallback((e: any) => {
-    setMouseInitial(e.clientX);
-  }, []);
+  const renderItem = (item: any, index: number) => {
+    const handleItemClick = () => {
+      if (!isDragging) {
+        router.push('/post-detailed');
+      }
+    };
 
-  const handleItemMouseLeave = useCallback(() => {
-    if (wasDragged) {
-      setWasDragged(false);
-      setMouseInitial(0);
-    }
-  }, [wasDragged]);
-  const renderItem = useCallback((item: any, index: number) => (
-    <SItemWrapper key={`${category}-${item.id}`} name={`cards-section-${category}-${index}`}>
-      <Card
-        item={item}
-        index={index + 1}
-        width={isMobile ? '100vw' : '12.5vw'}
-        height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
-        restore={restore}
-        preventClick={wasDragged}
-        onMouseLeave={handleItemMouseLeave}
-        onMouseDownCapture={handleItemMouseDownCapture}
-      />
-    </SItemWrapper>
-  ), [
-    restore,
-    isTablet,
-    category,
-    isMobile,
-    wasDragged,
-    handleItemMouseLeave,
-    handleItemMouseDownCapture,
-  ]);
+    return (
+      <SItemWrapper
+        key={`${category}-${item.id}`}
+        name={`cards-section-${category}-${index}`}
+        onClick={handleItemClick}
+      >
+        <Card
+          item={item}
+          index={index + 1}
+          width={isMobile ? '100vw' : '12.5vw'}
+          height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+        />
+      </SItemWrapper>
+    );
+  };
 
   const {
     renderLeftArrow,
     renderRightArrow,
   } = useHoverArrows(ref);
   const handleSeeMoreCLick = () => {
-    router.push(`/search?category=${category}`);
+    if (type === 'default') {
+      router.push(`/search?category=${category}`);
+    } else {
+      handleUserClick();
+    }
   };
 
   useEffect(() => {
@@ -202,8 +177,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       name={category}
       layoutId={category}
       transition={{
-        ease: 'easeInOut',
-        duration: 1,
+        duration: 0,
       }}
     >
       <STopWrapper>
@@ -234,7 +208,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             weight={700}
             onClick={handleSeeMoreCLick}
           >
-            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator')}
+            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user.username, true) })}
           </SCaption>
         )}
       </STopWrapper>
@@ -275,7 +249,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             view="secondary"
             onClick={handleSeeMoreCLick}
           >
-            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator')}
+            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user.username, true) })}
           </Button>
         </SButtonHolder>
       )}
