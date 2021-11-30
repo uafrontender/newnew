@@ -1,12 +1,8 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import Card from '../../molecules/Card';
@@ -32,19 +28,17 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const { collection } = props;
   const { t } = useTranslation('home');
   const ref: any = useRef();
+  const router = useRouter();
   const scrollContainerRef: any = useRef();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
-  const [isDragging, setIsDragging] = useState(false);
   const [clientX, setClientX] = useState<number>(0);
   const [scrollX, setScrollX] = useState<number>(0);
-
-  // To check if we're really dragging and avoid clicks on children
-  const [wasDragged, setWasDragged] = useState(false);
-  const [mouseInitial, setMouseInitial] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const country = 'USA';
@@ -56,7 +50,6 @@ export const TopSection: React.FC<ITopSection> = (props) => {
     scrollStep = SCROLL_STEP.tablet;
   }
 
-  const restore = useCallback(() => setWasDragged(false), []);
   const handleLeftClick = () => {
     scrollListTo(visibleListItem - scrollStep - 1);
   };
@@ -81,64 +74,51 @@ export const TopSection: React.FC<ITopSection> = (props) => {
     });
   };
   const mouseDownHandler = (e: any) => {
-    setIsDragging(true);
+    setMouseIsDown(true);
     setClientX(e.clientX);
     setScrollX(scrollContainerRef.current.scrollLeft);
-    setMouseInitial(e.clientX);
   };
   const mouseMoveHandler = (e: any) => {
-    if (!isDragging) {
+    if (!mouseIsDown) {
       return;
     }
 
     scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
-    if (mouseInitial && e.clientX !== mouseInitial) {
-      setWasDragged(true);
-    }
     setClientX(e.clientX);
     setScrollX(scrollX - e.clientX + clientX);
+    setIsDragging(true);
   };
   const mouseUpHandler = () => {
-    if (!isDragging) return;
+    setMouseIsDown(false);
 
-    // if (mouseInitial < clientX) {
-    //   if (canScrollLeft) {
-    //     handleLeftClick();
-    //   }
-    // } else if (mouseInitial > clientX) {
-    //   if (canScrollRight) {
-    //     handleRightClick();
-    //   }
-    // }
-
-    setIsDragging(false);
+    if (isDragging) {
+      setTimeout(() => {
+        setIsDragging(false);
+      }, 0);
+    }
   };
 
-  // Handlers for cards to avoid unncessary clicks
-  const handleItemMouseDownCapture = useCallback((e: any) => {
-    setMouseInitial(e.clientX);
-  }, []);
+  const renderItem = (item: any, index: number) => {
+    const handleItemClick = () => {
+      if (!isDragging) {
+        router.push('/post-detailed');
+      }
+    };
 
-  const handleItemMouseLeave = useCallback(() => {
-    if (wasDragged) {
-      setWasDragged(false);
-      setMouseInitial(0);
-    }
-  }, [wasDragged]);
-
-  const renderItem = useCallback((item: any, index: number) => (
-    <SItemWrapper key={item.id} name={`top-section-${index}`}>
-      <Card
-        type="inside"
-        item={item}
-        index={index + 1}
-        restore={restore}
-        preventClick={wasDragged}
-        onMouseLeave={handleItemMouseLeave}
-        onMouseDownCapture={handleItemMouseDownCapture}
-      />
-    </SItemWrapper>
-  ), [handleItemMouseDownCapture, handleItemMouseLeave, restore, wasDragged]);
+    return (
+      <SItemWrapper
+        key={item.id}
+        name={`top-section-${index}`}
+        onClick={handleItemClick}
+      >
+        <Card
+          type="inside"
+          item={item}
+          index={index + 1}
+        />
+      </SItemWrapper>
+    );
+  };
 
   const {
     renderLeftArrow,

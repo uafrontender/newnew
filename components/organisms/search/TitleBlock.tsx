@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import _map from 'lodash/map';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -29,7 +29,7 @@ export const TitleBlock = () => {
   }
 
   const sortEnabled = !!Object.keys(sort).length;
-  const sortOptions: any = [
+  const sortOptions: any = useMemo(() => [
     {
       key: 'bid',
       options: [
@@ -66,8 +66,8 @@ export const TitleBlock = () => {
         },
       ],
     },
-  ];
-  const collectionTypeOptions: any = [
+  ], []);
+  const collectionTypeOptions: any = useMemo(() => [
     {
       key: 'ac',
     },
@@ -83,7 +83,7 @@ export const TitleBlock = () => {
     {
       key: 'for-you',
     },
-  ];
+  ], []);
 
   const handleCollectionTypeChange = (newCategory: string) => {
     const newQuery = {
@@ -95,7 +95,7 @@ export const TitleBlock = () => {
       pathname: router.pathname,
     });
   };
-  const handleSortChange = (newSort: object = {}) => {
+  const handleSortChange = useCallback((newSort: object = {}) => {
     const newQuery = {
       ...router.query,
       sort: JSON.stringify(newSort),
@@ -104,8 +104,8 @@ export const TitleBlock = () => {
       query: newQuery,
       pathname: router.pathname,
     });
-  };
-  const handleClearSorting = () => {
+  }, [router]);
+  const handleClearSorting = useCallback(() => {
     const newQuery = { ...router.query };
 
     delete newQuery.sort;
@@ -114,8 +114,8 @@ export const TitleBlock = () => {
       query: newQuery,
       pathname: router.pathname,
     });
-  };
-  const renderSortOption = (option: string, key: string) => {
+  }, [router]);
+  const renderSortOption = useCallback((option: string, key: string) => {
     const handleClick = () => {
       const newSort: any = { ...(sort as object) };
 
@@ -142,7 +142,7 @@ export const TitleBlock = () => {
         />
       </SButton>
     );
-  };
+  }, [handleSortChange, sort, t]);
 
   return (
     <SContainer>

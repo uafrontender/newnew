@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -68,10 +68,6 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
-  preventClick?: boolean;
-  restore?: () => void;
-  onMouseDownCapture?: (e: any) => void;
-  onMouseLeave?: () => void;
 }
 
 export const Card: React.FC<ICard> = (props) => {
@@ -81,10 +77,6 @@ export const Card: React.FC<ICard> = (props) => {
     index,
     width,
     height,
-    preventClick,
-    restore,
-    onMouseDownCapture,
-    onMouseLeave,
   } = props;
   const { t } = useTranslation('home');
   const theme = useTheme();
@@ -101,30 +93,13 @@ export const Card: React.FC<ICard> = (props) => {
   const handleMoreClick = () => {
     router.push('/post-detailed');
   };
-  const handleItemClick = useCallback(() => {
-    router.push('/post-detailed');
-  }, [router]);
   const handleBidClick = () => {
     router.push('/post-detailed');
   };
 
-  const onClick = useCallback((e) => {
-    if (preventClick) {
-      e.preventDefault();
-      restore?.();
-      return;
-    }
-    handleItemClick();
-  }, [handleItemClick, preventClick, restore]);
-
   if (type === 'inside') {
     return (
-      <SWrapper
-        index={index}
-        onClick={onClick}
-        onMouseLeave={onMouseLeave}
-        onMouseDownCapture={onMouseDownCapture}
-      >
+      <SWrapper index={index}>
         {!isMobile && (
           <SNumberImageHolder index={index}>
             <InlineSVG
@@ -168,12 +143,7 @@ export const Card: React.FC<ICard> = (props) => {
   }
 
   return (
-    <SWrapperOutside
-      width={width}
-      onClick={onClick}
-      onMouseLeave={onMouseLeave}
-      onMouseDownCapture={onMouseDownCapture}
-    >
+    <SWrapperOutside width={width}>
       <SImageBG
         id="backgroundPart"
         height={height}
@@ -216,9 +186,9 @@ export const Card: React.FC<ICard> = (props) => {
           >
             {t(`button-card-${item.type}`, {
               votes: item.votes,
-              total: formatNumber(item.total),
-              backed: formatNumber(item.backed),
-              amount: `$${formatNumber(item.amount)}`,
+              total: formatNumber(item.total, true),
+              backed: formatNumber(item.backed, true),
+              amount: `$${formatNumber(item.amount, true)}`,
             })}
           </SButton>
           <SCaption variant={2} weight={700}>
@@ -236,13 +206,6 @@ Card.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
-  preventClick: false,
-  restore: () => {
-  },
-  onMouseDownCapture: () => {
-  },
-  onMouseLeave: () => {
-  },
 };
 
 interface ISWrapper {
@@ -340,6 +303,7 @@ const SImageHolder = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     width: 212px;
+    padding: 12px;
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -431,6 +395,7 @@ const SImageHolderOutside = styled.div`
   transition: all ease 0.5s;
 
   ${(props) => props.theme.media.tablet} {
+    padding: 12px;
     overflow: hidden;
     border-radius: ${(props) => props.theme.borderRadius.medium};
   }

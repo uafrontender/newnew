@@ -4,18 +4,21 @@ import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
 
 export type TAnimation =
   't-01'
+  | 't-01-reverse'
   | 't-02'
   | 't-08'
   | 't-09'
   | 't-10'
   | 'trans-06'
   | 'trans-06-reverse'
+  | 'o-02'
   | 'o-11'
   | 'o-11-reverse';
 
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
+  duration?: number;
   animation: TAnimation;
   onAnimationEnd?: () => void;
   animateWhenInView?: boolean;
@@ -25,6 +28,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
   const {
     start,
     delay,
+    duration,
     animation,
     animateWhenInView,
     onAnimationEnd,
@@ -46,6 +50,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       opacity: 1,
       transition: {
         delay: delay ?? 0.5,
+        duration: duration ?? 1,
       },
     },
     't-01_initial': {
@@ -53,6 +58,19 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     },
     't-01_exit': {
       opacity: 0,
+    },
+    't-01-reverse': {
+      opacity: 0,
+      transition: {
+        delay: delay ?? 0.5,
+        duration: duration ?? 1,
+      },
+    },
+    't-01_initial-reverse': {
+      opacity: 1,
+    },
+    't-01_exit-reverse': {
+      opacity: 1,
     },
     't-02': {
       y: 0,
@@ -164,6 +182,23 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       y: 0,
       opacity: 1,
     },
+    'o-02': {
+      x: 0,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+        duration: duration ?? 1,
+      },
+    },
+    'o-02_initial': {
+      x: 10,
+      opacity: 0,
+    },
+    'o-02_exit': {
+      x: 10,
+      opacity: 0,
+    },
     'o-11-reverse': {
       y: 0,
       opacity: 1,
@@ -225,6 +260,7 @@ export default AnimatedPresence;
 AnimatedPresence.defaultProps = {
   start: true,
   delay: undefined,
+  duration: undefined,
   animateWhenInView: true,
   onAnimationEnd: () => {
   },

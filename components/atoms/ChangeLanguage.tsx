@@ -6,7 +6,6 @@ import { useTranslation } from 'next-i18next';
 import Text from './Text';
 import Modal from '../organisms/Modal';
 import Button from './Button';
-import Caption from './Caption';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
 import { useAppSelector } from '../../redux-store/store';
@@ -32,7 +31,7 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 58 : 60)) + 24;
+  const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
 
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
@@ -55,9 +54,6 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
         <SItemTitle variant={3} weight={600}>
           {t(`dd-language-title-${item}`)}
         </SItemTitle>
-        <SItemSubTitle variant={2} weight={600}>
-          {t(`dd-language-subTitle-${item}`)}
-        </SItemSubTitle>
       </SButton>
     );
   };
@@ -144,16 +140,6 @@ const SItemTitle = styled(Text)`
   }
 `;
 
-const SItemSubTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  text-align: center;
-  white-space: nowrap;
-
-  ${(props) => props.theme.media.tablet} {
-    text-align: start;
-  }
-`;
-
 interface ISMobileListContainer {
   focused: boolean;
 }
@@ -186,7 +172,7 @@ interface ISButton {
 
 const SButton = styled(Button)<ISButton>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
-  padding: 12px;
+  padding: 16px;
 
   ${(props) => props.theme.media.tablet} {
     min-width: 136px;
