@@ -78,7 +78,9 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
       <SCaptionDiv>
         { frequencyCaption }
       </SCaptionDiv>
-      <SStyledButton>
+      <SStyledButton
+        onClick={() => setIsPopupVisible((curr) => !curr)}
+      >
         <InlineSvg
           svg={AlertIcon}
           width="24px"
@@ -190,6 +192,9 @@ const SPopup = styled.div<{
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   visibility: ${({ isVisible }) => (isVisible ? 'visible' : 'hidden')};
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
+
+  transition: .2s linear;
 
   &:after {
     position: absolute;

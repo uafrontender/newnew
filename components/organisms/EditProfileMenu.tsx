@@ -138,15 +138,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         text,
       });
 
-      console.log(payload);
-
       const res = await validateEditProfileTextFields(
         payload,
         user.credentialsData?.accessToken!!,
       );
-
-      console.log(res.data);
-      console.log(res.error);
 
       if (!res.data?.status) throw new Error('An error occured');
 
@@ -206,7 +201,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     text: string,
   ) => {
     validateTextViaAPI(kind, text);
-  }, 500),
+  }, 400),
   [validateTextViaAPI]);
 
   const handleUpdateDataInEdit = useCallback((
@@ -318,8 +313,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
 
-        console.log(res.data);
-
         const uploadResponse = await fetch(
           res.data.uploadUrl,
           {
@@ -348,8 +341,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
       });
 
-      console.log(payload);
-
       const res = await updateMe(
         payload,
         user.credentialsData?.accessToken!!,
@@ -357,13 +348,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (!res.data || res.error) throw new Error('Request failed');
 
-      console.log(res.data.me);
-
       dispatch(setUserData({
         username: res.data.me?.username,
         displayName: res.data.me?.displayName,
         bio: res.data.me?.bio,
-        ...(newCoverImgURL ? { coverUrl: res.data.me?.coverUrl } : {}),
+        coverUrl: res.data.me?.coverUrl,
       }));
 
       setIsLoading(false);
@@ -940,6 +929,8 @@ const SControlsWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     justify-content: space-between;
     align-items: center;
+
+    margin-bottom: 8px;
   }
 `;
 
@@ -949,6 +940,10 @@ const SControlsWrapperPicture = styled.div`
   align-items: center;
 
   padding: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 8px;
+  }
 `;
 
 type TUsernamePopupListItem = {

@@ -121,6 +121,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
           )}
           <SDeleteImgButton
             iconOnly
+            size="sm"
             view="transparent"
             onClick={() => {
               handleUnsetPictureInEdit();
@@ -142,6 +143,8 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
         >
           <SImageInput
             type="file"
+            accept="image/*"
+            multiple={false}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const { files } = e.target;
               handleSetPictureInEdit(files);
@@ -256,6 +259,9 @@ const SDeleteImgButton = styled(Button)`
 
   right: 12px;
   bottom: 12px;
+
+  padding: 8px;
+  border-radius: 12px;
 
   z-index: 10;
 `;
