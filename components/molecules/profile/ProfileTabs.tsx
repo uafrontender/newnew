@@ -78,7 +78,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
 
   // Route change
   const handleChangeRoute = useCallback((path: string) => {
-    router.push(path);
+    router.replace(path);
   }, [router]);
 
   // Scrolling the tabs with mouse & touch
