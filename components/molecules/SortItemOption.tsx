@@ -43,10 +43,14 @@ export const SortItemOption: React.FC<ISortItemOption> = (props) => {
 export default SortItemOption;
 
 const SCheckBox = styled(CheckBox)`
-  padding: 8px 8px 8px 0;
-  border-radius: 12px;
+  padding: 8px 8px 8px 3px;
 
-  :hover {
-    background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
+  ${(props) => props.theme.media.tablet} {
+    padding: 8px 11px;
+    border-radius: 12px;
+
+    :hover {
+      background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
+    }
   }
 `;

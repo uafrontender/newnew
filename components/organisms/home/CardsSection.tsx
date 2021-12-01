@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -59,6 +58,8 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
+  const isLaptop = ['laptop'].includes(resizeMode);
+  const isDesktop = ['laptopL'].includes(resizeMode);
 
   let collectionToRender = collection;
   let renderShowMore = false;
@@ -140,7 +141,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
         <Card
           item={item}
           index={index + 1}
-          width={isMobile ? '100vw' : '12.5vw'}
+          width={isMobile ? '100vw' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
           height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
         />
       </SItemWrapper>
@@ -173,13 +174,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   }, [visibleListItem, collection, scrollStep]);
 
   return (
-    <SWrapper
-      name={category}
-      layoutId={category}
-      transition={{
-        duration: 0,
-      }}
-    >
+    <SWrapper name={category}>
       <STopWrapper>
         {type === 'default' ? (
           <Headline
@@ -269,7 +264,7 @@ interface ISWrapper {
   name: string;
 }
 
-const SWrapper = styled(motion.section)<ISWrapper>`
+const SWrapper = styled.div<ISWrapper>`
   padding: 24px 0;
 
   /* No select */

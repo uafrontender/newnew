@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -41,12 +42,14 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
   const country = 'USA';
   let scrollStep = SCROLL_STEP.desktop;
 
-  if (['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode)) {
+  if (isMobile) {
     scrollStep = SCROLL_STEP.mobile;
-  } else if (resizeMode === 'tablet') {
+  } else if (isTablet) {
     scrollStep = SCROLL_STEP.tablet;
   }
 

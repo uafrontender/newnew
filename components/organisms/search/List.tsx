@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 import Card from '../../molecules/Card';
-import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -27,39 +26,17 @@ export const List: React.FC<IList> = (props) => {
       router.push('/post-detailed');
     };
 
-    if (index < 5) {
-      return (
-        <SItemWrapper
-          key={`${category}-${item.id}`}
-          onClick={handleItemClick}
-        >
-          <Card
-            item={item}
-            index={index + 1}
-            width="100%"
-            height={isMobile ? '564px' : '336px'}
-          />
-        </SItemWrapper>
-      );
-    }
-
     return (
       <SItemWrapper
         key={`${category}-${item.id}`}
         onClick={handleItemClick}
       >
-        <AnimatedPresence
-          start
-          animation="t-01"
-          animateWhenInView={false}
-        >
-          <Card
-            item={item}
-            index={index + 1}
-            width="100%"
-            height={isMobile ? '564px' : '336px'}
-          />
-        </AnimatedPresence>
+        <Card
+          item={item}
+          index={index + 1}
+          width="100%"
+          height={isMobile ? '564px' : '336px'}
+        />
       </SItemWrapper>
     );
   };
@@ -112,5 +89,9 @@ const SItemWrapper = styled.div`
 
   ${(props) => props.theme.media.laptopL} {
     width: calc(20% - 32px);
+  }
+
+  ${(props) => props.theme.media.desktop} {
+    width: calc(16.65% - 32px);
   }
 `;

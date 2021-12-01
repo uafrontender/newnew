@@ -1,6 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -547,14 +546,7 @@ const Search: NextPage = () => {
   return (
     <>
       <TopSection collection={collection} />
-      <SWrapper
-        name={category}
-        layoutId={category}
-        transition={{
-          ease: 'easeInOut',
-          duration: 0.7,
-        }}
-      >
+      <SWrapper name={category}>
         <TitleBlock />
         <SListContainer>
           <List
@@ -594,7 +586,7 @@ interface ISWrapper {
   name: string;
 }
 
-const SWrapper = styled(motion.section)<ISWrapper>`
+const SWrapper = styled.section<ISWrapper>`
   padding: 0 0 24px 0;
 
   /* No select */
