@@ -264,10 +264,10 @@ const SWrapper = styled.div<ISWrapper>`
 
     return '406px';
   }};
-    
+    height: 384px;
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopL} {
     width: 25vw;
     height: unset;
     
