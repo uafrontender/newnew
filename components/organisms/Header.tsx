@@ -28,7 +28,7 @@ export const Header: React.FC<IHeader> = (props) => {
     >
       <Banner />
       <SContentWrapper>
-        <Container>
+        <Container noMaxContent>
           <Row>
             <Col>
               {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode) && <Mobile />}
@@ -56,7 +56,7 @@ const SWrapper = styled.header<ISWrapper>`
   width: 100vw;
   z-index: 10;
   position: fixed;
-  transition: all ease 0.5s;
+  transition: top ease 0.5s;
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundHeader};
 `;
 
