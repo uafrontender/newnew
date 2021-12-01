@@ -68,7 +68,7 @@ const SWrapper = styled.div`
 `;
 
 const SAnimation = styled.div`
-  margin-right: 8px;
+  margin-right: 11px;
 `;
 
 const SLabel = styled(Text)``;

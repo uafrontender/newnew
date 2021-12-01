@@ -99,45 +99,55 @@ export const Card: React.FC<ICard> = (props) => {
 
   if (type === 'inside') {
     return (
-      <SWrapper index={index}>
-        {!isMobile && (
-          <SNumberImageHolder index={index}>
-            <InlineSVG
-              svg={NUMBER_ICONS[colorMode][index]}
-              width="100%"
-              height="100%"
-            />
-          </SNumberImageHolder>
-        )}
-        <SImageHolder>
-          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
-          <SImageMask />
-          <STopContent>
-            <SButtonIcon
-              iconOnly
-              id="showMore"
-              view="transparent"
-              onClick={handleMoreClick}
-            >
+      <SWrapper
+        index={index}
+        width={width}
+      >
+        <SContent>
+          {!isMobile && (
+            <SNumberImageHolder index={index}>
               <InlineSVG
-                svg={moreIcon}
-                fill={theme.colors.white}
-                width="20px"
-                height="20px"
+                svg={NUMBER_ICONS[colorMode][index]}
+                width="100%"
+                height="100%"
               />
-            </SButtonIcon>
-          </STopContent>
-          <SBottomContent>
-            <SUserAvatar
-              withClick
-              user={item.user}
-              onClick={handleUserClick}
+            </SNumberImageHolder>
+          )}
+          <SImageHolder index={index}>
+            <Image
+              src={item.url}
+              objectFit="cover"
+              layout="fill"
+              draggable={false}
             />
-            <SText variant={3} weight={600}>
-              {item.title}
-            </SText>
-          </SBottomContent>
-        </SImageHolder>
+            <SImageMask />
+            <STopContent>
+              <SButtonIcon
+                iconOnly
+                id="showMore"
+                view="transparent"
+                onClick={handleMoreClick}
+              >
+                <InlineSVG
+                  svg={moreIcon}
+                  fill={theme.colors.white}
+                  width="20px"
+                  height="20px"
+                />
+              </SButtonIcon>
+            </STopContent>
+            <SBottomContent>
+              <SUserAvatar
+                withClick
+                user={item.user}
+                onClick={handleUserClick}
+              />
+              <SText variant={3} weight={600}>
+                {item.title}
+              </SText>
+            </SBottomContent>
+          </SImageHolder>
+        </SContent>
       </SWrapper>
     );
   }
@@ -149,7 +159,12 @@ export const Card: React.FC<ICard> = (props) => {
         height={height}
       >
         <SImageHolderOutside id="animatedPart">
-          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
+          <Image
+            src={item.url}
+            objectFit="cover"
+            layout="fill"
+            draggable={false}
+          />
           <STopContent>
             <SButtonIcon
               iconOnly
@@ -250,12 +265,28 @@ const SWrapper = styled.div<ISWrapper>`
     return '406px';
   }};
     height: 384px;
+  }
 
+  ${(props) => props.theme.media.laptopL} {
+    width: 25vw;
+    height: unset;
+    
     :hover {
       #showMore {
         opacity: 1;
       }
     }
+  }
+  
+  ${(props) => props.theme.media.desktop} {
+    width: 20vw;
+  }
+`;
+
+const SContent = styled.div`
+  ${(props) => props.theme.media.laptopL} {
+    width: 100%;
+    padding: 50% 0;
   }
 `;
 
@@ -285,9 +316,23 @@ const SNumberImageHolder = styled.div<ISWrapper>`
   }};
     height: 280px;
   }
+
+  ${(props) => props.theme.media.laptopL} {
+    left: 0;
+    bottom: 0;
+    height: 70%;
+    position: absolute;
+    width: ${(props) => {
+    if (props.index === 10) {
+      return '90%';
+    }
+
+    return '55%';
+  }};
+  }
 `;
 
-const SImageHolder = styled.div`
+const SImageHolder = styled.div<ISWrapper>`
   top: 0;
   right: 0;
   width: 254px;
@@ -308,6 +353,20 @@ const SImageHolder = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     width: 256px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    width: ${(props) => {
+    if (props.index === 1) {
+      return '70%';
+    }
+
+    if (props.index === 10) {
+      return '55%';
+    }
+
+    return '65%';
+  }};
   }
 `;
 

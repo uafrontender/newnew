@@ -2,9 +2,9 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Text from './Text';
 import Modal from '../organisms/Modal';
 import Button from './Button';
+import CheckBox from '../molecules/CheckBox';
 import Headline from './Headline';
 import InlineSVG from './InlineSVG';
 
@@ -33,9 +33,6 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
-
-  const ddHeight = (options.length > 6 ? 300 : options.length * (isTablet ? 50 : 52)) + 16;
 
   const handleChangeCollectionTypeClick = () => {
     setFocused(!focused);
@@ -51,16 +48,12 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
     };
 
     return (
-      <SButton
+      <SCheckBox
         key={`change-collection-type-${item.key}`}
-        view={isSelected ? 'modalSecondarySelected' : 'modalSecondary'}
-        onClick={handleItemClick}
+        label={t(`${item.key}-block-title`)}
         selected={isSelected}
-      >
-        <SItemTitle variant={3} weight={600}>
-          {t(`${item.key}-block-title`)}
-        </SItemTitle>
-      </SButton>
+        handleChange={handleItemClick}
+      />
     );
   };
 
@@ -100,10 +93,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
           </SMobileListContainer>
         </Modal>
       ) : (
-        <SListHolder
-          height={ddHeight}
-          focused={focused}
-        >
+        <SListHolder focused={focused}>
           {options.map(renderItem)}
         </SListHolder>
       )}
@@ -125,32 +115,22 @@ const SWrapper = styled.div`
 `;
 
 interface ISListHolder {
-  height: number;
   focused: boolean;
 }
 
 const SListHolder = styled.div<ISListHolder>`
   top: 52px;
   left: 0;
-  height: ${(props) => (props.focused ? `${props.height}px` : '0px')};
+  opacity: ${(props) => (props.focused ? 1 : 0)};
   z-index: 2;
-  padding: ${(props) => (props.focused ? '8px' : '0px 8px')};
+  padding: 8px;
   overflow: hidden;
   position: absolute;
-  transition: all ease 0.5s;
+  transition: opacity ease 0.5s;
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
+  pointer-events: ${(props) => (props.focused ? 'unset' : 'none')};
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
-`;
-
-const SItemTitle = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  text-align: center;
-  white-space: nowrap;
-
-  ${(props) => props.theme.media.tablet} {
-    text-align: start;
-  }
 `;
 
 interface ISMobileListContainer {
@@ -179,17 +159,17 @@ const SMobileList = styled.div`
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
 `;
 
-interface ISButton {
-  selected: boolean;
-}
-
-const SButton = styled(Button)<ISButton>`
-  cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
-  padding: 16px 32px;
+const SCheckBox = styled(CheckBox)`
+  padding: 8px 8px 8px 3px;
 
   ${(props) => props.theme.media.tablet} {
+    padding: 8px 11px;
     min-width: 200px;
-    justify-content: flex-start;
+    border-radius: 12px;
+
+    :hover {
+      background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
+    }
   }
 `;
 

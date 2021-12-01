@@ -44,15 +44,6 @@ export const Sorting: React.FC<ISorting> = (props) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const selectedCount = Object.keys(selected).length;
-  let ddHeight = 0;
-
-  if (options.length <= 2) {
-    ddHeight = options.length * 124;
-  } else if (options.length > 2) {
-    ddHeight = ((options.length - 2) * 176) + (124 * 2);
-  }
-
-  ddHeight += 16;
 
   const handleToggleSortingClick = useCallback(() => {
     setFocused(!focused);
@@ -170,10 +161,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
           </SMobileListContainer>
         </Modal>
       ) : (
-        <SListHolder
-          height={ddHeight}
-          focused={focused}
-        >
+        <SListHolder focused={focused}>
           {options.map(renderItem)}
         </SListHolder>
       )}
@@ -242,21 +230,21 @@ const SMenuButton = styled.div`
 `;
 
 interface ISListHolder {
-  height: number;
   focused: boolean;
 }
 
 const SListHolder = styled.div<ISListHolder>`
   top: 52px;
   left: 0;
-  height: ${(props) => (props.focused ? `${props.height}px` : '0px')};
+  opacity: ${(props) => (props.focused ? 1 : 0)};
   z-index: 2;
-  padding: ${(props) => (props.focused ? '8px' : '0px 8px')};
+  padding: 8px;
   overflow: hidden;
   position: absolute;
-  transition: all ease 0.5s;
+  transition: opacity ease 0.5s;
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
+  pointer-events: ${(props) => (props.focused ? 'unset' : 'none')};
   background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
