@@ -78,7 +78,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
 
   // Route change
   const handleChangeRoute = useCallback((path: string) => {
-    router.push(path);
+    router.replace(path);
   }, [router]);
 
   // Scrolling the tabs with mouse & touch
@@ -246,7 +246,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
           width: window.innerWidth ?? 0,
           height: window.innerHeight ?? 0,
         });
-      }, 1000);
+      }, 1500);
     };
 
     window.addEventListener('resize', updateContainerWidth);
@@ -418,7 +418,5 @@ const SActiveTabIndicator = styled.div`
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) => theme.gradients.blueHorizontal};
 
-  transition: opacity .45s ease-in-out;
-
-  transition: left .25s linear;
+  transition: opacity .35s ease-in-out, left .25s linear, width .27s linear;
 `;
