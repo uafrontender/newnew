@@ -114,7 +114,7 @@ const SDisplaynameInput = styled.input<ISDisplaynameInput>`
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled, &:focus, &:active {
+  &:hover:enabled, &:focus:enabled, &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
@@ -123,6 +123,10 @@ const SDisplaynameInput = styled.input<ISDisplaynameInput>`
       return theme.colorsThemed.grayscale.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 `;
 

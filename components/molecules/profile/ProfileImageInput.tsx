@@ -1,27 +1,25 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 
 import EditIcon from '../../../public/images/svg/icons/filled/Edit.svg';
+import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
 interface IProfileImageInput {
   publicUrl: string;
+  disabled: boolean;
   handleImageInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
   publicUrl,
+  disabled,
   handleImageInputChange,
 }) => {
-  const [pressed, setPressed] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>();
 
   return (
-    <SProfileImageInput
-      pressed={pressed}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
-      onMouseLeave={() => setPressed(false)}
-    >
+    <SProfileImageInput>
       { publicUrl ? (
         <img
           src={publicUrl}
@@ -33,22 +31,35 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
       ) : <div />}
       <SImageInput
         type="file"
+        accept="image/*"
+        multiple={false}
+        disabled={disabled}
+        ref={(el) => {
+          imageInputRef.current = el!!;
+        }}
         onChange={handleImageInputChange}
       />
-      <SEditIcon
-        svg={EditIcon}
-        width="20px"
-        height="20px"
-      />
+      <SEditButton
+        iconOnly
+        withDim
+        withShrink
+        view="transparent"
+        disabled={disabled}
+        onClick={() => imageInputRef.current?.click()}
+      >
+        <InlineSvg
+          svg={EditIcon}
+          width="20px"
+          height="20px"
+        />
+      </SEditButton>
     </SProfileImageInput>
   );
 };
 
 export default ProfileImageInput;
 
-const SProfileImageInput = styled.label<{
-  pressed: boolean;
-}>`
+const SProfileImageInput = styled.label`
   position: absolute;
   left: calc(50% - 42px);
   top: 118px;
@@ -59,6 +70,9 @@ const SProfileImageInput = styled.label<{
   z-index: 6;
 
   border-radius: 50%;
+  box-shadow: 0px 0px 0px 14px ${({ theme }) => theme.colorsThemed.grayscale.background1};
+  background: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+
   width: 84px;
   height: 84px;
 
@@ -72,33 +86,26 @@ const SProfileImageInput = styled.label<{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  div {
-    svg {
-      transform: ${({ pressed }) => (!pressed ? 'initial' : 'scale(0.9)')};
-      path {
-        fill: ${({ theme, pressed }) => (!pressed ? '#FFFFFF' : theme.colorsThemed.text.secondary)};
-      }
-
-      transition: .2s ease-in-out;
-    }
-  }
-
-  ${(props) => props.theme.media.tablet} {
-
-  }
-
-  ${(props) => props.theme.media.laptop} {
-
-  }
 `;
 
 const SImageInput = styled.input`
   display: none;
 `;
 
-const SEditIcon = styled(InlineSvg)`
+const SEditButton = styled(Button)`
   position: absolute;
-  top: calc(50% - 10px);
-  left: calc(50% - 10px);
+  top: calc(50% - 18px);
+  left: calc(50% - 18px);
+
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(11, 10, 19, 0.6);
+
+  &:active:enabled {
+    svg {
+      path {
+        fill: ${({ theme }) => theme.colors.dark}
+      }
+    }
+  }
 `;

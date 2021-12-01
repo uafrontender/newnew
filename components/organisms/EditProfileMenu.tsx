@@ -201,7 +201,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     text: string,
   ) => {
     validateTextViaAPI(kind, text);
-  }, 400),
+  }, 100),
   [validateTextViaAPI]);
 
   const handleUpdateDataInEdit = useCallback((
@@ -607,6 +607,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   crop={cropCoverImage}
                   zoom={zoomCoverImage}
                   originalImageWidth={originalCoverImageWidth}
+                  disabled={isLoading}
                   handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
                   handleUnsetPictureInEdit={handleUnsetPictureInEdit}
                   onCropChange={handleCoverImageCropChange}
@@ -615,6 +616,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
                 <ProfileImageInput
                   publicUrl={user.userData?.avatarUrl!!}
+                  disabled={isLoading}
                   handleImageInputChange={handleSetProfilePictureInEdit}
                 />
               </SImageInputsWrapper>
@@ -622,6 +624,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 <DisplaynameInput
                   type="text"
                   value={dataInEdit.displayName as string}
+                  disabled={isLoading}
                   placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
                   errorCaption={t(`EditProfileMenu.inputs.displayName.errors.${formErrors.displaynameError}`)}
                   isValid={!formErrors.displaynameError}
@@ -630,6 +633,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 <UsernameInput
                   type="text"
                   value={dataInEdit.username}
+                  disabled={isLoading}
                   popupCaption={(
                     <UsernamePopupList
                       points={[
@@ -663,6 +667,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 <BioTextarea
                   maxChars={150}
                   value={dataInEdit.bio}
+                  disabled={isLoading}
                   placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
                   errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.bioError}`)}
                   isValid={!formErrors.bioError}
@@ -722,6 +727,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 zoom={zoomProfileImage}
                 avatarUrlInEdit={avatarUrlInEdit}
                 originalImageWidth={originalProfileImageWidth}
+                disabled={updateProfileImageLoading}
                 onCropChange={setCropProfileImage}
                 onCropComplete={onCropCompleteProfileImage}
                 onZoomChange={setZoomProfileImage}
@@ -731,7 +737,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   iconOnly
                   size="sm"
                   view="transparent"
-                  disabled={zoomProfileImage <= 1}
+                  disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
                   onClick={handleZoomOutProfileImage}
                 >
                   <InlineSvg
@@ -747,13 +753,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   max={3}
                   step={0.1}
                   ariaLabel="Zoom"
+                  disabled={updateProfileImageLoading}
                   onChange={(e) => setZoomProfileImage(Number(e.target.value))}
                 />
                 <Button
                   iconOnly
                   size="sm"
                   view="transparent"
-                  disabled={zoomProfileImage >= 3}
+                  disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
                   onClick={handleZoomInProfileImage}
                 >
                   <InlineSvg
@@ -804,7 +811,7 @@ const MAnimation = {
     },
     y: {
       type: 'spring',
-      stiffness: 60,
+      stiffness: 50,
       delay: 0.2,
     },
     default: { duration: 2 },

@@ -13,6 +13,7 @@ type TProfileImageCropper = {
   zoom: number;
   avatarUrlInEdit: string;
   originalImageWidth: number;
+  disabled: boolean;
   onCropChange: (location: Point) => void;
   onCropComplete: ((croppedArea: Area, croppedAreaPixels: Area) => void) | undefined;
   onZoomChange: ((zoom: number) => void) | undefined;
@@ -23,6 +24,7 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
   crop,
   avatarUrlInEdit,
   originalImageWidth,
+  disabled,
   onCropChange,
   onCropComplete,
   onZoomChange,
@@ -51,7 +53,7 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
       {avatarUrlInEdit && !isMobile ? (
         <DragToRepositionLabel
           text={t('EditProfileMenu.dragToReposition')}
-          isPressed={isPressed}
+          isPressed={disabled ?? isPressed}
         />
       ) : null}
       {avatarUrlInEdit && (
@@ -72,9 +74,9 @@ const ProfileImageCropper: React.FunctionComponent<TProfileImageCropper> = ({
             mediaClassName: 'cropper-media',
             cropAreaClassName: 'cropper-cropArea',
           }}
-          onCropChange={onCropChange}
-          onCropComplete={onCropComplete}
-          onZoomChange={onZoomChange}
+          onCropChange={disabled ? () => {} : onCropChange}
+          onCropComplete={disabled ? () => {} : onCropComplete}
+          onZoomChange={disabled ? () => {} : onZoomChange}
         />
       )}
     </SCropperWrapper>

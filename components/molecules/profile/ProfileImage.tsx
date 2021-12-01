@@ -30,6 +30,10 @@ const SProfileImage = styled.div`
   z-index: 5;
 
   border-radius: 50%;
+
+  box-shadow: 0px 0px 0px 16px ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  background: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+
   width: 96px;
   height: 96px;
 
@@ -40,6 +44,7 @@ const SProfileImage = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
 
   ${(props) => props.theme.media.tablet} {
     top: 152px;

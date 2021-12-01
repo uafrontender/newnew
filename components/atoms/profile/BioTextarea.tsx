@@ -141,16 +141,19 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
       color: ${({ theme }) => theme.colorsThemed.text.quaternary};
     }
 
-    &:hover:enabled, &:focus, &:active {
+    &:hover:enabled, &:focus:enabled, &:active:enabled {
       outline: none;
 
       border-color: ${({ theme }) => theme.colorsThemed.grayscale.outlines2}
     }
 
+    &:disabled {
+      opacity: 0.5;
+    }
+
     ${({ theme }) => theme.media.tablet} {
       height: 120px;
     }
-
   }
 
 `;

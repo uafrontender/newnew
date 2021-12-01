@@ -14,6 +14,7 @@ type TProfileBackgroundCropper = {
   pictureUrlInEdit: string;
   originalImageWidth: number;
   mobileCropWidth: number;
+  disabled: boolean;
   onCropChange: (location: Point) => void;
   onCropComplete: ((croppedArea: Area, croppedAreaPixels: Area) => void) | undefined;
   onZoomChange: ((zoom: number) => void) | undefined;
@@ -25,6 +26,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
   pictureUrlInEdit,
   originalImageWidth,
   mobileCropWidth,
+  disabled,
   onCropChange,
   onCropComplete,
   onZoomChange,
@@ -51,7 +53,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
         text={t('EditProfileMenu.dragToReposition')}
         top="40px"
         customZ={1}
-        isPressed={isPressed}
+        isPressed={disabled ?? isPressed}
       />
       {pictureUrlInEdit && (
         <Cropper
