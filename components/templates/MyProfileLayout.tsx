@@ -137,6 +137,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         >
           <Button
             view="transparent"
+            withShrink
+            withDim
             iconOnly={isMobileOrTablet}
             onClick={() => handleOpenEditProfileMenu()}
           >
@@ -149,6 +151,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           </Button>
           <Button
             view="transparent"
+            withDim
+            withShrink
             iconOnly={isMobileOrTablet}
             onClick={() => {}}
           >
@@ -179,9 +183,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             {user.userData?.displayName}
           </SUsername>
           <SShareDiv>
-            <Button
+            <SShareButton
               view="tertiary"
               iconOnly
+              withShrink
+              withDim
               style={{
                 paddingTop: '8px',
                 paddingBottom: '8px',
@@ -197,10 +203,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                   ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring(user.userData?.username.length - 3)}`
                   : user.userData?.username}
               </SUsernameButtonText>
-            </Button>
-            <Button
+            </SShareButton>
+            <SShareButton
               view="tertiary"
               iconOnly
+              withDim
+              withShrink
               style={{
                 padding: '8px',
               }}
@@ -212,7 +220,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 width="20px"
                 height="20px"
               />
-            </Button>
+            </SShareButton>
           </SShareDiv>
           {user.userData?.bio ? (
             <SBioText
@@ -289,6 +297,12 @@ const SShareDiv = styled.div`
   gap: 12px;
 
   margin-bottom: 16px;
+`;
+
+const SShareButton = styled(Button)`
+  &:focus:enabled {
+    background: ${({ theme, view }) => theme.colorsThemed.button.background[view!!]};
+  }
 `;
 
 const SUsernameButtonText = styled(Text)`
