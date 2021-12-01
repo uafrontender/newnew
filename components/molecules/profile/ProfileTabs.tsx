@@ -246,7 +246,7 @@ const ProfileTabs: React.FunctionComponent<IProfileTabs> = ({
           width: window.innerWidth ?? 0,
           height: window.innerHeight ?? 0,
         });
-      }, 1000);
+      }, 1500);
     };
 
     window.addEventListener('resize', updateContainerWidth);

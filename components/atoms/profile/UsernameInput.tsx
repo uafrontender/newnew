@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import InlineSvg from '../InlineSVG';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
@@ -18,6 +18,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   frequencyCaption,
   errorCaption,
   isValid,
+  disabled,
   onChange,
   onFocus,
   ...rest
@@ -35,6 +36,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
     <SWrapper>
       <SUsernameInput
         value={value}
+        disabled={disabled}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
         onBlur={() => {
@@ -75,10 +77,13 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
       >
         {popupCaption}
       </SPopup>
-      <SCaptionDiv>
+      <SCaptionDiv
+        disabled={disabled ?? false}
+      >
         { frequencyCaption }
       </SCaptionDiv>
       <SStyledButton
+        disabled={disabled}
         onClick={() => setIsPopupVisible((curr) => !curr)}
       >
         <InlineSvg
@@ -129,6 +134,11 @@ const SStyledButton = styled.button`
   &:focus, &:hover {
     outline: none;
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;
 
 interface ISUsernameInput {
@@ -167,7 +177,7 @@ const SUsernameInput = styled.input<ISUsernameInput>`
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled, &:focus, &:active {
+  &:hover:enabled, &:focus:enabled, &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
@@ -176,6 +186,10 @@ const SUsernameInput = styled.input<ISUsernameInput>`
       return theme.colorsThemed.grayscale.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 `;
 
@@ -195,6 +209,7 @@ const SPopup = styled.div<{
   opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
 
   transition: .2s linear;
+  z-index: 6;
 
   &:after {
     position: absolute;
@@ -213,7 +228,9 @@ const SPopup = styled.div<{
   }
 `;
 
-const SCaptionDiv = styled.div`
+const SCaptionDiv = styled.div<{
+  disabled: boolean;
+}>`
   text-align: left;
   font-weight: 600;
   font-size: 12px;
@@ -225,6 +242,11 @@ const SCaptionDiv = styled.div`
   color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 
   margin-top: 6px;
+
+  ${({ disabled }) => {
+    if (disabled) return css`opacity: 0.5;`;
+    return null;
+  }}
 `;
 
 const SErrorDiv = styled.div`
