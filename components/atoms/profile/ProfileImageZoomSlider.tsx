@@ -7,6 +7,7 @@ interface IProfileImageZoomSlider {
   max: number;
   step: number;
   ariaLabel: string;
+  disabled: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -16,6 +17,7 @@ const ProfileImageZoomSlider: React.FunctionComponent<IProfileImageZoomSlider> =
   max,
   step,
   ariaLabel,
+  disabled,
   onChange,
 }) => (
   <SSlider
@@ -24,6 +26,7 @@ const ProfileImageZoomSlider: React.FunctionComponent<IProfileImageZoomSlider> =
     min={min}
     max={max}
     step={step}
+    disabled={disabled}
     aria-labelledby={ariaLabel}
     onChange={onChange}
   />
