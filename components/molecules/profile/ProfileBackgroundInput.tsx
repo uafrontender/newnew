@@ -19,6 +19,7 @@ interface IProfileBackgroundInput {
   crop: Point;
   zoom: number;
   originalImageWidth: number;
+  disabled: boolean;
   handleSetPictureInEdit: (files: FileList | null) => void;
   handleUnsetPictureInEdit: () => void;
   onCropChange: (location: Point) => void;
@@ -32,6 +33,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
   zoom,
   crop,
   originalImageWidth,
+  disabled,
   handleSetPictureInEdit,
   handleUnsetPictureInEdit,
   onCropChange,
@@ -49,6 +51,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
 
   const handleOnDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
+    setDropZoneHighlighted(true);
   };
 
   const handleOnDragLeave = () => {
@@ -57,6 +60,8 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
 
   const handleOnDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
+
+    if (disabled) return;
 
     const { files } = e.dataTransfer;
     handleSetPictureInEdit(files);
@@ -82,19 +87,6 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
         containerRef.current = el!!;
       }}
     >
-      <SFrame>
-        <svg
-          id="profileBackgroundInputSvg"
-        >
-          <clipPath
-            id="profileBackgroundInputSvgClipPath"
-          >
-            <path
-              d="M 188 96 C 158.12 96 133.02261 116.47611 125.97461 144.16211 C 124.03137 151.79512 118.28764 158.38873 110.80469 159.73438 L 265.19531 159.73438 C 257.71289 158.38873 251.96863 151.79512 250.02539 144.16211 C 242.97739 116.47611 217.88 96 188 96 z "
-            />
-          </clipPath>
-        </svg>
-      </SFrame>
       {pictureInEditUrl ? (
         <>
           {originalPictureUrl === pictureInEditUrl ? (
@@ -114,15 +106,19 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
               zoom={zoom}
               originalImageWidth={originalImageWidth}
               mobileCropWidth={mobileCropWidth}
-              onCropChange={onCropChange}
-              onCropComplete={onCropComplete}
-              onZoomChange={onZoomChange}
+              disabled={disabled}
+              onCropChange={disabled ? () => {} : onCropChange}
+              onCropComplete={disabled ? () => {} : onCropComplete}
+              onZoomChange={disabled ? () => {} : onZoomChange}
             />
           )}
           <SDeleteImgButton
             iconOnly
             size="sm"
             view="transparent"
+            withDim
+            withShrink
+            disabled={disabled}
             onClick={() => {
               handleUnsetPictureInEdit();
             }}
@@ -145,12 +141,17 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
             type="file"
             accept="image/*"
             multiple={false}
+            disabled={disabled}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const { files } = e.target;
               handleSetPictureInEdit(files);
             }}
           />
-          <SChangeImageCaption>
+          <SChangeImageCaption
+            style={{
+              transform: !disabled && dropZoneHighlighted ? 'scale(1.1)' : 'none',
+            }}
+          >
             <InlineSvg
               svg={ImageIcon}
               fill={theme.colorsThemed.text.secondary}
@@ -188,7 +189,34 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
 
   background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
 
+  &:before {
+    position: absolute;
+    bottom: 0px;
+    left: calc(50% - 48px - 35px);
+    content: '';
+    width: 30px;
+    height: 30px;
+    border-bottom-right-radius: 70%;
+    box-shadow: 10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.grayscale.background1};
 
+    background: transparent;
+    z-index: 10;
+  }
+
+  &:after {
+    position: absolute;
+    bottom: 0px;
+    left: calc(50% + 44px + 9px);
+    content: '';
+    width: 30px;
+    height: 30px;
+    border-bottom-left-radius: 70%;
+    box-shadow: -10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.grayscale.background1};
+
+    background: transparent;
+    z-index: 10;
+    /* transform: translateY(0px) translateZ(1px); */
+  }
 
   ${(props) => props.theme.media.tablet} {
 
@@ -210,32 +238,6 @@ const SOriginalImgDiv = styled.div<{
     height: 100%;
     object-fit: cover;
     vertical-align: inherit;
-  }
-
-`;
-
-const SFrame = styled.div`
-  z-index: 5;
-
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  transform: translateY(10px) translateX(calc(50vw - 188px)) scale(0.9);
-
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
-
-  width: 376px;
-  height: 160px;
-
-  clip-path: url(#profileBackgroundInputSvgClipPath);
-
-  #profileBackgroundInputSvg {
-    width: 100%;
-    height: 100%;
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    transform: scale(0.9) translateY(10px) translateX(calc(211px - 188px));
   }
 `;
 
@@ -279,5 +281,6 @@ const SChangeImageCaption = styled.div`
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary}
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  transition: .2s linear;
 `;
