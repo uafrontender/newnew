@@ -115,7 +115,7 @@ export const General: React.FC<IGeneral> = (props) => {
       </Head>
       <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
       <SContent>
-        <Container>
+        <Container noMaxContent>
           <Row>
             <Col>
               {children}
@@ -153,7 +153,7 @@ const SWrapper = styled.div<ISWrapper>`
   height: 100vh;
   display: flex;
   overflow-y: auto;
-  transition: all ease 1s;
+  transition: padding ease 0.5s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
   flex-direction: column;

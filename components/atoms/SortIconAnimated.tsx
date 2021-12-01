@@ -34,9 +34,15 @@ export const SortIconAnimated: React.FC<Props> = (props) => {
   const center = {
     closed: {
       opacity: 1,
+      transition: {
+        duration: 0,
+      },
     },
     opened: {
       opacity: 0,
+      transition: {
+        duration: 0,
+      },
     },
   };
   const bottom = {
