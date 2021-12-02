@@ -201,7 +201,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     text: string,
   ) => {
     validateTextViaAPI(kind, text);
-  }, 100),
+  }, 250),
   [validateTextViaAPI]);
 
   const handleUpdateDataInEdit = useCallback((
@@ -286,6 +286,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Update textual data and cover URL
   const handleUpdateTextualDataAndCover = useCallback(async () => {
+    if (isAPIValidateLoading) return;
     try {
       setIsLoading(true);
 
@@ -365,6 +366,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setIsLoading, handleClose, user.credentialsData, dispatch,
     dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
     user.userData?.username, user.userData?.coverUrl,
+    isAPIValidateLoading,
   ]);
 
   // Profile image
@@ -686,9 +688,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   ) : null}
                 <Button
                   withShadow
-                  disabled={!wasModified || !isDataValid || isAPIValidateLoading || isLoading}
+                  disabled={!wasModified || !isDataValid || isLoading}
                   style={{
                     width: isMobile ? '100%' : 'initial',
+                    ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                   }}
                   onClick={() => handleUpdateTextualDataAndCover()}
                 >
