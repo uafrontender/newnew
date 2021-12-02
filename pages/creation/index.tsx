@@ -23,16 +23,17 @@ export const CreationFirstStep = () => {
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isDesktop = ['laptop', 'laptopL', 'desktop'].includes(resizeMode);
 
   const collection = useMemo(() => [
     {
-      key: 'ac',
+      key: 'auction',
     },
     {
-      key: 'mc',
+      key: 'multiple-choice',
     },
     {
-      key: 'cf',
+      key: 'crowdfunding',
     },
   ], []);
   const handleGoBack = useCallback(() => {
@@ -47,14 +48,16 @@ export const CreationFirstStep = () => {
     <SWrapper>
       <SBackLine onClick={handleGoBack}>
         <SInlineSVG
-          svg={isMobile ? chevronIcon : arrowLeftIcon}
+          svg={isDesktop ? arrowLeftIcon : chevronIcon}
           fill={theme.colorsThemed.text.secondary}
           width={isMobile ? '20px' : '24px'}
           height={isMobile ? '20px' : '24px'}
         />
-        <SText variant={3} weight={600}>
-          {t('back')}
-        </SText>
+        {isDesktop && (
+          <SText variant={3} weight={600}>
+            {t('back')}
+          </SText>
+        )}
       </SBackLine>
       <STitle variant={4}>
         {t('first-step-title')}
@@ -97,6 +100,10 @@ const SBackLine = styled.div`
   display: flex;
   padding: 18px 0;
   align-items: center;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 24px 0;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -112,16 +119,32 @@ const SText = styled(Text)`
     color: ${(props) => props.theme.colorsThemed.text.secondary};
     font-weight: bold;
   }
+
+  ${(props) => props.theme.media.laptop} {
+    padding: 6px 0;
+  }
 `;
 
 const STitle = styled(Headline)`
   padding: 0 35px;
   margin-top: 20px;
   text-align: center;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 120px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: 100px;
+  }
 `;
 
 const SSubTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   margin-top: 8px;
   text-align: center;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 12px;
+  }
 `;

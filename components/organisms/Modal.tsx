@@ -65,7 +65,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundT};
 
   ::before {
     top: 0;

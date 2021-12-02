@@ -828,7 +828,7 @@ const SEditProfileMenu = styled(motion.div)`
   width: 100%;
   height: 100%;
 
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.tablet} {
     position: absolute;

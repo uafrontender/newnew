@@ -33,8 +33,32 @@ const SList = styled.div`
   align-items: center;
   flex-direction: column;
   justify-content: center;
+
+  ${(props) => props.theme.media.tablet} {
+    left: -8px;
+    width: calc(100% + 16px);
+    position: relative;
+    margin-top: 140px;
+    flex-direction: row;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    left: unset;
+    margin: 164px auto 0 auto;
+    max-width: 768px;
+    flex-direction: row;
+  }
 `;
 
 const SItemWrapper = styled.div`
+  width: 100%;
   margin: 6px 0;
+
+  ${(props) => props.theme.media.tablet} {
+    margin: 0 8px;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    margin: 0 16px;
+  }
 `;

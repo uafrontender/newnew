@@ -31,8 +31,8 @@ const SProfileImage = styled.div`
 
   border-radius: 50%;
 
-  box-shadow: 0px 0px 0px 16px ${({ theme }) => theme.colorsThemed.grayscale.background2};
-  background: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  box-shadow: 0px 0px 0px 16px ${({ theme }) => theme.colorsThemed.background.secondary};
+  background: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   width: 96px;
   height: 96px;

@@ -192,7 +192,7 @@ const SSignInButton = styled.button<SISignInButton>`
   padding: 16px 20px 16px 22%;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   ${({ theme, hoverBgColor, hoverContentColor }) => (hoverBgColor && hoverContentColor
     ? css`& path {

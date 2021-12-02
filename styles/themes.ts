@@ -30,10 +30,12 @@ export const lightTheme: DefaultTheme = {
     statusBar: {
       background: '#fffefe', // #FFFFFF not working on ios
     },
-    grayscale: {
-      background1: '#FFFFFF',
-      background2: '#F1F3F9',
-      background3: '#F1F3F9',
+    background: {
+      primary: '#FFFFFF',
+      secondary: '#F1F3F9',
+      tertiary: '#EDF0F7',
+      quaternary: '#E2E7F3',
+      quinary: '#D4DBED',
       backgroundT: 'transparent',
       backgroundDD: '#FFFFFF',
       backgroundDDSelected: '#F1F3F9',
@@ -171,10 +173,12 @@ export const darkTheme: DefaultTheme = {
     statusBar: {
       background: '#0B0A13',
     },
-    grayscale: {
-      background1: '#0B0A13',
-      background2: '#14151F',
-      background3: '#1B1C27',
+    background: {
+      primary: '#0B0A13',
+      secondary: '#14151F',
+      tertiary: '#1B1C27',
+      quaternary: '#1E1F29',
+      quinary: '#282933',
       backgroundT: 'rgba(11, 10, 19, 0.65)',
       backgroundDD: '#14151F',
       backgroundDDSelected: '#21222C',
