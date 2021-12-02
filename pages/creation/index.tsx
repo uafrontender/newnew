@@ -121,12 +121,23 @@ const SBackLine = styled.div`
   padding: 18px 0;
   align-items: center;
 
+  :hover {
+    p {
+      color: ${(props) => props.theme.colorsThemed.text.primary};
+    }
+
+    svg {
+      fill: ${(props) => props.theme.colorsThemed.text.primary};
+    }
+  }
+
   ${(props) => props.theme.media.tablet} {
     padding: 24px 0;
   }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
+  transition: fill ease 0.5s;
   margin-right: 8px;
 
   ${(props) => props.theme.media.tablet} {
@@ -135,6 +146,8 @@ const SInlineSVG = styled(InlineSVG)`
 `;
 
 const SText = styled(Text)`
+  transition: color ease 0.5s;
+
   ${(props) => props.theme.media.tablet} {
     color: ${(props) => props.theme.colorsThemed.text.secondary};
     font-weight: bold;
