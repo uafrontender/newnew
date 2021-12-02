@@ -9,6 +9,7 @@ import { useAppDispatch } from '../../redux-store/store';
 interface IModal {
   show: boolean;
   transitionSpeed?: number;
+  overlayDim?: boolean;
   onClose: () => void;
   children: ReactNode;
 }
@@ -17,6 +18,7 @@ const Modal: React.FC<IModal> = (props) => {
   const {
     show,
     transitionSpeed,
+    overlayDim,
     onClose,
     children,
   } = props;
@@ -39,6 +41,7 @@ const Modal: React.FC<IModal> = (props) => {
         show={show}
         onClick={onClose}
         transitionSpeed={transitionSpeed ?? 0.5}
+        overlayDim={overlayDim ?? false}
       >
         {children}
       </StyledModalOverlay>,
@@ -52,6 +55,7 @@ const Modal: React.FC<IModal> = (props) => {
 interface IStyledModalOverlay {
   show: boolean;
   transitionSpeed?: number;
+  overlayDim?: boolean;
 }
 
 const StyledModalOverlay = styled.div<IStyledModalOverlay>`
@@ -65,7 +69,8 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
+  // To avoid overlapping dim color with this bg color
+  background-color: ${({ theme, overlayDim }) => (overlayDim ? 'transparent' : theme.colorsThemed.grayscale.backgroundT)};
 
   ::before {
     top: 0;
@@ -79,6 +84,9 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
     position: absolute;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+
+    /* Some screens have dimmed overlay */
+    background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.grayscale.overlayDim : null)};
   }
 `;
 
