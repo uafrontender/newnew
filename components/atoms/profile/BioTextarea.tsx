@@ -167,6 +167,7 @@ const SCharCounter = styled.div`
   font-size: 16px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  background: ${({ theme }) => (theme.name === 'light' ? 'rgba(241, 243, 249, 0.8)' : 'rgba(20, 21, 31, 0.8)')};
 `;
 
 const SErrorDiv = styled.div`

@@ -37,6 +37,7 @@ import ProfileImageCropper from '../molecules/profile/ProfileImageCropper';
 import ProfileImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
 import { updateMe, validateEditProfileTextFields } from '../../api/endpoints/user';
 import { getImageUploadUrl } from '../../api/endpoints/upload';
+import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture'
 
@@ -201,7 +202,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     text: string,
   ) => {
     validateTextViaAPI(kind, text);
-  }, 100),
+  }, 250),
   [validateTextViaAPI]);
 
   const handleUpdateDataInEdit = useCallback((
@@ -238,7 +239,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
-  const [originalCoverImageWidth, setOriginalCoverImageWidth] = useState(0);
+  const [
+    coverImageInitialObjectFit, setCoverImageInitialObjectFit,
+  ] = useState<CropperObjectFit>('horizontal-cover');
   const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
@@ -258,14 +261,19 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       reader.readAsDataURL(file);
       reader.addEventListener('load', () => {
         if (reader.result) {
-          setCoverUrlInEdit(reader.result as string);
-
           img.src = reader.result as string;
 
           // eslint-disable-next-line func-names
           img.addEventListener('load', function () {
             // eslint-disable-next-line react/no-this-in-sfc
-            setOriginalCoverImageWidth(this.width);
+            if (this.width > this.height) {
+              setCoverImageInitialObjectFit('vertical-cover');
+            } else {
+              setCoverImageInitialObjectFit('horizontal-cover');
+            }
+            setCropCoverImage({ x: 0, y: 0 });
+            setZoomCoverImage(1);
+            setCoverUrlInEdit(reader.result as string);
           });
         }
       });
@@ -286,6 +294,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Update textual data and cover URL
   const handleUpdateTextualDataAndCover = useCallback(async () => {
+    if (isAPIValidateLoading) return;
     try {
       setIsLoading(true);
 
@@ -365,6 +374,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setIsLoading, handleClose, user.credentialsData, dispatch,
     dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
     user.userData?.username, user.userData?.coverUrl,
+    isAPIValidateLoading,
   ]);
 
   // Profile image
@@ -606,7 +616,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   pictureInEditUrl={coverUrlInEdit ?? ''}
                   crop={cropCoverImage}
                   zoom={zoomCoverImage}
-                  originalImageWidth={originalCoverImageWidth}
+                  initialObjectFit={coverImageInitialObjectFit}
                   disabled={isLoading}
                   handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
                   handleUnsetPictureInEdit={handleUnsetPictureInEdit}
@@ -686,9 +696,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   ) : null}
                 <Button
                   withShadow
-                  disabled={!wasModified || !isDataValid || isAPIValidateLoading || isLoading}
+                  disabled={!wasModified || !isDataValid || isLoading}
                   style={{
                     width: isMobile ? '100%' : 'initial',
+                    ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                   }}
                   onClick={() => handleUpdateTextualDataAndCover()}
                 >
@@ -836,8 +847,8 @@ const SEditProfileMenu = styled(motion.div)`
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 70vh;
-    max-height: 724px;
+    height: 72vh;
+    max-height: 684px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }

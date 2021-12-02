@@ -43,6 +43,7 @@ export const lightTheme: DefaultTheme = {
       numbers: '#E5E9F1',
       backgroundHeader: 'rgba(255, 255, 255, 0.9)',
       backgroundFooter: '#F1F3F9',
+      overlayDim: 'rgba(229, 233, 241, 0.5)',
     },
     text: {
       primary: '#2C2C33',
@@ -184,6 +185,7 @@ export const darkTheme: DefaultTheme = {
       numbers: 'rgba(255, 255, 255, 0.06)',
       backgroundFooter: '#0B0A13',
       backgroundHeader: 'rgba(11, 10, 19, 0.9)',
+      overlayDim: 'rgba(11, 10, 19, 0.65)',
     },
     text: {
       primary: '#FFFFFF',

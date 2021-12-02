@@ -225,6 +225,7 @@ const SUsernameButtonText = styled(Text)`
 
 const SBioText = styled(Text)`
   text-align: center;
+  overflow-wrap: break-word;
 
   padding-left: 16px;
   padding-right: 16px;
