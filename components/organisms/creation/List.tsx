@@ -38,6 +38,7 @@ const SList = styled.div`
     left: -8px;
     width: calc(100% + 16px);
     position: relative;
+    max-width: 768px;
     margin-top: 140px;
     flex-direction: row;
   }
@@ -45,7 +46,6 @@ const SList = styled.div`
   ${(props) => props.theme.media.laptop} {
     left: unset;
     margin: 164px auto 0 auto;
-    max-width: 768px;
     flex-direction: row;
   }
 `;
