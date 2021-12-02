@@ -67,7 +67,7 @@ const SIndicator = styled.div<ISIndicator>`
 
 const SMinifiedIndicator = styled.div`
   width: 6px;
-  border: 3px solid ${(props) => props.theme.colorsThemed.grayscale.background1};
+  border: 3px solid ${(props) => props.theme.colorsThemed.background.primary};
   height: 6px;
   padding: 3px;
   overflow: hidden;

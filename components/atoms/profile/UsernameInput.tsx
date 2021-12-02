@@ -195,7 +195,7 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background3};
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   &::placeholder {
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
@@ -213,7 +213,7 @@ const SUsernameInput = styled.input<ISUsernameInput>`
     border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       // NB! Temp
-      return theme.colorsThemed.grayscale.outlines2;
+      return theme.colorsThemed.background.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
   }
