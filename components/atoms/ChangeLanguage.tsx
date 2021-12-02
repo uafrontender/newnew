@@ -122,7 +122,7 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -163,7 +163,7 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 `;
 
 interface ISButton {

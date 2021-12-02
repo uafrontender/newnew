@@ -245,7 +245,7 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   pointer-events: ${(props) => (props.focused ? 'unset' : 'none')};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -281,7 +281,7 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 `;
 
 const SCancelButton = styled(Button)`
@@ -300,7 +300,7 @@ const SSeparator = styled.div`
   left: -16px;
   width: calc(100% + 32px);
   margin: 8px 0;
-  border: 1px solid ${(props) => props.theme.colorsThemed.grayscale.outlines1};
+  border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
   position: relative;
 
   ${(props) => props.theme.media.tablet} {

@@ -127,7 +127,7 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
   }};
 
     color: ${({ theme }) => theme.colorsThemed.text.primary};
-    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background3};
+    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
     resize: none;
 
@@ -144,7 +144,7 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     &:hover:enabled, &:focus:enabled, &:active:enabled {
       outline: none;
 
-      border-color: ${({ theme }) => theme.colorsThemed.grayscale.outlines2}
+      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2}
     }
 
     &:disabled {

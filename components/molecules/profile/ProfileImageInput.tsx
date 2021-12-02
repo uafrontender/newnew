@@ -70,8 +70,8 @@ const SProfileImageInput = styled.label`
   z-index: 6;
 
   border-radius: 50%;
-  box-shadow: 0px 0px 0px 14px ${({ theme }) => theme.colorsThemed.grayscale.background1};
-  background: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+  box-shadow: 0px 0px 0px 14px ${({ theme }) => theme.colorsThemed.background.primary};
+  background: ${({ theme }) => theme.colorsThemed.background.primary};
 
   width: 84px;
   height: 84px;
