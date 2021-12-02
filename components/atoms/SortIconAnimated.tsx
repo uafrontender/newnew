@@ -75,7 +75,7 @@ export const SortIconAnimated: React.FC<Props> = (props) => {
       viewBox={`0 0 ${unitWidth} ${unitHeight}`}
       overflow="visible"
       preserveAspectRatio="none"
-      {...rest}
+      {...rest as any}
     >
       <motion.line
         x1="0"
