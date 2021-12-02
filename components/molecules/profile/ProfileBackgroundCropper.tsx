@@ -8,11 +8,13 @@ import { Area, Point } from 'react-easy-crop/types';
 import { useAppSelector } from '../../../redux-store/store';
 import DragToRepositionLabel from './DragToRepositionLabel';
 
+export type CropperObjectFit = 'horizontal-cover' | 'contain' | 'vertical-cover'
+
 type TProfileBackgroundCropper = {
   crop: Point;
   zoom: number;
   pictureUrlInEdit: string;
-  originalImageWidth: number;
+  initialObjectFit: CropperObjectFit;
   mobileCropWidth: number;
   disabled: boolean;
   onCropChange: (location: Point) => void;
@@ -24,7 +26,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
   zoom,
   crop,
   pictureUrlInEdit,
-  originalImageWidth,
+  initialObjectFit,
   mobileCropWidth,
   disabled,
   onCropChange,
@@ -41,7 +43,6 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
 
   return (
     <SCropperWrapper
-      pseudoElementWidth={originalImageWidth}
       onMouseDown={() => handleSetPressed()}
       onMouseUp={() => handleSetUnpressed()}
       onMouseLeave={() => handleSetUnpressed()}
@@ -58,7 +59,8 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
       {pictureUrlInEdit && (
         <Cropper
           image={pictureUrlInEdit}
-          objectFit="horizontal-cover"
+          // objectFit="horizontal-cover"
+          objectFit={initialObjectFit}
           crop={crop}
           cropSize={{
             height: 160,
@@ -84,9 +86,7 @@ const ProfileBackgroundCropper: React.FunctionComponent<TProfileBackgroundCroppe
 
 export default ProfileBackgroundCropper;
 
-const SCropperWrapper = styled.div<{
-  pseudoElementWidth: number,
-}>`
+const SCropperWrapper = styled.div`
   position: relative;
   height: 160px;
 

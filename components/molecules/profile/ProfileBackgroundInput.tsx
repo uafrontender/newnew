@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { Area, Point } from 'react-easy-crop/types';
 
-import ProfileBackgroundCropper from './ProfileBackgroundCropper';
+import ProfileBackgroundCropper, { CropperObjectFit } from './ProfileBackgroundCropper';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -18,7 +18,7 @@ interface IProfileBackgroundInput {
   pictureInEditUrl?: string;
   crop: Point;
   zoom: number;
-  originalImageWidth: number;
+  initialObjectFit: CropperObjectFit;
   disabled: boolean;
   handleSetPictureInEdit: (files: FileList | null) => void;
   handleUnsetPictureInEdit: () => void;
@@ -32,7 +32,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
   pictureInEditUrl,
   zoom,
   crop,
-  originalImageWidth,
+  initialObjectFit,
   disabled,
   handleSetPictureInEdit,
   handleUnsetPictureInEdit,
@@ -104,7 +104,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
               pictureUrlInEdit={pictureInEditUrl!!}
               crop={crop}
               zoom={zoom}
-              originalImageWidth={originalImageWidth}
+              initialObjectFit={initialObjectFit}
               mobileCropWidth={mobileCropWidth}
               disabled={disabled}
               onCropChange={disabled ? () => {} : onCropChange}
