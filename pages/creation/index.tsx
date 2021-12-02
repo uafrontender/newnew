@@ -59,15 +59,17 @@ export const CreationFirstStep = () => {
           </SText>
         )}
       </SBackLine>
-      <STitle variant={4}>
-        {t('first-step-title')}
-      </STitle>
-      <SSubTitle variant={2} weight={600}>
-        {t('first-step-sub-title')}
-      </SSubTitle>
-      <List
-        collection={collection}
-      />
+      <SContent>
+        <STitle variant={4}>
+          {t('first-step-title')}
+        </STitle>
+        <SSubTitle variant={2} weight={600}>
+          {t('first-step-sub-title')}
+        </SSubTitle>
+        <List
+          collection={collection}
+        />
+      </SContent>
     </SWrapper>
   );
 };
@@ -93,7 +95,25 @@ export async function getStaticProps(context: NextPageContext): Promise<any> {
   };
 }
 
-const SWrapper = styled.div``;
+const SWrapper = styled.div`
+  ${(props) => props.theme.media.tablet} {
+    height: 100vh;
+  }
+`;
+
+const SContent = styled.div`
+  ${(props) => props.theme.media.tablet} {
+    height: calc(100% - 72px);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    height: calc(100% - 80px);
+  }
+`;
 
 const SBackLine = styled.div`
   cursor: pointer;
@@ -131,11 +151,7 @@ const STitle = styled(Headline)`
   text-align: center;
 
   ${(props) => props.theme.media.tablet} {
-    margin-top: 120px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-top: 100px;
+    margin-top: unset;
   }
 `;
 
