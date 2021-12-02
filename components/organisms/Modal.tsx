@@ -86,7 +86,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
     -webkit-backdrop-filter: blur(16px);
 
     /* Some screens have dimmed overlay */
-    background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.grayscale.overlayDim : null)};
+    background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.background.overlayDim : null)};
   }
 `;
 
