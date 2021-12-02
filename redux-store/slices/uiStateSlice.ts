@@ -13,7 +13,7 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 // NB!
 
 export type TOverlay = true | false;
-export type TColorMode = 'light' | 'dark';
+export type TColorMode = 'light' | 'dark' | 'auto';
 export type TGlobalSearchActive = true | false;
 export type TResizeMode =
   'mobile'

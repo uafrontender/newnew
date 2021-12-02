@@ -154,7 +154,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             withDim
             withShrink
             iconOnly={isMobileOrTablet}
-            onClick={() => {}}
+            onClick={() => router.push('/profile/settings')}
           >
             <InlineSvg
               svg={SettingsIcon}
