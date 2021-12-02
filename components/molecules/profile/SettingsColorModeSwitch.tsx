@@ -183,7 +183,7 @@ const SColorSwitchButton = styled.button<{
     width: 40px;
     height: 40px;
 
-    background-color: ${({ theme, isActive }) => (isActive ? 'transparent' : theme.colorsThemed.grayscale.background2)};
+    background-color: ${({ theme, isActive }) => (isActive ? 'transparent' : theme.colorsThemed.background.secondary)};
   }
 
   div {
