@@ -130,7 +130,7 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   pointer-events: ${(props) => (props.focused ? 'unset' : 'none')};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 `;
 
 interface ISMobileListContainer {
@@ -156,7 +156,7 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 `;
 
 const SCheckBox = styled(CheckBox)`
@@ -168,7 +168,7 @@ const SCheckBox = styled(CheckBox)`
     border-radius: 12px;
 
     :hover {
-      background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
+      background-color: ${(props) => props.theme.colorsThemed.background.backgroundDDSelected};
     }
   }
 `;

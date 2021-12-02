@@ -21,10 +21,12 @@ declare module 'styled-components' {
       statusBar: {
         background: string;
       },
-      grayscale: {
-        background1: string;
-        background2: string;
-        background3: string;
+      background: {
+        primary: string;
+        secondary: string;
+        tertiary: string;
+        quaternary: string;
+        quinary: string;
         backgroundT: string;
         backgroundDD: string;
         backgroundDDSelected: string;

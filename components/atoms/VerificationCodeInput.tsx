@@ -183,7 +183,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       // NB! Temp
-      return theme.colorsThemed.grayscale.outlines1;
+      return theme.colorsThemed.background.outlines1;
     }
     return theme.colorsThemed.accent.error;
   }};
@@ -221,7 +221,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
 
     border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
-      return theme.colorsThemed.grayscale.outlines2;
+      return theme.colorsThemed.background.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
     }

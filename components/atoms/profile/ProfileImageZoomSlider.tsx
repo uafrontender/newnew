@@ -51,7 +51,7 @@ const SSlider = styled.input.attrs({ type: 'range' })`
     height: 4px;
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     border-color: transparent;
-    background: ${({ theme }) => theme.colorsThemed.grayscale.outlines1};
+    background: ${({ theme }) => theme.colorsThemed.background.outlines1};
   }
 
   &::-webkit-slider-thumb {
@@ -80,7 +80,7 @@ const SSlider = styled.input.attrs({ type: 'range' })`
     height: 4px;
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     border-color: transparent;
-    background: ${({ theme }) => theme.colorsThemed.grayscale.outlines1};
+    background: ${({ theme }) => theme.colorsThemed.background.outlines1};
   }
   &::-moz-range-thumb {
     height: 16px;

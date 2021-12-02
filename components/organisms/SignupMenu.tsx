@@ -188,7 +188,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             variants={item}
           >
             <TextWithLine
-              lineColor={theme.colorsThemed.grayscale.outlines1}
+              lineColor={theme.colorsThemed.background.outlines1}
               innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
             />
           </motion.div>
@@ -383,7 +383,7 @@ const SSignInBackButton = styled(GoBackButton)`
 
   padding: 8px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   span {
     display: none;
@@ -477,7 +477,7 @@ const SContinueWithSpan = styled.span`
   line-height: 20px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 `;
 
 const SErrorDiv = styled.div`

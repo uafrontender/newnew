@@ -62,7 +62,7 @@ const SWrapper = styled.div`
   border-radius: ${(props) => props.theme.borderRadius.medium};
   flex-direction: row;
   justify-content: space-between;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background2};
+  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
 `;
 
 const SCenterContent = styled.div`

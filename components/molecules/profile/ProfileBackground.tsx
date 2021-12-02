@@ -46,7 +46,7 @@ const SProfileBackground = styled.div<ISProfileBackground>`
     height: 30px;
     border-bottom-right-radius: 70%;
 
-    box-shadow: 12px 15px 0px 0px ${({ theme }) => theme.colorsThemed.grayscale.background2};
+    box-shadow: 12px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.secondary};
 
     background: transparent;
   }
@@ -60,7 +60,7 @@ const SProfileBackground = styled.div<ISProfileBackground>`
     height: 30px;
     border-bottom-left-radius: 70%;
 
-    box-shadow: -12px 15px 0px 0px ${({ theme }) => theme.colorsThemed.grayscale.background2};
+    box-shadow: -12px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.secondary};
 
     background: transparent;
   }
