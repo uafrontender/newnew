@@ -559,13 +559,11 @@ const Search: NextPage = () => {
   );
 };
 
-(Search as NextPageWithLayout).getLayout = function getLayout(page: React.ReactElement) {
-  return (
-    <HomeLayout>
-      {page}
-    </HomeLayout>
-  );
-};
+(Search as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
+  <HomeLayout>
+    {page}
+  </HomeLayout>
+);
 
 export default Search;
 

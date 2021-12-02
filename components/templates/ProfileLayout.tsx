@@ -296,7 +296,7 @@ const SProfileLayout = styled.div`
   margin-top: -28px;
   margin-bottom: 24px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: -8px;

@@ -91,7 +91,7 @@ const SContainer = styled.div`
   display: flex;
   padding: 12px 12px 12px 20px;
   box-shadow: ${(props) => props.theme.shadows.cookie};
-  background: ${(props) => props.theme.colorsThemed.grayscale.backgroundCookie};
+  background: ${(props) => props.theme.colorsThemed.background.backgroundCookie};
   align-items: center;
   border-radius: 50px;
   pointer-events: all;
