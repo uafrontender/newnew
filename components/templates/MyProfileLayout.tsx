@@ -236,8 +236,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         />
         {/* Edit Profile modal menu */}
         <Modal
-          transitionSpeed={isMobileOrTablet ? 0.5 : 0}
           show={isEditProfileMenuOpen}
+          overlayDim
+          transitionSpeed={isMobileOrTablet ? 0.5 : 0}
           onClose={handleClosePreventDiscarding}
         >
           {isEditProfileMenuOpen

@@ -839,8 +839,8 @@ const SEditProfileMenu = styled(motion.div)`
     left: calc(50% - 232px);
 
     width: 464px;
-    height: 70vh;
-    max-height: 724px;
+    height: 72vh;
+    max-height: 684px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
