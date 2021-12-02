@@ -120,7 +120,7 @@ const SDescription = styled(Caption)`
 
 const SImageWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
-    top: -84px;
+    top: -77px;
     left: 50%;
     position: absolute;
     transform: translateX(-50%);
