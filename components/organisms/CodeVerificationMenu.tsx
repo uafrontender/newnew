@@ -280,7 +280,7 @@ const SCodeVerificationMenu = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.xxxLarge};
     border-style: 1px transparent solid;
 
-    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
 `;
 

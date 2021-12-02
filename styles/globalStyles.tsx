@@ -35,7 +35,7 @@ const GlobalStyle = createGlobalStyle`
   /* General light/dark mode configs */
   body {
     color: ${({ theme }) => theme.colorsThemed.text.primary};
-    background: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+    background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
   
   body.blurred {

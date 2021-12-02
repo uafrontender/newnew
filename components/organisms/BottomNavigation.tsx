@@ -42,5 +42,5 @@ const SContainer = styled.nav<ISContainer>`
   transition: bottom ease 0.5s;
   align-items: center;
   justify-content: space-around;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
+  background-color: ${(props) => props.theme.colorsThemed.background.primary};
 `;

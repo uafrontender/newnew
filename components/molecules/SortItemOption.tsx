@@ -50,7 +50,7 @@ const SCheckBox = styled(CheckBox)`
     border-radius: 12px;
 
     :hover {
-      background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDDSelected};
+      background-color: ${(props) => props.theme.colorsThemed.background.backgroundDDSelected};
     }
   }
 `;
