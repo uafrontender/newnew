@@ -15,13 +15,23 @@ const Template: ComponentStory<typeof SignInTextInput> = (args) => {
   const [value, setValue] = useState('');
 
   return (
-  <SignInTextInput
-    value={value}
-    placeholder="Email"
-    isValid={validator.isEmail(value)}
-    errorCaption="Input is incorrect"
-    onChange={(e) => setValue(e.target.value)}
-  />
+    <div
+    style={{
+      width: '326px',
+      marginTop: '150px',
+      marginLeft: '50px',
+      display: 'flex',
+      flexDirection: 'column'
+    }}
+    >
+      <SignInTextInput
+        value={value}
+        placeholder="Email"
+        isValid={validator.isEmail(value)}
+        errorCaption="Input is incorrect"
+        onChange={(e) => setValue(e.target.value)}
+      />
+    </div>
   );
 };
 

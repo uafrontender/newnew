@@ -15,18 +15,34 @@ const Template: ComponentStory<typeof UsernameInput> = (args) => {
   const [value, setValue] = useState('');
 
   return (
-  <UsernameInput
-    value={value}
-    placeholder="@username"
-    isValid={validator.isAlphanumeric(value)}
-    errorCaption="Input is incorrect"
-    popupCaption={<div style={{ width: '100px', height: '50px' }}/>}
-    frequencyCaption="Can be changed only two times"
-    onChange={(e) => setValue(e.target.value)}
-  />
+    <div
+      style={{
+        width: '326px',
+        marginTop: '150px',
+        marginLeft: '50px',
+      }}
+    >
+      <UsernameInput
+        value={value}
+        placeholder="@username"
+        isValid={value.length > 0 ? validator.isAlphanumeric(value) : true}
+        errorCaption="Input is incorrect"
+        popupCaption={
+          <div
+            style={{ width: '100px', height: '50px' }}
+          >
+            Caption
+          </div>
+        }
+        frequencyCaption="Can be changed only two times"
+        onChange={(e) => setValue(e.target.value)}
+        {...args as any}
+      />
+    </div>
   );
 };
 
 export const Username = Template.bind({});
 Username.args = {
+  disabled: false,
 };
