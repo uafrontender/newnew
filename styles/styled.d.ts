@@ -36,6 +36,8 @@ declare module 'styled-components' {
         numbers: string;
         backgroundFooter: string;
         backgroundHeader: string;
+        // Used for overlaydim
+        overlayDim: string;
       },
       text: {
         // Used for both links and titles.
