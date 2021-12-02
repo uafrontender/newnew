@@ -119,10 +119,15 @@ const SDescription = styled(Caption)`
 `;
 
 const SImageWrapper = styled.div`
+  min-width: 80px;
+  min-height: 80px;
+
   ${(props) => props.theme.media.tablet} {
     top: -77px;
     left: 50%;
     position: absolute;
     transform: translateX(-50%);
+    min-width: 120px;
+    min-height: 120px;
   }
 `;
