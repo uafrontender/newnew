@@ -1,8 +1,9 @@
+/* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
 import React, { useEffect, useRef, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { DefaultTheme, keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 
 import { TColorMode } from '../../../redux-store/slices/uiStateSlice';
@@ -20,9 +21,17 @@ const optionsIcons = {
   auto: IconAuto,
 };
 
+export type CMButtonCaptions = {
+  light: string;
+  dark: string;
+  auto: string;
+}
+
 interface ISettingsColorModeSwitch {
+  theme: DefaultTheme;
   variant: 'vertical' | 'horizontal';
   currentlySelectedMode: TColorMode;
+  buttonsCaptions: CMButtonCaptions;
   wrapperStyle?: React.CSSProperties,
   handleSetColorMode: (mode: TColorMode) => void;
 }
@@ -30,27 +39,29 @@ interface ISettingsColorModeSwitch {
 const options: Array<keyof typeof optionsIcons> = ['light', 'dark', 'auto'];
 
 const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch> = ({
+  theme,
   variant,
+  buttonsCaptions,
   currentlySelectedMode,
   wrapperStyle,
   handleSetColorMode,
 }) => {
-  const theme = useTheme();
-
-  const [activeIcon, setActiveIcon] = useState(0);
+  const containerRef = useRef<HTMLDivElement>();
+  const buttonsRef = useRef<HTMLButtonElement[]>([]);
+  const [activeIcon, setActiveIcon] = useState(
+    options.findIndex((option) => option === currentlySelectedMode),
+  );
   const [indicatorStyle, setIndicatorStyle] = useState<{
     x: number,
     y: number,
     width: number,
     height: number,
   }>({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
+    x: buttonsRef.current[activeIcon]?.getBoundingClientRect().x - containerRef.current?.getBoundingClientRect().x!!,
+    y: buttonsRef.current[activeIcon]?.getBoundingClientRect().y - containerRef.current?.getBoundingClientRect().y!!,
+    width: buttonsRef.current[activeIcon]?.getBoundingClientRect().width,
+    height: buttonsRef.current[activeIcon]?.getBoundingClientRect().height,
   });
-  const containerRef = useRef<HTMLDivElement>();
-  const buttonsRef = useRef<HTMLButtonElement[]>([]);
 
   useEffect(() => {
     setActiveIcon(buttonsRef.current.findIndex((option) => option.title === currentlySelectedMode));
@@ -70,7 +81,7 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
     };
 
     setIndicatorStyle(updatedIndicatorStyle);
-  }, [activeIcon, setIndicatorStyle]);
+  }, [activeIcon, variant, setIndicatorStyle]);
 
   return (
     <SSettingsColorModeSwitchWrapper
@@ -101,7 +112,11 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
             ...(option === currentlySelectedMode ? { cursor: 'default' } : {}),
           }}
         >
-          <div>
+          <div
+            style={{
+              ...(variant === 'horizontal' ? { flexDirection: 'row' } : {}),
+            }}
+          >
             <InlineSvg
               svg={optionsIcons[option]}
               width="20px"
@@ -112,6 +127,9 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
                     ? '#FFFFFF' : '#2C2C33')
               }
             />
+            {variant === 'horizontal' && i === activeIcon ? (
+              <span>{ buttonsCaptions[option] }</span>
+            ) : null}
           </div>
         </SColorSwitchButton>
       ))}
@@ -144,7 +162,6 @@ const SColorSwitchButton = styled.button<{
   isActive: boolean;
 }>`
   position: relative;
-  display: flex;
   overflow: hidden;
 
   padding: 8px;
@@ -171,15 +188,48 @@ const SColorSwitchButton = styled.button<{
 
   div {
     z-index: 7;
+
+    display: flex;
+
+    span {
+      display: block;
+      margin: 0px 8px;
+
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+`;
+
+const IndicatorInitialAnimation = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 `;
 
 const SMIndicator = styled(motion.div)`
   position: absolute;
+  z-index: 0;
 
   border-radius: 50px;
 
   background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  z-index: 0;
+  transition: left .2s linear, top .2s linear, width .3s linear .2s;
+
+  opacity: 0;
+  animation-duration: 0.1s;
+  animation-delay: .4s;
+  animation-fill-mode: forwards;
+  animation-name: ${IndicatorInitialAnimation};
+
+  ${({ theme }) => theme.media.laptop} {
+    opacity: 1;
+    animation: unset;
+  }
 `;

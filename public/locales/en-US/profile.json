@@ -71,6 +71,14 @@
     }
   },
   "Settings": {
-
+    "heading": "General settings",
+    "goBackBtn": "Go back",
+    "colorModeSwtich": {
+      "options": {
+        "light": "Light",
+        "dark": "Dark",
+        "auto": "Auto"
+      }
+    }
   }
 }

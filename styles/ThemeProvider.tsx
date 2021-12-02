@@ -13,7 +13,7 @@ const GlobalTheme: React.FunctionComponent = ({ children }) => {
       return mode === 'light' ? lightTheme : darkTheme;
     }
     const hours = new Date().getHours();
-    const isDayTime = hours > 6 && hours < 20;
+    const isDayTime = hours > 7 && hours < 18;
     return isDayTime ? lightTheme : darkTheme;
   };
 

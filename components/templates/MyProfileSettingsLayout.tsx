@@ -16,7 +16,9 @@ const MyProfileSettingsLayout: React.FunctionComponent = ({
 
   return (
     <SGeneral>
-      { children }
+      <SSettingsLayout>
+        { children }
+      </SSettingsLayout>
     </SGeneral>
   );
 };
@@ -42,4 +44,9 @@ const SGeneral = styled(General)`
       }
     }
   }
+`;
+
+const SSettingsLayout = styled.div`
+  margin-top: -28px;
+  margin-bottom: 24px;
 `;
