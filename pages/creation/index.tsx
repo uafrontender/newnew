@@ -137,7 +137,7 @@ const SBackLine = styled.div`
 `;
 
 const SInlineSVG = styled(InlineSVG)`
-  transition: fill ease 0.5s;
+  transition: fill ease 0.2s;
   margin-right: 8px;
 
   ${(props) => props.theme.media.tablet} {
@@ -146,7 +146,7 @@ const SInlineSVG = styled(InlineSVG)`
 `;
 
 const SText = styled(Text)`
-  transition: color ease 0.5s;
+  transition: color ease 0.2s;
 
   ${(props) => props.theme.media.tablet} {
     color: ${(props) => props.theme.colorsThemed.text.secondary};

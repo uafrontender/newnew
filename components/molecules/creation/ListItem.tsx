@@ -80,7 +80,9 @@ const SWrapper = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     padding: 44px 24px 24px 24px;
+  }
 
+  ${(props) => props.theme.media.laptop} {
     :hover {
       transform: translateY(-12px);
     }
