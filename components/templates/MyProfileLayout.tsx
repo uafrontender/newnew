@@ -236,8 +236,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         />
         {/* Edit Profile modal menu */}
         <Modal
-          transitionSpeed={isMobileOrTablet ? 0.5 : 0}
           show={isEditProfileMenuOpen}
+          overlayDim
+          transitionSpeed={isMobileOrTablet ? 0.5 : 0}
           onClose={handleClosePreventDiscarding}
         >
           {isEditProfileMenuOpen
@@ -314,6 +315,7 @@ const SUsernameButtonText = styled(Text)`
 
 const SBioText = styled(Text)`
   text-align: center;
+  overflow-wrap: break-word;
 
   padding-left: 16px;
   padding-right: 16px;
