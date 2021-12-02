@@ -28,8 +28,8 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
 
   return (
     <SkeletonTheme
-      baseColor={theme.colorsThemed.grayscale.background2}
-      highlightColor={theme.colorsThemed.grayscale.background3}
+      baseColor={theme.colorsThemed.background.secondary}
+      highlightColor={theme.colorsThemed.background.tertiary}
     >
       <SAuthLayout>
         {/* <STestElement

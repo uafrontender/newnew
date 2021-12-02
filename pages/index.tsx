@@ -754,13 +754,11 @@ const Home: NextPage = () => {
   );
 };
 
-(Home as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return (
-    <HomeLayout>
-      { page }
-    </HomeLayout>
-  );
-};
+(Home as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <HomeLayout>
+    {page}
+  </HomeLayout>
+);
 
 export default Home;
 

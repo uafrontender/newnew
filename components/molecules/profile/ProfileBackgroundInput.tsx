@@ -187,7 +187,7 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
   height: 160px;
   margin-bottom: 62px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   &:before {
     position: absolute;
@@ -197,7 +197,7 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
     width: 30px;
     height: 30px;
     border-bottom-right-radius: 70%;
-    box-shadow: 10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.grayscale.background1};
+    box-shadow: 10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.primary};
 
     background: transparent;
     z-index: 10;
@@ -211,7 +211,7 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
     width: 30px;
     height: 30px;
     border-bottom-left-radius: 70%;
-    box-shadow: -10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.grayscale.background1};
+    box-shadow: -10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.primary};
 
     background: transparent;
     z-index: 10;

@@ -70,7 +70,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   -webkit-backdrop-filter: blur(16px);
   transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
   // To avoid overlapping dim color with this bg color
-  background-color: ${({ theme, overlayDim }) => (overlayDim ? 'transparent' : theme.colorsThemed.grayscale.backgroundT)};
+  background-color: ${({ theme, overlayDim }) => (overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT)};
 
   ::before {
     top: 0;
@@ -86,7 +86,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
     -webkit-backdrop-filter: blur(16px);
 
     /* Some screens have dimmed overlay */
-    background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.grayscale.overlayDim : null)};
+    background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.background.overlayDim : null)};
   }
 `;
 
