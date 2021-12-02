@@ -37,7 +37,7 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background: ${({ theme }) => theme.colorsThemed.grayscale.background1};
   }
-  
+
   body.blurred {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);

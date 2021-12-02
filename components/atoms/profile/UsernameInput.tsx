@@ -1,5 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../InlineSVG';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
@@ -72,11 +73,40 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
           </AnimatedPresence>
         ) : null
       }
-      <SPopup
-        isVisible={isPopupVisible}
-      >
-        {popupCaption}
-      </SPopup>
+      <AnimatePresence>
+        {isPopupVisible ? (
+          <SPopup
+            initial={{
+              y: 30,
+              opacity: 0,
+            }}
+            animate={{
+              y: 0,
+              opacity: 1,
+              transition: {
+                opacity: {
+                  duration: 0.1,
+                },
+                y: {
+                  type: 'spring',
+                  velocity: -300,
+                  stiffness: 100,
+                  delay: 0.1,
+                },
+              },
+            }}
+            exit={{
+              y: 30,
+              opacity: 0,
+              transition: {
+                duration: 0.1,
+              },
+            }}
+          >
+            {popupCaption}
+          </SPopup>
+        ) : null}
+      </AnimatePresence>
       <SCaptionDiv
         disabled={disabled ?? false}
       >
@@ -193,9 +223,7 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   }
 `;
 
-const SPopup = styled.div<{
-  isVisible: boolean;
-}>`
+const SPopup = styled(motion.div)`
   position: absolute;
   right: 0;
   bottom: 100%;
@@ -204,9 +232,6 @@ const SPopup = styled.div<{
   background-color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  visibility: ${({ isVisible }) => (isVisible ? 'visible' : 'hidden')};
-  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
 
   transition: .2s linear;
   z-index: 6;
@@ -223,7 +248,6 @@ const SPopup = styled.div<{
     display: inline-block;
 
     background-color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-    /* clip-path: polygon(0 0, 100% 0, 50% 100%); */
     clip-path: path('M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z');
   }
 `;
