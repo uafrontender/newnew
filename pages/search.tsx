@@ -1,7 +1,9 @@
 import React, { useMemo, useEffect } from 'react';
+import Head from 'next/head';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { NextPage, NextPageContext } from 'next';
 
@@ -20,6 +22,7 @@ import testUser3 from '../public/images/mock/test_user_3.jpg';
 import testUser4 from '../public/images/mock/test_user_4.jpg';
 
 const Search: NextPage = () => {
+  const { t } = useTranslation('home');
   const router = useRouter();
   const category = router.query.category?.toString() ?? '';
 
@@ -545,6 +548,11 @@ const Search: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <title>
+          {t('search.meta.title')}
+        </title>
+      </Head>
       <TopSection collection={collection} />
       <SWrapper name={category}>
         <TitleBlock />

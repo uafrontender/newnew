@@ -29,5 +29,15 @@
   "sort-title-option-time-oldest": "Oldest",
   "sort-title-option-numbers-of-bids": "Numbers of bids",
   "sort-title-option-numbers-of-bids-fewest": "Fewest",
-  "sort-title-option-numbers-of-bids-most-first": "Most first"
+  "sort-title-option-numbers-of-bids-most-first": "Most first",
+  "home": {
+    "meta": {
+      "title": "Home"
+    }
+  },
+  "search": {
+    "meta": {
+      "title": "See more"
+    }
+  }
 }

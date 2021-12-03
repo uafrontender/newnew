@@ -3,9 +3,9 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 
-import { NextPageWithLayout } from '../../_app';
+import { Tab } from '../../../components/molecules/Tabs';
 import ProfileLayout from '../../../components/templates/ProfileLayout';
-import { Tab } from '../../../components/molecules/profile/ProfileTabs';
+import { NextPageWithLayout } from '../../_app';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;

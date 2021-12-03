@@ -7,14 +7,15 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../redux-store/store';
 
-import General from './General';
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
+import General from './General';
+import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
+import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
-import ProfileTabs, { Tab } from '../molecules/profile/ProfileTabs';
 
 // Icons
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
@@ -125,7 +126,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     router.events.on('hashChangeComplete', verify);
 
     return () => router.events.off('hashChangeComplete', verify);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -194,7 +195,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 paddingLeft: '16px',
                 paddingRight: '16px',
               }}
-              onClick={() => {}}
+              onClick={() => {
+              }}
             >
               <SUsernameButtonText>
                 @
@@ -212,7 +214,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               style={{
                 padding: '8px',
               }}
-              onClick={() => {}}
+              onClick={() => {
+              }}
             >
               <InlineSvg
                 svg={ShareIconFilled}
@@ -226,7 +229,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             <SBioText
               variant={3}
             >
-              { user.userData?.bio }
+              {user.userData?.bio}
             </SBioText>
           ) : null}
         </div>
@@ -255,7 +258,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             ) : null}
         </Modal>
       </SMyProfileLayout>
-      { children }
+      {children}
     </SGeneral>
   );
 };
@@ -274,6 +277,7 @@ const SGeneral = styled(General)`
       div:first-child {
         padding-left: 0;
         padding-right: 0;
+
         div:first-child {
           margin-left: 0;
           margin-right: 0;
@@ -302,7 +306,10 @@ const SShareDiv = styled.div`
 
 const SShareButton = styled(Button)`
   &:focus:enabled {
-    background: ${({ theme, view }) => theme.colorsThemed.button.background[view!!]};
+    background: ${({
+    theme,
+    view,
+  }) => theme.colorsThemed.button.background[view!!]};
   }
 `;
 
