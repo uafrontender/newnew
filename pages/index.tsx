@@ -1,21 +1,15 @@
-import React, { ReactElement, useCallback, useMemo } from 'react';
-import { newnewapi } from 'newnew-api';
+import React, { ReactElement, useMemo } from 'react';
+import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { NextPage, NextPageContext } from 'next';
 
-import Button from '../components/atoms/Button';
 import HomeLayout from '../components/templates/HomeLayout';
 import TopSection from '../components/organisms/home/TopSection';
 import HeroSection from '../components/organisms/home/HeroSection';
 import CardsSection from '../components/organisms/home/CardsSection';
 
-import dateToTimestamp from '../utils/dateToTimestamp';
-import { setColorMode } from '../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import {
-  setUserLoggedIn, setUserData, setCredentialsData,
-} from '../redux-store/slices/userStateSlice';
+import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 
@@ -33,63 +27,7 @@ import testBGCreator3 from '../public/images/mock/test_bg_creator_3.jpg';
 const Home: NextPage = () => {
   const { t } = useTranslation('home');
   const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
-  const { colorMode } = useAppSelector((state) => state.ui);
 
-  const handleToggleDarkMode = useCallback(() => {
-    dispatch(
-      setColorMode(colorMode === 'dark' ? 'light' : 'dark'),
-    );
-  }, [dispatch, colorMode]);
-  const handleToggleUserLoggedIn = useCallback(() => {
-    const mockResponse = new newnewapi.SignInResponse({
-      me: {
-        username: 'johndoe12345',
-        displayName: 'John',
-        email: 'johndoe@test.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
-        coverUrl: '/images/mock/profile-bg.png',
-        userUuid: '12345',
-        options: {
-          isCreator: false,
-        },
-      },
-      credential: {
-        accessToken: '12345',
-        refreshToken: '12345',
-        expiresAt: dateToTimestamp(new Date()),
-      },
-      status: 1,
-    });
-
-    if (!user.loggedIn) {
-      dispatch(setUserData(mockResponse.me));
-      dispatch(setCredentialsData({
-        accessToken: mockResponse.credential?.accessToken,
-        refreshToken: mockResponse.credential?.refreshToken,
-        expiresAt: mockResponse.credential?.expiresAt?.seconds,
-      }));
-    } else {
-      dispatch(setUserData({
-        username: '',
-        displayName: '',
-        email: '',
-        avatarUrl: '',
-        coverUrl: '',
-        id: null,
-        options: {
-          isCreator: false,
-        },
-      }));
-      dispatch(setCredentialsData({
-        accessToken: '',
-        refreshToken: '',
-        expiresAt: '',
-      }));
-    }
-
-    dispatch(setUserLoggedIn(!user.loggedIn));
-  }, [dispatch, user.loggedIn]);
   const collection = useMemo(() => [
     {
       id: 'randomid1',
@@ -701,6 +639,11 @@ const Home: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <title>
+          {t('home.meta.title')}
+        </title>
+      </Head>
       {!user.loggedIn && <HeroSection />}
       <TopSection collection={collection} />
       {user.loggedIn && (
@@ -739,17 +682,6 @@ const Home: NextPage = () => {
         category="bellapoarch"
         collection={collectionCreator}
       />
-      <Button
-        id="dark-mode-button"
-        onClick={handleToggleDarkMode}
-      >
-        Toggle dark mode
-      </Button>
-      <Button
-        onClick={handleToggleUserLoggedIn}
-      >
-        Toggle user loggedIn
-      </Button>
     </>
   );
 };

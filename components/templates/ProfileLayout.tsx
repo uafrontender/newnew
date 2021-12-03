@@ -8,14 +8,15 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../redux-store/store';
 
-import General from './General';
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
+import General from './General';
+import { Tab } from '../molecules/Tabs';
 import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
+import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
-import ProfileTabs, { Tab } from '../molecules/profile/ProfileTabs';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
@@ -67,7 +68,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <SFavoritesButton
           view="transparent"
           iconOnly
-          onClick={() => {}}
+          onClick={() => {
+          }}
         >
           <InlineSvg
             svg={FavouritesIconFilled}
@@ -80,7 +82,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         <SMoreButton
           view="transparent"
           iconOnly
-          onClick={() => {}}
+          onClick={() => {
+          }}
         >
           <InlineSvg
             svg={MoreIconFilled}
@@ -116,7 +119,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 paddingLeft: '16px',
                 paddingRight: '16px',
               }}
-              onClick={() => {}}
+              onClick={() => {
+              }}
             >
               <SUsernameButtonText>
                 @
@@ -132,7 +136,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               style={{
                 padding: '8px',
               }}
-              onClick={() => {}}
+              onClick={() => {
+              }}
             >
               <InlineSvg
                 svg={ShareIconFilled}
@@ -152,7 +157,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 }}
                 onClick={handleClickSendMessage}
               >
-                { t('ProfileLayout.buttons.sendMessage') }
+                {t('ProfileLayout.buttons.sendMessage')}
               </Button>
             ) : null}
           {user.bio ? (
@@ -169,9 +174,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               pageType="othersProfile"
               tabs={tabs}
             />
-          ) : null }
+          ) : null}
       </SProfileLayout>
-      { children }
+      {children}
     </SGeneral>
   );
 };
@@ -190,6 +195,7 @@ const SGeneral = styled(General)`
       div:first-child {
         padding-left: 0;
         padding-right: 0;
+
         div:first-child {
           margin-left: 0;
           margin-right: 0;

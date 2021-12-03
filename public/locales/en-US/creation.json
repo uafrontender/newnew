@@ -7,5 +7,36 @@
   "first-step-multiple-choice-title": "Multiple Choice",
   "first-step-multiple-choice-sub-title": "The audience pay to vote on options presented by you.",
   "first-step-crowdfunding-title": "Crowdfunding",
-  "first-step-crowdfunding-sub-title": "The audience fund your single goal together."
+  "first-step-crowdfunding-sub-title": "The audience fund your single goal together.",
+  "second-step-auction-title": "Auction",
+  "second-step-multiple-choice-title": "Multiple Choice",
+  "second-step-crowdfunding-title": "Crowdfunding",
+  "tabs": {
+    "auction": "Auction",
+    "multiple-choice": "Multiple Choice",
+    "crowdfunding": "Crowdfunding"
+  },
+  "firstStep": {
+    "meta": {
+      "title": "Creation"
+    }
+  },
+  "secondStep": {
+    "meta": {
+      "title-auction": "Creation | Auction",
+      "title-multiple-choice": "Creation | Multiple Choice",
+      "title-crowdfunding": "Creation | Crowdfunding"
+    },
+    "input": {
+      "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
+    },
+    "fileUpload": {
+      "title": "Upload file",
+      "description": "Max size of the video 100 MB",
+      "button": "Select file"
+    },
+    "button": {
+      "submit": "Publish"
+    }
+  }
 }
