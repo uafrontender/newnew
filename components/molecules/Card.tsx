@@ -83,7 +83,6 @@ export const Card: React.FC<ICard> = (props) => {
   const router = useRouter();
   const {
     resizeMode,
-    colorMode,
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -107,7 +106,7 @@ export const Card: React.FC<ICard> = (props) => {
           {!isMobile && (
             <SNumberImageHolder index={index}>
               <InlineSVG
-                svg={NUMBER_ICONS[colorMode][index]}
+                svg={NUMBER_ICONS[theme.name][index]}
                 width="100%"
                 height="100%"
               />
@@ -270,14 +269,14 @@ const SWrapper = styled.div<ISWrapper>`
   ${(props) => props.theme.media.laptopL} {
     width: 25vw;
     height: unset;
-    
+
     :hover {
       #showMore {
         opacity: 1;
       }
     }
   }
-  
+
   ${(props) => props.theme.media.desktop} {
     width: 20vw;
   }
