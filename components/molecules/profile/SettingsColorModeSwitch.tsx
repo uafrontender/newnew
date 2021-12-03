@@ -30,6 +30,7 @@ export type CMButtonCaptions = {
 interface ISettingsColorModeSwitch {
   theme: DefaultTheme;
   variant: 'vertical' | 'horizontal';
+  isMobile: boolean;
   currentlySelectedMode: TColorMode;
   buttonsCaptions: CMButtonCaptions;
   wrapperStyle?: React.CSSProperties,
@@ -41,6 +42,7 @@ const options: Array<keyof typeof optionsIcons> = ['light', 'dark', 'auto'];
 const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch> = ({
   theme,
   variant,
+  isMobile,
   buttonsCaptions,
   currentlySelectedMode,
   wrapperStyle,
@@ -127,7 +129,7 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
                     ? '#FFFFFF' : '#2C2C33')
               }
             />
-            {variant === 'horizontal' && i === activeIcon ? (
+            {variant === 'horizontal' && i === activeIcon && !isMobile ? (
               <span>{ buttonsCaptions[option] }</span>
             ) : null}
           </div>

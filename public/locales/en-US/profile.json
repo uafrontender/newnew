@@ -73,11 +73,28 @@
   "Settings": {
     "heading": "General settings",
     "goBackBtn": "Go back",
-    "colorModeSwtich": {
+    "colorModeSwitch": {
       "options": {
         "light": "Light",
         "dark": "Dark",
         "auto": "Auto"
+      }
+    },
+    "sections": {
+      "Wallet": {
+
+      },
+      "PersonalInformation": {
+        "title": "Personal information"
+      },
+      "Notifications": {
+        "title": "Notifications"
+      },
+      "Transactions": {
+        "title": "Transactions"
+      },
+      "Privacy": {
+        "title": "Privacy"
       }
     }
   }
