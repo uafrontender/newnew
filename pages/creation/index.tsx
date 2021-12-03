@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
@@ -46,6 +47,11 @@ export const CreationFirstStep = () => {
 
   return (
     <SWrapper>
+      <Head>
+        <title>
+          {t('firstStep.meta.title')}
+        </title>
+      </Head>
       <SBackLine onClick={handleGoBack}>
         <SInlineSVG
           svg={isDesktop ? arrowLeftIcon : chevronIcon}

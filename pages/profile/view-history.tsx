@@ -2,9 +2,9 @@ import React, { ReactElement } from 'react';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import { NextPageWithLayout } from '../_app';
+import { Tab } from '../../components/molecules/Tabs';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import { Tab } from '../../components/molecules/profile/ProfileTabs';
+import { NextPageWithLayout } from '../_app';
 
 // Temp
 const tabs: Tab[] = [
