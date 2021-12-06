@@ -32,7 +32,7 @@
       "coverImage": {
         "changeCoverImage": "Change cover image"
       },
-      "displayName": {
+      "nickname": {
         "placeholder": "Nickname",
         "errors": {
           "generic": "Please check input",

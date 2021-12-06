@@ -5,12 +5,12 @@ import InlineSvg from '../InlineSVG';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AnimatedPresence from '../AnimatedPresence';
 
-type TDisplayNameInput = React.ComponentPropsWithoutRef<'input'> & {
+type TNicknameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   errorCaption: string;
 }
 
-const DisplaynameInput: React.FunctionComponent<TDisplayNameInput> = ({
+const NicknameInput: React.FunctionComponent<TNicknameInput> = ({
   value,
   isValid,
   errorCaption,
@@ -28,7 +28,7 @@ const DisplaynameInput: React.FunctionComponent<TDisplayNameInput> = ({
 
   return (
     <SWrapper>
-      <SDisplaynameInput
+      <SNicknameInput
         value={value}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
@@ -67,11 +67,11 @@ const DisplaynameInput: React.FunctionComponent<TDisplayNameInput> = ({
   );
 };
 
-DisplaynameInput.defaultProps = {
+NicknameInput.defaultProps = {
   isValid: undefined,
 };
 
-export default DisplaynameInput;
+export default NicknameInput;
 
 const SWrapper = styled.div`
   display: flex;
@@ -79,11 +79,11 @@ const SWrapper = styled.div`
   margin-bottom: 16px;
 `;
 
-interface ISDisplaynameInput {
+interface ISNicknameInput {
   errorBordersShown?: boolean
 }
 
-const SDisplaynameInput = styled.input<ISDisplaynameInput>`
+const SNicknameInput = styled.input<ISNicknameInput>`
   display: block;
 
   font-weight: 500;

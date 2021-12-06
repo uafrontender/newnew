@@ -19,7 +19,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       <h1>
         I will be
         {' '}
-        {user.displayName}
+        {user.nickname}
         &apos;s index page
       </h1>
       <div

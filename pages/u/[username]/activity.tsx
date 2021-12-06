@@ -19,7 +19,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       <h1>
         I will be
         {' '}
-        {user.displayName}
+        {user.nickname}
         &apos;s activity page
       </h1>
       <div
