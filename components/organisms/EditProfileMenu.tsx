@@ -146,7 +146,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (!res.data?.status) throw new Error('An error occured');
 
-      if (kind === newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME) {
+      if (kind === newnewapi.ValidateTextRequest.Kind.NICKNAME) {
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -217,7 +217,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
     if (key === 'nickname') {
       validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME,
+        newnewapi.ValidateTextRequest.Kind.NICKNAME,
         value,
       );
     } else if (key === 'username' && value !== user.userData?.username) {
