@@ -5,7 +5,7 @@
 import React, {
   useEffect, useState,
 } from 'react';
-import { OnChangeDateCallback } from 'react-calendar';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import validator from 'validator';
 
@@ -16,14 +16,18 @@ import SettingsEmailInput from '../../molecules/profile/SettingsEmailInput';
 type TSettingsPersonalInformationSection = {
   currentEmail?: string;
   currentDate?: Date;
+  // Layout
+  isMobile: boolean;
   // Allows handling visuals for active/inactive state
   handleSetActive: () => void;
 }
 const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPersonalInformationSection> = ({
   currentEmail,
   currentDate,
+  isMobile,
   handleSetActive,
 }) => {
+  const { t } = useTranslation('profile');
   const [wasModifed, setWasModified] = useState(false);
   const [emailInEdit, setEmailInEdit] = useState(currentEmail ?? '');
   const [dateInEdit, setDateInEdit] = useState(currentDate ?? undefined);
@@ -31,7 +35,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmailInEdit(e.target.value);
   };
-  const handleDateInput: OnChangeDateCallback = (value: Date) => {
+  const handleDateInput = (value: Date) => {
     setDateInEdit(value);
   };
 
@@ -58,24 +62,36 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         <SettingsEmailInput
           value={emailInEdit}
           isValid={emailInEdit.length > 0 ? validator.isEmail(emailInEdit) : true}
-          errorCaption="temp"
+          labelCaption={t('Settings.sections.PersonalInformation.emailInput.label')}
+          placeholder={t('Settings.sections.PersonalInformation.emailInput.placeholder')}
+          // Temp
+          errorCaption={t('Settings.sections.PersonalInformation.emailInput.errors.invalidEmail')}
           onChange={handleEmailInput}
           onFocus={() => handleSetActive()}
         />
         <SettingsBirthDateInput
           value={dateInEdit}
+          disabled={false}
+          labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
+          bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly')}
           onChange={handleDateInput}
         />
       </SInputsWrapper>
       {wasModifed ? (
         <SControlsWrapper>
-          <Button>
-            Save
+          <Button
+            view="primaryGrad"
+          >
+            {t('Settings.sections.PersonalInformation.saveBtn')}
           </Button>
           <Button
+            view="secondary"
+            style={{
+              ...(isMobile ? { order: -1 } : {}),
+            }}
             onClick={() => handleResetModifications()}
           >
-            Cancel
+            {t('Settings.sections.PersonalInformation.cancelBtn')}
           </Button>
         </SControlsWrapper>
       ) : null}
@@ -96,12 +112,21 @@ const SWrapper = styled.div`
 
 const SInputsWrapper = styled.div`
   display: flex;
+  flex-wrap: wrap;
+
+  gap: 16px;
 
   padding-bottom: 24px;
 `;
 
 const SControlsWrapper = styled.div`
   display: flex;
+  justify-content: space-between;
 
   padding-bottom: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    justify-content: flex-start;
+    gap: 24px;
+  }
 `;

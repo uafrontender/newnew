@@ -8,12 +8,14 @@ import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 type TSettingsEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
+  labelCaption: string;
   errorCaption: string;
 }
 
 const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
   value,
   isValid,
+  labelCaption,
   errorCaption,
   onChange,
   onFocus,
@@ -22,8 +24,15 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
   const [errorBordersShown, setErrorBordersShown] = useState(false);
 
   return (
-    <div>
+    <SContainer>
+      <SLabel
+        htmlFor="settings_email_input"
+      >
+        { labelCaption }
+      </SLabel>
       <SSettingsEmailInput
+        id="settings_email_input"
+        type="email"
         value={value}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
@@ -57,7 +66,7 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
           </AnimatedPresence>
         ) : null
       }
-    </div>
+    </SContainer>
   );
 };
 
@@ -67,6 +76,29 @@ SettingsEmailInput.defaultProps = {
 
 export default SettingsEmailInput;
 
+const SContainer = styled.div`
+  width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 344px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
+    width: 352px;
+  }
+`;
+
+const SLabel = styled.label`
+  display: block;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  margin-bottom: 6px;
+`;
+
 interface ISSettingsEmailInput {
   errorBordersShown?: boolean
 }
@@ -75,6 +107,7 @@ const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
   display: block;
 
   height: 44px;
+  width: 100%;
 
   font-weight: 500;
   font-size: 14px;
@@ -93,7 +126,7 @@ const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   &::placeholder {
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};

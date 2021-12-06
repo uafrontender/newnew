@@ -89,7 +89,26 @@
         }
       },
       "PersonalInformation": {
-        "title": "Personal information"
+        "title": "Personal information",
+        "emailInput": {
+          "label": "Email Address",
+          "placeholder": "email@email.com",
+          "errors": {
+            "invalidEmail": "Please enter a valid email",
+            "emailTaken": "Email taken"
+          }
+        },
+        "birthDateInput": {
+          "label": "Date of birth",
+          "captions": {
+            "twoTimesOnly": "Birthdate can be changed 2 times only.",
+            "cannotChange": "You can’t change birthdate."
+          },
+          "saveBtn": "Save",
+          "cancelBtn": "Cancel"
+        },
+        "saveBtn": "Save changes",
+        "cancelBtn": "Cancel"
       },
       "Notifications": {
         "title": "Notifications"

@@ -92,6 +92,7 @@ const MyProfileSettginsIndex: NextPage = () => {
         currentEmail={userData?.email ?? ''}
         currentDate={undefined}
         // currentDate={userData?.birthDate ?? ''}
+        isMobile={isMobile}
         handleSetActive={() => {}}
       />,
     },
