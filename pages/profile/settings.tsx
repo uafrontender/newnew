@@ -17,6 +17,7 @@ import SettingsColorModeSwitch from '../../components/molecules/profile/Settings
 import SettingsAccordion, { AccordionSection } from '../../components/organisms/settings/SettingsAccordion';
 import SettingsPersonalInformationSection from '../../components/organisms/settings/SettingsPersonalInformationSection';
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
+import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 
 const MyProfileSettginsIndex: NextPage = () => {
   const theme = useTheme();
@@ -162,8 +163,9 @@ const MyProfileSettginsIndex: NextPage = () => {
             } : {}),
           }}
         />
-        <div
-          style={{ height: '250px', backgroundColor: theme.colorsThemed.background.secondary }}
+        <SettingsWallet
+          // Temp
+          balance={0}
         />
         <SettingsAccordion
           sections={accordionSections}

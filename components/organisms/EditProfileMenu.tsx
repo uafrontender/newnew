@@ -307,7 +307,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           coverUrlInEdit,
           croppedAreaCoverImage!!,
           0,
-          'coverImage.png',
+          'coverImage.jpeg',
         );
 
         // API request would be here
@@ -453,6 +453,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         avatarUrlInEdit,
         croppedAreaProfileImage!!,
         0,
+        'avatarImage.jpeg',
       );
 
       // Get upload and public URLs

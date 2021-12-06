@@ -21,7 +21,7 @@ function getRadianAngle(degreeValue: number) {
  */
 export default async function getCroppedImg(
   imageSrc: string, pixelCrop: Area, rotation = 0,
-  filename = 'avatarImage.png',
+  filename = 'avatarImage.jpeg',
 ): Promise<File> {
   const image: HTMLImageElement = await createImage(imageSrc) as HTMLImageElement;
   const canvas = document.createElement('canvas');
@@ -59,14 +59,18 @@ export default async function getCroppedImg(
     Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y),
   );
 
+  // console.log(canvas.toDataURL('image/jpeg'));
+
   // Return as a file
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
       if (!blob) throw new Error('Error saving image as file');
       const file = new File([blob], filename, {
-        type: 'image/png',
+        type: 'image/jpeg',
       });
       resolve(file);
-    });
+    },
+    'image/jpeg',
+    1);
   });
 }

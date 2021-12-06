@@ -82,7 +82,11 @@
     },
     "sections": {
       "Wallet": {
-
+        "empty": {
+          "balance": "Balance",
+          "caption": "Use your NewNew wallet and make your bets with no fees.",
+          "topUpBtn": "Top up my wallet"
+        }
       },
       "PersonalInformation": {
         "title": "Personal information"
