@@ -21,7 +21,7 @@ import InlineSvg from '../atoms/InlineSVG';
 import GoBackButton from '../molecules/GoBackButton';
 import BioTextarea from '../atoms/profile/BioTextarea';
 import UsernameInput from '../atoms/profile/UsernameInput';
-import DisplaynameInput from '../atoms/profile/DisplayNameInput';
+import NicknameInput from '../atoms/profile/NicknameInput';
 import ProfileImageInput from '../molecules/profile/ProfileImageInput';
 import ProfileBackgroundInput from '../molecules/profile/ProfileBackgroundInput';
 
@@ -53,12 +53,12 @@ interface IEditProfileMenu {
 
 type ModalMenuUserData = {
   username: string;
-  displayName: string;
+  nickname: string;
   bio: string;
 }
 
 type TFormErrors = {
-  displaynameError?: string;
+  nicknameError?: string;
   usernameError?: string;
   bioError?: string;
 };
@@ -116,14 +116,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Textual data
   const [dataInEdit, setDataInEdit] = useState<ModalMenuUserData>({
-    displayName: user.userData?.displayName ?? '',
+    nickname: user.userData?.nickname ?? '',
     username: user.userData?.username ?? '',
     bio: user.userData?.bio ?? '',
   });
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [isDataValid, setIsDataValid] = useState(false);
   const [formErrors, setFormErrors] = useState<TFormErrors>({
-    displaynameError: '',
+    nicknameError: '',
     usernameError: '',
     bioError: '',
   });
@@ -146,17 +146,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (!res.data?.status) throw new Error('An error occured');
 
-      if (kind === newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME) {
+      if (kind === newnewapi.ValidateTextRequest.Kind.NICKNAME) {
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
-            errorsWorking.displaynameError = errorSwitch(res.data?.status!!);
+            errorsWorking.nicknameError = errorSwitch(res.data?.status!!);
             return errorsWorking;
           });
         } else {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
-            errorsWorking.displaynameError = '';
+            errorsWorking.nicknameError = '';
             return errorsWorking;
           });
         }
@@ -215,9 +215,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     workingData[key] = value;
     setDataInEdit({ ...workingData });
 
-    if (key === 'displayName') {
+    if (key === 'nickname') {
       validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.DISPLAY_NAME,
+        newnewapi.ValidateTextRequest.Kind.NICKNAME,
         value,
       );
     } else if (key === 'username' && value !== user.userData?.username) {
@@ -307,7 +307,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           coverUrlInEdit,
           croppedAreaCoverImage!!,
           0,
-          'coverImage.png',
+          'coverImage.jpeg',
         );
 
         // API request would be here
@@ -339,7 +339,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       }
 
       const payload = new newnewapi.UpdateMeRequest({
-        displayName: dataInEdit.displayName,
+        nickname: dataInEdit.nickname,
         bio: dataInEdit.bio,
         // Send username only if it was updated
         ...(dataInEdit.username !== user.userData?.username
@@ -359,7 +359,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       dispatch(setUserData({
         username: res.data.me?.username,
-        displayName: res.data.me?.displayName,
+        nickname: res.data.me?.nickname,
         bio: res.data.me?.bio,
         coverUrl: res.data.me?.coverUrl,
       }));
@@ -453,6 +453,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         avatarUrlInEdit,
         croppedAreaProfileImage!!,
         0,
+        'avatarImage.jpeg',
       );
 
       // Get upload and public URLs
@@ -514,7 +515,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   useEffect(() => {
     // Temp
     const initialData: ModalMenuUserData = {
-      displayName: user.userData?.displayName ?? '',
+      nickname: user.userData?.nickname ?? '',
       username: user.userData?.username ?? '',
       bio: user.userData?.bio ?? '',
     };
@@ -532,20 +533,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       && dataInEdit.username.length <= 15
       && validator.isAlphanumeric(dataInEdit.username)
       && validator.isLowercase(dataInEdit.username);
-    const isDisplaynameValid = dataInEdit && dataInEdit!!.displayName!!.length > 0;
+    const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
 
-    if (!isDisplaynameValid || !isUsernameValid) {
+    if (!isNicknameValid || !isUsernameValid) {
       setFormErrors((errors) => {
         const errorsWorking = { ...errors };
         errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-        errorsWorking.displaynameError = isDisplaynameValid ? '' : 'generic';
+        errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
         return errorsWorking;
       });
       setIsDataValid(false);
     } else {
       setFormErrors({
         usernameError: '',
-        displaynameError: '',
+        nicknameError: '',
       });
       setIsDataValid(true);
     }
@@ -560,13 +561,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         && dataInEdit.username.length <= 15
         && validator.isAlphanumeric(dataInEdit.username)
         && validator.isLowercase(dataInEdit.username);
-      const isDisplaynameValid = dataInEdit && dataInEdit!!.displayName!!.length > 0;
+      const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
 
-      if (!isDisplaynameValid || !isUsernameValid) {
+      if (!isNicknameValid || !isUsernameValid) {
         setFormErrors((errors) => {
           const errorsWorking = { ...errors };
           errorsWorking.usernameError = isUsernameValid ? '' : 'generic';
-          errorsWorking.displaynameError = isDisplaynameValid ? '' : 'generic';
+          errorsWorking.nicknameError = isNicknameValid ? '' : 'generic';
           return errorsWorking;
         });
         setIsDataValid(false);
@@ -631,14 +632,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 />
               </SImageInputsWrapper>
               <STextInputsWrapper>
-                <DisplaynameInput
+                <NicknameInput
                   type="text"
-                  value={dataInEdit.displayName as string}
+                  value={dataInEdit.nickname as string}
                   disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.displayName.placeholder')}
-                  errorCaption={t(`EditProfileMenu.inputs.displayName.errors.${formErrors.displaynameError}`)}
-                  isValid={!formErrors.displaynameError}
-                  onChange={(e) => handleUpdateDataInEdit('displayName', e.target.value)}
+                  placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
+                  errorCaption={t(`EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`)}
+                  isValid={!formErrors.nicknameError}
+                  onChange={(e) => handleUpdateDataInEdit('nickname', e.target.value)}
                 />
                 <UsernameInput
                   type="text"
