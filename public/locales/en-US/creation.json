@@ -37,6 +37,13 @@
     },
     "button": {
       "submit": "Publish"
+    },
+    "field": {
+      "minimalBid": "Minimum bid",
+      "min-backers": "Minimum backers",
+      "expire": "Expire",
+      "post": "Post",
+      "comments": "Commenting turned on"
     }
   }
 }
