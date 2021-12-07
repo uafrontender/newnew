@@ -6,6 +6,7 @@ import { newnewapi } from 'newnew-api';
 import { Tab } from '../../../components/molecules/Tabs';
 import ProfileLayout from '../../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../../_app';
+import { getUserByUsername } from '../../../api/endpoints/user';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -19,7 +20,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       <h1>
         I will be
         {' '}
-        {user.displayName}
+        {user.nickname}
         &apos;s index page
       </h1>
       <div
@@ -60,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ['common', 'profile'],
   );
 
-  if (!username) {
+  if (!username || Array.isArray(username)) {
     return {
       redirect: {
         destination: '/',
@@ -69,10 +70,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // Temp URL
-  const userDataBuffer = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/user/get_user_by_username?username=${username}`).then((res) => res.arrayBuffer());
+  const getUserRequestPayload = new newnewapi.GetUserRequest({
+    username,
+  });
 
-  if (!userDataBuffer) {
+  const res = await getUserByUsername(getUserRequestPayload);
+
+  if (!res.data || res.error) {
     return {
       redirect: {
         destination: '/',
@@ -80,12 +84,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-
-  const user = newnewapi.User.decode(new Uint8Array(userDataBuffer));
 
   return {
     props: {
-      user: user.toJSON(),
+      user: res.data.toJSON(),
       ...translationContext,
     },
   };

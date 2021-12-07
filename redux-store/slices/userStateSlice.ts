@@ -4,7 +4,7 @@ import { newnewapi } from 'newnew-api';
 
 import { DEFAULT_CURRENCY } from '../../constants/general';
 
-export type TUserData = Omit<newnewapi.Me, 'toJSON' | '_displayname' | '_email'>;
+export type TUserData = Omit<newnewapi.Me, 'toJSON' | '_nickname' | '_email'>;
 export type TCredentialsData = Omit<newnewapi.Credential, 'toJSON' | 'expiresAt'> & {
   expiresAt: string;
 };

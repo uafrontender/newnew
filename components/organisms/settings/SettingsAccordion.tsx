@@ -41,6 +41,7 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
       temp[idx] = !temp[idx];
       return temp;
     });
+    setActiveSection(-1);
   };
 
   useEffect(() => {
