@@ -125,7 +125,26 @@
         }
       },
       "Privacy": {
-        "title": "Privacy"
+        "title": "Privacy",
+        "privacySubsections": {
+          "spendings": {
+            "title": "Hide spending from other users.",
+            "caption": "People will not be able to see how much you spent on votes and bids."
+          },
+          "private": {
+            "title": "Make private account.",
+            "caption": "People will not be able to see your bids."
+          }
+        },
+        "blockedusers": {
+          "title": "Blocked uses",
+          "unblockBtn": "Unblock"
+        },
+        "closeAccount": {
+          "title": "Close account",
+          "caption": "Delete your account and account data.",
+          "closeBtn": "Delete"
+        }
       }
     }
   }

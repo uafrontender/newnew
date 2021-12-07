@@ -19,6 +19,7 @@ import SettingsPersonalInformationSection from '../../components/organisms/setti
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
 import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
+import PrivacySection from '../../components/organisms/settings/PrivacySection';
 
 // Mock
 const unicornbabe = {
@@ -99,6 +100,8 @@ const MyProfileSettginsIndex: NextPage = () => {
       },
     ],
   );
+  const [spendingHidden, setSpendingHidden] = useState(false);
+  const [accountPrivate, setAccountPrivate] = useState(false);
 
   const accordionSections: AccordionSection[] = [
     {
@@ -151,7 +154,18 @@ const MyProfileSettginsIndex: NextPage = () => {
     },
     {
       title: t('Settings.sections.Privacy.title'),
-      content: <div>hey</div>,
+      content: <PrivacySection
+        isSpendingHidden={spendingHidden}
+        isAccountPrivate={accountPrivate}
+        blockedUsers={[
+          unicornbabe,
+        ]}
+        handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
+        handleToggleAccountPrivate={() => setAccountPrivate((curr) => !curr)}
+        handleUnblockUser={() => {}}
+        handleCloseAccount={() => {}}
+        handleSetActive={() => {}}
+      />,
     },
   ];
 
