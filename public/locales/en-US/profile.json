@@ -114,7 +114,15 @@
         "title": "Notifications"
       },
       "Transactions": {
-        "title": "Transactions"
+        "title": "Transactions",
+        "you": "You",
+        "actions": {
+          "topup": "top-up your wallet.",
+          "decision": "decision.",
+          "bid": "bid on",
+          "vote": "voted for",
+          "support": "supported"
+        }
       },
       "Privacy": {
         "title": "Privacy"

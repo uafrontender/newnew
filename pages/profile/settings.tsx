@@ -18,6 +18,21 @@ import SettingsAccordion, { AccordionSection } from '../../components/organisms/
 import SettingsPersonalInformationSection from '../../components/organisms/settings/SettingsPersonalInformationSection';
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
 import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
+import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
+
+// Mock
+const unicornbabe = {
+  uuid: '1',
+  username: 'unicornbabe',
+  nickname: 'UnicornBabe',
+  avatarUrl: 'https://randomuser.me/api/portraits/women/34.jpg',
+  bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+  coverUrl: '/images/mock/profile-bg.png',
+  options: {
+    isCreator: true,
+    isVerified: true,
+  },
+};
 
 const MyProfileSettginsIndex: NextPage = () => {
   const theme = useTheme();
@@ -112,7 +127,27 @@ const MyProfileSettginsIndex: NextPage = () => {
     },
     {
       title: t('Settings.sections.Transactions.title'),
-      content: <div>hey</div>,
+      content: <TransactionsSection
+        transactions={[
+          {
+            actor: userData!!,
+            recipient: unicornbabe,
+            date: new Date('05.23.2021'),
+            amount: 2.99,
+            direction: 'from',
+            action: 'bid',
+          },
+          {
+            actor: userData!!,
+            recipient: userData!!,
+            date: new Date('04.23.2021'),
+            amount: 400,
+            direction: 'to',
+            action: 'topup',
+          },
+        ]}
+        handleSetActive={() => {}}
+      />,
     },
     {
       title: t('Settings.sections.Privacy.title'),
