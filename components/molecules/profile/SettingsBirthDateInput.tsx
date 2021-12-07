@@ -133,7 +133,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       }
 
       // Input too long
-      if (e.target.value.length > 9) return;
+      if (e.target.value.length > 8) return;
 
       // No hyphen
       if ((e.target.value.length === 3 || e.target.value.length === 6)
@@ -155,7 +155,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       setInputData(e.target.value);
 
       // The length is valid, call the outer onChange()
-      if (e.target.value.length === 8) {
+      if (e.target.value.length === 8 || e.target.value.length === 0) {
         props.onChange?.(e);
       }
     };

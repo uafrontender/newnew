@@ -39,6 +39,10 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     setEmailInEdit(e.target.value);
   };
   const handleDateInput = (value: Date) => {
+    if (value === null) {
+      setDateInEdit(undefined);
+      return;
+    }
     setDateInEdit(value);
   };
 
