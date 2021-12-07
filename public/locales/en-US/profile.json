@@ -32,7 +32,7 @@
       "coverImage": {
         "changeCoverImage": "Change cover image"
       },
-      "displayName": {
+      "nickname": {
         "placeholder": "Nickname",
         "errors": {
           "generic": "Please check input",
@@ -82,19 +82,69 @@
     },
     "sections": {
       "Wallet": {
-
+        "empty": {
+          "balance": "Balance",
+          "caption": "Use your NewNew wallet and make your bets with no fees.",
+          "topUpBtn": "Top up my wallet"
+        }
       },
       "PersonalInformation": {
-        "title": "Personal information"
+        "title": "Personal information",
+        "emailInput": {
+          "label": "Email Address",
+          "placeholder": "email@email.com",
+          "errors": {
+            "invalidEmail": "Please enter a valid email",
+            "emailTaken": "Email taken"
+          }
+        },
+        "birthDateInput": {
+          "label": "Date of birth",
+          "captions": {
+            "twoTimesOnly": "Birthdate can be changed 2 times only.",
+            "cannotChange": "You can’t change birthdate."
+          },
+          "saveBtn": "Save",
+          "cancelBtn": "Cancel"
+        },
+        "saveBtn": "Save changes",
+        "cancelBtn": "Cancel"
       },
       "Notifications": {
         "title": "Notifications"
       },
       "Transactions": {
-        "title": "Transactions"
+        "title": "Transactions",
+        "you": "You",
+        "actions": {
+          "topup": "top-up your wallet.",
+          "decision": "decision.",
+          "bid": "bid on",
+          "vote": "voted for",
+          "support": "supported"
+        }
       },
       "Privacy": {
-        "title": "Privacy"
+        "title": "Privacy",
+        "privacySubsections": {
+          "spendings": {
+            "title": "Hide spending from other users.",
+            "caption": "People will not be able to see how much you spent on votes and bids."
+          },
+          "private": {
+            "title": "Make private account.",
+            "caption": "People will not be able to see your bids."
+          }
+        },
+        "blockedusers": {
+          "title": "Blocked uses",
+          "unblockBtn": "Unblock"
+        },
+        "closeAccount": {
+          "title": "Close account",
+          "caption": "Delete your account and account data.",
+          "closeBtn": "Delete"
+        }
       }
     }
   }
