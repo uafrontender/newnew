@@ -151,6 +151,14 @@ const SAvatar = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  img {
+    display: block;
+    width: 36px;
+    height: 36px;
   }
 `;
 

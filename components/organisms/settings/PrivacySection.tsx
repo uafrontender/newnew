@@ -195,6 +195,9 @@ const SBlockedUserCard = styled.div`
 
 const SAvatar = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
+
   overflow: hidden;
 
   grid-area: avatar;
@@ -204,6 +207,11 @@ const SAvatar = styled.div`
   height: 36px;
   border-radius: 50%;
 
+  img {
+    display: block;
+    width: 36px;
+    height: 36px;
+  }
 `;
 
 const SNickname = styled(Text)`
