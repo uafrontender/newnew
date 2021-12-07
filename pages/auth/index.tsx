@@ -104,7 +104,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
 
         dispatch(setUserData({
           username: data.me?.username,
-          displayName: data.me?.displayName,
+          nickname: data.me?.nickname,
           email: data.me?.email,
           avatarUrl: data.me?.avatarUrl,
           coverUrl: data.me?.coverUrl,

@@ -6,6 +6,7 @@ import {
 
 export const BASE_URL_USER = `${BASE_URL}/user`;
 
+// Own data
 export const validateEditProfileTextFields = (
   payload: newnewapi.ValidateTextRequest,
   token: string,
@@ -32,4 +33,15 @@ export const updateMe = (
   {
     'x-auth-token': token,
   },
+);
+
+// Other users
+export const getUserByUsername = (
+  payload: newnewapi.GetUserRequest,
+) => fetchProtobuf<newnewapi.GetUserRequest, newnewapi.User>(
+  newnewapi.GetUserRequest,
+  newnewapi.User,
+  `${BASE_URL_USER}/get_user`,
+  'post',
+  payload,
 );

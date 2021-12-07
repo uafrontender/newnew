@@ -107,7 +107,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           <SUsername
             variant={4}
           >
-            {user.displayName}
+            {user.nickname}
           </SUsername>
           <SShareDiv>
             <Button
