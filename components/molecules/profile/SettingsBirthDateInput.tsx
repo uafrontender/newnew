@@ -1,19 +1,45 @@
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
-import React, { useState } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
-import DatePicker, { ReactDatePickerCustomHeaderProps } from 'react-datepicker';
+import DatePicker, { ReactDatePickerCustomHeaderProps, registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+// Components
 import InlineSvg from '../../atoms/InlineSVG';
+import DropdownSelect, { TDropdownSelectItem } from '../../atoms/DropdownSelect';
 
 // Icons
 import CalendarIcon from '../../../public/images/svg/icons/filled/Calendar.svg';
-
 // Signs
-import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
 import CakeIcon from '../../../public/images/png/astrology-signs/Cake.png';
 import SagittariusIcon from '../../../public/images/png/astrology-signs/Sagittarius.png';
-import DropdownSelect from '../../atoms/DropdownSelect';
+
+// Datepicker utils
+import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
+import getLocalizedMonth from '../../../utils/getMonth';
+import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+
+for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
+  let localeName = SUPPORTED_LANGUAGES[i];
+
+  if (localeName === 'en') localeName = 'en-us';
+  if (localeName === 'es-MX') localeName = 'es';
+
+  const importedLocale = require(`date-fns/locale/${localeName}/index.js`);
+  registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
+}
+const minDate = new Date(new Date().setFullYear(1900));
+const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+const years: TDropdownSelectItem<number>[] = [];
+for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
+  years.push({
+    name: i.toString(),
+    value: i,
+  });
+}
 
 const signs: IAstrologySigns = {
   Cake: CakeIcon,
@@ -33,17 +59,16 @@ const signs: IAstrologySigns = {
 
 interface ISettingsBirthDateInput {
   value?: Date;
+  locale?: string;
   disabled: boolean;
   labelCaption: string;
   bottomCaption: string;
   onChange: (date: Date) => void;
 }
 
-const minDate = new Date(new Date().setFullYear(1900));
-const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
-
 const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> = ({
   value,
+  locale,
   disabled,
   labelCaption,
   bottomCaption,
@@ -51,32 +76,76 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 }) => {
   const theme = useTheme();
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const months: TDropdownSelectItem<number>[] = Array(12).fill('').map((_, i) => {
+    return {
+      name: getLocalizedMonth(i, locale),
+      value: i,
+    };
+  });
 
   const handleToggleCalendarOpen = () => setCalendarOpen((curr) => !curr);
 
   const handleRenderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
-    console.log(props);
-
     return (
       <SDatePickerHeader>
         <DropdownSelect<number>
           label={props.date.getFullYear().toString()}
-          options={[
-            {
-              name: '1999',
-              value: 1999,
-            },
-            {
-              name: '2000',
-              value: 2000,
-            },
-          ]}
+          options={years}
           selected={props.date.getFullYear()}
+          width="110px"
+          maxItems={4}
+          closeOnSelect
           onSelect={(val) => props.changeYear(val)}
+        />
+        <DropdownSelect<number>
+          label={getLocalizedMonth(props.date.getMonth(), locale)}
+          options={months}
+          selected={props.date.getMonth()}
+          width="183px"
+          maxItems={4}
+          closeOnSelect
+          onSelect={(val) => props.changeMonth(val)}
         />
       </SDatePickerHeader>
     );
   };
+
+  const CustomInputForwardRef = forwardRef<
+    HTMLInputElement,
+    React.DetailedHTMLProps<
+      React.InputHTMLAttributes<HTMLInputElement>,
+      HTMLInputElement
+  >>((props, ref) => {
+    console.log(props);
+
+    return (
+      <SCustomInput>
+        <input
+          ref={ref}
+          value={props.value}
+          placeholder={props.placeholder}
+          onClick={() => {}}
+          // {...props}
+        />
+        <CalendarButton
+          type="button"
+          onClick={props.onClick as any}
+        >
+          <InlineSvg
+            svg={CalendarIcon}
+            width="24px"
+            height="24px"
+            fill={!calendarOpen
+              ? theme.colorsThemed.text.quaternary : theme.colorsThemed.text.primary}
+          />
+        </CalendarButton>
+      </SCustomInput>
+    );
+  });
+
+  useEffect(() => {
+    console.log(`Current value is: ${value}`);
+  }, [value]);
 
   return (
     <SContainer>
@@ -86,17 +155,6 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       <SAstrologyImg
         src={signs[findAstrologySign(value)].src}
       />
-      <CalendarButton
-        type="button"
-      >
-        <InlineSvg
-          svg={CalendarIcon}
-          width="24px"
-          height="24px"
-          fill={!calendarOpen
-            ? theme.colorsThemed.text.quaternary : theme.colorsThemed.text.primary}
-        />
-      </CalendarButton>
       <SDatePicker>
         <DatePicker
           disabled={disabled}
@@ -105,10 +163,25 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           dateFormat="dd-MM-yy"
           minDate={minDate}
           maxDate={maxDate}
-          showMonthDropdown
-          showYearDropdown
+          shouldCloseOnSelect={false}
+          fixedHeight
+          // Locales
+          locale={locale ?? 'en-US'}
+          formatWeekDay={(d) => d[0].toUpperCase()}
+          // Custom render props
           renderCustomHeader={handleRenderCustomHeader}
-          // renderDayContents={handleRenderDayContents}
+          customInput={<CustomInputForwardRef />}
+          // Calendar
+          popperPlacement="top-end"
+          popperModifiers={[
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 6],
+              },
+            },
+          ]}
+          // Handlers
           onChange={onChange}
           onCalendarOpen={() => handleToggleCalendarOpen()}
           onCalendarClose={() => handleToggleCalendarOpen()}
@@ -123,6 +196,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 
 SettingsBirthDateInput.defaultProps = {
   value: undefined,
+  locale: 'en-US',
 };
 
 export default SettingsBirthDateInput;
@@ -246,16 +320,19 @@ const SDatePicker = styled.div`
 
     div {
       border: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
 
       .react-datepicker {
         background: transparent;
+        width: 100%;
 
         .react-datepicker__triangle, .react-datepicker__navigation {
           display: none;
         }
 
         .react-datepicker__month-container {
+          width: 100%;
+
+
           .react-datepicker__header {
             background: transparent;
 
@@ -281,6 +358,97 @@ const SDatePicker = styled.div`
 
               }
             }
+
+            .react-datepicker__day-names {
+              display: flex;
+              gap: 16px;
+
+              padding-left: 34px;
+              padding-right: 34px;
+
+              div {
+                font-weight: 500;
+                font-size: 16px;
+                line-height: 24px;
+                color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+              }
+            }
+          }
+
+          // Days
+          .react-datepicker__month {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .react-datepicker__week {
+              display: flex;
+              gap: 16px;
+
+              padding-left: 28px;
+              padding-right: 28px;
+
+              div {
+                font-weight: 500;
+                font-size: 16px;
+                line-height: 24px;
+              }
+
+              .react-datepicker__day {
+                color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+                &:hover {
+                  position: relative;
+                  color: #FFFFFF;
+                  background: transparent;
+
+                  &:before {
+                    position: absolute;
+                    top: calc(50% - 22px);
+                    left: calc(50% - 22px);
+                    content: '';
+
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+
+                    background: ${({ theme }) => theme.colorsThemed.accent.blue};
+
+                    z-index: -1;
+                  }
+                }
+              }
+
+              .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+                position: relative;
+                color: #FFFFFF;
+                background: transparent;
+                outline: none;
+
+                &:before {
+                  position: absolute;
+                  top: calc(50% - 22px);
+                  left: calc(50% - 22px);
+                  content: '';
+
+                  width: 44px;
+                  height: 44px;
+                  border-radius: 50%;
+
+                  background: ${({ theme }) => theme.colorsThemed.accent.blue};
+
+                  z-index: -1;
+                }
+              }
+
+              .react-datepicker__day--outside-month {
+                color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+              }
+
+              .react-datepicker__day--disabled {
+                opacity: 0.5;
+              }
+            }
           }
         }
       }
@@ -291,4 +459,14 @@ const SDatePicker = styled.div`
 
 const SDatePickerHeader = styled.div`
   display: flex;
+  justify-content: flex-start;
+  gap: 16px;
+
+  width: 100%;
+  padding: 16px 24px !important;
+`;
+
+const SCustomInput = styled.div`
+
+
 `;

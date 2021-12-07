@@ -5,6 +5,7 @@
 import React, {
   useEffect, useState,
 } from 'react';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import validator from 'validator';
@@ -27,6 +28,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
   isMobile,
   handleSetActive,
 }) => {
+  const router = useRouter();
   const { t } = useTranslation('profile');
   const [wasModifed, setWasModified] = useState(false);
   const [emailInEdit, setEmailInEdit] = useState(currentEmail ?? '');
@@ -71,6 +73,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         />
         <SettingsBirthDateInput
           value={dateInEdit}
+          locale={router.locale}
           disabled={false}
           labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
           bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly')}
