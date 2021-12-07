@@ -2,12 +2,19 @@ import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 interface IInput {
+  id: string;
+  value: string;
+  onChange: (key: string, value: string | boolean) => void;
   placeholder: string;
 }
 
 export const Input: React.FC<IInput> = (props) => {
-  const { placeholder } = props;
-  const [value, setValue] = useState('');
+  const {
+    id,
+    value,
+    onChange,
+    placeholder,
+  } = props;
   const [focused, setFocused] = useState(false);
 
   const handleFocus = useCallback(() => {
@@ -17,12 +24,12 @@ export const Input: React.FC<IInput> = (props) => {
     setFocused(false);
   }, []);
   const handleChange = useCallback((e) => {
-    setValue(e.target.value);
-  }, []);
+    onChange(id, e.target.value);
+  }, [id, onChange]);
 
   return (
     <SWrapper>
-      {!focused && (
+      {!focused && !value && (
         <SLabel htmlFor="input">
           {placeholder}
         </SLabel>
