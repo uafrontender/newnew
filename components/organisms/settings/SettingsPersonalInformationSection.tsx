@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { AnimatePresence, motion } from 'framer-motion';
 import styled from 'styled-components';
 import validator from 'validator';
 
@@ -78,26 +79,33 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
           labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
           bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly')}
           onChange={handleDateInput}
+          handleSetActive={() => handleSetActive()}
         />
       </SInputsWrapper>
-      {wasModifed ? (
-        <SControlsWrapper>
-          <Button
-            view="primaryGrad"
+      <AnimatePresence>
+        {wasModifed ? (
+          <SControlsWrapper
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
           >
-            {t('Settings.sections.PersonalInformation.saveBtn')}
-          </Button>
-          <Button
-            view="secondary"
-            style={{
-              ...(isMobile ? { order: -1 } : {}),
-            }}
-            onClick={() => handleResetModifications()}
-          >
-            {t('Settings.sections.PersonalInformation.cancelBtn')}
-          </Button>
-        </SControlsWrapper>
-      ) : null}
+            <Button
+              view="primaryGrad"
+            >
+              {t('Settings.sections.PersonalInformation.saveBtn')}
+            </Button>
+            <Button
+              view="secondary"
+              style={{
+                ...(isMobile ? { order: -1 } : {}),
+              }}
+              onClick={() => handleResetModifications()}
+            >
+              {t('Settings.sections.PersonalInformation.cancelBtn')}
+            </Button>
+          </SControlsWrapper>
+        ) : null}
+      </AnimatePresence>
     </SWrapper>
   );
 };
@@ -122,14 +130,16 @@ const SInputsWrapper = styled.div`
   padding-bottom: 24px;
 `;
 
-const SControlsWrapper = styled.div`
+const SControlsWrapper = styled(motion.div)`
   display: flex;
   justify-content: space-between;
-
-  padding-bottom: 24px;
 
   ${({ theme }) => theme.media.tablet} {
     justify-content: flex-start;
     gap: 24px;
+  }
+
+  button {
+    margin-bottom: 24px;
   }
 `;

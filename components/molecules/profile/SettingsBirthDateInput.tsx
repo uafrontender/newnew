@@ -2,7 +2,9 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
-import React, { forwardRef, useState, useEffect } from 'react';
+import React, {
+  forwardRef, useState, useEffect, useRef,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import DatePicker, { ReactDatePickerCustomHeaderProps, registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -22,6 +24,7 @@ import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrology
 import getLocalizedMonth from '../../../utils/getMonth';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
 
+// Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
   let localeName = SUPPORTED_LANGUAGES[i];
 
@@ -64,6 +67,7 @@ interface ISettingsBirthDateInput {
   labelCaption: string;
   bottomCaption: string;
   onChange: (date: Date) => void;
+  handleSetActive?: () => void;
 }
 
 const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> = ({
@@ -73,6 +77,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
   labelCaption,
   bottomCaption,
   onChange,
+  handleSetActive,
 }) => {
   const theme = useTheme();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -116,16 +121,74 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       React.InputHTMLAttributes<HTMLInputElement>,
       HTMLInputElement
   >>((props, ref) => {
-    console.log(props);
+    const [inputData, setInputData] = useState(props.value);
+
+    const [placeholder, setPlaceholder] = useState(props.placeholder);
+    const explicitInputRef = useRef<HTMLInputElement>();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Input contains invalid characters
+      if (e.target.value.length > 0 && !e.target.value.match(/^[0-9-]+$/)) {
+        return;
+      }
+
+      // Input too long
+      if (e.target.value.length > 9) return;
+
+      // No hyphen
+      if ((e.target.value.length === 3 || e.target.value.length === 6)
+        && e.target.value.charAt(e.target.value.length - 1) !== '-'
+      ) {
+        return;
+      }
+
+      // Insert hyphen
+      if ((e.target.value.length === 2 || e.target.value.length === 5)
+        && e.target.value.length > (inputData as string)?.length
+      ) {
+        e.target.value += '-';
+        setInputData(e.target.value);
+        props.onChange?.(e);
+        return;
+      }
+
+      setInputData(e.target.value);
+
+      // The length is valid, call the outer onChange()
+      if (e.target.value.length === 8) {
+        props.onChange?.(e);
+      }
+    };
+
+    useEffect(() => {
+      const arr1 = Array((inputData as string).length).fill(' ');
+      const arr = arr1.map((val, i) => {
+        if (i === 2 || i === 5) {
+          return '<span>&nbsp;</span>';
+        }
+        return '<span>&nbsp;&nbsp;&nbsp;</span>';
+      });
+      const newVal = arr.join('') + props.placeholder?.slice((inputData as string).length);
+      setPlaceholder(newVal);
+    }, [inputData, props.placeholder]);
 
     return (
       <SCustomInput>
         <input
-          ref={ref}
-          value={props.value}
-          placeholder={props.placeholder}
-          onClick={() => {}}
-          // {...props}
+          ref={(node) => {
+            explicitInputRef.current = node!!;
+            (ref as Function)(node);
+          }}
+          inputMode="numeric"
+          value={inputData}
+          onChange={handleChange}
+          onPaste={(e) => e.preventDefault()}
+        />
+        <SPseudoPlaceholder
+          dangerouslySetInnerHTML={{
+            __html: placeholder ?? '',
+          }}
+          onClick={() => explicitInputRef.current?.focus()}
         />
         <CalendarButton
           type="button"
@@ -143,12 +206,10 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     );
   });
 
-  useEffect(() => {
-    console.log(`Current value is: ${value}`);
-  }, [value]);
-
   return (
-    <SContainer>
+    <SContainer
+      onMouseEnter={() => handleSetActive?.()}
+    >
       <SLabel>
         { labelCaption }
       </SLabel>
@@ -165,10 +226,13 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           maxDate={maxDate}
           shouldCloseOnSelect={false}
           fixedHeight
+          preventOpenOnFocus
+          adjustDateOnChange
+          onInputClick={() => {}}
           // Locales
           locale={locale ?? 'en-US'}
           formatWeekDay={(d) => d[0].toUpperCase()}
-          // Custom render props
+          // Custom render elements
           renderCustomHeader={handleRenderCustomHeader}
           customInput={<CustomInputForwardRef />}
           // Calendar
@@ -197,6 +261,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 SettingsBirthDateInput.defaultProps = {
   value: undefined,
   locale: 'en-US',
+  handleSetActive: () => {},
 };
 
 export default SettingsBirthDateInput;
@@ -263,8 +328,14 @@ const CalendarButton = styled.button`
   outline: none;
   border: none;
 
-  &:focus {
+  cursor: pointer;
+
+  &:focus:enabled, &:hover:enabled {
     outline: none;
+
+    svg {
+      fill: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
   }
 `;
 
@@ -468,5 +539,29 @@ const SDatePickerHeader = styled.div`
 
 const SCustomInput = styled.div`
 
+`;
 
+const SPseudoPlaceholder = styled.div`
+  position: absolute;
+  white-space: nowrap;
+  top: 0;
+  left: 5;
+  z-index: 1;
+
+  padding: 14px 20px 12px 53.5px;
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
+
+  cursor: text;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;
