@@ -62,6 +62,25 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setCredentialsData(state, { payload }: PayloadAction<TCredentialsData>) {
       state.credentialsData = { ...state.credentialsData, ...payload };
     },
+    logoutUser(state) {
+      state.loggedIn = false;
+      state.userData = {
+        avatarUrl: '',
+        userUuid: '',
+        username: '',
+        usernameChangedAt: undefined,
+        email: '',
+        coverUrl: '',
+        nickname: '',
+        bio: '',
+        options: {},
+      };
+      state.credentialsData = {
+        accessToken: '',
+        refreshToken: '',
+        expiresAt: '',
+      };
+    },
   },
 });
 
@@ -73,6 +92,7 @@ export const {
   setSignupEmailInput,
   setUserData,
   setCredentialsData,
+  logoutUser,
 } = userSlice.actions;
 
 export default userSlice.reducer;
