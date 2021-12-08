@@ -8,32 +8,35 @@ import InlineSVG from '../../atoms/InlineSVG';
 import chevronRight from '../../../public/images/svg/icons/outlined/ChevronRight.svg';
 
 interface IMobileField {
-  item: {
-    key: string;
-    type: undefined | 'toggle';
-  };
+  id: string;
+  type: undefined | 'toggle';
   value: any;
   onChange: (key: string, value: string | boolean) => void;
 }
 
 export const MobileField: React.FC<IMobileField> = (props) => {
-  const { item, value, onChange } = props;
+  const {
+    id,
+    type,
+    value,
+    onChange,
+  } = props;
   const { t } = useTranslation('creation');
   const theme = useTheme();
 
   const handleChange = useCallback(() => {
-    if (item.type === 'toggle') {
-      onChange(item.key, !value);
+    if (type === 'toggle') {
+      onChange(id, !value);
     }
-  }, [item.key, item.type, onChange, value]);
+  }, [id, type, onChange, value]);
 
   return (
     <SContainer>
       <STitle>
-        {t(`secondStep.field.${item.key}`)}
+        {t(`secondStep.field.${id}.title`)}
       </STitle>
       <SRightPart>
-        {item.type === 'toggle' ? (
+        {type === 'toggle' ? (
           <Toggle
             checked={!!value}
             onChange={handleChange}

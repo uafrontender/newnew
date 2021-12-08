@@ -36,14 +36,61 @@
       "button": "Select file"
     },
     "button": {
-      "submit": "Publish"
+      "cancel": "Cancel",
+      "submit": "Publish",
+      "preview": "Preview post",
+      "schedule": "Schedule"
     },
     "field": {
-      "minimalBid": "Minimum bid",
-      "min-backers": "Minimum backers",
-      "expire": "Expire",
-      "post": "Post",
-      "comments": "Commenting turned on"
+      "minimalBid": {
+        "title": "Minimum bid",
+        "value": "${{value}}",
+        "label": "$",
+        "placeholder": "1.00",
+        "description": "Starting bid is ${{value}}"
+      },
+      "expiresAt": {
+        "title": "Expire after",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "options": {
+          "1-hour": "1 hour",
+          "6-hours": "6 hours",
+          "12-hours": "12 hours",
+          "1-day": "1 day",
+          "3-days": "3 days",
+          "5-days": "5 days",
+          "7-days": "7 days"
+        }
+      },
+      "startsAt": {
+        "title": "Start date",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "modal": {
+          "title": "Start date",
+          "type": {
+            "schedule": "Schedule",
+            "right-away": "Right away"
+          },
+          "hours-format": {
+            "pm": "PM",
+            "am": "AM"
+          },
+          "days": {
+            "sunday": "S",
+            "monday": "M",
+            "tuesday": "T",
+            "wednesday": "W",
+            "thursday": "T",
+            "friday": "F",
+            "saturday": "S"
+          }
+        }
+      },
+      "comments": {
+        "title": "Commenting turned on"
+      }
     }
   }
 }

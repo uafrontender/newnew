@@ -4,17 +4,21 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 export interface ICreationStateInterface {
   post: {
     title: string;
-    startsAt: Date;
-    expiresAt: Date;
+    startsAt: {
+      type: string,
+      date: Date,
+      'hours-format': string,
+    };
+    expiresAt: string;
     options: {
       commentsEnabled: boolean;
     };
   },
   auction: {
-    minimalBid: number;
+    minimalBid: string;
   }
   crowdfunding: {
-    backingPrice: number;
+    backingPrice: string;
     targetBackerCount: number;
   }
   multiplechoice: {
@@ -27,17 +31,21 @@ export interface ICreationStateInterface {
 const defaultUIState: ICreationStateInterface = {
   post: {
     title: '',
-    startsAt: new Date(),
-    expiresAt: new Date(),
+    startsAt: {
+      type: 'right-away',
+      date: new Date(),
+      'hours-format': 'am',
+    },
+    expiresAt: '1-hour',
     options: {
       commentsEnabled: true,
     },
   },
   auction: {
-    minimalBid: 1.00,
+    minimalBid: '1.00',
   },
   crowdfunding: {
-    backingPrice: 1.00,
+    backingPrice: '1.00',
     targetBackerCount: 1,
   },
   multiplechoice: {
@@ -55,8 +63,14 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationComments(state, { payload }: PayloadAction<boolean>) {
       state.post.options.commentsEnabled = payload;
     },
-    setCreationMinBid(state, { payload }: PayloadAction<number>) {
+    setCreationMinBid(state, { payload }: PayloadAction<string>) {
       state.auction.minimalBid = payload;
+    },
+    setCreationExpireDate(state, { payload }: PayloadAction<string>) {
+      state.post.expiresAt = payload;
+    },
+    setCreationStartDate(state, { payload }: PayloadAction<Date>) {
+      state.post.startsAt = { ...state.post.startsAt, ...payload };
     },
   },
 });
@@ -65,6 +79,8 @@ export const {
   setCreationTitle,
   setCreationMinBid,
   setCreationComments,
+  setCreationStartDate,
+  setCreationExpireDate,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;

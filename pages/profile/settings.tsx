@@ -44,7 +44,7 @@ const MyProfileSettginsIndex: NextPage = () => {
   const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet', 'tabletL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   const handleSetColorMode = useCallback(
     (mode: TColorMode) => {
