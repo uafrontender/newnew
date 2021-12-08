@@ -1,12 +1,13 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
-import Lottie from 'react-lottie';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import jsonwebtoken from 'jsonwebtoken';
 import getRawBody from 'raw-body';
 import qs from 'querystring';
+
+import Lottie from '../../components/atoms/Lottie';
 
 import {
   signInWithApple,
