@@ -8,6 +8,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import _compact from 'lodash/compact';
 import { useRouter } from 'next/router';
+import ResizeObserver from 'resize-observer-polyfill';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -107,7 +108,15 @@ export const CreationSecondStep = () => {
   }, [auction.minimalBid, handleItemChange, post.options.commentsEnabled]);
 
   useEffect(() => {
-    setMinHeight(`${window.innerHeight}px`);
+    const resizeObserver = new ResizeObserver(() => {
+      setMinHeight(`${window.innerHeight}px`);
+    });
+
+    resizeObserver.observe(document.body);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, []);
 
   return (
