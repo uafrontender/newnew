@@ -66,7 +66,7 @@ export const CreationSecondStep = () => {
       router.push('/');
     }
   }, [router]);
-  const handleItemChange = useCallback((key: string, value: string | number | boolean) => {
+  const handleItemChange = useCallback((key: string, value: string | number | boolean | object) => {
     if (key === 'title') {
       dispatch(setCreationTitle(value));
     } else if (key === 'minimalBid') {

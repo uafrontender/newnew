@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
+import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -12,6 +13,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
+import Calendar from '../../atoms/creation/Calendar';
 import InlineSVG from '../../atoms/InlineSVG';
 import CustomToggle from '../CustomToggle';
 
@@ -188,7 +190,18 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 {days.map(renderDay)}
               </SCustomDays>
               <SSeparator />
-              Calendar
+              <SCalendarWrapper>
+                <SCalendarTopGrad />
+                <SCalendarContent>
+                  <Calendar
+                    minDate={moment().startOf('M')}
+                    maxDate={moment().add(2, 'M').endOf('M')}
+                    onSelect={() => {}}
+                    selectedDate={moment().startOf('D')}
+                  />
+                </SCalendarContent>
+                <SCalendarBottomGrad />
+              </SCalendarWrapper>
               <SSeparator />
               <SModalToggleWrapper>
                 <CustomToggle
@@ -380,7 +393,7 @@ const SMobileListContainer = styled.div<ISMobileListContainer>`
 const SMobileDateContainer = styled.div<ISMobileListContainer>`
   width: 100%;
   bottom: ${(props) => (props.focused ? 0 : '-100vh')};
-  height: 100%;
+  height: 100vh;
   display: flex;
   position: relative;
   transition: bottom ease 0.5s;
@@ -486,4 +499,37 @@ const SCustomDays = styled.div`
 
 const SDay = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SCalendarWrapper = styled.div`
+  position: relative;
+`;
+
+const SCalendarContent = styled.div`
+  height: 325px;
+  overflow-y: auto;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const SCalendarTopGrad = styled.div`
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: 1;
+  position: absolute;
+  background: ${(props) => props.theme.gradients.calendarTop};
+`;
+
+const SCalendarBottomGrad = styled.div`
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50px;
+  z-index: 1;
+  position: absolute;
+  background: ${(props) => props.theme.gradients.calendarBottom};
 `;
