@@ -141,7 +141,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await validateEditProfileTextFields(
         payload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!res.data?.status) throw new Error('An error occured');
@@ -195,7 +194,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       console.error(err);
       setIsAPIValidateLoading(false);
     }
-  }, [user.credentialsData?.accessToken, setFormErrors]);
+  }, [setFormErrors]);
 
   const validateTextViaAPIDebounced = useMemo(() => debounce((
     kind: newnewapi.ValidateTextRequest.Kind,
@@ -317,7 +316,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await getImageUploadUrl(
           imageUrlPayload,
-          user.credentialsData?.accessToken!!,
         );
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
@@ -352,7 +350,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await updateMe(
         payload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!res.data || res.error) throw new Error('Request failed');
@@ -371,7 +368,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       setIsLoading(false);
     }
   }, [
-    setIsLoading, handleClose, user.credentialsData, dispatch,
+    setIsLoading, handleClose, dispatch,
     dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
     user.userData?.username, user.userData?.coverUrl,
     isAPIValidateLoading,
@@ -463,7 +460,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await getImageUploadUrl(
         imageUrlPayload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
@@ -487,7 +483,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const updateMeRes = await updateMe(
         updateMePayload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
@@ -507,7 +502,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   }, [
     croppedAreaProfileImage,
     avatarUrlInEdit, handleSetStageToEditingGeneral, dispatch,
-    user.userData, user.credentialsData,
+    user.userData,
   ]);
 
   // Effects
