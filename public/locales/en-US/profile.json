@@ -146,6 +146,11 @@
           "closeBtn": "Delete"
         }
       }
+    },
+    "bottomDiv": {
+      "languageTitle": "Choose language",
+      "help": "Help",
+      "logout": "Log out"
     }
   }
 }

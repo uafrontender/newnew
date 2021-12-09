@@ -1,12 +1,21 @@
-import React, { ReactElement, useCallback, useState } from 'react';
+import React, {
+  ReactElement, useCallback, useEffect, useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import type { NextPage } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
+// Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice';
+import { logoutUser } from '../../redux-store/slices/userStateSlice';
+
+// API
+import { logout } from '../../api/endpoints/user';
 
 import { NextPageWithLayout } from '../_app';
 import MyProfileSettingsLayout from '../../components/templates/MyProfileSettingsLayout';
@@ -14,10 +23,10 @@ import MyProfileSettingsLayout from '../../components/templates/MyProfileSetting
 import Headline from '../../components/atoms/Headline';
 import GoBackButton from '../../components/molecules/GoBackButton';
 import SettingsColorModeSwitch from '../../components/molecules/profile/SettingsColorModeSwitch';
+import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 import SettingsAccordion, { AccordionSection } from '../../components/organisms/settings/SettingsAccordion';
 import SettingsPersonalInformationSection from '../../components/organisms/settings/SettingsPersonalInformationSection';
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
-import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
 import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../components/organisms/settings/PrivacySection';
 
@@ -37,20 +46,51 @@ const unicornbabe = {
 
 const MyProfileSettginsIndex: NextPage = () => {
   const theme = useTheme();
-  const { t } = useTranslation('profile');
   const router = useRouter();
+  // Translations
+  const { t } = useTranslation('profile');
+  const { t: commonT } = useTranslation('common');
+  // Redux
   const dispatch = useAppDispatch();
-  const { userData } = useAppSelector((state) => state.user);
+  const { userData, credentialsData, loggedIn } = useAppSelector((state) => state.user);
   const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
+  // Measurements
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet', 'tabletL'].includes(resizeMode);
+
+  // Logout loading
+  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
 
   const handleSetColorMode = useCallback(
     (mode: TColorMode) => {
       dispatch(setColorMode(mode));
     },
     [dispatch],
+  );
+
+  const handleLogout = useCallback(
+    async () => {
+      try {
+        setIsLogoutLoading(true);
+
+        const payload = new newnewapi.EmptyRequest({});
+
+        const res = await logout(
+          payload,
+          credentialsData?.accessToken!!,
+        );
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Log out failed');
+
+        dispatch(logoutUser(''));
+        setIsLogoutLoading(false);
+      } catch (err) {
+        setIsLogoutLoading(false);
+        console.error(err);
+      }
+    },
+    [dispatch, credentialsData, setIsLogoutLoading],
   );
 
   // temp
@@ -169,6 +209,10 @@ const MyProfileSettginsIndex: NextPage = () => {
     },
   ];
 
+  useEffect(() => {
+    if (!loggedIn) router.push('/');
+  }, [loggedIn, router]);
+
   return (
     <div>
       <SMain>
@@ -220,6 +264,22 @@ const MyProfileSettginsIndex: NextPage = () => {
         <SettingsAccordion
           sections={accordionSections}
         />
+        <SBottomLinksDiv>
+          <SBlockOptionButton>
+            {commonT(`selected-language-title-${router.locale}`)}
+          </SBlockOptionButton>
+          <Link href="/help">
+            <SBlockOption>
+              {t('Settings.bottomDiv.help')}
+            </SBlockOption>
+          </Link>
+          <SBlockOptionButton
+            disabled={isLogoutLoading}
+            onClick={() => handleLogout()}
+          >
+            {t('Settings.bottomDiv.logout')}
+          </SBlockOptionButton>
+        </SBottomLinksDiv>
       </SMain>
     </div>
   );
@@ -264,6 +324,54 @@ const SHeadline = styled(Headline)`
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 40px;
+  }
+`;
+
+const SBottomLinksDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+
+  margin-top: 24px;
+`;
+
+const SBlockOptionButton = styled.button`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-size: 14px;
+  transition: color ease 0.5s;
+  font-weight: 600;
+  line-height: 24px;
+  margin-bottom: 12px;
+
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+
+  &:hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+  }
+  &:hover, &:focus {
+    outline: none;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+`;
+
+const SBlockOption = styled.a`
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  font-size: 14px;
+  transition: color ease 0.5s;
+  font-weight: 600;
+  line-height: 24px;
+  margin-bottom: 12px;
+
+  cursor: pointer;
+
+  &:hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
   }
 `;
 

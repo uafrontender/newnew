@@ -1,14 +1,13 @@
 // Temp disabled until backend is in place
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import isEmail from 'validator/lib/isEmail';
-import Skeleton from 'react-loading-skeleton';
+// import Skeleton from 'react-loading-skeleton';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
@@ -74,14 +73,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
     setIsSubmitLoading(true);
     setSubmitError('');
     try {
-      // Temp commented out for dev purposes
-      /* const payload = new newnewapi.SendVerificationEmailRequest({
+      const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
       });
 
       const { data, error } = await sendVerificationEmail(payload);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed'); */
+      if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       dispatch(setSignupEmailInput(emailInput));
       setIsSubmitLoading(false);
