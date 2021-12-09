@@ -35,6 +35,20 @@ export const updateMe = (
   },
 );
 
+export const logout = (
+  payload: newnewapi.EmptyRequest,
+  token: string,
+) => fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_USER}/log_out`,
+  'post',
+  payload,
+  {
+    'x-auth-token': token,
+  },
+);
+
 // Other users
 export const getUserByUsername = (
   payload: newnewapi.GetUserRequest,
