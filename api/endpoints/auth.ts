@@ -22,7 +22,6 @@ export const sendVerificationEmail = (
 ) => fetchProtobuf<newnewapi.SendVerificationEmailRequest, newnewapi.EmptyResponse>(
   newnewapi.SendVerificationEmailRequest,
   newnewapi.EmptyResponse,
-  // TODO: the URL is temprorary!
   `${BASE_URL_AUTH}/send_verification_email`,
   'post',
   payload,
@@ -38,7 +37,6 @@ export const signInWithEmail = (
 ) => fetchProtobuf<newnewapi.EmailSignInRequest, newnewapi.SignInResponse>(
   newnewapi.EmailSignInRequest,
   newnewapi.SignInResponse,
-  // TODO: the URL is temprorary!
   `${BASE_URL_AUTH}/sign_in_with_email`,
   'post',
   payload,
