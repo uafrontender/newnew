@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -8,6 +6,7 @@ import { useRouter } from 'next/router';
 import { useAppSelector } from '../../redux-store/store';
 
 import Text from '../atoms/Text';
+import Modal from '../organisms/Modal';
 import Button from '../atoms/Button';
 import General from './General';
 import { Tab } from '../molecules/Tabs';
@@ -15,14 +14,15 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
+import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
+import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
 
 // Icons
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
-import Modal from '../organisms/Modal';
-import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
+
 import isBroswer from '../../utils/isBrowser';
 
 interface IMyProfileLayout {
@@ -130,136 +130,138 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   }, []);
 
   return (
-    <SGeneral>
-      <SMyProfileLayout>
-        <ProfileBackground
-          // Temp
-          pictureURL={user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'}
-        >
-          <Button
-            view="transparent"
-            withShrink
-            withDim
-            iconOnly={isMobileOrTablet}
-            onClick={() => handleOpenEditProfileMenu()}
+    <ErrorBoundary>
+      <SGeneral>
+        <SMyProfileLayout>
+          <ProfileBackground
+            // Temp
+            pictureURL={user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'}
           >
-            <InlineSvg
-              svg={EditIcon}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-            />
-            {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
-          </Button>
-          <Button
-            view="transparent"
-            withDim
-            withShrink
-            iconOnly={isMobileOrTablet}
-            onClick={() => router.push('/profile/settings')}
-          >
-            <InlineSvg
-              svg={SettingsIcon}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-            />
-            {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.settings')}
-          </Button>
-        </ProfileBackground>
-        {/* NB! Temp */}
-        {user.userData?.avatarUrl && (
-          <ProfileImage
-            src={user.userData?.avatarUrl}
-          />
-        )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <SUsername
-            variant={4}
-          >
-            {user.userData?.nickname}
-          </SUsername>
-          <SShareDiv>
-            <SShareButton
-              view="tertiary"
-              iconOnly
+            <Button
+              view="transparent"
               withShrink
               withDim
-              style={{
-                paddingTop: '8px',
-                paddingBottom: '8px',
-                paddingLeft: '16px',
-                paddingRight: '16px',
-              }}
-              onClick={() => {
-              }}
-            >
-              <SUsernameButtonText>
-                @
-                {/* Temp! */}
-                {user.userData?.username && user.userData?.username.length > 12
-                  ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring(user.userData?.username.length - 3)}`
-                  : user.userData?.username}
-              </SUsernameButtonText>
-            </SShareButton>
-            <SShareButton
-              view="tertiary"
-              iconOnly
-              withDim
-              withShrink
-              style={{
-                padding: '8px',
-              }}
-              onClick={() => {
-              }}
+              iconOnly={isMobileOrTablet}
+              onClick={() => handleOpenEditProfileMenu()}
             >
               <InlineSvg
-                svg={ShareIconFilled}
-                fill={theme.colorsThemed.text.primary}
-                width="20px"
-                height="20px"
+                svg={EditIcon}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
               />
-            </SShareButton>
-          </SShareDiv>
-          {user.userData?.bio ? (
-            <SBioText
-              variant={3}
+              {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
+            </Button>
+            <Button
+              view="transparent"
+              withDim
+              withShrink
+              iconOnly={isMobileOrTablet}
+              onClick={() => router.push('/profile/settings')}
             >
-              {user.userData?.bio}
-            </SBioText>
-          ) : null}
-        </div>
-        <ProfileTabs
-          pageType="myProfile"
-          tabs={tabs}
-        />
-        {/* Edit Profile modal menu */}
-        <Modal
-          show={isEditProfileMenuOpen}
-          overlayDim
-          transitionSpeed={isMobileOrTablet ? 0.5 : 0}
-          onClose={handleClosePreventDiscarding}
-        >
-          {isEditProfileMenuOpen
-            ? (
-              <EditProfileMenu
-                stage={editingStage}
-                wasModified={wasModified}
-                handleClose={handleCloseEditProfileMenu}
-                handleSetWasModified={handleSetWasModified}
-                handleClosePreventDiscarding={handleClosePreventDiscarding}
-                handleSetStageToEditingProfilePicture={handleSetStageToEditingProfilePicture}
-                handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
+              <InlineSvg
+                svg={SettingsIcon}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
               />
+              {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.settings')}
+            </Button>
+          </ProfileBackground>
+          {/* NB! Temp */}
+          {user.userData?.avatarUrl && (
+            <ProfileImage
+              src={user.userData?.avatarUrl}
+            />
+          )}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <SUsername
+              variant={4}
+            >
+              {user.userData?.nickname}
+            </SUsername>
+            <SShareDiv>
+              <SShareButton
+                view="tertiary"
+                iconOnly
+                withShrink
+                withDim
+                style={{
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                }}
+                onClick={() => {
+                }}
+              >
+                <SUsernameButtonText>
+                  @
+                  {/* Temp! */}
+                  {user.userData?.username && user.userData?.username.length > 12
+                    ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring(user.userData?.username.length - 3)}`
+                    : user.userData?.username}
+                </SUsernameButtonText>
+              </SShareButton>
+              <SShareButton
+                view="tertiary"
+                iconOnly
+                withDim
+                withShrink
+                style={{
+                  padding: '8px',
+                }}
+                onClick={() => {
+                }}
+              >
+                <InlineSvg
+                  svg={ShareIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width="20px"
+                  height="20px"
+                />
+              </SShareButton>
+            </SShareDiv>
+            {user.userData?.bio ? (
+              <SBioText
+                variant={3}
+              >
+                {user.userData?.bio}
+              </SBioText>
             ) : null}
-        </Modal>
-      </SMyProfileLayout>
-      {children}
-    </SGeneral>
+          </div>
+          <ProfileTabs
+            pageType="myProfile"
+            tabs={tabs}
+          />
+          {/* Edit Profile modal menu */}
+          <Modal
+            show={isEditProfileMenuOpen}
+            overlayDim
+            transitionSpeed={isMobileOrTablet ? 0.5 : 0}
+            onClose={handleClosePreventDiscarding}
+          >
+            {isEditProfileMenuOpen
+              ? (
+                <EditProfileMenu
+                  stage={editingStage}
+                  wasModified={wasModified}
+                  handleClose={handleCloseEditProfileMenu}
+                  handleSetWasModified={handleSetWasModified}
+                  handleClosePreventDiscarding={handleClosePreventDiscarding}
+                  handleSetStageToEditingProfilePicture={handleSetStageToEditingProfilePicture}
+                  handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
+                />
+              ) : null}
+          </Modal>
+        </SMyProfileLayout>
+        {children}
+      </SGeneral>
+    </ErrorBoundary>
   );
 };
 
