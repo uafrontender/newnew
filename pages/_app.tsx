@@ -74,8 +74,8 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="robots" content="noindex" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
-      {/* <SocketContextProvider> */}
       <CookiesProvider>
+        {/* <SocketContextProvider> */}
         <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
           <ResizeMode>
             <GlobalTheme>
@@ -83,8 +83,8 @@ const MyApp = (props: IMyApp): ReactElement => {
             </GlobalTheme>
           </ResizeMode>
         </PersistGate>
+        {/* </SocketContextProvider> */}
       </CookiesProvider>
-      {/* </SocketContextProvider> */}
     </>
   );
 };
