@@ -78,7 +78,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
       const { data, error } = await signInWithEmail(signInRequest);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+      console.log(data);
+
+      if (
+        !data
+        || data.status !== newnewapi.SignInResponse.Status.SUCCESS
+        || error
+      ) throw new Error(error?.message ?? 'Request failed');
 
       dispatch(setUserData({
         username: data.me?.username,
