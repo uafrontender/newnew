@@ -37,7 +37,7 @@ const defaultUIState: ICreationStateInterface = {
       type: 'right-away',
       date: new Date(),
       time: moment().format('hh:mm'),
-      'hours-format': 'am',
+      'hours-format': moment().format('a'),
     },
     expiresAt: '1-hour',
     options: {
