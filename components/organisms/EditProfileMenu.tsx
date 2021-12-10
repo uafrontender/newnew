@@ -13,7 +13,7 @@ import { Area, Point } from 'react-easy-crop/types';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
+import { logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
 
 // Components
 import Button from '../atoms/Button';
@@ -141,7 +141,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await validateEditProfileTextFields(
         payload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!res.data?.status) throw new Error('An error occured');
@@ -194,8 +193,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } catch (err) {
       console.error(err);
       setIsAPIValidateLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
     }
-  }, [user.credentialsData?.accessToken, setFormErrors]);
+  }, [setFormErrors, dispatch]);
 
   const validateTextViaAPIDebounced = useMemo(() => debounce((
     kind: newnewapi.ValidateTextRequest.Kind,
@@ -317,7 +324,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
         const res = await getImageUploadUrl(
           imageUrlPayload,
-          user.credentialsData?.accessToken!!,
         );
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
@@ -352,7 +358,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await updateMe(
         payload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!res.data || res.error) throw new Error('Request failed');
@@ -369,9 +374,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } catch (err) {
       console.error(err);
       setIsLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
     }
   }, [
-    setIsLoading, handleClose, user.credentialsData, dispatch,
+    setIsLoading, handleClose, dispatch,
     dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
     user.userData?.username, user.userData?.coverUrl,
     isAPIValidateLoading,
@@ -463,7 +476,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const res = await getImageUploadUrl(
         imageUrlPayload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
@@ -487,7 +499,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       const updateMeRes = await updateMe(
         updateMePayload,
-        user.credentialsData?.accessToken!!,
       );
 
       if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
@@ -500,14 +511,22 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       setUpdateProfileImageLoading(false);
       handleSetStageToEditingGeneral();
-    } catch (e) {
+    } catch (err) {
+      console.error(err);
       setUpdateProfileImageLoading(false);
-      console.error(e);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
     }
   }, [
     croppedAreaProfileImage,
     avatarUrlInEdit, handleSetStageToEditingGeneral, dispatch,
-    user.userData, user.credentialsData,
+    user.userData,
   ]);
 
   // Effects
