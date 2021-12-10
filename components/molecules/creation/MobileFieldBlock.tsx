@@ -157,6 +157,14 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       const handleScheduleChange = (selectedId: string) => {
         if (selectedId === 'right-away') {
           onChange(id, { date: new Date() });
+          onChange(id, {
+            time: moment()
+              .format('hh:mm'),
+          });
+          onChange(id, {
+            'hours-format': moment()
+              .format('a'),
+          });
         }
         onChange(id, { type: selectedId });
       };
