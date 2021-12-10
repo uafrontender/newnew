@@ -78,8 +78,6 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
       const { data, error } = await signInWithEmail(signInRequest);
 
-      console.log(data);
-
       if (
         !data
         || data.status !== newnewapi.SignInResponse.Status.SUCCESS
