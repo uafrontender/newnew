@@ -21,6 +21,7 @@ export const Desktop: React.FC<IDesktop> = () => {
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const handleCreateClick = () => {
+    router.push('/creation');
   };
   const handleDashboardClick = () => {
     router.push('/dashboard');

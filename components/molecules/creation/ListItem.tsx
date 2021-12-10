@@ -32,8 +32,14 @@ export const ListItem: React.FC<IListItem> = (props) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  let link = `${router.pathname}/${item.key}`;
+
+  if (router.query?.referer) {
+    link += `?referer=${router.query.referer}`;
+  }
+
   return (
-    <Link href={`${router.pathname}/${item.key}`}>
+    <Link href={link}>
       <a>
         <SWrapper>
           <SContent>

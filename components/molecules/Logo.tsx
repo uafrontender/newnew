@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Lottie from 'react-lottie';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
+import Lottie from '../atoms/Lottie';
 import InlineSVG from '../atoms/InlineSVG';
 
 import { useAppSelector } from '../../redux-store/store';

@@ -40,8 +40,8 @@ const Modal: React.FC<IModal> = (props) => {
       <StyledModalOverlay
         show={show}
         onClick={onClose}
-        transitionSpeed={transitionSpeed ?? 0.5}
         overlayDim={overlayDim ?? false}
+        transitionSpeed={transitionSpeed ?? 0.5}
       >
         {children}
       </StyledModalOverlay>,
