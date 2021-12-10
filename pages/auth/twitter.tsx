@@ -51,7 +51,10 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         const { data } = res!!;
 
-        if (!data) throw new Error('No data');
+        if (
+          !data
+          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
+        ) throw new Error('No data');
 
         dispatch(setUserData({
           username: data.me?.username,
