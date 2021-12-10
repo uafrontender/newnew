@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useEffect, useState } from 'react';
 import type { NextPage, NextPageContext } from 'next';
@@ -7,9 +9,22 @@ import { newnewapi } from 'newnew-api';
 import { BASE_URL, fetchProtobuf } from '../api/apiConfigs';
 
 import General from '../components/templates/General';
+import PostModal from '../components/organisms/decision/PostModal';
 
 const TestPostModal: NextPage = () => {
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+
+  const handleOpenPost = (post: newnewapi.IPost) => {
+    setDisplayedPost(post);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setDisplayedPost(undefined);
+  };
 
   useEffect(() => {
     async function fetchAll() {
@@ -51,6 +66,7 @@ const TestPostModal: NextPage = () => {
                 return (
                   <div
                     key={post.postUuid}
+                    onClick={() => handleOpenPost(postType)}
                   >
                     <div>{ i + 1 }) Auction</div>
                     <h2>{post.title }</h2>
@@ -62,6 +78,7 @@ const TestPostModal: NextPage = () => {
                 return (
                   <div
                     key={post.postUuid}
+                    onClick={() => handleOpenPost(postType)}
                   >
                     <div>{ i + 1 }) Crowdfunding</div>
                     <h2>{post.title }</h2>
@@ -72,6 +89,7 @@ const TestPostModal: NextPage = () => {
               return (
                 <div
                   key={post!!.postUuid}
+                  onClick={() => handleOpenPost(postType)}
                 >
                   <div>{ i + 1 }) Multiple choice</div>
                   <h2>{post!!.title }</h2>
@@ -81,6 +99,11 @@ const TestPostModal: NextPage = () => {
           </div>
         </main>
       </div>
+      <PostModal
+        isOpen={modalOpen}
+        post={displayedPost}
+        handleClose={() => handleCloseModal()}
+      />
     </General>
   );
 };
