@@ -10,6 +10,9 @@ import { CookiesProvider } from 'react-cookie';
 import { parse, UserAgent } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 
+// Custom error page
+import Error from './_error';
+
 // Global CSS configurations
 import ResizeMode from '../HOC/ResizeMode';
 import GlobalTheme from '../styles/ThemeProvider';
@@ -23,9 +26,12 @@ import isBrowser from '../utils/isBrowser';
 // Socket context
 // import SocketContextProvider from '../contexts/socketContext';
 
+// Global Cookies instance
+import { cookiesInstance } from '../api/apiConfigs';
+
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode
+  getLayout?: (page: ReactElement) => ReactNode,
 }
 
 interface IMyApp extends AppProps {
@@ -74,17 +80,26 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="robots" content="noindex" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
-      {/* <SocketContextProvider> */}
-      <CookiesProvider>
+      <CookiesProvider
+        cookies={cookiesInstance}
+      >
+        {/* <SocketContextProvider> */}
         <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
           <ResizeMode>
             <GlobalTheme>
-              {getLayout(<Component {...pageProps} />)}
+              {!pageProps.error ? (
+                getLayout(<Component {...pageProps} />)
+              ) : (
+                <Error
+                  errorMsg={pageProps.error?.message}
+                  statusCode={pageProps.error?.statusCode ?? 500}
+                />
+              )}
             </GlobalTheme>
           </ResizeMode>
         </PersistGate>
+        {/* </SocketContextProvider> */}
       </CookiesProvider>
-      {/* </SocketContextProvider> */}
     </>
   );
 };

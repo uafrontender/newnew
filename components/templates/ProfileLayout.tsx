@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -16,6 +14,7 @@ import Headline from '../atoms/Headline';
 import InlineSvg from '../atoms/InlineSVG';
 import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
+import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 
 // Icons
@@ -58,126 +57,128 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
 
   return (
-    <SGeneral>
-      <SProfileLayout>
-        <ProfileBackground
-          // Temp
-          pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
-        />
-        {/* Favorites and more options buttons */}
-        <SFavoritesButton
-          view="transparent"
-          iconOnly
-          onClick={() => {
-          }}
-        >
-          <InlineSvg
-            svg={FavouritesIconFilled}
-            fill={theme.colorsThemed.text.primary}
-            width={isMobileOrTablet ? '20px' : '24px'}
-            height={isMobileOrTablet ? '20px' : '24px'}
+    <ErrorBoundary>
+      <SGeneral>
+        <SProfileLayout>
+          <ProfileBackground
+            // Temp
+            pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
           />
-          {t('ProfileLayout.buttons.favorites')}
-        </SFavoritesButton>
-        <SMoreButton
-          view="transparent"
-          iconOnly
-          onClick={() => {
-          }}
-        >
-          <InlineSvg
-            svg={MoreIconFilled}
-            fill={theme.colorsThemed.text.primary}
-            width={isMobileOrTablet ? '20px' : '24px'}
-            height={isMobileOrTablet ? '20px' : '24px'}
-          />
-          {t('ProfileLayout.buttons.more')}
-        </SMoreButton>
-        <ProfileImage
-          src={user.avatarUrl ?? ''}
-        />
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <SUsername
-            variant={4}
+          {/* Favorites and more options buttons */}
+          <SFavoritesButton
+            view="transparent"
+            iconOnly
+            onClick={() => {
+            }}
           >
-            {user.nickname}
-          </SUsername>
-          <SShareDiv>
-            <Button
-              view="tertiary"
-              iconOnly
-              style={{
-                paddingTop: '8px',
-                paddingBottom: '8px',
-                paddingLeft: '16px',
-                paddingRight: '16px',
-              }}
-              onClick={() => {
-              }}
-            >
-              <SUsernameButtonText>
-                @
-                {/* Temp! */}
-                {user.username && user.username.length > 12
-                  ? `${user.username.substring(0, 6)}...${user.username.substring(user.username.length - 3)}`
-                  : user.username}
-              </SUsernameButtonText>
-            </Button>
-            <Button
-              view="tertiary"
-              iconOnly
-              style={{
-                padding: '8px',
-              }}
-              onClick={() => {
-              }}
-            >
-              <InlineSvg
-                svg={ShareIconFilled}
-                fill={theme.colorsThemed.text.primary}
-                width="20px"
-                height="20px"
-              />
-            </Button>
-          </SShareDiv>
-          {user.options?.isCreator
-            ? (
-              <Button
-                withShadow
-                view="primaryGrad"
-                style={{
-                  marginBottom: '16px',
-                }}
-                onClick={handleClickSendMessage}
-              >
-                {t('ProfileLayout.buttons.sendMessage')}
-              </Button>
-            ) : null}
-          {user.bio ? (
-            <SBioText
-              variant={3}
-            >
-              {user.bio}
-            </SBioText>
-          ) : null}
-        </div>
-        {user.options?.isCreator // && !user.options?.isPrivate
-          ? (
-            <ProfileTabs
-              pageType="othersProfile"
-              tabs={tabs}
+            <InlineSvg
+              svg={FavouritesIconFilled}
+              fill={theme.colorsThemed.text.primary}
+              width={isMobileOrTablet ? '20px' : '24px'}
+              height={isMobileOrTablet ? '20px' : '24px'}
             />
-          ) : null}
-      </SProfileLayout>
-      {children}
-    </SGeneral>
+            {t('ProfileLayout.buttons.favorites')}
+          </SFavoritesButton>
+          <SMoreButton
+            view="transparent"
+            iconOnly
+            onClick={() => {
+            }}
+          >
+            <InlineSvg
+              svg={MoreIconFilled}
+              fill={theme.colorsThemed.text.primary}
+              width={isMobileOrTablet ? '20px' : '24px'}
+              height={isMobileOrTablet ? '20px' : '24px'}
+            />
+            {t('ProfileLayout.buttons.more')}
+          </SMoreButton>
+          <ProfileImage
+            src={user.avatarUrl ?? ''}
+          />
+          <div
+            style={{
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <SUsername
+              variant={4}
+            >
+              {user.nickname}
+            </SUsername>
+            <SShareDiv>
+              <Button
+                view="tertiary"
+                iconOnly
+                style={{
+                  paddingTop: '8px',
+                  paddingBottom: '8px',
+                  paddingLeft: '16px',
+                  paddingRight: '16px',
+                }}
+                onClick={() => {
+                }}
+              >
+                <SUsernameButtonText>
+                  @
+                  {/* Temp! */}
+                  {user.username && user.username.length > 12
+                    ? `${user.username.substring(0, 6)}...${user.username.substring(user.username.length - 3)}`
+                    : user.username}
+                </SUsernameButtonText>
+              </Button>
+              <Button
+                view="tertiary"
+                iconOnly
+                style={{
+                  padding: '8px',
+                }}
+                onClick={() => {
+                }}
+              >
+                <InlineSvg
+                  svg={ShareIconFilled}
+                  fill={theme.colorsThemed.text.primary}
+                  width="20px"
+                  height="20px"
+                />
+              </Button>
+            </SShareDiv>
+            {user.options?.isCreator
+              ? (
+                <Button
+                  withShadow
+                  view="primaryGrad"
+                  style={{
+                    marginBottom: '16px',
+                  }}
+                  onClick={handleClickSendMessage}
+                >
+                  {t('ProfileLayout.buttons.sendMessage')}
+                </Button>
+              ) : null}
+            {user.bio ? (
+              <SBioText
+                variant={3}
+              >
+                {user.bio}
+              </SBioText>
+            ) : null}
+          </div>
+          {user.options?.isCreator // && !user.options?.isPrivate
+            ? (
+              <ProfileTabs
+                pageType="othersProfile"
+                tabs={tabs}
+              />
+            ) : null}
+        </SProfileLayout>
+        {children}
+      </SGeneral>
+    </ErrorBoundary>
   );
 };
 
