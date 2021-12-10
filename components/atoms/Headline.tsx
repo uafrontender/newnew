@@ -8,6 +8,7 @@ interface IHeadline {
   children: React.ReactNode;
   animation?: TAnimation;
   animateWhenInView?: boolean;
+  onClick?: () => void;
 }
 
 const Headline: React.FC<IHeadline> = (props) => {
@@ -51,6 +52,7 @@ Headline.defaultProps = {
   variant: 1,
   animation: undefined,
   animateWhenInView: true,
+  onClick: () => {},
 };
 
 export default Headline;

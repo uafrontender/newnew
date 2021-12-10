@@ -60,7 +60,7 @@ const MyProfileSettginsIndex: NextPage = () => {
   // Measurements
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet', 'tabletL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   // Logout loading
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
