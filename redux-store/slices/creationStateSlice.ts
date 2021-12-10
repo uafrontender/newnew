@@ -15,10 +15,10 @@ export interface ICreationStateInterface {
     };
   },
   auction: {
-    minimalBid: string;
+    minimalBid: number;
   }
   crowdfunding: {
-    backingPrice: string;
+    backingPrice: number;
     targetBackerCount: number;
   }
   multiplechoice: {
@@ -42,10 +42,10 @@ const defaultUIState: ICreationStateInterface = {
     },
   },
   auction: {
-    minimalBid: '1.00',
+    minimalBid: 1,
   },
   crowdfunding: {
-    backingPrice: '1.00',
+    backingPrice: 1,
     targetBackerCount: 1,
   },
   multiplechoice: {
@@ -63,7 +63,7 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationComments(state, { payload }: PayloadAction<boolean>) {
       state.post.options.commentsEnabled = payload;
     },
-    setCreationMinBid(state, { payload }: PayloadAction<string>) {
+    setCreationMinBid(state, { payload }: PayloadAction<number>) {
       state.auction.minimalBid = payload;
     },
     setCreationExpireDate(state, { payload }: PayloadAction<string>) {

@@ -256,10 +256,12 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
             </SInputLabel>
             <SInput
               id={id}
+              min={1}
               ref={inputRef}
               type={inputType}
               value={value}
               onBlur={handleBlur}
+              pattern="\d*"
               onFocus={handleFocus}
               onChange={handleChange}
               placeholder={t(`secondStep.field.${id}.placeholder`)}

@@ -59,7 +59,7 @@ export const General: React.FC<IGeneral> = (props) => {
           },
           {
             key: 'add',
-            url: '/add',
+            url: '/creation',
             width: '20%',
           },
           {
@@ -82,7 +82,7 @@ export const General: React.FC<IGeneral> = (props) => {
           },
           {
             key: 'add',
-            url: '/add',
+            url: '/creation',
             width: '33%',
           },
           {
