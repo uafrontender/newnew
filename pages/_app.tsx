@@ -23,6 +23,9 @@ import isBrowser from '../utils/isBrowser';
 // Socket context
 // import SocketContextProvider from '../contexts/socketContext';
 
+// Global Cookies instance
+import { cookiesInstance } from '../api/apiConfigs';
+
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -74,7 +77,9 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="robots" content="noindex" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
-      <CookiesProvider>
+      <CookiesProvider
+        cookies={cookiesInstance}
+      >
         {/* <SocketContextProvider> */}
         <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
           <ResizeMode>

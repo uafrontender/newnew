@@ -4,7 +4,9 @@ import * as $protobuf from 'protobufjs';
 import { Cookies } from 'react-cookie';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-const cookiesInstance = new Cookies();
+
+// Initialize global Cookies instance available throughout the whole app
+export const cookiesInstance = new Cookies();
 
 /**
  * Universal interface for RESTful API responses
@@ -182,8 +184,6 @@ ResponseType = keyof NewnewapiType>(
         // refreshToken: 'wrong token',
       });
       const resRefresh = await refreshCredentials(refreshPayload);
-
-      console.log(resRefresh);
 
       if (!resRefresh.data || resRefresh.error) throw new Error('Refresh failed');
 
