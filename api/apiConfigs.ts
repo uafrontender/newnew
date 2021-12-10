@@ -140,7 +140,6 @@ export type TTokenCookie = {
  * @param url resource string, necessary query params are also set here
  * @param method HTTP method
  * @param payload payload to be sent to the API
- * @param headers additional headers, should be initialized with `new Headers()`
  * @param tokens access and refresh tokens, when used server-side
  * @param updateCookieServerSideCallback used to update cookies server-side
  */
