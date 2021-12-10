@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import Head from 'next/head';
+import moment from 'moment';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
@@ -108,6 +109,34 @@ export const CreationSecondStep = () => {
       title: t('secondStep.field.expiresAt.options.7-days'),
     },
   ], [t]);
+  const formatStartsAtDescription = () => {
+    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+
+    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes())
+      .format('ddd, DD MMM [at] hh A');
+  };
+  const formatExpiresAtDescription = () => {
+    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+    const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+
+    if (post.expiresAt === '1-hour') {
+      dateValue.add(1, 'h');
+    } else if (post.expiresAt === '6-hours') {
+      dateValue.add(6, 'h');
+    } else if (post.expiresAt === '12-hours') {
+      dateValue.add(12, 'h');
+    } else if (post.expiresAt === '1-day') {
+      dateValue.add(1, 'd');
+    } else if (post.expiresAt === '3-days') {
+      dateValue.add(3, 'd');
+    } else if (post.expiresAt === '5-days') {
+      dateValue.add(5, 'd');
+    } else if (post.expiresAt === '7-days') {
+      dateValue.add(7, 'd');
+    }
+
+    return dateValue.format('ddd, DD MMM [at] hh A');
+  };
 
   return (
     <SWrapper>
@@ -171,7 +200,7 @@ export const CreationSecondStep = () => {
                   options={expireOptions}
                   onChange={handleItemChange}
                   formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-                  formattedDescription="00 Nov 0000 at 00 PM"
+                  formattedDescription={formatExpiresAtDescription()}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
@@ -180,8 +209,8 @@ export const CreationSecondStep = () => {
                   type="date"
                   value={post.startsAt}
                   onChange={handleItemChange}
-                  formattedValue={post.startsAt}
-                  formattedDescription="00 Nov 0000 at 00 PM"
+                  formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
+                  formattedDescription={formatStartsAtDescription()}
                 />
               </SFieldWrapper>
             </SListWrapper>

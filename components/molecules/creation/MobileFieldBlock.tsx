@@ -16,6 +16,7 @@ import Headline from '../../atoms/Headline';
 import Calendar from '../../atoms/creation/Calendar';
 import InlineSVG from '../../atoms/InlineSVG';
 import CustomToggle from '../CustomToggle';
+import TimePicker from './TimePicker';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
@@ -149,15 +150,24 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         },
       ];
       const renderDay = (el: any) => (
-        <SDay key={el.id} variant={2} weight={500}>
+        <SDay key={el.id} variant={1} weight={500}>
           {t(`secondStep.field.startsAt.modal.days.${el.id}`)}
         </SDay>
       );
       const handleScheduleChange = (selectedId: string) => {
+        if (selectedId === 'right-away') {
+          onChange(id, { date: new Date() });
+        }
         onChange(id, { type: selectedId });
       };
       const handleFormatChange = (selectedId: string) => {
         onChange(id, { 'hours-format': selectedId });
+      };
+      const handleTimeChange = (e: any) => {
+        onChange(id, { time: e.target.value });
+      };
+      const handleDateChange = (date: any) => {
+        onChange(id, { date });
       };
 
       return (
@@ -194,16 +204,25 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 <SCalendarTopGrad />
                 <SCalendarContent>
                   <Calendar
-                    minDate={moment().startOf('M')}
-                    maxDate={moment().add(2, 'M').endOf('M')}
-                    onSelect={() => {}}
-                    selectedDate={moment().startOf('D')}
+                    minDate={moment()}
+                    maxDate={value?.type === 'right-away' ? moment() : moment()
+                      .add(2, 'M')
+                      .endOf('M')}
+                    onSelect={handleDateChange}
+                    selectedDate={moment(value?.date)
+                      .startOf('D')}
                   />
                 </SCalendarContent>
                 <SCalendarBottomGrad />
               </SCalendarWrapper>
               <SSeparator />
               <SModalToggleWrapper>
+                <STimePickerWrapper>
+                  <TimePicker
+                    value={value?.time}
+                    onChange={handleTimeChange}
+                  />
+                </STimePickerWrapper>
                 <CustomToggle
                   options={formatOptions}
                   selected={value?.['hours-format']}
@@ -534,4 +553,8 @@ const SCalendarBottomGrad = styled.div`
   z-index: 1;
   position: absolute;
   background: ${(props) => props.theme.gradients.calendarBottom};
+`;
+
+const STimePickerWrapper = styled.div`
+  margin-right: 10px;
 `;

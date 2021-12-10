@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 import Text from '../atoms/Text';
 
+import { useAppSelector } from '../../redux-store/store';
+
 interface ICustomToggle {
   options: {}[];
   selected: string | undefined;
@@ -15,8 +17,10 @@ const CustomToggle: React.FC<ICustomToggle> = (props) => {
     selected,
     onChange,
   } = props;
+  const { colorMode } = useAppSelector((state) => state.ui);
 
   const renderOption = useCallback((item) => {
+    const isSelected = selected === item.id;
     const handleClick = () => {
       onChange(item.id);
     };
@@ -25,14 +29,19 @@ const CustomToggle: React.FC<ICustomToggle> = (props) => {
       <SOption
         key={item.key}
         onClick={handleClick}
-        selected={selected === item.id}
+        selected={isSelected}
       >
-        <SOptionTitle variant={2} weight={500}>
+        <SOptionTitle
+          weight={500}
+          variant={2}
+          selected={isSelected}
+          colorMode={colorMode}
+        >
           {item.title}
         </SOptionTitle>
       </SOption>
     );
-  }, [onChange, selected]);
+  }, [colorMode, onChange, selected]);
 
   return (
     <SCustomToggleWrapper>
@@ -57,12 +66,20 @@ interface ISOption {
 }
 
 const SOption = styled.div<ISOption>`
+  cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 6px 10px;
   overflow: hidden;
   background: ${(props) => (props.selected ? props.theme.colorsThemed.accent.blue : 'transparent')};
   transition: background-color ease 0.5s;
   border-radius: 12px;
+  pointer-events: ${(props) => (props.selected ? 'none' : 'unset')};
 `;
 
-const SOptionTitle = styled(Text)`
+interface ISOptionTitle {
+  selected: boolean;
+  colorMode: string;
+}
+
+const SOptionTitle = styled(Text)<ISOptionTitle>`
+  color: ${(props) => (props.selected ? `${props.colorMode === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white}` : props.theme.colorsThemed.text.primary)}
 `;
