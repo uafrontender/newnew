@@ -52,9 +52,14 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
 
+        console.log(res);
+
         const { data } = res!!;
 
-        if (!data) throw new Error('No data');
+        if (
+          !data
+          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
+        ) throw new Error('No data');
 
         dispatch(setUserData({
           username: data.me?.username,
