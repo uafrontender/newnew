@@ -1,25 +1,20 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-
-import { useAppSelector } from '../../redux-store/store';
+import React from 'react';
+import styled from 'styled-components';
 
 import General from './General';
+import ErrorBoundary from '../organisms/ErrorBoundary';
 
-const MyProfileSettingsLayout: React.FunctionComponent = ({
-  children,
-}) => {
-  const { t } = useTranslation('profile');
+const MyProfileSettingsLayout: React.FunctionComponent = (props) => {
+  const { children } = props;
 
   return (
-    <SGeneral>
-      <SSettingsLayout>
-        { children }
-      </SSettingsLayout>
-    </SGeneral>
+    <ErrorBoundary>
+      <SGeneral>
+        <SSettingsLayout>
+          {children}
+        </SSettingsLayout>
+      </SGeneral>
+    </ErrorBoundary>
   );
 };
 
@@ -37,6 +32,7 @@ const SGeneral = styled(General)`
       div:first-child {
         padding-left: 0;
         padding-right: 0;
+
         div:first-child {
           margin-left: 0;
           margin-right: 0;

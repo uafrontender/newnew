@@ -118,10 +118,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         <SHeadline
           variant={3}
         >
-          {reason ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}` : t('heading.sign_in')}
+          {reason && reason !== 'session_expired' ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}` : t('heading.sign_in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
-          {t('heading.subheading')}
+          { reason !== 'session_expired' ? t('heading.subheading') : t('heading.subheadingSessionExpired') }
         </SSubheading>
         <MSContentWrapper
           variants={container}

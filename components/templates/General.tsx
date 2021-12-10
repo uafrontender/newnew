@@ -9,6 +9,7 @@ import Footer from '../organisms/Footer';
 import Header from '../organisms/Header';
 import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
+import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -104,41 +105,43 @@ export const General: React.FC<IGeneral> = (props) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   return (
-    <SWrapper
-      id="generalScrollContainer"
-      ref={wrapperRef}
-      withBanner={!!banner?.show}
-      {...props}
-    >
-      <Head>
-        <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
-      </Head>
-      <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
-      <SContent>
-        <Container noMaxContent>
-          <Row>
-            <Col>
-              {children}
-            </Col>
-          </Row>
-        </Container>
-      </SContent>
-      <Footer />
-      <BottomNavigation
-        visible={isMobile && scrollDirection !== 'down'}
-        collection={bottomNavigation}
-      />
-      <SortingContainer
-        id="sorting-container"
-        withCookie={cookies.accepted !== 'true'}
-        bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-      />
-      <CookieContainer
-        bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+    <ErrorBoundary>
+      <SWrapper
+        id="generalScrollContainer"
+        ref={wrapperRef}
+        withBanner={!!banner?.show}
+        {...props}
       >
-        <Cookie />
-      </CookieContainer>
-    </SWrapper>
+        <Head>
+          <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
+        </Head>
+        <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
+        <SContent>
+          <Container noMaxContent>
+            <Row>
+              <Col>
+                {children}
+              </Col>
+            </Row>
+          </Container>
+        </SContent>
+        <Footer />
+        <BottomNavigation
+          visible={isMobile && scrollDirection !== 'down'}
+          collection={bottomNavigation}
+        />
+        <SortingContainer
+          id="sorting-container"
+          withCookie={cookies.accepted !== 'true'}
+          bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+        />
+        <CookieContainer
+          bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+        >
+          <Cookie />
+        </CookieContainer>
+      </SWrapper>
+    </ErrorBoundary>
   );
 };
 

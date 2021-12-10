@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 import type { GetServerSideProps, NextPage } from 'next';
 import Lottie from 'react-lottie';
 import { useRouter } from 'next/router';
@@ -16,7 +17,7 @@ import { APIResponse } from '../../api/apiConfigs';
 import { SUPPORTED_AUTH_PROVIDERS } from '../../constants/general';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setCredentialsData, setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import { setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -37,9 +38,10 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
   provider,
   body,
 }) => {
+  const router = useRouter();
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -112,11 +114,23 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           bio: data.me?.bio,
           options: data.me?.options,
         }));
-        dispatch(setCredentialsData({
-          accessToken: data.credential?.accessToken,
-          refreshToken: data.credential?.refreshToken,
-          expiresAt: data.credential?.expiresAt?.seconds,
-        }));
+        // Set credential cookies
+        setCookie(
+          'accessToken',
+          data.credential?.accessToken,
+          {
+            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+          },
+        );
+        setCookie(
+          'refreshToken',
+          data.credential?.refreshToken,
+          {
+            // Expire in 10 years
+            maxAge: (10 * 365 * 24 * 60 * 60),
+          },
+        );
+
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);

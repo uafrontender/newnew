@@ -5,11 +5,12 @@ import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useCookies } from 'react-cookie';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
-  setCredentialsData, setSignupEmailInput, setUserData, setUserLoggedIn,
+  setSignupEmailInput, setUserData, setUserLoggedIn,
 } from '../../redux-store/slices/userStateSlice';
 
 // API
@@ -42,6 +43,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
+
+  // useCookies
+  const [, setCookie] = useCookies();
 
   // isSuccess - no bottom sections
   const [isSucces, setIsSuccess] = useState(false);
@@ -86,11 +90,24 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         bio: data.me?.bio,
         options: data.me?.options,
       }));
-      dispatch(setCredentialsData({
-        accessToken: data.credential?.accessToken,
-        refreshToken: data.credential?.refreshToken,
-        expiresAt: data.credential?.expiresAt?.seconds,
-      }));
+      // Set credential cookies
+      setCookie(
+        'accessToken',
+        data.credential?.accessToken,
+        {
+          expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+        },
+      );
+      setCookie(
+        'refreshToken',
+        data.credential?.refreshToken,
+        {
+          // Expire in 10 years
+          maxAge: (10 * 365 * 24 * 60 * 60),
+        },
+      );
+
+      // Set logged in and
       dispatch(setUserLoggedIn(true));
       dispatch(setSignupEmailInput(''));
 
@@ -111,8 +128,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   [
     setIsSigninWithEmailLoading,
     setSubmitError,
-    signupEmailInput,
     setTimerActive,
+    setCookie,
+    signupEmailInput,
     dispatch,
     router,
   ]);

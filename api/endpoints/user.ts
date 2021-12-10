@@ -2,6 +2,8 @@ import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
   fetchProtobuf,
+  fetchProtobufProtectedIntercepted,
+  TTokenCookie,
 } from '../apiConfigs';
 
 export const BASE_URL_USER = `${BASE_URL}/user`;
@@ -9,44 +11,52 @@ export const BASE_URL_USER = `${BASE_URL}/user`;
 // Own data
 export const validateEditProfileTextFields = (
   payload: newnewapi.ValidateTextRequest,
-  token: string,
-) => fetchProtobuf<newnewapi.ValidateTextRequest, newnewapi.ValidateTextResponse>(
+) => fetchProtobufProtectedIntercepted<
+newnewapi.ValidateTextRequest, newnewapi.ValidateTextResponse>(
   newnewapi.ValidateTextRequest,
   newnewapi.ValidateTextResponse,
   `${BASE_URL_USER}/validate_text`,
   'post',
   payload,
-  {
-    'x-auth-token': token,
-  },
 );
 
 export const updateMe = (
   payload: newnewapi.UpdateMeRequest,
-  token: string,
-) => fetchProtobuf<newnewapi.UpdateMeRequest, newnewapi.UpdateMeResponse>(
+) => fetchProtobufProtectedIntercepted<newnewapi.UpdateMeRequest, newnewapi.UpdateMeResponse>(
   newnewapi.UpdateMeRequest,
   newnewapi.UpdateMeResponse,
   `${BASE_URL_USER}/update_me`,
   'post',
   payload,
-  {
-    'x-auth-token': token,
-  },
 );
 
 export const logout = (
   payload: newnewapi.EmptyRequest,
-  token: string,
-) => fetchProtobuf<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
   newnewapi.EmptyRequest,
   newnewapi.EmptyResponse,
   `${BASE_URL_USER}/log_out`,
   'post',
   payload,
-  {
-    'x-auth-token': token,
+);
+
+// Test
+export const getMyPosts = (
+  payload: newnewapi.GetMyPostsRequest,
+  tokens?: {
+    accessToken: string;
+    refreshToken: string;
   },
+  updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.GetMyPostsRequest, newnewapi.PagedPostsResponse>(
+  newnewapi.GetMyPostsRequest,
+  newnewapi.PagedPostsResponse,
+  `${BASE_URL}/post/get_my_posts`,
+  'post',
+  payload,
+  tokens,
+  updateCookieServerSideCallback,
 );
 
 // Other users
