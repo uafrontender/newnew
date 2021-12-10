@@ -4,11 +4,14 @@ import type { GetServerSideProps, NextPage } from 'next';
 import Lottie from 'react-lottie';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useCookies } from 'react-cookie';
 
 import { signInWithEmail } from '../../api/endpoints/auth';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setCredentialsData, setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import {
+  setUserData, setUserLoggedIn, setSignupEmailInput,
+} from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -21,9 +24,10 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   email_address,
   token,
 }) => {
+  const router = useRouter();
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
 
@@ -62,11 +66,24 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           bio: data.me?.bio,
           options: data.me?.options,
         }));
-        dispatch(setCredentialsData({
-          accessToken: data.credential?.accessToken,
-          refreshToken: data.credential?.refreshToken,
-          expiresAt: data.credential?.expiresAt?.seconds,
-        }));
+        // Set credential cookies
+        setCookie(
+          'accessToken',
+          data.credential?.accessToken,
+          {
+            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+          },
+        );
+        setCookie(
+          'refreshToken',
+          data.credential?.refreshToken,
+          {
+            // Expire in 10 years
+            maxAge: (10 * 365 * 24 * 60 * 60),
+          },
+        );
+
+        dispatch(setSignupEmailInput(''));
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);

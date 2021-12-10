@@ -17,7 +17,18 @@ import DropdownSelect, { TDropdownSelectItem } from '../../atoms/DropdownSelect'
 import CalendarIcon from '../../../public/images/svg/icons/filled/Calendar.svg';
 // Signs
 import CakeIcon from '../../../public/images/png/astrology-signs/Cake.png';
+import AquariusIcon from '../../../public/images/png/astrology-signs/Aquarius.png';
+import PiscesIcon from '../../../public/images/png/astrology-signs/Pisces.png';
+import AriesIcon from '../../../public/images/png/astrology-signs/Aries.png';
+import TaurusIcon from '../../../public/images/png/astrology-signs/Taurus.png';
+import GeminiIcon from '../../../public/images/png/astrology-signs/Gemini.png';
+import CancerIcon from '../../../public/images/png/astrology-signs/Cancer.png';
+import LeoIcon from '../../../public/images/png/astrology-signs/Leo.png';
+import VirgoIcon from '../../../public/images/png/astrology-signs/Virgo.png';
+import LibraIcon from '../../../public/images/png/astrology-signs/Libra.png';
+import ScorpioIcon from '../../../public/images/png/astrology-signs/Scorpio.png';
 import SagittariusIcon from '../../../public/images/png/astrology-signs/Sagittarius.png';
+import CapricornIcon from '../../../public/images/png/astrology-signs/Capricorn.png';
 
 // Datepicker utils
 import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
@@ -46,18 +57,18 @@ for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
 
 const signs: IAstrologySigns = {
   Cake: CakeIcon,
-  Aquarius: SagittariusIcon,
-  Pisces: SagittariusIcon,
-  Aries: SagittariusIcon,
-  Taurus: SagittariusIcon,
-  Gemini: SagittariusIcon,
-  Cancer: SagittariusIcon,
-  Leo: SagittariusIcon,
-  Virgo: SagittariusIcon,
-  Libra: SagittariusIcon,
-  Scorpio: SagittariusIcon,
+  Aquarius: AquariusIcon,
+  Pisces: PiscesIcon,
+  Aries: AriesIcon,
+  Taurus: TaurusIcon,
+  Gemini: GeminiIcon,
+  Cancer: CancerIcon,
+  Leo: LeoIcon,
+  Virgo: VirgoIcon,
+  Libra: LibraIcon,
+  Scorpio: ScorpioIcon,
   Sagittarius: SagittariusIcon,
-  Capricorn: SagittariusIcon,
+  Capricorn: CapricornIcon,
 };
 
 interface ISettingsBirthDateInput {

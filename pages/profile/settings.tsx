@@ -6,13 +6,14 @@ import { newnewapi } from 'newnew-api';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useCookies } from 'react-cookie';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice';
-import { logoutUser } from '../../redux-store/slices/userStateSlice';
+import { logoutUser, logoutUserClearCookiesAndRedirect } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { logout } from '../../api/endpoints/user';
@@ -50,9 +51,11 @@ const MyProfileSettginsIndex: NextPage = () => {
   // Translations
   const { t } = useTranslation('profile');
   const { t: commonT } = useTranslation('common');
+  // useCookies
+  const [, , removeCookie] = useCookies();
   // Redux
   const dispatch = useAppDispatch();
-  const { userData, credentialsData, loggedIn } = useAppSelector((state) => state.user);
+  const { userData, loggedIn } = useAppSelector((state) => state.user);
   const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
   // Measurements
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
@@ -78,19 +81,30 @@ const MyProfileSettginsIndex: NextPage = () => {
 
         const res = await logout(
           payload,
-          credentialsData?.accessToken!!,
         );
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Log out failed');
 
         dispatch(logoutUser(''));
+        // Unset credential cookies
+        removeCookie('accessToken');
+        removeCookie('refreshToken');
+
         setIsLogoutLoading(false);
       } catch (err) {
-        setIsLogoutLoading(false);
         console.error(err);
+        setIsLogoutLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+        }
       }
     },
-    [dispatch, credentialsData, setIsLogoutLoading],
+    [dispatch, setIsLogoutLoading, removeCookie],
   );
 
   // temp

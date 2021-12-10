@@ -12,7 +12,8 @@
       "bid": "bid",
       "subscribe": "subscribe"
     },
-    "subheading": "We'll sign you in or create an account."
+    "subheading": "We'll sign you in or create an account.",
+    "subheadingSessionExpired": "Session expired, please sign in again"
   },
   "signupOptions": {
     "google": "Continue with Google",

@@ -1,10 +1,12 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import {
+  Action,
   combineReducers,
   configureStore,
   EnhancedStore,
   ReducerFromReducersMapObject,
   StateFromReducersMapObject,
+  ThunkAction,
 } from '@reduxjs/toolkit';
 
 // React-persist
@@ -99,6 +101,8 @@ const makeStore = () => {
 
 export type RootState = StateFromReducersMapObject<typeof reducers>
 export type AppDispatch = ReducerFromReducersMapObject<typeof reducers>
+export type AppThunk<ReturnType = void> =
+ThunkAction<ReturnType, RootState, unknown, Action<string>>
 
 export const useAppDispatch = (): any => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
