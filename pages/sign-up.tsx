@@ -14,7 +14,7 @@ import AuthLayout from '../components/templates/AuthLayout';
 import SignupMenu from '../components/organisms/SignupMenu';
 
 // Sign up reasons
-export const signupReasons = ['comment', 'bid', 'subscribe'] as const;
+export const signupReasons = ['comment', 'bid', 'subscribe', 'session_expired'] as const;
 export type SignupReason = typeof signupReasons[number];
 
 interface ISignup {

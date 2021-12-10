@@ -61,35 +61,48 @@ export default MyProfileIndex;
 export async function getServerSideProps(
   context: GetServerSidePropsContext,
 ): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'profile'],
-  );
+  try {
+    const translationContext = await serverSideTranslations(
+      context.locale!!,
+      ['common', 'profile'],
+    );
 
-  const { req } = context;
-  // Example of using protected & intercepted fetching function is SSR context
-  const payload = new newnewapi.GetMyPostsRequest({
-    kind: newnewapi.GetMyPostsRequest.Kind.MY_ACTIVE_BIDDINGS,
-  });
-  const res = await getMyPosts(
-    payload,
-    {
-      accessToken: req.cookies?.accessToken,
-      refreshToken: req.cookies?.refreshToken,
-    },
-    (tokens: TTokenCookie[]) => {
-      const parsedTokens = tokens.map((t) => `${t.name}=${t.value}; ${t.expires ? `expires=${t.expires}; ` : ''} ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`);
-      context.res.setHeader(
-        'set-cookie',
-        parsedTokens,
-      );
-    },
-  );
-  console.log(res);
+    const { req } = context;
+    // Example of using protected & intercepted fetching function is SSR context
+    const payload = new newnewapi.GetMyPostsRequest({
+      kind: newnewapi.GetMyPostsRequest.Kind.MY_ACTIVE_BIDDINGS,
+    });
+    const res = await getMyPosts(
+      payload,
+      {
+        accessToken: req.cookies?.accessToken,
+        refreshToken: req.cookies?.refreshToken,
+      },
+      (tokens: TTokenCookie[]) => {
+        const parsedTokens = tokens.map((t) => `${t.name}=${t.value}; ${t.expires ? `expires=${t.expires}; ` : ''} ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`);
+        context.res.setHeader(
+          'set-cookie',
+          parsedTokens,
+        );
+      },
+    );
 
-  return {
-    props: {
-      ...translationContext,
-    },
-  };
+    console.log(res);
+
+    return {
+      props: {
+        ...translationContext,
+      },
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      props: {
+        error: {
+          message: (err as Error).message,
+          statusCode: 400,
+        },
+      },
+    };
+  }
 }

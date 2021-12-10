@@ -13,7 +13,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice';
-import { logoutUser } from '../../redux-store/slices/userStateSlice';
+import { logoutUser, logoutUserClearCookiesAndRedirect } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { logout } from '../../api/endpoints/user';
@@ -92,8 +92,16 @@ const MyProfileSettginsIndex: NextPage = () => {
 
         setIsLogoutLoading(false);
       } catch (err) {
-        setIsLogoutLoading(false);
         console.error(err);
+        setIsLogoutLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+        }
       }
     },
     [dispatch, setIsLogoutLoading, removeCookie],

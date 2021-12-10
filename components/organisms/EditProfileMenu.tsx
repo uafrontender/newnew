@@ -13,7 +13,7 @@ import { Area, Point } from 'react-easy-crop/types';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setUserData } from '../../redux-store/slices/userStateSlice';
+import { logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
 
 // Components
 import Button from '../atoms/Button';
@@ -193,8 +193,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } catch (err) {
       console.error(err);
       setIsAPIValidateLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
     }
-  }, [setFormErrors]);
+  }, [setFormErrors, dispatch]);
 
   const validateTextViaAPIDebounced = useMemo(() => debounce((
     kind: newnewapi.ValidateTextRequest.Kind,
@@ -366,6 +374,14 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } catch (err) {
       console.error(err);
       setIsLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
     }
   }, [
     setIsLoading, handleClose, dispatch,
@@ -495,9 +511,17 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       setUpdateProfileImageLoading(false);
       handleSetStageToEditingGeneral();
-    } catch (e) {
+    } catch (err) {
+      console.error(err);
       setUpdateProfileImageLoading(false);
-      console.error(e);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
     }
   }, [
     croppedAreaProfileImage,

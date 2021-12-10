@@ -47,7 +47,7 @@ export const handleProtobufResponse = (response: Response): Promise<ArrayBuffer>
       return resolve(response.arrayBuffer());
     }
     if (response.status >= 400 && response.status < 404) {
-      return reject(new Error('Token invalid'));
+      return reject(new Error('Access token invalid'));
     }
     return reject(new Error('An error occured'));
   });
@@ -140,7 +140,7 @@ export type TTokenCookie = {
  * @param url resource string, necessary query params are also set here
  * @param method HTTP method
  * @param payload payload to be sent to the API
- * @param tokens access and refresh tokens, when used server-side
+ * @param serverSideTokens access and refresh tokens, when used server-side
  * @param updateCookieServerSideCallback used to update cookies server-side
  */
 export async function fetchProtobufProtectedIntercepted<
@@ -151,20 +151,24 @@ ResponseType = keyof NewnewapiType>(
   url: string,
   method: Request['method'] = 'get',
   payload?: RequestType,
-  tokens?: {
+  serverSideTokens?: {
     accessToken: string;
     refreshToken: string;
   },
   updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void,
 ): Promise<APIResponse<ResponseType>> {
+  // Declare response
+  let res: APIResponse<ResponseType>;
   // Try to get tokens - from react-cookie instance or from passed params
-  const accessToken = tokens?.accessToken ?? cookiesInstance.get('accessToken');
-  const refreshToken = tokens?.refreshToken ?? cookiesInstance.get('refreshToken');
-
-  if (!accessToken) throw new Error('No token');
+  const accessToken = serverSideTokens?.accessToken ?? cookiesInstance.get('accessToken');
+  const refreshToken = serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
 
   try {
-    let res: APIResponse<ResponseType> = await fetchProtobuf<
+    if (!accessToken && !refreshToken) throw new Error('No token');
+    if (!accessToken && refreshToken) throw new Error('Access token invalid');
+
+    // Try to make request if access and refresh tokens are present
+    res = await fetchProtobuf<
     RequestType, ResponseType>(
       reqT,
       resT,
@@ -176,69 +180,93 @@ ResponseType = keyof NewnewapiType>(
       },
     );
 
-    // Invalid token, refresh and try again
-    if (!res.data && res.error?.message === 'Token invalid') {
-      const refreshPayload = new newnewapi.RefreshCredentialRequest({
-        refreshToken,
-        // refreshToken: 'wrong token',
-      });
-      const resRefresh = await refreshCredentials(refreshPayload);
-
-      if (!resRefresh.data || resRefresh.error) throw new Error('Refresh failed');
-
-      // Client side
-      if (!tokens) {
-        cookiesInstance.set(
-          'accessToken',
-          resRefresh.data.credential?.accessToken,
-          {
-            expires: new Date((resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000),
-          },
-        );
-        cookiesInstance.set(
-          'refreshToken',
-          resRefresh.data.credential?.refreshToken,
-          {
-            // Expire in 10 years
-            maxAge: (10 * 365 * 24 * 60 * 60),
-          },
-        );
-      } else {
-        // Server-side
-        updateCookieServerSideCallback?.([
-          {
-            name: 'accessToken',
-            value: resRefresh.data.credential?.accessToken!!,
-            expires: new Date((
-              resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000)
-              .toUTCString(),
-          },
-          {
-            name: 'refreshToken',
-            value: resRefresh.data.credential?.refreshToken!!,
-            maxAge: (10 * 365 * 24 * 60 * 60).toString(),
-          },
-        ]);
-      }
-
-      // Try again with new credentials
-      res = await fetchProtobuf<
-        RequestType, ResponseType>(
-          reqT,
-          resT,
-          url,
-          method,
-          payload,
-          {
-            'x-auth-token': resRefresh.data.credential?.accessToken,
-          },
-        );
+    // Throw an error if the access token was invalid
+    if (!res.data && res.error?.message === 'Access token invalid') {
+      throw new Error(res.error?.message);
     }
 
     return res;
-  } catch (err) {
+  } catch (errFirstAttempt) {
+    // Invalid acces token, refresh and try again
+    if ((errFirstAttempt as Error).message === 'Access token invalid') {
+      try {
+        const refreshPayload = new newnewapi.RefreshCredentialRequest({
+          refreshToken,
+        });
+        const resRefresh = await refreshCredentials(refreshPayload);
+
+        // Refresh failed, session "expired"
+        // (i.e. user probably logged in from another device, or exceeded
+        // max number of logged in devices/browsers)
+        if (!resRefresh.data || resRefresh.error) throw new Error('Refresh token invalid');
+
+        // Refreshed succeded, re-set access and refresh tokens
+        // Client side
+        if (!serverSideTokens) {
+          cookiesInstance.set(
+            'accessToken',
+            resRefresh.data.credential?.accessToken,
+            {
+              expires: new Date((
+                resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000),
+            },
+          );
+          cookiesInstance.set(
+            'refreshToken',
+            resRefresh.data.credential?.refreshToken,
+            {
+              // Expire in 10 years
+              maxAge: (10 * 365 * 24 * 60 * 60),
+            },
+          );
+        } else {
+          // Server-side
+          updateCookieServerSideCallback?.([
+            {
+              name: 'accessToken',
+              value: resRefresh.data.credential?.accessToken!!,
+              expires: new Date((
+                resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000)
+                .toUTCString(),
+            },
+            {
+              name: 'refreshToken',
+              value: resRefresh.data.credential?.refreshToken!!,
+              maxAge: (10 * 365 * 24 * 60 * 60).toString(),
+            },
+          ]);
+        }
+        // Try request again with new credentials
+        res = await fetchProtobuf<
+          RequestType, ResponseType>(
+            reqT,
+            resT,
+            url,
+            method,
+            payload,
+            {
+              'x-auth-token': resRefresh.data.credential?.accessToken,
+            },
+          );
+        return res;
+      } catch (errSecondAttempt) {
+        // If error is auth-related - throw
+        if (
+          (errSecondAttempt as Error).message === 'Refresh token invalid'
+        ) throw new Error((errSecondAttempt as Error).message);
+        // Return as APIResponse.error
+        return {
+          error: errSecondAttempt as Error,
+        };
+      }
+    }
+    // If error is auth-related - throw
+    if (
+      (errFirstAttempt as Error).message === 'No token'
+    ) throw new Error((errFirstAttempt as Error).message);
+    // Return as APIResponse.error
     return {
-      error: err as Error,
+      error: errFirstAttempt as Error,
     };
   }
 }

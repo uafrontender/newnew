@@ -10,6 +10,9 @@ import { CookiesProvider } from 'react-cookie';
 import { parse, UserAgent } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 
+// Custom error page
+import Error from './_error';
+
 // Global CSS configurations
 import ResizeMode from '../HOC/ResizeMode';
 import GlobalTheme from '../styles/ThemeProvider';
@@ -28,7 +31,7 @@ import { cookiesInstance } from '../api/apiConfigs';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode
+  getLayout?: (page: ReactElement) => ReactNode,
 }
 
 interface IMyApp extends AppProps {
@@ -84,7 +87,14 @@ const MyApp = (props: IMyApp): ReactElement => {
         <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
           <ResizeMode>
             <GlobalTheme>
-              {getLayout(<Component {...pageProps} />)}
+              {!pageProps.error ? (
+                getLayout(<Component {...pageProps} />)
+              ) : (
+                <Error
+                  errorMsg={pageProps.error?.message}
+                  statusCode={pageProps.error?.statusCode ?? 500}
+                />
+              )}
             </GlobalTheme>
           </ResizeMode>
         </PersistGate>

@@ -1,8 +1,11 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { newnewapi } from 'newnew-api';
+import router from 'next/router';
+import { cookiesInstance } from '../../api/apiConfigs';
 
 import { DEFAULT_CURRENCY } from '../../constants/general';
+import { AppThunk } from '../store';
 
 export type TUserData = Omit<newnewapi.Me, 'toJSON' | '_nickname' | '_email'>;
 
@@ -83,3 +86,13 @@ export const {
 } = userSlice.actions;
 
 export default userSlice.reducer;
+
+// Thunks
+export const logoutUserClearCookiesAndRedirect = (
+  redirectUrl?: string,
+): AppThunk => (dispatch) => {
+  dispatch(logoutUser(''));
+  cookiesInstance.remove('accessToken');
+  cookiesInstance.remove('refreshToken');
+  router.push(redirectUrl ?? '/');
+};
