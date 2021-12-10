@@ -46,7 +46,7 @@
         "title": "Minimum bid",
         "value": "${{value}}",
         "label": "$",
-        "placeholder": "1.00",
+        "placeholder": "1",
         "description": "Starting bid is ${{value}}"
       },
       "expiresAt": {

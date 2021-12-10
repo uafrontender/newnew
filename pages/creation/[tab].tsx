@@ -26,7 +26,6 @@ import {
 } from '../../redux-store/slices/creationStateSlice';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
-import { formatNumber } from '../../utils/format';
 
 export const CreationSecondStep = () => {
   const { t } = useTranslation('creation');
@@ -161,7 +160,7 @@ export const CreationSecondStep = () => {
                   value={auction.minimalBid}
                   onChange={handleItemChange}
                   inputType="number"
-                  formattedDescription={formatNumber(+auction.minimalBid)}
+                  formattedDescription={auction.minimalBid}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
