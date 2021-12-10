@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 
@@ -35,15 +35,13 @@ export const ScrollCalendar: React.FC<IScrollCalendar> = (props) => {
     minDate,
     maxDate,
     onSelect,
-    selectedDate: _selectedDate,
+    selectedDate,
   } = props;
-  const [selectedDate, setSelectedDate] = useState(_selectedDate);
 
   const handleSelectedDate = (e: any, value: any) => {
     if (e) {
       e.preventDefault();
     }
-    setSelectedDate(value);
 
     if (onSelect) {
       onSelect(value);
@@ -137,16 +135,14 @@ export const RenderMonthHeader = (props: any) => {
   const month = date.format('MMMM');
   const year = date.format('YYYY');
   return (
-    <SMonthHeader variant={2} weight={600}>
+    <SMonthHeader variant={1} weight={600}>
       {`${month}, ${year}`}
     </SMonthHeader>
   );
 };
 
 const SMonthHeader = styled(Text)`
-  font-size: 16px;
   text-align: center;
-  line-height: 24px;
   margin-bottom: 16px;
 `;
 
@@ -166,7 +162,7 @@ export const RenderSingleDay = (props: any) => {
     <SDayHolder key={i}>
       <SDay
         weight={isActive ? 600 : 500}
-        variant={2}
+        variant={1}
         onClick={onClick}
         isActive={isActive}
         isDisabled={_isDisabled}
@@ -180,7 +176,6 @@ export const RenderSingleDay = (props: any) => {
 const SDayHolder = styled.li`
   width: 14.28%;
   float: left;
-  cursor: pointer;
   display: flex;
   min-height: 44px;
   text-align: center;
@@ -196,13 +191,14 @@ interface ISDay {
 
 const SDay = styled(Text)<ISDay>`
   width: 44px;
-  color: ${(props) => (props.isActive ? props.theme.colors.white : props.theme.colorsThemed.text.primary)};
+  color: ${(props) => (props.isActive ? props.theme.colors.white : `${props.isDisabled ? props.theme.colorsThemed.text.tertiary : props.theme.colorsThemed.text.primary}`)};
+  cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
   height: 44px;
   display: inline-block;
-  font-size: 16px;
   background: ${(props) => (props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent')};
   line-height: 46px;
   border-radius: 22px;
+  pointer-events: ${(props) => ((props.isDisabled || props.isActive) ? 'none' : 'unset')};
 `;
 
 export const RenderDays = (props: any) => {
@@ -224,11 +220,11 @@ export const RenderDays = (props: any) => {
     for (let i = 1; i <= daysInMonth; i++) {
       elements.push(
         <RenderSingleDay
+          key={i}
           isActive={isSameDate(now.clone(), selectedDate)}
           isDisabled={isDisabled(minDate, now.clone(), maxDate)}
           handleClick={handleSelect}
           currentValue={now.clone()}
-          key={i}
         />,
       );
       now = now.add(1, 'days');

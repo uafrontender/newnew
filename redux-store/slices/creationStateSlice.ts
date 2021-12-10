@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import moment from 'moment';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 export interface ICreationStateInterface {
@@ -7,6 +8,7 @@ export interface ICreationStateInterface {
     startsAt: {
       type: string,
       date: Date,
+      time: string,
       'hours-format': string,
     };
     expiresAt: string;
@@ -34,6 +36,7 @@ const defaultUIState: ICreationStateInterface = {
     startsAt: {
       type: 'right-away',
       date: new Date(),
+      time: moment().format('hh:mm'),
       'hours-format': 'am',
     },
     expiresAt: '1-hour',
