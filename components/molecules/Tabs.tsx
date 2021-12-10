@@ -13,6 +13,7 @@ interface ITabs {
   t: any;
   tabs: Tab[];
   activeTabIndex: number;
+  withTabIndicator?: boolean;
 }
 
 export interface Tab {
@@ -21,7 +22,12 @@ export interface Tab {
 }
 
 const Tabs: React.FunctionComponent<ITabs> = (props) => {
-  const { t, tabs, activeTabIndex } = props;
+  const {
+    t,
+    tabs,
+    activeTabIndex,
+    withTabIndicator,
+  } = props;
   const router = useRouter();
 
   const [windowSize, setWindowSize] = useState({
@@ -290,31 +296,38 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
         {tabs && tabs.map((tab, i) => (
           <STab
             key={tab.nameToken}
-            extraMargin={i === 0 && shouldDrag}
-            type="button"
-            activeTab={i === activeTabIndex}
             ref={(el) => {
               tabRefs.current[i] = el!!;
             }}
-            onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
-            onMouseLeave={handleButtonMouseLeave}
+            type="button"
             onClick={(e) => handleButtonClick(e, tab)}
+            activeTab={i === activeTabIndex}
+            extraMargin={i === 0 && shouldDrag}
+            onMouseLeave={handleButtonMouseLeave}
+            withTabIndicator={withTabIndicator}
+            onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
           >
             {t(`tabs.${tab.nameToken}`)}
           </STab>
         ))}
-        <SActiveTabIndicator
-          style={{
-            width: activeTabIndicator.width,
-            left: activeTabIndicator.left,
-          }}
-        />
+        {withTabIndicator && (
+          <SActiveTabIndicator
+            style={{
+              width: activeTabIndicator.width,
+              left: activeTabIndicator.left,
+            }}
+          />
+        )}
       </STabsContainer>
     </STabs>
   );
 };
 
 export default Tabs;
+
+Tabs.defaultProps = {
+  withTabIndicator: true,
+};
 
 const STabs = styled.div`
   position: relative;
@@ -336,17 +349,20 @@ const STabsContainer = styled.div<{
   overflow: hidden;
 `;
 
-const STab = styled.button<{
+interface ISTab {
   activeTab: boolean;
   extraMargin: boolean;
-}>`
+  withTabIndicator?: boolean;
+}
+
+const STab = styled.button<ISTab>`
   position: relative;
   width: min-content;
 
   background: transparent;
   border: transparent;
 
-  padding-bottom: 6px;
+  padding-bottom: ${({ withTabIndicator }) => (withTabIndicator ? '6px' : '0')};
 
   margin-left: ${({ extraMargin }) => (extraMargin ? '24px' : 'initial')};
 

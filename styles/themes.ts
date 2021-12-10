@@ -164,6 +164,8 @@ export const lightTheme: DefaultTheme = {
     heroNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
     heroNotificationsTablet: 'linear-gradient(360deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
     bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
+    calendarTop: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)',
+    calendarBottom: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 98.96%)',
   },
 };
 
@@ -308,5 +310,7 @@ export const darkTheme: DefaultTheme = {
     heroNotifications: 'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
     heroNotificationsTablet: 'linear-gradient(360deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
     bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
+    calendarTop: 'linear-gradient(180deg, #14151F 0%, rgba(20, 21, 31, 0) 100%)',
+    calendarBottom: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, #14151F 100%)',
   },
 };

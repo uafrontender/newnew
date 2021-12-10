@@ -162,6 +162,8 @@ declare module 'styled-components' {
       heroNotifications: string,
       heroNotificationsTablet: string,
       bannerPink: string,
+      calendarTop: string,
+      calendarBottom: string,
     },
     borderRadius: {
       small: string,
