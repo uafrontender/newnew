@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import Lottie from 'react-lottie';
 import styled from 'styled-components';
 
 import Text from '../atoms/Text';
+import Lottie from '../atoms/Lottie';
 
 import checkBoxAnim from '../../public/animations/checkbox.json';
 
