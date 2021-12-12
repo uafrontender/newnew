@@ -26,7 +26,11 @@ interface IMobileFieldBlock {
   value: any;
   options?: {}[];
   onChange: (key: string, value: string | number | boolean | object) => void;
-  inputType?: 'text' | 'number' | 'tel';
+  inputProps?: {
+    min?: number;
+    type?: 'text' | 'number' | 'tel';
+    pattern?: string;
+  };
   formattedValue?: any;
   formattedDescription?: any;
 }
@@ -37,7 +41,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     type,
     value,
     options,
-    inputType,
+    inputProps,
     formattedValue,
     formattedDescription,
     onChange,
@@ -59,10 +63,10 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const handleBlur = useCallback(() => {
     setFocused(false);
 
-    if (!value) {
-      onChange(id, 1);
+    if (inputProps?.type === 'number' && inputProps?.min as number > value) {
+      onChange(id, inputProps?.min as number);
     }
-  }, [id, onChange, value]);
+  }, [inputProps, id, onChange, value]);
   const preventCLick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
@@ -214,7 +218,8 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   <Calendar
                     minDate={moment()}
                     maxDate={value?.type === 'right-away' ? moment() : moment()
-                      .add(2, 'M')
+                      .startOf('M')
+                      .add(1, 'M')
                       .endOf('M')}
                     onSelect={handleDateChange}
                     selectedDate={moment(value?.date)
@@ -268,6 +273,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
       inputRef.current.focus();
     }
   }, [focused, inputRef]);
+  const inputLabel = t(`secondStep.field.${id}.label`);
 
   return (
     <>
@@ -278,20 +284,21 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         </STitle>
         {type === 'input' ? (
           <SInputWrapper>
-            <SInputLabel htmlFor={id}>
-              {t(`secondStep.field.${id}.label`)}
-            </SInputLabel>
+            {inputLabel && (
+              <SInputLabel htmlFor={id}>
+                {inputLabel}
+              </SInputLabel>
+            )}
             <SInput
               id={id}
-              min={1}
               ref={inputRef}
-              type={inputType}
               value={value}
               onBlur={handleBlur}
-              pattern="\d*"
               onFocus={handleFocus}
               onChange={handleChange}
+              withLabel={!!inputLabel}
               placeholder={t(`secondStep.field.${id}.placeholder`)}
+              {...inputProps}
             />
           </SInputWrapper>
         ) : (
@@ -312,7 +319,9 @@ export default MobileFieldBlock;
 MobileFieldBlock.defaultProps = {
   type: '',
   options: [],
-  inputType: 'text',
+  inputProps: {
+    type: 'text',
+  },
   formattedValue: '',
   formattedDescription: '',
 };
@@ -368,13 +377,17 @@ const SInputWrapper = styled.div`
   margin-top: 16px;
 `;
 
-const SInput = styled.input`
+interface ISInput {
+  withLabel: boolean;
+}
+
+const SInput = styled.input<ISInput>`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
   border: none;
   outline: none;
   background: transparent;
-  padding-left: 10px;
+  padding-left: ${(props) => (props.withLabel ? '10px' : '0')};
 
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -422,7 +435,7 @@ const SMobileListContainer = styled.div<ISMobileListContainer>`
 const SMobileDateContainer = styled.div<ISMobileListContainer>`
   width: 100%;
   bottom: ${(props) => (props.focused ? 0 : '-100vh')};
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   transition: bottom ease 0.5s;
