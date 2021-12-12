@@ -69,7 +69,7 @@ export const RenderCalendarYear = (props: any) => {
     minDate,
     maxDate,
   } = props;
-  const totalMonth = Math.round(maxDate.diff(minDate, 'months', true)) + 1;
+  const totalMonth = Math.round(maxDate.diff(minDate, 'months', true));
   const elements = [];
   let now = moment(minDate, 'DD/MMM/YYYY');
   // eslint-disable-next-line no-plusplus

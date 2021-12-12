@@ -15,7 +15,9 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
     <SWrapper>
       <SUserAvatar
         user={{
-          avatar: item.bidUser.avatar,
+          userData: {
+            avatarUrl: item.bidUser.avatar,
+          },
         }}
       />
       <SCenterContent>
@@ -46,7 +48,9 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
       </SCenterContent>
       <SUserAvatarRight
         user={{
-          avatar: item.bidForUser.avatar,
+          userData: {
+            avatarUrl: item.bidForUser.avatar,
+          },
         }}
       />
     </SWrapper>
