@@ -7,23 +7,27 @@ import { NextPageContext } from 'next';
 import styled, { useTheme } from 'styled-components';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import Input from '../../components/atoms/creation/Input';
 import Button from '../../components/atoms/Button';
+import TextArea from '../../components/atoms/creation/TextArea';
 import InlineSVG from '../../components/atoms/InlineSVG';
 import FileUpload from '../../components/molecules/creation/FileUpload';
 import MobileField from '../../components/molecules/creation/MobileField';
 import Tabs, { Tab } from '../../components/molecules/Tabs';
 import CreationLayout from '../../components/templates/CreationLayout';
 import MobileFieldBlock from '../../components/molecules/creation/MobileFieldBlock';
+import DraggableMobileOptions from '../../components/organisms/creation/DraggableMobileOptions';
 
 import { NextPageWithLayout } from '../_app';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
+  clearCreation,
   setCreationTitle,
   setCreationMinBid,
+  setCreationChoices,
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationTargetBackerCount,
 } from '../../redux-store/slices/creationStateSlice';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
@@ -36,9 +40,11 @@ export const CreationSecondStep = () => {
   const {
     post,
     auction,
+    crowdfunding,
+    multiplechoice,
   } = useAppSelector((state) => state.creation);
   const { resizeMode } = useAppSelector((state) => state.ui);
-
+  const { query: { tab } } = router;
   const tabs: Tab[] = useMemo(() => [
     {
       nameToken: 'auction',
@@ -53,7 +59,7 @@ export const CreationSecondStep = () => {
       url: '/creation/crowdfunding',
     },
   ], []);
-  const activeTabIndex = tabs.findIndex((tab) => tab.nameToken === router?.query?.tab);
+  const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const disabled = true;
 
@@ -65,8 +71,9 @@ export const CreationSecondStep = () => {
     } else {
       router.push('/');
     }
-  }, [router]);
-  const handleItemChange = useCallback((key: string, value: string | number | boolean | object) => {
+    dispatch(clearCreation({}));
+  }, [dispatch, router]);
+  const handleItemChange = useCallback((key: string, value: any) => {
     if (key === 'title') {
       dispatch(setCreationTitle(value));
     } else if (key === 'minimalBid') {
@@ -77,6 +84,10 @@ export const CreationSecondStep = () => {
       dispatch(setCreationExpireDate(value));
     } else if (key === 'startsAt') {
       dispatch(setCreationStartDate(value));
+    } else if (key === 'targetBackerCount') {
+      dispatch(setCreationTargetBackerCount(value));
+    } else if (key === 'choices') {
+      dispatch(setCreationChoices(value));
     }
   }, [dispatch]);
   const expireOptions = useMemo(() => [
@@ -112,12 +123,16 @@ export const CreationSecondStep = () => {
   const formatStartsAtDescription = () => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
 
-    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes())
+    return moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes())
       .format('ddd, DD MMM [at] hh A');
   };
   const formatExpiresAtDescription = () => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-    const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+    const dateValue = moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes());
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
@@ -150,6 +165,7 @@ export const CreationSecondStep = () => {
           <Tabs
             t={t}
             tabs={tabs}
+            draggable={false}
             activeTabIndex={activeTabIndex}
             withTabIndicator={!isMobile && resizeMode !== 'tablet'}
           />
@@ -173,7 +189,7 @@ export const CreationSecondStep = () => {
             </SItemWrapper>
             {isMobile && (
               <SItemWrapper>
-                <Input
+                <TextArea
                   id="title"
                   value={post?.title}
                   onChange={handleItemChange}
@@ -181,17 +197,56 @@ export const CreationSecondStep = () => {
                 />
               </SItemWrapper>
             )}
+            {
+              tab === 'multiple-choice' && (
+                <>
+                  <SSeparator margin="16px 0" />
+                  <DraggableMobileOptions
+                    id="choices"
+                    options={multiplechoice.choices}
+                    onChange={handleItemChange}
+                  />
+                  <SSeparator margin="16px 0" />
+                </>
+              )
+            }
             <SListWrapper>
-              <SFieldWrapper>
-                <MobileFieldBlock
-                  id="minimalBid"
-                  type="input"
-                  value={auction.minimalBid}
-                  onChange={handleItemChange}
-                  inputType="number"
-                  formattedDescription={auction.minimalBid}
-                />
-              </SFieldWrapper>
+              {
+                tab === 'auction' && (
+                  <SFieldWrapper>
+                    <MobileFieldBlock
+                      id="minimalBid"
+                      type="input"
+                      value={auction.minimalBid}
+                      onChange={handleItemChange}
+                      formattedDescription={auction.minimalBid}
+                      inputProps={{
+                        min: 5,
+                        type: 'number',
+                        pattern: '[0-9]*',
+                      }}
+                    />
+                  </SFieldWrapper>
+                )
+              }
+              {
+                tab === 'crowdfunding' && (
+                  <SFieldWrapper>
+                    <MobileFieldBlock
+                      id="targetBackerCount"
+                      type="input"
+                      value={crowdfunding.targetBackerCount}
+                      onChange={handleItemChange}
+                      formattedDescription={crowdfunding.targetBackerCount}
+                      inputProps={{
+                        min: 1,
+                        type: 'number',
+                        pattern: '[0-9]*',
+                      }}
+                    />
+                  </SFieldWrapper>
+                )
+              }
               <SFieldWrapper>
                 <MobileFieldBlock
                   id="expiresAt"
@@ -226,13 +281,15 @@ export const CreationSecondStep = () => {
       </div>
       {isMobile && (
         <SButtonWrapper>
-          <SButton
-            view="primaryGrad"
-            onClick={handleSubmit}
-            disabled={disabled}
-          >
-            {t('secondStep.button.preview')}
-          </SButton>
+          <SButtonContent>
+            <SButton
+              view="primaryGrad"
+              onClick={handleSubmit}
+              disabled={disabled}
+            >
+              {t('secondStep.button.preview')}
+            </SButton>
+          </SButtonContent>
         </SButtonWrapper>
       )}
     </SWrapper>
@@ -329,15 +386,37 @@ const SItemWrapper = styled.div`
   margin-top: 16px;
 `;
 
-const SSeparator = styled.div`
+interface ISSeparator {
+  margin?: string;
+}
+
+const SSeparator = styled.div<ISSeparator>`
   width: 100%;
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
-  margin: 8px 0 16px 0;
+  margin: ${(props) => props.margin || '8px 0 16px 0'};
 `;
 
 const SButton = styled(Button)`
   width: 100%;
   padding: 16px 20px;
+
+  &:disabled {
+    cursor: default;
+    opacity: 1;
+    outline: none;
+
+    :after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+      opacity: 1;
+      z-index: 6;
+      position: absolute;
+      background: ${(props) => props.theme.colorsThemed.button.disabled};
+    }
+  }
 `;
 
 const SListWrapper = styled.div`
@@ -356,17 +435,24 @@ const SFieldWrapper = styled.div`
 `;
 
 const SButtonWrapper = styled.div`
-  left: 16px;
-  width: calc(100% - 32px);
-  bottom: 24px;
+  left: 0;
+  width: 100%;
+  bottom: 0;
   z-index: 5;
+  display: flex;
+  padding: 24px 16px;
   position: fixed;
+  background: ${(props) => props.theme.gradients.creationSubmit};
+`;
+
+const SButtonContent = styled.div`
+  width: 100%;
 `;
 
 const SCloseIconWrapper = styled.div`
   top: 50%;
   right: 0;
-  z-index: 5;
+  z-index: 10;
   position: absolute;
   transform: translateY(-50%);
 `;

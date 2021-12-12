@@ -148,6 +148,7 @@ export const lightTheme: DefaultTheme = {
       progress: {
         primaryProgress: '#1D6AFF',
       },
+      disabled: 'rgba(255, 255, 255, 0.5)',
     },
   },
   shadows: {
@@ -166,6 +167,7 @@ export const lightTheme: DefaultTheme = {
     bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
     calendarTop: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)',
     calendarBottom: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 98.96%)',
+    creationSubmit: 'linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);',
   },
 };
 
@@ -294,6 +296,7 @@ export const darkTheme: DefaultTheme = {
       progress: {
         primaryProgress: '#1D6AFF',
       },
+      disabled: 'rgba(11, 10, 19, 0.5)',
     },
   },
   shadows: {
@@ -312,5 +315,6 @@ export const darkTheme: DefaultTheme = {
     bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
     calendarTop: 'linear-gradient(180deg, #14151F 0%, rgba(20, 21, 31, 0) 100%)',
     calendarBottom: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, #14151F 100%)',
+    creationSubmit: 'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%);',
   },
 };

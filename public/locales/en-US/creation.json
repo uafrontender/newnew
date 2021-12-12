@@ -49,6 +49,13 @@
         "placeholder": "1",
         "description": "Starting bid is ${{value}}"
       },
+      "targetBackerCount": {
+        "title": "Minimum backers",
+        "value": "{{value}}",
+        "label": "",
+        "placeholder": "10",
+        "description": "No less than {{value}}"
+      },
       "expiresAt": {
         "title": "Expire after",
         "value": "{{value}}",
@@ -90,6 +97,12 @@
       },
       "comments": {
         "title": "Commenting turned on"
+      },
+      "choices": {
+        "add": "Add another option",
+        "option": {
+          "label": "Option {{value}}"
+        }
       }
     }
   }
