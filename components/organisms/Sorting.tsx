@@ -313,6 +313,7 @@ const SSelectedCounter = styled.div`
   width: 18px;
   height: 18px;
   overflow: hidden;
+  position: relative;
   margin-left: 4px;
   border-radius: 16px;
   background-color: ${(props) => props.theme.colors.white};

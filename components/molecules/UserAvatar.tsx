@@ -81,6 +81,7 @@ interface ISContainer {
 const SContainer = styled.div<ISContainer>`
   width: 36px;
   height: 36px;
+  position: relative;
   overflow: hidden;
   min-width: 36px;
   min-height: 36px;

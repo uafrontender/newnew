@@ -55,6 +55,7 @@ export default CustomToggle;
 const SCustomToggleWrapper = styled.div`
   padding: 6px;
   display: flex;
+  position: relative;
   overflow: hidden;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 12px;
@@ -69,6 +70,7 @@ const SOption = styled.div<ISOption>`
   cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
   padding: 6px 10px;
   overflow: hidden;
+  position: relative;
   background: ${(props) => (props.selected ? props.theme.colorsThemed.accent.blue : 'transparent')};
   transition: background-color ease 0.5s;
   border-radius: 12px;
@@ -81,5 +83,5 @@ interface ISOptionTitle {
 }
 
 const SOptionTitle = styled(Text)<ISOptionTitle>`
-  color: ${(props) => (props.selected ? `${props.colorMode === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white}` : props.theme.colorsThemed.text.primary)}
+  color: ${(props) => (props.selected ? props.theme.colors.white : props.theme.colorsThemed.text.primary)}
 `;

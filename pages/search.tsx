@@ -32,7 +32,9 @@ const Search: NextPage = () => {
       url: testBG,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -40,7 +42,9 @@ const Search: NextPage = () => {
       url: testBG2,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -48,7 +52,9 @@ const Search: NextPage = () => {
       url: testBG3,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -56,7 +62,9 @@ const Search: NextPage = () => {
       url: testBG,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -64,7 +72,9 @@ const Search: NextPage = () => {
       url: testBG2,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -72,7 +82,9 @@ const Search: NextPage = () => {
       url: testBG3,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -80,7 +92,9 @@ const Search: NextPage = () => {
       url: testBG,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -88,7 +102,9 @@ const Search: NextPage = () => {
       url: testBG2,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -96,7 +112,9 @@ const Search: NextPage = () => {
       url: testBG3,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -104,7 +122,9 @@ const Search: NextPage = () => {
       url: testBG,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
   ], []);
@@ -116,7 +136,9 @@ const Search: NextPage = () => {
       amount: 300,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -126,7 +148,9 @@ const Search: NextPage = () => {
       amount: 500,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -136,7 +160,9 @@ const Search: NextPage = () => {
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       amount: 700,
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -146,7 +172,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 2500,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -156,7 +184,9 @@ const Search: NextPage = () => {
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       amount: 200,
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -166,7 +196,9 @@ const Search: NextPage = () => {
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       amount: 250,
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -176,7 +208,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 2400,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -186,7 +220,9 @@ const Search: NextPage = () => {
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       amount: 2570,
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -196,7 +232,9 @@ const Search: NextPage = () => {
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       amount: 200,
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -206,7 +244,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 500,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
   ], []);
@@ -218,7 +258,9 @@ const Search: NextPage = () => {
       votes: 300,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -228,7 +270,9 @@ const Search: NextPage = () => {
       votes: 320,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -238,7 +282,9 @@ const Search: NextPage = () => {
       votes: 200,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -248,7 +294,9 @@ const Search: NextPage = () => {
       votes: 500,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -258,7 +306,9 @@ const Search: NextPage = () => {
       votes: 700,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -268,7 +318,9 @@ const Search: NextPage = () => {
       votes: 100,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -278,7 +330,9 @@ const Search: NextPage = () => {
       votes: 600,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -288,7 +342,9 @@ const Search: NextPage = () => {
       votes: 3000,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -298,7 +354,9 @@ const Search: NextPage = () => {
       votes: 1300,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -308,7 +366,9 @@ const Search: NextPage = () => {
       votes: 200,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
   ], []);
@@ -321,7 +381,9 @@ const Search: NextPage = () => {
       backed: 8000,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -332,7 +394,9 @@ const Search: NextPage = () => {
       backed: 3200,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -343,7 +407,9 @@ const Search: NextPage = () => {
       backed: 1000,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -354,7 +420,9 @@ const Search: NextPage = () => {
       backed: 10000,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -365,7 +433,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -376,7 +446,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -387,7 +459,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -398,7 +472,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -409,7 +485,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -420,7 +498,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'Want a new tattoo. Where should I get it? 🙈',
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
   ], []);
@@ -432,7 +512,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 300,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -442,7 +524,9 @@ const Search: NextPage = () => {
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       votes: 200,
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -453,7 +537,9 @@ const Search: NextPage = () => {
       backed: 1200,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -463,7 +549,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 4500,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -473,7 +561,9 @@ const Search: NextPage = () => {
       votes: 100,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -484,7 +574,9 @@ const Search: NextPage = () => {
       backed: 2340,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -494,7 +586,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 3450,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
     {
@@ -504,7 +598,9 @@ const Search: NextPage = () => {
       votes: 120,
       title: 'New Iron Man. Who will it be? It\'s all depends on you!',
       user: {
-        avatar: testUser3,
+        userData: {
+          avatarUrl: testUser3,
+        },
       },
     },
     {
@@ -515,7 +611,9 @@ const Search: NextPage = () => {
       backed: 3500,
       title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
       user: {
-        avatar: testUser4,
+        userData: {
+          avatarUrl: testUser4,
+        },
       },
     },
     {
@@ -525,7 +623,9 @@ const Search: NextPage = () => {
       title: 'Want a new tattoo. Where should I get it? 🙈',
       amount: 230,
       user: {
-        avatar: testUser2,
+        userData: {
+          avatarUrl: testUser2,
+        },
       },
     },
   ], []);

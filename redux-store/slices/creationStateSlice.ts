@@ -56,6 +56,10 @@ const defaultUIState: ICreationStateInterface = {
         id: 1,
         text: '',
       },
+      {
+        id: 2,
+        text: '',
+      },
     ],
   },
 };

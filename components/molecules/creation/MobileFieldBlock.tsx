@@ -218,9 +218,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                   <Calendar
                     minDate={moment()}
                     maxDate={value?.type === 'right-away' ? moment() : moment()
-                      .startOf('M')
-                      .add(1, 'M')
-                      .endOf('M')}
+                      .add(1, 'M')}
                     onSelect={handleDateChange}
                     selectedDate={moment(value?.date)
                       .startOf('D')}
@@ -331,6 +329,7 @@ const SContainer = styled.div`
   display: flex;
   padding: 16px;
   overflow: hidden;
+  position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
   flex-direction: column;

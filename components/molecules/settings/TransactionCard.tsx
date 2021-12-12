@@ -140,6 +140,7 @@ const SInlineSvg = styled(InlineSvg)`
 
 const SAvatar = styled.div`
   display: none;
+  position: relative;
   overflow: hidden;
 
   grid-area: avatar;
