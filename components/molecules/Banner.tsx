@@ -109,6 +109,7 @@ const SText = styled(Text)`
   color: ${(props) => props.theme.colors.white};
   z-index: 2;
   overflow: hidden;
+  position: relative;
   max-width: 70%;
   text-align: center;
   white-space: nowrap;

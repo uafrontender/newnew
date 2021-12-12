@@ -25,7 +25,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
     e.preventDefault();
     const newValue = e.target.value;
     // if (/[^1-9]/.test(newValue)) return;
-    if (/[^1-9]/.test(newValue)) return;
+    if (/[^0-9]/.test(newValue)) return;
 
     const workingCode = [...code];
     workingCode[slot] = newValue;
@@ -60,7 +60,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
 
     if (!data) return;
 
-    const regex = /[1-9]/;
+    const regex = /[0-9]/;
 
     if (data && !Array.isArray(data) && data.length === 6 && regex.test(data)) {
       const pastedCode = data.split('');

@@ -203,6 +203,7 @@ export const CreationSecondStep = () => {
                   <SSeparator margin="16px 0" />
                   <DraggableMobileOptions
                     id="choices"
+                    min={2}
                     options={multiplechoice.choices}
                     onChange={handleItemChange}
                   />

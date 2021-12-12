@@ -199,7 +199,8 @@ const SAvatar = styled.div`
   align-items: center;
 
   overflow: hidden;
-
+  position: relative;
+  
   grid-area: avatar;
   justify-self: left;
 

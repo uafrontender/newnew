@@ -71,6 +71,7 @@ const SMinifiedIndicator = styled.div`
   height: 6px;
   padding: 3px;
   overflow: hidden;
+  position: relative;
   border-radius: 50px;
   background-color: ${(props) => props.theme.colorsThemed.accent.pink};
 `;

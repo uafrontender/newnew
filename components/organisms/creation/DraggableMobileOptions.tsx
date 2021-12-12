@@ -10,6 +10,7 @@ import plusIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 
 interface IDraggableMobileOptions {
   id: string;
+  min: number;
   options: {}[];
   onChange: (key: string, value: any) => void;
 }
@@ -17,6 +18,7 @@ interface IDraggableMobileOptions {
 export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props) => {
   const {
     id,
+    min,
     options,
     onChange,
   } = props;
@@ -43,12 +45,13 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props)
       key={`draggable-option-${item.id}`}
       item={item}
       index={index}
+      withDelete={options.length > min}
       handleChange={handleOptionChange}
     />
   );
   const handleAddNewOption = () => {
     onChange(id, [...options, {
-      id: options.length + 1,
+      id: Date.now(),
       text: '',
     }]);
   };

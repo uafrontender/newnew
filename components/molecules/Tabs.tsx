@@ -350,6 +350,7 @@ const STabsContainer = styled.div<{
 
   width: ${({ shouldDrag }) => (shouldDrag ? 'min-content' : '100%')};
   overflow: hidden;
+  position: relative;
 `;
 
 interface ISTab {

@@ -15,18 +15,27 @@ interface IOptionItem {
     text: string;
   };
   index: number;
+  withDelete: boolean;
   handleChange: (index: number, item: object | null) => void;
 }
 
 export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
-  const { item, index, handleChange } = props;
+  const {
+    item,
+    index,
+    withDelete,
+    handleChange,
+  } = props;
   const y = useMotionValue(0);
   const theme = useTheme();
   const { t } = useTranslation('creation');
   const dragControls = useDragControls();
 
   const handleInputChange = (e: any) => {
-    handleChange(index, { ...item, text: e.target.value });
+    handleChange(index, {
+      ...item,
+      text: e.target.value,
+    });
   };
   const handleDelete = () => {
     handleChange(index, null);
@@ -43,16 +52,18 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
         <STextArea
           value={item.text}
           onChange={handleInputChange}
-          placeholder={t('secondStep.field.choices.option.label', { value: item.id })}
+          placeholder={t('secondStep.field.choices.option.label', { value: index + 1 })}
         />
-        <InlineSVG
-          clickable
-          svg={trashIcon}
-          fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
-          onClick={handleDelete}
-        />
+        {withDelete && (
+          <InlineSVG
+            clickable
+            svg={trashIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width="24px"
+            height="24px"
+            onClick={handleDelete}
+          />
+        )}
       </SLeftPart>
       <SRightPart
         onPointerDown={(event: any) => dragControls.start(event)}
@@ -84,6 +95,7 @@ const SLeftPart = styled.div`
   display: flex;
   padding: 12px 20px;
   overflow: hidden;
+  position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   align-items: center;
   border-radius: 16px;
@@ -100,7 +112,7 @@ const STextArea = styled(TextArea)`
   background: transparent;
   line-height: 24px;
   margin-right: 12px;
-  
+
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
   }
