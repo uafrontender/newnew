@@ -146,6 +146,7 @@ declare module 'styled-components' {
         progress: {
           primaryProgress: string,
         },
+        disabled: string,
       },
     },
     shadows: {
@@ -164,6 +165,7 @@ declare module 'styled-components' {
       bannerPink: string,
       calendarTop: string,
       calendarBottom: string,
+      creationSubmit: string,
     },
     borderRadius: {
       small: string,
