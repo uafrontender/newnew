@@ -399,6 +399,7 @@ const SText = styled(Text)`
   color: ${(props) => props.theme.colors.white};
   display: -webkit-box;
   overflow: hidden;
+  position: relative;
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -473,6 +474,7 @@ const STextOutside = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   display: -webkit-box;
   overflow: hidden;
+  position: relative;
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

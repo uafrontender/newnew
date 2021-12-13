@@ -12,6 +12,7 @@ import isBrowser from '../../utils/isBrowser';
 interface ITabs {
   t: any;
   tabs: Tab[];
+  draggable?: boolean;
   activeTabIndex: number;
   withTabIndicator?: boolean;
 }
@@ -25,6 +26,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
   const {
     t,
     tabs,
+    draggable,
     activeTabIndex,
     withTabIndicator,
   } = props;
@@ -42,7 +44,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
     tabs.length * 100,
   );
 
-  const shouldDrag = tabsWidth!! >= containerWidth!!;
+  const shouldDrag = (draggable ?? true) && tabsWidth!! >= containerWidth!!;
 
   const [isDragging, setIsDragging] = useState(false);
   const [posLeft, setPosLeft] = useState<number>(0);
@@ -326,6 +328,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
 export default Tabs;
 
 Tabs.defaultProps = {
+  draggable: true,
   withTabIndicator: true,
 };
 
@@ -347,6 +350,7 @@ const STabsContainer = styled.div<{
 
   width: ${({ shouldDrag }) => (shouldDrag ? 'min-content' : '100%')};
   overflow: hidden;
+  position: relative;
 `;
 
 interface ISTab {

@@ -11,7 +11,9 @@ import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg'
 
 interface IUserAvatar {
   user: {
-    avatar?: string,
+    userData?: {
+      avatarUrl?: string,
+    }
   },
   onClick?: () => any,
   withClick?: boolean,
@@ -29,7 +31,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const theme = useTheme();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  if (!user.avatar) {
+  if (!user.userData?.avatarUrl) {
     return (
       <SButton
         iconOnly
@@ -54,7 +56,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       withClick={withClick ?? false}
     >
       <Image
-        src={user.avatar}
+        src={user.userData.avatarUrl}
         alt="User avatar"
         width="100%"
         height="100%"
@@ -79,6 +81,7 @@ interface ISContainer {
 const SContainer = styled.div<ISContainer>`
   width: 36px;
   height: 36px;
+  position: relative;
   overflow: hidden;
   min-width: 36px;
   min-height: 36px;

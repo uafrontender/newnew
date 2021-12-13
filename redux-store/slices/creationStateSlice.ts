@@ -20,11 +20,11 @@ export interface ICreationStateInterface {
     minimalBid: number;
   }
   crowdfunding: {
-    backingPrice: number;
     targetBackerCount: number;
   }
   multiplechoice: {
     choices: {
+      id: number;
       text: string;
     }[],
   }
@@ -48,11 +48,19 @@ const defaultUIState: ICreationStateInterface = {
     minimalBid: 1,
   },
   crowdfunding: {
-    backingPrice: 1,
     targetBackerCount: 1,
   },
   multiplechoice: {
-    choices: [],
+    choices: [
+      {
+        id: 1,
+        text: '',
+      },
+      {
+        id: 2,
+        text: '',
+      },
+    ],
   },
 };
 
@@ -75,15 +83,30 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationStartDate(state, { payload }: PayloadAction<Date>) {
       state.post.startsAt = { ...state.post.startsAt, ...payload };
     },
+    setCreationTargetBackerCount(state, { payload }: PayloadAction<number>) {
+      state.crowdfunding.targetBackerCount = payload;
+    },
+    setCreationChoices(state, { payload }: PayloadAction<[]>) {
+      state.multiplechoice.choices = payload;
+    },
+    clearCreation(state) {
+      state.post = { ...defaultUIState.post };
+      state.auction = { ...defaultUIState.auction };
+      state.crowdfunding = { ...defaultUIState.crowdfunding };
+      state.multiplechoice = { ...defaultUIState.multiplechoice };
+    },
   },
 });
 
 export const {
+  clearCreation,
   setCreationTitle,
   setCreationMinBid,
+  setCreationChoices,
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationTargetBackerCount,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;
