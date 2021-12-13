@@ -35,7 +35,7 @@ const TestPostModal: NextPage = () => {
           newnewapi.PagingRequest, newnewapi.PagedPostsResponse>(
             newnewapi.PagingRequest,
             newnewapi.PagedPostsResponse,
-            `${BASE_URL}/post/get_all`,
+            `${BASE_URL}/post/get_curated_posts`,
             'post',
             getAllRequest,
           );
@@ -111,7 +111,7 @@ const TestPostModal: NextPage = () => {
 export async function getStaticProps(context: NextPageContext): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'home'],
+    ['common', 'home', 'decision'],
   );
 
   return {
