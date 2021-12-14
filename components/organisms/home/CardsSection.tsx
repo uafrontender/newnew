@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 
 import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
@@ -19,6 +20,7 @@ import { formatString } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
+import switchPostType from '../../../utils/switchPostType';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -30,17 +32,18 @@ interface ICardSection {
   type?: 'default' | 'creator'
   title?: string,
   category: string,
-  collection: {}[],
+  collection: newnewapi.Post[],
+  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const CardsSection: React.FC<ICardSection> = (props) => {
-  const {
-    user,
-    type,
-    title,
-    category,
-    collection,
-  } = props;
+export const CardsSection: React.FC<ICardSection> = ({
+  user,
+  type,
+  title,
+  category,
+  collection,
+  handlePostClicked,
+}) => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const ref: any = useRef();
@@ -128,13 +131,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
       if (!isDragging) {
-        router.push('/post-detailed');
+        handlePostClicked(item);
       }
     };
 
     return (
       <SItemWrapper
-        key={`${category}-${item.id}`}
+        key={switchPostType(item).postUuid}
         name={`cards-section-${category}-${index}`}
         onClick={handleItemClick}
       >

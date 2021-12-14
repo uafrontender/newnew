@@ -59,10 +59,10 @@ const SVideoWrapper = styled.div`
 
   overflow: hidden;
 
-  width: calc(100vw - 32px);
+  /* width: calc(100vw - 32px); */
+  width: 100vw;
   height: calc(100vh - 72px);
-
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  margin-left: -16px;
 
   video {
     display: block;
@@ -72,6 +72,9 @@ const SVideoWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     width: 284px;
     height: 506px;
+    margin-left: initial;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     video {
       width: initial;

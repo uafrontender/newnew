@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useMemo, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -653,7 +655,8 @@ const Search: NextPage = () => {
           {t('search.meta.title')}
         </title>
       </Head>
-      <TopSection collection={collection} />
+      {/* Temp */}
+      {/* <TopSection collection={collection} />
       <SWrapper name={category}>
         <TitleBlock />
         <SListContainer>
@@ -662,7 +665,7 @@ const Search: NextPage = () => {
             collection={collections[category] || []}
           />
         </SListContainer>
-      </SWrapper>
+      </SWrapper> */}
     </>
   );
 };

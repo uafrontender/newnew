@@ -1,4 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {
+  ReactElement, useCallback, useEffect, useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -25,13 +29,17 @@ import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
   tabs: Tab[];
+  postsCachedCreatorDecisions?: newnewapi.Post[];
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
   tabs,
+  postsCachedCreatorDecisions,
   children,
 }) => {
+  const [creatorsDecisions, setCreatorsDecisions] = useState(postsCachedCreatorDecisions);
+
   const { t } = useTranslation('profile');
   const theme = useTheme();
 
@@ -168,7 +176,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SBioText>
             ) : null}
           </div>
-          {user.options?.isCreator // && !user.options?.isPrivate
+          {/* Temp, all creactors for now */}
+          {/* {user.options?.isCreator && !user.options?.isPrivate */}
+          {user
             ? (
               <ProfileTabs
                 pageType="othersProfile"
@@ -176,10 +186,22 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               />
             ) : null}
         </SProfileLayout>
-        {children}
+        {/* {children} */}
+        {
+          React.cloneElement(
+            children as ReactElement,
+            {
+              cachedPosts: creatorsDecisions,
+            },
+          )
+        }
       </SGeneral>
     </ErrorBoundary>
   );
+};
+
+ProfileLayout.defaultProps = {
+  postsCachedCreatorDecisions: undefined,
 };
 
 export default ProfileLayout;

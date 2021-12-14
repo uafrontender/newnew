@@ -1,761 +1,83 @@
-import React, { ReactElement, useMemo } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {
+  ReactElement, useEffect, useState,
+} from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import type { NextPage, NextPageContext } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
+import { newnewapi } from 'newnew-api';
 
 import HomeLayout from '../components/templates/HomeLayout';
 import TopSection from '../components/organisms/home/TopSection';
 import HeroSection from '../components/organisms/home/HeroSection';
 import CardsSection from '../components/organisms/home/CardsSection';
+import PostModal from '../components/organisms/decision/PostModal';
 
 import { useAppSelector } from '../redux-store/store';
+import { fetchLiveAuctions, fetchPostByUUID } from '../api/endpoints/post';
 
 import { NextPageWithLayout } from './_app';
 
-import testBG from '../public/images/mock/test_bg_1.jpg';
-import testBG2 from '../public/images/mock/test_bg_2.jpg';
-import testBG3 from '../public/images/mock/test_bg_3.jpg';
 import testUser1 from '../public/images/mock/test_user_1.jpg';
-import testUser2 from '../public/images/mock/test_user_2.jpg';
-import testUser3 from '../public/images/mock/test_user_3.jpg';
-import testUser4 from '../public/images/mock/test_user_4.jpg';
-import testBGCreator1 from '../public/images/mock/test_bg_creator_1.jpg';
-import testBGCreator2 from '../public/images/mock/test_bg_creator_2.jpg';
-import testBGCreator3 from '../public/images/mock/test_bg_creator_3.jpg';
 
-const Home: NextPage = () => {
+interface IHome {
+  postFromQuery?: newnewapi.Post,
+}
+
+const Home: NextPage<IHome> = ({
+  postFromQuery,
+}) => {
   const { t } = useTranslation('home');
   const user = useAppSelector((state) => state.user);
 
-  const collection = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBG,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBG2,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBG3,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBG,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBG2,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBG3,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBG,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBG2,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBG3,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBG,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-  ], []);
-  const collectionAC = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBG,
-      type: 'ac',
-      amount: 300,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBG2,
-      type: 'ac',
-      amount: 500,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBG3,
-      type: 'ac',
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      amount: 700,
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 2500,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBG2,
-      type: 'ac',
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      amount: 200,
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBG3,
-      type: 'ac',
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      amount: 250,
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 2400,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBG2,
-      type: 'ac',
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      amount: 2570,
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBG3,
-      type: 'ac',
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      amount: 200,
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 500,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-  ], []);
-  const collectionMC = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBG,
-      type: 'mc',
-      votes: 300,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBG2,
-      type: 'mc',
-      votes: 320,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBG3,
-      type: 'mc',
-      votes: 200,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBG,
-      type: 'mc',
-      votes: 500,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBG2,
-      type: 'mc',
-      votes: 700,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBG3,
-      type: 'mc',
-      votes: 100,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBG,
-      type: 'mc',
-      votes: 600,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBG2,
-      type: 'mc',
-      votes: 3000,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBG3,
-      type: 'mc',
-      votes: 1300,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBG,
-      type: 'mc',
-      votes: 200,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-  ], []);
-  const collectionCF = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBG,
-      type: 'cf',
-      total: 10000,
-      backed: 8000,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBG2,
-      type: 'cf',
-      total: 20000,
-      backed: 3200,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBG3,
-      type: 'cf',
-      total: 5000,
-      backed: 1000,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBG,
-      type: 'cf',
-      total: 100000,
-      backed: 10000,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBG2,
-      type: 'cf',
-      total: 30000,
-      backed: 1200,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBG3,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBG,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBG2,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBG3,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBG,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-  ], []);
-  const collectionBiggest = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 300,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBG2,
-      type: 'mc',
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      votes: 200,
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBG3,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 4500,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBG2,
-      type: 'mc',
-      votes: 100,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBG3,
-      type: 'cf',
-      total: 20000,
-      backed: 2340,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 3450,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBG2,
-      type: 'mc',
-      votes: 120,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser3,
-        },
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBG3,
-      type: 'cf',
-      total: 230,
-      backed: 3500,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser4,
-        },
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBG,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 230,
-      user: {
-        userData: {
-          avatarUrl: testUser2,
-        },
-      },
-    },
-  ], []);
-  const collectionCreator = useMemo(() => [
-    {
-      id: 'randomid1',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 300,
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomid2',
-      url: testBGCreator2,
-      type: 'mc',
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      votes: 200,
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomi3',
-      url: testBGCreator3,
-      type: 'cf',
-      total: 10000,
-      backed: 1200,
-      title: 'If 200 of you guys back this decision, I\'ll eat 10 🍋',
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomid4',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 4500,
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomid5',
-      url: testBGCreator2,
-      type: 'mc',
-      votes: 100,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomi6',
-      url: testBGCreator3,
-      type: 'cf',
-      total: 20000,
-      backed: 2340,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomid7',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 3450,
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomid8',
-      url: testBGCreator2,
-      type: 'mc',
-      votes: 120,
-      title: 'New Iron Man. Who will it be? It\'s all depends on you!',
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomi9',
-      url: testBGCreator3,
-      type: 'cf',
-      total: 230,
-      backed: 3500,
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-    {
-      id: 'randomid10',
-      url: testBGCreator1,
-      type: 'ac',
-      title: 'Want a new tattoo. Where should I get it? 🙈',
-      amount: 230,
-      user: {
-        userData: {
-          avatarUrl: testUser1,
-        },
-      },
-    },
-  ], []);
+  // Posts
+  const [topSectionCollection, setTopSectionCollection] = useState<newnewapi.Post[]>([]);
+  const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
+  const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
+  const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
+  const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>([]);
+  const [collectionCreator, setCollectionCreator] = useState<newnewapi.Post[]>([]);
+
+  // Display post
+  const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  const [displayedPost, setDisplayedPost] = useState<
+  newnewapi.IPost | undefined>(postFromQuery ?? undefined);
+
+  const handleOpenPostModal = (post: newnewapi.IPost) => {
+    setDisplayedPost(post);
+    setPostModalOpen(true);
+  };
+
+  const handleClosePostModal = () => {
+    setPostModalOpen(false);
+    setDisplayedPost(undefined);
+  };
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const liveAuctionsPayload = new newnewapi.PagedRequest({
+
+        });
+
+        const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
+
+        console.log(resLiveAuctions.data?.posts);
+
+        if (resLiveAuctions) {
+          setCollectionAC(() => resLiveAuctions.data?.posts as newnewapi.Post[]);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchPosts();
+  }, []);
 
   return (
     <>
@@ -765,33 +87,41 @@ const Home: NextPage = () => {
         </title>
       </Head>
       {!user.loggedIn && <HeroSection />}
-      <TopSection collection={collection} />
+      <TopSection
+        collection={topSectionCollection}
+        handlePostClicked={handleOpenPostModal}
+      />
       {user.loggedIn && (
         <CardsSection
           title={t('for-you-block-title')}
           category="for-you"
           collection={collectionBiggest}
+          handlePostClicked={handleOpenPostModal}
         />
       )}
       <CardsSection
         title={t('ac-block-title')}
         category="ac"
         collection={collectionAC}
+        handlePostClicked={handleOpenPostModal}
       />
       <CardsSection
         title={t('mc-block-title')}
         category="mc"
         collection={collectionMC}
+        handlePostClicked={handleOpenPostModal}
       />
       <CardsSection
         title={t('cf-block-title')}
         category="cf"
         collection={collectionCF}
+        handlePostClicked={handleOpenPostModal}
       />
       <CardsSection
         title={t('biggest-block-title')}
         category="biggest"
         collection={collectionBiggest}
+        handlePostClicked={handleOpenPostModal}
       />
       <CardsSection
         user={{
@@ -801,6 +131,12 @@ const Home: NextPage = () => {
         type="creator"
         category="bellapoarch"
         collection={collectionCreator}
+        handlePostClicked={handleOpenPostModal}
+      />
+      <PostModal
+        isOpen={postModalOpen}
+        post={displayedPost}
+        handleClose={() => handleClosePostModal()}
       />
     </>
   );
@@ -814,15 +150,34 @@ const Home: NextPage = () => {
 
 export default Home;
 
-export async function getStaticProps(context: NextPageContext): Promise<any> {
+export const getServerSideProps:GetServerSideProps = async (context) => {
+  const { post } = context.query;
+
   const translationContext = await serverSideTranslations(
-    context.locale as string,
-    ['common', 'home'],
+    context.locale!!,
+    ['common', 'home', 'decision'],
   );
+
+  if (post || !Array.isArray(post)) {
+    const getPostPayload = new newnewapi.GetPostRequest({
+      postUuid: post as string,
+    });
+
+    const res = await fetchPostByUUID(getPostPayload);
+
+    if (res.data && !res.error) {
+      return {
+        props: {
+          postFromQuery: res.data.toJSON(),
+          ...translationContext,
+        },
+      };
+    }
+  }
 
   return {
     props: {
       ...translationContext,
     },
   };
-}
+};

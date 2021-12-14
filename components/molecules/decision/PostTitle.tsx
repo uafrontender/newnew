@@ -18,9 +18,9 @@ const PostTitle: React.FunctionComponent = ({
       { !isEllipsed ? (
         children
       ) : (
-        (children as string).length > 10
+        (children as string).length > 100
           ? (
-            `${(children as string).slice(0, 10)}...`
+            `${(children as string).slice(0, 100)}...`
           ) : children
       ) }
     </SHeadline>

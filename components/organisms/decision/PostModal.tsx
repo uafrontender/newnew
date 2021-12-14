@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -13,21 +14,13 @@ import Modal from '../Modal';
 import isBrowser from '../../../utils/isBrowser';
 import PostViewMC from './PostViewMC';
 import Headline from '../../atoms/Headline';
+import switchPostType from '../../../utils/switchPostType';
 
 interface IPostModal {
   isOpen: boolean;
   post?: newnewapi.IPost,
   handleClose: () => void;
 }
-
-const switchPostType = (
-  post: newnewapi.IPost,
-): newnewapi.IAuction | newnewapi.ICrowdfunding | newnewapi.IMultipleChoice => {
-  if (post.auction) return post.auction;
-  if (post.crowdfunding) return post.crowdfunding;
-  if (post.multipleChoice) return post.multipleChoice;
-  throw new Error('Unknow post type');
-};
 
 const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
@@ -59,7 +52,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (isOpen && postParsed) {
       window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}`);
     } else {
-      router.replace(router.pathname);
+      // router.replace(router.pathname);
+      if (router.query.username) {
+        router.replace(
+          router.asPath,
+          undefined,
+          {
+            shallow: true,
+          },
+        );
+      } else {
+        router.replace(router.pathname);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, postParsed]);

@@ -1,5 +1,7 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import Image from 'next/image';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
@@ -35,6 +37,13 @@ import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 
+// Utils
+import switchPostType from '../../utils/switchPostType';
+
+// Mock
+import testBG from '../../public/images/mock/test_bg_1.jpg';
+import testBG2 from '../../public/images/mock/test_bg_2.jpg';
+
 const NUMBER_ICONS: any = {
   light: {
     1: iconLight1,
@@ -63,21 +72,20 @@ const NUMBER_ICONS: any = {
 };
 
 interface ICard {
-  item: any;
+  item: newnewapi.Post;
   type?: 'inside' | 'outside';
   index: number;
   width?: string;
   height?: string;
 }
 
-export const Card: React.FC<ICard> = (props) => {
-  const {
-    item,
-    type,
-    index,
-    width,
-    height,
-  } = props;
+export const Card: React.FC<ICard> = ({
+  item,
+  type,
+  index,
+  width,
+  height,
+}) => {
   const { t } = useTranslation('home');
   const theme = useTheme();
   const router = useRouter();
@@ -86,8 +94,8 @@ export const Card: React.FC<ICard> = (props) => {
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const handleUserClick = () => {
-    router.push('/profile');
+  const handleUserClick = (username: string) => {
+    router.push(`/u/${username}`);
   };
   const handleMoreClick = () => {
     router.push('/post-detailed');
@@ -114,7 +122,10 @@ export const Card: React.FC<ICard> = (props) => {
           )}
           <SImageHolder index={index}>
             <Image
-              src={item.url}
+              src={
+                (switchPostType(item).announcement?.thumbnailUrl as string) ?? (
+                  index % 2 === 0 ? testBG : testBG2)
+              }
               objectFit="cover"
               layout="fill"
               draggable={false}
@@ -138,11 +149,15 @@ export const Card: React.FC<ICard> = (props) => {
             <SBottomContent>
               <SUserAvatar
                 withClick
-                user={item.user}
-                onClick={handleUserClick}
+                user={{
+                  userData: {
+                    avatarUrl: switchPostType(item).creator?.avatarUrl!!,
+                  },
+                }}
+                onClick={() => handleUserClick(switchPostType(item).creator?.username!!)}
               />
               <SText variant={3} weight={600}>
-                {item.title}
+                {switchPostType(item).title}
               </SText>
             </SBottomContent>
           </SImageHolder>
@@ -159,7 +174,11 @@ export const Card: React.FC<ICard> = (props) => {
       >
         <SImageHolderOutside id="animatedPart">
           <Image
-            src={item.url}
+            // src={
+            //   (switchPostType(item).announcement?.thumbnailUrl as string) ?? (
+            //     index % 2 === 0 ? testBG : testBG2)
+            // }
+            src={testBG2}
             objectFit="cover"
             layout="fill"
             draggable={false}
@@ -183,26 +202,66 @@ export const Card: React.FC<ICard> = (props) => {
       </SImageBG>
       <SBottomContentOutside>
         <SBottomStart>
-          <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
+          <SUserAvatar
+            user={{
+              userData: {
+                avatarUrl: switchPostType(item).creator?.avatarUrl!!,
+              },
+            }}
+            withClick
+            onClick={() => handleUserClick(switchPostType(item).creator?.username!!)}
+          />
           <STextOutside variant={3} weight={600}>
-            {item.title}
+            {switchPostType(item).title}
           </STextOutside>
         </SBottomStart>
-        <SBottomEnd type={item.type}>
+        <SBottomEnd
+          type={
+            item.auction ? (
+              'ac'
+            ) : item.crowdfunding ? (
+              'cf'
+            ) : 'mc'
+          }
+        >
           <SButton
             withDim
             withShrink
-            view={item.type === 'cf' ? 'primaryProgress' : 'primary'}
+            view={item.crowdfunding === 'cf' ? 'primaryProgress' : 'primary'}
             onClick={handleBidClick}
-            cardType={item.type}
-            progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
-            withProgress={item.type === 'cf'}
+            cardType={
+              item.auction ? (
+                'ac'
+              ) : item.crowdfunding ? (
+                'cf'
+              ) : 'mc'
+            }
+            progress={item.crowdfunding === 'cf' ? (
+              ((switchPostType(item) as newnewapi.Crowdfunding).targetBackerCount * 100)
+              / (switchPostType(item) as newnewapi.Crowdfunding).currentBackerCount
+            ) : 0}
+            withProgress={item.crowdfunding === 'cf'}
           >
-            {t(`button-card-${item.type}`, {
-              votes: item.votes,
-              total: formatNumber(item.total, true),
-              backed: formatNumber(item.backed, true),
-              amount: `$${formatNumber(item.amount, true)}`,
+            {t(`button-card-${
+              item.auction ? (
+                'ac'
+              ) : item.crowdfunding ? (
+                'cf'
+              ) : 'mc'
+            }`, {
+              votes: (switchPostType(item) as newnewapi.MultipleChoice).totalVotes,
+              total: formatNumber(
+                (switchPostType(item) as newnewapi.Auction).totalAmount?.usdCents ?? 0,
+                true,
+              ),
+              backed: formatNumber(
+                (switchPostType(item) as newnewapi.Crowdfunding).currentBackerCount ?? 0,
+                true,
+              ),
+              amount: formatNumber(
+                (switchPostType(item) as newnewapi.Auction).totalAmount?.usdCents ?? 0,
+                true,
+              ),
             })}
           </SButton>
           <SCaption variant={2} weight={700}>
