@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import Image from 'next/image';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -39,10 +38,6 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 
 // Utils
 import switchPostType from '../../utils/switchPostType';
-
-// Mock
-import testBG from '../../public/images/mock/test_bg_1.jpg';
-import testBG2 from '../../public/images/mock/test_bg_2.jpg';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -94,6 +89,8 @@ export const Card: React.FC<ICard> = ({
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const [postParsed, typeOfPost] = switchPostType(item);
+
   const handleUserClick = (username: string) => {
     router.push(`/u/${username}`);
   };
@@ -121,14 +118,14 @@ export const Card: React.FC<ICard> = ({
             </SNumberImageHolder>
           )}
           <SImageHolder index={index}>
-            <Image
-              src={
-                (switchPostType(item).announcement?.thumbnailUrl as string) ?? (
-                  index % 2 === 0 ? testBG : testBG2)
-              }
-              objectFit="cover"
-              layout="fill"
-              draggable={false}
+            <video
+              // src={postParsed.announcement?.thumbnailUrl as string}
+              // src="/video/mock/mock_video_1.mp4"
+              src={postParsed.announcement?.thumbnailUrl ? postParsed.announcement?.thumbnailUrl : '/video/mock/mock_video_1.mp4'}
+              loop
+              muted
+              autoPlay
+              playsInline
             />
             <SImageMask />
             <STopContent>
@@ -149,15 +146,14 @@ export const Card: React.FC<ICard> = ({
             <SBottomContent>
               <SUserAvatar
                 withClick
-                user={{
-                  userData: {
-                    avatarUrl: switchPostType(item).creator?.avatarUrl!!,
-                  },
+                avatarUrl={postParsed.creator?.avatarUrl!!}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUserClick(postParsed.creator?.username!!);
                 }}
-                onClick={() => handleUserClick(switchPostType(item).creator?.username!!)}
               />
               <SText variant={3} weight={600}>
-                {switchPostType(item).title}
+                {postParsed.title}
               </SText>
             </SBottomContent>
           </SImageHolder>
@@ -173,15 +169,14 @@ export const Card: React.FC<ICard> = ({
         height={height}
       >
         <SImageHolderOutside id="animatedPart">
-          <Image
-            // src={
-            //   (switchPostType(item).announcement?.thumbnailUrl as string) ?? (
-            //     index % 2 === 0 ? testBG : testBG2)
-            // }
-            src={testBG2}
-            objectFit="cover"
-            layout="fill"
-            draggable={false}
+          <video
+            // src={postParsed.announcement?.thumbnailUrl as string}
+            // src="/video/mock/mock_video_1.mp4"
+            src={postParsed.announcement?.thumbnailUrl ? postParsed.announcement?.thumbnailUrl : '/video/mock/mock_video_1.mp4'}
+            loop
+            muted
+            autoPlay
+            playsInline
           />
           <STopContent>
             <SButtonIcon
@@ -203,63 +198,44 @@ export const Card: React.FC<ICard> = ({
       <SBottomContentOutside>
         <SBottomStart>
           <SUserAvatar
-            user={{
-              userData: {
-                avatarUrl: switchPostType(item).creator?.avatarUrl!!,
-              },
-            }}
+            avatarUrl={postParsed?.creator?.avatarUrl!!}
             withClick
-            onClick={() => handleUserClick(switchPostType(item).creator?.username!!)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUserClick(postParsed.creator?.username!!);
+            }}
           />
           <STextOutside variant={3} weight={600}>
-            {switchPostType(item).title}
+            {postParsed.title}
           </STextOutside>
         </SBottomStart>
         <SBottomEnd
-          type={
-            item.auction ? (
-              'ac'
-            ) : item.crowdfunding ? (
-              'cf'
-            ) : 'mc'
-          }
+          type={typeOfPost}
         >
           <SButton
             withDim
             withShrink
-            view={item.crowdfunding === 'cf' ? 'primaryProgress' : 'primary'}
+            view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
             onClick={handleBidClick}
-            cardType={
-              item.auction ? (
-                'ac'
-              ) : item.crowdfunding ? (
-                'cf'
-              ) : 'mc'
-            }
-            progress={item.crowdfunding === 'cf' ? (
-              ((switchPostType(item) as newnewapi.Crowdfunding).targetBackerCount * 100)
-              / (switchPostType(item) as newnewapi.Crowdfunding).currentBackerCount
+            cardType={typeOfPost}
+            progress={typeOfPost === 'cf' ? (
+              Math.floor(((postParsed as newnewapi.Crowdfunding).currentBackerCount * 100)
+              / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
             ) : 0}
-            withProgress={item.crowdfunding === 'cf'}
+            withProgress={typeOfPost === 'cf'}
           >
-            {t(`button-card-${
-              item.auction ? (
-                'ac'
-              ) : item.crowdfunding ? (
-                'cf'
-              ) : 'mc'
-            }`, {
-              votes: (switchPostType(item) as newnewapi.MultipleChoice).totalVotes,
+            {t(`button-card-${typeOfPost}`, {
+              votes: (postParsed as newnewapi.MultipleChoice).totalVotes,
               total: formatNumber(
-                (switchPostType(item) as newnewapi.Auction).totalAmount?.usdCents ?? 0,
+                (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
                 true,
               ),
               backed: formatNumber(
-                (switchPostType(item) as newnewapi.Crowdfunding).currentBackerCount ?? 0,
+                (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0,
                 true,
               ),
               amount: formatNumber(
-                (switchPostType(item) as newnewapi.Auction).totalAmount?.usdCents ?? 0,
+                (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0,
                 true,
               ),
             })}
@@ -426,6 +402,16 @@ const SImageHolder = styled.div<ISWrapper>`
     return '65%';
   }};
   }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
 `;
 
 const SImageMask = styled.div`
@@ -516,6 +502,16 @@ const SImageHolderOutside = styled.div`
     padding: 12px;
     overflow: hidden;
     border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
   }
 `;
 

@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React, { ReactElement, useState } from 'react';
+import React, {
+  ReactElement, useCallback, useEffect, useMemo, useState,
+} from 'react';
 import styled from 'styled-components';
+import { debounce } from 'lodash';
+import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
@@ -12,22 +16,32 @@ import { getUserByUsername } from '../../../api/endpoints/user';
 import { fetchUsersPosts } from '../../../api/endpoints/post';
 
 import PostModal from '../../../components/organisms/decision/PostModal';
-import CardsSection from '../../../components/organisms/home/CardsSection';
+import List from '../../../components/organisms/search/List';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
   pagedPosts?: newnewapi.PagedPostsResponse;
   cachedPosts?: newnewapi.Post[];
+  handleAddNewPosts: (newPosts: newnewapi.Post[]) => void;
 }
 
 const UserPageIndex: NextPage<IUserPageIndex> = ({
   user,
   pagedPosts,
   cachedPosts,
+  handleAddNewPosts,
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+
+  // Loading state
+  const [pagingToken, setPagingToken] = useState<string | null | undefined>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    ref: loadingRef,
+    inView,
+  } = useInView();
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     setDisplayedPost(post);
@@ -39,25 +53,87 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     setDisplayedPost(undefined);
   };
 
+  // TODO: filters and other parameters
+  const loadPosts = useCallback(async (
+    pageToken?: string,
+  ) => {
+    try {
+      setIsLoading(true);
+      const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
+        userUuid: user.uuid,
+        filter: newnewapi.Post.Filter.ALL,
+        paging: {
+          ...(pageToken ? { pageToken } : {}),
+        },
+      });
+      const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
+
+      console.log(postsResponse);
+
+      if (postsResponse.data && postsResponse.data.posts) {
+        handleAddNewPosts(postsResponse.data?.posts as newnewapi.Post[]);
+        setPagingToken(postsResponse.data.paging?.nextPageToken);
+      }
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+      console.error(err);
+    }
+  }, [
+    handleAddNewPosts, user.uuid,
+  ]);
+
+  const loadPostsDebounced = useMemo(() => debounce((
+    pageToken?: string,
+  ) => {
+    loadPosts(pageToken ?? '');
+  }, 250),
+  [loadPosts]);
+
+  // useEffect(() => {
+  //   if (!cachedPosts || cachedPosts.length === 0) {
+  //     loadPosts();
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    if (inView) {
+      if (pagingToken) {
+        loadPostsDebounced(pagingToken);
+      } else if (!pagingToken && cachedPosts?.length === 0) {
+        loadPostsDebounced();
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, pagingToken]);
+
   return (
     <div>
       <main>
         <SCardsSection>
           {cachedPosts && (
-            <CardsSection
-              title=""
+            <List
               category=""
+              loading={isLoading}
               collection={cachedPosts}
+              wrapperStyle={{
+                left: 0,
+              }}
               handlePostClicked={handleOpenPostModal}
             />
           )}
         </SCardsSection>
+        <div
+          ref={loadingRef}
+        />
       </main>
-      <PostModal
-        isOpen={postModalOpen}
-        post={displayedPost}
-        handleClose={() => handleClosePostModal()}
-      />
+      {displayedPost && (
+        <PostModal
+          isOpen={postModalOpen}
+          post={displayedPost}
+          handleClose={() => handleClosePostModal()}
+        />
+      )}
     </div>
   );
 };
@@ -120,14 +196,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // will fetch only for creators
   // if (res.data.options?.isCreator) {
-  if (res.data) {
+  if (res.data && !context.req.url?.startsWith('/_next')) {
     const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
       userUuid: res.data.uuid,
+      filter: newnewapi.Post.Filter.ALL,
+      paging: {
+        limit: 10,
+      },
     });
 
     const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
-
-    console.log(postsResponse);
 
     if (postsResponse.data) {
       return {
@@ -143,6 +221,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       user: res.data.toJSON(),
+      pagedPosts: {},
       ...translationContext,
     },
   };
@@ -152,10 +231,10 @@ const SCardsSection = styled.div`
   display: flex;
   flex-wrap: wrap;
 
-  gap: 16px;
+  margin-right: -16px !important;
 
-  ${({ theme }) => theme.media.laptop} {
-    gap: 32px;
+  ${(props) => props.theme.media.tablet} {
+    margin-right: -32px !important;
   }
 
 `;

@@ -5,7 +5,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -20,6 +20,7 @@ import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
+import { CardSkeletonList } from '../molecules/CardSkeleton';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
@@ -38,7 +39,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   postsCachedCreatorDecisions,
   children,
 }) => {
-  const [creatorsDecisions, setCreatorsDecisions] = useState(postsCachedCreatorDecisions);
+  const [routeChangeLoading, setRouteChangeLoading] = useState(false);
+
+  const [
+    creatorsDecisions, setCreatorsDecisions,
+  ] = useState(postsCachedCreatorDecisions ?? []);
 
   const { t } = useTranslation('profile');
   const theme = useTheme();
@@ -48,6 +53,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const router = useRouter();
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  // Add new posts to cached ones
+  const addNewPosts = useCallback((newPosts: newnewapi.Post[]) => {
+    setCreatorsDecisions((curr) => [...curr, ...newPosts]);
+  }, [setCreatorsDecisions]);
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(() => {
@@ -63,6 +73,26 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       router.push('/profile');
     }
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
+
+  useEffect(() => {
+    const start = (url: string) => {
+      if (url.includes(user.username)) {
+        setRouteChangeLoading(true);
+      }
+    };
+    const end = () => {
+      setRouteChangeLoading(false);
+    };
+    Router.events.on('routeChangeStart', start);
+    Router.events.on('routeChangeComplete', end);
+    Router.events.on('routeChangeError', end);
+    return () => {
+      Router.events.off('routeChangeStart', start);
+      Router.events.off('routeChangeComplete', end);
+      Router.events.off('routeChangeError', end);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -187,14 +217,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             ) : null}
         </SProfileLayout>
         {/* {children} */}
-        {
-          React.cloneElement(
-            children as ReactElement,
-            {
-              cachedPosts: creatorsDecisions,
-            },
-          )
-        }
+        {!routeChangeLoading
+          ? (
+            React.cloneElement(
+              children as ReactElement,
+              {
+                ...(creatorsDecisions ? { cachedPosts: creatorsDecisions } : {}),
+                handleAddNewPosts: addNewPosts,
+              },
+            )
+          ) : (
+            <CardSkeletonList
+              count={8}
+              wrapperStyle={{
+                left: 0,
+              }}
+            />
+          )}
       </SGeneral>
     </ErrorBoundary>
   );

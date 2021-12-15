@@ -21,6 +21,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
+import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -28,11 +29,15 @@ const SCROLL_STEP = {
 };
 
 interface ICardSection {
-  user?: any,
-  type?: 'default' | 'creator'
-  title?: string,
-  category: string,
-  collection: newnewapi.Post[],
+  user?: {
+    avatarUrl: string;
+    username: string;
+  };
+  type?: 'default' | 'creator';
+  title?: string;
+  category: string;
+  collection: newnewapi.Post[];
+  loading?: boolean;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -42,6 +47,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   title,
   category,
   collection,
+  loading,
   handlePostClicked,
 }) => {
   const { t } = useTranslation('home');
@@ -137,7 +143,7 @@ export const CardsSection: React.FC<ICardSection> = ({
 
     return (
       <SItemWrapper
-        key={switchPostType(item).postUuid}
+        key={switchPostType(item)[0].postUuid}
         name={`cards-section-${category}-${index}`}
         onClick={handleItemClick}
       >
@@ -191,9 +197,11 @@ export const CardsSection: React.FC<ICardSection> = ({
             animation="t-01"
           >
             <SCreatorHeadline onClick={handleUserClick}>
-              <UserAvatar user={user} />
+              <UserAvatar
+                avatarUrl={user?.avatarUrl!!}
+              />
               <SHeadline variant={4}>
-                {user.username}
+                {user?.username!!}
               </SHeadline>
               <Tag>
                 {t('button-creator-on-the-rise')}
@@ -206,7 +214,7 @@ export const CardsSection: React.FC<ICardSection> = ({
             weight={700}
             onClick={handleSeeMoreCLick}
           >
-            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user.username, true) })}
+            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
           </SCaption>
         )}
       </STopWrapper>
@@ -219,7 +227,13 @@ export const CardsSection: React.FC<ICardSection> = ({
           onMouseMove={mouseMoveHandler}
           onMouseLeave={mouseUpHandler}
         >
-          {collectionToRender.map(renderItem)}
+          {!loading
+            ? collectionToRender.map(renderItem)
+            : (
+              <CardSkeletonSection
+                count={5}
+              />
+            )}
         </SListWrapper>
         {!isMobile && (
           <>
@@ -247,7 +261,7 @@ export const CardsSection: React.FC<ICardSection> = ({
             view="secondary"
             onClick={handleSeeMoreCLick}
           >
-            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user.username, true) })}
+            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
           </Button>
         </SButtonHolder>
       )}
@@ -259,8 +273,12 @@ export default CardsSection;
 
 CardsSection.defaultProps = {
   type: 'default',
-  user: {},
+  user: {
+    avatarUrl: '',
+    username: '',
+  },
   title: '',
+  loading: undefined,
 };
 
 interface ISWrapper {

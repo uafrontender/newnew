@@ -14,7 +14,8 @@ import Modal from '../Modal';
 import isBrowser from '../../../utils/isBrowser';
 import PostViewMC from './PostViewMC';
 import Headline from '../../atoms/Headline';
-import switchPostType from '../../../utils/switchPostType';
+import switchPostType, { postType } from '../../../utils/switchPostType';
+import PostViewAC from './PostViewAC';
 
 interface IPostModal {
   isOpen: boolean;
@@ -29,44 +30,67 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
-  const postParsed = post && switchPostType(post);
+  const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
 
-  const [ownModalOpen, setOwnModalOpen] = useState(false);
+  const [currLocation] = useState(isBrowser() ? window.location.pathname : '');
+
+  const [open, setOpen] = useState(false);
+
+  console.log(post);
+
+  const handleCloseAndGoBack = () => {
+    // window.history.back();
+    handleClose();
+    window.history.replaceState('', '', currLocation);
+  };
 
   const renderPostview = (
-    postToRender: newnewapi.IPost,
+    postToRender: postType,
   ) => {
-    if (postToRender.multipleChoice) {
+    if (postToRender === 'mc') {
       return (
         <PostViewMC
-          post={postToRender.multipleChoice}
+          post={postParsed as newnewapi.MultipleChoice}
         />
       );
     }
-    if (postToRender.crowdfunding) return <></>;
-    if (postToRender.auction) return <></>;
+    if (postToRender === 'ac') {
+      return (
+        <PostViewAC
+          post={postParsed as newnewapi.Auction}
+        />
+      );
+    }
+    if (postToRender === 'cf') return <></>;
     return <></>;
   };
 
   useEffect(() => {
     if (isOpen && postParsed) {
+      setOpen(true);
       window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}`);
-    } else {
-      // router.replace(router.pathname);
-      if (router.query.username) {
-        router.replace(
-          router.asPath,
-          undefined,
-          {
-            shallow: true,
-          },
-        );
-      } else {
-        router.replace(router.pathname);
-      }
     }
+
+    return () => {
+      setOpen(false);
+      console.log('i am here');
+      // window.history.back();
+      // eslint-disable-next-line no-useless-return
+      return;
+      // if (router.query.username) {
+      //   router.replace(
+      //     router.asPath,
+      //     undefined,
+      //     {
+      //       shallow: true,
+      //     },
+      //   );
+      // } else {
+      //   router.replace(router.pathname);
+      // }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, postParsed]);
+  }, []);
 
   // Close modal on back btn
   useEffect(() => {
@@ -75,29 +99,33 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
       const postId = new URL(window.location.href).searchParams.get('post');
 
+      console.log(postId);
+
       if (!postId) {
         handleClose();
-        setOwnModalOpen(false);
       }
     };
 
-    router.events.on('routeChangeComplete', verify);
+    // router.events.on('routeChangeComplete', verify);
 
-    return () => router.events.off('routeChangeComplete', verify);
+    window.addEventListener('popstate', verify);
+
+    // return () => router.events.off('routeChangeComplete', verify);
+    return () => window.removeEventListener('popstate', verify);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [open]);
 
   return (
     <Modal
-      show={isOpen}
+      show={open}
       overlayDim
-      onClose={handleClose}
+      onClose={() => handleCloseAndGoBack()}
     >
-      {postParsed ? (
+      {postParsed && typeOfPost ? (
         <SPostModalContainer
           onClick={(e) => e.stopPropagation()}
         >
-          {renderPostview(post)}
+          {renderPostview(typeOfPost)}
           <SRecommendationsSection>
             <Headline
               variant={4}

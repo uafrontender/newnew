@@ -14,11 +14,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
   return (
     <SWrapper>
       <SUserAvatar
-        user={{
-          userData: {
-            avatarUrl: item.bidUser.avatar,
-          },
-        }}
+        avatarUrl={item.bidForUser.avatar}
       />
       <SCenterContent>
         <STitle>
@@ -47,11 +43,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
         </SSubTitle>
       </SCenterContent>
       <SUserAvatarRight
-        user={{
-          userData: {
-            avatarUrl: item.bidForUser.avatar,
-          },
-        }}
+        avatarUrl={item.bidForUser.avatar}
       />
     </SWrapper>
   );
@@ -115,7 +107,7 @@ const SUserAvatar = styled(UserAvatar)`
 
 const SUserAvatarRight = styled(SUserAvatar)`
   border-radius: 8px;
-  
+
   ${(props) => props.theme.media.laptop} {
     width: 72px;
     height: 72px;

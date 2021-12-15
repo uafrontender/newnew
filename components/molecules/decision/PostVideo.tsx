@@ -28,6 +28,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         }}
         src={videoSrc}
         muted={isMuted}
+        playsInline
         autoPlay
         loop
       />

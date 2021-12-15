@@ -99,11 +99,13 @@ const TestPostModal: NextPage = () => {
           </div>
         </main>
       </div>
-      <PostModal
-        isOpen={modalOpen}
-        post={displayedPost}
-        handleClose={() => handleCloseModal()}
-      />
+      {displayedPost && (
+        <PostModal
+          isOpen={modalOpen}
+          post={displayedPost}
+          handleClose={() => handleCloseModal()}
+        />
+      )}
     </General>
   );
 };

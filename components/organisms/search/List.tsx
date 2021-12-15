@@ -1,34 +1,42 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import Card from '../../molecules/Card';
 
 import { useAppSelector } from '../../../redux-store/store';
+import switchPostType from '../../../utils/switchPostType';
+import CardSkeleton from '../../molecules/CardSkeleton';
 
 interface IList {
   category: string;
   collection: any;
+  loading: boolean;
+  wrapperStyle: React.CSSProperties;
+  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const List: React.FC<IList> = (props) => {
-  const {
-    category,
-    collection,
-  } = props;
-  const router = useRouter();
+export const List: React.FC<IList> = ({
+  category,
+  collection,
+  loading,
+  wrapperStyle,
+  handlePostClicked,
+}) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
-      router.push('/post-detailed');
+      handlePostClicked(item);
     };
 
     return (
       <SItemWrapper
-        key={`${category}-${item.id}`}
+        key={switchPostType(item)[0].postUuid}
         onClick={handleItemClick}
       >
         <Card
@@ -42,8 +50,18 @@ export const List: React.FC<IList> = (props) => {
   };
 
   return (
-    <SListWrapper>
+    <SListWrapper
+      style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
+    >
       {collection.map(renderItem)}
+      {loading && Array(5).fill('_').map((_, i) => (
+        <CardSkeleton
+          key={i}
+          count={1}
+          cardWidth="100%"
+          cardHeight="100%"
+        />
+      ))}
     </SListWrapper>
   );
 };
@@ -71,6 +89,42 @@ const SListWrapper = styled.div`
     width: calc(100% + 32px);
     padding: 32px 0 0 0;
   }
+
+
+  .skeletonsContainer {
+    display: block;
+    height: 400px;
+
+    width: 100vw;
+    margin: 16px 0;
+
+    ${(props) => props.theme.media.tablet} {
+      width: calc(33% - 16px);
+      margin: 0 8px 24px 8px;
+    }
+
+    ${(props) => props.theme.media.laptop} {
+      width: calc(25% - 32px);
+      margin: 0 16px 32px 16px;
+    }
+
+    ${(props) => props.theme.media.laptopL} {
+      width: calc(20% - 32px);
+    }
+
+    ${(props) => props.theme.media.desktop} {
+      width: calc(16.65% - 32px);
+    }
+
+
+    div {
+      .skeletonSpan {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
 `;
 
 const SItemWrapper = styled.div`
@@ -94,4 +148,5 @@ const SItemWrapper = styled.div`
   ${(props) => props.theme.media.desktop} {
     width: calc(16.65% - 32px);
   }
+
 `;

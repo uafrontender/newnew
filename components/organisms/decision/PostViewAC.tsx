@@ -10,11 +10,11 @@ import PostTimer from '../../molecules/decision/PostTimer';
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
 
-interface IPostViewMC {
-  post: newnewapi.MultipleChoice;
+interface IPostViewAC {
+  post: newnewapi.Auction;
 }
 
-const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
+const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   post,
 }) => {
   // NB! Will be moved to Redux
@@ -42,7 +42,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   );
 };
 
-export default PostViewMC;
+export default PostViewAC;
 
 const SWrapper = styled.div`
   display: grid;
