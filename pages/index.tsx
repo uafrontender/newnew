@@ -16,7 +16,8 @@ import CardsSection from '../components/organisms/home/CardsSection';
 import PostModal from '../components/organisms/decision/PostModal';
 
 import { useAppSelector } from '../redux-store/store';
-import { fetchLiveAuctions, fetchPostByUUID } from '../api/endpoints/post';
+import { fetchPostByUUID } from '../api/endpoints/post';
+import { fetchLiveAuctions } from '../api/endpoints/auction';
 
 import { NextPageWithLayout } from './_app';
 
