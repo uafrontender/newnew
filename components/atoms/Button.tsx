@@ -4,7 +4,10 @@ import { debounce } from 'lodash';
 import { useInView } from 'react-intersection-observer';
 import styled, { css } from 'styled-components';
 
+import Lottie from './Lottie';
 import RippleAnimation from './RippleAnimation';
+
+import logoAnimation from '../../public/animations/mobile_logo.json';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
 type TView =
@@ -17,12 +20,14 @@ type TView =
   | 'tertiary'
   | 'quaternary'
   | 'changeLanguage'
-  | 'transparent';
+  | 'transparent'
+  | 'danger';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
   size?: TSize,
   view?: TView,
+  loading?: boolean,
   progress?: number,
   iconOnly?: boolean,
   withDim?: boolean,
@@ -34,6 +39,7 @@ interface IButton {
 
 const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   const {
+    loading,
     children,
     disabled,
     withRipple,
@@ -125,6 +131,19 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
       {withProgress && (
         <SProgress view={rest.view} progress={progress} />
       )}
+      {loading && (
+        <SLoader>
+          <Lottie
+            width={25}
+            height={20}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: logoAnimation,
+            }}
+          />
+        </SLoader>
+      )}
     </SButton>
   );
 };
@@ -133,6 +152,7 @@ Button.defaultProps = {
   size: 'sm',
   view: 'primary',
   withDim: false,
+  loading: false,
   progress: 0,
   iconOnly: false,
   withShadow: false,
@@ -314,4 +334,12 @@ const SButton = styled.button<ISButton>`
       opacity: 0.5;
     }
   `)}
+`;
+
+const SLoader = styled.div`
+  top: 50%;
+  right: 16px;
+  z-index: 20;
+  position: absolute;
+  transform: translateY(-50%);
 `;

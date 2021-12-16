@@ -1,24 +1,19 @@
 import React, { useMemo, useCallback } from 'react';
-import Head from 'next/head';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { NextPageContext } from 'next';
 import styled, { useTheme } from 'styled-components';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import Button from '../../components/atoms/Button';
-import TextArea from '../../components/atoms/creation/TextArea';
-import InlineSVG from '../../components/atoms/InlineSVG';
-import FileUpload from '../../components/molecules/creation/FileUpload';
-import MobileField from '../../components/molecules/creation/MobileField';
-import Tabs, { Tab } from '../../components/molecules/Tabs';
-import CreationLayout from '../../components/templates/CreationLayout';
-import MobileFieldBlock from '../../components/molecules/creation/MobileFieldBlock';
-import DraggableMobileOptions from '../../components/organisms/creation/DraggableMobileOptions';
+import Button from '../../../atoms/Button';
+import TextArea from '../../../atoms/creation/TextArea';
+import InlineSVG from '../../../atoms/InlineSVG';
+import FileUpload from '../../../molecules/creation/FileUpload';
+import MobileField from '../../../molecules/creation/MobileField';
+import Tabs, { Tab } from '../../../molecules/Tabs';
+import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
+import DraggableMobileOptions from '../DraggableMobileOptions';
 
-import { NextPageWithLayout } from '../_app';
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
   clearCreation,
   setCreationTitle,
@@ -27,12 +22,22 @@ import {
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationAllowSuggestions,
   setCreationTargetBackerCount,
-} from '../../redux-store/slices/creationStateSlice';
+} from '../../../../redux-store/slices/creationStateSlice';
 
-import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 
-export const CreationSecondStep = () => {
+interface ICreationSecondStepContent {
+  video: any;
+  setVideo: (video: any) => void;
+}
+
+export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (props) => {
+  const {
+    video,
+    setVideo,
+  } = props;
   const { t } = useTranslation('creation');
   const theme = useTheme();
   const router = useRouter();
@@ -61,10 +66,44 @@ export const CreationSecondStep = () => {
   ], []);
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const disabled = true;
+  const titleIsValid = post.title.length > 5 && post.title.length < 70;
+  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => item.text.length === 0) === -1;
+  const disabled = !titleIsValid || !video.name || !optionsAreValid;
 
-  const handleSubmit = useCallback(() => {
-  }, []);
+  const formatStartsAt = useCallback(() => {
+    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+
+    return moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes());
+  }, [post.startsAt]);
+  const formatExpiresAt = useCallback(() => {
+    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+    const dateValue = moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes());
+
+    if (post.expiresAt === '1-hour') {
+      dateValue.add(1, 'h');
+    } else if (post.expiresAt === '6-hours') {
+      dateValue.add(6, 'h');
+    } else if (post.expiresAt === '12-hours') {
+      dateValue.add(12, 'h');
+    } else if (post.expiresAt === '1-day') {
+      dateValue.add(1, 'd');
+    } else if (post.expiresAt === '3-days') {
+      dateValue.add(3, 'd');
+    } else if (post.expiresAt === '5-days') {
+      dateValue.add(5, 'd');
+    } else if (post.expiresAt === '7-days') {
+      dateValue.add(7, 'd');
+    }
+
+    return dateValue;
+  }, [post.expiresAt, post.startsAt]);
+  const handleSubmit = useCallback(async () => {
+    router.push(`/creation/${tab}/preview`);
+  }, [tab, router]);
   const handleCloseClick = useCallback(() => {
     if (router.query?.referer) {
       router.push(router.query.referer as string);
@@ -80,6 +119,8 @@ export const CreationSecondStep = () => {
       dispatch(setCreationMinBid(value));
     } else if (key === 'comments') {
       dispatch(setCreationComments(value));
+    } else if (key === 'allowSuggestions') {
+      dispatch(setCreationAllowSuggestions(value));
     } else if (key === 'expiresAt') {
       dispatch(setCreationExpireDate(value));
     } else if (key === 'startsAt') {
@@ -88,8 +129,10 @@ export const CreationSecondStep = () => {
       dispatch(setCreationTargetBackerCount(value));
     } else if (key === 'choices') {
       dispatch(setCreationChoices(value));
+    } else if (key === 'video') {
+      setVideo(value);
     }
-  }, [dispatch]);
+  }, [dispatch, setVideo]);
   const expireOptions = useMemo(() => [
     {
       id: '1-hour',
@@ -120,46 +163,9 @@ export const CreationSecondStep = () => {
       title: t('secondStep.field.expiresAt.options.7-days'),
     },
   ], [t]);
-  const formatStartsAtDescription = () => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-
-    return moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes())
-      .format('ddd, DD MMM [at] hh A');
-  };
-  const formatExpiresAtDescription = () => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-    const dateValue = moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
-
-    if (post.expiresAt === '1-hour') {
-      dateValue.add(1, 'h');
-    } else if (post.expiresAt === '6-hours') {
-      dateValue.add(6, 'h');
-    } else if (post.expiresAt === '12-hours') {
-      dateValue.add(12, 'h');
-    } else if (post.expiresAt === '1-day') {
-      dateValue.add(1, 'd');
-    } else if (post.expiresAt === '3-days') {
-      dateValue.add(3, 'd');
-    } else if (post.expiresAt === '5-days') {
-      dateValue.add(5, 'd');
-    } else if (post.expiresAt === '7-days') {
-      dateValue.add(7, 'd');
-    }
-
-    return dateValue.format('ddd, DD MMM [at] hh A');
-  };
 
   return (
-    <SWrapper>
-      <Head>
-        <title>
-          {t(`secondStep.meta.title-${router?.query?.tab}`)}
-        </title>
-      </Head>
+    <>
       <div>
         <STabsWrapper>
           <Tabs
@@ -185,7 +191,11 @@ export const CreationSecondStep = () => {
         <SContent>
           <SLeftPart>
             <SItemWrapper>
-              <FileUpload />
+              <FileUpload
+                id="video"
+                value={video}
+                onChange={handleItemChange}
+              />
             </SItemWrapper>
             {isMobile && (
               <SItemWrapper>
@@ -256,7 +266,8 @@ export const CreationSecondStep = () => {
                   options={expireOptions}
                   onChange={handleItemChange}
                   formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-                  formattedDescription={formatExpiresAtDescription()}
+                  formattedDescription={formatExpiresAt()
+                    .format('DD MMM [at] hh:mm A')}
                 />
               </SFieldWrapper>
               <SFieldWrapper>
@@ -266,11 +277,22 @@ export const CreationSecondStep = () => {
                   value={post.startsAt}
                   onChange={handleItemChange}
                   formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
-                  formattedDescription={formatStartsAtDescription()}
+                  formattedDescription={formatStartsAt()
+                    .format('DD MMM [at] hh:mm A')}
                 />
               </SFieldWrapper>
             </SListWrapper>
             <SSeparator />
+            {tab === 'multiple-choice' && (
+              <SMobileFieldWrapper>
+                <MobileField
+                  id="allowSuggestions"
+                  type="toggle"
+                  value={multiplechoice.options.allowSuggestions}
+                  onChange={handleItemChange}
+                />
+              </SMobileFieldWrapper>
+            )}
             <MobileField
               id="comments"
               type="toggle"
@@ -293,58 +315,11 @@ export const CreationSecondStep = () => {
           </SButtonContent>
         </SButtonWrapper>
       )}
-    </SWrapper>
+    </>
   );
 };
 
-(CreationSecondStep as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>
-    {page}
-  </CreationLayout>
-);
-
-export default CreationSecondStep;
-
-export async function getStaticPaths() {
-  return {
-    paths: [
-      '/creation/auction',
-      '/creation/multiple-choice',
-      '/creation/crowdfunding',
-    ],
-    fallback: true,
-  };
-}
-
-export async function getStaticProps(context: NextPageContext): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale as string,
-    ['common', 'creation'],
-  );
-
-  return {
-    props: {
-      ...translationContext,
-    },
-  };
-}
-
-const SWrapper = styled.div`
-  display: flex;
-  padding-bottom: 104px;
-  flex-direction: column;
-  justify-content: space-between;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin: 0 auto;
-    max-width: 464px;
-    padding-bottom: 0;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    max-width: 736px;
-  }
-`;
+export default CreationSecondStepContent;
 
 const SContent = styled.div`
   display: flex;
@@ -433,6 +408,10 @@ const SListWrapper = styled.div`
 const SFieldWrapper = styled.div`
   width: calc(50% - 16px);
   margin: 8px;
+`;
+
+const SMobileFieldWrapper = styled.div`
+  margin-bottom: 16px;
 `;
 
 const SButtonWrapper = styled.div`

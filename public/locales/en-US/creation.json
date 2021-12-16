@@ -35,11 +35,18 @@
       "description": "Max size of the video 100 MB",
       "button": "Select file"
     },
+    "modal": {
+      "deleteFile": {
+        "title": "Delete file",
+        "description": "Are you sure you want to permanently delete this file? You can’t undo the action."
+      }
+    },
     "button": {
       "cancel": "Cancel",
       "submit": "Publish",
       "preview": "Preview post",
-      "schedule": "Schedule"
+      "schedule": "Schedule",
+      "delete": "Delete permanently"
     },
     "field": {
       "minimalBid": {
@@ -98,12 +105,74 @@
       "comments": {
         "title": "Commenting turned on"
       },
+      "allowSuggestions": {
+        "title": "Allow suggestions from VIP subscribers"
+      },
       "choices": {
         "add": "Add another option",
         "option": {
           "label": "Option {{value}}"
         }
       }
+    },
+    "video": {
+      "setThumbnail": "Set thumbnail",
+      "deleteFile": "Delete file",
+      "previewThumbnail": "Preview thumbnail",
+      "thumbnail": {
+        "title": "Set thumbnail preview",
+        "submit": "Save changes"
+      }
+    }
+  },
+  "preview": {
+    "meta": {
+      "title-auction": "Creation | Auction | Preview",
+      "title-multiple-choice": "Creation | Multiple Choice | Preview",
+      "title-crowdfunding": "Creation | Crowdfunding | Preview"
+    },
+    "button": {
+      "submit": "Publish"
+    },
+    "settings": {
+      "minimalBid": "Minimum bid",
+      "targetBackerCount": "Backers",
+      "expiresAt": "Expire after",
+      "startsAt": "Start date",
+      "comments": "Commenting",
+      "allowSuggestions": "Suggestions"
+    },
+    "values": {
+      "minimalBid": "${{value}}",
+      "comments-allowed": "Allowed",
+      "comments-forbidden": "Forbidden",
+      "allowSuggestions-allowed": "Allowed",
+      "allowSuggestions-forbidden": "Forbidden"
+    }
+  },
+  "published": {
+    "meta": {
+      "title-auction-published": "Creation | Auction | Published",
+      "title-multiple-choice-published": "Creation | Multiple Choice | Published",
+      "title-crowdfunding-published": "Creation | Crowdfunding | Published",
+      "title-auction-scheduled": "Creation | Auction | Scheduled",
+      "title-multiple-choice-scheduled": "Creation | Multiple Choice | Scheduled",
+      "title-crowdfunding-scheduled": "Creation | Crowdfunding | Scheduled"
+    },
+    "button": {
+      "submit": "View decision"
+    },
+    "texts": {
+      "subTitle-published": "Your decision is successfully created. Expand your reach and share decision with others.",
+      "subTitle-scheduled": "Your decision is successfully created  and scheduled on {{value}}. Expand your reach and share decision with others.",
+      "title": "Let’s show-off a little"
+    },
+    "socials": {
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "copy": "Copy Link"
     }
   }
 }

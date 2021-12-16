@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TextArea from 'react-textarea-autosize';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -26,6 +26,7 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     withDelete,
     handleChange,
   } = props;
+  const [isDragging, setIsDragging] = useState(false);
   const y = useMotionValue(0);
   const theme = useTheme();
   const { t } = useTranslation('creation');
@@ -40,6 +41,13 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const handleDelete = () => {
     handleChange(index, null);
   };
+  const handlePointerDown = (event: any) => {
+    dragControls.start(event);
+    setIsDragging(true);
+  };
+  const handlePointerUp = () => {
+    setIsDragging(false);
+  };
 
   return (
     <SWrapper
@@ -48,7 +56,9 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       dragListener={false}
       dragControls={dragControls}
     >
-      <SLeftPart>
+      <SLeftPart
+        isDragging={isDragging}
+      >
         <STextArea
           value={item.text}
           onChange={handleInputChange}
@@ -66,7 +76,8 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
         )}
       </SLeftPart>
       <SRightPart
-        onPointerDown={(event: any) => dragControls.start(event)}
+        onPointerUp={handlePointerUp}
+        onPointerDown={handlePointerDown}
       >
         <InlineSVG
           svg={changeOrderIcon}
@@ -90,13 +101,18 @@ const SWrapper = styled(Reorder.Item)`
   justify-content: flex-start;
 `;
 
-const SLeftPart = styled.div`
+interface ISLeftPart {
+  isDragging: boolean;
+}
+
+const SLeftPart = styled.div<ISLeftPart>`
   flex: 1;
+  border: 1.5px solid ${(props) => props.theme.colorsThemed.background[props.isDragging ? 'outlines2' : 'tertiary']};
   display: flex;
-  padding: 12px 20px;
+  padding: 10.5px 20px;
   overflow: hidden;
   position: relative;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  background: ${(props) => props.theme.colorsThemed.background[props.isDragging ? 'quinary' : 'tertiary']};
   align-items: center;
   border-radius: 16px;
   flex-direction: row;
