@@ -75,16 +75,14 @@ const Search: NextPage<ISearch> = ({
         | newnewapi.PagedCrowdfundingsResponse
       >;
 
-      // TODO: update to PagedRequest once the API is fixed
       if (categoryToFetch === 'for-you' && loggedIn) {
-        // const fyPayload = new newnewapi.PagedRequest({
-        //   ...(pageToken ? {
-        //     paging: {
-        //       pageToken,
-        //     },
-        //   } : {}),
-        // });
-        const fyPayload = new newnewapi.EmptyRequest({});
+        const fyPayload = new newnewapi.PagedRequest({
+          ...(pageToken ? {
+            paging: {
+              pageToken,
+            },
+          } : {}),
+        });
 
         res = await fetchForYouPosts(fyPayload);
 

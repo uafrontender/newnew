@@ -98,7 +98,7 @@ const Home: NextPage<IHome> = ({
       try {
         setCollectionFYInitialLoading(true);
 
-        const fyPayload = new newnewapi.EmptyRequest({});
+        const fyPayload = new newnewapi.PagedRequest({});
 
         const resFY = await fetchForYouPosts(fyPayload);
 

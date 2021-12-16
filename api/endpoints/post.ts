@@ -73,9 +73,9 @@ export const fetchFeaturedCreatorPosts = (
 );
 
 export const fetchForYouPosts = (
-  payload: newnewapi.EmptyRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.PagedPostsResponse>(
-  newnewapi.EmptyRequest,
+  payload: newnewapi.PagedRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
+  newnewapi.PagedRequest,
   newnewapi.PagedPostsResponse,
   `${BASE_URL_POST}/get_for_you_posts`,
   'post',
