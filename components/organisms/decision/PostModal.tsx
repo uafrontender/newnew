@@ -41,7 +41,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const router = useRouter();
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
 
-  const [currLocation] = useState(isBrowser() ? window.location.pathname : '');
+  const [currLocation] = useState(isBrowser() ? window.location.href : '');
 
   const [open, setOpen] = useState(false);
 
@@ -141,7 +141,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   useEffect(() => {
-    console.log(post);
     if (isOpen && postParsed) {
       setOpen(true);
       window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}`);
