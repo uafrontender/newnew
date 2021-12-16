@@ -1,13 +1,16 @@
 /* eslint-disable no-param-reassign */
 import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+
+export type TPostData = Omit<newnewapi.Post, 'toJSON' | '_nickname' | '_email'>;
 
 export interface ICreationStateInterface {
   post: {
     title: string;
     startsAt: {
       type: string,
-      date: Date,
+      date: string,
       time: string,
       'hours-format': string,
     };
@@ -27,7 +30,11 @@ export interface ICreationStateInterface {
       id: number;
       text: string;
     }[],
-  }
+    options: {
+      allowSuggestions: boolean;
+    };
+  },
+  postData?: TPostData,
 }
 
 const defaultUIState: ICreationStateInterface = {
@@ -35,7 +42,7 @@ const defaultUIState: ICreationStateInterface = {
     title: '',
     startsAt: {
       type: 'right-away',
-      date: new Date(),
+      date: moment().format(),
       time: moment().format('hh:mm'),
       'hours-format': moment().format('a'),
     },
@@ -61,6 +68,9 @@ const defaultUIState: ICreationStateInterface = {
         text: '',
       },
     ],
+    options: {
+      allowSuggestions: true,
+    },
   },
 };
 
@@ -68,6 +78,9 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
   name: 'creationState',
   initialState: defaultUIState,
   reducers: {
+    setPostData(state, { payload }: PayloadAction<TPostData>) {
+      state.postData = { ...state.postData, ...payload };
+    },
     setCreationTitle(state, { payload }: PayloadAction<string>) {
       state.post.title = payload;
     },
@@ -89,6 +102,9 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationChoices(state, { payload }: PayloadAction<[]>) {
       state.multiplechoice.choices = payload;
     },
+    setCreationAllowSuggestions(state, { payload }: PayloadAction<boolean>) {
+      state.multiplechoice.options.allowSuggestions = payload;
+    },
     clearCreation(state) {
       state.post = { ...defaultUIState.post };
       state.auction = { ...defaultUIState.auction };
@@ -99,13 +115,16 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
 });
 
 export const {
+  setPostData,
   clearCreation,
+  setCreationVideo,
   setCreationTitle,
   setCreationMinBid,
   setCreationChoices,
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationAllowSuggestions,
   setCreationTargetBackerCount,
 } = creationSlice.actions;
 

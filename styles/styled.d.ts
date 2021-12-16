@@ -80,6 +80,21 @@ declare module 'styled-components' {
           hover: string;
           pressed: string;
         },
+        instagram: {
+          main: string,
+          hover: string,
+          pressed: string,
+        },
+        tiktok: {
+          main: string,
+          hover: string,
+          pressed: string,
+        },
+        copy: {
+          main: string,
+          hover: string,
+          pressed: string,
+        },
       },
       tag: {
         color: {
@@ -101,6 +116,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         background: {
           primary: string,
@@ -113,6 +129,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         hover: {
           primary: string,
@@ -125,6 +142,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         active: {
           primary: string,
@@ -137,6 +155,7 @@ declare module 'styled-components' {
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         ripple: {
           primary: string,
