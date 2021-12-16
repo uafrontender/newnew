@@ -82,6 +82,21 @@ export const lightTheme: DefaultTheme = {
         hover: '#000000',
         pressed: 'linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), #000000',
       },
+      instagram: {
+        main: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        hover: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        pressed: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+      },
+      tiktok: {
+        main: '#FFFFFF',
+        hover: '#FFFFFF',
+        pressed: '#FFFFFF',
+      },
+      copy: {
+        main: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        hover: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        pressed: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+      },
     },
     tag: {
       color: {
@@ -103,6 +118,7 @@ export const lightTheme: DefaultTheme = {
         quaternary: '#2C2C33',
         transparent: '#FFFFFF',
         changeLanguage: '#2C2C33',
+        danger: '#FFFFFF',
       },
       background: {
         primary: '#1D6AFF',
@@ -115,6 +131,7 @@ export const lightTheme: DefaultTheme = {
         quaternary: 'rgba(0, 21, 128, 0.06)',
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#FFFFFF',
+        danger: '#F12C46',
       },
       hover: {
         primary: '#1D6AFF',
@@ -127,6 +144,7 @@ export const lightTheme: DefaultTheme = {
         quaternary: 'rgba(0, 21, 128, 0.1)',
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#E2E7F3',
+        danger: '#F12C46',
       },
       active: {
         primary: '#0950DA',
@@ -139,6 +157,7 @@ export const lightTheme: DefaultTheme = {
         quaternary: 'rgba(0, 21, 128, 0.14)',
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#D4DBED',
+        danger: '#F12C46',
       },
       ripple: {
         primary: '#0045CC',
@@ -230,6 +249,21 @@ export const darkTheme: DefaultTheme = {
         hover: '#000000',
         pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #FFFFFF',
       },
+      instagram: {
+        main: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        hover: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        pressed: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+      },
+      tiktok: {
+        main: '#FFFFFF',
+        hover: '#FFFFFF',
+        pressed: '#FFFFFF',
+      },
+      copy: {
+        main: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        hover: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        pressed: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+      },
     },
     tag: {
       color: {
@@ -251,6 +285,7 @@ export const darkTheme: DefaultTheme = {
         quaternary: '#FFFFFF',
         transparent: '#FFFFFF',
         changeLanguage: '#FFFFFF',
+        danger: '#FFFFFF',
       },
       background: {
         primary: '#1D6AFF',
@@ -263,6 +298,7 @@ export const darkTheme: DefaultTheme = {
         quaternary: 'rgba(255, 255, 255, 0.06)',
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#14151F',
+        danger: '#F12C46',
       },
       hover: {
         primary: '#1D6AFF',
@@ -275,6 +311,7 @@ export const darkTheme: DefaultTheme = {
         quaternary: 'rgba(255, 255, 255, 0.1)',
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#1E1F29',
+        danger: '#F12C46',
       },
       active: {
         primary: '#0950DA',
@@ -287,6 +324,7 @@ export const darkTheme: DefaultTheme = {
         quaternary: 'rgba(255, 255, 255, 0.14)',
         transparent: 'rgba(11, 10, 19, 0.2)',
         changeLanguage: '#282933',
+        danger: '#F12C46',
       },
       ripple: {
         primary: '#0045CC',

@@ -27,7 +27,7 @@ const CustomToggle: React.FC<ICustomToggle> = (props) => {
 
     return (
       <SOption
-        key={item.key}
+        key={item.id}
         onClick={handleClick}
         selected={isSelected}
       >
