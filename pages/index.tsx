@@ -4,11 +4,12 @@ import React, {
   ReactElement, useEffect, useState,
 } from 'react';
 import Head from 'next/head';
+import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 
+import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
 import TopSection from '../components/organisms/home/TopSection';
 import HeroSection from '../components/organisms/home/HeroSection';
@@ -17,15 +18,16 @@ import PostModal from '../components/organisms/decision/PostModal';
 
 import { useAppSelector } from '../redux-store/store';
 import {
-  fetchBiggestPosts, fetchCuratedPosts, fetchFeaturedCreatorPosts, fetchPostByUUID,
+  fetchPostByUUID,
+  fetchForYouPosts,
+  fetchCuratedPosts,
+  fetchBiggestPosts,
+  fetchFeaturedCreatorPosts,
 } from '../api/endpoints/post';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
-
-import { NextPageWithLayout } from './_app';
-
-import testUser1 from '../public/images/mock/test_user_1.jpg';
-import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
+import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
+
 import switchPostType from '../utils/switchPostType';
 
 interface IHome {
@@ -45,6 +47,10 @@ const Home: NextPage<IHome> = ({
   const [
     topSectionCollection, setTopSectionCollection,
   ] = useState<newnewapi.Post[]>(top10posts.posts as newnewapi.Post[]);
+  // For you - authenticated users only
+  const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
+  const [collectionFYInitialLoading, setCollectionFYInitialLoading] = useState(false);
+  const [collectionFYLoading, setCollectionFYLoading] = useState(false);
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   const [collectionACInitialLoading, setCollectionACInitialLoading] = useState(false);
@@ -76,19 +82,48 @@ const Home: NextPage<IHome> = ({
     setPostModalOpen(true);
   };
 
+  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+    setDisplayedPost(post);
+  };
+
   const handleClosePostModal = () => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
   };
 
+  // Fetch top posts of various types
+  // FY posts
   useEffect(() => {
-    async function fetchPostsInitial() {
+    async function fetchFYPosts() {
+      try {
+        setCollectionFYInitialLoading(true);
+
+        const fyPayload = new newnewapi.EmptyRequest({});
+
+        const resFY = await fetchForYouPosts(fyPayload);
+
+        if (resFY) {
+          setCollectionFY(() => resFY.data?.posts as newnewapi.Post[]);
+          setCollectionFYInitialLoading(false);
+        } else {
+          throw new Error('Request failed');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (user.loggedIn) {
+      fetchFYPosts();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Live Auctions posts
+  useEffect(() => {
+    async function fetchAuctions() {
       try {
         setCollectionACInitialLoading(true);
-        setCollectionMCInitialLoading(true);
-        setCollectionCFInitialLoading(true);
-        setCollectionBiggestInitialLoading(true);
-        setCollectionCreatorInitialLoading(true);
 
         const liveAuctionsPayload = new newnewapi.PagedRequest({});
 
@@ -100,7 +135,19 @@ const Home: NextPage<IHome> = ({
         } else {
           throw new Error('Request failed');
         }
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
+    fetchAuctions();
+  }, []);
+
+  // Top Multiple Choices
+  useEffect(() => {
+    async function fetchMultipleChoices() {
+      try {
+        setCollectionMCInitialLoading(true);
         const multichoicePayload = new newnewapi.PagedRequest({});
 
         const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
@@ -111,7 +158,19 @@ const Home: NextPage<IHome> = ({
         } else {
           throw new Error('Request failed');
         }
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
+    fetchMultipleChoices();
+  }, []);
+
+  // Top Crowdfunding
+  useEffect(() => {
+    async function fetchCrowdfundings() {
+      try {
+        setCollectionCFInitialLoading(true);
         const cfPayload = new newnewapi.PagedRequest({});
 
         const resCF = await fetchTopCrowdfundings(cfPayload);
@@ -122,7 +181,19 @@ const Home: NextPage<IHome> = ({
         } else {
           throw new Error('Request failed');
         }
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
+    fetchCrowdfundings();
+  }, []);
+
+  // Biggest of all time
+  useEffect(() => {
+    async function fetchBiggest() {
+      try {
+        setCollectionBiggestInitialLoading(true);
         const biggestPayload = new newnewapi.PagedRequest({});
 
         const resBiggest = await fetchBiggestPosts(biggestPayload);
@@ -133,7 +204,19 @@ const Home: NextPage<IHome> = ({
         } else {
           throw new Error('Request failed');
         }
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
+    fetchBiggest();
+  }, []);
+
+  // Creator on the rise
+  useEffect(() => {
+    async function fetchCreatorOnRise() {
+      try {
+        setCollectionCreatorInitialLoading(true);
         const creatorOnRisePayload = new newnewapi.EmptyRequest({});
 
         const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(creatorOnRisePayload);
@@ -149,7 +232,7 @@ const Home: NextPage<IHome> = ({
       }
     }
 
-    fetchPostsInitial();
+    fetchCreatorOnRise();
   }, []);
 
   return (
@@ -168,7 +251,8 @@ const Home: NextPage<IHome> = ({
         <CardsSection
           title={t('for-you-block-title')}
           category="for-you"
-          collection={collectionBiggest}
+          collection={collectionFY}
+          loading={collectionFYInitialLoading}
           handlePostClicked={handleOpenPostModal}
         />
       )}
@@ -217,6 +301,7 @@ const Home: NextPage<IHome> = ({
           isOpen={postModalOpen}
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
+          handleOpenAnotherPost={handleSetDisplayedPost}
         />
       )}
     </>

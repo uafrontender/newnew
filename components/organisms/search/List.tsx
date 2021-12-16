@@ -15,7 +15,7 @@ interface IList {
   category: string;
   collection: any;
   loading: boolean;
-  wrapperStyle: React.CSSProperties;
+  wrapperStyle?: React.CSSProperties;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -64,6 +64,10 @@ export const List: React.FC<IList> = ({
       ))}
     </SListWrapper>
   );
+};
+
+List.defaultProps = {
+  wrapperStyle: {},
 };
 
 export default List;

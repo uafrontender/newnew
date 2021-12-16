@@ -84,7 +84,7 @@ export const fetchForYouPosts = (
 
 export const fetchBiggestPosts = (
   payload: newnewapi.PagedRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
+) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
   newnewapi.PagedRequest,
   newnewapi.PagedPostsResponse,
   `${BASE_URL_POST}/get_biggest_posts`,

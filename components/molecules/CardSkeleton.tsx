@@ -120,14 +120,20 @@ CardSkeletonSection.defaultProps = {
 
 const SCardSkeletonSectionWrapper = styled.div`
   width: 100%;
+  overflow-y: hidden;
 
   opacity: 0;
-  animation: ${SkeletonWrapperAnimation} .3s forwards;
+  animation: ${SkeletonWrapperAnimation} .1s forwards;
 
   .skeletonsContainer {
     display: flex;
-    flex-wrap: wrap;
+    width: fit-content;
+    flex-wrap: nowrap;
     gap: 32px;
+
+    position: relative;
+    left: 16px;
+
   }
 `;
 

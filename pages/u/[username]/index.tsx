@@ -1,9 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, {
-  ReactElement, useCallback, useEffect, useMemo, useState,
+  ReactElement, useCallback, useEffect, useState,
 } from 'react';
 import styled from 'styled-components';
-import { debounce } from 'lodash';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -22,6 +21,7 @@ interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
   pagedPosts?: newnewapi.PagedPostsResponse;
   cachedPosts?: newnewapi.Post[];
+  nextPageTokenFromServer?: string;
   handleAddNewPosts: (newPosts: newnewapi.Post[]) => void;
 }
 
@@ -29,6 +29,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   user,
   pagedPosts,
   cachedPosts,
+  nextPageTokenFromServer,
   handleAddNewPosts,
 }) => {
   // Display post
@@ -36,7 +37,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
 
   // Loading state
-  const [pagingToken, setPagingToken] = useState<string | null | undefined>('');
+  const [pagingToken, setPagingToken] = useState<string | null | undefined>(nextPageTokenFromServer ?? '');
   const [isLoading, setIsLoading] = useState(false);
   const {
     ref: loadingRef,
@@ -48,6 +49,10 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     setPostModalOpen(true);
   };
 
+  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+    setDisplayedPost(post);
+  };
+
   const handleClosePostModal = () => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
@@ -57,6 +62,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   const loadPosts = useCallback(async (
     pageToken?: string,
   ) => {
+    if (isLoading) return;
     try {
       setIsLoading(true);
       const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
@@ -81,31 +87,21 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     }
   }, [
     handleAddNewPosts, user.uuid,
+    isLoading,
   ]);
 
-  const loadPostsDebounced = useMemo(() => debounce((
-    pageToken?: string,
-  ) => {
-    loadPosts(pageToken ?? '');
-  }, 250),
-  [loadPosts]);
-
-  // useEffect(() => {
-  //   if (!cachedPosts || cachedPosts.length === 0) {
-  //     loadPosts();
-  //   }
-  // }, []);
-
   useEffect(() => {
-    if (inView) {
+    if (inView && !isLoading) {
       if (pagingToken) {
-        loadPostsDebounced(pagingToken);
+        // loadPostsDebounced(pagingToken);
+        loadPosts(pagingToken);
       } else if (!pagingToken && cachedPosts?.length === 0) {
-        loadPostsDebounced();
+        // loadPostsDebounced();
+        loadPosts();
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken]);
+  }, [inView, pagingToken, isLoading]);
 
   return (
     <div>
@@ -132,6 +128,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
           isOpen={postModalOpen}
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
+          handleOpenAnotherPost={handleSetDisplayedPost}
         />
       )}
     </div>
@@ -195,7 +192,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   // will fetch only for creators
-  // if (res.data.options?.isCreator) {
+  // if (res.data.options?.isCreator && !context.req.url?.startsWith('/_next')) {
   if (res.data && !context.req.url?.startsWith('/_next')) {
     const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
       userUuid: res.data.uuid,
@@ -212,6 +209,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
           user: res.data.toJSON(),
           pagedPosts: postsResponse.data.toJSON(),
+          nextPageTokenFromServer: postsResponse.data.paging?.nextPageToken,
           ...translationContext,
         },
       };
