@@ -17,6 +17,7 @@ import arrowDown from '../../public/images/svg/icons/filled/ArrowDown.svg';
 interface IChangeCollectionType {
   options: any;
   selected: string;
+  disabled?: boolean;
   onChange: (newCategory: string) => void;
 }
 
@@ -24,6 +25,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
   const {
     options,
     selected,
+    disabled,
     onChange,
   } = props;
   const theme = useTheme();
@@ -52,7 +54,7 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
         key={`change-collection-type-${item.key}`}
         label={t(`${item.key}-block-title`)}
         selected={isSelected}
-        handleChange={handleItemClick}
+        handleChange={!disabled ? handleItemClick : () => {}}
       />
     );
   };
@@ -99,6 +101,10 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
       )}
     </SContainer>
   );
+};
+
+ChangeCollectionType.defaultProps = {
+  disabled: undefined,
 };
 
 export default ChangeCollectionType;

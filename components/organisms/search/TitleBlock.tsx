@@ -14,7 +14,15 @@ import { useAppSelector } from '../../../redux-store/store';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import closeCircleIcon from '../../../public/images/svg/icons/filled/CloseCircle.svg';
 
-export const TitleBlock = () => {
+interface ITitleBlock {
+  authenticated?: boolean;
+  disabled?: boolean;
+}
+
+export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
+  authenticated,
+  disabled,
+}) => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -80,10 +88,14 @@ export const TitleBlock = () => {
     {
       key: 'biggest',
     },
-    {
-      key: 'for-you',
-    },
-  ], []);
+    ...(
+      authenticated ? [
+        {
+          key: 'for-you',
+        },
+      ] : []
+    ),
+  ], [authenticated]);
 
   const handleCollectionTypeChange = (newCategory: string) => {
     const newQuery = {
@@ -128,6 +140,7 @@ export const TitleBlock = () => {
       <SButton
         key={`${option}-${key}`}
         view="primary"
+        disabled={disabled}
         onClick={handleClick}
       >
         {t(`sort-title-option-${key}`)}
@@ -142,7 +155,7 @@ export const TitleBlock = () => {
         />
       </SButton>
     );
-  }, [handleSortChange, sort, t]);
+  }, [handleSortChange, sort, disabled, t]);
 
   return (
     <SContainer>
@@ -150,6 +163,7 @@ export const TitleBlock = () => {
         <ChangeCollectionType
           options={collectionTypeOptions}
           selected={category}
+          disabled={disabled}
           onChange={handleCollectionTypeChange}
         />
         <Sorting
@@ -163,6 +177,7 @@ export const TitleBlock = () => {
           <SButtonClear
             view="tertiary"
             onClick={handleClearSorting}
+            disabled={disabled}
           >
             Clear all
             <InlineSVG
@@ -176,6 +191,11 @@ export const TitleBlock = () => {
       )}
     </SContainer>
   );
+};
+
+TitleBlock.defaultProps = {
+  authenticated: undefined,
+  disabled: undefined,
 };
 
 export default TitleBlock;

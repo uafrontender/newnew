@@ -1,9 +1,9 @@
 /* eslint-disable no-nested-ternary */
 import React, { useRef, useState, useEffect } from 'react';
+import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import Card from '../../molecules/Card';
@@ -22,14 +22,16 @@ const SCROLL_STEP = {
 };
 
 interface ITopSection {
-  collection: {}[],
+  collection: newnewapi.Post[],
+  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const TopSection: React.FC<ITopSection> = (props) => {
-  const { collection } = props;
+export const TopSection: React.FC<ITopSection> = ({
+  collection,
+  handlePostClicked,
+}) => {
   const { t } = useTranslation('home');
   const ref: any = useRef();
-  const router = useRouter();
   const scrollContainerRef: any = useRef();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -104,7 +106,7 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
       if (!isDragging) {
-        router.push('/post-detailed');
+        handlePostClicked(item);
       }
     };
 
