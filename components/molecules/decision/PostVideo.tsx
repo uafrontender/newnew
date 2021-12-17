@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
-import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOff.svg';
+import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF.svg';
 
 interface IPostVideo {
   videoSrc: string;

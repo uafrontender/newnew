@@ -16,3 +16,14 @@ newnewapi.GetImageUploadUrlRequest, newnewapi.GetImageUploadUrlResponse>(
   'post',
   payload,
 );
+
+export const getVideoUploadUrl = (
+  payload: newnewapi.GetVideoUploadUrlRequest,
+) => fetchProtobufProtectedIntercepted<
+  newnewapi.GetVideoUploadUrlRequest, newnewapi.GetImageUploadUrlResponse>(
+    newnewapi.GetVideoUploadUrlRequest,
+    newnewapi.GetVideoUploadUrlResponse,
+    `${BASE_URL_UPLOAD}/get_video_upload_url`,
+    'post',
+    payload,
+  );
