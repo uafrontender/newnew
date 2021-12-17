@@ -29,6 +29,7 @@ import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
 import switchPostType from '../utils/switchPostType';
+import isBrowser from '../utils/isBrowser';
 
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse,
@@ -50,27 +51,27 @@ const Home: NextPage<IHome> = ({
   // For you - authenticated users only
   const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
   const [collectionFYInitialLoading, setCollectionFYInitialLoading] = useState(false);
-  const [collectionFYLoading, setCollectionFYLoading] = useState(false);
+  const [collectionFYError, setCollectionFYError] = useState(false);
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
   const [collectionACInitialLoading, setCollectionACInitialLoading] = useState(false);
-  const [collectionACLoading, setCollectionACLoading] = useState(false);
+  const [collectionACError, setCollectionACError] = useState(false);
   // Multiple choice
   const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
   const [collectionMCInitialLoading, setCollectionMCInitialLoading] = useState(false);
-  const [collectionMCLoading, setCollectionMCLoading] = useState(false);
+  const [collectionMCError, setCollectionMCError] = useState(false);
   // Crowdfunding
   const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
   const [collectionCFInitialLoading, setCollectionCFInitialLoading] = useState(false);
-  const [collectionCFLoading, setCollectionCFLoading] = useState(false);
+  const [collectionCFError, setCollectionCFError] = useState(false);
   // Biggest of all time
   const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>([]);
   const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] = useState(false);
-  const [collectionBiggestLoading, setCollectionBiggestLoading] = useState(false);
+  const [collectionBiggestError, setCollectionBiggestError] = useState(false);
   // Creator on the rise
   const [collectionCreator, setCollectionCreator] = useState<newnewapi.Post[]>([]);
   const [collectionCreatorInitialLoading, setCollectionCreatorInitialLoading] = useState(false);
-  const [collectionCreatorLoading, setCollectionCreatorLoading] = useState(false);
+  const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
@@ -109,7 +110,8 @@ const Home: NextPage<IHome> = ({
           throw new Error('Request failed');
         }
       } catch (err) {
-        console.error(err);
+        setCollectionFYInitialLoading(false);
+        setCollectionFYError(true);
       }
     }
 
@@ -136,7 +138,8 @@ const Home: NextPage<IHome> = ({
           throw new Error('Request failed');
         }
       } catch (err) {
-        console.error(err);
+        setCollectionACInitialLoading(false);
+        setCollectionACError(true);
       }
     }
 
@@ -159,7 +162,8 @@ const Home: NextPage<IHome> = ({
           throw new Error('Request failed');
         }
       } catch (err) {
-        console.error(err);
+        setCollectionMCInitialLoading(false);
+        setCollectionMCError(true);
       }
     }
 
@@ -182,7 +186,8 @@ const Home: NextPage<IHome> = ({
           throw new Error('Request failed');
         }
       } catch (err) {
-        console.error(err);
+        setCollectionCFInitialLoading(false);
+        setCollectionCFError(true);
       }
     }
 
@@ -205,7 +210,8 @@ const Home: NextPage<IHome> = ({
           throw new Error('Request failed');
         }
       } catch (err) {
-        console.error(err);
+        setCollectionBiggestInitialLoading(false);
+        setCollectionBiggestError(true);
       }
     }
 
@@ -228,7 +234,8 @@ const Home: NextPage<IHome> = ({
           throw new Error('Request failed');
         }
       } catch (err) {
-        console.error(err);
+        setCollectionCreatorInitialLoading(false);
+        setCollectionCreatorError(true);
       }
     }
 
@@ -247,7 +254,7 @@ const Home: NextPage<IHome> = ({
         collection={topSectionCollection}
         handlePostClicked={handleOpenPostModal}
       />
-      {user.loggedIn && (
+      {user.loggedIn && !collectionFYError && (
         <CardsSection
           title={t('for-you-block-title')}
           category="for-you"
@@ -256,34 +263,42 @@ const Home: NextPage<IHome> = ({
           handlePostClicked={handleOpenPostModal}
         />
       )}
-      <CardsSection
-        title={t('ac-block-title')}
-        category="ac"
-        collection={collectionAC}
-        loading={collectionACInitialLoading}
-        handlePostClicked={handleOpenPostModal}
-      />
-      <CardsSection
-        title={t('mc-block-title')}
-        category="mc"
-        collection={collectionMC}
-        loading={collectionMCInitialLoading}
-        handlePostClicked={handleOpenPostModal}
-      />
-      <CardsSection
-        title={t('cf-block-title')}
-        category="cf"
-        collection={collectionCF}
-        loading={collectionCFInitialLoading}
-        handlePostClicked={handleOpenPostModal}
-      />
-      <CardsSection
-        title={t('biggest-block-title')}
-        category="biggest"
-        collection={collectionBiggest}
-        loading={collectionBiggestInitialLoading}
-        handlePostClicked={handleOpenPostModal}
-      />
+      {!collectionACError && (
+        <CardsSection
+          title={t('ac-block-title')}
+          category="ac"
+          collection={collectionAC}
+          loading={collectionACInitialLoading}
+          handlePostClicked={handleOpenPostModal}
+        />
+      )}
+      {!collectionMCError && (
+        <CardsSection
+          title={t('mc-block-title')}
+          category="mc"
+          collection={collectionMC}
+          loading={collectionMCInitialLoading}
+          handlePostClicked={handleOpenPostModal}
+        />
+      )}
+      {!collectionCFError && (
+        <CardsSection
+          title={t('cf-block-title')}
+          category="cf"
+          collection={collectionCF}
+          loading={collectionCFInitialLoading}
+          handlePostClicked={handleOpenPostModal}
+        />
+      )}
+      {!collectionBiggestError && (
+        <CardsSection
+          title={t('biggest-block-title')}
+          category="biggest"
+          collection={collectionBiggest}
+          loading={collectionBiggestInitialLoading}
+          handlePostClicked={handleOpenPostModal}
+        />
+      )}
       {!collectionCreatorInitialLoading && collectionCreator.length > 0 ? (
         <CardsSection
           user={{
@@ -300,6 +315,7 @@ const Home: NextPage<IHome> = ({
         <PostModal
           isOpen={postModalOpen}
           post={displayedPost}
+          manualCurrLocation={isBrowser() ? window.location.pathname : ''}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
         />

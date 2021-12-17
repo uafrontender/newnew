@@ -1,8 +1,9 @@
 /* eslint-disable no-nested-ternary */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
@@ -89,6 +90,14 @@ export const Card: React.FC<ICard> = ({
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const {
+    ref: cardRef,
+    inView,
+  } = useInView({
+    threshold: 0.55,
+  });
+  const videoRef = useRef<HTMLVideoElement>();
+
   const [postParsed, typeOfPost] = switchPostType(item);
 
   const handleUserClick = (username: string) => {
@@ -101,9 +110,18 @@ export const Card: React.FC<ICard> = ({
     router.push('/post-detailed');
   };
 
+  useEffect(() => {
+    if (inView) {
+      videoRef.current?.play();
+    } else {
+      videoRef.current?.pause();
+    }
+  }, [inView]);
+
   if (type === 'inside') {
     return (
       <SWrapper
+        ref={cardRef}
         index={index}
         width={width}
       >
@@ -121,10 +139,22 @@ export const Card: React.FC<ICard> = ({
             <video
               // src={postParsed.announcement?.thumbnailUrl as string}
               // src="/video/mock/mock_video_1.mp4"
-              src={postParsed.announcement?.thumbnailUrl ? postParsed.announcement?.thumbnailUrl : '/video/mock/mock_video_1.mp4'}
+              // Temp
+              src={
+                postParsed.announcement?.thumbnailUrl
+                  ? postParsed.announcement?.thumbnailUrl
+                  : (
+                    index % 2 === 0 ? '/video/mock/mock_video_1.mp4' : '/video/mock/mock_video_2.mp4'
+                  )
+                }
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              // NB! Might use this one to avoid waisting user's resources
+              // and use a poster here NB!
+              // preload="none"
               loop
               muted
-              autoPlay
               playsInline
             />
             <SImageMask />
@@ -163,7 +193,10 @@ export const Card: React.FC<ICard> = ({
   }
 
   return (
-    <SWrapperOutside width={width}>
+    <SWrapperOutside
+      ref={cardRef}
+      width={width}
+    >
       <SImageBG
         id="backgroundPart"
         height={height}
@@ -172,10 +205,22 @@ export const Card: React.FC<ICard> = ({
           <video
             // src={postParsed.announcement?.thumbnailUrl as string}
             // src="/video/mock/mock_video_1.mp4"
-            src={postParsed.announcement?.thumbnailUrl ? postParsed.announcement?.thumbnailUrl : '/video/mock/mock_video_1.mp4'}
+            // Temp
+            src={
+              postParsed.announcement?.thumbnailUrl
+                ? postParsed.announcement?.thumbnailUrl
+                : (
+                  index % 2 === 0 ? '/video/mock/mock_video_1.mp4' : '/video/mock/mock_video_2.mp4'
+                )
+              }
+            ref={(el) => {
+              videoRef.current = el!!;
+            }}
+            // NB! Might use this one to avoid waisting user's resources
+            // and use a poster here NB!
+            // preload="none"
             loop
             muted
-            autoPlay
             playsInline
           />
           <STopContent>

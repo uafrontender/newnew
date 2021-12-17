@@ -16,6 +16,8 @@ interface IList {
   collection: any;
   loading: boolean;
   wrapperStyle?: React.CSSProperties;
+  skeletonsBgColor?: string,
+  skeletonsHighlightColor?: string,
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -24,6 +26,8 @@ export const List: React.FC<IList> = ({
   collection,
   loading,
   wrapperStyle,
+  skeletonsBgColor,
+  skeletonsHighlightColor,
   handlePostClicked,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -60,6 +64,8 @@ export const List: React.FC<IList> = ({
           count={1}
           cardWidth="100%"
           cardHeight="100%"
+          bgColor={skeletonsBgColor}
+          highlightColor={skeletonsHighlightColor}
         />
       ))}
     </SListWrapper>
@@ -68,6 +74,8 @@ export const List: React.FC<IList> = ({
 
 List.defaultProps = {
   wrapperStyle: {},
+  skeletonsBgColor: undefined,
+  skeletonsHighlightColor: undefined,
 };
 
 export default List;

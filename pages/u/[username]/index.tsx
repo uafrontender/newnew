@@ -209,7 +209,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
           user: res.data.toJSON(),
           pagedPosts: postsResponse.data.toJSON(),
-          nextPageTokenFromServer: postsResponse.data.paging?.nextPageToken,
+          ...(postsResponse.data.paging?.nextPageToken ? {
+            nextPageTokenFromServer: postsResponse.data.paging?.nextPageToken,
+          } : {}),
           ...translationContext,
         },
       };

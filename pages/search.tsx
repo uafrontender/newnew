@@ -262,6 +262,7 @@ const Search: NextPage<ISearch> = ({
     router.query.category,
   ]);
 
+  // NB! Will be removed as we'll be fetching sorted data from the API NB!
   // Sort collection after collectionLoaded and on sort changes
   useEffect(() => {
     const sort = router.query.sort?.toString() ? JSON.parse(router.query.sort?.toString()) : '';
@@ -274,17 +275,13 @@ const Search: NextPage<ISearch> = ({
         setIsCollectionSorting(true);
         const workingArray = [...collectionLoaded];
         if (sort.time) {
-          console.log(sort.time);
           const workingArray2 = workingArray.sort((a, b) => {
             const [A, typeA] = switchPostType(a);
             const [B, typeB] = switchPostType(b);
-            console.log(A);
-            console.log(B);
             if (sort.time === 'newest') return (B.expiresAt?.seconds as number) - (A.expiresAt?.seconds as number);
             if (sort.time === 'oldest') return (A.expiresAt?.seconds as number) - (B.expiresAt?.seconds as number);
             return (A.expiresAt?.seconds as number) - (B.expiresAt?.seconds as number);
           });
-          console.log(workingArray2);
           setCollectionSorted(() => [...workingArray2]);
           setIsCollectionSorting(false);
           return;

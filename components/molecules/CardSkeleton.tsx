@@ -10,12 +10,16 @@ interface ICardSkeleton {
   count: number;
   cardWidth?: string;
   cardHeight?: string;
+  bgColor?: string;
+  highlightColor?: string;
 }
 
 const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
   count,
   cardWidth,
   cardHeight,
+  bgColor,
+  highlightColor,
 }) => (
   <Skeleton
     count={count}
@@ -23,6 +27,14 @@ const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
     duration={2}
     className="skeletonSpan"
     containerClassName="skeletonsContainer"
+    {...{
+      ...(bgColor ? {
+        baseColor: bgColor,
+      } : {}),
+      ...(highlightColor ? {
+        highlightColor,
+      } : {}),
+    }}
     wrapper={
       ({ children: skeletons }) => (
         <SSingleSkeletonWrapper
@@ -39,6 +51,8 @@ const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
 CardSkeleton.defaultProps = {
   cardHeight: undefined,
   cardWidth: undefined,
+  bgColor: undefined,
+  highlightColor: undefined,
 };
 
 export default CardSkeleton;

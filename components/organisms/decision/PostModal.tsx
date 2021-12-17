@@ -10,7 +10,7 @@ import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import Modal from '../Modal';
 
@@ -26,6 +26,7 @@ import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 interface IPostModal {
   isOpen: boolean;
   post?: newnewapi.IPost,
+  manualCurrLocation?: string,
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
 }
@@ -33,14 +34,16 @@ interface IPostModal {
 const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
+  manualCurrLocation,
   handleClose,
   handleOpenAnotherPost,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const router = useRouter();
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
 
-  const [currLocation] = useState(isBrowser() ? window.location.href : '');
+  const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
 
   const [open, setOpen] = useState(false);
 
@@ -246,12 +249,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             {recommenedPosts && (
               <List
                 category=""
-                // loading={recommenedPostsLoading}
-                loading
+                loading={recommenedPostsLoading}
+                // loading
                 collection={recommenedPosts}
+                // collection={[]}
                 wrapperStyle={{
                   left: 0,
                 }}
+                skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                skeletonsHighlightColor={theme.colorsThemed.background.secondary}
                 handlePostClicked={handleOpenRecommendedPost}
               />
             )}
@@ -272,6 +278,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 PostModal.defaultProps = {
   post: undefined,
   handleOpenAnotherPost: () => {},
+  manualCurrLocation: undefined,
 };
 
 export default PostModal;
