@@ -10,6 +10,7 @@ interface IModal {
   show: boolean;
   transitionSpeed?: number;
   overlayDim?: boolean;
+  additionalZ?: number;
   onClose: () => void;
   children: ReactNode;
 }
@@ -19,6 +20,7 @@ const Modal: React.FC<IModal> = (props) => {
     show,
     transitionSpeed,
     overlayDim,
+    additionalZ,
     onClose,
     children,
   } = props;
@@ -41,6 +43,7 @@ const Modal: React.FC<IModal> = (props) => {
         show={show}
         onClick={onClose}
         overlayDim={overlayDim ?? false}
+        additionalZ={additionalZ ?? undefined}
         transitionSpeed={transitionSpeed ?? 0.5}
       >
         {children}
@@ -56,6 +59,7 @@ interface IStyledModalOverlay {
   show: boolean;
   transitionSpeed?: number;
   overlayDim?: boolean;
+  additionalZ?: number;
 }
 
 const StyledModalOverlay = styled.div<IStyledModalOverlay>`
@@ -63,7 +67,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   width: 100vw;
   bottom: 0;
   height: ${(props) => (props.show ? '100%' : 0)};
-  z-index: 10;
+  z-index: ${({ additionalZ }) => additionalZ ?? 10};
   overflow: hidden;
   position: fixed;
   backdrop-filter: blur(16px);

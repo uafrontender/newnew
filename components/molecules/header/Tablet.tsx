@@ -121,7 +121,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 <SItemWithMargin>
                   <UserAvatar
                     withClick
-                    user={user}
+                    avatarUrl={user.userData?.avatarUrl}
                     onClick={handleUserClick}
                   />
                 </SItemWithMargin>

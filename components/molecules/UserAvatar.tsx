@@ -10,18 +10,14 @@ import { useAppSelector } from '../../redux-store/store';
 import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
 
 interface IUserAvatar {
-  user: {
-    userData?: {
-      avatarUrl?: string,
-    }
-  },
-  onClick?: () => any,
+  avatarUrl?: string,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => any,
   withClick?: boolean,
 }
 
 export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const {
-    user,
+    avatarUrl,
     onClick,
     withClick,
     ...rest
@@ -31,7 +27,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const theme = useTheme();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  if (!user.userData?.avatarUrl) {
+  if (!avatarUrl) {
     return (
       <SButton
         iconOnly
@@ -56,7 +52,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       withClick={withClick ?? false}
     >
       <Image
-        src={user.userData.avatarUrl}
+        src={avatarUrl}
         alt="User avatar"
         width="100%"
         height="100%"
@@ -69,9 +65,9 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
 export default UserAvatar;
 
 UserAvatar.defaultProps = {
+  avatarUrl: undefined,
   withClick: false,
-  onClick: () => {
-  },
+  onClick: () => {},
 };
 
 interface ISContainer {
