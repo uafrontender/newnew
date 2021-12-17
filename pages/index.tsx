@@ -130,7 +130,7 @@ const Home: NextPage<IHome> = ({
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
         if (resLiveAuctions) {
-          setCollectionAC(() => resLiveAuctions.data?.posts as newnewapi.Post[]);
+          setCollectionAC(() => resLiveAuctions.data?.auctions as newnewapi.Post[]);
           setCollectionACInitialLoading(false);
         } else {
           throw new Error('Request failed');

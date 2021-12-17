@@ -87,3 +87,13 @@ export const fetchBiggestPosts = (
   'post',
   payload,
 );
+
+export const fetchMoreLikePosts = (
+  payload: newnewapi.GetMoreLikePostsRequest,
+) => fetchProtobuf<newnewapi.GetMoreLikePostsRequest, newnewapi.PagedPostsResponse>(
+  newnewapi.GetMoreLikePostsRequest,
+  newnewapi.PagedPostsResponse,
+  `${BASE_URL_POST}/get_more_like_posts`,
+  'post',
+  payload,
+);

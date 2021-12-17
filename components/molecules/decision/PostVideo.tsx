@@ -6,6 +6,7 @@ import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF.svg';
+import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 
 interface IPostVideo {
   videoSrc: string;
@@ -38,7 +39,7 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         onClick={() => handleToggleMuted()}
       >
         <InlineSvg
-          svg={isMuted ? VolumeOff : null}
+          svg={isMuted ? VolumeOff : VolumeOn}
           width="24px"
           height="24px"
           fill="#FFFFFF"

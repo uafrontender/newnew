@@ -9,9 +9,9 @@ export const BASE_URL_AUCTION = `${BASE_URL}/auction`;
 
 export const fetchLiveAuctions = (
   payload: newnewapi.PagedRequest,
-) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
+) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedAuctionsResponse>(
   newnewapi.PagedRequest,
-  newnewapi.PagedPostsResponse,
+  newnewapi.PagedAuctionsResponse,
   `${BASE_URL_AUCTION}/get_live_auctions`,
   'post',
   payload,

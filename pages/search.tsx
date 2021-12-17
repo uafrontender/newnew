@@ -73,6 +73,7 @@ const Search: NextPage<ISearch> = ({
         newnewapi.PagedPostsResponse
         | newnewapi.PagedMultipleChoicesResponse
         | newnewapi.PagedCrowdfundingsResponse
+        | newnewapi.PagedAuctionsResponse
       >;
 
       if (categoryToFetch === 'for-you' && loggedIn) {
@@ -111,11 +112,12 @@ const Search: NextPage<ISearch> = ({
 
         res = await fetchLiveAuctions(liveAuctionsPayload);
 
-        if (res.data && (res.data as newnewapi.PagedPostsResponse).posts) {
+        if (res.data && (res.data as newnewapi.PagedAuctionsResponse).auctions) {
           setCollectionLoaded(
             (curr) => [
               ...curr,
-              ...(res.data as newnewapi.PagedPostsResponse).posts as newnewapi.Post[],
+              ...(res.data as newnewapi.PagedAuctionsResponse)
+                .auctions as newnewapi.Post[],
             ],
           );
           setNextPageToken(res.data.paging?.nextPageToken);

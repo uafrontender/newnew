@@ -21,8 +21,7 @@ import switchPostType, { postType } from '../../../utils/switchPostType';
 import PostViewAC from './PostViewAC';
 import PostViewCF from './PostViewCF';
 import List from '../search/List';
-import { fetchBiggestPosts } from '../../../api/endpoints/post';
-import { fetchLiveAuctions } from '../../../api/endpoints/auction';
+import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 
 interface IPostModal {
   isOpen: boolean;
@@ -90,13 +89,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (recommenedPostsLoading) return;
     try {
       setRecommenedPostsLoading(true);
-      // Temp, there will be a special endpoint
-      const fetchRecommenedPostsPayload = new newnewapi.PagedRequest({
-        paging: {
-          ...(pageToken ? { pageToken } : {}),
-        },
+
+      const fetchRecommenedPostsPayload = new newnewapi.GetMoreLikePostsRequest({
+        postUuid: postParsed?.postUuid,
+        ...(pageToken ? {
+          paging: {
+            pageToken,
+          },
+        } : {}),
       });
-      const postsResponse = await fetchBiggestPosts(fetchRecommenedPostsPayload);
+      const postsResponse = await fetchMoreLikePosts(fetchRecommenedPostsPayload);
 
       console.log(postsResponse);
 
@@ -111,6 +113,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
   }, [
     setRecommenedPosts, recommenedPostsLoading,
+    postParsed,
   ]);
 
   const renderPostview = (
@@ -148,7 +151,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
     return () => {
       setOpen(false);
-      console.log('i am here');
 
       // test
       innerHistoryStack.current = [];
@@ -244,7 +246,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             {recommenedPosts && (
               <List
                 category=""
-                loading={recommenedPostsLoading}
+                // loading={recommenedPostsLoading}
+                loading
                 collection={recommenedPosts}
                 wrapperStyle={{
                   left: 0,
@@ -254,6 +257,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             )}
             <div
               ref={loadingRef}
+              style={{
+                position: 'relative',
+                bottom: '10px',
+              }}
             />
           </SRecommendationsSection>
         </SPostModalContainer>

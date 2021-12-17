@@ -31,7 +31,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         />
       </SExpiresSection>
       <PostVideo
-        videoSrc={MockVideo}
+        videoSrc={post.announcement?.videoUrl ?? MockVideo}
         isMuted={muted}
         handleToggleMuted={() => setMuted((curr) => !curr)}
       />
