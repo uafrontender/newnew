@@ -9,7 +9,7 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 
 import volumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import volumeOff from '../../../public/images/svg/icons/filled/VolumeOFF.svg';
+import volumeOff from '../../../public/images/svg/icons/filled/VolumeOff.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 interface IFileUpload {

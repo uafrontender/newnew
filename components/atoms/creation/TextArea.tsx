@@ -47,10 +47,21 @@ const STextArea = styled(TextAreaAutoSize)`
   border: none;
   resize: none;
   outline: none;
-  font-size: 14px;
   background: transparent;
   font-weight: 500;
+
+  font-size: 14px;
   line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 16px;
+    line-height: 24px;
+  }
   
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};

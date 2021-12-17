@@ -370,10 +370,11 @@ const STab = styled.button<ISTab>`
 
   margin-left: ${({ extraMargin }) => (extraMargin ? '24px' : 'initial')};
 
-  font-size: 14px;
   white-space: nowrap;
-  line-height: 20px;
   font-weight: 600;
+
+  font-size: 14px;
+  line-height: 20px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 14px;

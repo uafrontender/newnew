@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
+import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
 import InlineSVG from '../../atoms/InlineSVG';
 
@@ -32,7 +33,7 @@ export const MobileField: React.FC<IMobileField> = (props) => {
 
   return (
     <SContainer>
-      <STitle>
+      <STitle variant={3} weight={600}>
         {t(`secondStep.field.${id}.title`)}
       </STitle>
       <SRightPart>
@@ -67,12 +68,7 @@ const SContainer = styled.div`
   justify-content: space-between;
 `;
 
-const STitle = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 24px;
-`;
+const STitle = styled(Text)``;
 
 const SRightPart = styled.div`
   display: flex;
