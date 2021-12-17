@@ -191,7 +191,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     width: 52px;
     height: 72px;
 
-    padding: 16px;
+    padding: 14px;
 
     font-weight: 600;
     font-size: 32px;

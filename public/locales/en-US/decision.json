@@ -1,0 +1,10 @@
+{
+  "expires": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m"
+  },
+  "RecommendationsSection": {
+    "heading": "More like this"
+  }
+}

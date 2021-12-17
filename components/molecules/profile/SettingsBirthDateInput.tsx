@@ -285,7 +285,7 @@ const SContainer = styled.div`
     width: 272px;
   }
 
-  ${({ theme }) => theme.media.desktop} {
+  ${({ theme }) => theme.media.laptop} {
     width: 224px;
   }
 `;

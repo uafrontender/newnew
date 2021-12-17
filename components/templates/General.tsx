@@ -2,6 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import styled, { useTheme } from 'styled-components';
+import { SkeletonTheme } from 'react-loading-skeleton';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -106,41 +107,46 @@ export const General: React.FC<IGeneral> = (props) => {
 
   return (
     <ErrorBoundary>
-      <SWrapper
-        id="generalScrollContainer"
-        ref={wrapperRef}
-        withBanner={!!banner?.show}
-        {...props}
+      <SkeletonTheme
+        baseColor={theme.colorsThemed.background.secondary}
+        highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <Head>
-          <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
-        </Head>
-        <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
-        <SContent>
-          <Container noMaxContent>
-            <Row>
-              <Col>
-                {children}
-              </Col>
-            </Row>
-          </Container>
-        </SContent>
-        <Footer />
-        <BottomNavigation
-          visible={isMobile && scrollDirection !== 'down'}
-          collection={bottomNavigation}
-        />
-        <SortingContainer
-          id="sorting-container"
-          withCookie={cookies.accepted !== 'true'}
-          bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-        />
-        <CookieContainer
-          bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+        <SWrapper
+          id="generalScrollContainer"
+          ref={wrapperRef}
+          withBanner={!!banner?.show}
+          {...props}
         >
-          <Cookie />
-        </CookieContainer>
-      </SWrapper>
+          <Head>
+            <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
+          </Head>
+          <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
+          <SContent>
+            <Container noMaxContent>
+              <Row>
+                <Col>
+                  {children}
+                </Col>
+              </Row>
+            </Container>
+          </SContent>
+          <Footer />
+          <BottomNavigation
+            visible={isMobile && scrollDirection !== 'down'}
+            collection={bottomNavigation}
+          />
+          <SortingContainer
+            id="sorting-container"
+            withCookie={cookies.accepted !== 'true'}
+            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+          />
+          <CookieContainer
+            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+          >
+            <Cookie />
+          </CookieContainer>
+        </SWrapper>
+      </SkeletonTheme>
     </ErrorBoundary>
   );
 };
