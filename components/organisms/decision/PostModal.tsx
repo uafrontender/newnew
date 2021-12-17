@@ -103,8 +103,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       });
       const postsResponse = await fetchMoreLikePosts(fetchRecommenedPostsPayload);
 
-      console.log(postsResponse);
-
       if (postsResponse.data && postsResponse.data.posts) {
         setRecommenedPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
         setNextPageToken(postsResponse.data.paging?.nextPageToken);
@@ -154,23 +152,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
     return () => {
       setOpen(false);
-
-      // test
       innerHistoryStack.current = [];
-      // window.history.back();
       // eslint-disable-next-line no-useless-return
       return;
-      // if (router.query.username) {
-      //   router.replace(
-      //     router.asPath,
-      //     undefined,
-      //     {
-      //       shallow: true,
-      //     },
-      //   );
-      // } else {
-      //   router.replace(router.pathname);
-      // }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -181,10 +165,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       if (!isBrowser()) return;
 
       const postId = new URL(window.location.href).searchParams.get('post');
-
-      console.log(postId);
-
-      console.log(innerHistoryStack.current);
 
       if (innerHistoryStack.current
         && innerHistoryStack.current[innerHistoryStack.current.length - 1]) {
@@ -206,11 +186,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
     };
 
-    // router.events.on('routeChangeComplete', verify);
-
     window.addEventListener('popstate', verify);
 
-    // return () => router.events.off('routeChangeComplete', verify);
     return () => window.removeEventListener('popstate', verify);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
