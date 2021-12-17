@@ -109,7 +109,6 @@ const SContent = styled.div`
 `;
 
 const STitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
   margin-bottom: 4px;
 
   ${(props) => props.theme.media.tablet} {
