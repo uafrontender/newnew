@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 
 import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
@@ -19,6 +20,8 @@ import { formatString } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
+import switchPostType from '../../../utils/switchPostType';
+import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -26,21 +29,27 @@ const SCROLL_STEP = {
 };
 
 interface ICardSection {
-  user?: any,
-  type?: 'default' | 'creator'
-  title?: string,
-  category: string,
-  collection: {}[],
+  user?: {
+    avatarUrl: string;
+    username: string;
+  };
+  type?: 'default' | 'creator';
+  title?: string;
+  category: string;
+  collection: newnewapi.Post[];
+  loading?: boolean;
+  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const CardsSection: React.FC<ICardSection> = (props) => {
-  const {
-    user,
-    type,
-    title,
-    category,
-    collection,
-  } = props;
+export const CardsSection: React.FC<ICardSection> = ({
+  user,
+  type,
+  title,
+  category,
+  collection,
+  loading,
+  handlePostClicked,
+}) => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const ref: any = useRef();
@@ -128,13 +137,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
       if (!isDragging) {
-        router.push('/post-detailed');
+        handlePostClicked(item);
       }
     };
 
     return (
       <SItemWrapper
-        key={`${category}-${item.id}`}
+        key={switchPostType(item)[0].postUuid}
         name={`cards-section-${category}-${index}`}
         onClick={handleItemClick}
       >
@@ -188,9 +197,11 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             animation="t-01"
           >
             <SCreatorHeadline onClick={handleUserClick}>
-              <UserAvatar user={user} />
+              <UserAvatar
+                avatarUrl={user?.avatarUrl!!}
+              />
               <SHeadline variant={4}>
-                {user.username}
+                {user?.username!!}
               </SHeadline>
               <Tag>
                 {t('button-creator-on-the-rise')}
@@ -203,7 +214,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             weight={700}
             onClick={handleSeeMoreCLick}
           >
-            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user.username, true) })}
+            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
           </SCaption>
         )}
       </STopWrapper>
@@ -216,7 +227,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
           onMouseMove={mouseMoveHandler}
           onMouseLeave={mouseUpHandler}
         >
-          {collectionToRender.map(renderItem)}
+          {!loading
+            ? collectionToRender.map(renderItem)
+            : (
+              <CardSkeletonSection
+                count={5}
+              />
+            )}
         </SListWrapper>
         {!isMobile && (
           <>
@@ -244,7 +261,7 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
             view="secondary"
             onClick={handleSeeMoreCLick}
           >
-            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user.username, true) })}
+            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
           </Button>
         </SButtonHolder>
       )}
@@ -256,8 +273,12 @@ export default CardsSection;
 
 CardsSection.defaultProps = {
   type: 'default',
-  user: {},
+  user: {
+    avatarUrl: '',
+    username: '',
+  },
   title: '',
+  loading: undefined,
 };
 
 interface ISWrapper {

@@ -49,7 +49,7 @@ export const Mobile: React.FC<IMobile> = () => {
         <SItemWithMargin>
           <UserAvatar
             withClick
-            user={user}
+            avatarUrl={user.userData?.avatarUrl}
             onClick={handleUserClick}
           />
         </SItemWithMargin>

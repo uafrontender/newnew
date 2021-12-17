@@ -1,7 +1,9 @@
-import React from 'react';
-import Image from 'next/image';
+/* eslint-disable no-nested-ternary */
+import React, { useEffect, useRef } from 'react';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
@@ -35,6 +37,9 @@ import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 
+// Utils
+import switchPostType from '../../utils/switchPostType';
+
 const NUMBER_ICONS: any = {
   light: {
     1: iconLight1,
@@ -63,21 +68,20 @@ const NUMBER_ICONS: any = {
 };
 
 interface ICard {
-  item: any;
+  item: newnewapi.Post;
   type?: 'inside' | 'outside';
   index: number;
   width?: string;
   height?: string;
 }
 
-export const Card: React.FC<ICard> = (props) => {
-  const {
-    item,
-    type,
-    index,
-    width,
-    height,
-  } = props;
+export const Card: React.FC<ICard> = ({
+  item,
+  type,
+  index,
+  width,
+  height,
+}) => {
   const { t } = useTranslation('home');
   const theme = useTheme();
   const router = useRouter();
@@ -86,8 +90,18 @@ export const Card: React.FC<ICard> = (props) => {
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const handleUserClick = () => {
-    router.push('/profile');
+  const {
+    ref: cardRef,
+    inView,
+  } = useInView({
+    threshold: 0.55,
+  });
+  const videoRef = useRef<HTMLVideoElement>();
+
+  const [postParsed, typeOfPost] = switchPostType(item);
+
+  const handleUserClick = (username: string) => {
+    router.push(`/u/${username}`);
   };
   const handleMoreClick = () => {
     router.push('/post-detailed');
@@ -96,9 +110,18 @@ export const Card: React.FC<ICard> = (props) => {
     router.push('/post-detailed');
   };
 
+  useEffect(() => {
+    if (inView) {
+      videoRef.current?.play();
+    } else {
+      videoRef.current?.pause();
+    }
+  }, [inView]);
+
   if (type === 'inside') {
     return (
       <SWrapper
+        ref={cardRef}
         index={index}
         width={width}
       >
@@ -113,11 +136,26 @@ export const Card: React.FC<ICard> = (props) => {
             </SNumberImageHolder>
           )}
           <SImageHolder index={index}>
-            <Image
-              src={item.url}
-              objectFit="cover"
-              layout="fill"
-              draggable={false}
+            <video
+              // src={postParsed.announcement?.thumbnailUrl as string}
+              // src="/video/mock/mock_video_1.mp4"
+              // Temp
+              src={
+                postParsed.announcement?.thumbnailUrl
+                  ? postParsed.announcement?.thumbnailUrl
+                  : (
+                    index % 2 === 0 ? '/video/mock/mock_video_1.mp4' : '/video/mock/mock_video_2.mp4'
+                  )
+                }
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              // NB! Might use this one to avoid waisting user's resources
+              // and use a poster here NB!
+              // preload="none"
+              loop
+              muted
+              playsInline
             />
             <SImageMask />
             <STopContent>
@@ -138,11 +176,14 @@ export const Card: React.FC<ICard> = (props) => {
             <SBottomContent>
               <SUserAvatar
                 withClick
-                user={item.user}
-                onClick={handleUserClick}
+                avatarUrl={postParsed.creator?.avatarUrl!!}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUserClick(postParsed.creator?.username!!);
+                }}
               />
               <SText variant={3} weight={600}>
-                {item.title}
+                {postParsed.title}
               </SText>
             </SBottomContent>
           </SImageHolder>
@@ -152,17 +193,35 @@ export const Card: React.FC<ICard> = (props) => {
   }
 
   return (
-    <SWrapperOutside width={width}>
+    <SWrapperOutside
+      ref={cardRef}
+      width={width}
+    >
       <SImageBG
         id="backgroundPart"
         height={height}
       >
         <SImageHolderOutside id="animatedPart">
-          <Image
-            src={item.url}
-            objectFit="cover"
-            layout="fill"
-            draggable={false}
+          <video
+            // src={postParsed.announcement?.thumbnailUrl as string}
+            // src="/video/mock/mock_video_1.mp4"
+            // Temp
+            src={
+              postParsed.announcement?.thumbnailUrl
+                ? postParsed.announcement?.thumbnailUrl
+                : (
+                  index % 2 === 0 ? '/video/mock/mock_video_1.mp4' : '/video/mock/mock_video_2.mp4'
+                )
+              }
+            ref={(el) => {
+              videoRef.current = el!!;
+            }}
+            // NB! Might use this one to avoid waisting user's resources
+            // and use a poster here NB!
+            // preload="none"
+            loop
+            muted
+            playsInline
           />
           <STopContent>
             <SButtonIcon
@@ -183,26 +242,47 @@ export const Card: React.FC<ICard> = (props) => {
       </SImageBG>
       <SBottomContentOutside>
         <SBottomStart>
-          <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
+          <SUserAvatar
+            avatarUrl={postParsed?.creator?.avatarUrl!!}
+            withClick
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUserClick(postParsed.creator?.username!!);
+            }}
+          />
           <STextOutside variant={3} weight={600}>
-            {item.title}
+            {postParsed.title}
           </STextOutside>
         </SBottomStart>
-        <SBottomEnd type={item.type}>
+        <SBottomEnd
+          type={typeOfPost}
+        >
           <SButton
             withDim
             withShrink
-            view={item.type === 'cf' ? 'primaryProgress' : 'primary'}
+            view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
             onClick={handleBidClick}
-            cardType={item.type}
-            progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
-            withProgress={item.type === 'cf'}
+            cardType={typeOfPost}
+            progress={typeOfPost === 'cf' ? (
+              Math.floor(((postParsed as newnewapi.Crowdfunding).currentBackerCount * 100)
+              / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
+            ) : 0}
+            withProgress={typeOfPost === 'cf'}
           >
-            {t(`button-card-${item.type}`, {
-              votes: item.votes,
-              total: formatNumber(item.total, true),
-              backed: formatNumber(item.backed, true),
-              amount: `$${formatNumber(item.amount, true)}`,
+            {t(`button-card-${typeOfPost}`, {
+              votes: (postParsed as newnewapi.MultipleChoice).totalVotes,
+              total: formatNumber(
+                (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
+                true,
+              ),
+              backed: formatNumber(
+                (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0,
+                true,
+              ),
+              amount: formatNumber(
+                (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0,
+                true,
+              ),
             })}
           </SButton>
           <SCaption variant={2} weight={700}>
@@ -367,6 +447,16 @@ const SImageHolder = styled.div<ISWrapper>`
     return '65%';
   }};
   }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
 `;
 
 const SImageMask = styled.div`
@@ -457,6 +547,16 @@ const SImageHolderOutside = styled.div`
     padding: 12px;
     overflow: hidden;
     border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
   }
 `;
 

@@ -100,7 +100,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 <SItemWithMargin>
                   <UserAvatar
                     withClick
-                    user={user}
+                    avatarUrl={user.userData?.avatarUrl}
                     onClick={handleUserClick}
                   />
                 </SItemWithMargin>
@@ -121,7 +121,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 <SItemWithMargin>
                   <UserAvatar
                     withClick
-                    user={user}
+                    avatarUrl={user.userData?.avatarUrl}
                     onClick={handleUserClick}
                   />
                 </SItemWithMargin>

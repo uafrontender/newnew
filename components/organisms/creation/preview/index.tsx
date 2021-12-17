@@ -15,6 +15,9 @@ import { setPostData } from '../../../../redux-store/slices/creationStateSlice';
 import { getVideoUploadUrl } from '../../../../api/endpoints/upload';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
+// Utils
+import urltoFile from '../../../../utils/urlToFile';
+
 interface IPreviewContent {
   video: any;
 }
@@ -85,11 +88,13 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
 
     if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
 
+    const file = await urltoFile(video.url, video.name, video.type);
+
     const uploadResponse = await fetch(
       res.data.uploadUrl,
       {
         method: 'PUT',
-        body: video,
+        body: file,
         headers: {
           'Content-Type': video.type,
         },
@@ -159,7 +164,7 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
     auction.minimalBid,
     crowdfunding.targetBackerCount,
     multiplechoice.choices,
-    multiplechoice.options.allowSuggestions,
+    multiplechoice?.options?.allowSuggestions,
     formatExpiresAt,
   ]);
   const settings: any = useMemo(() => _compact([
@@ -194,7 +199,7 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
     post.options.commentsEnabled,
     auction.minimalBid,
     crowdfunding.targetBackerCount,
-    multiplechoice.options.allowSuggestions,
+    multiplechoice?.options?.allowSuggestions,
     formatExpiresAt,
   ]);
   const renderSetting = (item: any) => (
