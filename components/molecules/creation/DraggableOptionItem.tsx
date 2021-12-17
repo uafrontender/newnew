@@ -124,14 +124,15 @@ const STextArea = styled(TextArea)`
   border: none;
   resize: none;
   outline: none;
-  font-size: 16px;
   background: transparent;
-  line-height: 24px;
   margin-right: 12px;
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
   }
+
+  font-size: 14px;
+  line-height: 20px;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
@@ -139,8 +140,8 @@ const STextArea = styled(TextArea)`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 16px;
+    line-height: 24px;
   }
 `;
 
