@@ -23,11 +23,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     <SWrapper>
       <SExpiresSection>
         <PostTimer
-          timestampSeconds={
-            Math.floor((new Date('2021-12-30').getTime() - Date.now()) / 1000)
-            // Temp, because the date was old
-            // new Date((post.expiresAt?.seconds as number) * 1000).getTime() - Date.now()
-          }
+          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+          postType="cf"
         />
       </SExpiresSection>
       <PostVideo

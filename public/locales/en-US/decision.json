@@ -1,8 +1,15 @@
 {
+  "postType": {
+    "ac": "Auction",
+    "mc": "Multiple Choice",
+    "cf": "Crowdfunding"
+  },
   "expires": {
     "days": "d",
     "hours": "h",
-    "minutes": "m"
+    "minutes": "m",
+    "ended_on": "ended on",
+    "at_time": "at"
   },
   "RecommendationsSection": {
     "heading": "More like this"

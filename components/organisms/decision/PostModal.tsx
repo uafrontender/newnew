@@ -17,7 +17,7 @@ import Modal from '../Modal';
 import isBrowser from '../../../utils/isBrowser';
 import PostViewMC from './PostViewMC';
 import Headline from '../../atoms/Headline';
-import switchPostType, { postType } from '../../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import PostViewAC from './PostViewAC';
 import PostViewCF from './PostViewCF';
 import List from '../search/List';
@@ -118,7 +118,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   ]);
 
   const renderPostview = (
-    postToRender: postType,
+    postToRender: TPostType,
   ) => {
     if (postToRender === 'mc') {
       return (
