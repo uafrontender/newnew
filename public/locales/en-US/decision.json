@@ -11,6 +11,14 @@
     "ended_on": "ended on",
     "at_time": "at"
   },
+  "PostTopInfo": {
+    "in_bids": "in bids"
+  },
+  "tabs": {
+    "bids": "Bids",
+    "comments": "Comments",
+    "votes": "Votes"
+  },
   "RecommendationsSection": {
     "heading": "More like this"
   }

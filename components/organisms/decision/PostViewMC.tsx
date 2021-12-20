@@ -1,9 +1,10 @@
 /* eslint-disable arrow-body-style */
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
@@ -27,12 +28,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-
+  const dispatch = useAppDispatch();
+  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  // NB! Will be moved to Redux
-  const [muted, setMuted] = useState(true);
+  const handleToggleMutedMode = useCallback(() => {
+    dispatch(toggleMutedMode(''));
+  }, [dispatch]);
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -63,8 +66,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       </SExpiresSection>
       <PostVideo
         videoSrc={post.announcement?.videoUrl ?? MockVideo}
-        isMuted={muted}
-        handleToggleMuted={() => setMuted((curr) => !curr)}
+        isMuted={mutedMode}
+        handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTitle>
         { post.title }

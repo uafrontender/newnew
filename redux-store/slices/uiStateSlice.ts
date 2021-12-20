@@ -34,6 +34,7 @@ export interface UIStateInterface {
   overlay: TOverlay;
   colorMode: TColorMode;
   resizeMode: TResizeMode;
+  mutedMode: boolean;
   globalSearchActive: TGlobalSearchActive;
 }
 
@@ -45,6 +46,7 @@ export const defaultUIState: UIStateInterface = {
   overlay: false,
   colorMode: 'auto',
   resizeMode: 'mobile',
+  mutedMode: true,
   globalSearchActive: false,
 };
 
@@ -67,6 +69,9 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     setBanner(state, { payload }: PayloadAction<TBanner>) {
       state.banner = payload;
     },
+    toggleMutedMode(state) {
+      state.mutedMode = !state.mutedMode;
+    },
   },
 });
 
@@ -75,6 +80,7 @@ export const {
   setOverlay,
   setColorMode,
   setResizeMode,
+  toggleMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
 

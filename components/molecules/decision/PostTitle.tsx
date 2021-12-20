@@ -33,4 +33,13 @@ const SHeadline = styled(Headline)<{
   ellipsed: boolean;
 }>`
   grid-area: title;
+
+  height: fit-content;
+
+  margin-top: 24px;
+  margin-bottom: 12px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 16px;
+  }
 `;

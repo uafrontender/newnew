@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 /* eslint-disable arrow-body-style */
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { fetchCurrentBidsForPost } from '../../../api/endpoints/auction';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
@@ -13,6 +17,8 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import DecisionTabs from '../../molecules/decision/PostTabs';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -27,11 +33,63 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-
+  const dispatch = useAppDispatch();
+  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  // NB! Will be moved to Redux
-  const [muted, setMuted] = useState(true);
+
+  // Tabs
+  const [currentTab, setCurrentTab] = useState<
+    'bids' | 'comments'
+  >('bids');
+
+  // Bids
+  const [bids, setBids] = useState<newnewapi.Auction.Option[]>([]);
+  const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
+  const [bidsLoading, setBidsLoading] = useState(false);
+  const [loadingBidsError, setLoadingBidsError] = useState('');
+
+  const handleToggleMutedMode = useCallback(() => {
+    dispatch(toggleMutedMode(''));
+  }, [dispatch]);
+
+  const fetchBids = useCallback(async (
+    pageToken?: string,
+  ) => {
+    if (bidsLoading) return;
+    try {
+      setBidsLoading(true);
+      setLoadingBidsError('');
+
+      const getCurrentBidsPayload = new newnewapi.GetCurrentBidsRequest({
+        postUuid: post.postUuid,
+        ...(pageToken ? {
+          paging: {
+            pageToken,
+          },
+        } : {}),
+      });
+
+      const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      console.log(res.data);
+
+      if (res.data && res.data.options) {
+        setBids((curr) => [...curr, ...res.data?.options as newnewapi.Auction.Option[]]);
+        setBidsNextPageToken(res.data.paging?.nextPageToken);
+      }
+
+      setBidsLoading(false);
+    } catch (err) {
+      setBidsLoading(false);
+      setLoadingBidsError((err as Error).message);
+      console.error(err);
+    }
+  }, [
+    setBids, bidsLoading,
+    post,
+  ]);
 
   return (
     <SWrapper>
@@ -63,12 +121,34 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       </SExpiresSection>
       <PostVideo
         videoSrc={post.announcement?.videoUrl ?? MockVideo}
-        isMuted={muted}
-        handleToggleMuted={() => setMuted((curr) => !curr)}
+        isMuted={mutedMode}
+        handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTitle>
         { post.title }
       </PostTitle>
+      <div
+        style={{
+          gridArea: 'activites',
+        }}
+      >
+        <PostTopInfo
+          postType="ac"
+          // Temp
+          // amountInBids={post.totalAmount?.usdCents ?? 0}
+          amountInBids={5000}
+          creator={post.creator!!}
+          startsAtSeconds={post.startsAt?.seconds as number}
+          handleFollowCreator={() => {}}
+          handleFollowDecision={() => {}}
+          handleReportAnnouncement={() => {}}
+        />
+        <DecisionTabs
+          tabs={['bids', 'comments']}
+          activeTab={currentTab}
+          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+        />
+      </div>
     </SWrapper>
   );
 };
@@ -88,21 +168,28 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-      grid-template-areas:
+    grid-template-areas:
       'expires expires'
       'title title'
       'video activites'
     ;
+    grid-template-columns: 284px 1fr;
+    grid-template-rows: 46px 64px 40px calc(506px - 46px);
+    grid-column-gap: 16px;
+
+    align-items: flex-start;
   }
 
   ${({ theme }) => theme.media.laptop} {
-      grid-template-areas:
+    grid-template-areas:
       'video expires'
       'video title'
       'video activites'
     ;
 
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px);
+
+    grid-template-columns: 410px 1fr;
   }
 `;
 
