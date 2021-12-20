@@ -124,6 +124,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewMC
           post={postParsed as newnewapi.MultipleChoice}
+          handleGoBack={() => {
+            window.history.back();
+          }}
         />
       );
     }
@@ -131,6 +134,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewAC
           post={postParsed as newnewapi.Auction}
+          handleGoBack={() => {
+            window.history.back();
+          }}
         />
       );
     }
@@ -138,6 +144,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewCF
           post={postParsed as newnewapi.Crowdfunding}
+          handleGoBack={() => {
+            window.history.back();
+          }}
         />
       );
     }
@@ -271,6 +280,14 @@ const SPostModalContainer = styled.div`
   height: 100%;
 
   padding: 16px;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
     top: 32px;

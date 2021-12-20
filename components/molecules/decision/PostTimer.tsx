@@ -90,6 +90,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 export default PostTimer;
 
 const SWrapper = styled.div`
+  grid-area: timer;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -103,6 +105,8 @@ const SWrapper = styled.div`
 
 const STimerItem = styled.div`
   padding: 10px 14px;
+
+  width: max-content;
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
