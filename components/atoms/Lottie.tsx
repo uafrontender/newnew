@@ -37,6 +37,12 @@ export class Lottie extends React.Component<ILottie> {
     title: '',
   };
 
+  private el: any;
+
+  private anim: any;
+
+  private options: {} | undefined;
+
   componentDidMount() {
     const {
       options,
@@ -136,12 +142,6 @@ export class Lottie extends React.Component<ILottie> {
     // eslint-disable-next-line react/destructuring-assignment
     this.anim.setDirection(this.props.direction);
   }
-
-  private el: any;
-
-  private anim: any;
-
-  private options: {} | undefined;
 
   play() {
     this.anim.play();

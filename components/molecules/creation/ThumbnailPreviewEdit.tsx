@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -17,18 +18,23 @@ import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.s
 interface IThumbnailPreviewEdit {
   open: boolean;
   value: any;
+  thumbnails: any;
   handleClose: () => void;
+  handleSubmit: (value: any) => void;
 }
 
 export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => {
   const {
     open,
     value,
+    thumbnails,
     handleClose,
+    handleSubmit,
   } = props;
   const theme = useTheme();
   const { t } = useTranslation('creation');
   const videoRef: any = useRef();
+  const videoThumbs: any = useRef({ ...thumbnails });
   const constraintsRef: any = useRef(null);
   const progressIndicator: any = useRef(null);
   const constraintsLeftRef: any = useRef(null);
@@ -37,22 +43,32 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoChanks, setVideoChanks] = useState([]);
 
+  const visiblePart = (3 * 100) / (videoRef?.current?.duration || 0);
+  const hiddenPartFirst = videoThumbs.current.startTime
+    ? (videoThumbs.current.startTime * 100) / (videoRef?.current?.duration || 0) : 0;
+  const hiddenPartSecond = 100 - visiblePart - hiddenPartFirst;
+
   const preventCLick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
   };
-  const handleVideoSelectDrag = () => {
+  const onSubmit = () => {
+    handleSubmit(videoThumbs.current);
+  };
+  const handleVideoSelectDrag = useCallback(() => {
     const x = constraintsCenterRef.current.getBoundingClientRect().x - 16;
     constraintsLeftRef.current.style.width = `${x}px`;
-    constraintsRightRef.current.style.width = `calc(70% - ${x}px)`;
-    const xPositionPercent = ((x + 16) * 100) / window.innerWidth;
+    constraintsRightRef.current.style.width = `calc(${100 - visiblePart}% - ${x}px + 5px)`;
+    const xPositionPercent = ((x - 3) * 100) / (window.innerWidth - 36);
     const startFrame = +((videoRef.current.duration * xPositionPercent) / 100).toFixed(2);
 
+    videoThumbs.current.startTime = startFrame;
+    videoThumbs.current.endTime = startFrame + 3;
     videoRef.current.currentTime = startFrame;
     videoRef.current.play();
-  };
+  }, [visiblePart]);
 
-  const handleVideoLoaded = () => {
+  const handleVideoLoaded = useCallback(() => {
     const { duration } = videoRef.current;
     const onePart: any = (duration / 10).toFixed(2);
     const chanks: any = [];
@@ -66,40 +82,54 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     }
     setVideoChanks(chanks);
     setVideoLoaded(true);
-  };
-  const handleVideoProgress = () => {
-    const percentage = (videoRef.current.currentTime / videoRef.current.duration) * 100;
-    progressIndicator.current.style.transition = 'all ease 0.5s';
-    progressIndicator.current.style.left = `${percentage}%`;
+  }, []);
+  const handleVideoProgress = useCallback(() => {
+    if (open) {
+      const percentage = (videoRef.current.currentTime * 100) / videoRef.current.duration;
+      progressIndicator.current.style.transition = 'all ease 0.5s';
+      progressIndicator.current.style.left = `calc(${percentage}% - 3px)`;
+      progressIndicator.current.style.transform = 'translateX(-50%)';
 
-    if (videoRef.current.duration >= 3) {
-      videoRef.current.pause();
+      if (videoRef.current.currentTime >= videoThumbs.current.endTime) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
     }
-
-    if (percentage === 100) {
-      progressIndicator.current.style.transition = 'unset';
-      progressIndicator.current.style.left = 0;
-    }
-  };
+  }, [open]);
 
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.onloadeddata = handleVideoLoaded;
       videoRef.current.ontimeupdate = handleVideoProgress;
     }
-  }, [videoRef]);
+  }, [handleVideoLoaded, handleVideoProgress, videoRef]);
   useEffect(() => {
-    if (open) {
-      videoRef.current.currentTime = 0;
-      progressIndicator.current.style.transition = 'unset';
-      progressIndicator.current.style.left = 0;
+    if (open && progressIndicator.current) {
+      const percentage = videoThumbs.current.startTime
+        ? (videoThumbs.current.startTime * 100) / videoRef.current.duration : 0;
+      videoRef.current.currentTime = videoThumbs.current.startTime;
+      progressIndicator.current.style.left = `${percentage}%`;
+      if (percentage) {
+        progressIndicator.current.style.transform = 'translateX(-50%)';
+        progressIndicator.current.style.transition = 'all ease 0.5s';
+      } else {
+        progressIndicator.current.style.transform = 'unset';
+        progressIndicator.current.style.transition = 'unset';
+      }
       setTimeout(() => {
         videoRef.current?.play();
       }, 500);
     } else {
       videoRef.current.pause();
     }
-  }, [open]);
+  }, [
+    open,
+    progressIndicator,
+    thumbnails.endTime,
+    thumbnails.startTime,
+    videoThumbs.current.startTime,
+  ]);
 
   return (
     <Modal
@@ -123,7 +153,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
           </SModalTopLine>
           <SModalVideoEdit
             ref={videoRef}
-            src={value.url}
+            src={value}
             onLoad={handleVideoLoaded}
           />
           {videoLoaded && (
@@ -132,7 +162,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 <SModalVideoEditSmall
                   muted
                   key={chank.start}
-                  src={`${value.url}#t=${chank.start},${chank.end}`}
+                  src={`${value}#t=${chank.start},${chank.end}`}
                 />
               ))}
               <SModalSelectTopWrapper ref={constraintsRef}>
@@ -140,14 +170,14 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 <SModalSelectTopWrapperHiddenLeftPart
                   ref={constraintsLeftRef}
                   style={{
-                    width: 0,
+                    width: `${hiddenPartFirst}%`,
                   }}
                 />
                 <SModalSelectTopWrapperVisiblePart
                   ref={constraintsCenterRef}
                   drag="x"
                   style={{
-                    width: '30%',
+                    width: `${visiblePart}%`,
                   }}
                   onDrag={handleVideoSelectDrag}
                   onDragEnd={handleVideoSelectDrag}
@@ -159,7 +189,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 <SModalSelectTopWrapperHiddenRightPart
                   ref={constraintsRightRef}
                   style={{
-                    width: '70%',
+                    width: `${hiddenPartSecond}%`,
                   }}
                 />
               </SModalSelectTopWrapper>
@@ -169,7 +199,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
         <SModalButtonContainer>
           <Button
             view="primaryGrad"
-            onClick={handleClose}
+            onClick={onSubmit}
           >
             {t('secondStep.video.thumbnail.submit')}
           </Button>

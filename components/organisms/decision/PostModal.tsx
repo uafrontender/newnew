@@ -141,7 +141,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         />
       );
     }
-    return <></>;
+    return <div />;
   };
 
   useEffect(() => {
