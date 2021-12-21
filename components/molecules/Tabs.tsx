@@ -374,17 +374,7 @@ const STab = styled.button<ISTab>`
   font-weight: 600;
 
   font-size: 14px;
-  line-height: 20px;
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 14px;
-    line-height: 18px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    font-size: 14px;
-    line-height: 20px;
-  }
+  line-height: 24px;
   
   color: ${({
     activeTab,
@@ -401,10 +391,6 @@ const STab = styled.button<ISTab>`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 12px;
-  }
 `;
 
 const IndicatorInitialAnimation = keyframes`

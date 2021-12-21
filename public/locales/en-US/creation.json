@@ -31,9 +31,15 @@
       "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
-      "title": "Upload file",
       "description": "Max size of the video 100 MB",
       "button": "Select file"
+    },
+    "block": {
+      "title": {
+        "file": "Upload file",
+        "decision": "Decision information",
+        "advanced": "Advanced settings"
+      }
     },
     "modal": {
       "deleteFile": {
@@ -125,8 +131,10 @@
       "deleteFile": "Delete file",
       "previewThumbnail": "Preview thumbnail",
       "thumbnail": {
+        "info": "Learn more",
         "title": "Set thumbnail preview",
-        "submit": "Save changes"
+        "submit": "Save changes",
+        "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
       }
     }
   },

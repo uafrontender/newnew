@@ -59,7 +59,7 @@ const SText2 = styled(SText)`
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
-    line-height: 20px;
+    line-height: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {
