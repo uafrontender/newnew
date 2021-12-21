@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import _compact from 'lodash/compact';
+import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -12,18 +13,12 @@ import Headline from '../../../atoms/Headline';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { setPostData } from '../../../../redux-store/slices/creationStateSlice';
-import { getVideoUploadUrl } from '../../../../api/endpoints/upload';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
-// Utils
-import urltoFile from '../../../../utils/urlToFile';
-
 interface IPreviewContent {
-  video: any;
 }
 
-export const PreviewContent: React.FC<IPreviewContent> = (props) => {
-  const { video } = props;
+export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t } = useTranslation('creation');
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -40,7 +35,7 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
   const titleIsValid = post.title.length > 5 && post.title.length < 70;
   const disabled = loading || !titleIsValid;
 
-  const formatStartsAt = useCallback(() => {
+  const formatStartsAt: () => any = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
 
     return moment(post.startsAt.date)
@@ -79,36 +74,9 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
 
     return inSeconds ? seconds : dateValue;
   }, [post.expiresAt, post.startsAt]);
-  const handleVideoUpload = useCallback(async () => {
-    const payload = new newnewapi.GetVideoUploadUrlRequest({
-      filename: video.name,
-    });
-
-    const res = await getVideoUploadUrl(payload);
-
-    if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
-
-    const file = await urltoFile(video.url, video.name, video.type);
-
-    const uploadResponse = await fetch(
-      res.data.uploadUrl,
-      {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': video.type,
-        },
-      },
-    );
-
-    if (!uploadResponse.ok) throw new Error('Upload failed');
-
-    return res.data;
-  }, [video]);
   const handleSubmit = useCallback(async () => {
     setLoading(true);
     try {
-      const videoResp: any = await handleVideoUpload();
       const body: any = {
         post: {
           title: post.title,
@@ -116,7 +84,8 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
           startsAt: post.startsAt.type === 'right-away' ? null : formatStartsAt()
             .format(),
           expiresAfter: formatExpiresAt(true),
-          announcementVideoUrl: videoResp.publicUrl,
+          thumbnailParameters: post.thumbnailParameters,
+          announcementVideoUrl: post.announcementVideoUrl,
         },
       };
 
@@ -150,21 +119,18 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
       setLoading(false);
       router.push(`/creation/${tab}/published`);
     } catch (err: any) {
+      toast.error(err);
       setLoading(false);
     }
   }, [
     tab,
+    post,
     router,
+    auction,
     dispatch,
+    crowdfunding,
+    multiplechoice,
     formatStartsAt,
-    handleVideoUpload,
-    post.title,
-    post.options,
-    post.startsAt.type,
-    auction.minimalBid,
-    crowdfunding.targetBackerCount,
-    multiplechoice.choices,
-    multiplechoice?.options?.allowSuggestions,
     formatExpiresAt,
   ]);
   const settings: any = useMemo(() => _compact([
@@ -178,11 +144,13 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
     },
     {
       key: 'startsAt',
-      value: formatStartsAt().format('DD MMM [at] hh:mm A'),
+      value: formatStartsAt()
+        .format('DD MMM [at] hh:mm A'),
     },
     {
       key: 'expiresAt',
-      value: formatExpiresAt(false).format('DD MMM [at] hh:mm A'),
+      value: formatExpiresAt(false)
+        .format('DD MMM [at] hh:mm A'),
     },
     {
       key: 'comments',
@@ -242,7 +210,7 @@ export const PreviewContent: React.FC<IPreviewContent> = (props) => {
         <SVideo
           loop
           autoPlay
-          src={video.url}
+          src={post.announcementVideoUrl}
         />
       </SContent>
       {isMobile && (

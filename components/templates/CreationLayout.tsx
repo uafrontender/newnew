@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -28,7 +28,6 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
   const { t } = useTranslation('creation');
   const theme = useTheme();
   const router = useRouter();
-  const [video, setVideo] = useState<any>({});
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isDesktop = ['laptop', 'laptopL', 'desktop'].includes(resizeMode);
@@ -62,10 +61,7 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
                   )}
                 </SBackLine>
               )}
-              {React.cloneElement(children as any, {
-                video,
-                setVideo,
-              })}
+              {children}
             </Col>
           </Row>
         </Container>

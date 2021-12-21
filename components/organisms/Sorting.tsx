@@ -182,7 +182,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         document.getElementById('sorting-container') as HTMLElement,
       );
     }
-    return <></>;
+    return <div />;
   }
 
   return content;

@@ -116,6 +116,11 @@
       }
     },
     "video": {
+      "error": {
+        "minLength": "Video duration too small, choose from 10 seconds",
+        "maxLength": "Video duration too long, choose up to 5 minutes",
+        "maxSize": "Video size too big, choose up to 100mb"
+      },
       "setThumbnail": "Set thumbnail",
       "deleteFile": "Delete file",
       "previewThumbnail": "Preview thumbnail",

@@ -224,7 +224,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                   @
                   {/* Temp! */}
                   {user.userData?.username && user.userData?.username.length > 12
-                    ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring(user.userData?.username.length - 3)}`
+                    ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring((user.userData?.username.length || 0) - 3)}`
                     : user.userData?.username}
                 </SUsernameButtonText>
               </SShareButton>

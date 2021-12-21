@@ -27,20 +27,16 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-interface IPublishedContent {
-  video: any;
-}
+interface IPublishedContent {}
 
-export const PublishedContent: React.FC<IPublishedContent> = (props) => {
-  const { video } = props;
+export const PublishedContent: React.FC<IPublishedContent> = () => {
   const { t } = useTranslation('creation');
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { post } = useAppSelector((state) => state.creation);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const { post, postData } = useAppSelector((state) => state.creation);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  console.log(postData);
   const handleSubmit = useCallback(async () => {
     router.push('/');
     dispatch(clearCreation({}));
@@ -90,7 +86,7 @@ export const PublishedContent: React.FC<IPublishedContent> = (props) => {
         <SVideo
           loop
           autoPlay
-          src={video.url}
+          src={post.announcementVideoUrl}
         />
         <SSubTitle variant={2} weight={500}>
           {t(`published.texts.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {

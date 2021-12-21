@@ -74,7 +74,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   let renderShowMore = false;
   let scrollStep = SCROLL_STEP.desktop;
 
-  if (isMobile && collection.length > 3) {
+  if (isMobile && collection?.length > 3) {
     renderShowMore = true;
     collectionToRender = collection.slice(0, 3);
   }
@@ -179,7 +179,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem <= collection.length - scrollStep);
+    setCanScrollRight(visibleListItem <= (collection?.length || 0) - scrollStep);
   }, [visibleListItem, collection, scrollStep]);
 
   return (
@@ -228,7 +228,7 @@ export const CardsSection: React.FC<ICardSection> = ({
           onMouseLeave={mouseUpHandler}
         >
           {!loading
-            ? collectionToRender.map(renderItem)
+            ? collectionToRender?.map(renderItem)
             : (
               <CardSkeletonSection
                 count={5}
