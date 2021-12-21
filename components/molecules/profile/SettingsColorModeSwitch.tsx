@@ -59,8 +59,8 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
     width: number,
     height: number,
   }>({
-    x: buttonsRef.current[activeIcon]?.getBoundingClientRect().x - containerRef.current?.getBoundingClientRect().x!!,
-    y: buttonsRef.current[activeIcon]?.getBoundingClientRect().y - containerRef.current?.getBoundingClientRect().y!!,
+    x: (buttonsRef.current[activeIcon]?.getBoundingClientRect().x || 0) - (containerRef.current?.getBoundingClientRect().x || 0)!!,
+    y: (buttonsRef.current[activeIcon]?.getBoundingClientRect().y || 0) - (containerRef.current?.getBoundingClientRect().y || 0)!!,
     width: buttonsRef.current[activeIcon]?.getBoundingClientRect().width,
     height: buttonsRef.current[activeIcon]?.getBoundingClientRect().height,
   });
@@ -76,8 +76,8 @@ const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch>
     if (!container) return;
 
     const updatedIndicatorStyle = {
-      x: currentButtonRef.getBoundingClientRect().x - container?.getBoundingClientRect().x,
-      y: currentButtonRef.getBoundingClientRect().y - container?.getBoundingClientRect().y,
+      x: currentButtonRef.getBoundingClientRect().x - (container?.getBoundingClientRect().x || 0),
+      y: currentButtonRef.getBoundingClientRect().y - (container?.getBoundingClientRect().y || 0),
       width: currentButtonRef.getBoundingClientRect().width,
       height: currentButtonRef.getBoundingClientRect().height,
     };

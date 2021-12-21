@@ -4,6 +4,10 @@ import { newnewapi } from 'newnew-api';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 export type TPostData = Omit<newnewapi.Post, 'toJSON' | '_nickname' | '_email'>;
+export type TThumbnailParameters = {
+  startTime: number;
+  endTime: number;
+};
 
 export interface ICreationStateInterface {
   post: {
@@ -18,6 +22,8 @@ export interface ICreationStateInterface {
     options: {
       commentsEnabled: boolean;
     };
+    announcementVideoUrl: string;
+    thumbnailParameters: TThumbnailParameters
   },
   auction: {
     minimalBid: number;
@@ -49,6 +55,11 @@ const defaultUIState: ICreationStateInterface = {
     expiresAt: '1-hour',
     options: {
       commentsEnabled: true,
+    },
+    announcementVideoUrl: '',
+    thumbnailParameters: {
+      startTime: 0,
+      endTime: 3,
     },
   },
   auction: {
@@ -83,6 +94,12 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     },
     setCreationTitle(state, { payload }: PayloadAction<string>) {
       state.post.title = payload;
+    },
+    setCreationVideo(state, { payload }: PayloadAction<string>) {
+      state.post.announcementVideoUrl = payload;
+    },
+    setCreationVideoThumbnails(state, { payload }: PayloadAction<TThumbnailParameters>) {
+      state.post.thumbnailParameters = { ...payload };
     },
     setCreationComments(state, { payload }: PayloadAction<boolean>) {
       state.post.options.commentsEnabled = payload;
@@ -124,6 +141,7 @@ export const {
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationVideoThumbnails,
   setCreationAllowSuggestions,
   setCreationTargetBackerCount,
 } = creationSlice.actions;

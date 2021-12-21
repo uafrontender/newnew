@@ -4,6 +4,7 @@ import React, {
   useCallback,
 } from 'react';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';
 
 import Button from '../../atoms/Button';
@@ -13,11 +14,13 @@ import ThumbnailPreview from './ThumbnailPreview';
 import ThumbnailPreviewEdit from './ThumbnailPreviewEdit';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
 
 interface IFileUpload {
   id: string;
-  value: any;
+  value: string;
   onChange: (id: string, value: any) => void;
+  thumbnails: any;
 }
 
 export const FileUpload: React.FC<IFileUpload> = (props) => {
@@ -25,6 +28,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
     id,
     value,
     onChange,
+    thumbnails,
   } = props;
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
@@ -57,22 +61,41 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
   }, []);
   const handleDeleteVideo = useCallback(() => {
     handleCloseDeleteVideoClick();
-    onChange(id, {});
+    onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
+  const handlePreviewEditSubmit = useCallback((params) => {
+    handleCloseThumbnailEditClick();
+    onChange('thumbnailParameters', params);
+  }, [handleCloseThumbnailEditClick, onChange]);
   const handleFileChange = useCallback((e) => {
     const file = e.target?.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.addEventListener('load', () => {
-      if (reader.result) {
-        onChange(id, {
-          url: reader.result,
-          name: file.name,
-          type: file.type,
-        });
-      }
-    });
-  }, [id, onChange]);
+
+    if (file.size > MAX_VIDEO_SIZE) {
+      toast.error(t('secondStep.video.error.maxSize'));
+    } else {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.addEventListener('load', () => {
+        if (reader.result) {
+          // @ts-ignore
+          const media = new Audio(reader.result);
+          media.onloadedmetadata = () => {
+            if (media.duration < MIN_VIDEO_DURATION) {
+              toast.error(t('secondStep.video.error.minLength'));
+            } else if (media.duration > MAX_VIDEO_DURATION) {
+              toast.error(t('secondStep.video.error.maxLength'));
+            } else {
+              onChange(id, {
+                url: reader.result,
+                name: file.name,
+                type: file.type,
+              });
+            }
+          };
+        }
+      });
+    }
+  }, [id, onChange, t]);
 
   return (
     <SWrapper>
@@ -92,6 +115,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
         <ThumbnailPreview
           open={showThumbnailPreview}
           value={value}
+          thumbnails={thumbnails}
           handleClose={handleCloseThumbnailPreviewClick}
         />
       )}
@@ -99,10 +123,12 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
         <ThumbnailPreviewEdit
           open={showThumbnailEdit}
           value={value}
+          thumbnails={thumbnails}
           handleClose={handleCloseThumbnailEditClick}
+          handleSubmit={handlePreviewEditSubmit}
         />
       )}
-      {value?.name ? (
+      {value ? (
         <SFileBox>
           <input
             id="file"
@@ -114,7 +140,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
             onChange={handleFileChange}
           />
           <SVideo
-            src={value.url}
+            src={value}
             onClick={handleButtonClick}
           />
           <SButtonsContainer>
