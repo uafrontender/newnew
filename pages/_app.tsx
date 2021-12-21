@@ -6,6 +6,7 @@ import { useStore } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
+import { ToastContainer } from 'react-toastify';
 import { CookiesProvider } from 'react-cookie';
 import { parse, UserAgent } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
@@ -28,6 +29,8 @@ import isBrowser from '../utils/isBrowser';
 
 // Global Cookies instance
 import { cookiesInstance } from '../api/apiConfigs';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -87,14 +90,17 @@ const MyApp = (props: IMyApp): ReactElement => {
         <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
           <ResizeMode>
             <GlobalTheme>
-              {!pageProps.error ? (
-                getLayout(<Component {...pageProps} />)
-              ) : (
-                <Error
-                  errorMsg={pageProps.error?.message}
-                  statusCode={pageProps.error?.statusCode ?? 500}
-                />
-              )}
+              <div>
+                <ToastContainer />
+                {!pageProps.error ? (
+                  getLayout(<Component {...pageProps} />)
+                ) : (
+                  <Error
+                    errorMsg={pageProps.error?.message}
+                    statusCode={pageProps.error?.statusCode ?? 500}
+                  />
+                )}
+              </div>
             </GlobalTheme>
           </ResizeMode>
         </PersistGate>

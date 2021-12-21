@@ -83,7 +83,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       // eslint-disable-next-line max-len
-      setInputRightPosition(-(window.innerWidth - inputContainerRef.current?.getBoundingClientRect()?.right - (isMobile ? 16 : 32)));
+      setInputRightPosition(-(window.innerWidth - (inputContainerRef.current?.getBoundingClientRect()?.right || 0) - (isMobile ? 16 : 32)));
     });
 
     resizeObserver.observe(document.body);

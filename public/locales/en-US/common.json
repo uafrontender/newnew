@@ -47,5 +47,11 @@
   "selected-currency-title-usd": "USD",
   "selected-currency-title-eur": "EUR",
   "cookie-text": "We use",
-  "cookie-link": "Learn more"
+  "cookie-link": "Learn more",
+  "error": {
+    "text": {
+      "min": "Text is too short, min {{value}} chars",
+      "max": "Text is too long, max {{value}} chars"
+    }
+  }
 }

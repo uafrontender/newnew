@@ -43,7 +43,7 @@ const TestPostModal: NextPage = () => {
         if (!res.data?.posts || !Array.isArray(res.data?.posts)) throw new Error('No posts');
         console.log(res.data?.posts);
 
-        setPosts(() => [...res.data?.posts!!]);
+        setPosts(() => [...(res.data?.posts || [])!!]);
       } catch (err) {
         console.error(err);
       }

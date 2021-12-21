@@ -11,10 +11,7 @@ import PreviewContent from '../../../components/organisms/creation/preview';
 
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationPreview {
-  video: any;
-  setVideo: (video: any) => void;
-}
+interface ICreationPreview {}
 
 export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   const { t } = useTranslation('creation');

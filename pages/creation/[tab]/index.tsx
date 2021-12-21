@@ -11,10 +11,7 @@ import SecondStepContent from '../../../components/organisms/creation/second';
 
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationSecondStep {
-  video: any;
-  setVideo: (video: any) => void;
-}
+interface ICreationSecondStep {}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
   const { t } = useTranslation('creation');
