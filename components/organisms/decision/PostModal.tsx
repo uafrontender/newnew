@@ -240,7 +240,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 collection={recommenedPosts}
                 // collection={[]}
                 wrapperStyle={{
-                  left: 0,
+                  left: '-16px',
                 }}
                 skeletonsBgColor={theme.colorsThemed.background.tertiary}
                 skeletonsHighlightColor={theme.colorsThemed.background.secondary}

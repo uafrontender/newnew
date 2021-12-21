@@ -3,6 +3,7 @@
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { AnimatePresence, motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 
 import { fetchCurrentBidsForPost } from '../../../api/endpoints/auction';
@@ -19,6 +20,8 @@ import InlineSvg from '../../atoms/InlineSVG';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
+import BidsTab from '../../molecules/decision/auction/BidsTab';
+import CommentsTab from '../../molecules/decision/CommentsTab';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -47,6 +50,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
   const [bidsLoading, setBidsLoading] = useState(false);
   const [loadingBidsError, setLoadingBidsError] = useState('');
+
+  // Comments
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -91,6 +100,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     post,
   ]);
 
+  useEffect(() => {
+    setBids([]);
+    setBidsNextPageToken('');
+    fetchBids();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post]);
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -127,11 +143,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       <PostTitle>
         { post.title }
       </PostTitle>
-      <div
-        style={{
-          gridArea: 'activites',
-        }}
-      >
+      <SActivitesContainer>
         <PostTopInfo
           postType="ac"
           // Temp
@@ -144,11 +156,41 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           handleReportAnnouncement={() => {}}
         />
         <DecisionTabs
-          tabs={['bids', 'comments']}
+          tabs={[
+            {
+              label: 'bids',
+              value: 'bids',
+              ...(
+                bids.length > 0
+                  ? { amount: bids.length.toString() } : {}
+              ),
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+              ...(
+                comments.length > 0
+                  ? { amount: comments.length.toString() } : {}
+              ),
+            },
+          ]}
           activeTab={currentTab}
           handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
         />
-      </div>
+        {currentTab === 'bids'
+          ? (
+            <BidsTab
+              bids={bids}
+              bidsLoading={bidsLoading}
+              pagingToken={bidsNextPageToken}
+              handleLoadBids={fetchBids}
+            />
+          ) : (
+            <CommentsTab
+              comments={comments}
+            />
+          )}
+      </SActivitesContainer>
     </SWrapper>
   );
 };
@@ -162,7 +204,7 @@ const SWrapper = styled.div`
     'expires'
     'video'
     'title'
-    'activites'
+    'activities'
   ;
 
   margin-bottom: 32px;
@@ -171,7 +213,7 @@ const SWrapper = styled.div`
     grid-template-areas:
       'expires expires'
       'title title'
-      'video activites'
+      'video activities'
     ;
     grid-template-columns: 284px 1fr;
     grid-template-rows: 46px 64px 40px calc(506px - 46px);
@@ -184,10 +226,11 @@ const SWrapper = styled.div`
     grid-template-areas:
       'video expires'
       'video title'
-      'video activites'
+      'video activities'
     ;
 
     grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px);
+    /* grid-template-rows: 1fr max-content; */
 
     grid-template-columns: 410px 1fr;
   }
@@ -224,4 +267,22 @@ const SGoBackButtonDesktop = styled.button`
   text-transform: capitalize;
 
   cursor: pointer;
+`;
+
+const SActivitesContainer = styled.div`
+  grid-area: activities;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: calc(728px - 46px - 64px - 40px - 72px);
+
+  ${({ theme }) => theme.media.tablet} {
+    min-height: initial;
+    height: calc(728px - 46px - 64px - 40px - 72px);
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height: calc(728px - 46px - 64px);
+  }
 `;

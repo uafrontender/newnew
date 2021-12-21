@@ -7,8 +7,14 @@ import React, {
 import styled, { keyframes } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
+type TDecisonTab = {
+  label: string;
+  value: string;
+  amount?: string | undefined;
+}
+
 interface IDecisionTabs {
-  tabs: string[];
+  tabs: TDecisonTab[];
   activeTab: string;
   handleChangeTab: (val: string) => void;
 }
@@ -32,7 +38,7 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
   const tabRefs = useRef<HTMLButtonElement[]>(new Array(tabs.length));
 
   useEffect(() => {
-    const activeTabIndex = tabs.findIndex((curr) => curr === activeTab);
+    const activeTabIndex = tabs.findIndex((curr) => curr.value === activeTab);
     if (activeTabIndex === -1) return;
     const boundingRect = tabRefs.current[activeTabIndex].getBoundingClientRect();
 
@@ -57,15 +63,16 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
       >
         {tabs && tabs.map((tab, i) => (
           <STab
-            key={tab}
+            key={tab.value}
             ref={(el) => {
               tabRefs.current[i] = el!!;
             }}
             type="button"
-            onClick={() => handleChangeTab(tab)}
-            activeTab={tab === activeTab}
+            onClick={() => handleChangeTab(tab.value)}
+            activeTab={tab.value === activeTab}
           >
-            {t(`tabs.${tab}`)}
+            {t(`tabs.${tab.label}`)}
+            {tab.amount ? ` ${tab.amount}` : ''}
           </STab>
         ))}
         <SActiveTabIndicator
@@ -85,8 +92,10 @@ const STabs = styled.div`
   position: relative;
   overflow: hidden;
 
-  ${({ theme }) => theme.media.laptop} {
-    cursor: default;
+  margin-bottom: 12px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
   }
 `;
 
