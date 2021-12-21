@@ -179,7 +179,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
         }
         return '<span>&nbsp;&nbsp;&nbsp;</span>';
       });
-      const newVal = arr.join('') + props.placeholder?.slice((inputData as string).length);
+      const newVal = arr.join('') + (props.placeholder?.slice((inputData as string).length) || 0);
       setPlaceholder(newVal);
     }, [inputData, props.placeholder]);
 

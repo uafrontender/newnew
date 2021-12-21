@@ -258,7 +258,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
     setActiveTabIndicator((current) => ({
       ...current,
       width: boundingRect.width ?? 0,
-      left: (boundingRect.left - tabsContainerRef.current?.getBoundingClientRect()?.left!!)
+      left: (boundingRect.left - (tabsContainerRef.current?.getBoundingClientRect()?.left || 0)!!)
         ?? 0,
     }));
   }, [activeTabIndex, windowSize, setPrevLeft, setPosLeft, setActiveTabIndicator]);

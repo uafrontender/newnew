@@ -13,6 +13,7 @@ interface IDraggableMobileOptions {
   min: number;
   options: {}[];
   onChange: (key: string, value: any) => void;
+  validation: (text: string, min: number, max: number) => string;
 }
 
 export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props) => {
@@ -21,6 +22,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props)
     min,
     options,
     onChange,
+    validation,
   } = props;
   const theme = useTheme();
   const { t } = useTranslation('creation');
@@ -45,6 +47,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props)
       key={`draggable-option-${item.id}`}
       item={item}
       index={index}
+      validation={validation}
       withDelete={options.length > min}
       handleChange={handleOptionChange}
     />

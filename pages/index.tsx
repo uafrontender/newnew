@@ -299,7 +299,7 @@ const Home: NextPage<IHome> = ({
           handlePostClicked={handleOpenPostModal}
         />
       )}
-      {!collectionCreatorInitialLoading && collectionCreator.length > 0 ? (
+      {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
         <CardsSection
           user={{
             avatarUrl: switchPostType(collectionCreator[0])[0].creator?.avatarUrl!!,

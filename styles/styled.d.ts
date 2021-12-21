@@ -38,6 +38,7 @@ declare module 'styled-components' {
         numbers: string;
         backgroundFooter: string;
         backgroundHeader: string;
+        backgroundErrorPopup: string;
         // Used for overlaydim
         overlayDim: string;
       },

@@ -1,5 +1,12 @@
-import React, { useMemo, useCallback } from 'react';
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import moment from 'moment';
+import { toast } from 'react-toastify';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -13,31 +20,39 @@ import Tabs, { Tab } from '../../../molecules/Tabs';
 import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
 import DraggableMobileOptions from '../DraggableMobileOptions';
 
+import urltoFile from '../../../../utils/urlToFile';
+import useDebounce from '../../../../utils/hooks/useDebounce';
+import { getVideoUploadUrl } from '../../../../api/endpoints/upload';
+import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
   clearCreation,
+  setCreationVideo,
   setCreationTitle,
   setCreationMinBid,
   setCreationChoices,
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationVideoThumbnails,
   setCreationAllowSuggestions,
   setCreationTargetBackerCount,
 } from '../../../../redux-store/slices/creationStateSlice';
 
+import {
+  CREATION_TITLE_MIN,
+  CREATION_TITLE_MAX,
+  CREATION_OPTION_MAX,
+  CREATION_OPTION_MIN,
+} from '../../../../constants/general';
+
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 
 interface ICreationSecondStepContent {
-  video: any;
-  setVideo: (video: any) => void;
 }
 
-export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (props) => {
-  const {
-    video,
-    setVideo,
-  } = props;
+export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = () => {
+  const { t: tCommon } = useTranslation();
   const { t } = useTranslation('creation');
   const theme = useTheme();
   const router = useRouter();
@@ -64,12 +79,24 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
       url: '/creation/crowdfunding',
     },
   ], []);
+  const [titleError, setTitleError] = useState('');
+
+  const validateText = useCallback((text: string, min: number, max: number) => {
+    let error = minLength(tCommon, text, min);
+
+    if (!error) {
+      error = maxLength(tCommon, text, max);
+    }
+
+    return error;
+  }, [tCommon]);
+
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const titleIsValid = post.title.length > 5 && post.title.length < 70;
-  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => item.text.length === 0) === -1;
-  const disabled = !titleIsValid || !video.name || !optionsAreValid;
+  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) === -1;
+  const disabled = !!titleError || !post.title || !post.announcementVideoUrl || !optionsAreValid;
 
+  const validateTitleDebounced = useDebounce(post.title, 500);
   const formatStartsAt = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
 
@@ -112,7 +139,52 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     }
     dispatch(clearCreation({}));
   }, [dispatch, router]);
-  const handleItemChange = useCallback((key: string, value: any) => {
+  const handleVideoUpload = useCallback(async (value) => {
+    try {
+      const payload = new newnewapi.GetVideoUploadUrlRequest({
+        filename: value.name,
+      });
+
+      const res = await getVideoUploadUrl(payload);
+
+      if (!res.data || res.error) {
+        throw new Error(res.error?.message ?? 'An error occured');
+      }
+
+      const file = await urltoFile(value.url, value.name, value.type);
+
+      const uploadResponse = await fetch(
+        res.data.uploadUrl,
+        {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': value.type,
+          },
+        },
+      );
+
+      if (!uploadResponse.ok) {
+        throw new Error('Upload failed');
+      }
+
+      return res.data;
+    } catch (error: any) {
+      toast.error(error?.message);
+      return false;
+    }
+  }, []);
+  const handleItemFocus = useCallback((key: string) => {
+    if (key === 'title') {
+      setTitleError('');
+    }
+  }, []);
+  const handleItemBlur = useCallback((key: string, value: string) => {
+    if (key === 'title') {
+      setTitleError(validateText(value, CREATION_TITLE_MIN, CREATION_TITLE_MAX));
+    }
+  }, [validateText]);
+  const handleItemChange = useCallback(async (key: string, value: any) => {
     if (key === 'title') {
       dispatch(setCreationTitle(value));
     } else if (key === 'minimalBid') {
@@ -130,9 +202,18 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     } else if (key === 'choices') {
       dispatch(setCreationChoices(value));
     } else if (key === 'video') {
-      setVideo(value);
+      if (value) {
+        const res: any = await handleVideoUpload(value);
+        if (res?.publicUrl) {
+          dispatch(setCreationVideo(res?.publicUrl));
+        }
+      } else {
+        dispatch(setCreationVideo(''));
+      }
+    } else if (key === 'thumbnailParameters') {
+      dispatch(setCreationVideoThumbnails(value));
     }
-  }, [dispatch, setVideo]);
+  }, [dispatch, handleVideoUpload]);
   const expireOptions = useMemo(() => [
     {
       id: '1-hour',
@@ -164,6 +245,12 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     },
   ], [t]);
 
+  useEffect(() => {
+    if (validateTitleDebounced) {
+      setTitleError(validateText(validateTitleDebounced, CREATION_TITLE_MIN, CREATION_TITLE_MAX));
+    }
+  }, [validateText, validateTitleDebounced]);
+
   return (
     <>
       <div>
@@ -193,8 +280,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
             <SItemWrapper>
               <FileUpload
                 id="video"
-                value={video}
+                value={post.announcementVideoUrl}
                 onChange={handleItemChange}
+                thumbnails={post.thumbnailParameters}
               />
             </SItemWrapper>
             {isMobile && (
@@ -202,6 +290,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 <TextArea
                   id="title"
                   value={post?.title}
+                  error={titleError}
+                  onBlur={handleItemBlur}
+                  onFocus={handleItemFocus}
                   onChange={handleItemChange}
                   placeholder={t('secondStep.input.placeholder')}
                 />
@@ -216,6 +307,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                     min={2}
                     options={multiplechoice.choices}
                     onChange={handleItemChange}
+                    validation={validateText}
                   />
                   <SSeparator margin="16px 0" />
                 </>

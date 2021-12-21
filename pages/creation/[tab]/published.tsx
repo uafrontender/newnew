@@ -1,9 +1,9 @@
 import React from 'react';
 import Head from 'next/head';
+import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
-import styled from 'styled-components';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import CreationLayout from '../../../components/templates/CreationLayout';
@@ -12,10 +12,7 @@ import PublishedContent from '../../../components/organisms/creation/published';
 import { useAppSelector } from '../../../redux-store/store';
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationPublished {
-  video: any;
-  setVideo: (video: any) => void;
-}
+interface ICreationPublished {}
 
 export const CreationPublished: React.FC<ICreationPublished> = (props) => {
   const { t } = useTranslation('creation');
