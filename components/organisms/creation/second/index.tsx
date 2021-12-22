@@ -19,6 +19,7 @@ import FileUpload from '../../../molecules/creation/FileUpload';
 import MobileField from '../../../molecules/creation/MobileField';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
+import TabletFieldBlock from '../../../molecules/creation/TabletFieldBlock';
 import DraggableMobileOptions from '../DraggableMobileOptions';
 
 import urltoFile from '../../../../utils/urlToFile';
@@ -278,6 +279,48 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
           </>
         )
       }
+      {
+        tab === 'auction' && !isMobile && (
+          <>
+            <SSeparator margin="16px 0" />
+            <SItemWrapper>
+              <TabletFieldBlock
+                id="minimalBid"
+                type="input"
+                value={auction.minimalBid}
+                onChange={handleItemChange}
+                formattedDescription={auction.minimalBid}
+                inputProps={{
+                  min: 5,
+                  type: 'number',
+                  pattern: '[0-9]*',
+                }}
+              />
+            </SItemWrapper>
+          </>
+        )
+      }
+      {
+        tab === 'crowdfunding' && !isMobile && (
+          <>
+            <SSeparator margin="16px 0" />
+            <SItemWrapper>
+              <TabletFieldBlock
+                id="targetBackerCount"
+                type="input"
+                value={crowdfunding.targetBackerCount}
+                onChange={handleItemChange}
+                formattedDescription={crowdfunding.targetBackerCount}
+                inputProps={{
+                  min: 1,
+                  type: 'number',
+                  pattern: '[0-9]*',
+                }}
+              />
+            </SItemWrapper>
+          </>
+        )
+      }
     </>
   ), [
     t,
@@ -285,6 +328,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     isMobile,
     titleError,
     post?.title,
+    auction?.minimalBid,
+    crowdfunding?.targetBackerCount,
     validateText,
     handleItemBlur,
     handleItemFocus,
@@ -295,7 +340,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     <>
       <SListWrapper>
         {
-          tab === 'auction' && (
+          tab === 'auction' && isMobile && (
             <SFieldWrapper>
               <MobileFieldBlock
                 id="minimalBid"
@@ -313,7 +358,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
           )
         }
         {
-          tab === 'crowdfunding' && (
+          tab === 'crowdfunding' && isMobile && (
             <SFieldWrapper>
               <MobileFieldBlock
                 id="targetBackerCount"
@@ -375,6 +420,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
   ), [
     t,
     tab,
+    isMobile,
     post.startsAt,
     post.expiresAt,
     post.options.commentsEnabled,
