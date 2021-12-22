@@ -129,12 +129,15 @@
       },
       "setThumbnail": "Set thumbnail",
       "deleteFile": "Delete file",
-      "previewThumbnail": "Preview thumbnail",
+      "previewFull": "Preview",
       "thumbnail": {
         "info": "Learn more",
         "title": "Set thumbnail preview",
         "submit": "Save changes",
         "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
+      },
+      "full": {
+        "title": "Video preview"
       }
     }
   },

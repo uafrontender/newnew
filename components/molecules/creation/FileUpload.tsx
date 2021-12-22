@@ -9,8 +9,8 @@ import { useTranslation } from 'next-i18next';
 
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
+import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
-import ThumbnailPreview from './ThumbnailPreview';
 import ThumbnailPreviewEdit from './ThumbnailPreviewEdit';
 
 import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
@@ -31,18 +31,18 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
   } = props;
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
-  const [showThumbnailPreview, setShowThumbnailPreview] = useState(false);
+  const [showFullPreview, setShowFullPreview] = useState(false);
   const { t } = useTranslation('creation');
   const inputRef: any = useRef();
 
   const handleButtonClick = useCallback(() => {
     inputRef.current?.click();
   }, []);
-  const handlePreviewThumb = useCallback(() => {
-    setShowThumbnailPreview(true);
+  const handleFullPreview = useCallback(() => {
+    setShowFullPreview(true);
   }, []);
-  const handleCloseThumbnailPreviewClick = useCallback(() => {
-    setShowThumbnailPreview(false);
+  const handleCloseFullPreviewClick = useCallback(() => {
+    setShowFullPreview(false);
   }, []);
   const handleEditThumb = useCallback(() => {
     setShowThumbnailEdit(true);
@@ -101,11 +101,10 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
         handleClose={handleCloseDeleteVideoClick}
         handleSubmit={handleDeleteVideo}
       />
-      <ThumbnailPreview
-        open={showThumbnailPreview}
+      <FullPreview
+        open={showFullPreview}
         value={value}
-        thumbnails={thumbnails}
-        handleClose={handleCloseThumbnailPreviewClick}
+        handleClose={handleCloseFullPreviewClick}
       />
       <ThumbnailPreviewEdit
         open={showThumbnailEdit}
@@ -139,8 +138,8 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
               </SVideoButton>
             </SButtonsContainerLeft>
             <div>
-              <SVideoButton onClick={handlePreviewThumb}>
-                {t('secondStep.video.previewThumbnail')}
+              <SVideoButton onClick={handleFullPreview}>
+                {t('secondStep.video.previewFull')}
               </SVideoButton>
             </div>
           </SButtonsContainer>

@@ -224,9 +224,6 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
               <SText>
                 {t('secondStep.video.thumbnail.description')}
               </SText>
-              <SInfo>
-                {t('secondStep.video.thumbnail.info')}
-              </SInfo>
             </SDescription>
           )}
         </SModalTopContent>
@@ -422,11 +419,4 @@ const SText = styled.span`
     font-size: 14px;
     line-height: 20px;
   }
-`;
-
-const SInfo = styled.span`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  font-size: 14px;
-  margin-left: 5px;
-  line-height: 24px;
 `;
