@@ -1,7 +1,10 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -22,6 +25,7 @@ import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import BidsTab from '../../molecules/decision/auction/BidsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
+import { SocketContext } from '../../../contexts/socketContext';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -39,6 +43,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const dispatch = useAppDispatch();
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
 
   // Tabs
   const [currentTab, setCurrentTab] = useState<
@@ -106,6 +113,58 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     fetchBids();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post]);
+
+  useEffect(() => {
+    const msg = new newnewapi.SubscribeToChannels({
+      channels: [
+        {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        },
+      ],
+    });
+    if (socketConnection.connected) {
+      socketConnection.emit(
+        newnewapi.SubscribeToChannels.name,
+        newnewapi.SubscribeToChannels.encode(msg).finish(),
+      );
+
+      socketConnection.on(newnewapi.PostAcBidCreatedOrUpdated.name, (data) => {
+        console.log(data);
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostAcBidCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          setBids((curr) => {
+            const workingArr = [...curr];
+            const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
+            if (idx === -1) {
+              return [decoded.option as newnewapi.Auction.Option, ...workingArr];
+            }
+            workingArr[idx] = decoded.option as newnewapi.Auction.Option;
+            return workingArr;
+          });
+        }
+      });
+    }
+
+    return () => {
+      console.log('unsubscribing');
+      const unsubMsg = new newnewapi.UnsubscribeFromChannels({
+        channels: [
+          {
+            postUpdates: {
+              postUuid: post.postUuid,
+            },
+          },
+        ],
+      });
+      socketConnection.emit(
+        newnewapi.UnsubscribeFromChannels.name,
+        newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
+      );
+    };
+  }, [socketConnection, post, setBids]);
 
   return (
     <SWrapper>
@@ -180,9 +239,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         {currentTab === 'bids'
           ? (
             <BidsTab
+              postId={post.postUuid}
               bids={bids}
               bidsLoading={bidsLoading}
               pagingToken={bidsNextPageToken}
+              minAmount={post.minimalBid?.usdCents
+                ? (
+                  parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
+                ) : 5}
               handleLoadBids={fetchBids}
             />
           ) : (

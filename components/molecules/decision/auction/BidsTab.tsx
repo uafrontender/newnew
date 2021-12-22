@@ -4,31 +4,103 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
+import { placeBidOnAuction } from '../../../../api/endpoints/auction';
+import { useAppSelector } from '../../../../redux-store/store';
+
 import BidCard from './BidCard';
 import Button from '../../../atoms/Button';
+import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
+import PaymentModal from '../PaymentModal';
+import PlaceBidForm from './PlaceBidForm';
+import LoadingModal from '../LoadingModal';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
 interface IBidsTab {
+  postId: string;
   bids: newnewapi.Auction.Option[];
   bidsLoading: boolean;
   pagingToken: string | undefined | null;
+  minAmount: number;
   handleLoadBids: (token?: string) => void;
 }
 
 const BidsTab: React.FunctionComponent<IBidsTab> = ({
+  postId,
   bids,
   bidsLoading,
   pagingToken,
+  minAmount,
   handleLoadBids,
 }) => {
+  const { t } = useTranslation('decision');
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
+  // Infinite load
   const {
     ref: loadingRef,
     inView,
   } = useInView();
   const textareaRef = useRef<HTMLTextAreaElement>();
+
+  const [bidBeingSupported, setBidBeingSupported] = useState<number>(-1);
+
+  // New suggestion/bid
+  const [newBidText, setNewBidText] = useState('');
+  const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
+  // Payment modal
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  // Handlers
+  const handleTogglePaymentModalOpen = () => {
+    if (!user.loggedIn) {
+      router.push('/sign-up?reason=bid');
+      return;
+    }
+    setPaymentModalOpen(true);
+  };
+
+  const handleSubmitNewSuggestion = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const makeBidPayload = new newnewapi.PlaceBidRequest({
+        amount: new newnewapi.MoneyAmount({
+          usdCents: parseInt(newBidAmount, 10) * 100,
+        }),
+        optionTitle: newBidText,
+        postUuid: postId,
+      });
+
+      const res = await placeBidOnAuction(makeBidPayload);
+
+      console.log(res);
+
+      if (!res.data
+        || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      console.log(res.data.status);
+
+      setNewBidAmount('');
+      setNewBidText('');
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [
+    newBidAmount,
+    newBidText,
+    postId,
+  ]);
 
   useEffect(() => {
     if (inView && !bidsLoading && pagingToken) {
@@ -45,12 +117,22 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <SBidsContainer>
-          {bids.length > 0 && Array(20).fill(bids[0]).map((bid) => (
+        <SBidsContainer
+          style={{
+            ...(bidBeingSupported !== -1 ? {
+              overflowY: 'hidden',
+            } : {}),
+          }}
+        >
+          {bids.map((bid, i) => (
             <BidCard
               key={bid.id.toString()}
               bid={bid}
-              onSupportBtnClick={() => {}}
+              postId={postId}
+              index={i}
+              minAmount={minAmount}
+              bidBeingSupported={bidBeingSupported}
+              handleSetSupportedBid={(idx: number) => setBidBeingSupported(idx)}
             />
           ))}
         </SBidsContainer>
@@ -58,30 +140,50 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
           ref={loadingRef}
         />
         <SActionSection>
-          <STextarea
-            ref={(el) => {
-              textareaRef.current = el!!;
-            }}
-            rows={1}
+          <SuggestionTextArea
+            value={newBidText}
             placeholder="Add a suggestion ..."
-            onChangeCapture={() => {
-              if (textareaRef?.current) {
-                textareaRef.current.style.height = '';
-                textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-              }
-            }}
+            onChange={(e) => setNewBidText(e.target.value)}
           />
-          <SAmountInput
-            value="$5"
+          <BidAmountTextInput
+            value={newBidAmount}
+            inputAlign="center"
+            horizontalPadding="5px"
+            onChange={(newValue: string) => setNewBidAmount(newValue)}
+            minAmount={minAmount}
+            style={{
+              width: '60px',
+            }}
           />
           <Button
             view="primaryGrad"
             size="sm"
+            disabled={!newBidText || parseInt(newBidAmount, 10) < minAmount}
+            onClick={() => handleTogglePaymentModalOpen()}
           >
             Place a bid
           </Button>
         </SActionSection>
       </STabContainer>
+      {/* Payment Modal */}
+      {paymentModalOpen ? (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          zIndex={12}
+          onClose={() => setPaymentModalOpen(false)}
+        >
+          <PlaceBidForm
+            bidTitle={newBidText}
+            amountRounded={newBidAmount}
+            handlePlaceBid={handleSubmitNewSuggestion}
+          />
+        </PaymentModal>
+      ) : null }
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
     </>
   );
 };

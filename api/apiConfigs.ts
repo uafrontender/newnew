@@ -1,3 +1,5 @@
+/* eslint-disable no-promise-executor-return */
+/* eslint-disable default-param-last */
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
