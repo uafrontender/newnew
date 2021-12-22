@@ -106,6 +106,13 @@
             "friday": "F",
             "saturday": "S"
           }
+        },
+        "tablet": {
+          "title": "Start date",
+          "type": {
+            "schedule": "Schedule publishing",
+            "right-away": "Right away after I publish my decision"
+          }
         }
       },
       "comments": {

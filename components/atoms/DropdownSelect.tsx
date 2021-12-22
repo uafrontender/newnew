@@ -96,7 +96,7 @@ const DropdownSelect = <T, >({
             width={containerRef.current?.getBoundingClientRect().width
               ? `${containerRef.current?.getBoundingClientRect().width}px`
               : 'inherit'}
-            height={maxItems ? `${(maxItems * 40) + 16}px` : undefined}
+            height={maxItems ? `${(maxItems * 44) + 16}px` : undefined}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -136,7 +136,7 @@ DropdownSelect.defaultProps = {
 export default DropdownSelect;
 
 const SWrapper = styled.div`
-
+  position: relative;
 `;
 
 const SLabelButton = styled.button`
@@ -151,9 +151,19 @@ const SLabelButton = styled.button`
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 14px;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
+  line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 
   padding: 12px 12px 12px 20px;
 
@@ -183,7 +193,7 @@ const SOptionsContainer = styled(motion.div)<{
   height?: string;
 }>`
   position: absolute;
-  top: 76px;
+  top: 54px;
 
   max-height: ${({ height }) => height ?? '300px'};
   width: ${({ width }) => width};
@@ -199,7 +209,7 @@ const SOptionsContainer = styled(motion.div)<{
     flex-direction: column;
     gap: 4px;
 
-    padding: 4px 10px;
+    padding: 10px;
   }
 
   z-index: 4;

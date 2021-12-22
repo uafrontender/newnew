@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 
-import Text from '../Text';
+import Text from '../../Text';
 
 const isSameDate = (firstDate: moment.Moment, secondDate: Date) => (
   moment(firstDate, 'DD/MM/YYYY')
@@ -23,14 +23,14 @@ const isDisabled = (minDate: Date, currentDate: moment.Moment, maxDate: Date) =>
   return !(min <= current && current <= max);
 };
 
-interface IScrollCalendar {
+interface ICalendarSimple {
   minDate: any,
   maxDate: any,
   onSelect: (value: any) => void,
   selectedDate?: any | null,
 }
 
-export const ScrollCalendar: React.FC<IScrollCalendar> = (props) => {
+export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   const {
     minDate,
     maxDate,
@@ -58,11 +58,11 @@ export const ScrollCalendar: React.FC<IScrollCalendar> = (props) => {
   );
 };
 
-ScrollCalendar.defaultProps = {
+CalendarSimple.defaultProps = {
   selectedDate: null,
 };
 
-export default ScrollCalendar;
+export default CalendarSimple;
 
 export const RenderCalendarYear = (props: any) => {
   const {

@@ -18,6 +18,7 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import MobileField from '../../../molecules/creation/MobileField';
 import Tabs, { Tab } from '../../../molecules/Tabs';
+import TabletStartDate from '../../../molecules/creation/TabletStartDate';
 import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
 import TabletFieldBlock from '../../../molecules/creation/TabletFieldBlock';
 import DraggableMobileOptions from '../DraggableMobileOptions';
@@ -338,68 +339,98 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
   ]);
   const getAdvancedPart = useCallback(() => (
     <>
-      <SListWrapper>
-        {
-          tab === 'auction' && isMobile && (
+      {isMobile ? (
+        <>
+          <SListWrapper>
+            {
+              tab === 'auction' && (
+                <SFieldWrapper>
+                  <MobileFieldBlock
+                    id="minimalBid"
+                    type="input"
+                    value={auction.minimalBid}
+                    onChange={handleItemChange}
+                    formattedDescription={auction.minimalBid}
+                    inputProps={{
+                      min: 5,
+                      type: 'number',
+                      pattern: '[0-9]*',
+                    }}
+                  />
+                </SFieldWrapper>
+              )
+            }
+            {
+              tab === 'crowdfunding' && (
+                <SFieldWrapper>
+                  <MobileFieldBlock
+                    id="targetBackerCount"
+                    type="input"
+                    value={crowdfunding.targetBackerCount}
+                    onChange={handleItemChange}
+                    formattedDescription={crowdfunding.targetBackerCount}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                      pattern: '[0-9]*',
+                    }}
+                  />
+                </SFieldWrapper>
+              )
+            }
             <SFieldWrapper>
               <MobileFieldBlock
-                id="minimalBid"
-                type="input"
-                value={auction.minimalBid}
+                id="expiresAt"
+                type="select"
+                value={post.expiresAt}
+                options={expireOptions}
                 onChange={handleItemChange}
-                formattedDescription={auction.minimalBid}
-                inputProps={{
-                  min: 5,
-                  type: 'number',
-                  pattern: '[0-9]*',
-                }}
+                formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
+                formattedDescription={formatExpiresAt()
+                  .format('DD MMM [at] hh:mm A')}
               />
             </SFieldWrapper>
-          )
-        }
-        {
-          tab === 'crowdfunding' && isMobile && (
             <SFieldWrapper>
               <MobileFieldBlock
-                id="targetBackerCount"
-                type="input"
-                value={crowdfunding.targetBackerCount}
+                id="startsAt"
+                type="date"
+                value={post.startsAt}
                 onChange={handleItemChange}
-                formattedDescription={crowdfunding.targetBackerCount}
-                inputProps={{
-                  min: 1,
-                  type: 'number',
-                  pattern: '[0-9]*',
-                }}
+                formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
+                formattedDescription={formatStartsAt()
+                  .format('DD MMM [at] hh:mm A')}
               />
             </SFieldWrapper>
-          )
-        }
-        <SFieldWrapper>
-          <MobileFieldBlock
-            id="expiresAt"
-            type="select"
-            value={post.expiresAt}
-            options={expireOptions}
-            onChange={handleItemChange}
-            formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-            formattedDescription={formatExpiresAt()
-              .format('DD MMM [at] hh:mm A')}
-          />
-        </SFieldWrapper>
-        <SFieldWrapper>
-          <MobileFieldBlock
+          </SListWrapper>
+          <SSeparator />
+        </>
+      ) : (
+        <>
+          <SItemWrapper>
+            <TabletFieldBlock
+              id="expiresAt"
+              type="select"
+              value={post.expiresAt}
+              options={expireOptions}
+              maxItems={5}
+              onChange={handleItemChange}
+              formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
+              formattedDescription={formatExpiresAt()
+                .format('DD MMM [at] hh:mm A')}
+            />
+          </SItemWrapper>
+          <SSeparator margin="16px 0" />
+          <STabletBlockTitle variant={1} weight={700}>
+            {t('secondStep.field.startsAt.tablet.title')}
+          </STabletBlockTitle>
+          <TabletStartDate
             id="startsAt"
-            type="date"
             value={post.startsAt}
             onChange={handleItemChange}
-            formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
-            formattedDescription={formatStartsAt()
-              .format('DD MMM [at] hh:mm A')}
           />
-        </SFieldWrapper>
-      </SListWrapper>
-      <SSeparator />
+          <SSeparator margin="16px 0" />
+        </>
+      )}
       {tab === 'multiple-choice' && (
         <SMobileFieldWrapper>
           <MobileField
@@ -596,7 +627,6 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 const TabletFieldWrapper = styled.div`
   border: 1px solid ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
   padding: 23px;
-  overflow: hidden;
   background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
   border-radius: 16px;
 `;

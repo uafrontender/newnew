@@ -13,7 +13,9 @@ export type TAnimation =
   | 'trans-06-reverse'
   | 'o-02'
   | 'o-11'
-  | 'o-11-reverse';
+  | 'o-11-reverse'
+  | 'o-12'
+  | 'o-12-reverse';
 
 interface IAnimatedWords {
   start?: boolean;
@@ -166,22 +168,6 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       y: 0,
       opacity: 1,
     },
-    'o-11': {
-      y: -5,
-      opacity: 1,
-      transition: {
-        delay: delay ?? 0.1,
-        bounce: 0,
-      },
-    },
-    'o-11_initial': {
-      y: 0,
-      opacity: 1,
-    },
-    'o-11_exit': {
-      y: 0,
-      opacity: 1,
-    },
     'o-02': {
       x: 0,
       opacity: 1,
@@ -199,6 +185,22 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       x: 10,
       opacity: 0,
     },
+    'o-11': {
+      y: -5,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-11_initial': {
+      y: 0,
+      opacity: 1,
+    },
+    'o-11_exit': {
+      y: 0,
+      opacity: 1,
+    },
     'o-11-reverse': {
       y: 0,
       opacity: 1,
@@ -214,6 +216,64 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     'o-11_exit-reverse': {
       y: -5,
       opacity: 1,
+    },
+    'o-12': {
+      height: 'auto',
+      visibility: 'visible',
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-12_initial': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
+    },
+    'o-12_exit': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
+    },
+    'o-12-reverse': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
+    },
+    'o-12_initial-reverse': {
+      height: 'auto',
+      visibility: 'visible',
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-12_exit-reverse': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
     },
   };
 

@@ -13,7 +13,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import Calendar from '../../atoms/creation/Calendar';
+import Calendar from '../../atoms/creation/calendar/ScrollableVertically';
 import InlineSVG from '../../atoms/InlineSVG';
 import CustomToggle from '../CustomToggle';
 import TimePicker from './TimePicker';
