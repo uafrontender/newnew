@@ -47,7 +47,7 @@ const Home: NextPage<IHome> = ({
   // Top section/Curated posts
   const [
     topSectionCollection, setTopSectionCollection,
-  ] = useState<newnewapi.Post[]>(top10posts.posts as newnewapi.Post[]);
+  ] = useState<newnewapi.Post[]>(top10posts.posts as newnewapi.Post[] ?? []);
   // For you - authenticated users only
   const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
   const [collectionFYInitialLoading, setCollectionFYInitialLoading] = useState(false);
@@ -250,10 +250,12 @@ const Home: NextPage<IHome> = ({
         </title>
       </Head>
       {!user.loggedIn && <HeroSection />}
-      <TopSection
-        collection={topSectionCollection}
-        handlePostClicked={handleOpenPostModal}
-      />
+      {topSectionCollection.length > 0 && (
+        <TopSection
+          collection={topSectionCollection}
+          handlePostClicked={handleOpenPostModal}
+        />
+      )}
       {user.loggedIn && !collectionFYError && (
         <CardsSection
           title={t('for-you-block-title')}
@@ -344,7 +346,8 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const resTop10 = await fetchCuratedPosts(top10payload);
 
-  if (!resTop10.data?.posts || resTop10.error) {
+  // if (!resTop10.data?.posts || resTop10.error) {
+  if (resTop10.error) {
     throw new Error('Request failed');
   }
 
@@ -358,7 +361,9 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     if (res.data && !res.error) {
       return {
         props: {
-          top10posts: resTop10.data.toJSON(),
+          ...(resTop10.data ? {
+            top10posts: resTop10.data.toJSON(),
+          } : {}),
           postFromQuery: res.data.toJSON(),
           ...translationContext,
         },
@@ -368,7 +373,9 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   return {
     props: {
-      top10posts: resTop10.data.toJSON(),
+      ...(resTop10.data ? {
+        top10posts: resTop10.data.toJSON(),
+      } : {}),
       ...translationContext,
     },
   };

@@ -316,6 +316,14 @@ const SWrapper = styled.div<ISWrapper>`
   align-items: flex-end;
   flex-direction: row;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   ${(props) => props.theme.media.tablet} {
     width: ${(props) => {
     if (props.index === 1) {
@@ -501,6 +509,14 @@ const SWrapperOutside = styled.div<ISWrapper>`
   display: flex;
   position: relative;
   flex-direction: column;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   ${(props) => props.theme.media.tablet} {
     :hover {
