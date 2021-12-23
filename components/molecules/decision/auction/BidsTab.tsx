@@ -48,7 +48,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   } = useInView();
   const textareaRef = useRef<HTMLTextAreaElement>();
 
-  const [bidBeingSupported, setBidBeingSupported] = useState<number>(-1);
+  const [bidBeingSupported, setBidBeingSupported] = useState<string>('');
 
   // New suggestion/bid
   const [newBidText, setNewBidText] = useState('');
@@ -119,7 +119,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
       >
         <SBidsContainer
           style={{
-            ...(bidBeingSupported !== -1 ? {
+            ...(bidBeingSupported ? {
               overflowY: 'hidden',
             } : {}),
           }}
@@ -132,7 +132,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
               index={i}
               minAmount={minAmount}
               bidBeingSupported={bidBeingSupported}
-              handleSetSupportedBid={(idx: number) => setBidBeingSupported(idx)}
+              handleSetSupportedBid={(id: string) => setBidBeingSupported(id)}
             />
           ))}
         </SBidsContainer>

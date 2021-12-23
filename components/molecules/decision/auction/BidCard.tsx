@@ -25,9 +25,9 @@ interface IBidCard {
   bid: newnewapi.Auction.Option;
   postId: string;
   index: number;
-  bidBeingSupported?: number;
+  bidBeingSupported?: string;
   minAmount: number;
-  handleSetSupportedBid: (idx: number) => void;
+  handleSetSupportedBid: (id: string) => void;
 }
 
 const BidCard: React.FunctionComponent<IBidCard> = ({
@@ -46,16 +46,16 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
-  const disabled = bidBeingSupported !== -1 && bidBeingSupported !== index;
+  const disabled = bidBeingSupported !== '' && bidBeingSupported !== bid.id.toString();
 
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
-    handleSetSupportedBid(index);
+    handleSetSupportedBid(bid.id.toString());
   };
 
   const handleCloseSupportForm = () => {
     setIsSupportFormOpen(false);
-    handleSetSupportedBid(-1);
+    handleSetSupportedBid('');
   };
 
   // Payment and Loading modals
@@ -94,7 +94,7 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
 
       // Need to updated cached data!!!
 
-      handleSetSupportedBid(-1);
+      handleSetSupportedBid('');
       setSupportBidAmount('');
       setIsSupportFormOpen(false);
       setPaymentModalOpen(false);
@@ -116,7 +116,23 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
   ]);
 
   return (
-    <>
+    <motion.div
+      key={bid.id.toString()}
+      layout="position"
+      transition={{
+        y: {
+          type: 'spring',
+          damping: 20,
+          stiffness: 300,
+        },
+        default: {},
+      }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
       <SContainer
         isDisabled={disabled}
       >
@@ -152,7 +168,7 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
             </SAmount>
           </SBidInfo>
         </SBidDetails>
-        {bidBeingSupported !== -1 && !disabled ? (
+        {bidBeingSupported && !disabled ? (
           <div
             style={{
               minWidth: '92px',
@@ -211,7 +227,7 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
-    </>
+    </motion.div>
   );
 };
 

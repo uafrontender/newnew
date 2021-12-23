@@ -90,10 +90,18 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      console.log(res.data);
-
       if (res.data && res.data.options) {
-        setBids((curr) => [...curr, ...res.data?.options as newnewapi.Auction.Option[]]);
+        setBids((curr) => {
+          const workingArrUnsorted = [...curr, ...res.data?.options as newnewapi.Auction.Option[]];
+          const workingArrSorted = workingArrUnsorted.sort((a, b) => (
+            (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
+          ));
+          const workingSortedUnique = [...workingArrSorted.reduce((a, b) => {
+            a.set(b.id, b);
+            return a;
+          }, new Map()).values()];
+          return workingSortedUnique;
+        });
         setBidsNextPageToken(res.data.paging?.nextPageToken);
       }
 
@@ -139,13 +147,22 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         if (decoded.option && decoded.postUuid === post.postUuid) {
           setBids((curr) => {
             const workingArr = [...curr];
+            let workingArrUnsorted;
             const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
             if (idx === -1) {
-              // return [decoded.option as newnewapi.Auction.Option, ...workingArr];
-              return curr;
+              workingArrUnsorted = [...workingArr, decoded.option as newnewapi.Auction.Option];
+            } else {
+              workingArr[idx] = decoded.option as newnewapi.Auction.Option;
+              workingArrUnsorted = workingArr;
             }
-            workingArr[idx] = decoded.option as newnewapi.Auction.Option;
-            return workingArr;
+
+            const workingArrSorted = workingArrUnsorted.sort((a, b) => (
+              (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
+            ));
+
+            console.log(workingArrSorted);
+
+            return workingArrSorted;
           });
         }
       });
@@ -171,9 +188,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     };
   }, [socketConnection, post, setBids]);
 
+  const [order, setOrder] = useState(true);
+  useEffect(() => {
+    setBids((curr) => curr.sort((a, b) => (
+      order
+        ? ((a.totalAmount?.usdCents as number) - (b.totalAmount?.usdCents as number))
+        : ((b.totalAmount?.usdCents as number) - (a.totalAmount?.usdCents as number))
+    )));
+  }, [order, setBids]);
+
   return (
     <SWrapper>
-      <SExpiresSection>
+      <SExpiresSection
+        onDoubleClick={() => setOrder((o) => !o)}
+      >
         {isMobile && (
           <GoBackButton
             style={{
