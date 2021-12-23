@@ -20,7 +20,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
 
   return (
     <SContainer visible={visible}>
-      {collection.map(renderItem)}
+      {collection?.map(renderItem)}
     </SContainer>
   );
 };

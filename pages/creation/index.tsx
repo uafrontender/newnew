@@ -48,6 +48,6 @@ export async function getStaticProps(context: NextPageContext): Promise<any> {
 
 const SWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
-    height: 100vh;
+    height: calc(100vh - 148px);
   }
 `;

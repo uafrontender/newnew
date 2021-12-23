@@ -60,8 +60,21 @@ const SMobileContainer = styled.div`
   position: relative;
   overflow: hidden;
   transform: translateY(-50%);
-  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
   border-radius: 16px;
+
+  ${({ theme }) => theme.media.mobileL} {
+    margin: 0 auto;
+    max-width: 464px;
+  }
+  
+  ${({ theme }) => theme.media.tablet} {
+    padding: 24px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 480px;
+  }
 `;
 
 const SButtonsHolder = styled.div`
@@ -72,6 +85,10 @@ const SButtonsHolder = styled.div`
 
 const STitle = styled(Headline)`
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 24px;
+  }
 `;
 
 const SDescription = styled(Text)`

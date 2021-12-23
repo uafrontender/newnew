@@ -8,32 +8,59 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../../atoms/Text';
+import Video from '../../../atoms/creation/Video';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
+import PublishedModal from '../../../molecules/creation/PublishedModal';
 
 import { createPost } from '../../../../api/endpoints/post';
-import { setPostData } from '../../../../redux-store/slices/creationStateSlice';
+import { maxLength, minLength } from '../../../../utils/validation';
+import { clearCreation, setPostData } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+
+import {
+  CREATION_TITLE_MIN,
+  CREATION_TITLE_MAX,
+  CREATION_OPTION_MIN,
+  CREATION_OPTION_MAX,
+} from '../../../../constants/general';
 
 interface IPreviewContent {
 }
 
 export const PreviewContent: React.FC<IPreviewContent> = () => {
+  const { t: tCommon } = useTranslation();
   const { t } = useTranslation('creation');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const [playVideo, setPlayVideo] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const {
     post,
     auction,
     crowdfunding,
     multiplechoice,
   } = useAppSelector((state) => state.creation);
+  const validateText = useCallback((text: string, min: number, max: number) => {
+    let error = minLength(tCommon, text, min);
+
+    if (!error) {
+      error = maxLength(tCommon, text, max);
+    }
+
+    return error;
+  }, [tCommon]);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { query: { tab } } = router;
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const titleIsValid = post.title.length > 5 && post.title.length < 70;
-  const disabled = loading || !titleIsValid;
+  const titleIsValid = !validateText(post.title, CREATION_TITLE_MIN, CREATION_TITLE_MAX);
+  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) === -1;
+  const disabled = loading
+    || !titleIsValid
+    || !post.title
+    || !post.announcementVideoUrl
+    || !optionsAreValid;
 
   const formatStartsAt: () => any = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
@@ -74,6 +101,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
     return inSeconds ? seconds : dateValue;
   }, [post.expiresAt, post.startsAt]);
+  const handleClose = useCallback(() => {
+    router.back();
+  }, [router]);
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+    router.push('/');
+    dispatch(clearCreation({}));
+  }, [dispatch, router]);
   const handleSubmit = useCallback(async () => {
     setLoading(true);
     try {
@@ -117,7 +152,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       dispatch(setPostData(data));
       setLoading(false);
-      router.push(`/creation/${tab}/published`);
+
+      if (isMobile) {
+        router.push(`/creation/${tab}/published`);
+      } else {
+        setPlayVideo(false);
+        setShowModal(true);
+      }
     } catch (err: any) {
       toast.error(err);
       setLoading(false);
@@ -127,6 +168,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     post,
     router,
     auction,
+    isMobile,
     dispatch,
     crowdfunding,
     multiplechoice,
@@ -193,27 +235,27 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     </SChoiceItem>
   );
 
-  return (
-    <>
-      <SContent>
-        <SHeadline variant={5}>
-          {post.title}
-        </SHeadline>
-        {tab === 'multiple-choice' && (
-          <SChoices>
-            {multiplechoice.choices.map(renderChoice)}
-          </SChoices>
-        )}
-        <SSettings>
-          {settings.map(renderSetting)}
-        </SSettings>
-        <SVideo
-          loop
-          autoPlay
-          src={post.announcementVideoUrl}
-        />
-      </SContent>
-      {isMobile && (
+  if (isMobile) {
+    return (
+      <>
+        <SContent>
+          <SHeadline variant={5}>
+            {post.title}
+          </SHeadline>
+          {tab === 'multiple-choice' && (
+            <SChoices>
+              {multiplechoice.choices.map(renderChoice)}
+            </SChoices>
+          )}
+          <SSettings>
+            {settings.map(renderSetting)}
+          </SSettings>
+          <SVideo
+            loop
+            autoPlay
+            src={post.announcementVideoUrl}
+          />
+        </SContent>
         <SButtonWrapper>
           <SButtonContent>
             <SButton
@@ -226,7 +268,60 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             </SButton>
           </SButtonContent>
         </SButtonWrapper>
-      )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <PublishedModal
+        open={showModal}
+        handleClose={handleCloseModal}
+      />
+      <SHeadLine variant={3} weight={600}>
+        {t('preview.title')}
+      </SHeadLine>
+      <STabletContent>
+        <SLeftPart>
+          <Video
+            loop
+            muted
+            src={post.announcementVideoUrl}
+            play={playVideo}
+            mutePosition="left"
+          />
+        </SLeftPart>
+        <SRightPart>
+          <SHeadline variant={5}>
+            {post.title}
+          </SHeadline>
+          {tab === 'multiple-choice' && (
+            <SChoices>
+              {multiplechoice.choices.map(renderChoice)}
+            </SChoices>
+          )}
+          <SSettings>
+            {settings.map(renderSetting)}
+          </SSettings>
+          <SButtonsWrapper>
+            <Button
+              view="secondary"
+              onClick={handleClose}
+              disabled={loading}
+            >
+              {t('preview.button.edit')}
+            </Button>
+            <Button
+              view="primaryGrad"
+              loading={loading}
+              onClick={handleSubmit}
+              disabled={disabled}
+            >
+              {t('preview.button.submit')}
+            </Button>
+          </SButtonsWrapper>
+        </SRightPart>
+      </STabletContent>
     </>
   );
 };
@@ -237,6 +332,45 @@ const SContent = styled.div`
   display: flex;
   margin-top: 16px;
   flex-direction: column;
+`;
+
+const STabletContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const SHeadLine = styled(Text)`
+  padding: 26px 0;
+  text-align: center;
+
+  ${({ theme }) => theme.media.laptop} {
+    padding: 8px 0;
+    margin-bottom: 40px;
+  }
+`;
+
+const SLeftPart = styled.div`
+  flex: 1;
+  max-width: calc(50% - 76px);
+  margin-right: 76px;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 352px;
+    margin-right: 16px;
+  }
+`;
+
+const SRightPart = styled.div`
+  flex: 1;
+  display: flex;
+  max-width: 50%;
+  flex-direction: column;
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 352px;
+    margin-left: 16px;
+  }
 `;
 
 const SButton = styled(Button)`
@@ -338,4 +472,12 @@ const SVideo = styled.video`
   height: auto;
   position: relative;
   margin-top: 42px;
+`;
+
+const SButtonsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  margin-top: 26px;
+  align-items: center;
+  justify-content: space-between;
 `;
