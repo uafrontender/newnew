@@ -1,8 +1,8 @@
 import React, {
-  useCallback,
-  useEffect,
   useRef,
   useState,
+  useEffect,
+  useCallback,
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
@@ -11,8 +11,12 @@ import styled, { useTheme } from 'styled-components';
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
+import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 
+import { useAppSelector } from '../../../redux-store/store';
+
+import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 interface IThumbnailPreviewEdit {
@@ -42,6 +46,8 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
   const constraintsCenterRef: any = useRef(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoChanks, setVideoChanks] = useState([]);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
   const visiblePart = (3 * 100) / (videoRef?.current?.duration || 0);
   const hiddenPartFirst = videoThumbs.current.startTime
@@ -136,20 +142,38 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
       show={open}
       onClose={handleClose}
     >
-      <SMobileContainerEdit onClick={preventCLick}>
+      <SContainer onClick={preventCLick}>
         <SModalTopContent>
           <SModalTopLine>
-            <InlineSVG
-              clickable
-              svg={chevronLeft}
-              fill={theme.colorsThemed.text.primary}
-              width="20px"
-              height="20px"
-              onClick={handleClose}
-            />
-            <SModalTopLineTitle variant={3} weight={600}>
-              {t('secondStep.video.thumbnail.title')}
-            </SModalTopLineTitle>
+            {isMobile && (
+              <InlineSVG
+                clickable
+                svg={chevronLeft}
+                fill={theme.colorsThemed.text.primary}
+                width="20px"
+                height="20px"
+                onClick={handleClose}
+              />
+            )}
+            {isMobile ? (
+              <SModalTopLineTitle variant={3} weight={600}>
+                {t('secondStep.video.thumbnail.title')}
+              </SModalTopLineTitle>
+            ) : (
+              <SModalTopLineTitleTablet variant={6}>
+                {t('secondStep.video.thumbnail.title')}
+              </SModalTopLineTitleTablet>
+            )}
+            {!isMobile && (
+              <InlineSVG
+                clickable
+                svg={closeIcon}
+                fill={theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+                onClick={handleClose}
+              />
+            )}
           </SModalTopLine>
           <SModalVideoEdit
             ref={videoRef}
@@ -195,21 +219,74 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
               </SModalSelectTopWrapper>
             </SModalSelectLine>
           )}
+          {!isMobile && (
+            <SDescription>
+              <SText>
+                {t('secondStep.video.thumbnail.description')}
+              </SText>
+            </SDescription>
+          )}
         </SModalTopContent>
-        <SModalButtonContainer>
-          <Button
-            view="primaryGrad"
-            onClick={onSubmit}
-          >
-            {t('secondStep.video.thumbnail.submit')}
-          </Button>
-        </SModalButtonContainer>
-      </SMobileContainerEdit>
+        {isMobile ? (
+          <SModalButtonContainer>
+            <Button
+              view="primaryGrad"
+              onClick={onSubmit}
+            >
+              {t('secondStep.video.thumbnail.submit')}
+            </Button>
+          </SModalButtonContainer>
+        ) : (
+          <SButtonsWrapper>
+            <Button
+              view="secondary"
+              onClick={handleClose}
+            >
+              {t('secondStep.button.cancel')}
+            </Button>
+            <Button
+              view="primaryGrad"
+              onClick={onSubmit}
+            >
+              {t('secondStep.video.thumbnail.submit')}
+            </Button>
+          </SButtonsWrapper>
+        )}
+      </SContainer>
     </Modal>
   );
 };
 
 export default ThumbnailPreviewEdit;
+
+const SContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  position: relative;
+  min-height: 100vh;
+  background: ${(props) => props.theme.colorsThemed.background.primary};
+
+  ${({ theme }) => theme.media.mobileL} {
+    top: 50%;
+    height: unset;
+    margin: 0 auto;
+    overflow: hidden;
+    max-width: 464px;
+    transform: translateY(-50%);
+    min-height: unset;
+    background: ${(props) => props.theme.colorsThemed.background.secondary};
+    border-radius: 16px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 24px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 480px;
+  }
+`;
 
 const SModalVideoEdit = styled.video`
   width: calc(100% - 58px);
@@ -225,20 +302,21 @@ const SModalVideoEditSmall = styled.video`
   height: auto;
 `;
 
-const SMobileContainerEdit = styled.div`
-  width: 100%;
-  height: 100%;
-  padding: 18px;
-  position: relative;
-  min-height: 100vh;
-  background: ${(props) => props.theme.colorsThemed.background.primary};
-`;
-
 const SModalTopLine = styled.div`
   display: flex;
   padding: 18px 0;
   align-items: center;
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.mobileL} {
+    padding: 10px 0;
+    margin-bottom: 24px;
+    justify-content: space-between;
+  }
+`;
+
+const SModalTopLineTitleTablet = styled(Headline)`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
 const SModalTopLineTitle = styled(Text)`
@@ -313,4 +391,32 @@ const SModalSelectTopWrapperHiddenRightPart = styled.div`
   opacity: 0.5;
   position: absolute;
   background: ${(props) => props.theme.colorsThemed.background.primary};
+`;
+
+const SButtonsWrapper = styled.div`
+  display: flex;
+  margin-top: 30px;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const SDescription = styled.div`
+  margin-top: 24px;
+`;
+
+const SText = styled.span`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;

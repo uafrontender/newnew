@@ -57,7 +57,7 @@ export const List: React.FC<IList> = ({
     <SListWrapper
       style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
     >
-      {collection.map(renderItem)}
+      {collection?.map(renderItem)}
       {loading && Array(5).fill('_').map((_, i) => (
         <CardSkeleton
           key={i}

@@ -18,19 +18,28 @@ import arrowLeftIcon from '../../public/images/svg/icons/outlined/ArrowLeft.svg'
 
 interface ICreationLayout {
   noHeader?: boolean;
+  noTabletHeader?: boolean;
 }
 
 const CreationLayout: React.FC<ICreationLayout> = (props) => {
   const {
     children,
     noHeader,
+    noTabletHeader,
   } = props;
   const { t } = useTranslation('creation');
   const theme = useTheme();
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isDesktop = ['laptop', 'laptopL', 'desktop'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet;
+
+  let withHeader = !noHeader;
+
+  if (noTabletHeader && (isTablet || isDesktop)) {
+    withHeader = false;
+  }
 
   const handleGoBack = useCallback(() => {
     if (window.history.length > 2) {
@@ -46,7 +55,7 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
         <Container>
           <Row>
             <Col>
-              {!noHeader && (
+              {withHeader && (
                 <SBackLine onClick={handleGoBack}>
                   <SInlineSVG
                     svg={isDesktop ? arrowLeftIcon : chevronIcon}
@@ -74,6 +83,7 @@ export default CreationLayout;
 
 CreationLayout.defaultProps = {
   noHeader: false,
+  noTabletHeader: false,
 };
 
 const SBackLine = styled.div`

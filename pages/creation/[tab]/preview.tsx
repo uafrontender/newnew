@@ -11,7 +11,8 @@ import PreviewContent from '../../../components/organisms/creation/preview';
 
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationPreview {}
+interface ICreationPreview {
+}
 
 export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   const { t } = useTranslation('creation');
@@ -30,7 +31,7 @@ export const CreationPreview: React.FC<ICreationPreview> = (props) => {
 };
 
 (CreationPreview as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>
+  <CreationLayout noTabletHeader>
     {page}
   </CreationLayout>
 );
@@ -68,12 +69,6 @@ const SWrapper = styled.div`
   justify-content: space-between;
 
   ${({ theme }) => theme.media.tablet} {
-    margin: 0 auto;
-    max-width: 464px;
-    padding-bottom: 0;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    max-width: 736px;
+    padding-bottom: unset;
   }
 `;

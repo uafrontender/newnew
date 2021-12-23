@@ -3,8 +3,6 @@ import styled from 'styled-components';
 
 import Text from '../atoms/Text';
 
-import { useAppSelector } from '../../redux-store/store';
-
 interface ICustomToggle {
   options: {}[];
   selected: string | undefined;
@@ -17,8 +15,6 @@ const CustomToggle: React.FC<ICustomToggle> = (props) => {
     selected,
     onChange,
   } = props;
-  const { colorMode } = useAppSelector((state) => state.ui);
-
   const renderOption = useCallback((item) => {
     const isSelected = selected === item.id;
     const handleClick = () => {
@@ -35,13 +31,12 @@ const CustomToggle: React.FC<ICustomToggle> = (props) => {
           weight={500}
           variant={2}
           selected={isSelected}
-          colorMode={colorMode}
         >
           {item.title}
         </SOptionTitle>
       </SOption>
     );
-  }, [colorMode, onChange, selected]);
+  }, [onChange, selected]);
 
   return (
     <SCustomToggleWrapper>
@@ -79,7 +74,6 @@ const SOption = styled.div<ISOption>`
 
 interface ISOptionTitle {
   selected: boolean;
-  colorMode: string;
 }
 
 const SOptionTitle = styled(Text)<ISOptionTitle>`
