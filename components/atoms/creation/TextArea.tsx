@@ -112,11 +112,6 @@ const STextArea = styled(TextAreaAutoSize)`
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
-    line-height: 20px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    font-size: 16px;
     line-height: 24px;
   }
 

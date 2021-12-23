@@ -11,13 +11,17 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
+import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import MobileField from '../../../molecules/creation/MobileField';
 import Tabs, { Tab } from '../../../molecules/Tabs';
+import TabletStartDate from '../../../molecules/creation/TabletStartDate';
 import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
+import TabletFieldBlock from '../../../molecules/creation/TabletFieldBlock';
 import DraggableMobileOptions from '../DraggableMobileOptions';
 
 import urltoFile from '../../../../utils/urlToFile';
@@ -93,6 +97,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
 
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet;
   const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) === -1;
   const disabled = !!titleError || !post.title || !post.announcementVideoUrl || !optionsAreValid;
 
@@ -245,6 +251,220 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     },
   ], [t]);
 
+  const getDecisionPart = useCallback(() => (
+    <>
+      <SItemWrapper>
+        <TextArea
+          id="title"
+          value={post?.title}
+          error={titleError}
+          onBlur={handleItemBlur}
+          onFocus={handleItemFocus}
+          onChange={handleItemChange}
+          placeholder={t('secondStep.input.placeholder')}
+        />
+      </SItemWrapper>
+      {
+        tab === 'multiple-choice' && (
+          <>
+            <SSeparator margin="16px 0" />
+            <DraggableMobileOptions
+              id="choices"
+              min={2}
+              options={multiplechoice.choices}
+              onChange={handleItemChange}
+              validation={validateText}
+            />
+            {isMobile && (
+              <SSeparator margin="16px 0" />
+            )}
+          </>
+        )
+      }
+      {
+        tab === 'auction' && !isMobile && (
+          <>
+            <SSeparator margin="16px 0" />
+            <SItemWrapper>
+              <TabletFieldBlock
+                id="minimalBid"
+                type="input"
+                value={auction.minimalBid}
+                onChange={handleItemChange}
+                formattedDescription={auction.minimalBid}
+                inputProps={{
+                  min: 5,
+                  type: 'number',
+                  pattern: '[0-9]*',
+                }}
+              />
+            </SItemWrapper>
+          </>
+        )
+      }
+      {
+        tab === 'crowdfunding' && !isMobile && (
+          <>
+            <SSeparator margin="16px 0" />
+            <SItemWrapper>
+              <TabletFieldBlock
+                id="targetBackerCount"
+                type="input"
+                value={crowdfunding.targetBackerCount}
+                onChange={handleItemChange}
+                formattedDescription={crowdfunding.targetBackerCount}
+                inputProps={{
+                  min: 1,
+                  type: 'number',
+                  pattern: '[0-9]*',
+                }}
+              />
+            </SItemWrapper>
+          </>
+        )
+      }
+    </>
+  ), [
+    t,
+    tab,
+    isMobile,
+    titleError,
+    post?.title,
+    auction?.minimalBid,
+    crowdfunding?.targetBackerCount,
+    validateText,
+    handleItemBlur,
+    handleItemFocus,
+    handleItemChange,
+    multiplechoice.choices,
+  ]);
+  const getAdvancedPart = useCallback(() => (
+    <>
+      {isMobile ? (
+        <>
+          <SListWrapper>
+            {
+              tab === 'auction' && (
+                <SFieldWrapper>
+                  <MobileFieldBlock
+                    id="minimalBid"
+                    type="input"
+                    value={auction.minimalBid}
+                    onChange={handleItemChange}
+                    formattedDescription={auction.minimalBid}
+                    inputProps={{
+                      min: 5,
+                      type: 'number',
+                      pattern: '[0-9]*',
+                    }}
+                  />
+                </SFieldWrapper>
+              )
+            }
+            {
+              tab === 'crowdfunding' && (
+                <SFieldWrapper>
+                  <MobileFieldBlock
+                    id="targetBackerCount"
+                    type="input"
+                    value={crowdfunding.targetBackerCount}
+                    onChange={handleItemChange}
+                    formattedDescription={crowdfunding.targetBackerCount}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                      pattern: '[0-9]*',
+                    }}
+                  />
+                </SFieldWrapper>
+              )
+            }
+            <SFieldWrapper>
+              <MobileFieldBlock
+                id="expiresAt"
+                type="select"
+                value={post.expiresAt}
+                options={expireOptions}
+                onChange={handleItemChange}
+                formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
+                formattedDescription={formatExpiresAt()
+                  .format('DD MMM [at] hh:mm A')}
+              />
+            </SFieldWrapper>
+            <SFieldWrapper>
+              <MobileFieldBlock
+                id="startsAt"
+                type="date"
+                value={post.startsAt}
+                onChange={handleItemChange}
+                formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
+                formattedDescription={formatStartsAt()
+                  .format('DD MMM [at] hh:mm A')}
+              />
+            </SFieldWrapper>
+          </SListWrapper>
+          <SSeparator />
+        </>
+      ) : (
+        <>
+          <SItemWrapper>
+            <TabletFieldBlock
+              id="expiresAt"
+              type="select"
+              value={post.expiresAt}
+              options={expireOptions}
+              maxItems={5}
+              onChange={handleItemChange}
+              formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
+              formattedDescription={formatExpiresAt()
+                .format('DD MMM [at] hh:mm A')}
+            />
+          </SItemWrapper>
+          <SSeparator margin="16px 0" />
+          <STabletBlockTitle variant={1} weight={700}>
+            {t('secondStep.field.startsAt.tablet.title')}
+          </STabletBlockTitle>
+          <TabletStartDate
+            id="startsAt"
+            value={post.startsAt}
+            onChange={handleItemChange}
+          />
+          <SSeparator margin="16px 0" />
+        </>
+      )}
+      {tab === 'multiple-choice' && (
+        <SMobileFieldWrapper>
+          <MobileField
+            id="allowSuggestions"
+            type="toggle"
+            value={multiplechoice.options.allowSuggestions}
+            onChange={handleItemChange}
+          />
+        </SMobileFieldWrapper>
+      )}
+      <MobileField
+        id="comments"
+        type="toggle"
+        value={post.options.commentsEnabled}
+        onChange={handleItemChange}
+      />
+    </>
+  ), [
+    t,
+    tab,
+    isMobile,
+    post.startsAt,
+    post.expiresAt,
+    post.options.commentsEnabled,
+    auction.minimalBid,
+    crowdfunding.targetBackerCount,
+    multiplechoice.options.allowSuggestions,
+    expireOptions,
+    formatStartsAt,
+    formatExpiresAt,
+    handleItemChange,
+  ]);
+
   useEffect(() => {
     if (validateTitleDebounced) {
       setTitleError(validateText(validateTitleDebounced, CREATION_TITLE_MIN, CREATION_TITLE_MAX));
@@ -260,7 +480,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
             tabs={tabs}
             draggable={false}
             activeTabIndex={activeTabIndex}
-            withTabIndicator={!isMobile && resizeMode !== 'tablet'}
+            withTabIndicator={isDesktop}
           />
           {isMobile && (
             <SCloseIconWrapper>
@@ -277,7 +497,12 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
         </STabsWrapper>
         <SContent>
           <SLeftPart>
-            <SItemWrapper>
+            <SItemWrapper noMargin={isDesktop}>
+              {!isMobile && (
+                <STabletBlockTitle variant={1} weight={700}>
+                  {t('secondStep.block.title.file')}
+                </STabletBlockTitle>
+              )}
               <FileUpload
                 id="video"
                 value={post.announcementVideoUrl}
@@ -285,128 +510,73 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 thumbnails={post.thumbnailParameters}
               />
             </SItemWrapper>
-            {isMobile && (
+            {isMobile ? getDecisionPart() : (
               <SItemWrapper>
-                <TextArea
-                  id="title"
-                  value={post?.title}
-                  error={titleError}
-                  onBlur={handleItemBlur}
-                  onFocus={handleItemFocus}
-                  onChange={handleItemChange}
-                  placeholder={t('secondStep.input.placeholder')}
-                />
+                <TabletFieldWrapper>
+                  <STabletBlockTitle variant={1} weight={700}>
+                    {t('secondStep.block.title.decision')}
+                  </STabletBlockTitle>
+                  {getDecisionPart()}
+                </TabletFieldWrapper>
               </SItemWrapper>
             )}
-            {
-              tab === 'multiple-choice' && (
-                <>
-                  <SSeparator margin="16px 0" />
-                  <DraggableMobileOptions
-                    id="choices"
-                    min={2}
-                    options={multiplechoice.choices}
-                    onChange={handleItemChange}
-                    validation={validateText}
-                  />
-                  <SSeparator margin="16px 0" />
-                </>
-              )
-            }
-            <SListWrapper>
-              {
-                tab === 'auction' && (
-                  <SFieldWrapper>
-                    <MobileFieldBlock
-                      id="minimalBid"
-                      type="input"
-                      value={auction.minimalBid}
-                      onChange={handleItemChange}
-                      formattedDescription={auction.minimalBid}
-                      inputProps={{
-                        min: 5,
-                        type: 'number',
-                        pattern: '[0-9]*',
-                      }}
-                    />
-                  </SFieldWrapper>
-                )
-              }
-              {
-                tab === 'crowdfunding' && (
-                  <SFieldWrapper>
-                    <MobileFieldBlock
-                      id="targetBackerCount"
-                      type="input"
-                      value={crowdfunding.targetBackerCount}
-                      onChange={handleItemChange}
-                      formattedDescription={crowdfunding.targetBackerCount}
-                      inputProps={{
-                        min: 1,
-                        type: 'number',
-                        pattern: '[0-9]*',
-                      }}
-                    />
-                  </SFieldWrapper>
-                )
-              }
-              <SFieldWrapper>
-                <MobileFieldBlock
-                  id="expiresAt"
-                  type="select"
-                  value={post.expiresAt}
-                  options={expireOptions}
-                  onChange={handleItemChange}
-                  formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-                  formattedDescription={formatExpiresAt()
-                    .format('DD MMM [at] hh:mm A')}
-                />
-              </SFieldWrapper>
-              <SFieldWrapper>
-                <MobileFieldBlock
-                  id="startsAt"
-                  type="date"
-                  value={post.startsAt}
-                  onChange={handleItemChange}
-                  formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
-                  formattedDescription={formatStartsAt()
-                    .format('DD MMM [at] hh:mm A')}
-                />
-              </SFieldWrapper>
-            </SListWrapper>
-            <SSeparator />
-            {tab === 'multiple-choice' && (
-              <SMobileFieldWrapper>
-                <MobileField
-                  id="allowSuggestions"
-                  type="toggle"
-                  value={multiplechoice.options.allowSuggestions}
-                  onChange={handleItemChange}
-                />
-              </SMobileFieldWrapper>
+            {!isMobile && tab === 'multiple-choice' && (
+              <SItemWrapper>
+                <TabletFieldWrapper>
+                  <STabletBlockSubTitle variant={3} weight={600}>
+                    {t('secondStep.block.subTitle.votesInfo')}
+                  </STabletBlockSubTitle>
+                </TabletFieldWrapper>
+              </SItemWrapper>
             )}
-            <MobileField
-              id="comments"
-              type="toggle"
-              value={post.options.commentsEnabled}
-              onChange={handleItemChange}
-            />
+            {isMobile ? getAdvancedPart() : (
+              <SItemWrapper>
+                <TabletFieldWrapper>
+                  <STabletBlockTitle variant={1} weight={700}>
+                    {t('secondStep.block.title.advanced')}
+                  </STabletBlockTitle>
+                  {getAdvancedPart()}
+                </TabletFieldWrapper>
+              </SItemWrapper>
+            )}
+            {isMobile ? (
+              <SButtonWrapper>
+                <SButtonContent>
+                  <SButton
+                    view="primaryGrad"
+                    onClick={handleSubmit}
+                    disabled={disabled}
+                  >
+                    {t('secondStep.button.preview')}
+                  </SButton>
+                </SButtonContent>
+              </SButtonWrapper>
+            ) : (
+              <SItemWrapper>
+                <STabletButtonsWrapper>
+                  <div>
+                    <SButton
+                      view="secondary"
+                      onClick={handleCloseClick}
+                    >
+                      {t('secondStep.button.cancel')}
+                    </SButton>
+                  </div>
+                  <div>
+                    <SButton
+                      view="primaryGrad"
+                      onClick={handleSubmit}
+                      disabled={disabled}
+                    >
+                      {t('secondStep.button.preview')}
+                    </SButton>
+                  </div>
+                </STabletButtonsWrapper>
+              </SItemWrapper>
+            )}
           </SLeftPart>
         </SContent>
       </div>
-      {isMobile && (
-        <SButtonWrapper>
-          <SButtonContent>
-            <SButton
-              view="primaryGrad"
-              onClick={handleSubmit}
-              disabled={disabled}
-            >
-              {t('secondStep.button.preview')}
-            </SButton>
-          </SButtonContent>
-        </SButtonWrapper>
-      )}
     </>
   );
 };
@@ -422,6 +592,7 @@ const SContent = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
+    margin-top: 0;
     flex-direction: column;
   }
 `;
@@ -442,16 +613,32 @@ const STabsWrapper = styled.div`
   justify-content: center;
 
   ${({ theme }) => theme.media.tablet} {
-    padding: 18px 0;
+    padding: 24px 0;
   }
 
   ${({ theme }) => theme.media.laptop} {
+    padding: 40px 0;
     justify-content: flex-start;
   }
 `;
 
-const SItemWrapper = styled.div`
-  margin-top: 16px;
+interface ISItemWrapper {
+  noMargin?: boolean;
+}
+
+const SItemWrapper = styled.div<ISItemWrapper>`
+  margin-top: ${(props) => (props.noMargin ? 0 : 16)}px;
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-top: ${(props) => (props.noMargin ? 0 : 24)}px;
+  }
+`;
+
+const TabletFieldWrapper = styled.div`
+  border: 1px solid ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+  padding: 23px;
+  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+  border-radius: 16px;
 `;
 
 interface ISSeparator {
@@ -467,6 +654,10 @@ const SSeparator = styled.div<ISSeparator>`
 const SButton = styled(Button)`
   width: 100%;
   padding: 16px 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 12px 24px;
+  }
 
   &:disabled {
     cursor: default;
@@ -528,3 +719,20 @@ const SCloseIconWrapper = styled.div`
   position: absolute;
   transform: translateY(-50%);
 `;
+
+const STabletButtonsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  justify-content: space-between;
+`;
+
+const STabletBlockTitle = styled(Caption)`
+  margin-bottom: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
+`;
+
+const STabletBlockSubTitle = styled(Text)``;

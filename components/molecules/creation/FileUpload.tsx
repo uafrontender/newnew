@@ -9,11 +9,10 @@ import { useTranslation } from 'next-i18next';
 
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
+import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
-import ThumbnailPreview from './ThumbnailPreview';
 import ThumbnailPreviewEdit from './ThumbnailPreviewEdit';
 
-import { useAppSelector } from '../../../redux-store/store';
 import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
 
 interface IFileUpload {
@@ -32,20 +31,18 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
   } = props;
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
-  const [showThumbnailPreview, setShowThumbnailPreview] = useState(false);
+  const [showFullPreview, setShowFullPreview] = useState(false);
   const { t } = useTranslation('creation');
   const inputRef: any = useRef();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const handleButtonClick = useCallback(() => {
     inputRef.current?.click();
   }, []);
-  const handlePreviewThumb = useCallback(() => {
-    setShowThumbnailPreview(true);
+  const handleFullPreview = useCallback(() => {
+    setShowFullPreview(true);
   }, []);
-  const handleCloseThumbnailPreviewClick = useCallback(() => {
-    setShowThumbnailPreview(false);
+  const handleCloseFullPreviewClick = useCallback(() => {
+    setShowFullPreview(false);
   }, []);
   const handleEditThumb = useCallback(() => {
     setShowThumbnailEdit(true);
@@ -99,35 +96,23 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
 
   return (
     <SWrapper>
-      {!isMobile && (
-        <STitle variant={1} weight={700}>
-          {t('secondStep.fileUpload.title')}
-        </STitle>
-      )}
-      {isMobile && (
-        <DeleteVideo
-          open={showVideoDelete}
-          handleClose={handleCloseDeleteVideoClick}
-          handleSubmit={handleDeleteVideo}
-        />
-      )}
-      {isMobile && (
-        <ThumbnailPreview
-          open={showThumbnailPreview}
-          value={value}
-          thumbnails={thumbnails}
-          handleClose={handleCloseThumbnailPreviewClick}
-        />
-      )}
-      {isMobile && (
-        <ThumbnailPreviewEdit
-          open={showThumbnailEdit}
-          value={value}
-          thumbnails={thumbnails}
-          handleClose={handleCloseThumbnailEditClick}
-          handleSubmit={handlePreviewEditSubmit}
-        />
-      )}
+      <DeleteVideo
+        open={showVideoDelete}
+        handleClose={handleCloseDeleteVideoClick}
+        handleSubmit={handleDeleteVideo}
+      />
+      <FullPreview
+        open={showFullPreview}
+        value={value}
+        handleClose={handleCloseFullPreviewClick}
+      />
+      <ThumbnailPreviewEdit
+        open={showThumbnailEdit}
+        value={value}
+        thumbnails={thumbnails}
+        handleClose={handleCloseThumbnailEditClick}
+        handleSubmit={handlePreviewEditSubmit}
+      />
       {value ? (
         <SFileBox>
           <input
@@ -153,8 +138,8 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
               </SVideoButton>
             </SButtonsContainerLeft>
             <div>
-              <SVideoButton onClick={handlePreviewThumb}>
-                {t('secondStep.video.previewThumbnail')}
+              <SVideoButton onClick={handleFullPreview}>
+                {t('secondStep.video.previewFull')}
               </SVideoButton>
             </div>
           </SButtonsContainer>
@@ -193,14 +178,6 @@ const SWrapper = styled.div`
   width: 100%;
 `;
 
-const STitle = styled(Caption)`
-  margin-bottom: 8px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 16px;
-  }
-`;
-
 const SDropBox = styled.label`
   width: 100%;
   cursor: copy;
@@ -230,6 +207,15 @@ const SFileBox = styled.div`
   height: 108px;
   display: flex;
   flex-direction: row;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 176px;
+    border: 1px solid ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+    padding: 23px;
+    overflow: hidden;
+    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    border-radius: 16px;
+  }
 `;
 
 const SVideo = styled.video`
