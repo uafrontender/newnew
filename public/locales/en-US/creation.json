@@ -31,9 +31,18 @@
       "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
     },
     "fileUpload": {
-      "title": "Upload file",
       "description": "Max size of the video 100 MB",
       "button": "Select file"
+    },
+    "block": {
+      "title": {
+        "file": "Upload file",
+        "decision": "Decision information",
+        "advanced": "Advanced settings"
+      },
+      "subTitle": {
+        "votesInfo": "All votes start at a $1 dollar by default"
+      }
     },
     "modal": {
       "deleteFile": {
@@ -100,6 +109,13 @@
             "friday": "F",
             "saturday": "S"
           }
+        },
+        "tablet": {
+          "title": "Start date",
+          "type": {
+            "schedule": "Schedule publishing",
+            "right-away": "Right away after I publish my decision"
+          }
         }
       },
       "comments": {
@@ -123,10 +139,15 @@
       },
       "setThumbnail": "Set thumbnail",
       "deleteFile": "Delete file",
-      "previewThumbnail": "Preview thumbnail",
+      "previewFull": "Preview",
       "thumbnail": {
+        "info": "Learn more",
         "title": "Set thumbnail preview",
-        "submit": "Save changes"
+        "submit": "Save changes",
+        "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
+      },
+      "full": {
+        "title": "Video preview"
       }
     }
   },
@@ -136,8 +157,10 @@
       "title-multiple-choice": "Creation | Multiple Choice | Preview",
       "title-crowdfunding": "Creation | Crowdfunding | Preview"
     },
+    "title": "Post preview",
     "button": {
-      "submit": "Publish"
+      "submit": "Publish",
+      "edit": "Edit"
     },
     "settings": {
       "minimalBid": "Minimum bid",
