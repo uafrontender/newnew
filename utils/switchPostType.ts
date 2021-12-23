@@ -1,12 +1,12 @@
 import { newnewapi } from 'newnew-api';
 
-export type postType = 'cf' | 'mc' | 'ac';
+export type TPostType = 'cf' | 'mc' | 'ac';
 
 const switchPostType = (
   post: newnewapi.IPost | newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice,
 ): [
   newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice,
-  postType,
+  TPostType,
 ] => {
   if (!(post as any).postUuid) {
     const postAsPost = post as newnewapi.Post;

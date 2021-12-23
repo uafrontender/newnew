@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
-// import { useCookies } from 'react-cookie';
-import socketIOClient, { Socket } from 'socket.io-client';
+import { useCookies } from 'react-cookie';
+import { Socket, io } from 'socket.io-client';
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_URL ?? '';
 
@@ -8,10 +8,17 @@ export const SocketContext = createContext<Socket>({} as any);
 
 const SocketContextProvider: React.FC = ({ children }) => {
   const [socket, setSocket] = useState({} as Socket);
-  // const [cookies] = useCookies();
+  const [cookies] = useCookies();
 
+  // Will use access token if it is available to connect to socket.io
   useEffect(() => {
-    const socketConnected = socketIOClient(ENDPOINT);
+    const socketConnected = io(ENDPOINT, {
+      ...(cookies.accessToken ? {
+        query: {
+          token: cookies.accessToken,
+        },
+      } : {}),
+    });
     setSocket(() => socketConnected);
 
     function cleanup() {
@@ -19,26 +26,7 @@ const SocketContextProvider: React.FC = ({ children }) => {
     }
 
     return cleanup;
-  }, []);
-
-  // Comment out for now;
-  // Will use access token if it is available to connect to socket.io
-  // useEffect(() => {
-  //   const socketConnected = socketIOClient(ENDPOINT, {
-  //     ...(cookies.accessToken ? {
-  //       query: {
-  //         token: cookies.accessToken,
-  //       },
-  //     } : {}),
-  //   });
-  //   setSocket(() => socketConnected);
-
-  //   function cleanup() {
-  //     socketConnected.disconnect();
-  //   }
-
-  //   return cleanup;
-  // }, [cookies]);
+  }, [cookies]);
 
   return (
     <SocketContext.Provider

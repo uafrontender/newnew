@@ -1,8 +1,36 @@
 {
+  "postType": {
+    "ac": "Auction",
+    "mc": "Multiple Choice",
+    "cf": "Crowdfunding"
+  },
   "expires": {
     "days": "d",
     "hours": "h",
-    "minutes": "m"
+    "minutes": "m",
+    "ended_on": "ended on",
+    "at_time": "at"
+  },
+  "PostTopInfo": {
+    "in_bids": "in bids"
+  },
+  "tabs": {
+    "bids": "Bids",
+    "comments": "Comments",
+    "votes": "Votes"
+  },
+  "BidsTab": {
+    "BidCard": {
+      "by": "by",
+      "bidders": "bidders",
+      "supportBtn": "Support",
+      "placeABidBtn": "Place a bid",
+      "cancelBtn": "Cancel"
+    },
+    "ActionSection": {
+      "suggestionPlaceholder": "Add a suggestion ...",
+      "placeABidBtn": "Place a bid"
+    }
   },
   "RecommendationsSection": {
     "heading": "More like this"

@@ -2,6 +2,8 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 
+import { useAppSelector } from '../../../redux-store/store';
+
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -19,6 +21,8 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
   isMuted,
   handleToggleMuted,
 }) => {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const videoRef = useRef<HTMLVideoElement>();
 
   return (
@@ -40,8 +44,8 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       >
         <InlineSvg
           svg={isMuted ? VolumeOff : VolumeOn}
-          width="24px"
-          height="24px"
+          width={isMobileOrTablet ? '20px' : '24px'}
+          height={isMobileOrTablet ? '20px' : '24px'}
           fill="#FFFFFF"
         />
       </SSoundButton>
@@ -92,11 +96,29 @@ const SVideoWrapper = styled.div`
 
 const SSoundButton = styled(Button)`
   position: absolute;
-  right: 24px;
-  bottom: 24px;
+  right: 16px;
+  bottom: 16px;
 
-  padding: 12px;
-  width: 48px;
-  height: 48px;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
 
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  ${({ theme }) => theme.media.tablet} {
+    right: initial;
+    left: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    right: initial;
+    left: 24px;
+    bottom: 24px;
+
+    padding: 12px;
+    width: 48px;
+    height: 48px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
 `;

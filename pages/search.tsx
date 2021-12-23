@@ -48,7 +48,7 @@ const Search: NextPage<ISearch> = ({
   // Top section/Curated posts
   const [
     topSectionCollection, setTopSectionCollection,
-  ] = useState<newnewapi.Post[]>(top10posts.posts as newnewapi.Post[]);
+  ] = useState<newnewapi.Post[]>(top10posts.posts as newnewapi.Post[] ?? []);
 
   // Searched and sorted posts
   const [collectionLoaded, setCollectionLoaded] = useState<newnewapi.Post[]>([]);
@@ -299,10 +299,12 @@ const Search: NextPage<ISearch> = ({
           {t('search.meta.title')}
         </title>
       </Head>
-      <TopSection
-        collection={topSectionCollection}
-        handlePostClicked={handleOpenPostModal}
-      />
+      {topSectionCollection.length > 0 && (
+        <TopSection
+          collection={topSectionCollection}
+          handlePostClicked={handleOpenPostModal}
+        />
+      )}
       <SWrapper name={router.query.category?.toString() ?? ''}>
         <TitleBlock
           authenticated={loggedIn}
@@ -350,13 +352,15 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   const resTop10 = await fetchCuratedPosts(top10payload);
 
-  if (!resTop10.data?.posts || resTop10.error) {
+  if (resTop10.error) {
     throw new Error('Request failed');
   }
 
   return {
     props: {
-      top10posts: resTop10.data.toJSON(),
+      ...(resTop10.data ? {
+        top10posts: resTop10.data.toJSON(),
+      } : {}),
       ...translationContext,
     },
   };

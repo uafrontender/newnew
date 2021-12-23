@@ -192,8 +192,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   // will fetch only for creators
-  // if (res.data.options?.isCreator && !context.req.url?.startsWith('/_next')) {
-  if (res.data && !context.req.url?.startsWith('/_next')) {
+  if (res.data.options?.isCreator && !context.req.url?.startsWith('/_next')) {
+  // if (res.data && !context.req.url?.startsWith('/_next')) {
     const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
       userUuid: res.data.uuid,
       filter: newnewapi.Post.Filter.ALL,

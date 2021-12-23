@@ -92,7 +92,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         coverUrl: data.me?.coverUrl,
         userUuid: data.me?.userUuid,
         bio: data.me?.bio,
-        options: data.me?.options,
+        options: {
+          isActivityPrivate: data.me?.options?.isActivityPrivate,
+          isCreator: data.me?.options?.isCreator,
+          isVerified: data.me?.options?.isVerified,
+        },
       }));
       // Set credential cookies
       setCookie(
