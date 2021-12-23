@@ -8,13 +8,13 @@ import InlineSvg from '../atoms/InlineSVG';
 // Icons
 import BackButtonIcon from '../../public/images/svg/auth/icon-back.svg';
 
-interface IGoBackButton {
+type TGoBackButton = {
   children?: React.ReactNode;
   defer?: number;
   onClick: () => void;
-}
+} & React.ComponentPropsWithoutRef<'button'>;
 
-const GoBackButton: React.FunctionComponent<IGoBackButton> = ({
+const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
   children,
   defer,
   onClick,

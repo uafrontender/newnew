@@ -53,8 +53,6 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
 
-        console.log(res);
-
         const { data } = res!!;
 
         if (
@@ -70,7 +68,11 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
           bio: data.me?.bio,
-          options: data.me?.options,
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+          },
         }));
         // Set credential cookies
         setCookie(

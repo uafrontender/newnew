@@ -25,7 +25,7 @@ import { EnhancedStoreWithPersistor, wrapper } from '../redux-store/store';
 import isBrowser from '../utils/isBrowser';
 
 // Socket context
-// import SocketContextProvider from '../contexts/socketContext';
+import SocketContextProvider from '../contexts/socketContext';
 
 // Global Cookies instance
 import { cookiesInstance } from '../api/apiConfigs';
@@ -86,25 +86,25 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider
         cookies={cookiesInstance}
       >
-        {/* <SocketContextProvider> */}
-        <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
-          <ResizeMode>
-            <GlobalTheme>
-              <div>
-                <ToastContainer />
-                {!pageProps.error ? (
-                  getLayout(<Component {...pageProps} />)
-                ) : (
-                  <Error
-                    errorMsg={pageProps.error?.message}
-                    statusCode={pageProps.error?.statusCode ?? 500}
-                  />
-                )}
-              </div>
-            </GlobalTheme>
-          </ResizeMode>
-        </PersistGate>
-        {/* </SocketContextProvider> */}
+        <SocketContextProvider>
+          <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
+            <ResizeMode>
+              <GlobalTheme>
+                <div>
+                  <ToastContainer />
+                  {!pageProps.error ? (
+                    getLayout(<Component {...pageProps} />)
+                  ) : (
+                    <Error
+                      errorMsg={pageProps.error?.message}
+                      statusCode={pageProps.error?.statusCode ?? 500}
+                    />
+                  )}
+                </div>
+              </GlobalTheme>
+            </ResizeMode>
+          </PersistGate>
+        </SocketContextProvider>
       </CookiesProvider>
     </>
   );
