@@ -124,11 +124,11 @@ const SCalendarField = styled.div`
 `;
 
 const SCalendarInput = styled(SCalendarField)`
-  width: 60%;
+  width: 65%;
 `;
 
 const STimeInput = styled.div`
-  width: 40%;
+  width: 35%;
 `;
 
 const SCalendarLabel = styled(Text)``;
