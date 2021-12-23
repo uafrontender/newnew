@@ -66,8 +66,8 @@ export const TopSection: React.FC<ITopSection> = ({
 
     if (to < 0) {
       scrollTo = 0;
-    } else if (scrollTo > collection.length - 1) {
-      scrollTo = collection.length - 1;
+    } else if (scrollTo > (collection?.length || 0) - 1) {
+      scrollTo = (collection?.length || 0) - 1;
     }
 
     scroller.scrollTo(`top-section-${scrollTo}`, {
@@ -140,7 +140,7 @@ export const TopSection: React.FC<ITopSection> = ({
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem < collection.length - 1);
+    setCanScrollRight(visibleListItem < (collection?.length || 0) - 1);
   }, [visibleListItem, collection]);
 
   return (
@@ -167,7 +167,7 @@ export const TopSection: React.FC<ITopSection> = ({
           onMouseMove={mouseMoveHandler}
           onMouseLeave={mouseUpHandler}
         >
-          {collection.map(renderItem)}
+          {collection?.map(renderItem)}
         </SListWrapper>
         {!isDragging && canScrollLeft && (
           <ScrollArrow

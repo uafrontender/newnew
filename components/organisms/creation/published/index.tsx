@@ -10,6 +10,7 @@ import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 
+import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
 import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
@@ -17,7 +18,6 @@ import tiktokIcon from '../../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../../public/images/svg/icons/socials/Instagram.svg';
-import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -84,7 +84,6 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     <>
       <SContent>
         <SVideo
-          loop
           autoPlay
           src={post.announcementVideoUrl}
         />
