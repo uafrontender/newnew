@@ -35,7 +35,8 @@ import isImage from '../../utils/isImage';
 import getCroppedImg from '../../utils/cropImage';
 import ProfileImageCropper from '../molecules/profile/ProfileImageCropper';
 import ProfileImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
-import { updateMe, validateEditProfileTextFields } from '../../api/endpoints/user';
+import { updateMe, validateUsernameTextField } from '../../api/endpoints/user';
+import { validateText } from '../../api/endpoints/infrastructure';
 import { getImageUploadUrl } from '../../api/endpoints/upload';
 import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper';
 
@@ -63,7 +64,8 @@ type TFormErrors = {
   bioError?: string;
 };
 
-const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
+const errorSwitch = (
+  status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
 
   switch (status) {
@@ -75,15 +77,40 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       errorMsg = 'tooShort';
       break;
     }
-    case newnewapi.ValidateTextResponse.Status.INVALID_CHARACTER: {
-      errorMsg = 'invalidChar';
-      break;
-    }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
       errorMsg = 'innappropriate';
       break;
     }
-    case newnewapi.ValidateTextResponse.Status.USERNAME_TAKEN: {
+    default: {
+      break;
+    }
+  }
+
+  return errorMsg;
+};
+
+const errorSwitchUsername = (
+  status: newnewapi.ValidateUsernameResponse.Status) => {
+  let errorMsg = 'generic';
+
+  switch (status) {
+    case newnewapi.ValidateUsernameResponse.Status.TOO_LONG: {
+      errorMsg = 'tooLong';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.TOO_SHORT: {
+      errorMsg = 'tooShort';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.INVALID_CHARACTER: {
+      errorMsg = 'invalidChar';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
+      errorMsg = 'innappropriate';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
       errorMsg = 'taken';
       break;
     }
@@ -128,6 +155,56 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     bioError: '',
   });
 
+  const validateUsernameViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateUsernameRequest({
+        username: text,
+      });
+
+      const res = await validateUsernameTextField(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+      if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
+        setFormErrors((errors) => {
+          const errorsWorking = { ...errors };
+          errorsWorking.usernameError = errorSwitchUsername(res.data?.status!!);
+          return errorsWorking;
+        });
+      } else {
+        setFormErrors((errors) => {
+          const errorsWorking = { ...errors };
+          errorsWorking.usernameError = '';
+          return errorsWorking;
+        });
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
+    }
+  }, [setFormErrors, dispatch]);
+
+  const validateUsernameViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateUsernameViaAPI(text);
+  }, 250),
+  [validateUsernameViaAPI]);
+
   const validateTextViaAPI = useCallback(async (
     kind: newnewapi.ValidateTextRequest.Kind,
     text: string,
@@ -139,13 +216,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         text,
       });
 
-      const res = await validateEditProfileTextFields(
+      const res = await validateText(
         payload,
       );
 
       if (!res.data?.status) throw new Error('An error occured');
 
-      if (kind === newnewapi.ValidateTextRequest.Kind.NICKNAME) {
+      if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -159,21 +236,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             return errorsWorking;
           });
         }
-      } else if (kind === newnewapi.ValidateTextRequest.Kind.USERNAME) {
-        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.usernameError = errorSwitch(res.data?.status!!);
-            return errorsWorking;
-          });
-        } else {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.usernameError = '';
-            return errorsWorking;
-          });
-        }
-      } else if (kind === newnewapi.ValidateTextRequest.Kind.BIO) {
+      } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
         if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
@@ -224,24 +287,25 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
     if (key === 'nickname') {
       validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.NICKNAME,
+        newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
         value,
       );
     } else if (key === 'username' && value !== user.userData?.username) {
-      validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.USERNAME,
+      validateUsernameViaAPIDebounced(
         value,
       );
     } else if (key === 'bio') {
       validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.BIO,
+        newnewapi.ValidateTextRequest.Kind.USER_BIO,
         value,
       );
     }
   },
   [
     dataInEdit, user.userData?.username,
-    setDataInEdit, validateTextViaAPIDebounced, setIsDataValid,
+    setDataInEdit, validateTextViaAPIDebounced,
+    validateUsernameViaAPIDebounced,
+    setIsDataValid,
   ]);
 
   // Cover image
