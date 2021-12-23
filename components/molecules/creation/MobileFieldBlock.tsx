@@ -20,6 +20,8 @@ import TimePicker from './TimePicker';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
+import { DAYS } from '../../../constants/general';
+
 interface IMobileFieldBlock {
   id: string;
   type?: 'input' | 'select' | 'date' | '';
@@ -130,32 +132,9 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
           title: t('secondStep.field.startsAt.modal.hours-format.pm'),
         },
       ];
-      const days = [
-        {
-          id: 'sunday',
-        },
-        {
-          id: 'monday',
-        },
-        {
-          id: 'tuesday',
-        },
-        {
-          id: 'wednesday',
-        },
-        {
-          id: 'thursday',
-        },
-        {
-          id: 'friday',
-        },
-        {
-          id: 'saturday',
-        },
-      ];
       const renderDay = (el: any) => (
-        <SDay key={el.id} variant={1} weight={500}>
-          {t(`secondStep.field.startsAt.modal.days.${el.id}`)}
+        <SDay key={el.value} variant={1} weight={500}>
+          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
         </SDay>
       );
       const handleScheduleChange = (selectedId: string) => {
@@ -209,7 +188,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
                 />
               </SModalToggleWrapper>
               <SCustomDays>
-                {days.map(renderDay)}
+                {DAYS.map(renderDay)}
               </SCustomDays>
               <SSeparator />
               <SCalendarWrapper>

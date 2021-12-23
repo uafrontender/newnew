@@ -16,7 +16,7 @@ const isSameDate = (firstDate: moment.Moment, secondDate: Date) => (
 const isDisabled = (minDate: Date, currentDate: moment.Moment, maxDate: Date) => {
   const min = moment(moment(minDate)
     .format('DD/MM/YYYY'), 'DD/MM/YYYY');
-  const max = moment(moment(maxDate)
+  const max = moment(moment(maxDate || currentDate)
     .format('DD/MM/YYYY'), 'DD/MM/YYYY');
   const current = moment(moment(currentDate)
     .format('DD/MM/YYYY'), 'DD/MM/YYYY');
@@ -149,6 +149,7 @@ const SMonthHeader = styled(Text)`
 export const RenderSingleDay = (props: any) => {
   const {
     i,
+    view,
     isActive,
     handleClick,
     currentValue,
@@ -162,7 +163,7 @@ export const RenderSingleDay = (props: any) => {
     <SDayHolder key={i}>
       <SDay
         weight={isActive ? 600 : 500}
-        variant={1}
+        variant={view === 'sm' ? 2 : 1}
         onClick={onClick}
         isActive={isActive}
         isDisabled={_isDisabled}
@@ -192,18 +193,23 @@ interface ISDay {
 const SDay = styled(Text)<ISDay>`
   width: 44px;
   color: ${(props) => (props.isActive ? props.theme.colors.white : `${props.isDisabled ? props.theme.colorsThemed.text.tertiary : props.theme.colorsThemed.text.primary}`)};
-  cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
+  cursor: ${(props) => ((props.isDisabled || props.isActive) ? 'not-allowed' : 'pointer')};
   height: 44px;
   display: inline-block;
   background: ${(props) => (props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent')};
   line-height: 46px;
   border-radius: 22px;
   pointer-events: ${(props) => ((props.isDisabled || props.isActive) ? 'none' : 'unset')};
+
+  :hover {
+    background: ${(props) => (props.isActive ? props.theme.colorsThemed.accent.blue : props.theme.colorsThemed.background.quaternary)};
+  }
 `;
 
 export const RenderDays = (props: any) => {
   const {
     date,
+    view = 'md',
     minDate,
     maxDate,
     selectedDate,
@@ -221,6 +227,7 @@ export const RenderDays = (props: any) => {
       elements.push(
         <RenderSingleDay
           key={i}
+          view={view}
           isActive={isSameDate(now.clone(), selectedDate)}
           isDisabled={isDisabled(minDate, now.clone(), maxDate)}
           handleClick={handleSelect}
@@ -239,6 +246,7 @@ export const RenderDays = (props: any) => {
     }
     return elements;
   };
+
   return (
     <SList>
       {renderUnwantedDay(balanceDayCount)}

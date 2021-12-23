@@ -1,15 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import moment from 'moment';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
 
-import Text from '../../atoms/Text';
 import CheckBox from '../CheckBox';
-import InlineSVG from '../../atoms/InlineSVG';
 import TimePicker from '../../atoms/creation/TimePicker';
+import CalendarPicker from '../../atoms/creation/calendar/Simple';
 import AnimatedPresence, { TAnimation } from '../../atoms/AnimatedPresence';
-
-import calendarIcon from '../../../public/images/svg/icons/filled/Calendar.svg';
 
 interface ITabletStartDate {
   id: string;
@@ -23,7 +20,6 @@ export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
     value,
     onChange,
   } = props;
-  const theme = useTheme();
   const { t } = useTranslation('creation');
   const [animate, setAnimate] = useState(value.type === 'schedule');
   const [animation, setAnimation] = useState('o-12');
@@ -34,8 +30,21 @@ export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const handleTimeChange = useCallback((key, time: any) => {
     onChange(id, { [key]: time });
   }, [id, onChange]);
+  const handleDateChange = useCallback((date: any) => {
+    onChange(id, { date });
+  }, [id, onChange]);
   const handleTypeChange = useCallback((e, type) => {
-    onChange(id, { type });
+    const changeBody: any = { type };
+    if (type === 'right-away') {
+      changeBody.date = moment()
+        .format();
+      changeBody.time = moment()
+        .format('hh:mm');
+      changeBody['hours-format'] = moment()
+        .format('a');
+    }
+
+    onChange(id, changeBody);
     setAnimate(true);
     setAnimation(type === 'schedule' ? 'o-12' : 'o-12-reverse');
   }, [id, onChange]);
@@ -63,15 +72,9 @@ export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       >
         <SCalendarWrapper>
           <SCalendarInput>
-            <SCalendarLabel variant={2} weight={500}>
-              {moment(value?.date)
-                .format('DD MMMM')}
-            </SCalendarLabel>
-            <InlineSVG
-              svg={calendarIcon}
-              fill={theme.colorsThemed.text.secondary}
-              width="24px"
-              height="24px"
+            <CalendarPicker
+              date={value?.date}
+              onChange={handleDateChange}
             />
           </SCalendarInput>
           <STimeInput>
@@ -106,29 +109,10 @@ const SCalendarWrapper = styled.div`
   margin-top: 16px;
 `;
 
-const SCalendarField = styled.div`
-  width: 60%;
-  cursor: pointer;
-  display: flex;
-  padding: 12px 20px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
-  align-items: center;
-  border-radius: 16px;
-  justify-content: space-between;
-
-  transition: .2s linear;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
-  }
-`;
-
-const SCalendarInput = styled(SCalendarField)`
+const SCalendarInput = styled.div`
   width: 65%;
 `;
 
 const STimeInput = styled.div`
   width: 35%;
 `;
-
-const SCalendarLabel = styled(Text)``;

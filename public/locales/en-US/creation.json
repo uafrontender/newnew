@@ -157,8 +157,10 @@
       "title-multiple-choice": "Creation | Multiple Choice | Preview",
       "title-crowdfunding": "Creation | Crowdfunding | Preview"
     },
+    "title": "Post preview",
     "button": {
-      "submit": "Publish"
+      "submit": "Publish",
+      "edit": "Edit"
     },
     "settings": {
       "minimalBid": "Minimum bid",

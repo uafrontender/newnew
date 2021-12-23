@@ -318,4 +318,27 @@ module.exports = {
       value: 'pm',
     },
   ],
+  DAYS: [
+    {
+      value: 'sunday',
+    },
+    {
+      value: 'monday',
+    },
+    {
+      value: 'tuesday',
+    },
+    {
+      value: 'wednesday',
+    },
+    {
+      value: 'thursday',
+    },
+    {
+      value: 'friday',
+    },
+    {
+      value: 'saturday',
+    },
+  ],
 };

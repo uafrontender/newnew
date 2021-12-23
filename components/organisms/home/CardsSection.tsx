@@ -319,14 +319,14 @@ const SListWrapper = styled.div`
   overflow-x: auto;
   flex-direction: column;
 
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
   ${(props) => props.theme.media.tablet} {
     left: -32px;
     padding: 24px 24px 0 24px;
     flex-direction: row;
-
-    ::-webkit-scrollbar {
-      display: none;
-    }
   }
 
   ${(props) => props.theme.media.laptop} {

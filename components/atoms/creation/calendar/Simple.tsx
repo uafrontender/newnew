@@ -1,270 +1,308 @@
-import React from 'react';
+import React, {
+  useRef,
+  useState,
+  useCallback, useEffect,
+} from 'react';
 import moment from 'moment';
-import styled from 'styled-components';
+import { scroller } from 'react-scroll';
+import { useTranslation } from 'next-i18next';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../../Text';
+import InlineSVG from '../../InlineSVG';
+import { RenderDays } from './ScrollableVertically';
+import AnimatedPresence, { TAnimation } from '../../AnimatedPresence';
 
-const isSameDate = (firstDate: moment.Moment, secondDate: Date) => (
-  moment(firstDate, 'DD/MM/YYYY')
-    .diff(
-      moment(secondDate, 'DD/MM/YYYY'),
-      'days',
-      false,
-    ) === 0
-);
+import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
+import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
+import useDropDownDirection from '../../../../utils/hooks/useDropDownDirection';
 
-const isDisabled = (minDate: Date, currentDate: moment.Moment, maxDate: Date) => {
-  const min = moment(moment(minDate)
-    .format('DD/MM/YYYY'), 'DD/MM/YYYY');
-  const max = moment(moment(maxDate)
-    .format('DD/MM/YYYY'), 'DD/MM/YYYY');
-  const current = moment(moment(currentDate)
-    .format('DD/MM/YYYY'), 'DD/MM/YYYY');
-  return !(min <= current && current <= max);
-};
+import chevronLeft from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import chevronRight from '../../../../public/images/svg/icons/outlined/ChevronRight.svg';
+import calendarIcon from '../../../../public/images/svg/icons/filled/Calendar.svg';
+
+import { DAYS } from '../../../../constants/general';
 
 interface ICalendarSimple {
-  minDate: any,
-  maxDate: any,
-  onSelect: (value: any) => void,
-  selectedDate?: any | null,
+  date: any;
+  onChange: (date: any) => void;
 }
 
 export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   const {
-    minDate,
-    maxDate,
-    onSelect,
-    selectedDate,
+    date,
+    onChange,
   } = props;
+  const monthsToRender = [
+    moment()
+      .startOf('month'),
+    moment()
+      .startOf('month')
+      .add(1, 'month'),
+  ];
 
-  const handleSelectedDate = (e: any, value: any) => {
+  const theme = useTheme();
+  const { t } = useTranslation('creation');
+  const wrapperRef: any = useRef();
+  const [open, setOpen] = useState(false);
+  const [animate, setAnimate] = useState(false);
+  const [animation, setAnimation] = useState('o-12');
+  const [visibleMonth, setVisibleMonth] = useState(monthsToRender.findIndex((m) => m.format('M') === moment(date)
+    .format('M')));
+  const direction = useDropDownDirection(wrapperRef, 400);
+
+  const hasPrevMonth = visibleMonth !== 0;
+  const hasNextMonth = visibleMonth < monthsToRender.length - 1;
+
+  const handleClick = useCallback(() => {
+    setAnimation('o-12');
+    setAnimate(true);
+    setOpen(true);
+  }, []);
+  const handleClose = useCallback(() => {
+    setAnimation('o-12-reversed');
+    setAnimate(true);
+    setOpen(false);
+  }, []);
+  const handleAnimationEnd = useCallback(() => {
+    setAnimate(false);
+  }, []);
+  const handleChange = useCallback((e: any, value: any) => {
     if (e) {
       e.preventDefault();
     }
+    onChange(value.format());
+  }, [onChange]);
+  const handlePrevMonth = useCallback(() => {
+    setVisibleMonth(visibleMonth - 1);
+  }, [visibleMonth]);
+  const handleNextMonth = useCallback(() => {
+    setVisibleMonth(visibleMonth + 1);
+  }, [visibleMonth]);
+  const renderDay = useCallback((el: any) => (
+    <SDay key={el.value}>
+      <SDayLabel variant={2} weight={500}>
+        {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+      </SDayLabel>
+    </SDay>
+  ), [t]);
+  const renderMonth = useCallback((el, index) => {
+    const opts: any = {
+      date: el,
+    };
 
-    if (onSelect) {
-      onSelect(value);
+    if (el === 0) {
+      opts.minDate = moment()
+        .startOf('day');
     }
-  };
+
+    return (
+      <SDaysListItem
+        id={`month-item-${index}`}
+        key={`month-list-${el}`}
+      >
+        <RenderDays
+          view="sm"
+          selectedDate={moment(date)
+            .startOf('day')}
+          handleSelect={handleChange}
+          {...opts}
+        />
+      </SDaysListItem>
+    );
+  }, [date, handleChange]);
+
+  useOnClickEsc(wrapperRef, handleClose);
+  useOnClickOutside(wrapperRef, handleClose);
+
+  useEffect(() => {
+    console.log(visibleMonth);
+    scroller.scrollTo(`month-item-${visibleMonth}`, {
+      offset: 0,
+      smooth: 'easeInOutQuart',
+      duration: 500,
+      horizontal: true,
+      containerId: 'monthsContainer',
+    });
+  }, [visibleMonth]);
 
   return (
-    <RenderCalendarYear
-      minDate={minDate}
-      maxDate={maxDate}
-      selectedDate={selectedDate}
-      handleSelect={handleSelectedDate}
-    />
+    <SWrapper ref={wrapperRef}>
+      <SContainer
+        onClick={open ? handleClose : handleClick}
+      >
+        <SCalendarLabel variant={2} weight={500}>
+          {moment(date)
+            .format('DD MMMM')}
+        </SCalendarLabel>
+        <InlineSVG
+          svg={calendarIcon}
+          fill={theme.colorsThemed.text.secondary}
+          width="24px"
+          height="24px"
+        />
+      </SContainer>
+      <AnimatedPresence
+        start={animate}
+        animation={animation as TAnimation}
+        onAnimationEnd={handleAnimationEnd}
+        animateWhenInView={false}
+      >
+        <SListHolder direction={direction}>
+          <STopLine>
+            <SInlineSVGWrapper
+              onClick={handlePrevMonth}
+              disabled={!hasPrevMonth}
+            >
+              {hasPrevMonth && (
+                <InlineSVG
+                  svg={chevronLeft}
+                  fill={theme.colorsThemed.text.secondary}
+                  width="20px"
+                  height="20px"
+                />
+              )}
+            </SInlineSVGWrapper>
+            <SMonth variant={2} weight={600}>
+              {
+                moment()
+                  .add(visibleMonth, 'month')
+                  .format('MMMM, YYYY')
+              }
+            </SMonth>
+            <SInlineSVGWrapper
+              onClick={handleNextMonth}
+              disabled={!hasNextMonth}
+            >
+              {hasNextMonth && (
+                <InlineSVG
+                  svg={chevronRight}
+                  fill={theme.colorsThemed.text.secondary}
+                  width="20px"
+                  height="20px"
+                />
+              )}
+            </SInlineSVGWrapper>
+          </STopLine>
+          <SDays>
+            {DAYS.map(renderDay)}
+          </SDays>
+          <SDaysList id="monthsContainer">
+            {monthsToRender.map(renderMonth)}
+          </SDaysList>
+        </SListHolder>
+      </AnimatedPresence>
+    </SWrapper>
   );
-};
-
-CalendarSimple.defaultProps = {
-  selectedDate: null,
 };
 
 export default CalendarSimple;
 
-export const RenderCalendarYear = (props: any) => {
-  const {
-    minDate,
-    maxDate,
-  } = props;
-  const totalMonth = Math.round(maxDate.diff(minDate, 'months', true)) + 1;
-  const elements = [];
-  let now = moment(minDate, 'DD/MMM/YYYY');
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < totalMonth; i++) {
-    elements.push(
-      <RenderMonthCard key={i} currentMonth={now.clone()} {...props} />,
-    );
-    now = now.add(1, 'M');
-  }
-  return (
-    <SContent>
-      {elements}
-    </SContent>
-  );
-};
-
-const SContent = styled.div`
+const SWrapper = styled.div`
   width: 100%;
-  color: #53576d;
-
-  :before,
-  :after {
-    content: " ";
-    display: table;
-  }
-
-  :after {
-    clear: both;
-  }
+  position: relative;
 `;
 
-export const RenderMonthCard = (props: any) => {
-  const { currentMonth } = props;
-  return (
-    <SMonth id={currentMonth.format('MMMM-YYYY')}>
-      <RenderMonthHeader date={currentMonth} {...props} />
-      <RenderDays date={currentMonth} {...props} />
-    </SMonth>
-  );
-};
-
-const SMonth = styled.section`
+const SContainer = styled.div`
   width: 100%;
-  margin-bottom: 16px;
-
-  &:first-child {
-    padding-top: 24px;
-  }
-
-  :before,
-  :after {
-    content: " ";
-    display: table;
-  }
-
-  :after {
-    clear: both;
-  }
-`;
-
-export const RenderMonthHeader = (props: any) => {
-  const { date } = props;
-  const month = date.format('MMMM');
-  const year = date.format('YYYY');
-  return (
-    <SMonthHeader variant={1} weight={600}>
-      {`${month}, ${year}`}
-    </SMonthHeader>
-  );
-};
-
-const SMonthHeader = styled(Text)`
-  text-align: center;
-  margin-bottom: 16px;
-`;
-
-export const RenderSingleDay = (props: any) => {
-  const {
-    i,
-    isActive,
-    handleClick,
-    currentValue,
-    isDisabled: _isDisabled,
-  } = props;
-  const onClick = (e: any) => {
-    handleClick(e, currentValue);
-  };
-
-  return (
-    <SDayHolder key={i}>
-      <SDay
-        weight={isActive ? 600 : 500}
-        variant={1}
-        onClick={onClick}
-        isActive={isActive}
-        isDisabled={_isDisabled}
-      >
-        {currentValue.date()}
-      </SDay>
-    </SDayHolder>
-  );
-};
-
-const SDayHolder = styled.li`
-  width: 14.28%;
-  float: left;
+  cursor: pointer;
   display: flex;
-  min-height: 44px;
-  text-align: center;
+  padding: 12px 20px;
+  background: ${(props) => props.theme.colorsThemed.background.tertiary};
   align-items: center;
-  border-radius: 50%;
+  border-radius: 16px;
+  justify-content: space-between;
+
+  transition: .2s linear;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+  }
+`;
+
+const SCalendarLabel = styled(Text)``;
+
+interface ISListHolder {
+  direction: string;
+}
+
+const SListHolder = styled.div<ISListHolder>`
+  left: 0;
+  width: 356px;
+  padding: 24px;
+  z-index: 5;
+  display: flex;
+  overflow: hidden;
+  position: absolute;
+  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  border-radius: 16px;
+  flex-direction: column;
+
+  ${(props) => {
+    if (props.direction === 'down') {
+      return css`
+        top: 54px;
+      `;
+    }
+
+    return css`
+      bottom: 54px;
+    `;
+  }}
+`;
+
+const STopLine = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const SMonth = styled(Text)``;
+
+const SDays = styled.div`
+  width: 100%;
+  display: flex;
+  margin-top: 16px;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const SDay = styled.div`
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
   justify-content: center;
 `;
 
-interface ISDay {
-  isActive: boolean;
-  isDisabled: boolean;
+const SDayLabel = styled(Text)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+interface ISInlineSVGWrapper {
+  disabled: boolean;
 }
 
-const SDay = styled(Text)<ISDay>`
-  width: 44px;
-  color: ${(props) => (props.isActive ? props.theme.colors.white : `${props.isDisabled ? props.theme.colorsThemed.text.tertiary : props.theme.colorsThemed.text.primary}`)};
-  cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
-  height: 44px;
-  display: inline-block;
-  background: ${(props) => (props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent')};
-  line-height: 46px;
-  border-radius: 22px;
-  pointer-events: ${(props) => ((props.isDisabled || props.isActive) ? 'none' : 'unset')};
+const SInlineSVGWrapper = styled.div<ISInlineSVGWrapper>`
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ${(props) => props.disabled && css`
+    pointer-events: none;
+  `}
 `;
 
-export const RenderDays = (props: any) => {
-  const {
-    date,
-    minDate,
-    maxDate,
-    selectedDate,
-    handleSelect,
-  } = props;
-  const startDate = date.startOf('month');
-  const daysInMonth = date.daysInMonth();
-  const balanceDayCount = startDate.day();
-
-  const renderDay = () => {
-    const elements = [];
-    let now = moment(date, 'DD/MMM/YYYY');
-    // eslint-disable-next-line no-plusplus
-    for (let i = 1; i <= daysInMonth; i++) {
-      elements.push(
-        <RenderSingleDay
-          key={i}
-          isActive={isSameDate(now.clone(), selectedDate)}
-          isDisabled={isDisabled(minDate, now.clone(), maxDate)}
-          handleClick={handleSelect}
-          currentValue={now.clone()}
-        />,
-      );
-      now = now.add(1, 'days');
-    }
-    return elements;
-  };
-  const renderUnwantedDay = (count: number) => {
-    const elements = [];
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < count; i++) {
-      elements.push(<SUnwantedDays key={i} />);
-    }
-    return elements;
-  };
-  return (
-    <SList>
-      {renderUnwantedDay(balanceDayCount)}
-      {renderDay()}
-    </SList>
-  );
-};
-
-const SList = styled.ul`
-  list-style: none;
-  padding-left: 0;
-
-  :before,
-  :after {
-    content: " ";
-    display: table;
-  }
-
-  :after {
-    clear: both;
-  }
+const SDaysList = styled.div`
+  display: flex;
+  overflow-x: hidden;
+  flex-direction: row;
 `;
 
-const SUnwantedDays = styled.li`
-  float: left;
-  width: 14.28%;
-  min-height: 44px;
-  text-align: center;
+const SDaysListItem = styled.div`
+  min-width: 308px;
 `;
