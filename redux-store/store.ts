@@ -39,6 +39,7 @@ const uiPersistConfig = {
   storage,
   whitelist: [
     'colorMode',
+    'mutedMode',
   ],
 };
 

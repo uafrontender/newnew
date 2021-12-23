@@ -17,7 +17,7 @@ import Modal from '../Modal';
 import isBrowser from '../../../utils/isBrowser';
 import PostViewMC from './PostViewMC';
 import Headline from '../../atoms/Headline';
-import switchPostType, { postType } from '../../../utils/switchPostType';
+import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import PostViewAC from './PostViewAC';
 import PostViewCF from './PostViewCF';
 import List from '../search/List';
@@ -118,12 +118,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   ]);
 
   const renderPostview = (
-    postToRender: postType,
+    postToRender: TPostType,
   ) => {
     if (postToRender === 'mc') {
       return (
         <PostViewMC
           post={postParsed as newnewapi.MultipleChoice}
+          handleGoBack={() => {
+            window.history.back();
+          }}
         />
       );
     }
@@ -131,6 +134,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewAC
           post={postParsed as newnewapi.Auction}
+          handleGoBack={() => {
+            window.history.back();
+          }}
         />
       );
     }
@@ -138,6 +144,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewCF
           post={postParsed as newnewapi.Crowdfunding}
+          handleGoBack={() => {
+            window.history.back();
+          }}
         />
       );
     }
@@ -231,7 +240,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 collection={recommenedPosts}
                 // collection={[]}
                 wrapperStyle={{
-                  left: 0,
+                  left: '-16px',
                 }}
                 skeletonsBgColor={theme.colorsThemed.background.tertiary}
                 skeletonsHighlightColor={theme.colorsThemed.background.secondary}
@@ -271,6 +280,14 @@ const SPostModalContainer = styled.div`
   height: 100%;
 
   padding: 16px;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
     top: 32px;

@@ -1,39 +1,73 @@
 /* eslint-disable arrow-body-style */
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useCallback } from 'react';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
+import GoBackButton from '../../molecules/GoBackButton';
+import InlineSvg from '../../atoms/InlineSVG';
+
+// Icons
+import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
 
 interface IPostViewMC {
   post: newnewapi.MultipleChoice;
+  handleGoBack: () => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   post,
+  handleGoBack,
 }) => {
-  // NB! Will be moved to Redux
-  const [muted, setMuted] = useState(true);
+  const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const handleToggleMutedMode = useCallback(() => {
+    dispatch(toggleMutedMode(''));
+  }, [dispatch]);
+
   return (
     <SWrapper>
       <SExpiresSection>
+        {isMobile && (
+          <GoBackButton
+            style={{
+              gridArea: 'closeBtnMobile',
+            }}
+            onClick={handleGoBack}
+          />
+        )}
         <PostTimer
-          timestampSeconds={
-            Math.floor((new Date('2021-12-30').getTime() - Date.now()) / 1000)
-            // Temp, because the date was old
-            // new Date((post.expiresAt?.seconds as number) * 1000).getTime() - Date.now()
-          }
+          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+          postType="mc"
         />
+        {!isMobile && (
+          <SGoBackButtonDesktop
+            onClick={handleGoBack}
+          >
+            <InlineSvg
+              svg={CancelIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SGoBackButtonDesktop>
+        )}
       </SExpiresSection>
       <PostVideo
         videoSrc={post.announcement?.videoUrl ?? MockVideo}
-        isMuted={muted}
-        handleToggleMuted={() => setMuted((curr) => !curr)}
+        isMuted={mutedMode}
+        handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTitle>
         { post.title }
@@ -78,4 +112,32 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   grid-area: expires;
 
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: 'closeBtnMobile timer closeBtnDesktop';
+
+  width: 100%;
+
+  margin-bottom: 6px;
+`;
+
+const SGoBackButtonDesktop = styled.button`
+  grid-area: closeBtnDesktop;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  width: 100%;
+  border: transparent;
+  background: transparent;
+  padding: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  cursor: pointer;
 `;
