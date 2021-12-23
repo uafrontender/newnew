@@ -9,13 +9,13 @@ import {
 export const BASE_URL_USER = `${BASE_URL}/user`;
 
 // Own data
-export const validateEditProfileTextFields = (
-  payload: newnewapi.ValidateTextRequest,
+export const validateUsernameTextField = (
+  payload: newnewapi.ValidateUsernameRequest,
 ) => fetchProtobufProtectedIntercepted<
-newnewapi.ValidateTextRequest, newnewapi.ValidateTextResponse>(
-  newnewapi.ValidateTextRequest,
-  newnewapi.ValidateTextResponse,
-  `${BASE_URL_USER}/validate_text`,
+newnewapi.ValidateUsernameRequest, newnewapi.ValidateUsernameResponse>(
+  newnewapi.ValidateUsernameRequest,
+  newnewapi.ValidateUsernameResponse,
+  `${BASE_URL_USER}/validate_username`,
   'post',
   payload,
 );

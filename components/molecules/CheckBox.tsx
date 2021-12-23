@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import Text from '../atoms/Text';
@@ -7,13 +7,15 @@ import Lottie from '../atoms/Lottie';
 import checkBoxAnim from '../../public/animations/checkbox.json';
 
 interface ICheckBox {
+  id?: string;
   label: string;
   selected?: boolean;
-  handleChange: (e: any) => void;
+  handleChange: (e: any, id?: string) => void;
 }
 
 export const CheckBox: React.FC<ICheckBox> = (props) => {
   const {
+    id,
     label,
     selected,
     handleChange,
@@ -21,19 +23,26 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
   } = props;
   const ref: any = useRef();
 
+  const onClick = useCallback((e) => {
+    handleChange(e, id);
+  }, [id, handleChange]);
+
   useEffect(() => {
     ref.current.anim.stop();
 
     if (selected) {
       ref.current.anim.setSegment(0, 23);
-      ref.current.anim.play();
     } else {
       ref.current.anim.setSegment(1, 1);
     }
+    ref.current.anim.play();
   }, [ref, selected]);
 
   return (
-    <SWrapper onClick={handleChange} {...rest}>
+    <SWrapper
+      onClick={onClick}
+      {...rest}
+    >
       <SAnimation>
         <Lottie
           ref={ref}
@@ -56,6 +65,7 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
 export default CheckBox;
 
 CheckBox.defaultProps = {
+  id: '',
   selected: false,
 };
 

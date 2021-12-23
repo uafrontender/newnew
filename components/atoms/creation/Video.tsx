@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 
@@ -14,9 +14,10 @@ import volumeOff from '../../../public/images/svg/icons/filled/VolumeOff.svg';
 interface IVideo {
   src: string;
   play: boolean;
-  loop: boolean;
-  muted: boolean;
-  thumbnails: any;
+  loop?: boolean;
+  muted?: boolean;
+  thumbnails?: any;
+  mutePosition?: string;
 }
 
 export const Video: React.FC<IVideo> = (props) => {
@@ -26,6 +27,7 @@ export const Video: React.FC<IVideo> = (props) => {
     loop,
     muted,
     thumbnails,
+    mutePosition,
   } = props;
   const videoRef: any = useRef();
   const [isMuted, setIsMuted] = useState(muted);
@@ -33,32 +35,33 @@ export const Video: React.FC<IVideo> = (props) => {
 
   const handleVideoProgress = useCallback(() => {
     if (play) {
-      if (videoRef.current.currentTime >= thumbnails.endTime) {
+      if (videoRef.current.currentTime >= thumbnails?.endTime) {
         videoRef.current.pause();
-        videoRef.current.currentTime = thumbnails.startTime;
+        videoRef.current.currentTime = thumbnails?.startTime;
         videoRef.current.play();
       }
     }
   }, [play, thumbnails]);
   const toggleThumbnailVideoMuted = useCallback(() => {
     setIsMuted(!isMuted);
-  }, [isMuted]);
+    videoRef.current.muted = !isMuted;
+  }, [isMuted, videoRef]);
 
   useEffect(() => {
-    if (videoRef?.current) {
+    if (videoRef?.current && thumbnails) {
       videoRef.current.ontimeupdate = handleVideoProgress;
     }
-  }, [handleVideoProgress, videoRef]);
+  }, [handleVideoProgress, thumbnails, videoRef]);
   useEffect(() => {
     if (videoRef?.current) {
       if (play) {
-        videoRef.current.currentTime = thumbnails.startTime;
+        videoRef.current.currentTime = thumbnails?.startTime || 0;
         videoRef.current.play();
       } else {
         videoRef.current.pause();
       }
     }
-  }, [play, videoRef, thumbnails.startTime]);
+  }, [play, videoRef, thumbnails]);
 
   return (
     <SWrapper>
@@ -68,7 +71,7 @@ export const Video: React.FC<IVideo> = (props) => {
         loop={loop}
         muted={isMuted}
       />
-      <SModalSoundIcon>
+      <SModalSoundIcon position={mutePosition}>
         <Button
           iconOnly
           view="transparent"
@@ -76,7 +79,7 @@ export const Video: React.FC<IVideo> = (props) => {
         >
           <InlineSVG
             svg={isMuted ? volumeOff : volumeOn}
-            fill={theme.colorsThemed.text.primary}
+            fill={theme.colors.white}
             width="20px"
             height="20px"
           />
@@ -88,10 +91,17 @@ export const Video: React.FC<IVideo> = (props) => {
 
 export default Video;
 
+Video.defaultProps = {
+  loop: false,
+  muted: false,
+  thumbnails: null,
+  mutePosition: 'right',
+};
+
 const SWrapper = styled.div`
   width: 100%;
-  height: 100%;
   display: flex;
+  position: relative;
   align-items: center;
   justify-content: center;
 `;
@@ -99,10 +109,23 @@ const SWrapper = styled.div`
 const SVideo = styled.video`
   width: 100%;
   height: auto;
+
+  ${({ theme }) => theme.media.mobileL} {
+    overflow: hidden;
+    border-radius: 16px;
+  }
 `;
 
-const SModalSoundIcon = styled.div`
-  right: 16px;
+interface ISModalSoundIcon {
+  position?: string;
+}
+
+const SModalSoundIcon = styled.div<ISModalSoundIcon>`
+  ${(props) => (props.position === 'left' ? css`
+    left: 16px;
+  ` : css`
+    right: 16px;
+  `)}
   bottom: 16px;
   position: absolute;
 
