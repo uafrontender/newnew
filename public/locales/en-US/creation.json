@@ -39,6 +39,9 @@
         "file": "Upload file",
         "decision": "Decision information",
         "advanced": "Advanced settings"
+      },
+      "subTitle": {
+        "votesInfo": "All votes start at a $1 dollar by default"
       }
     },
     "modal": {

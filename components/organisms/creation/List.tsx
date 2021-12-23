@@ -20,7 +20,7 @@ export const List: React.FC<IList> = (props) => {
 
   return (
     <SList>
-      {collection.map(renderItem)}
+      {collection?.map(renderItem)}
     </SList>
   );
 };

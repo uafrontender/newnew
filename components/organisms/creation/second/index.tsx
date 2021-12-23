@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
@@ -519,6 +520,15 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 </TabletFieldWrapper>
               </SItemWrapper>
             )}
+            {!isMobile && tab === 'multiple-choice' && (
+              <SItemWrapper>
+                <TabletFieldWrapper>
+                  <STabletBlockSubTitle variant={3} weight={600}>
+                    {t('secondStep.block.subTitle.votesInfo')}
+                  </STabletBlockSubTitle>
+                </TabletFieldWrapper>
+              </SItemWrapper>
+            )}
             {isMobile ? getAdvancedPart() : (
               <SItemWrapper>
                 <TabletFieldWrapper>
@@ -724,3 +734,5 @@ const STabletBlockTitle = styled(Caption)`
     margin-bottom: 16px;
   }
 `;
+
+const STabletBlockSubTitle = styled(Text)``;

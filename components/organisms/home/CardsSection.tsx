@@ -97,8 +97,8 @@ export const CardsSection: React.FC<ICardSection> = ({
 
     if (to < 0) {
       scrollTo = 0;
-    } else if (scrollTo > collection.length - 1) {
-      scrollTo = collection.length - 1;
+    } else if (scrollTo > (collection?.length || 0) - 1) {
+      scrollTo = (collection?.length || 0) - 1;
     }
 
     scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
