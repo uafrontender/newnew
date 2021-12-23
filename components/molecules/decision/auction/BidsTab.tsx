@@ -147,8 +147,8 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
           />
           <BidAmountTextInput
             value={newBidAmount}
-            inputAlign="center"
-            horizontalPadding="5px"
+            inputAlign="left"
+            horizontalPadding="16px"
             onChange={(newValue: string) => setNewBidAmount(newValue)}
             minAmount={minAmount}
             style={{
@@ -230,7 +230,7 @@ const SActionSection = styled.div`
     bottom: 0;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-    box-shadow: 0px -50px 18px 20px rgba(20, 21, 31, 0.9);
+    box-shadow: 0px -50px 18px 20px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 0.9)' : 'rgba(241, 243, 249, 0.9)')};
   }
 `;
 

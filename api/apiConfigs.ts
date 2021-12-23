@@ -1,5 +1,3 @@
-/* eslint-disable no-promise-executor-return */
-/* eslint-disable default-param-last */
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
@@ -46,12 +44,12 @@ export const handleProtobufResponse = (response: Response): Promise<ArrayBuffer>
 
   return new Promise((resolve, reject) => {
     if (response.ok && contentType && contentType.indexOf('application/x-protobuf') !== -1) {
-      return resolve(response.arrayBuffer());
+      resolve(response.arrayBuffer());
     }
     if (response.status >= 400 && response.status < 404) {
-      return reject(new Error('Access token invalid'));
+      reject(new Error('Access token invalid'));
     }
-    return reject(new Error('An error occured'));
+    reject(new Error('An error occured'));
   });
 };
 
@@ -77,7 +75,7 @@ ResponseType = keyof NewnewapiType>(
   reqT: EncDec<RequestType>,
   resT: EncDec<ResponseType>,
   url: string,
-  method: Request['method'] = 'get',
+  method: Request['method'],
   payload?: RequestType,
   headers: any = {},
   mode: Request['mode'] = 'cors',
@@ -151,7 +149,7 @@ ResponseType = keyof NewnewapiType>(
   reqT: EncDec<RequestType>,
   resT: EncDec<ResponseType>,
   url: string,
-  method: Request['method'] = 'get',
+  method: Request['method'],
   payload?: RequestType,
   serverSideTokens?: {
     accessToken: string;

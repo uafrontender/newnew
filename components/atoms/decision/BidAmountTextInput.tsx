@@ -45,6 +45,7 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
           onClick={() => inputRef.current?.focus()}
           align={inputAlign}
           horizontalPadding={horizontalPadding}
+          numSymbols={minAmount.toString().length}
         >
           { minAmount }
         </PseudoPlaceholder>
@@ -99,6 +100,7 @@ const SInput = styled.input<{
 const PseudoPlaceholder = styled.div<{
   align: string;
   horizontalPadding?: string;
+  numSymbols: number;
 }>`
   position: absolute;
   left: 0;
@@ -107,8 +109,13 @@ const PseudoPlaceholder = styled.div<{
   font-size: 16px;
   line-height: 24px;
   color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  padding: 12.5px calc(.6rem + ${({ horizontalPadding }) => horizontalPadding ?? '5px'});
+  padding-top: 12.5px;
+  padding-bottom: 12.5px;
+  padding-left: ${({ numSymbols, horizontalPadding }) => `calc(
+    ${(numSymbols * 5)}px + ${horizontalPadding ?? '5px'}
+  )`};
   text-align: ${({ align }) => align};
+  width: 100%;
 `;
 
 const SBottomPlaceholder = styled.div`

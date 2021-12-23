@@ -34,7 +34,7 @@ const SHeadline = styled(Headline)<{
 }>`
   grid-area: title;
 
-  height: fit-content;
+  /* height: fit-content; */
 
   margin-top: 24px;
   margin-bottom: 12px;

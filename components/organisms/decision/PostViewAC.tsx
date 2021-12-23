@@ -54,6 +54,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   // Bids
   const [bids, setBids] = useState<newnewapi.Auction.Option[]>([]);
+  const [numberOfBids, setNumberOfBids] = useState<number | undefined>(undefined);
   const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
   const [bidsLoading, setBidsLoading] = useState(false);
   const [loadingBidsError, setLoadingBidsError] = useState('');
@@ -108,6 +109,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   ]);
 
   useEffect(() => {
+    setComments([]);
     setBids([]);
     setBidsNextPageToken('');
     fetchBids();
@@ -115,42 +117,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   }, [post]);
 
   useEffect(() => {
-    const msg = new newnewapi.SubscribeToChannels({
-      channels: [
-        {
-          postUpdates: {
-            postUuid: post.postUuid,
-          },
-        },
-      ],
-    });
-    if (socketConnection.connected) {
-      socketConnection.emit(
-        newnewapi.SubscribeToChannels.name,
-        newnewapi.SubscribeToChannels.encode(msg).finish(),
-      );
-
-      socketConnection.on(newnewapi.PostAcBidCreatedOrUpdated.name, (data) => {
-        console.log(data);
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostAcBidCreatedOrUpdated.decode(arr);
-        if (decoded.option && decoded.postUuid === post.postUuid) {
-          setBids((curr) => {
-            const workingArr = [...curr];
-            const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
-            if (idx === -1) {
-              return [decoded.option as newnewapi.Auction.Option, ...workingArr];
-            }
-            workingArr[idx] = decoded.option as newnewapi.Auction.Option;
-            return workingArr;
-          });
-        }
-      });
-    }
-
-    return () => {
-      console.log('unsubscribing');
-      const unsubMsg = new newnewapi.UnsubscribeFromChannels({
+    if (socketConnection && socketConnection.connected) {
+      console.log('Subscribing for socket updates');
+      const subscribeMsg = new newnewapi.SubscribeToChannels({
         channels: [
           {
             postUpdates: {
@@ -160,9 +129,45 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         ],
       });
       socketConnection.emit(
-        newnewapi.UnsubscribeFromChannels.name,
-        newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
+        newnewapi.SubscribeToChannels.name,
+        newnewapi.SubscribeToChannels.encode(subscribeMsg).finish(),
       );
+
+      socketConnection.on(newnewapi.PostAcBidCreatedOrUpdated.name, (data) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostAcBidCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          setBids((curr) => {
+            const workingArr = [...curr];
+            const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
+            if (idx === -1) {
+              // return [decoded.option as newnewapi.Auction.Option, ...workingArr];
+              return curr;
+            }
+            workingArr[idx] = decoded.option as newnewapi.Auction.Option;
+            return workingArr;
+          });
+        }
+      });
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        console.log('Unsubscribing from socket updates');
+        const unsubMsg = new newnewapi.UnsubscribeFromChannels({
+          channels: [
+            {
+              postUpdates: {
+                postUuid: post.postUuid,
+              },
+            },
+          ],
+        });
+        socketConnection.emit(
+          newnewapi.UnsubscribeFromChannels.name,
+          newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
+        );
+      }
     };
   }, [socketConnection, post, setBids]);
 
@@ -280,7 +285,8 @@ const SWrapper = styled.div`
       'video activities'
     ;
     grid-template-columns: 284px 1fr;
-    grid-template-rows: 46px 64px 40px calc(506px - 46px);
+    /* grid-template-rows: 46px 64px 40px calc(506px - 46px); */
+    grid-template-rows: 46px min-content 1fr;
     grid-column-gap: 16px;
 
     align-items: flex-start;
@@ -293,7 +299,7 @@ const SWrapper = styled.div`
       'video activities'
     ;
 
-    grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px);
+    /* grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px); */
     /* grid-template-rows: 1fr max-content; */
 
     grid-template-columns: 410px 1fr;
@@ -339,14 +345,18 @@ const SActivitesContainer = styled.div`
   display: flex;
   flex-direction: column;
 
+  align-self: bottom;
+
+  height: 100%;
+
   min-height: calc(728px - 46px - 64px - 40px - 72px);
 
   ${({ theme }) => theme.media.tablet} {
     min-height: initial;
-    height: calc(728px - 46px - 64px - 40px - 72px);
+    max-height: calc(728px - 46px - 64px - 40px - 72px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: calc(728px - 46px - 64px);
+    max-height: calc(728px - 46px - 64px);
   }
 `;
