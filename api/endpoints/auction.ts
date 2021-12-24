@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  cookiesInstance,
   fetchProtobuf,
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
@@ -23,6 +24,21 @@ export const fetchCurrentBidsForPost = (
   newnewapi.GetCurrentBidsRequest,
   newnewapi.GetCurrentBidsResponse,
   `${BASE_URL_AUCTION}/get_current_bids`,
+  'post',
+  payload,
+  // Optional authentication to get indidualized list of options
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
+);
+
+export const fetchBidsForOption = (
+  payload: newnewapi.GetPostAcBidsRequest,
+) => fetchProtobuf<newnewapi.GetPostAcBidsRequest, newnewapi.GetPostAcBidsResponse>(
+  newnewapi.GetPostAcBidsRequest,
+  newnewapi.GetPostAcBidsResponse,
+  // Temp name and url
+  `${BASE_URL_AUCTION}/get_bids_for_option`,
   'post',
   payload,
 );

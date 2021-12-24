@@ -1,9 +1,7 @@
-/* eslint-disable quotes */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable jsx-a11y/media-has-caption */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -15,47 +13,50 @@ import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 import { useAppSelector } from '../../../../redux-store/store';
 
 import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import Text from '../../../atoms/Text';
+import InlineSvg from '../../../atoms/InlineSVG';
 import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceBidForm';
 
-interface IBidCard {
-  bid: newnewapi.Auction.Option;
+import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+
+interface ISuggestionTopInfo {
+  creator: newnewapi.IUser;
+  createdAtSeconds: number;
+  suggestion: newnewapi.Auction.Option;
   postId: string;
-  index: number;
-  bidBeingSupported?: string;
   minAmount: number;
-  handleSetSupportedBid: (id: string) => void;
+  amountInBids?: number;
 }
 
-const BidCard: React.FunctionComponent<IBidCard> = ({
-  bid,
+const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
+  creator,
+  createdAtSeconds,
+  suggestion,
   postId,
-  index,
-  bidBeingSupported,
   minAmount,
-  handleSetSupportedBid,
+  amountInBids,
 }) => {
-  const { t } = useTranslation('decision');
+  const theme = useTheme();
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { t } = useTranslation('decision');
+  const createdAtParsed = new Date(createdAtSeconds * 1000);
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
-  const disabled = bidBeingSupported !== '' && bidBeingSupported !== bid.id.toString();
 
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
-    handleSetSupportedBid(bid.id.toString());
   };
 
   const handleCloseSupportForm = () => {
     setIsSupportFormOpen(false);
-    handleSetSupportedBid('');
   };
 
   // Payment and Loading modals
@@ -77,7 +78,7 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
         amount: new newnewapi.MoneyAmount({
           usdCents: parseInt(supportBidAmount, 10) * 100,
         }),
-        optionId: bid.id,
+        optionId: suggestion.id,
         postUuid: postId,
       });
 
@@ -92,9 +93,6 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
 
       console.log(res.data.status);
 
-      // Need to updated cached data!!!
-
-      handleSetSupportedBid('');
       setSupportBidAmount('');
       setIsSupportFormOpen(false);
       setPaymentModalOpen(false);
@@ -109,81 +107,75 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
     setLoadingModalOpen,
     setIsSupportFormOpen,
     setSupportBidAmount,
-    handleSetSupportedBid,
     supportBidAmount,
-    bid.id,
+    suggestion.id,
     postId,
   ]);
 
   return (
-    <motion.div
-      key={bid.id.toString()}
-      layout="position"
-      transition={{
-        y: {
-          type: 'spring',
-          damping: 20,
-          stiffness: 300,
-        },
-        default: {},
-      }}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}
-    >
-      <SContainer
-        isDisabled={disabled}
-      >
-        <SBidDetails
+    <SWrapper>
+      <SBidsAmount>
+        <span>
+          $
+          {((amountInBids ?? 0) / 100).toFixed(2)}
+        </span>
+        {' '}
+        { t('PostTopInfo.in_bids') }
+      </SBidsAmount>
+      <CreatorCard>
+        <SAvatarArea>
+          <img
+            src={creator.avatarUrl!! as string}
+            alt={creator.username!!}
+          />
+        </SAvatarArea>
+        <SUsername>
+          @
+          { creator.username }
+        </SUsername>
+        <SStartsAt>
+          { createdAtParsed.getDate() }
+          {' '}
+          { createdAtParsed.toLocaleString('default', { month: 'short' }) }
+          {' '}
+          { createdAtParsed.getFullYear() }
+          {' '}
+        </SStartsAt>
+      </CreatorCard>
+      <SActionsDiv>
+        <SShareButton
+          view="transparent"
+          iconOnly
+          withDim
+          withShrink
+          style={{
+            padding: '8px',
+          }}
           onClick={() => {
-            if (disabled) return;
-            handleOpenSupportForm();
           }}
         >
-          <SBidTitle
-            variant={3}
-          >
-            { bid.title }
-          </SBidTitle>
-          <SBidInfo>
-            <SAvatarArea>
-              <img
-                src={bid?.creator?.avatarUrl!! as string}
-                alt={bid?.creator?.username!!}
-              />
-            </SAvatarArea>
-            <SUsername>
-              { bid?.creator?.username }
-            </SUsername>
-            <SAmount>
-              {bid.totalAmount?.usdCents
-                ? (
-                  `$${(bid?.totalAmount?.usdCents / 100).toFixed(2)}`
-                ) : '00.00'}
-                {` by `}
-                { bid.supporterCount }
-                {` bidders `}
-            </SAmount>
-          </SBidInfo>
-        </SBidDetails>
-        {bidBeingSupported && !disabled ? (
+          <InlineSvg
+            svg={ShareIconFilled}
+            fill={theme.colorsThemed.text.secondary}
+            width="24px"
+            height="24px"
+          />
+        </SShareButton>
+        {isSupportFormOpen ? (
           <div
             style={{
-              minWidth: '92px',
+              minWidth: '72px',
             }}
           />
         ) : (
           <SSupportButton
             view="secondary"
-            disabled={disabled}
             onClick={() => handleOpenSupportForm()}
           >
             { t('BidsTab.BidCard.supportBtn') }
           </SSupportButton>
         )}
-      </SContainer>
+      </SActionsDiv>
       {!isMobile && isSupportFormOpen && (
         <SSupportBidForm>
           <BidAmountTextInput
@@ -216,7 +208,7 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
           onClose={() => setPaymentModalOpen(false)}
         >
           <PlaceBidForm
-            bidTitle={bid.title}
+            suggestionTitle={suggestion.title}
             amountRounded={supportBidAmount}
             handlePlaceBid={handleSubmitSupportBid}
           />
@@ -227,61 +219,59 @@ const BidCard: React.FunctionComponent<IBidCard> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
-    </motion.div>
+    </SWrapper>
   );
 };
 
-BidCard.defaultProps = {
-  bidBeingSupported: undefined,
+SuggestionTopInfo.defaultProps = {
+  amountInBids: undefined,
 };
 
-export default BidCard;
+export default SuggestionTopInfo;
 
-const SContainer = styled.div<{
-  isDisabled: boolean;
-}>`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  width: 100%;
-
-  opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 16px;
-  }
-`;
-
-const SBidDetails = styled.div`
+const SWrapper = styled.div`
+  position: relative;
   display: grid;
 
-  width: 100%;
+  grid-template-areas:
+    'stats stats stats'
+    'userCard userCard actions'
+  ;
 
-  padding: 14px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  height: fit-content;
 
+  margin-bottom: 24px;
 
-  ${({ theme }) => theme.media.laptop} {
-    width: 430px;
+  ${({ theme }) => theme.media.tablet} {
+    width: 100%;
+    grid-template-areas:
+      'userCard stats actions'
+    ;
+    grid-template-rows: 40px;
+    grid-template-columns: 1fr 1fr 120px;
+    align-items: center;
   }
 `;
 
-const SBidTitle = styled(Text)`
-  margin-bottom: 8px;
-`;
+// Creator card
+const CreatorCard = styled.div`
+  grid-area: userCard;
 
-const SBidInfo = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 8px;
+  display: grid;
+  grid-template-areas:
+    'avatar username'
+    'avatar startsAt'
+  ;
+  grid-template-columns: 44px 1fr;
+
+  height: 36px;
 `;
 
 const SAvatarArea = styled.div`
+  grid-area: avatar;
+
+  align-self: center;
+
   overflow: hidden;
   border-radius: 50%;
   width: 36px;
@@ -299,19 +289,85 @@ const SAvatarArea = styled.div`
 `;
 
 const SUsername = styled.div`
+  grid-area: username;
+
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
-const SAmount = styled.div`
-  font-weight: 600;
+const SStartsAt = styled.div`
+  grid-area: startsAt;
+
+  font-weight: bold;
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
+// Action buttons
+const SActionsDiv = styled.div`
+  grid-area: actions;
+
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+`;
+
+const SShareButton = styled(Button)`
+  background: none;
+
+  padding: 0px;
+  &:focus:enabled {
+    background: ${({
+    theme,
+    view,
+  }) => theme.colorsThemed.button.background[view!!]};
+  }
+`;
+
+const SMoreButton = styled(Button)`
+  background: none;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  padding: 0px;
+  padding-right: 26px;
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+// Auction
+const SBidsAmount = styled.div`
+  grid-area: stats;
+
+  margin-bottom: 12px;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: initial;
+    justify-self: flex-end;
+  }
+`;
+
+// Support suggestion
 const SSupportButton = styled(Button)`
   width: 100%;
 
@@ -331,6 +387,9 @@ const SSupportButton = styled(Button)`
 `;
 
 const SSupportBidForm = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+
   display: flex;
   justify-content: space-between;
   gap: 16px;

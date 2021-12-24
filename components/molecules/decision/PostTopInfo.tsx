@@ -215,7 +215,7 @@ const SActionsDiv = styled.div`
 `;
 
 const SShareButton = styled(Button)`
-
+  background: none;
   padding: 0px;
   &:focus:enabled {
     background: ${({
@@ -230,8 +230,8 @@ const SMoreButton = styled(Button)`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  padding: 0px;
-  padding-right: 26px;
+  padding: 8px;
+  margin-right: 18px;
 
   span {
     display: flex;

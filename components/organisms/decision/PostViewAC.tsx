@@ -26,6 +26,11 @@ import DecisionTabs from '../../molecules/decision/PostTabs';
 import BidsTab from '../../molecules/decision/auction/BidsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import { SocketContext } from '../../../contexts/socketContext';
+import isBrowser from '../../../utils/isBrowser';
+import Headline from '../../atoms/Headline';
+import Caption from '../../atoms/Caption';
+import SuggestionTitle from '../../molecules/decision/auction/SuggestionTitle';
+import SuggestionTopInfo from '../../molecules/decision/auction/SuggestionTopInfo';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -53,11 +58,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   >('bids');
 
   // Bids
-  const [bids, setBids] = useState<newnewapi.Auction.Option[]>([]);
+  const [suggestions, setSuggestions] = useState<newnewapi.Auction.Option[]>([]);
   const [numberOfBids, setNumberOfBids] = useState<number | undefined>(undefined);
   const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
   const [bidsLoading, setBidsLoading] = useState(false);
   const [loadingBidsError, setLoadingBidsError] = useState('');
+
+  // Bids history / Suggestion overview
+  const [
+    overviewedSuggestion, setOverviewedSuggestion,
+  ] = useState<newnewapi.Auction.Option | undefined>(undefined);
+  const [
+    suggestionBidsHistory, setSuggestionBidsHistory,
+  ] = useState<newnewapi.Auction.Bid[]>([]);
+  const currLocation = `/?post=${post.postUuid}`;
 
   // Comments
   const [comments, setComments] = useState<any[]>([]);
@@ -91,7 +105,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       if (res.data && res.data.options) {
-        setBids((curr) => {
+        setSuggestions((curr) => {
           const workingArrUnsorted = [...curr, ...res.data?.options as newnewapi.Auction.Option[]];
           const workingArrSorted = workingArrUnsorted.sort((a, b) => (
             (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
@@ -112,13 +126,33 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       console.error(err);
     }
   }, [
-    setBids, bidsLoading,
+    setSuggestions, bidsLoading,
     post,
   ]);
 
+  const handleOpenSuggestionBidHistory = (
+    suggestionToOpen: newnewapi.Auction.Option,
+  ) => {
+    setOverviewedSuggestion(suggestionToOpen);
+    window.history.pushState(
+      suggestionToOpen.id,
+      'Post',
+      `${currLocation}&suggestion=${suggestionToOpen.id}`,
+    );
+  };
+
+  const handleCloseSuggestionBidHistory = () => {
+    setOverviewedSuggestion(undefined);
+    window.history.replaceState('', '', currLocation);
+  };
+
+  const handleSetSuggestionBidsHistory = (bidHistory: newnewapi.Auction.Bid[]) => {
+    setSuggestionBidsHistory(() => bidHistory);
+  };
+
   useEffect(() => {
     setComments([]);
-    setBids([]);
+    setSuggestions([]);
     setBidsNextPageToken('');
     fetchBids();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,11 +175,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         newnewapi.SubscribeToChannels.encode(subscribeMsg).finish(),
       );
 
-      socketConnection.on(newnewapi.PostAcBidCreatedOrUpdated.name, (data) => {
+      socketConnection.on(newnewapi.PostAcOptionCreatedOrUpdated.name, (data) => {
         const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostAcBidCreatedOrUpdated.decode(arr);
+        const decoded = newnewapi.PostAcOptionCreatedOrUpdated.decode(arr);
         if (decoded.option && decoded.postUuid === post.postUuid) {
-          setBids((curr) => {
+          setSuggestions((curr) => {
             const workingArr = [...curr];
             let workingArrUnsorted;
             const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
@@ -186,28 +220,39 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         );
       }
     };
-  }, [socketConnection, post, setBids]);
+  }, [socketConnection, post, setSuggestions]);
 
+  // Just a test for animations
   const [order, setOrder] = useState(true);
   useEffect(() => {
-    setBids((curr) => curr.sort((a, b) => (
+    setSuggestions((curr) => curr.sort((a, b) => (
       order
         ? ((a.totalAmount?.usdCents as number) - (b.totalAmount?.usdCents as number))
         : ((b.totalAmount?.usdCents as number) - (a.totalAmount?.usdCents as number))
     )));
-  }, [order, setBids]);
+  }, [order, setSuggestions]);
 
   return (
     <SWrapper>
       <SExpiresSection
         onDoubleClick={() => setOrder((o) => !o)}
       >
-        {isMobile && (
+        {isMobile && !overviewedSuggestion && (
           <GoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
             onClick={handleGoBack}
+          />
+        )}
+        {overviewedSuggestion && (
+          <GoBackButton
+            style={{
+              gridArea: 'closeBtnMobile',
+            }}
+            onClick={() => {
+              handleCloseSuggestionBidHistory();
+            }}
           />
         )}
         <PostTimer
@@ -232,55 +277,94 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <PostTitle>
-        { post.title }
-      </PostTitle>
+      <div
+        style={{
+          gridArea: 'title',
+        }}
+      >
+        <PostTitle
+          shrink={overviewedSuggestion !== undefined}
+        >
+          { post.title }
+        </PostTitle>
+        {overviewedSuggestion && (
+          <SuggestionTitle
+            suggestion={overviewedSuggestion}
+          />
+        )}
+      </div>
       <SActivitesContainer>
-        <PostTopInfo
-          postType="ac"
-          // Temp
-          // amountInBids={post.totalAmount?.usdCents ?? 0}
-          amountInBids={5000}
-          creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
-          handleFollowCreator={() => {}}
-          handleFollowDecision={() => {}}
-          handleReportAnnouncement={() => {}}
-        />
-        <DecisionTabs
-          tabs={[
-            {
-              label: 'bids',
-              value: 'bids',
-              ...(
-                bids.length > 0
-                  ? { amount: bids.length.toString() } : {}
-              ),
-            },
-            {
-              label: 'comments',
-              value: 'comments',
-              ...(
-                comments.length > 0
-                  ? { amount: comments.length.toString() } : {}
-              ),
-            },
-          ]}
-          activeTab={currentTab}
-          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
-        />
+        {!overviewedSuggestion ? (
+          <PostTopInfo
+            postType="ac"
+            // Temp
+            // amountInBids={post.totalAmount?.usdCents ?? 0}
+            amountInBids={5000}
+            creator={post.creator!!}
+            startsAtSeconds={post.startsAt?.seconds as number}
+            handleFollowCreator={() => {}}
+            handleFollowDecision={() => {}}
+            handleReportAnnouncement={() => {}}
+          />
+        ) : (
+          <SuggestionTopInfo
+            creator={overviewedSuggestion?.creator!!}
+            suggestion={overviewedSuggestion}
+            postId={post.postUuid}
+            minAmount={post.minimalBid?.usdCents
+              ? (
+                parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
+              ) : 5}
+            amountInBids={overviewedSuggestion?.totalAmount?.usdCents!!}
+            createdAtSeconds={overviewedSuggestion?.createdAt?.seconds as number}
+          />
+        )}
+        {!overviewedSuggestion ? (
+          <DecisionTabs
+            tabs={[
+              {
+                label: 'bids',
+                value: 'bids',
+                // NB! Temp there will a separate endpoint and socket.io event
+                // for amount of bids and comments
+                ...(
+                  suggestions.length > 0
+                    ? { amount: suggestions.length.toString() } : {}
+                ),
+              },
+              {
+                label: 'comments',
+                value: 'comments',
+                ...(
+                  comments.length > 0
+                    ? { amount: comments.length.toString() } : {}
+                ),
+              },
+            ]}
+            activeTab={currentTab}
+            handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+          />
+        ) : (
+          <SHistoryLabel>
+            History
+          </SHistoryLabel>
+        )}
         {currentTab === 'bids'
           ? (
             <BidsTab
               postId={post.postUuid}
-              bids={bids}
-              bidsLoading={bidsLoading}
+              suggestions={suggestions}
+              suggestionsLoading={bidsLoading}
               pagingToken={bidsNextPageToken}
               minAmount={post.minimalBid?.usdCents
                 ? (
                   parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
                 ) : 5}
               handleLoadBids={fetchBids}
+              overviewedSuggestion={overviewedSuggestion}
+              handleOpenSuggestionBidHistory={handleOpenSuggestionBidHistory}
+              handleCloseSuggestionBidHistory={handleCloseSuggestionBidHistory}
+              handleSetSuggestionBidsHistory={handleSetSuggestionBidsHistory}
             />
           ) : (
             <CommentsTab
@@ -330,7 +414,9 @@ const SWrapper = styled.div`
     /* grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px); */
     /* grid-template-rows: 1fr max-content; */
 
-    grid-template-columns: 410px 1fr;
+    // NB! 1fr results in unstable width
+    /* grid-template-columns: 410px 1fr; */
+    grid-template-columns: 410px 538px;
   }
 `;
 
@@ -387,4 +473,13 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px);
   }
+`;
+
+//
+const SHistoryLabel = styled.div`
+  height: 32px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
 `;

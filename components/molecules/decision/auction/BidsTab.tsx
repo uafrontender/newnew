@@ -3,7 +3,7 @@
 import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -13,30 +13,41 @@ import { useInView } from 'react-intersection-observer';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import BidCard from './BidCard';
+import SuggestionCard from './SuggestionCard';
 import Button from '../../../atoms/Button';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceBidForm';
 import LoadingModal from '../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import SuggestionOverview from './SuggestionOverview';
 
 interface IBidsTab {
   postId: string;
-  bids: newnewapi.Auction.Option[];
-  bidsLoading: boolean;
+  suggestions: newnewapi.Auction.Option[];
+  suggestionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
   handleLoadBids: (token?: string) => void;
+  overviewedSuggestion?: newnewapi.Auction.Option;
+  handleCloseSuggestionBidHistory: () => void;
+  handleSetSuggestionBidsHistory: (bids: newnewapi.Auction.Bid[]) => void;
+  handleOpenSuggestionBidHistory: (
+    suggestionToOpen: newnewapi.Auction.Option
+  ) => void;
 }
 
 const BidsTab: React.FunctionComponent<IBidsTab> = ({
   postId,
-  bids,
-  bidsLoading,
+  suggestions,
+  suggestionsLoading,
   pagingToken,
   minAmount,
   handleLoadBids,
+  overviewedSuggestion,
+  handleCloseSuggestionBidHistory,
+  handleSetSuggestionBidsHistory,
+  handleOpenSuggestionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -48,7 +59,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   } = useInView();
   const textareaRef = useRef<HTMLTextAreaElement>();
 
-  const [bidBeingSupported, setBidBeingSupported] = useState<string>('');
+  const [suggestionBeingSupported, setSuggestionBeingSupported] = useState<string>('');
 
   // New suggestion/bid
   const [newBidText, setNewBidText] = useState('');
@@ -103,11 +114,11 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   ]);
 
   useEffect(() => {
-    if (inView && !bidsLoading && pagingToken) {
+    if (inView && !suggestionsLoading && pagingToken) {
       handleLoadBids(pagingToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, bidsLoading]);
+  }, [inView, pagingToken, suggestionsLoading]);
 
   return (
     <>
@@ -117,31 +128,42 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <SBidsContainer
-          style={{
-            ...(bidBeingSupported ? {
-              overflowY: 'hidden',
-            } : {}),
-          }}
-        >
-          {bids.map((bid, i) => (
-            <BidCard
-              key={bid.id.toString()}
-              bid={bid}
-              postId={postId}
-              index={i}
-              minAmount={minAmount}
-              bidBeingSupported={bidBeingSupported}
-              handleSetSupportedBid={(id: string) => setBidBeingSupported(id)}
+        {
+          !overviewedSuggestion ? (
+            <SBidsContainer
+              style={{
+                ...(suggestionBeingSupported ? {
+                  overflowY: 'hidden',
+                } : {}),
+              }}
+            >
+              {suggestions.map((suggestion, i) => (
+                <SuggestionCard
+                  key={suggestion.id.toString()}
+                  suggestion={suggestion}
+                  postId={postId}
+                  index={i}
+                  minAmount={minAmount}
+                  suggestionBeingSupported={suggestionBeingSupported}
+                  handleSetSupportedBid={(id: string) => setSuggestionBeingSupported(id)}
+                  handleOpenSuggestionBidHistory={() => handleOpenSuggestionBidHistory(suggestion)}
+                />
+              ))}
+            </SBidsContainer>
+          ) : (
+            <SuggestionOverview
+              overviewedSuggestion={overviewedSuggestion}
+              handleCloseSuggestionBidHistory={handleCloseSuggestionBidHistory}
             />
-          ))}
-        </SBidsContainer>
+          )
+          }
         <SLoaderDiv
           ref={loadingRef}
         />
         <SActionSection>
           <SuggestionTextArea
             value={newBidText}
+            disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
             placeholder="Add a suggestion ..."
             onChange={(e) => setNewBidText(e.target.value)}
           />
@@ -149,6 +171,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
             value={newBidAmount}
             inputAlign="left"
             horizontalPadding="16px"
+            disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
             onChange={(newValue: string) => setNewBidAmount(newValue)}
             minAmount={minAmount}
             style={{
@@ -158,7 +181,10 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
           <Button
             view="primaryGrad"
             size="sm"
-            disabled={!newBidText || parseInt(newBidAmount, 10) < minAmount}
+            disabled={!newBidText
+              || parseInt(newBidAmount, 10) < minAmount
+              || suggestionBeingSupported !== ''
+              || overviewedSuggestion !== undefined}
             onClick={() => handleTogglePaymentModalOpen()}
           >
             Place a bid
@@ -173,7 +199,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
           onClose={() => setPaymentModalOpen(false)}
         >
           <PlaceBidForm
-            bidTitle={newBidText}
+            suggestionTitle={newBidText}
             amountRounded={newBidAmount}
             handlePlaceBid={handleSubmitNewSuggestion}
           />
@@ -186,6 +212,10 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
       />
     </>
   );
+};
+
+BidsTab.defaultProps = {
+  overviewedSuggestion: undefined,
 };
 
 export default BidsTab;
@@ -203,7 +233,7 @@ const SBidsContainer = styled.div`
 
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  /* gap: 16px; */
 
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 125px;
