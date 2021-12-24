@@ -118,7 +118,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           settings: post.options,
           startsAt: post.startsAt.type === 'right-away' ? null : formatStartsAt()
             .format(),
-          expiresAfter: formatExpiresAt(true),
+          expiresAfter: {
+            seconds: formatExpiresAt(true),
+          },
           thumbnailParameters: post.thumbnailParameters,
           announcementVideoUrl: post.announcementVideoUrl,
         },
