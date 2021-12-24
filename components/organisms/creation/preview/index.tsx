@@ -116,8 +116,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         post: {
           title: post.title,
           settings: post.options,
-          startsAt: post.startsAt.type === 'right-away' ? null : formatStartsAt()
-            .format(),
+          startsAt: post.startsAt.type === 'right-away' ? null : {
+            seconds: formatStartsAt().unix(),
+          },
           expiresAfter: {
             seconds: formatExpiresAt(true),
           },
