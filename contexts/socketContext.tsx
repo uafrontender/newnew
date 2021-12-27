@@ -21,6 +21,10 @@ const SocketContextProvider: React.FC = ({ children }) => {
     });
     setSocket(() => socketConnected);
 
+    socketConnected.on('disconnect', (err) => console.log('Err disconnect:', (err)));
+    socketConnected.on('connect_failed', (err) => console.log('Err connect_failed:', (err)));
+    socketConnected.on('connect_error', (err) => console.log('Err connect_error:', (err)));
+
     function cleanup() {
       socketConnected.disconnect();
     }

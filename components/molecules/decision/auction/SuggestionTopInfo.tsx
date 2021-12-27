@@ -28,6 +28,7 @@ interface ISuggestionTopInfo {
   postId: string;
   minAmount: number;
   amountInBids?: number;
+  handleUpdateIsSupportedByUser: (id: number) => void;
 }
 
 const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
@@ -37,6 +38,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
   postId,
   minAmount,
   amountInBids,
+  handleUpdateIsSupportedByUser,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -91,7 +93,8 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
-      console.log(res.data.status);
+      // Mark the option as isSupportedByUser
+      handleUpdateIsSupportedByUser(suggestion.id as number);
 
       setSupportBidAmount('');
       setIsSupportFormOpen(false);
@@ -107,6 +110,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
     setLoadingModalOpen,
     setIsSupportFormOpen,
     setSupportBidAmount,
+    handleUpdateIsSupportedByUser,
     supportBidAmount,
     suggestion.id,
     postId,
@@ -130,8 +134,8 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
           />
         </SAvatarArea>
         <SUsername>
-          @
-          { creator.username }
+          { creator.uuid !== user.userData?.userUuid
+            ? creator.username : t('me') }
         </SUsername>
         <SStartsAt>
           { createdAtParsed.getDate() }
@@ -172,7 +176,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
             view="secondary"
             onClick={() => handleOpenSupportForm()}
           >
-            { t('BidsTab.BidCard.supportBtn') }
+            { t('BidsTab.SuggestionCard.supportBtn') }
           </SSupportButton>
         )}
       </SActionsDiv>
@@ -190,13 +194,13 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
             disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
             onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('BidsTab.BidCard.placeABidBtn') }
+            { t('BidsTab.SuggestionCard.placeABidBtn') }
           </Button>
           <SCancelButton
             view="secondary"
             onClick={() => handleCloseSupportForm()}
           >
-            { t('BidsTab.BidCard.cancelBtn') }
+            { t('BidsTab.SuggestionCard.cancelBtn') }
           </SCancelButton>
         </SSupportBidForm>
       )}

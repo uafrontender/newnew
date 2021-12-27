@@ -38,7 +38,7 @@ export const fetchBidsForOption = (
   newnewapi.GetPostAcBidsRequest,
   newnewapi.GetPostAcBidsResponse,
   // Temp name and url
-  `${BASE_URL_AUCTION}/get_bids_for_option`,
+  `${BASE_URL_AUCTION}/get_post_ac_bids`,
   'post',
   payload,
 );

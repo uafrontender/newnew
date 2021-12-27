@@ -65,7 +65,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         )}
       </SExpiresSection>
       <PostVideo
-        videoSrc={post.announcement?.videoUrl ?? MockVideo}
+        videoSrc={post.announcement?.originalVideoUrl ?? MockVideo}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />

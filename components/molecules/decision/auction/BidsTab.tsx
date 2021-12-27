@@ -21,6 +21,7 @@ import PlaceBidForm from './PlaceBidForm';
 import LoadingModal from '../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import SuggestionOverview from './SuggestionOverview';
+import { TOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 
 interface IBidsTab {
   postId: string;
@@ -30,8 +31,8 @@ interface IBidsTab {
   minAmount: number;
   handleLoadBids: (token?: string) => void;
   overviewedSuggestion?: newnewapi.Auction.Option;
+  handleUpdateIsSupportedByUser: (id: number) => void;
   handleCloseSuggestionBidHistory: () => void;
-  handleSetSuggestionBidsHistory: (bids: newnewapi.Auction.Bid[]) => void;
   handleOpenSuggestionBidHistory: (
     suggestionToOpen: newnewapi.Auction.Option
   ) => void;
@@ -45,8 +46,8 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   minAmount,
   handleLoadBids,
   overviewedSuggestion,
+  handleUpdateIsSupportedByUser,
   handleCloseSuggestionBidHistory,
-  handleSetSuggestionBidsHistory,
   handleOpenSuggestionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
@@ -57,7 +58,6 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
     ref: loadingRef,
     inView,
   } = useInView();
-  const textareaRef = useRef<HTMLTextAreaElement>();
 
   const [suggestionBeingSupported, setSuggestionBeingSupported] = useState<string>('');
 
@@ -140,26 +140,28 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
               {suggestions.map((suggestion, i) => (
                 <SuggestionCard
                   key={suggestion.id.toString()}
-                  suggestion={suggestion}
+                  suggestion={suggestion as TOptionWithHighestField}
                   postId={postId}
                   index={i}
                   minAmount={minAmount}
                   suggestionBeingSupported={suggestionBeingSupported}
                   handleSetSupportedBid={(id: string) => setSuggestionBeingSupported(id)}
+                  handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
                   handleOpenSuggestionBidHistory={() => handleOpenSuggestionBidHistory(suggestion)}
                 />
               ))}
+              <SLoaderDiv
+                ref={loadingRef}
+              />
             </SBidsContainer>
           ) : (
             <SuggestionOverview
+              postUuid={postId}
               overviewedSuggestion={overviewedSuggestion}
               handleCloseSuggestionBidHistory={handleCloseSuggestionBidHistory}
             />
           )
           }
-        <SLoaderDiv
-          ref={loadingRef}
-        />
         <SActionSection>
           <SuggestionTextArea
             value={newBidText}
@@ -241,7 +243,7 @@ const SBidsContainer = styled.div`
 `;
 
 const SLoaderDiv = styled.div`
-
+  height: 10px;
 `;
 
 const SActionSection = styled.div`

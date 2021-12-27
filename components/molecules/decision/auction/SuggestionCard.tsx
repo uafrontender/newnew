@@ -17,17 +17,19 @@ import { useAppSelector } from '../../../../redux-store/store';
 import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import Text from '../../../atoms/Text';
+import { TOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceBidForm';
 
 interface ISuggestionCard {
-  suggestion: newnewapi.Auction.Option;
+  suggestion: TOptionWithHighestField;
   postId: string;
   index: number;
   suggestionBeingSupported?: string;
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
+  handleUpdateIsSupportedByUser: (id: number) => void;
   handleOpenSuggestionBidHistory: () => void;
 }
 
@@ -38,6 +40,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
   suggestionBeingSupported,
   minAmount,
   handleSetSupportedBid,
+  handleUpdateIsSupportedByUser,
   handleOpenSuggestionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
@@ -60,6 +63,9 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
     setIsSupportFormOpen(false);
     handleSetSupportedBid('');
   };
+
+  // Redirect to user's page
+  const handleRedirectToUser = () => router.push(`/u/${suggestion.creator?.username}`);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -95,7 +101,8 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
 
       console.log(res.data.status);
 
-      // Need to updated cached data!!!
+      // Mark the option as isSupportedByUser
+      handleUpdateIsSupportedByUser(suggestion.id as number);
 
       handleSetSupportedBid('');
       setSupportBidAmount('');
@@ -113,6 +120,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
     setIsSupportFormOpen,
     setSupportBidAmount,
     handleSetSupportedBid,
+    handleUpdateIsSupportedByUser,
     supportBidAmount,
     suggestion.id,
     postId,
@@ -122,18 +130,6 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
     <motion.div
       key={suggestion.id.toString()}
       layout="position"
-      // transition={{
-      //   y: {
-      //     type: 'spring',
-      //     damping: 20,
-      //     stiffness: 300,
-      //   },
-      //   default: {
-      //     type: 'spring',
-      //     damping: 20,
-      //     stiffness: 300,
-      //   },
-      // }}
       transition={{
         type: 'spring',
         damping: 20,
@@ -162,13 +158,41 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
           }}
         >
           <SBidInfo>
-              <SAvatar
-                src={suggestion?.creator?.avatarUrl!! as string}
-                alt={suggestion?.creator?.username!!}
-                draggable={false}
-              />
-            <SUsername>
-              { suggestion?.creator?.username }
+            {suggestion.isSupportedByUser
+              && suggestion.creator?.uuid !== user.userData?.userUuid
+              ? (
+                <STag>{t('BidsTab.tags.my_vote')}</STag>
+              ) : null}
+            {suggestion.creator?.uuid === user.userData?.userUuid
+              ? (
+                <STag>{t('BidsTab.tags.my_bid')}</STag>
+              ) : null}
+            {suggestion.isHighest
+              ? (
+                <STag>{t('BidsTab.tags.highest')}</STag>
+              ) : null}
+            {/* Comment out for now */}
+            {/* {suggestion.creator.isVIP
+              ? (
+                <STag>{t('BidsTab.tags.vip')}</STag>
+              ) : null} */}
+            <SAvatar
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRedirectToUser();
+              }}
+              src={suggestion?.creator?.avatarUrl!! as string}
+              alt={suggestion?.creator?.username!!}
+              draggable={false}
+            />
+            <SUsername
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRedirectToUser();
+              }}
+            >
+              { suggestion.creator?.uuid === user.userData?.userUuid
+                ? t('me') : suggestion?.creator?.username }
             </SUsername>
             <SBidTitle
               variant={3}
@@ -195,7 +219,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
             disabled={disabled}
             onClick={() => handleOpenSupportForm()}
           >
-            { t('BidsTab.BidCard.supportBtn') }
+            { t('BidsTab.SuggestionCard.supportBtn') }
           </SSupportButton>
         )}
       </SContainer>
@@ -216,13 +240,13 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
             disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
             onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('BidsTab.BidCard.placeABidBtn') }
+            { t('BidsTab.SuggestionCard.placeABidBtn') }
           </Button>
           <SCancelButton
             view="secondary"
             onClick={() => handleCloseSupportForm()}
           >
-            { t('BidsTab.BidCard.cancelBtn') }
+            { t('BidsTab.SuggestionCard.cancelBtn') }
           </SCancelButton>
         </>
       )}
@@ -310,31 +334,31 @@ const SBidInfo = styled.div`
   line-height: 24px;
 `;
 
+const STag = styled.span`
+  background-color: ${({ theme }) => theme.colorsThemed.text.primary};
+  border-radius: 50px;
+  padding: 6px;
+
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 12px;
+  color: ${({ theme }) => theme.colorsThemed.background.primary};
+
+  margin-right: 8px;
+`;
+
 const SAvatar = styled.img`
+  position: relative;
+  top: 7.5px;
+
   display: inline;
   width: 24px;
   height: 24px;
   border-radius: 50%;
 
   margin-right: 8px;
-  float: left;
-`;
 
-const SAvatarArea = styled.div`
-  overflow: hidden;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    display: block;
-    width: 36px;
-    height: 36px;
-  }
+  cursor: pointer;
 `;
 
 const SUsername = styled.div`
@@ -344,6 +368,13 @@ const SUsername = styled.div`
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   margin-right: 8px;
+
+  transition: 0.2s linear;
+  cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
 `;
 
 const SBidTitle = styled(Text)`
