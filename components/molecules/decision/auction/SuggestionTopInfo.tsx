@@ -86,8 +86,6 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
 
       const res = await placeBidOnAuction(makeBidPayload);
 
-      console.log(res);
-
       if (!res.data
         || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         || res.error

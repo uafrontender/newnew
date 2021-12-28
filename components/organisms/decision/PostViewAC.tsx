@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { uniqBy } from 'lodash';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { fetchCurrentBidsForPost } from '../../../api/endpoints/auction';
@@ -28,6 +27,8 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import { ChannelsContext } from '../../../contexts/channelsSetContext';
+import switchPostType from '../../../utils/switchPostType';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -38,11 +39,13 @@ export type TOptionWithHighestField = newnewapi.Auction.Option & {
 
 interface IPostViewAC {
   post: newnewapi.Auction;
+  suggestionFromUrl?: newnewapi.Auction.Option;
   handleGoBack: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   post,
+  suggestionFromUrl,
   handleGoBack,
 }) => {
   const theme = useTheme();
@@ -53,15 +56,23 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   // Socket
   const socketConnection = useContext(SocketContext);
+  const {
+    channels,
+    addChannel,
+    removeChannel,
+  } = useContext(ChannelsContext);
 
   // Tabs
   const [currentTab, setCurrentTab] = useState<
     'bids' | 'comments'
   >('bids');
 
+  // Total amount
+  const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
+
   // Bids
   const [suggestions, setSuggestions] = useState<TOptionWithHighestField[]>([]);
-  const [numberOfBids, setNumberOfBids] = useState<number | undefined>(undefined);
+  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(post.optionCount ?? '');
   const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
   const [bidsLoading, setBidsLoading] = useState(false);
   const [loadingBidsError, setLoadingBidsError] = useState('');
@@ -90,7 +101,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       setBidsLoading(true);
       setLoadingBidsError('');
 
-      const getCurrentBidsPayload = new newnewapi.GetCurrentBidsRequest({
+      const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
         postUuid: post.postUuid,
         ...(pageToken ? {
           paging: {
@@ -135,7 +146,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           ];
 
           const workingSortedUnique = joinedArr.length > 0
-            ? uniqBy(joinedArr, 'id') : [];
+            ? [...new Set(joinedArr)] : [];
 
           const highestOptionIdx = (
             workingSortedUnique as TOptionWithHighestField[]
@@ -195,7 +206,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   }, [post]);
 
   useEffect(() => {
-    const socketHandler = (data: any) => {
+    if (suggestionFromUrl) {
+      setOverviewedSuggestion(suggestionFromUrl);
+    }
+  }, [suggestionFromUrl]);
+
+  useEffect(() => {
+    const socketHandlerOptionCreatedOrUpdated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostAcOptionCreatedOrUpdated.decode(arr);
       if (decoded.option && decoded.postUuid === post.postUuid) {
@@ -216,6 +233,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           const highestOption = workingArrUnsorted.sort((a, b) => (
             (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
           ))[0];
+
+          workingArrUnsorted.forEach((option, i) => {
+            if (i > 0) {
+              // eslint-disable-next-line no-param-reassign
+              option.isHighest = false;
+            }
+          });
 
           const optionsByUser = user.userData?.userUuid
             ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
@@ -241,7 +265,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           ];
 
           const workingSortedUnique = joinedArr.length > 0
-            ? uniqBy(joinedArr, 'id') : [];
+            ? [...new Set(joinedArr)] : [];
 
           const highestOptionIdx = (
             workingSortedUnique as TOptionWithHighestField[]
@@ -253,11 +277,33 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
           return workingSortedUnique;
         });
+
+        setOverviewedSuggestion((curr) => {
+          if (curr === undefined) return curr;
+          const workingObj = { ...curr };
+          if (workingObj.totalAmount) {
+            workingObj.totalAmount.usdCents = decoded.option?.totalAmount?.usdCents!!;
+          }
+          return workingObj as newnewapi.Auction.Option;
+        });
+      }
+    };
+
+    const socketHandlerPostData = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostUpdated.decode(arr);
+
+      if (!decoded) return;
+      const [decodedParsed] = switchPostType(
+        decoded.post as newnewapi.IPost);
+      if (decodedParsed.postUuid === post.postUuid) {
+        setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+        setNumberOfOptions(decoded.post?.auction?.optionCount!!);
       }
     };
 
     if (socketConnection && socketConnection.connected) {
-      console.log('Subscribing for socket updates');
+      // console.log('Subscribing to socket updates');
       const subscribeMsg = new newnewapi.SubscribeToChannels({
         channels: [
           {
@@ -270,126 +316,37 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
 
-      console.log(subscribeMsgEncoded);
-      console.log(subscribeMsg);
+      // Subscribe to channel if not yet
+      if (!channels.has(post.postUuid)) {
+        // console.log(`Subscribing to socket updates ${post.title} from Modal`);
+        socketConnection.emit(
+          'SubscribeToChannels',
+          subscribeMsgEncoded,
+        );
+      }
 
-      socketConnection.emit(
-        newnewapi.SubscribeToChannels.name,
-        subscribeMsgEncoded,
-      );
-
-      console.log(newnewapi.PostAcOptionCreatedOrUpdated.name);
-      console.log('hello');
-
-      socketConnection.on(newnewapi.PostAcOptionCreatedOrUpdated.name, (data: any) => {
-        console.log('Received option data');
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostAcOptionCreatedOrUpdated.decode(arr);
-        if (decoded.option && decoded.postUuid === post.postUuid) {
-          setSuggestions((curr) => {
-            const workingArr = [...curr];
-            let workingArrUnsorted;
-            const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
-            if (idx === -1) {
-              workingArrUnsorted = [...workingArr, decoded.option as TOptionWithHighestField];
-            } else {
-              workingArr[idx]
-                .supporterCount = (decoded.option?.supporterCount as number);
-              workingArr[idx]
-                .totalAmount = (decoded.option?.totalAmount as newnewapi.IMoneyAmount);
-              workingArrUnsorted = workingArr;
-            }
-
-            const highestOption = workingArrUnsorted.sort((a, b) => (
-              (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
-            ))[0];
-
-            const optionsByUser = user.userData?.userUuid
-              ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-              : [];
-
-            const optionsSupportedByUser = user.userData?.userUuid
-              ? workingArrUnsorted.filter((o) => o.isSupportedByUser)
-              : [];
-
-            // const optionsByVipUsers = [];
-
-            const workingArrSorted = workingArrUnsorted.sort((a, b) => {
-              // Sort the rest by newest first
-              return (b.id as number) - (a.id as number);
-            });
-
-            const joinedArr = [
-              ...optionsByUser,
-              ...optionsSupportedByUser,
-              // ...optionsByVipUsers,
-              ...(highestOption ? [highestOption] : []),
-              ...workingArrSorted,
-            ];
-
-            const workingSortedUnique = joinedArr.length > 0
-              ? uniqBy(joinedArr, 'id') : [];
-
-            const highestOptionIdx = (
-              workingSortedUnique as TOptionWithHighestField[]
-            ).findIndex((o) => o.id === highestOption.id);
-
-            if (workingSortedUnique[highestOptionIdx]) {
-              (workingSortedUnique[highestOptionIdx] as TOptionWithHighestField).isHighest = true;
-            }
-
-            console.log(workingSortedUnique);
-            return workingSortedUnique;
-          });
-        }
-      });
+      socketConnection.on('PostAcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on('PostUpdated', socketHandlerPostData);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        console.log('Unsubscribing from socket updates');
-        const unsubMsg = new newnewapi.UnsubscribeFromChannels({
-          channels: [
-            {
-              postUpdates: {
-                postUuid: post.postUuid,
-              },
-            },
-          ],
-        });
-        // socketConnection.off(newnewapi.PostAcOptionCreatedOrUpdated.name, socketHandler);
-        socketConnection.emit(
-          newnewapi.UnsubscribeFromChannels.name,
-          newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
-        );
+        // console.log('Unsubscribing from socket updates');
+        socketConnection.off('PostAcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off('PostUpdated', socketHandlerPostData);
       }
     };
   }, [
     socketConnection,
+    channels,
     post,
     user.userData?.userUuid,
     setSuggestions,
   ]);
 
-  // Just a test for animations
-  const [order, setOrder] = useState(true);
-  useEffect(() => {
-    setSuggestions((curr) => curr.sort((a, b) => (
-      order
-        ? ((a.totalAmount?.usdCents as number) - (b.totalAmount?.usdCents as number))
-        : ((b.totalAmount?.usdCents as number) - (a.totalAmount?.usdCents as number))
-    )));
-  }, [order, setSuggestions]);
-
-  useEffect(() => {
-    console.log(socketConnection.listeners(newnewapi.PostAcOptionCreatedOrUpdated.name));
-  }, [socketConnection]);
-
   return (
     <SWrapper>
-      <SExpiresSection
-        onDoubleClick={() => setOrder((o) => !o)}
-      >
+      <SExpiresSection>
         {isMobile && !overviewedSuggestion && (
           <GoBackButton
             style={{
@@ -452,8 +409,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           <PostTopInfo
             postType="ac"
             // Temp
-            // amountInBids={post.totalAmount?.usdCents ?? 0}
-            amountInBids={5000}
+            amountInBids={totalAmount}
             creator={post.creator!!}
             startsAtSeconds={post.startsAt?.seconds as number}
             handleFollowCreator={() => {}}
@@ -480,11 +436,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
               {
                 label: 'bids',
                 value: 'bids',
-                // NB! Temp there will a separate endpoint and socket.io event
-                // for amount of bids and comments
                 ...(
-                  suggestions.length > 0
-                    ? { amount: suggestions.length.toString() } : {}
+                  numberOfOptions
+                    ? { amount: numberOfOptions.toString() } : {}
                 ),
               },
               {
@@ -529,6 +483,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       </SActivitesContainer>
     </SWrapper>
   );
+};
+
+PostViewAC.defaultProps = {
+  suggestionFromUrl: undefined,
 };
 
 export default PostViewAC;

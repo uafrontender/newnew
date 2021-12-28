@@ -92,14 +92,10 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
 
       const res = await placeBidOnAuction(makeBidPayload);
 
-      console.log(res);
-
       if (!res.data
         || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
-
-      console.log(res.data.status);
 
       // Mark the option as isSupportedByUser
       handleUpdateIsSupportedByUser(suggestion.id as number);

@@ -51,7 +51,7 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
       setBidsLoading(true);
       setLoadingBidsError('');
 
-      const getCurrentBidsPayload = new newnewapi.GetPostAcBidsRequest({
+      const getCurrentBidsPayload = new newnewapi.GetAcBidsRequest({
         postUuid,
         optionId: overviewedSuggestion.id,
         ...(pageToken ? {
@@ -64,8 +64,6 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
       const res = await fetchBidsForOption(getCurrentBidsPayload);
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      console.log(res.data);
 
       if (res.data && res.data.bids) {
         setBidsHistory((curr) => {
@@ -127,23 +125,14 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
     };
 
     if (socketConnection && socketConnection.connected) {
-      console.log('Listening for bids updates events');
-      console.log(newnewapi.PostAcBidCreated.name);
+      // console.log('Listening for bids updates events');
 
-      socketConnection.on(newnewapi.PostAcBidCreated.name, (data: any) => {
-        console.log('Received bids data');
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostAcBidCreated.decode(arr);
-        if (decoded.optionId === overviewedSuggestion.id && decoded.bid) {
-          console.log(decoded.optionId);
-          setBidsHistory((curr) => ([(decoded.bid as newnewapi.Auction.Bid), ...curr]));
-        }
-      });
+      socketConnection.on('PostAcBidCreated', socketHandler);
     }
 
     return () => {
-      console.log('Stop listening for bids updates events');
-      // socketConnection.off(newnewapi.PostAcBidCreated.name, socketHandler);
+      // console.log('Stop listening for bids updates events');
+      socketConnection.off(newnewapi.PostAcBidCreated.name, socketHandler);
     };
   }, [
     socketConnection,

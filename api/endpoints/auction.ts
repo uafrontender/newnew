@@ -19,11 +19,11 @@ export const fetchLiveAuctions = (
 );
 
 export const fetchCurrentBidsForPost = (
-  payload: newnewapi.GetCurrentBidsRequest,
-) => fetchProtobuf<newnewapi.GetCurrentBidsRequest, newnewapi.GetCurrentBidsResponse>(
-  newnewapi.GetCurrentBidsRequest,
-  newnewapi.GetCurrentBidsResponse,
-  `${BASE_URL_AUCTION}/get_current_bids`,
+  payload: newnewapi.GetAcOptionsRequest,
+) => fetchProtobuf<newnewapi.GetAcOptionsRequest, newnewapi.GetAcOptionsResponse>(
+  newnewapi.GetAcOptionsRequest,
+  newnewapi.GetAcOptionsResponse,
+  `${BASE_URL_AUCTION}/get_ac_options`,
   'post',
   payload,
   // Optional authentication to get indidualized list of options
@@ -33,14 +33,27 @@ export const fetchCurrentBidsForPost = (
 );
 
 export const fetchBidsForOption = (
-  payload: newnewapi.GetPostAcBidsRequest,
-) => fetchProtobuf<newnewapi.GetPostAcBidsRequest, newnewapi.GetPostAcBidsResponse>(
-  newnewapi.GetPostAcBidsRequest,
-  newnewapi.GetPostAcBidsResponse,
-  // Temp name and url
-  `${BASE_URL_AUCTION}/get_post_ac_bids`,
+  payload: newnewapi.GetAcBidsRequest,
+) => fetchProtobuf<newnewapi.GetAcBidsRequest, newnewapi.GetAcBidsResponse>(
+  newnewapi.GetAcBidsRequest,
+  newnewapi.GetAcBidsResponse,
+  `${BASE_URL_AUCTION}/get_ac_bids`,
   'post',
   payload,
+);
+
+export const fetchAcOptionById = (
+  payload: newnewapi.GetAcOptionRequest,
+) => fetchProtobuf<newnewapi.GetAcOptionRequest, newnewapi.GetAcOptionResponse>(
+  newnewapi.GetAcOptionRequest,
+  newnewapi.GetAcOptionResponse,
+  `${BASE_URL_AUCTION}/get_ac_option`,
+  'post',
+  payload,
+  // Optional authentication to get indidualized list of options
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
 );
 
 export const placeBidOnAuction = (
