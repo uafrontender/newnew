@@ -1,5 +1,7 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useRef } from 'react';
+import React, {
+  useContext, useEffect, useRef, useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -39,6 +41,8 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 
 // Utils
 import switchPostType from '../../utils/switchPostType';
+import { SocketContext } from '../../contexts/socketContext';
+import { ChannelsContext } from '../../contexts/channelsSetContext';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -71,6 +75,7 @@ interface ICard {
   item: newnewapi.Post;
   type?: 'inside' | 'outside';
   index: number;
+  isInModal?: boolean;
   width?: string;
   height?: string;
 }
@@ -79,6 +84,7 @@ export const Card: React.FC<ICard> = ({
   item,
   type,
   index,
+  isInModal,
   width,
   height,
 }) => {
@@ -90,6 +96,14 @@ export const Card: React.FC<ICard> = ({
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const {
+    channels,
+    addChannel,
+    removeChannel,
+  } = useContext(ChannelsContext);
+
   const {
     ref: cardRef,
     inView,
@@ -99,6 +113,18 @@ export const Card: React.FC<ICard> = ({
   const videoRef = useRef<HTMLVideoElement>();
 
   const [postParsed, typeOfPost] = switchPostType(item);
+  // Live updates stored in local state
+  const [totalAmount, setTotalAmount] = useState<number>(() => (typeOfPost === 'cf'
+    ? (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0
+    : 0));
+  const [totalVotes, setTotalVotes] = useState<number>(() => (typeOfPost === 'cf'
+    ? (postParsed as newnewapi.MultipleChoice).totalVotes ?? 0
+    : 0));
+  const [currentBackerCount, setCurrentBackerCount] = useState<number>(() => (typeOfPost === 'cf'
+    ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
+    : 0));
+
+  const initiallySubscribed = useRef(false);
 
   const handleUserClick = (username: string) => {
     router.push(`/u/${username}`);
@@ -117,6 +143,83 @@ export const Card: React.FC<ICard> = ({
       videoRef.current?.pause();
     }
   }, [inView]);
+
+  // Track if subscribed for the first time
+  useEffect(() => {
+    initiallySubscribed.current = channels.has(postParsed.postUuid);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Subscribe to socket updates after the cards mounts
+  useEffect(() => {
+    if (socketConnection && socketConnection.connected) {
+      // console.log(`Subscribing to post updates ${postParsed.title}`);
+      const subscribeMsg = new newnewapi.SubscribeToChannels({
+        channels: [
+          {
+            postUpdates: {
+              postUuid: postParsed.postUuid,
+            },
+          },
+        ],
+      });
+
+      const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+
+      if (!channels.has(postParsed.postUuid)) {
+        // console.log(`Subscribing to channel ${postParsed.title}`);
+        socketConnection.emit(
+          'SubscribeToChannels',
+          subscribeMsgEncoded,
+        );
+
+        addChannel(postParsed.postUuid);
+      }
+
+      socketConnection.on('PostUpdated', (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostUpdated.decode(arr);
+
+        if (!decoded) return;
+        const [decodedParsed] = switchPostType(
+          decoded.post as newnewapi.IPost);
+        if (decodedParsed.postUuid === postParsed.postUuid) {
+          if (typeOfPost === 'ac') {
+            setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+          }
+          if (typeOfPost === 'cf') {
+            setCurrentBackerCount(decoded.post?.crowdfunding?.currentBackerCount!!);
+          }
+          if (typeOfPost === 'mc') {
+            setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
+          }
+        }
+      });
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        if (!initiallySubscribed.current && !isInModal) {
+          // console.log(`Unsubscribing from channel ${postParsed.title}`);
+          const unsubMsg = new newnewapi.UnsubscribeFromChannels({
+            channels: [
+              {
+                postUpdates: {
+                  postUuid: postParsed.postUuid,
+                },
+              },
+            ],
+          });
+          socketConnection.emit(
+            'UnsubscribeFromChannels',
+            newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
+          );
+          removeChannel(postParsed.postUuid);
+        }
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (type === 'inside') {
     return (
@@ -264,25 +367,22 @@ export const Card: React.FC<ICard> = ({
             onClick={handleBidClick}
             cardType={typeOfPost}
             progress={typeOfPost === 'cf' ? (
-              Math.floor(((postParsed as newnewapi.Crowdfunding).currentBackerCount * 100)
+              Math.floor((currentBackerCount * 100)
               / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
             ) : 0}
             withProgress={typeOfPost === 'cf'}
           >
             {t(`button-card-${typeOfPost}`, {
-              votes: (postParsed as newnewapi.MultipleChoice).totalVotes,
+              votes: totalVotes,
               total: formatNumber(
                 (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
                 true,
               ),
               backed: formatNumber(
-                (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0,
+                currentBackerCount ?? 0,
                 true,
               ),
-              amount: formatNumber(
-                (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0,
-                true,
-              ),
+              amount: `$${(totalAmount / 100).toFixed(0)}`,
             })}
           </SButton>
           <SCaption variant={2} weight={700}>
@@ -297,6 +397,7 @@ export const Card: React.FC<ICard> = ({
 export default Card;
 
 Card.defaultProps = {
+  isInModal: false,
   type: 'outside',
   width: '',
   height: '',
