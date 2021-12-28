@@ -22,6 +22,7 @@ import PostViewAC from './PostViewAC';
 import PostViewCF from './PostViewCF';
 import List from '../search/List';
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
+import { fetchAcOptionById } from '../../../api/endpoints/auction';
 
 interface IPostModal {
   isOpen: boolean;
@@ -44,6 +45,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
 
   const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
+  const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<
+  newnewapi.Auction.Option | undefined>(undefined);
+  const acSuggestionIDFromUrl = isBrowser()
+    ? new URL(window.location.href).searchParams.get('suggestion')
+    : undefined;
 
   const [open, setOpen] = useState(false);
 
@@ -134,6 +140,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewAC
           post={postParsed as newnewapi.Auction}
+          suggestionFromUrl={acSuggestionFromUrl}
           handleGoBack={() => {
             window.history.back();
           }}
@@ -165,6 +172,31 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       // eslint-disable-next-line no-useless-return
       return;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchSuggestionFromUrl = async () => {
+      if (!acSuggestionIDFromUrl) return;
+      try {
+        const payload = new newnewapi.GetAcOptionRequest({
+          optionId: parseInt(acSuggestionIDFromUrl, 10),
+        });
+
+        const res = await fetchAcOptionById(payload);
+
+        if (res.data?.option) {
+          setAcSuggestionFromUrl(res.data.option as newnewapi.Auction.Option);
+          return;
+        }
+        throw new Error('Could not fetch option from URL');
+      } catch (err) {
+        console.error(err);
+        setAcSuggestionFromUrl(undefined);
+      }
+    };
+
+    fetchSuggestionFromUrl();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -236,6 +268,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               <List
                 category=""
                 loading={recommenedPostsLoading}
+                isInModal
                 // loading
                 collection={recommenedPosts}
                 // collection={[]}

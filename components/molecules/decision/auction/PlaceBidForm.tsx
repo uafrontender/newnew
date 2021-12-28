@@ -6,13 +6,13 @@ import { useTranslation } from 'next-i18next';
 import Button from '../../../atoms/Button';
 
 interface IPlaceBidForm {
-  bidTitle: string;
+  suggestionTitle: string;
   amountRounded: string;
   handlePlaceBid: () => void;
 }
 
 const PlaceBidForm: React.FunctionComponent<IPlaceBidForm> = ({
-  bidTitle,
+  suggestionTitle,
   amountRounded,
   handlePlaceBid,
 }) => {
