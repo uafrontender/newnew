@@ -20,12 +20,22 @@
     "votes": "Votes"
   },
   "BidsTab": {
-    "BidCard": {
+    "me": "me",
+    "SuggestionCard": {
       "by": "by",
       "bidders": "bidders",
       "supportBtn": "Support",
       "placeABidBtn": "Place a bid",
       "cancelBtn": "Cancel"
+    },
+    "BidCard": {
+      "didABid": "bid"
+    },
+    "tags": {
+      "my_vote": "My vote",
+      "my_bid": "My vote",
+      "highest": "Highest",
+      "vip": "VIP"
     },
     "ActionSection": {
       "suggestionPlaceholder": "Add a suggestion ...",

@@ -31,6 +31,7 @@ import SocketContextProvider from '../contexts/socketContext';
 import { cookiesInstance } from '../api/apiConfigs';
 
 import 'react-toastify/dist/ReactToastify.css';
+import ChannelsContextProvider from '../contexts/channelsSetContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -87,23 +88,28 @@ const MyApp = (props: IMyApp): ReactElement => {
         cookies={cookiesInstance}
       >
         <SocketContextProvider>
-          <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
-            <ResizeMode>
-              <GlobalTheme>
-                <div>
-                  <ToastContainer />
-                  {!pageProps.error ? (
-                    getLayout(<Component {...pageProps} />)
-                  ) : (
-                    <Error
-                      errorMsg={pageProps.error?.message}
-                      statusCode={pageProps.error?.statusCode ?? 500}
-                    />
-                  )}
-                </div>
-              </GlobalTheme>
-            </ResizeMode>
-          </PersistGate>
+          <ChannelsContextProvider>
+            <PersistGate
+              loading={null}
+              persistor={(store as EnhancedStoreWithPersistor).__persistor}
+            >
+              <ResizeMode>
+                <GlobalTheme>
+                  <div>
+                    <ToastContainer />
+                    {!pageProps.error ? (
+                      getLayout(<Component {...pageProps} />)
+                    ) : (
+                      <Error
+                        errorMsg={pageProps.error?.message}
+                        statusCode={pageProps.error?.statusCode ?? 500}
+                      />
+                    )}
+                  </div>
+                </GlobalTheme>
+              </ResizeMode>
+            </PersistGate>
+          </ChannelsContextProvider>
         </SocketContextProvider>
       </CookiesProvider>
     </>
