@@ -6,6 +6,7 @@ import React, {
   useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
@@ -49,6 +50,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -443,7 +445,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           />
         ) : (
           <SHistoryLabel>
-            History
+            { t('tabs.history') }
           </SHistoryLabel>
         )}
         {currentTab === 'bids'

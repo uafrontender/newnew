@@ -21,8 +21,6 @@ const SocketContextProvider: React.FC = ({ children }) => {
     });
     setSocket(() => socketConnected);
 
-    // socketConnected.on('ConnectionReady', () => {});
-
     function cleanup() {
       socketConnected.disconnect();
     }

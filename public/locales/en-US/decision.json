@@ -15,6 +15,7 @@
     "in_bids": "in bids"
   },
   "tabs": {
+    "history": "History",
     "bids": "Bids",
     "comments": "Comments",
     "votes": "Votes"
