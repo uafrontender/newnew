@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
@@ -22,6 +23,7 @@ import LoadingModal from '../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import SuggestionOverview from './SuggestionOverview';
 import { TOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import SuggestionActionMobileModal from './SuggestionActionMobileModal';
 
 interface IBidsTab {
   postId: string;
@@ -53,6 +55,8 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   const { t } = useTranslation('decision');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   // Infinite load
   const {
     ref: loadingRef,
@@ -64,6 +68,8 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   // New suggestion/bid
   const [newBidText, setNewBidText] = useState('');
   const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
+  // Mobile modal for new suggestion
+  const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -96,6 +102,7 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
 
       setNewBidAmount('');
       setNewBidText('');
+      setSuggestNewMobileOpen(false);
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
     } catch (err) {
@@ -146,9 +153,21 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
                   handleOpenSuggestionBidHistory={() => handleOpenSuggestionBidHistory(suggestion)}
                 />
               ))}
-              <SLoaderDiv
-                ref={loadingRef}
-              />
+              {!isMobile ? (
+                <SLoaderDiv
+                  ref={loadingRef}
+                />
+              ) : (
+                pagingToken ? (
+                  (
+                    <SLoadMoreBtn
+                      onClick={() => handleLoadBids(pagingToken)}
+                    >
+                      Load more
+                    </SLoadMoreBtn>
+                  )
+                ) : null
+              )}
             </SBidsContainer>
           ) : (
             <SuggestionOverview
@@ -189,6 +208,42 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
           </Button>
         </SActionSection>
       </STabContainer>
+      {/* Suggest new Modal */}
+      {isMobile ? (
+        <SuggestionActionMobileModal
+          isOpen={suggestNewMobileOpen}
+          onClose={() => setSuggestNewMobileOpen(false)}
+          zIndex={12}
+        >
+          <SSuggestNewContainer>
+            <SuggestionTextArea
+              value={newBidText}
+              disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
+              placeholder="Add a suggestion ..."
+              onChange={(e) => setNewBidText(e.target.value)}
+            />
+            <BidAmountTextInput
+              value={newBidAmount}
+              inputAlign="left"
+              horizontalPadding="16px"
+              disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
+              onChange={(newValue: string) => setNewBidAmount(newValue)}
+              minAmount={minAmount}
+            />
+            <Button
+              view="primaryGrad"
+              size="sm"
+              disabled={!newBidText
+                || parseInt(newBidAmount, 10) < minAmount
+                || suggestionBeingSupported !== ''
+                || overviewedSuggestion !== undefined}
+              onClick={() => handleTogglePaymentModalOpen()}
+            >
+              Place a bid
+            </Button>
+          </SSuggestNewContainer>
+        </SuggestionActionMobileModal>
+      ) : null}
       {/* Payment Modal */}
       {paymentModalOpen ? (
         <PaymentModal
@@ -208,6 +263,15 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Mobile floating button */}
+      {isMobile && !suggestNewMobileOpen ? (
+        <SActionButton
+          view="primaryGrad"
+          onClick={() => setSuggestNewMobileOpen(true)}
+        >
+          Suggest new
+        </SActionButton>
+      ) : null}
     </>
   );
 };
@@ -240,6 +304,31 @@ const SBidsContainer = styled.div`
 
 const SLoaderDiv = styled.div`
   height: 10px;
+`;
+
+const SLoadMoreBtn = styled(Button)`
+
+`;
+
+const SActionButton = styled(Button)`
+  position: fixed;
+  z-index: 2;
+
+  width: calc(100% - 32px);
+  bottom: 16px;
+  left: 16px;
+`;
+
+const SSuggestNewContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 16px;
+
+  textarea {
+    width: 100%;
+  }
 `;
 
 const SActionSection = styled.div`

@@ -20,6 +20,7 @@ import PlaceBidForm from './PlaceBidForm';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import SuggestionActionMobileModal from './SuggestionActionMobileModal';
 
 interface ISuggestionTopInfo {
   creator: newnewapi.IUser;
@@ -202,8 +203,36 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
           </SCancelButton>
         </SSupportBidForm>
       )}
+      {isMobile ? (
+        <SuggestionActionMobileModal
+          isOpen={isSupportFormOpen}
+          onClose={() => handleCloseSupportForm()}
+          zIndex={12}
+        >
+          <SSuggestSupportMobileContainer>
+            <div>
+              { suggestion.title }
+            </div>
+            <BidAmountTextInput
+              value={supportBidAmount}
+              inputAlign="left"
+              horizontalPadding="16px"
+              onChange={(newValue: string) => setSupportBidAmount(newValue)}
+              minAmount={minAmount}
+            />
+            <Button
+              view="primaryGrad"
+              size="sm"
+              disabled={!supportBidAmount}
+              onClick={() => handleTogglePaymentModalOpen()}
+            >
+              Place a bid
+            </Button>
+          </SSuggestSupportMobileContainer>
+        </SuggestionActionMobileModal>
+      ) : null}
       {/* Payment Modal */}
-      {paymentModalOpen ? (
+      {isMobile && paymentModalOpen ? (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
@@ -420,4 +449,13 @@ const SCancelButton = styled(Button)`
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
+`;
+
+const SSuggestSupportMobileContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 16px;
+
 `;

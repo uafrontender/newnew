@@ -15,7 +15,6 @@ interface IList {
   category: string;
   collection: any;
   loading: boolean;
-  isInModal?: boolean;
   wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string,
   skeletonsHighlightColor?: string,
@@ -26,7 +25,6 @@ export const List: React.FC<IList> = ({
   category,
   collection,
   loading,
-  isInModal,
   wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
@@ -48,7 +46,6 @@ export const List: React.FC<IList> = ({
         <Card
           item={item}
           index={index + 1}
-          isInModal={isInModal}
           width="100%"
           height={isMobile ? '564px' : '336px'}
         />
@@ -76,7 +73,6 @@ export const List: React.FC<IList> = ({
 };
 
 List.defaultProps = {
-  isInModal: false,
   wrapperStyle: {},
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
