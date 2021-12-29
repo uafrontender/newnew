@@ -42,7 +42,7 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 // Utils
 import switchPostType from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
-import { ChannelsContext } from '../../contexts/channelsSetContext';
+import { ChannelsContext } from '../../contexts/channelsContext';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -75,7 +75,6 @@ interface ICard {
   item: newnewapi.Post;
   type?: 'inside' | 'outside';
   index: number;
-  isInModal?: boolean;
   width?: string;
   height?: string;
 }
@@ -84,7 +83,6 @@ export const Card: React.FC<ICard> = ({
   item,
   type,
   index,
-  isInModal,
   width,
   height,
 }) => {
@@ -99,7 +97,6 @@ export const Card: React.FC<ICard> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channels,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
@@ -124,8 +121,6 @@ export const Card: React.FC<ICard> = ({
     ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
     : 0));
 
-  const initiallySubscribed = useRef(false);
-
   const handleUserClick = (username: string) => {
     router.push(`/u/${username}`);
   };
@@ -144,82 +139,50 @@ export const Card: React.FC<ICard> = ({
     }
   }, [inView]);
 
-  // Track if subscribed for the first time
+  // Increment channel subs after mounting
+  // Decrement when unmounting
   useEffect(() => {
-    initiallySubscribed.current = channels.has(postParsed.postUuid);
+    addChannel(postParsed.postUuid);
+
+    return () => {
+      removeChannel(postParsed.postUuid);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Subscribe to socket updates after the cards mounts
+  // Subscribe to post updates event
   useEffect(() => {
-    if (socketConnection && socketConnection.connected) {
-      // console.log(`Subscribing to post updates ${postParsed.title}`);
-      const subscribeMsg = new newnewapi.SubscribeToChannels({
-        channels: [
-          {
-            postUpdates: {
-              postUuid: postParsed.postUuid,
-            },
-          },
-        ],
-      });
+    const handlerSocketPostUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostUpdated.decode(arr);
 
-      const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-
-      if (!channels.has(postParsed.postUuid)) {
-        // console.log(`Subscribing to channel ${postParsed.title}`);
-        socketConnection.emit(
-          'SubscribeToChannels',
-          subscribeMsgEncoded,
-        );
-
-        addChannel(postParsed.postUuid);
-      }
-
-      socketConnection.on('PostUpdated', (data: any) => {
-        const arr = new Uint8Array(data);
-        const decoded = newnewapi.PostUpdated.decode(arr);
-
-        if (!decoded) return;
-        const [decodedParsed] = switchPostType(
-          decoded.post as newnewapi.IPost);
-        if (decodedParsed.postUuid === postParsed.postUuid) {
-          if (typeOfPost === 'ac') {
-            setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
-          }
-          if (typeOfPost === 'cf') {
-            setCurrentBackerCount(decoded.post?.crowdfunding?.currentBackerCount!!);
-          }
-          if (typeOfPost === 'mc') {
-            setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
-          }
+      if (!decoded) return;
+      const [decodedParsed] = switchPostType(
+        decoded.post as newnewapi.IPost);
+      if (decodedParsed.postUuid === postParsed.postUuid) {
+        if (typeOfPost === 'ac') {
+          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
         }
-      });
+        if (typeOfPost === 'cf') {
+          setCurrentBackerCount(decoded.post?.crowdfunding?.currentBackerCount!!);
+        }
+        if (typeOfPost === 'mc') {
+          setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
+        }
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection.on('PostUpdated', handlerSocketPostUpdated);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        if (!initiallySubscribed.current && !isInModal) {
-          // console.log(`Unsubscribing from channel ${postParsed.title}`);
-          const unsubMsg = new newnewapi.UnsubscribeFromChannels({
-            channels: [
-              {
-                postUpdates: {
-                  postUuid: postParsed.postUuid,
-                },
-              },
-            ],
-          });
-          socketConnection.emit(
-            'UnsubscribeFromChannels',
-            newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
-          );
-          removeChannel(postParsed.postUuid);
-        }
+        socketConnection.off('PostUpdated', handlerSocketPostUpdated);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [socketConnection]);
 
   if (type === 'inside') {
     return (
@@ -397,7 +360,6 @@ export const Card: React.FC<ICard> = ({
 export default Card;
 
 Card.defaultProps = {
-  isInModal: false,
   type: 'outside',
   width: '',
   height: '',

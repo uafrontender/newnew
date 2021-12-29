@@ -268,7 +268,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               <List
                 category=""
                 loading={recommenedPostsLoading}
-                isInModal
                 // loading
                 collection={recommenedPosts}
                 // collection={[]}

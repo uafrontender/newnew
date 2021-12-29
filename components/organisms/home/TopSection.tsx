@@ -14,6 +14,7 @@ import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TOP_10 } from '../../../constants/timings';
+import switchPostType from '../../../utils/switchPostType';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -112,7 +113,7 @@ export const TopSection: React.FC<ITopSection> = ({
 
     return (
       <SItemWrapper
-        key={item.id}
+        key={switchPostType(item)[0].postUuid}
         name={`top-section-${index}`}
         onClick={handleItemClick}
       >

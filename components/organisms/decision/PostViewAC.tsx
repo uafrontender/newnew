@@ -27,7 +27,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { ChannelsContext } from '../../../contexts/channelsSetContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
 
 // Temp
@@ -57,7 +57,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channels,
+    channelsWithSubs,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
@@ -197,6 +197,17 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     window.history.replaceState('', '', currLocation);
   };
 
+  // Increment channel subs after mounting
+  // Decrement when unmounting
+  useEffect(() => {
+    addChannel(post.postUuid);
+
+    return () => {
+      removeChannel(post.postUuid);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     setComments([]);
     setSuggestions([]);
@@ -302,43 +313,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       }
     };
 
-    if (socketConnection && socketConnection.connected) {
-      // console.log('Subscribing to socket updates');
-      const subscribeMsg = new newnewapi.SubscribeToChannels({
-        channels: [
-          {
-            postUpdates: {
-              postUuid: post.postUuid,
-            },
-          },
-        ],
-      });
-
-      const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-
-      // Subscribe to channel if not yet
-      if (!channels.has(post.postUuid)) {
-        // console.log(`Subscribing to socket updates ${post.title} from Modal`);
-        socketConnection.emit(
-          'SubscribeToChannels',
-          subscribeMsgEncoded,
-        );
-      }
-
+    if (socketConnection) {
       socketConnection.on('PostAcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        // console.log('Unsubscribing from socket updates');
         socketConnection.off('PostAcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     socketConnection,
-    channels,
     post,
     user.userData?.userUuid,
     setSuggestions,
