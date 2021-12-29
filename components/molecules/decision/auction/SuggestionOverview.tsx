@@ -124,7 +124,7 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
       }
     };
 
-    if (socketConnection && socketConnection.connected) {
+    if (socketConnection) {
       // console.log('Listening for bids updates events');
 
       socketConnection.on('PostAcBidCreated', socketHandler);

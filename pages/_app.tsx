@@ -31,7 +31,7 @@ import SocketContextProvider from '../contexts/socketContext';
 import { cookiesInstance } from '../api/apiConfigs';
 
 import 'react-toastify/dist/ReactToastify.css';
-import ChannelsContextProvider from '../contexts/channelsSetContext';
+import ChannelsContextProvider from '../contexts/channelsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {

@@ -27,7 +27,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
           </div>
         ))}
         <SActionSection>
-          hey
+          Comments placeholder
         </SActionSection>
       </STabContainer>
     </>
@@ -40,11 +40,10 @@ const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
   height: calc(100% - 112px);
-  background-color: blue;
+  background-color: gray;
 `;
 
 const SActionSection = styled.div`
   position: absolute;
   bottom: 0;
-
 `;
