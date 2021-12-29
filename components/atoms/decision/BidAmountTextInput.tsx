@@ -71,23 +71,30 @@ export default BidAmountTextInput;
 
 const SWrapper = styled.div`
   position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: block;
+  }
 `;
 
 const SInput = styled.input<{
   align: string;
   horizontalPadding?: string;
 }>`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 12.5px 2px;
-  padding-left: ${({ horizontalPadding }) => `calc(0.65rem + ${horizontalPadding})` ?? '5px'};
-  min-width: 80px;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 40px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  text-align: ${({ align }) => align};
+  text-align: left;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  padding-left: calc(50% - .2em);
+  width: 100%;
+
+  background-color: transparent;
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -98,6 +105,23 @@ const SInput = styled.input<{
   &:focus {
     outline: none;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 12.5px 2px;
+    padding-left: ${({ horizontalPadding }) => `calc(0.65rem + ${horizontalPadding})` ?? '5px'};
+    min-width: 80px;
+
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+    text-align: ${({ align }) => align};
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    border: transparent;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
 `;
 
 const PseudoPlaceholder = styled.div<{
@@ -107,15 +131,27 @@ const PseudoPlaceholder = styled.div<{
   position: absolute;
   left: 0;
   top: 0;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 40px;
   color: ${(props) => props.theme.colorsThemed.text.primary};
-  padding-top: 12.5px;
-  padding-bottom: 12.5px;
-  padding-left: ${({ horizontalPadding }) => horizontalPadding ?? '5px'};
-  text-align: ${({ align }) => align};
-  width: fit-content;
+
+  margin-left: -.65em;
+
+  text-align: center;
+  width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+    padding-top: 12.5px;
+    padding-bottom: 12.5px;
+    padding-left: ${({ horizontalPadding }) => horizontalPadding ?? '5px'};
+    text-align: ${({ align }) => align};
+    width: fit-content;
+  }
 `;
 
 const SBottomPlaceholder = styled.div`

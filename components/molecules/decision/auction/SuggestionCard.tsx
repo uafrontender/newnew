@@ -21,6 +21,7 @@ import { TOptionWithHighestField } from '../../../organisms/decision/PostViewAC'
 import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceBidForm';
+import SuggestionActionMobileModal from './SuggestionActionMobileModal';
 
 interface ISuggestionCard {
   suggestion: TOptionWithHighestField;
@@ -124,7 +125,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
 
   return (
     <motion.div
-      key={suggestion.id.toString()}
+      key={index}
       layout="position"
       transition={{
         type: 'spring',
@@ -246,6 +247,34 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
           </SCancelButton>
         </>
       )}
+      {isMobile ? (
+        <SuggestionActionMobileModal
+          isOpen={isSupportFormOpen}
+          onClose={() => handleCloseSupportForm()}
+          zIndex={12}
+        >
+          <SSuggestSupportMobileContainer>
+            <div>
+              { suggestion.title }
+            </div>
+            <BidAmountTextInput
+              value={supportBidAmount}
+              inputAlign="left"
+              horizontalPadding="16px"
+              onChange={(newValue: string) => setSupportBidAmount(newValue)}
+              minAmount={minAmount}
+            />
+            <Button
+              view="primaryGrad"
+              size="sm"
+              disabled={!supportBidAmount}
+              onClick={() => handleTogglePaymentModalOpen()}
+            >
+              Place a bid
+            </Button>
+          </SSuggestSupportMobileContainer>
+        </SuggestionActionMobileModal>
+      ) : null}
       </SSupportBidForm>
       {/* Payment Modal */}
       {paymentModalOpen ? (
@@ -283,11 +312,12 @@ const SContainer = styled(motion.div)<{
   flex-direction: column;
   gap: 12px;
 
-  width: 100%;
+  width: calc(100% - 16px);
 
   opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
+    /* width: 80%; */
     flex-direction: row;
     justify-content: space-between;
     gap: 16px;
@@ -308,11 +338,6 @@ const SBidDetails = styled.div`
 
   &:hover {
     cursor: pointer;
-  }
-
-
-  ${({ theme }) => theme.media.laptop} {
-    width: 430px;
   }
 `;
 
@@ -441,4 +466,13 @@ const SCancelButton = styled(Button)`
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
+`;
+
+const SSuggestSupportMobileContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 16px;
+
 `;

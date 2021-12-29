@@ -268,7 +268,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               <List
                 category=""
                 loading={recommenedPostsLoading}
-                isInModal
                 // loading
                 collection={recommenedPosts}
                 // collection={[]}
@@ -307,7 +306,7 @@ const SPostModalContainer = styled.div`
 
   overflow-y: auto;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   width: 100%;
   height: 100%;
@@ -324,6 +323,7 @@ const SPostModalContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     top: 32px;
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 
