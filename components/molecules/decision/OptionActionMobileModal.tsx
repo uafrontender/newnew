@@ -1,16 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Modal from '../../../organisms/Modal';
+import Modal from '../../organisms/Modal';
 
-interface ISuggestionActionMobileModal {
+interface IOptionActionMobileModal {
   isOpen: boolean;
   zIndex: number;
   onClose: () => void;
 }
 
-const SuggestionActionMobileModal: React.FunctionComponent<
-  ISuggestionActionMobileModal
+const OptionActionMobileModal: React.FunctionComponent<
+  IOptionActionMobileModal
 > = ({
   isOpen,
   zIndex,
@@ -35,7 +35,7 @@ const SuggestionActionMobileModal: React.FunctionComponent<
   </Modal>
 );
 
-export default SuggestionActionMobileModal;
+export default OptionActionMobileModal;
 
 const SWrapper = styled.div`
   width: 100%;

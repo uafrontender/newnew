@@ -60,7 +60,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             {(amountInBids / 100).toFixed(2)}
           </span>
           {' '}
-          { t('PostTopInfo.in_bids') }
+          { t('AcPost.PostTopInfo.in_bids') }
+        </SBidsAmount>
+      )}
+      {postType === 'mc' && totalVotes && (
+        <SBidsAmount>
+          <span>
+            { totalVotes }
+          </span>
+          {' '}
+          { t('McPost.PostTopInfo.votes') }
         </SBidsAmount>
       )}
       <CreatorCard>

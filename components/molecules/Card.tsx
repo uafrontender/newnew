@@ -111,10 +111,10 @@ export const Card: React.FC<ICard> = ({
 
   const [postParsed, typeOfPost] = switchPostType(item);
   // Live updates stored in local state
-  const [totalAmount, setTotalAmount] = useState<number>(() => (typeOfPost === 'cf'
+  const [totalAmount, setTotalAmount] = useState<number>(() => (typeOfPost === 'ac'
     ? (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0
     : 0));
-  const [totalVotes, setTotalVotes] = useState<number>(() => (typeOfPost === 'cf'
+  const [totalVotes, setTotalVotes] = useState<number>(() => (typeOfPost === 'mc'
     ? (postParsed as newnewapi.MultipleChoice).totalVotes ?? 0
     : 0));
   const [currentBackerCount, setCurrentBackerCount] = useState<number>(() => (typeOfPost === 'cf'

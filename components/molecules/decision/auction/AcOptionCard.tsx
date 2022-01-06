@@ -17,32 +17,32 @@ import { useAppSelector } from '../../../../redux-store/store';
 import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import Text from '../../../atoms/Text';
-import { TOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
-import PlaceBidForm from './PlaceBidForm';
-import SuggestionActionMobileModal from './SuggestionActionMobileModal';
+import PlaceBidForm from './PlaceAcBidForm';
+import OptionActionMobileModal from '../OptionActionMobileModal';
 
-interface ISuggestionCard {
-  suggestion: TOptionWithHighestField;
+interface IAcOptionCard {
+  option: TAcOptionWithHighestField;
   postId: string;
   index: number;
-  suggestionBeingSupported?: string;
+  optionBeingSupported?: string;
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
   handleUpdateIsSupportedByUser: (id: number) => void;
-  handleOpenSuggestionBidHistory: () => void;
+  handleOpenOptionBidHistory: () => void;
 }
 
-const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
-  suggestion,
+const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
+  option,
   postId,
   index,
-  suggestionBeingSupported,
+  optionBeingSupported,
   minAmount,
   handleSetSupportedBid,
   handleUpdateIsSupportedByUser,
-  handleOpenSuggestionBidHistory,
+  handleOpenOptionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -53,11 +53,11 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
-  const disabled = suggestionBeingSupported !== '' && suggestionBeingSupported !== suggestion.id.toString();
+  const disabled = optionBeingSupported !== '' && optionBeingSupported !== option.id.toString();
 
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
-    handleSetSupportedBid(suggestion.id.toString());
+    handleSetSupportedBid(option.id.toString());
   };
 
   const handleCloseSupportForm = () => {
@@ -66,7 +66,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToUser = () => router.push(`/u/${suggestion.creator?.username}`);
+  const handleRedirectToUser = () => router.push(`/u/${option.creator?.username}`);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -87,7 +87,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
         amount: new newnewapi.MoneyAmount({
           usdCents: parseInt(supportBidAmount, 10) * 100,
         }),
-        optionId: suggestion.id,
+        optionId: option.id,
         postUuid: postId,
       });
 
@@ -99,7 +99,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       // Mark the option as isSupportedByUser
-      handleUpdateIsSupportedByUser(suggestion.id as number);
+      handleUpdateIsSupportedByUser(option.id as number);
 
       handleSetSupportedBid('');
       setSupportBidAmount('');
@@ -119,7 +119,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
     handleSetSupportedBid,
     handleUpdateIsSupportedByUser,
     supportBidAmount,
-    suggestion.id,
+    option.id,
     postId,
   ]);
 
@@ -150,36 +150,36 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
       >
         <SBidDetails
           onClick={() => {
-            if (suggestionBeingSupported) return;
-            handleOpenSuggestionBidHistory();
+            if (optionBeingSupported) return;
+            handleOpenOptionBidHistory();
           }}
         >
           <SBidInfo>
-            {suggestion.isSupportedByUser
-              && suggestion.creator?.uuid !== user.userData?.userUuid
+            {option.isSupportedByUser
+              && option.creator?.uuid !== user.userData?.userUuid
               ? (
-                <STag>{t('BidsTab.tags.my_vote')}</STag>
+                <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag>
               ) : null}
-            {suggestion.creator?.uuid === user.userData?.userUuid
+            {option.creator?.uuid === user.userData?.userUuid
               ? (
-                <STag>{t('BidsTab.tags.my_bid')}</STag>
+                <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag>
               ) : null}
-            {suggestion.isHighest
+            {option.isHighest
               ? (
-                <STag>{t('BidsTab.tags.highest')}</STag>
+                <STag>{t('AcPost.OptionsTab.tags.highest')}</STag>
               ) : null}
             {/* Comment out for now */}
-            {/* {suggestion.creator.isVIP
+            {/* {option.creator.isVIP
               ? (
-                <STag>{t('BidsTab.tags.vip')}</STag>
+                <STag>{t('AcPost.OptionsTab.tags.vip')}</STag>
               ) : null} */}
             <SAvatar
               onClick={(e) => {
                 e.stopPropagation();
                 handleRedirectToUser();
               }}
-              src={suggestion?.creator?.avatarUrl!! as string}
-              alt={suggestion?.creator?.username!!}
+              src={option?.creator?.avatarUrl!! as string}
+              alt={option?.creator?.username!!}
               draggable={false}
             />
             <SUsername
@@ -188,23 +188,23 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
                 handleRedirectToUser();
               }}
             >
-              { suggestion.creator?.uuid === user.userData?.userUuid
-                ? t('me') : suggestion?.creator?.username }
+              { option.creator?.uuid === user.userData?.userUuid
+                ? t('me') : option?.creator?.username }
             </SUsername>
             <SBidTitle
               variant={3}
             >
-              { suggestion.title }
+              { option.title }
             </SBidTitle>
           </SBidInfo>
           <SAmount>
-            {suggestion.totalAmount?.usdCents
+            {option.totalAmount?.usdCents
               ? (
-                `$${(suggestion?.totalAmount?.usdCents / 100).toFixed(2)}`
+                `$${(option?.totalAmount?.usdCents / 100).toFixed(2)}`
               ) : '00.00'}
           </SAmount>
         </SBidDetails>
-        {suggestionBeingSupported && !disabled ? (
+        {optionBeingSupported && !disabled ? (
           <div
             style={{
               minWidth: isMobileOrTablet ? '82px' : '92px',
@@ -216,7 +216,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
             disabled={disabled}
             onClick={() => handleOpenSupportForm()}
           >
-            { t('BidsTab.SuggestionCard.supportBtn') }
+            { t('AcPost.OptionsTab.OptionCard.supportBtn') }
           </SSupportButton>
         )}
       </SContainer>
@@ -237,25 +237,25 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
             disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
             onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('BidsTab.SuggestionCard.placeABidBtn') }
+            { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
           </Button>
           <SCancelButton
             view="secondary"
             onClick={() => handleCloseSupportForm()}
           >
-            { t('BidsTab.SuggestionCard.cancelBtn') }
+            { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
           </SCancelButton>
         </>
       )}
       {isMobile ? (
-        <SuggestionActionMobileModal
+        <OptionActionMobileModal
           isOpen={isSupportFormOpen}
           onClose={() => handleCloseSupportForm()}
           zIndex={12}
         >
           <SSuggestSupportMobileContainer>
             <div>
-              { suggestion.title }
+              { option.title }
             </div>
             <BidAmountTextInput
               value={supportBidAmount}
@@ -270,10 +270,10 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              Place a bid
+              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
             </Button>
           </SSuggestSupportMobileContainer>
-        </SuggestionActionMobileModal>
+        </OptionActionMobileModal>
       ) : null}
       </SSupportBidForm>
       {/* Payment Modal */}
@@ -284,7 +284,7 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
           onClose={() => setPaymentModalOpen(false)}
         >
           <PlaceBidForm
-            suggestionTitle={suggestion.title}
+            optionTitle={option.title}
             amountRounded={supportBidAmount}
             handlePlaceBid={handleSubmitSupportBid}
           />
@@ -299,11 +299,11 @@ const SuggestionCard: React.FunctionComponent<ISuggestionCard> = ({
   );
 };
 
-SuggestionCard.defaultProps = {
-  suggestionBeingSupported: undefined,
+AcOptionCard.defaultProps = {
+  optionBeingSupported: undefined,
 };
 
-export default SuggestionCard;
+export default AcOptionCard;
 
 const SContainer = styled(motion.div)<{
   isDisabled: boolean;

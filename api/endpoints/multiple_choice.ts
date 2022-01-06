@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  cookiesInstance,
   fetchProtobuf,
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
@@ -15,6 +16,20 @@ export const fetchTopMultipleChoices = (
   `${BASE_URL_MULTICHOICE}/get_top_multiple_choices`,
   'post',
   payload,
+);
+
+export const fetchCurrentOptionsForMCPost = (
+  payload: newnewapi.GetMcOptionsRequest,
+) => fetchProtobuf<newnewapi.GetMcOptionsRequest, newnewapi.GetMcOptionsResponse>(
+  newnewapi.GetMcOptionsRequest,
+  newnewapi.GetMcOptionsResponse,
+  `${BASE_URL_MULTICHOICE}/get_mc_options`,
+  'post',
+  payload,
+  // Optional authentication to get indidualized list of options
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
 );
 
 export const voteOnPost = (

@@ -11,36 +11,73 @@
     "ended_on": "ended on",
     "at_time": "at"
   },
-  "PostTopInfo": {
-    "in_bids": "in bids"
-  },
   "tabs": {
-    "history": "History",
-    "bids": "Bids",
     "comments": "Comments",
-    "votes": "Votes"
+    "bids": "Bids",
+    "history": "History",
+    "options": "Options"
   },
-  "BidsTab": {
-    "me": "me",
-    "SuggestionCard": {
-      "by": "by",
-      "bidders": "bidders",
-      "supportBtn": "Support",
-      "placeABidBtn": "Place a bid",
-      "cancelBtn": "Cancel"
+  "AcPost": {
+    "PostTopInfo": {
+      "in_bids": "in bids"
     },
-    "BidCard": {
-      "didABid": "bid"
+    "OptionsTab": {
+      "me": "me",
+      "tags": {
+        "my_vote": "My vote",
+        "my_bid": "My bid",
+        "highest": "Highest",
+        "vip": "VIP"
+      },
+      "loadMoreBtn": "Load more",
+      "OptionCard": {
+        "by": "by",
+        "bidders": "bidders",
+        "supportBtn": "Support",
+        "placeABidBtn": "Place a bid",
+        "cancelBtn": "Cancel"
+      },
+      "BidCard": {
+        "didABid": "bid"
+      },
+      "ActionSection": {
+        "suggestionPlaceholder": "Add a suggestion ...",
+        "placeABidBtn": "Place a bid"
+      }
     },
-    "tags": {
-      "my_vote": "My vote",
-      "my_bid": "My vote",
-      "highest": "Highest",
-      "vip": "VIP"
+    "FloatingActionButton": {
+      "suggestNewBtn": "Suggest new"
+    }
+  },
+  "McPost": {
+    "PostTopInfo": {
+      "votes": "votes"
     },
-    "ActionSection": {
-      "suggestionPlaceholder": "Add a suggestion ...",
-      "placeABidBtn": "Place a bid"
+    "OptionsTab": {
+      "me": "me",
+      "tags": {
+        "my_vote": "My vote",
+        "my_bid": "My option",
+        "highest": "Highest",
+        "vip": "VIP"
+      },
+      "loadMoreBtn": "Load more",
+      "OptionCard": {
+        "votes": "votes",
+        "supportBtn": "Vote",
+        "placeABidBtn": "Vote",
+        "cancelBtn": "Cancel"
+      },
+      "BidCard": {
+        "didABid": "bid"
+      },
+      "ActionSection": {
+        "suggestionPlaceholder": "Add a suggestion ...",
+        "placeABidBtn": "Place a bid"
+      }
+    },
+    "FloatingActionButton": {
+      "suggestNewBtn": "Suggest new"
     }
   },
   "RecommendationsSection": {

@@ -6,11 +6,11 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../../../../redux-store/store';
 
-interface IBidCard {
+interface IAcBidCard {
   bid: newnewapi.Auction.Bid;
 }
 
-const BidCard:React.FunctionComponent<IBidCard> = ({
+const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
   bid,
 }) => {
   const router = useRouter();
@@ -51,10 +51,10 @@ const BidCard:React.FunctionComponent<IBidCard> = ({
             onClick={() => handleRedirectToUser()}
           >
             {bid.bidder?.uuid !== user.userData?.userUuid
-              ? bid.bidder?.username : t('me')}
+              ? bid.bidder?.username : t('AcPost.me')}
           </SUsernameSpan>
           <SDidABidSpan>
-            { t('BidsTab.BidCard.didABid') }
+            { t('AcPost.OptionsTab.BidCard.didABid') }
           </SDidABidSpan>
           <SAmountSpan>
             $
@@ -77,7 +77,7 @@ const BidCard:React.FunctionComponent<IBidCard> = ({
   );
 };
 
-export default BidCard;
+export default AcBidCard;
 
 const SCardWrapper = styled.div`
   display: grid;
