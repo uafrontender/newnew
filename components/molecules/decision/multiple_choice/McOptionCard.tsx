@@ -8,9 +8,8 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
+import React, { useCallback, useState } from 'react';
+import styled from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 

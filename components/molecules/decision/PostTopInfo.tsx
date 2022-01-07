@@ -25,7 +25,7 @@ interface IPostTopInfo {
   amountInBids?: number;
   totalVotes?: number;
   currentBackers?: number;
-  goalBackers?: number;
+  targetBackers?: number;
   handleFollowCreator: () => void;
   handleFollowDecision: () => void;
   handleReportAnnouncement: () => void;
@@ -38,7 +38,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   amountInBids,
   totalVotes,
   currentBackers,
-  goalBackers,
+  targetBackers,
   handleFollowCreator,
   handleFollowDecision,
   handleReportAnnouncement,
@@ -133,7 +133,7 @@ PostTopInfo.defaultProps = {
   amountInBids: undefined,
   totalVotes: undefined,
   currentBackers: undefined,
-  goalBackers: undefined,
+  targetBackers: undefined,
 };
 
 export default PostTopInfo;

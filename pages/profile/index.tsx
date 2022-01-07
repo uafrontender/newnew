@@ -69,8 +69,8 @@ export async function getServerSideProps(
 
     const { req } = context;
     // Example of using protected & intercepted fetching function is SSR context
-    const payload = new newnewapi.GetMyPostsRequest({
-      kind: newnewapi.GetMyPostsRequest.Kind.MY_ACTIVE_BIDDINGS,
+    const payload = new newnewapi.GetRelatedToMePostsRequest({
+      kind: newnewapi.GetRelatedToMePostsRequest.Kind.MY_ACTIVE_BIDDINGS,
     });
     const res = await getMyPosts(
       payload,

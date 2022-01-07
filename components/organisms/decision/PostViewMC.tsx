@@ -230,7 +230,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
             workingArrUnsorted = workingArr;
           }
 
-          const highestOption = workingArr.sort((a, b) => (
+          const highestOption = workingArrUnsorted.sort((a, b) => (
             (b?.voteCount as number) - (a?.voteCount as number)
           ))[0];
 
@@ -244,7 +244,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
           // const optionsByVipUsers = [];
 
-          const workingArrSorted = workingArr.sort((a, b) => {
+          const workingArrSorted = workingArrUnsorted.sort((a, b) => {
             // Sort the rest by newest first
             return (b.id as number) - (a.id as number);
           });
