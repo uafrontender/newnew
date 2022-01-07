@@ -84,7 +84,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
           usdCents: parseInt(pledgeAmount?.toString()!!, 10),
         }),
         postUuid: post.postUuid,
-        message: pledgeMessage ?? '',
+        ...(pledgeMessage ? (
+          {
+            message: pledgeMessage,
+          }
+        ) : {}),
       });
 
       console.log(makePledgePayload);

@@ -10,7 +10,6 @@ import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
-import Caption from '../atoms/Caption';
 import InlineSVG from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
 
@@ -43,6 +42,7 @@ import moreIcon from '../../public/images/svg/icons/filled/More.svg';
 import switchPostType from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
+import CardTimer from '../atoms/CardTimer';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -348,9 +348,9 @@ export const Card: React.FC<ICard> = ({
               amount: `$${(totalAmount / 100).toFixed(0)}`,
             })}
           </SButton>
-          <SCaption variant={2} weight={700}>
-            {t('card-time-left', { time: '24h 40m' })}
-          </SCaption>
+          <CardTimer
+            timestampSeconds={new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()}
+          />
         </SBottomEnd>
       </SBottomContentOutside>
     </SWrapperOutside>
@@ -719,10 +719,6 @@ const SButton = styled(Button)<ISButtonSpan>`
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
   }
-`;
-
-const SCaption = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
 const SUserAvatar = styled(UserAvatar)`

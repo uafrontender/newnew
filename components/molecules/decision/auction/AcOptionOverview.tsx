@@ -1,16 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useContext, useEffect, useRef, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { SocketContext } from '../../../../contexts/socketContext';
-import { fetchBidsForOption, placeBidOnAuction } from '../../../../api/endpoints/auction';
+import { fetchBidsForOption } from '../../../../api/endpoints/auction';
 
 import AcBidCard from './AcBidCard';
 
@@ -142,7 +140,7 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
 
   return (
     <SBidsContainer>
-      {bidsHistory.map((bid, i) => (
+      {bidsHistory.map((bid) => (
         <AcBidCard
           key={bid.id.toString()}
           bid={bid}

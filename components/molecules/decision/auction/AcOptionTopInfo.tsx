@@ -358,22 +358,6 @@ const SShareButton = styled(Button)`
   }
 `;
 
-const SMoreButton = styled(Button)`
-  background: none;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  padding: 0px;
-  padding-right: 26px;
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
 // Auction
 const SBidsAmount = styled.div`
   grid-area: stats;

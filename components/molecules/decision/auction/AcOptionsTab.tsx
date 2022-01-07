@@ -1,8 +1,6 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -14,16 +12,17 @@ import { useInView } from 'react-intersection-observer';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import AcOptionCard from './AcOptionCard';
-import Button from '../../../atoms/Button';
-import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import PaymentModal from '../PaymentModal';
-import PlaceBidForm from './PlaceAcBidForm';
-import LoadingModal from '../LoadingModal';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import OptionOverview from './AcOptionOverview';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+
+import AcOptionCard from './AcOptionCard';
+import OptionOverview from './AcOptionOverview';
+import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import PlaceBidForm from './PlaceAcBidForm';
+import PaymentModal from '../PaymentModal';
+import LoadingModal from '../LoadingModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import Button from '../../../atoms/Button';
 
 interface IAcOptionsTab {
   postId: string;
@@ -348,50 +347,5 @@ const SActionSection = styled.div`
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     box-shadow: 0px -50px 18px 20px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 0.9)' : 'rgba(241, 243, 249, 0.9)')};
-  }
-`;
-
-const STextarea = styled.textarea`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 12.5px 20px;
-  resize: none;
-  width: 277px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border: transparent;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ::placeholder {
-    color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  }
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const SAmountInput = styled.input`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 12.5px 5px;
-  width: 80px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  text-align: center;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border: transparent;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ::placeholder {
-    color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  }
-
-  &:focus {
-    outline: none;
   }
 `;
