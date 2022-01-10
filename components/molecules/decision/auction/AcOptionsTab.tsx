@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, {
-  useCallback, useEffect, useState,
+  useCallback, useEffect, useRef, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -61,6 +61,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     ref: loadingRef,
     inView,
   } = useInView();
+
+  const containerRef = useRef<HTMLDivElement>();
 
   const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
@@ -127,6 +129,17 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
 
+  useEffect(() => {
+    if (optionBeingSupported && containerRef.current) {
+      const optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
+      const childDiv = containerRef.current.children[optIdx];
+      childDiv.scrollIntoView({
+        block: 'center',
+        // behavior: 'smooth',
+      });
+    }
+  }, [options, optionBeingSupported]);
+
   return (
     <>
       <STabContainer
@@ -138,10 +151,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         {
           !overviewedOption ? (
             <SBidsContainer
-              style={{
-                ...(optionBeingSupported ? {
-                  overflowY: 'hidden',
-                } : {}),
+              ref={(el) => {
+                containerRef.current = el!!;
               }}
             >
               {options.map((option, i) => (

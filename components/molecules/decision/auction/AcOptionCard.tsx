@@ -127,12 +127,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   return (
     <motion.div
       key={index}
-      layout="position"
-      transition={{
-        type: 'spring',
-        damping: 20,
-        stiffness: 300,
-      }}
+      // layout="position"
+      // transition={{
+      //   type: 'spring',
+      //   damping: 20,
+      //   stiffness: 300,
+      // }}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -141,12 +141,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }}
     >
       <SContainer
-        layout="position"
-        transition={{
-          type: 'spring',
-          damping: 20,
-          stiffness: 300,
-        }}
+        // layout="position"
+        // transition={{
+        //   type: 'spring',
+        //   damping: 20,
+        //   stiffness: 300,
+        // }}
         isDisabled={disabled}
       >
         <SBidDetails
@@ -222,7 +222,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         )}
       </SContainer>
       <SSupportBidForm
-        layout
+        // layout
+        layout="size"
+        transition={{
+          type: 'spring',
+          damping: 20,
+          stiffness: 300,
+        }}
       >
       {!isMobile && isSupportFormOpen && (
         <>
