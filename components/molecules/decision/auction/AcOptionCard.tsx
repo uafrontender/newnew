@@ -30,7 +30,7 @@ interface IAcOptionCard {
   optionBeingSupported?: string;
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
-  handleUpdateIsSupportedByUser: (id: number) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
   handleOpenOptionBidHistory: () => void;
 }
 
@@ -41,7 +41,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   optionBeingSupported,
   minAmount,
   handleSetSupportedBid,
-  handleUpdateIsSupportedByUser,
+  handleAddOrUpdateOptionFromResponse,
   handleOpenOptionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
@@ -98,8 +98,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
-      // Mark the option as isSupportedByUser
-      handleUpdateIsSupportedByUser(option.id as number);
+      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       handleSetSupportedBid('');
       setSupportBidAmount('');
@@ -117,7 +118,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     setIsSupportFormOpen,
     setSupportBidAmount,
     handleSetSupportedBid,
-    handleUpdateIsSupportedByUser,
+    handleAddOrUpdateOptionFromResponse,
     supportBidAmount,
     option.id,
     postId,

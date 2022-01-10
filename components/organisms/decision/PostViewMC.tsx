@@ -166,6 +166,63 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     post, user.userData?.userUuid,
   ]);
 
+  const handleAddOrUpdateOptionFromResponse = useCallback((
+    newOrUpdatedption: newnewapi.MultipleChoice.Option,
+  ) => {
+    setOptions((curr) => {
+      const workingArr = [...curr];
+      let workingArrUnsorted;
+      const idx = workingArr.findIndex((op) => op.id === newOrUpdatedption.id);
+      if (idx === -1) {
+        workingArrUnsorted = [...workingArr, newOrUpdatedption as TMcOptionWithHighestField];
+      } else {
+        workingArr[idx]
+          .voteCount = (newOrUpdatedption.voteCount as number);
+        workingArrUnsorted = workingArr;
+      }
+
+      const highestOption = workingArrUnsorted.sort((a, b) => (
+        (b?.voteCount as number) - (a?.voteCount as number)
+      ))[0];
+
+      const optionsByUser = user.userData?.userUuid
+        ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+        : [];
+
+      const optionsSupportedByUser = user.userData?.userUuid
+        ? workingArr.filter((o) => o.isSupportedByUser)
+        : [];
+
+      // const optionsByVipUsers = [];
+
+      const workingArrSorted = workingArrUnsorted.sort((a, b) => {
+        // Sort the rest by newest first
+        return (b.id as number) - (a.id as number);
+      });
+
+      const joinedArr = [
+        ...optionsByUser,
+        ...optionsSupportedByUser,
+        // ...optionsByVipUsers,
+        ...(highestOption ? [highestOption] : []),
+        ...workingArrSorted,
+      ];
+
+      const workingSortedUnique = joinedArr.length > 0
+        ? [...new Set(joinedArr)] : [];
+
+      const highestOptionIdx = (
+        workingSortedUnique as TMcOptionWithHighestField[]
+      ).findIndex((o) => o.id === highestOption.id);
+
+      if (workingSortedUnique[highestOptionIdx]) {
+        workingSortedUnique[highestOptionIdx].isHighest = true;
+      }
+
+      return workingSortedUnique;
+    });
+  }, [setOptions, user.userData?.userUuid]);
+
   const fetchPostLatestData = useCallback(async () => {
     try {
       const fetchPostPayload = new newnewapi.GetPostRequest({
@@ -183,15 +240,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleUpdateIsSupportedByUser = (id: number) => {
-    setOptions((curr) => {
-      const workingArr = [...curr];
-      const idx = workingArr.findIndex((o) => o.id === id);
-      workingArr[idx].isSupportedByUser = true;
-      return workingArr;
-    });
-  };
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -392,7 +440,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
                   parseInt((post.votePrice?.usdCents / 100).toFixed(0), 10)
                 ) : 1}
               handleLoadOptions={fetchOptions}
-              handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             />
           ) : (
             <CommentsTab

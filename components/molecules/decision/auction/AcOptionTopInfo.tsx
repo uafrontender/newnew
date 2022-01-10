@@ -29,7 +29,7 @@ interface IAcOptionTopInfo {
   postId: string;
   minAmount: number;
   amountInBids?: number;
-  handleUpdateIsSupportedByUser: (id: number) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
 }
 
 const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
@@ -39,7 +39,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   postId,
   minAmount,
   amountInBids,
-  handleUpdateIsSupportedByUser,
+  handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -92,8 +92,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
-      // Mark the option as isSupportedByUser
-      handleUpdateIsSupportedByUser(option.id as number);
+      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setSupportBidAmount('');
       setIsSupportFormOpen(false);
@@ -109,7 +110,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
     setLoadingModalOpen,
     setIsSupportFormOpen,
     setSupportBidAmount,
-    handleUpdateIsSupportedByUser,
+    handleAddOrUpdateOptionFromResponse,
     supportBidAmount,
     option.id,
     postId,

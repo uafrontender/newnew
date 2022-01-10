@@ -32,7 +32,7 @@ interface IAcOptionsTab {
   minAmount: number;
   handleLoadBids: (token?: string) => void;
   overviewedOption?: newnewapi.Auction.Option;
-  handleUpdateIsSupportedByUser: (id: number) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
   handleCloseOptionBidHistory: () => void;
   handleOpenOptionBidHistory: (
     optionToOpen: newnewapi.Auction.Option
@@ -47,7 +47,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   minAmount,
   handleLoadBids,
   overviewedOption,
-  handleUpdateIsSupportedByUser,
+  handleAddOrUpdateOptionFromResponse,
   handleCloseOptionBidHistory,
   handleOpenOptionBidHistory,
 }) => {
@@ -99,6 +99,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
+      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
       setNewBidAmount('');
       setNewBidText('');
       setSuggestNewMobileOpen(false);
@@ -113,6 +117,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     newBidAmount,
     newBidText,
     postId,
+    handleAddOrUpdateOptionFromResponse,
   ]);
 
   useEffect(() => {
@@ -148,7 +153,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                   minAmount={minAmount}
                   optionBeingSupported={optionBeingSupported}
                   handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
-                  handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
+                  handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
                   handleOpenOptionBidHistory={() => handleOpenOptionBidHistory(option)}
                 />
               ))}

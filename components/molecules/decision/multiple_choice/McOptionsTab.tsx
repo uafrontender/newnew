@@ -31,7 +31,7 @@ interface IMcOptionsTab {
   pagingToken: string | undefined | null;
   minAmount: number;
   handleLoadOptions: (token?: string) => void;
-  handleUpdateIsSupportedByUser: (id: number) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
@@ -41,7 +41,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   pagingToken,
   minAmount,
   handleLoadOptions,
-  handleUpdateIsSupportedByUser,
+  handleAddOrUpdateOptionFromResponse,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -89,6 +89,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
+      const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
       setNewBidAmount('');
       setNewOptionText('');
       setSuggestNewMobileOpen(false);
@@ -103,6 +107,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     newBidAmount,
     newOptionText,
     post.postUuid,
+    handleAddOrUpdateOptionFromResponse,
   ]);
 
   useEffect(() => {
@@ -137,7 +142,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               minAmount={minAmount}
               optionBeingSupported={optionBeingSupported}
               handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
-              handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             />
           ))}
           {!isMobile ? (

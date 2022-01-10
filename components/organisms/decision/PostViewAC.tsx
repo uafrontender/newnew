@@ -202,6 +202,72 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     });
   };
 
+  const handleAddOrUpdateOptionFromResponse = useCallback((
+    newOption: newnewapi.Auction.Option,
+  ) => {
+    setOptions((curr) => {
+      const workingArr = [...curr];
+      let workingArrUnsorted;
+      const idx = workingArr.findIndex((op) => op.id === newOption?.id);
+      if (idx === -1) {
+        workingArrUnsorted = [...workingArr, newOption as TAcOptionWithHighestField];
+      } else {
+        workingArr[idx]
+          .supporterCount = (newOption?.supporterCount as number);
+        workingArr[idx]
+          .totalAmount = (newOption?.totalAmount as newnewapi.IMoneyAmount);
+        workingArrUnsorted = workingArr;
+      }
+
+      const highestOption = workingArrUnsorted.sort((a, b) => (
+        (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
+      ))[0];
+
+      workingArrUnsorted.forEach((option, i) => {
+        if (i > 0) {
+          // eslint-disable-next-line no-param-reassign
+          option.isHighest = false;
+        }
+      });
+
+      const optionsByUser = user.userData?.userUuid
+        ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+        : [];
+
+      const optionsSupportedByUser = user.userData?.userUuid
+        ? workingArrUnsorted.filter((o) => o.isSupportedByUser)
+        : [];
+
+      // const optionsByVipUsers = [];
+
+      const workingArrSorted = workingArrUnsorted.sort((a, b) => {
+        // Sort the rest by newest first
+        return (b.id as number) - (a.id as number);
+      });
+
+      const joinedArr = [
+        ...optionsByUser,
+        ...optionsSupportedByUser,
+        // ...optionsByVipUsers,
+        ...(highestOption ? [highestOption] : []),
+        ...workingArrSorted,
+      ];
+
+      const workingSortedUnique = joinedArr.length > 0
+        ? [...new Set(joinedArr)] : [];
+
+      const highestOptionIdx = (
+        workingSortedUnique as TAcOptionWithHighestField[]
+      ).findIndex((o) => o.id === highestOption.id);
+
+      if (workingSortedUnique[highestOptionIdx]) {
+        (workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField).isHighest = true;
+      }
+
+      return workingSortedUnique;
+    });
+  }, [setOptions, user.userData?.userUuid]);
+
   const handleOpenOptionBidHistory = (
     optionToOpen: newnewapi.Auction.Option,
   ) => {
@@ -437,7 +503,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
               ) : 5}
             amountInBids={overviewedOption?.totalAmount?.usdCents!!}
             createdAtSeconds={overviewedOption?.createdAt?.seconds as number}
-            handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
+            handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
         )}
         {!overviewedOption ? (
@@ -481,7 +547,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
                 ) : 5}
               handleLoadBids={fetchBids}
               overviewedOption={overviewedOption}
-              handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
               handleOpenOptionBidHistory={handleOpenOptionBidHistory}
               handleCloseOptionBidHistory={handleCloseOptionBidHistory}
             />

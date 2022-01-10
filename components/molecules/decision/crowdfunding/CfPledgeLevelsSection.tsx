@@ -4,6 +4,7 @@
 import React, {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -11,6 +12,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -23,16 +25,19 @@ import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceCfBidForm from './PlaceCfBidForm';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
+import { validateText } from '../../../../api/endpoints/infrastructure';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
   post: newnewapi.Crowdfunding;
+  handleAddPledgeFromResponse: (newPledge: newnewapi.Crowdfunding.Pledge) => void;
   handleSetHeightDelta: (newValue: number) => void;
 }
 
 const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = ({
   pledgeLevels,
   post,
+  handleAddPledgeFromResponse,
   handleSetHeightDelta,
 }, ref) => {
   const { t } = useTranslation('decision');
@@ -48,9 +53,62 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   const [selectedPledgeLevelIdx, setSelectedPledgeLevelIdx] = useState(-1);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [pledgeMessage, setPledgeMessage] = useState('');
+  const [pledgeMessageValid, setPledgeMessageValid] = useState(true);
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+  // Handlers
+  const validateTextViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        // NB! temp
+        kind: newnewapi.ValidateTextRequest.Kind.USER_BIO,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setPledgeMessageValid(false);
+      } else {
+        setPledgeMessageValid(true);
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+    }
+  }, []);
+
+  const validateTextViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateTextViaAPI(text);
+  }, 250),
+  [validateTextViaAPI]);
+
+  const handleMessageInputChange = useCallback((
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setPledgeMessage(e.target.value);
+
+    validateTextViaAPIDebounced(
+      e.target.value,
+    );
+  },
+  [
+    setPledgeMessage, validateTextViaAPIDebounced,
+  ]);
 
   const handleOpenPledgeForm = useCallback((idx: number, amount: number) => {
     setPledgeAmount(amount);
@@ -68,6 +126,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   };
 
   const handleTogglePaymentModalOpen = () => {
+    if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
       router.push('/sign-up?reason=make-pledge');
       return;
@@ -100,6 +159,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
+      console.log(res.data);
+
+      handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
+
       setCustomPledgeAmount('');
       setSelectedPledgeLevelIdx(-1);
       setIsFormOpen(false);
@@ -111,17 +174,25 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
     }
-  }, [pledgeAmount, pledgeMessage, post.postUuid]);
+  }, [
+    pledgeAmount,
+    pledgeMessage,
+    post.postUuid,
+    handleAddPledgeFromResponse,
+  ]);
 
   useEffect(() => {
-    const handleUpdate = () => {
-      console.log(containerRef.current?.getBoundingClientRect().height);
-      handleSetHeightDelta(containerRef.current?.getBoundingClientRect().height ?? 256);
+    const resizeObserver = new ResizeObserver((entry) => {
+      if (entry[0]?.borderBoxSize[0]?.blockSize) {
+        handleSetHeightDelta(entry[0].borderBoxSize[0].blockSize + 90);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current!!);
+
+    return () => {
+      // resizeObserver.unobserve(containerRef.current!!);
     };
-
-    containerRef.current?.addEventListener('resize', handleUpdate);
-
-    return () => containerRef.current?.removeEventListener('resize', handleUpdate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -173,11 +244,15 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
             <SuggestionTextArea
               value={pledgeMessage}
               placeholder={t('McPost.PledgeLevelsSection.messagePlaceholder')}
-              onChange={(e) => setPledgeMessage(e.target.value)}
+              onChange={handleMessageInputChange}
             />
             <Button
               view="primaryGrad"
               size="sm"
+              disabled={pledgeMessage.length > 0 && !pledgeMessageValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }

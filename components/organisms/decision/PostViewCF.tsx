@@ -89,8 +89,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      console.log(res.data);
-
       setPledgeLevels(res.data.amounts);
 
       setPledgeLevelsLoading(false);
@@ -127,31 +125,41 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       if (res.data && res.data.pledges) {
         setPledges((curr) => {
           const workingArr = [...curr, ...res.data?.pledges as TCfPledgeWithHighestField[]];
+          const workingArrUnsorted = [...workingArr];
+
+          // eslint-disable-next-line no-plusplus
+          for (let i = 0; i < workingArrUnsorted.length; i++) {
+            workingArrUnsorted[i].isHighest = false;
+          }
 
           const highestPledge = workingArr.sort((a, b) => (
             (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
           ))[0];
 
           const pledgesByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            : [];
-
-          const pledgesSupportedByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+            ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+              .sort((a, b) => {
+                // Sort by newest first
+                return (b.id as number) - (a.id as number);
+              })
             : [];
 
           // const pledgesByVipUsers = [];
 
-          const workingArrSorted = workingArr.sort((a, b) => {
+          const workingArrSorted = workingArrUnsorted.sort((a, b) => {
             // Sort the rest by newest first
             return (b.id as number) - (a.id as number);
           });
 
           const joinedArr = [
+            ...(
+              highestPledge
+              && highestPledge.creator?.uuid === user.userData?.userUuid ? [highestPledge] : []),
             ...pledgesByUser,
-            ...pledgesSupportedByUser,
             // ...pledgesByVipUsers,
-            ...(highestPledge ? [highestPledge] : []),
+            ...(
+              highestPledge
+              && highestPledge.creator?.uuid !== user.userData?.userUuid ? [highestPledge] : []),
             ...workingArrSorted,
           ];
 
@@ -182,6 +190,61 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     setPledges,
     post, user.userData?.userUuid,
   ]);
+
+  const handleAddPledgeFromResponse = useCallback((newPledge: newnewapi.Crowdfunding.Pledge) => {
+    setPledges((curr) => {
+      const workingArrUnsorted = [...curr, newPledge as TCfPledgeWithHighestField];
+
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < workingArrUnsorted.length; i++) {
+        workingArrUnsorted[i].isHighest = false;
+      }
+
+      const highestPledge = workingArrUnsorted.sort((a, b) => (
+        (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
+      ))[0];
+
+      const pledgesByUser = user.userData?.userUuid
+        ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+          .sort((a, b) => {
+            // Sort by newest first
+            return (b.id as number) - (a.id as number);
+          })
+        : [];
+
+      // const pledgesByVipUsers = [];
+
+      const workingArrSorted = workingArrUnsorted.sort((a, b) => {
+        // Sort the rest by newest first
+        return (b.id as number) - (a.id as number);
+      });
+
+      const joinedArr = [
+        ...(
+          highestPledge
+          && highestPledge.creator?.uuid === user.userData?.userUuid ? [highestPledge] : []),
+        ...pledgesByUser,
+        // ...pledgesByVipUsers,
+        ...(
+          highestPledge
+          && highestPledge.creator?.uuid !== user.userData?.userUuid ? [highestPledge] : []),
+        ...workingArrSorted,
+      ];
+
+      const workingSortedUnique = joinedArr.length > 0
+        ? [...new Set(joinedArr)] : [];
+
+      const highestPledgeIdx = (
+        workingSortedUnique as TCfPledgeWithHighestField[]
+      ).findIndex((o) => o.id === highestPledge.id);
+
+      if (workingSortedUnique[highestPledgeIdx]) {
+        workingSortedUnique[highestPledgeIdx].isHighest = true;
+      }
+
+      return workingSortedUnique;
+    });
+  }, [setPledges, user.userData?.userUuid]);
 
   const fetchPostLatestData = useCallback(async () => {
     try {
@@ -225,6 +288,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.CfPledgeCreated.decode(arr);
       if (decoded.pledge && decoded.postUuid === post.postUuid) {
+        if (decoded.pledge.creator?.uuid === user.userData?.userUuid) return;
         setPledges((curr) => {
           const workingArr = [...curr];
           let workingArrUnsorted;
@@ -237,12 +301,21 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
             workingArrUnsorted = workingArr;
           }
 
+          // eslint-disable-next-line no-plusplus
+          for (let i = 0; i < workingArrUnsorted.length; i++) {
+            workingArrUnsorted[i].isHighest = false;
+          }
+
           const highestPledge = workingArrUnsorted.sort((a, b) => (
             (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
           ))[0];
 
           const pledgesByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+            ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+              .sort((a, b) => {
+                // Sort by newest first
+                return (b.id as number) - (a.id as number);
+              })
             : [];
 
           // const pledgesByVipUsers = [];
@@ -253,9 +326,14 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           });
 
           const joinedArr = [
+            ...(
+              highestPledge
+              && highestPledge.creator?.uuid === user.userData?.userUuid ? [highestPledge] : []),
             ...pledgesByUser,
             // ...pledgesByVipUsers,
-            ...(highestPledge ? [highestPledge] : []),
+            ...(
+              highestPledge
+              && highestPledge.creator?.uuid !== user.userData?.userUuid ? [highestPledge] : []),
             ...workingArrSorted,
           ];
 
@@ -363,6 +441,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         <CfPledgeLevelsSection
           pledgeLevels={pledgeLevels}
           post={post}
+          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
           handleSetHeightDelta={(newValue: number) => setHeightDelta(newValue)}
         />
         <CfPledgesSection

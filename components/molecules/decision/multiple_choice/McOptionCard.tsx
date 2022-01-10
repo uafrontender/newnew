@@ -31,7 +31,7 @@ interface IMcOptionCard {
   optionBeingSupported?: string;
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
-  handleUpdateIsSupportedByUser: (id: number) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
@@ -42,7 +42,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   optionBeingSupported,
   minAmount,
   handleSetSupportedBid,
-  handleUpdateIsSupportedByUser,
+  handleAddOrUpdateOptionFromResponse,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -96,8 +96,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
-      // Mark the option as isSupportedByUser
-      handleUpdateIsSupportedByUser(option.id as number);
+      const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       handleSetSupportedBid('');
       setSupportBidAmount('');
@@ -115,7 +116,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsSupportFormOpen,
     setSupportBidAmount,
     handleSetSupportedBid,
-    handleUpdateIsSupportedByUser,
+    handleAddOrUpdateOptionFromResponse,
     supportBidAmount,
     option.id,
     postId,
