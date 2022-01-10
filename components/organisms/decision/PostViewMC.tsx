@@ -84,6 +84,64 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
+  const sortOptions = useCallback((unsortedArr: TMcOptionWithHighestField[]) => {
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < unsortedArr.length; i++) {
+      // eslint-disable-next-line no-param-reassign
+      unsortedArr[i].isHighest = false;
+    }
+
+    const highestOption = unsortedArr.sort((a, b) => (
+      (b?.voteCount as number) - (a?.voteCount as number)
+    ))[0];
+
+    const optionsByUser = user.userData?.userUuid
+      ? unsortedArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+        .sort((a, b) => (
+          (b?.voteCount as number) - (a?.voteCount as number)
+        ))
+      : [];
+
+    const optionsSupportedByUser = user.userData?.userUuid
+      ? unsortedArr.filter((o) => o.isSupportedByUser)
+        .sort((a, b) => (
+          (b?.voteCount as number) - (a?.voteCount as number)
+        ))
+      : [];
+
+    // const optionsByVipUsers = [];
+
+    const workingArrSorted = unsortedArr.sort((a, b) => (
+      (b?.voteCount as number) - (a?.voteCount as number)
+    ));
+
+    const joinedArr = [
+      ...(
+        highestOption
+        && highestOption.creator?.uuid === user.userData?.userUuid ? [highestOption] : []),
+      ...optionsByUser,
+      ...optionsSupportedByUser,
+      // ...optionsByVipUsers,
+      ...(
+        highestOption
+        && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),
+      ...workingArrSorted,
+    ];
+
+    const workingSortedUnique = joinedArr.length > 0
+      ? [...new Set(joinedArr)] : [];
+
+    const highestOptionIdx = (
+      workingSortedUnique as TMcOptionWithHighestField[]
+    ).findIndex((o) => o.id === highestOption.id);
+
+    if (workingSortedUnique[highestOptionIdx]) {
+      workingSortedUnique[highestOptionIdx].isHighest = true;
+    }
+
+    return workingSortedUnique;
+  }, [user.userData?.userUuid]);
+
   const fetchOptions = useCallback(async (
     pageToken?: string,
   ) => {
@@ -111,45 +169,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         setOptions((curr) => {
           const workingArr = [...curr, ...res.data?.options as TMcOptionWithHighestField[]];
 
-          const highestOption = workingArr.sort((a, b) => (
-            (b?.voteCount as number) - (a?.voteCount as number)
-          ))[0];
-
-          const optionsByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            : [];
-
-          const optionsSupportedByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.isSupportedByUser)
-            : [];
-
-          // const optionsByVipUsers = [];
-
-          const workingArrSorted = workingArr.sort((a, b) => {
-            // Sort the rest by newest first
-            return (b.id as number) - (a.id as number);
-          });
-
-          const joinedArr = [
-            ...optionsByUser,
-            ...optionsSupportedByUser,
-            // ...optionsByVipUsers,
-            ...(highestOption ? [highestOption] : []),
-            ...workingArrSorted,
-          ];
-
-          const workingSortedUnique = joinedArr.length > 0
-            ? [...new Set(joinedArr)] : [];
-
-          const highestOptionIdx = (
-            workingSortedUnique as TMcOptionWithHighestField[]
-          ).findIndex((o) => o.id === highestOption.id);
-
-          if (workingSortedUnique[highestOptionIdx]) {
-            workingSortedUnique[highestOptionIdx].isHighest = true;
-          }
-
-          return workingSortedUnique;
+          return sortOptions(workingArr);
         });
         setOptionsNextPageToken(res.data.paging?.nextPageToken);
       }
@@ -163,7 +183,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   }, [
     optionsLoading,
     setOptions,
-    post, user.userData?.userUuid,
+    sortOptions,
+    post,
   ]);
 
   const handleAddOrUpdateOptionFromResponse = useCallback((
@@ -181,47 +202,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         workingArrUnsorted = workingArr;
       }
 
-      const highestOption = workingArrUnsorted.sort((a, b) => (
-        (b?.voteCount as number) - (a?.voteCount as number)
-      ))[0];
-
-      const optionsByUser = user.userData?.userUuid
-        ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-        : [];
-
-      const optionsSupportedByUser = user.userData?.userUuid
-        ? workingArr.filter((o) => o.isSupportedByUser)
-        : [];
-
-      // const optionsByVipUsers = [];
-
-      const workingArrSorted = workingArrUnsorted.sort((a, b) => {
-        // Sort the rest by newest first
-        return (b.id as number) - (a.id as number);
-      });
-
-      const joinedArr = [
-        ...optionsByUser,
-        ...optionsSupportedByUser,
-        // ...optionsByVipUsers,
-        ...(highestOption ? [highestOption] : []),
-        ...workingArrSorted,
-      ];
-
-      const workingSortedUnique = joinedArr.length > 0
-        ? [...new Set(joinedArr)] : [];
-
-      const highestOptionIdx = (
-        workingSortedUnique as TMcOptionWithHighestField[]
-      ).findIndex((o) => o.id === highestOption.id);
-
-      if (workingSortedUnique[highestOptionIdx]) {
-        workingSortedUnique[highestOptionIdx].isHighest = true;
-      }
-
-      return workingSortedUnique;
+      return sortOptions(workingArrUnsorted);
     });
-  }, [setOptions, user.userData?.userUuid]);
+  }, [
+    setOptions,
+    sortOptions,
+  ]);
 
   const fetchPostLatestData = useCallback(async () => {
     try {
@@ -278,45 +264,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
             workingArrUnsorted = workingArr;
           }
 
-          const highestOption = workingArrUnsorted.sort((a, b) => (
-            (b?.voteCount as number) - (a?.voteCount as number)
-          ))[0];
-
-          const optionsByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            : [];
-
-          const optionsSupportedByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.isSupportedByUser)
-            : [];
-
-          // const optionsByVipUsers = [];
-
-          const workingArrSorted = workingArrUnsorted.sort((a, b) => {
-            // Sort the rest by newest first
-            return (b.id as number) - (a.id as number);
-          });
-
-          const joinedArr = [
-            ...optionsByUser,
-            ...optionsSupportedByUser,
-            // ...optionsByVipUsers,
-            ...(highestOption ? [highestOption] : []),
-            ...workingArrSorted,
-          ];
-
-          const workingSortedUnique = joinedArr.length > 0
-            ? [...new Set(joinedArr)] : [];
-
-          const highestOptionIdx = (
-            workingSortedUnique as TMcOptionWithHighestField[]
-          ).findIndex((o) => o.id === highestOption.id);
-
-          if (workingSortedUnique[highestOptionIdx]) {
-            workingSortedUnique[highestOptionIdx].isHighest = true;
-          }
-
-          return workingSortedUnique;
+          return sortOptions(workingArrUnsorted);
         });
       }
     };
@@ -351,6 +299,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     post,
     user.userData?.userUuid,
     setOptions,
+    sortOptions,
   ]);
 
   return (
