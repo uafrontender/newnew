@@ -46,7 +46,7 @@ export const handleProtobufResponse = (response: Response): Promise<ArrayBuffer>
     if (response.ok && contentType && contentType.indexOf('application/x-protobuf') !== -1) {
       resolve(response.arrayBuffer());
     }
-    if (response.status >= 400 && response.status < 404) {
+    if (response.status >= 401 && response.status < 404) {
       reject(new Error('Access token invalid'));
     }
     reject(new Error('An error occured'));

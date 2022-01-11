@@ -5,14 +5,14 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Button from '../../../atoms/Button';
 
-interface IPlaceBidForm {
-  suggestionTitle: string;
+interface IPlaceAcBidForm {
+  optionTitle: string;
   amountRounded: string;
   handlePlaceBid: () => void;
 }
 
-const PlaceBidForm: React.FunctionComponent<IPlaceBidForm> = ({
-  suggestionTitle,
+const PlaceAcBidForm: React.FunctionComponent<IPlaceAcBidForm> = ({
+  optionTitle,
   amountRounded,
   handlePlaceBid,
 }) => {
@@ -29,7 +29,7 @@ const PlaceBidForm: React.FunctionComponent<IPlaceBidForm> = ({
   );
 };
 
-export default PlaceBidForm;
+export default PlaceAcBidForm;
 
 const SWrapper = styled.div`
 

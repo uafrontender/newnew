@@ -65,7 +65,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     if (isLoading) return;
     try {
       setIsLoading(true);
-      const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
+      const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
         userUuid: user.uuid,
         filter: newnewapi.Post.Filter.ALL,
         paging: {
@@ -194,7 +194,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // will fetch only for creators
   if (res.data.options?.isCreator && !context.req.url?.startsWith('/_next')) {
   // if (res.data && !context.req.url?.startsWith('/_next')) {
-    const fetchUserPostsPayload = new newnewapi.GetTheirPostsRequest({
+    const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
       userUuid: res.data.uuid,
       filter: newnewapi.Post.Filter.ALL,
       paging: {

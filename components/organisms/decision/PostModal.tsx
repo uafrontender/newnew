@@ -140,7 +140,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewAC
           post={postParsed as newnewapi.Auction}
-          suggestionFromUrl={acSuggestionFromUrl}
+          optionFromUrl={acSuggestionFromUrl}
           handleGoBack={() => {
             window.history.back();
           }}

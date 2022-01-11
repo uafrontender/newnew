@@ -16,30 +16,30 @@ import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
-import PlaceBidForm from './PlaceBidForm';
+import PlaceBidForm from './PlaceAcBidForm';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import SuggestionActionMobileModal from './SuggestionActionMobileModal';
+import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
-interface ISuggestionTopInfo {
+interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
   createdAtSeconds: number;
-  suggestion: newnewapi.Auction.Option;
+  option: newnewapi.Auction.Option;
   postId: string;
   minAmount: number;
   amountInBids?: number;
-  handleUpdateIsSupportedByUser: (id: number) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
 }
 
-const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
+const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   creator,
   createdAtSeconds,
-  suggestion,
+  option,
   postId,
   minAmount,
   amountInBids,
-  handleUpdateIsSupportedByUser,
+  handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -81,7 +81,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
         amount: new newnewapi.MoneyAmount({
           usdCents: parseInt(supportBidAmount, 10) * 100,
         }),
-        optionId: suggestion.id,
+        optionId: option.id,
         postUuid: postId,
       });
 
@@ -92,8 +92,9 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
-      // Mark the option as isSupportedByUser
-      handleUpdateIsSupportedByUser(suggestion.id as number);
+      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setSupportBidAmount('');
       setIsSupportFormOpen(false);
@@ -109,9 +110,9 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
     setLoadingModalOpen,
     setIsSupportFormOpen,
     setSupportBidAmount,
-    handleUpdateIsSupportedByUser,
+    handleAddOrUpdateOptionFromResponse,
     supportBidAmount,
-    suggestion.id,
+    option.id,
     postId,
   ]);
 
@@ -123,7 +124,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
           {((amountInBids ?? 0) / 100).toFixed(2)}
         </span>
         {' '}
-        { t('PostTopInfo.in_bids') }
+        { t('AcPost.PostTopInfo.in_bids') }
       </SBidsAmount>
       <CreatorCard>
         <SAvatarArea>
@@ -134,7 +135,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
         </SAvatarArea>
         <SUsername>
           { creator.uuid !== user.userData?.userUuid
-            ? creator.username : t('me') }
+            ? creator.username : t('AcPost.OptionsTab.me') }
         </SUsername>
         <SStartsAt>
           { createdAtParsed.getDate() }
@@ -175,7 +176,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
             view="secondary"
             onClick={() => handleOpenSupportForm()}
           >
-            { t('BidsTab.SuggestionCard.supportBtn') }
+            { t('AcPost.OptionsTab.OptionCard.supportBtn') }
           </SSupportButton>
         )}
       </SActionsDiv>
@@ -193,13 +194,13 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
             disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
             onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('BidsTab.SuggestionCard.placeABidBtn') }
+            { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
           </Button>
           <SCancelButton
             view="secondary"
             onClick={() => handleCloseSupportForm()}
           >
-            { t('BidsTab.SuggestionCard.cancelBtn') }
+            { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
           </SCancelButton>
         </SSupportBidForm>
       )}
@@ -211,7 +212,7 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
         >
           <SSuggestSupportMobileContainer>
             <div>
-              { suggestion.title }
+              { option.title }
             </div>
             <BidAmountTextInput
               value={supportBidAmount}
@@ -226,20 +227,20 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              Place a bid
+              { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
             </Button>
           </SSuggestSupportMobileContainer>
         </SuggestionActionMobileModal>
       ) : null}
       {/* Payment Modal */}
-      {isMobile && paymentModalOpen ? (
+      {paymentModalOpen ? (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
           onClose={() => setPaymentModalOpen(false)}
         >
           <PlaceBidForm
-            suggestionTitle={suggestion.title}
+            optionTitle={option.title}
             amountRounded={supportBidAmount}
             handlePlaceBid={handleSubmitSupportBid}
           />
@@ -254,11 +255,11 @@ const SuggestionTopInfo: React.FunctionComponent<ISuggestionTopInfo> = ({
   );
 };
 
-SuggestionTopInfo.defaultProps = {
+AcOptionTopInfo.defaultProps = {
   amountInBids: undefined,
 };
 
-export default SuggestionTopInfo;
+export default AcOptionTopInfo;
 
 const SWrapper = styled.div`
   position: relative;
@@ -358,22 +359,6 @@ const SShareButton = styled(Button)`
   }
 `;
 
-const SMoreButton = styled(Button)`
-  background: none;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  padding: 0px;
-  padding-right: 26px;
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
 // Auction
 const SBidsAmount = styled.div`
   grid-area: stats;
@@ -398,7 +383,7 @@ const SBidsAmount = styled.div`
   }
 `;
 
-// Support suggestion
+// Support option
 const SSupportButton = styled(Button)`
   width: 100%;
 
