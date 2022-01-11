@@ -345,7 +345,7 @@ export const Card: React.FC<ICard> = ({
                 currentBackerCount ?? 0,
                 true,
               ),
-              amount: `$${(totalAmount / 100).toFixed(0)}`,
+              amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
             })}
           </SButton>
           <CardTimer

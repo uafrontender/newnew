@@ -22,6 +22,7 @@ import LoadingModal from '../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceAcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import { formatNumber } from '../../../../utils/format';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -201,8 +202,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SAmount>
             {option.totalAmount?.usdCents
               ? (
-                `$${(option?.totalAmount?.usdCents / 100).toFixed(2)}`
-              ) : '00.00'}
+                `$${formatNumber((option?.totalAmount?.usdCents / 100) ?? 0, true)}`
+              ) : '$0'}
           </SAmount>
         </SBidDetails>
         {optionBeingSupported && !disabled ? (

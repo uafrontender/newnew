@@ -172,8 +172,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      console.log(res.data);
-
       if (res.data && res.data.pledges) {
         setPledges((curr) => {
           const workingArr = [...curr, ...res.data?.pledges as TCfPledgeWithHighestField[]];

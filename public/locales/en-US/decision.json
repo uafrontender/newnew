@@ -11,6 +11,13 @@
     "ended_on": "ended on",
     "at_time": "at"
   },
+  "socials": {
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "copy": "Copy Link"
+  },
   "tabs": {
     "comments": "Comments",
     "bids": "Bids",

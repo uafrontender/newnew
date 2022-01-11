@@ -43,9 +43,6 @@ const SHeadline = styled(Headline)<{
   ellipsed: boolean;
   shrink: boolean;
 }>`
-
-  /* height: fit-content; */
-
   margin-top: 24px;
   margin-bottom: 12px;
 
