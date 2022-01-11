@@ -6,17 +6,21 @@ import React, { useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import { TPostType } from '../../../utils/switchPostType';
 
-import UserAvatar from '../UserAvatar';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+
+import { formatNumber } from '../../../utils/format';
+import PostShareMenu from './PostShareMenu';
+import PostShareModal from './PostShareModal';
 
 interface IPostTopInfo {
   creator: newnewapi.IUser;
@@ -25,7 +29,7 @@ interface IPostTopInfo {
   amountInBids?: number;
   totalVotes?: number;
   currentBackers?: number;
-  goalBackers?: number;
+  targetBackers?: number;
   handleFollowCreator: () => void;
   handleFollowDecision: () => void;
   handleReportAnnouncement: () => void;
@@ -38,18 +42,30 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   amountInBids,
   totalVotes,
   currentBackers,
-  goalBackers,
+  targetBackers,
   handleFollowCreator,
   handleFollowDecision,
   handleReportAnnouncement,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const startingDateParsed = new Date(startsAtSeconds * 1000);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+
+  const handleRedirectToUser = () => {
+    router.push(`/u/${creator.username}`);
+  };
+
+  const handleOpenShareMenu = () => setShareMenuOpen(true);
+  const handleCloseShareMenu = () => setShareMenuOpen(false);
+
+  const handleOpenEllipseMenu = () => setShareMenuOpen(true);
+  const handleCloseEllipseMenu = () => setShareMenuOpen(false);
 
   return (
     <SWrapper>
@@ -57,13 +73,24 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         <SBidsAmount>
           <span>
             $
-            {(amountInBids / 100).toFixed(2)}
+            {formatNumber((amountInBids / 100) ?? 0, true)}
           </span>
           {' '}
-          { t('PostTopInfo.in_bids') }
+          { t('AcPost.PostTopInfo.in_bids') }
         </SBidsAmount>
       )}
-      <CreatorCard>
+      {postType === 'mc' && totalVotes && (
+        <SBidsAmount>
+          <span>
+            {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
+          </span>
+          {' '}
+          { t('McPost.PostTopInfo.votes') }
+        </SBidsAmount>
+      )}
+      <CreatorCard
+        onClick={() => handleRedirectToUser()}
+      >
         <SAvatarArea>
           <img
             src={creator.avatarUrl!! as string}
@@ -93,13 +120,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             padding: '8px',
           }}
           onClick={() => {
+            if (shareMenuOpen) {
+              handleCloseShareMenu();
+              return;
+            }
+            handleOpenShareMenu();
           }}
         >
           <InlineSvg
             svg={ShareIconFilled}
             fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
+            width="20px"
+            height="20px"
           />
         </SShareButton>
         <SMoreButton
@@ -111,10 +143,23 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           <InlineSvg
             svg={MoreIconFilled}
             fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
+            width="20px"
+            height="20px"
           />
         </SMoreButton>
+        {!isMobile && (
+          <PostShareMenu
+            isVisible={shareMenuOpen}
+            handleClose={handleCloseShareMenu}
+          />
+        )}
+        {isMobile && shareMenuOpen ? (
+          <PostShareModal
+            isOpen={shareMenuOpen}
+            zIndex={11}
+            onClose={handleCloseShareMenu}
+          />
+        ) : null}
       </SActionsDiv>
     </SWrapper>
   );
@@ -124,7 +169,7 @@ PostTopInfo.defaultProps = {
   amountInBids: undefined,
   totalVotes: undefined,
   currentBackers: undefined,
-  goalBackers: undefined,
+  targetBackers: undefined,
 };
 
 export default PostTopInfo;
@@ -147,7 +192,7 @@ const SWrapper = styled.div`
       'userCard stats actions'
     ;
     grid-template-rows: 40px;
-    grid-template-columns: 1fr 1fr 120px;
+    grid-template-columns: 1fr 1fr 100px;
     align-items: center;
   }
 `;
@@ -164,6 +209,18 @@ const CreatorCard = styled.div`
   grid-template-columns: 44px 1fr;
 
   height: 36px;
+
+  cursor: pointer;
+
+  & > div:nth-child(2) {
+    transition: .2s linear;
+  }
+
+  &:hover {
+    & > div:nth-child(2) {
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
 `;
 
 const SAvatarArea = styled.div`
@@ -207,10 +264,10 @@ const SStartsAt = styled.div`
 
 // Action buttons
 const SActionsDiv = styled.div`
+  position: relative;
   grid-area: actions;
 
   display: flex;
-  gap: 16px;
   justify-content: flex-end;
 `;
 

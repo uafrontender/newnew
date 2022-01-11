@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  cookiesInstance,
   fetchProtobuf,
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
@@ -25,6 +26,10 @@ export const fetchPledges = (
   `${BASE_URL_CROWDFUNDING}/get_pledges`,
   'post',
   payload,
+  // Optional authentication to get indidualized list of options
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
 );
 
 export const fetchPledgeLevels = (
