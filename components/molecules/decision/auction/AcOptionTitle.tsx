@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Headline from '../../../atoms/Headline';
 
-interface ISuggestionTitle {
-  suggestion: newnewapi.Auction.Option;
+interface IAcOptionTitle {
+  option: newnewapi.Auction.Option;
 }
 
-const SuggestionTitle: React.FunctionComponent<ISuggestionTitle> = ({
-  suggestion,
+const AcOptionTitle: React.FunctionComponent<IAcOptionTitle> = ({
+  option,
 }) => {
   const [isEllipsed, setIsEllipsed] = useState(true);
 
@@ -22,19 +22,19 @@ const SuggestionTitle: React.FunctionComponent<ISuggestionTitle> = ({
         onClick={() => setIsEllipsed((c) => !c)}
       >
         { !isEllipsed ? (
-          suggestion.title
+          option.title
         ) : (
-          (suggestion.title as string).length > 100
+          (option.title as string).length > 100
             ? (
-              `${(suggestion.title as string).slice(0, 100)}...`
-            ) : suggestion.title
+              `${(option.title as string).slice(0, 100)}...`
+            ) : option.title
         ) }
       </SHeadline>
     </>
   );
 };
 
-export default SuggestionTitle;
+export default AcOptionTitle;
 
 const SHeadline = styled(Headline)<{
   ellipsed: boolean;

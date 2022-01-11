@@ -1,31 +1,29 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useContext, useEffect, useRef, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 
-import { useAppSelector } from '../../../../redux-store/store';
 import { SocketContext } from '../../../../contexts/socketContext';
-import { fetchBidsForOption, placeBidOnAuction } from '../../../../api/endpoints/auction';
+import { fetchBidsForOption } from '../../../../api/endpoints/auction';
 
-import BidCard from './BidCard';
+import AcBidCard from './AcBidCard';
 
 import isBrowser from '../../../../utils/isBrowser';
 
-interface ISuggestionOverview {
+interface IOptionOverview {
   postUuid: string;
-  overviewedSuggestion: newnewapi.Auction.Option;
-  handleCloseSuggestionBidHistory: () => void;
+  overviewedOption: newnewapi.Auction.Option;
+  handleCloseOptionBidHistory: () => void;
 }
 
-const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
+const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
   postUuid,
-  overviewedSuggestion,
-  handleCloseSuggestionBidHistory,
+  overviewedOption,
+  handleCloseOptionBidHistory,
 }) => {
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -53,7 +51,7 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
 
       const getCurrentBidsPayload = new newnewapi.GetAcBidsRequest({
         postUuid,
-        optionId: overviewedSuggestion.id,
+        optionId: overviewedOption.id,
         ...(pageToken ? {
           paging: {
             pageToken,
@@ -81,25 +79,25 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
     }
   }, [
     setBidsHistory, bidsLoading,
-    overviewedSuggestion,
+    overviewedOption,
     postUuid,
   ]);
 
   // Close on back btn
   useEffect(() => {
-    const verifySuggestionHistoryOpen = () => {
+    const verifyOptionHistoryOpen = () => {
       if (!isBrowser()) return;
 
-      const suggestionId = new URL(window.location.href).searchParams.get('suggestion');
+      const optionId = new URL(window.location.href).searchParams.get('suggestion');
 
-      if (!suggestionId) {
-        handleCloseSuggestionBidHistory();
+      if (!optionId) {
+        handleCloseOptionBidHistory();
       }
     };
 
-    window.addEventListener('popstate', verifySuggestionHistoryOpen);
+    window.addEventListener('popstate', verifyOptionHistoryOpen);
 
-    return () => window.removeEventListener('popstate', verifySuggestionHistoryOpen);
+    return () => window.removeEventListener('popstate', verifyOptionHistoryOpen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -118,8 +116,8 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
   useEffect(() => {
     const socketHandler = (data: any) => {
       const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostAcBidCreated.decode(arr);
-      if (decoded.optionId === overviewedSuggestion.id && decoded.bid) {
+      const decoded = newnewapi.AcBidCreated.decode(arr);
+      if (decoded.optionId === overviewedOption.id && decoded.bid) {
         setBidsHistory((curr) => ([(decoded.bid as newnewapi.Auction.Bid), ...curr]));
       }
     };
@@ -127,23 +125,23 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
     if (socketConnection) {
       // console.log('Listening for bids updates events');
 
-      socketConnection.on('PostAcBidCreated', socketHandler);
+      socketConnection.on('AcBidCreated', socketHandler);
     }
 
     return () => {
       // console.log('Stop listening for bids updates events');
-      socketConnection.off(newnewapi.PostAcBidCreated.name, socketHandler);
+      socketConnection.off('AcBidCreated', socketHandler);
     };
   }, [
     socketConnection,
-    overviewedSuggestion,
+    overviewedOption,
     setBidsHistory,
   ]);
 
   return (
     <SBidsContainer>
-      {bidsHistory.map((bid, i) => (
-        <BidCard
+      {bidsHistory.map((bid) => (
+        <AcBidCard
           key={bid.id.toString()}
           bid={bid}
         />
@@ -155,7 +153,7 @@ const SuggestionOverview: React.FunctionComponent<ISuggestionOverview> = ({
   );
 };
 
-export default SuggestionOverview;
+export default OptionOverview;
 
 const SBidsContainer = styled.div`
   width: 100%;

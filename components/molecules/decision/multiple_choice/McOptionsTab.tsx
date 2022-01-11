@@ -11,46 +11,37 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
+import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
 import { useAppSelector } from '../../../../redux-store/store';
 
-import SuggestionCard from './SuggestionCard';
+import McOptionCard from './McOptionCard';
 import Button from '../../../atoms/Button';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import PaymentModal from '../PaymentModal';
-import PlaceBidForm from './PlaceBidForm';
+import PlaceMcBidForm from './PlaceMcBidForm';
 import LoadingModal from '../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import SuggestionOverview from './SuggestionOverview';
-import { TOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
-import SuggestionActionMobileModal from './SuggestionActionMobileModal';
+import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+import OptionActionMobileModal from '../OptionActionMobileModal';
 
-interface IBidsTab {
-  postId: string;
-  suggestions: newnewapi.Auction.Option[];
-  suggestionsLoading: boolean;
+interface IMcOptionsTab {
+  post: newnewapi.MultipleChoice;
+  options: newnewapi.MultipleChoice.Option[];
+  optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
-  handleLoadBids: (token?: string) => void;
-  overviewedSuggestion?: newnewapi.Auction.Option;
-  handleUpdateIsSupportedByUser: (id: number) => void;
-  handleCloseSuggestionBidHistory: () => void;
-  handleOpenSuggestionBidHistory: (
-    suggestionToOpen: newnewapi.Auction.Option
-  ) => void;
+  handleLoadOptions: (token?: string) => void;
+  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
 
-const BidsTab: React.FunctionComponent<IBidsTab> = ({
-  postId,
-  suggestions,
-  suggestionsLoading,
+const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
+  post,
+  options,
+  optionsLoading,
   pagingToken,
   minAmount,
-  handleLoadBids,
-  overviewedSuggestion,
-  handleUpdateIsSupportedByUser,
-  handleCloseSuggestionBidHistory,
-  handleOpenSuggestionBidHistory,
+  handleLoadOptions,
+  handleAddOrUpdateOptionFromResponse,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -63,12 +54,12 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
     inView,
   } = useInView();
 
-  const [suggestionBeingSupported, setSuggestionBeingSupported] = useState<string>('');
+  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
-  // New suggestion/bid
-  const [newBidText, setNewBidText] = useState('');
+  // New option/bid
+  const [newOptionText, setNewOptionText] = useState('');
   const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
-  // Mobile modal for new suggestion
+  // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -76,32 +67,34 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (!user.loggedIn) {
-      router.push('/sign-up?reason=bid');
+      router.push('/sign-up?reason=vote');
       return;
     }
     setPaymentModalOpen(true);
   };
 
-  const handleSubmitNewSuggestion = useCallback(async () => {
+  const handleSubmitNewOption = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.PlaceBidRequest({
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(newBidAmount, 10) * 100,
-        }),
-        optionTitle: newBidText,
-        postUuid: postId,
+      const makeBidPayload = new newnewapi.VoteOnPostRequest({
+        votesCount: parseInt(newBidAmount, 10),
+        optionText: newOptionText,
+        postUuid: post.postUuid,
       });
 
-      const res = await placeBidOnAuction(makeBidPayload);
+      const res = await voteOnPost(makeBidPayload);
 
       if (!res.data
-        || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+        || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
 
+      const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByUser = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
       setNewBidAmount('');
-      setNewBidText('');
+      setNewOptionText('');
       setSuggestNewMobileOpen(false);
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -112,16 +105,17 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
     }
   }, [
     newBidAmount,
-    newBidText,
-    postId,
+    newOptionText,
+    post.postUuid,
+    handleAddOrUpdateOptionFromResponse,
   ]);
 
   useEffect(() => {
-    if (inView && !suggestionsLoading && pagingToken) {
-      handleLoadBids(pagingToken);
+    if (inView && !optionsLoading && pagingToken) {
+      handleLoadOptions(pagingToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, suggestionsLoading]);
+  }, [inView, pagingToken, optionsLoading]);
 
   return (
     <>
@@ -131,118 +125,108 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {
-          !overviewedSuggestion ? (
-            <SBidsContainer
-              style={{
-                ...(suggestionBeingSupported ? {
-                  overflowY: 'hidden',
-                } : {}),
-              }}
-            >
-              {suggestions.map((suggestion, i) => (
-                <SuggestionCard
-                  key={suggestion.id.toString()}
-                  suggestion={suggestion as TOptionWithHighestField}
-                  postId={postId}
-                  index={i}
-                  minAmount={minAmount}
-                  suggestionBeingSupported={suggestionBeingSupported}
-                  handleSetSupportedBid={(id: string) => setSuggestionBeingSupported(id)}
-                  handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
-                  handleOpenSuggestionBidHistory={() => handleOpenSuggestionBidHistory(suggestion)}
-                />
-              ))}
-              {!isMobile ? (
-                <SLoaderDiv
-                  ref={loadingRef}
-                />
-              ) : (
-                pagingToken ? (
-                  (
-                    <SLoadMoreBtn
-                      onClick={() => handleLoadBids(pagingToken)}
-                    >
-                      Load more
-                    </SLoadMoreBtn>
-                  )
-                ) : null
-              )}
-            </SBidsContainer>
-          ) : (
-            <SuggestionOverview
-              postUuid={postId}
-              overviewedSuggestion={overviewedSuggestion}
-              handleCloseSuggestionBidHistory={handleCloseSuggestionBidHistory}
+        <SBidsContainer
+          style={{
+            ...(optionBeingSupported ? {
+              overflowY: 'hidden',
+            } : {}),
+          }}
+        >
+          {options.map((option, i) => (
+            <McOptionCard
+              key={option.id.toString()}
+              option={option as TMcOptionWithHighestField}
+              creator={option.creator ?? post.creator!!}
+              postId={post.postUuid}
+              index={i}
+              minAmount={minAmount}
+              optionBeingSupported={optionBeingSupported}
+              handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             />
-          )
-          }
-        <SActionSection>
-          <SuggestionTextArea
-            value={newBidText}
-            disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
-            placeholder="Add a suggestion ..."
-            onChange={(e) => setNewBidText(e.target.value)}
-          />
-          <BidAmountTextInput
-            value={newBidAmount}
-            inputAlign="left"
-            horizontalPadding="16px"
-            disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
-            onChange={(newValue: string) => setNewBidAmount(newValue)}
-            minAmount={minAmount}
-            style={{
-              width: '60px',
-            }}
-          />
-          <Button
-            view="primaryGrad"
-            size="sm"
-            disabled={!newBidText
-              || parseInt(newBidAmount, 10) < minAmount
-              || suggestionBeingSupported !== ''
-              || overviewedSuggestion !== undefined}
-            onClick={() => handleTogglePaymentModalOpen()}
-          >
-            Place a bid
-          </Button>
-        </SActionSection>
+          ))}
+          {!isMobile ? (
+            <SLoaderDiv
+              ref={loadingRef}
+            />
+          ) : (
+            pagingToken ? (
+              (
+                <SLoadMoreBtn
+                  onClick={() => handleLoadOptions(pagingToken)}
+                >
+                  Load more
+                </SLoadMoreBtn>
+              )
+            ) : null
+          )}
+        </SBidsContainer>
+        {post.isSuggestionsAllowed ? (
+          <SActionSection>
+            <SuggestionTextArea
+              value={newOptionText}
+              disabled={optionBeingSupported !== ''}
+              placeholder="Add a option ..."
+              onChange={(e) => setNewOptionText(e.target.value)}
+            />
+            <BidAmountTextInput
+              value={newBidAmount}
+              inputAlign="left"
+              horizontalPadding="16px"
+              disabled={optionBeingSupported !== ''}
+              onChange={(newValue: string) => setNewBidAmount(newValue)}
+              minAmount={minAmount}
+              style={{
+                width: '60px',
+              }}
+            />
+            <Button
+              view="primaryGrad"
+              size="sm"
+              disabled={!newOptionText
+                || parseInt(newBidAmount, 10) < minAmount
+                || optionBeingSupported !== ''}
+              onClick={() => handleTogglePaymentModalOpen()}
+            >
+              Place a bid
+            </Button>
+          </SActionSection>
+        ) : null}
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile ? (
-        <SuggestionActionMobileModal
+        <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
           onClose={() => setSuggestNewMobileOpen(false)}
           zIndex={12}
         >
           <SSuggestNewContainer>
             <SuggestionTextArea
-              value={newBidText}
-              disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
-              placeholder="Add a suggestion ..."
-              onChange={(e) => setNewBidText(e.target.value)}
+              value={newOptionText}
+              disabled={optionBeingSupported !== ''}
+              placeholder="Add a option ..."
+              onChange={(e) => setNewOptionText(e.target.value)}
             />
             <BidAmountTextInput
               value={newBidAmount}
               inputAlign="left"
               horizontalPadding="16px"
-              disabled={suggestionBeingSupported !== '' || overviewedSuggestion !== undefined}
+              disabled={optionBeingSupported !== ''}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
             />
             <Button
               view="primaryGrad"
               size="sm"
-              disabled={!newBidText
+              disabled={!newOptionText
                 || parseInt(newBidAmount, 10) < minAmount
-                || suggestionBeingSupported !== ''
-                || overviewedSuggestion !== undefined}
+                || optionBeingSupported !== ''}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               Place a bid
             </Button>
           </SSuggestNewContainer>
-        </SuggestionActionMobileModal>
+        </OptionActionMobileModal>
       ) : null}
       {/* Payment Modal */}
       {paymentModalOpen ? (
@@ -251,10 +235,10 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
           zIndex={12}
           onClose={() => setPaymentModalOpen(false)}
         >
-          <PlaceBidForm
-            suggestionTitle={newBidText}
+          <PlaceMcBidForm
+            optionTitle={newOptionText}
             amountRounded={newBidAmount}
-            handlePlaceBid={handleSubmitNewSuggestion}
+            handlePlaceBid={handleSubmitNewOption}
           />
         </PaymentModal>
       ) : null }
@@ -276,11 +260,10 @@ const BidsTab: React.FunctionComponent<IBidsTab> = ({
   );
 };
 
-BidsTab.defaultProps = {
-  overviewedSuggestion: undefined,
+McOptionsTab.defaultProps = {
 };
 
-export default BidsTab;
+export default McOptionsTab;
 
 const STabContainer = styled(motion.div)`
   position: relative;
