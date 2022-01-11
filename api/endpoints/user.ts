@@ -42,17 +42,17 @@ export const logout = (
 
 // Test
 export const getMyPosts = (
-  payload: newnewapi.GetMyPostsRequest,
+  payload: newnewapi.GetRelatedToMePostsRequest,
   tokens?: {
     accessToken: string;
     refreshToken: string;
   },
   updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void,
 ) => fetchProtobufProtectedIntercepted<
-newnewapi.GetMyPostsRequest, newnewapi.PagedPostsResponse>(
-  newnewapi.GetMyPostsRequest,
+newnewapi.GetRelatedToMePostsRequest, newnewapi.PagedPostsResponse>(
+  newnewapi.GetRelatedToMePostsRequest,
   newnewapi.PagedPostsResponse,
-  `${BASE_URL}/post/get_my_posts`,
+  `${BASE_URL}/post/get_related_to_me_posts`,
   'post',
   payload,
   tokens,

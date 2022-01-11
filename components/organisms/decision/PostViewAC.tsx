@@ -19,10 +19,10 @@ import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import BidsTab from '../../molecules/decision/auction/BidsTab';
+import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
-import SuggestionTitle from '../../molecules/decision/auction/SuggestionTitle';
-import SuggestionTopInfo from '../../molecules/decision/auction/SuggestionTopInfo';
+import OptionTitle from '../../molecules/decision/auction/AcOptionTitle';
+import AcOptionTopInfo from '../../molecules/decision/auction/AcOptionTopInfo';
 import GoBackButton from '../../molecules/GoBackButton';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -30,23 +30,24 @@ import InlineSvg from '../../atoms/InlineSVG';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
 
-export type TOptionWithHighestField = newnewapi.Auction.Option & {
+export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
 
 interface IPostViewAC {
   post: newnewapi.Auction;
-  suggestionFromUrl?: newnewapi.Auction.Option;
+  optionFromUrl?: newnewapi.Auction.Option;
   handleGoBack: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   post,
-  suggestionFromUrl,
+  optionFromUrl,
   handleGoBack,
 }) => {
   const theme = useTheme();
@@ -72,16 +73,16 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   // Total amount
   const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
 
-  // Bids
-  const [suggestions, setSuggestions] = useState<TOptionWithHighestField[]>([]);
+  // Options
+  const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
   const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(post.optionCount ?? '');
-  const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
-  const [bidsLoading, setBidsLoading] = useState(false);
-  const [loadingBidsError, setLoadingBidsError] = useState('');
+  const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
+  const [optionsLoading, setOptionsLoading] = useState(false);
+  const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
-  // Suggestion overview
+  // Option overview
   const [
-    overviewedSuggestion, setOverviewedSuggestion,
+    overviewedOption, setOverviewedOption,
   ] = useState<newnewapi.Auction.Option | undefined>(undefined);
   const currLocation = `/?post=${post.postUuid}`;
 
@@ -95,13 +96,82 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
+  const sortOptions = useCallback((unsortedArr: TAcOptionWithHighestField[]) => {
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < unsortedArr.length; i++) {
+      // eslint-disable-next-line no-param-reassign
+      unsortedArr[i].isHighest = false;
+    }
+
+    const highestOption = unsortedArr.sort((a, b) => (
+      (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
+    ))[0];
+
+    unsortedArr.forEach((option, i) => {
+      if (i > 0) {
+        // eslint-disable-next-line no-param-reassign
+        option.isHighest = false;
+      }
+    });
+
+    const optionsByUser = user.userData?.userUuid
+      ? unsortedArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
+        .sort((a, b) => {
+          return (b.id as number) - (a.id as number);
+        })
+      : [];
+
+    const optionsSupportedByUser = user.userData?.userUuid
+      ? unsortedArr.filter((o) => o.isSupportedByUser)
+        .sort((a, b) => {
+          return (b.id as number) - (a.id as number);
+        })
+      : [];
+
+    // const optionsByVipUsers = [];
+
+    const workingArrSorted = unsortedArr.sort((a, b) => {
+      // Sort the rest by newest first
+      return (b.id as number) - (a.id as number);
+    });
+
+    const joinedArr = [
+      ...(
+        highestOption
+        && (highestOption.creator?.uuid === user.userData?.userUuid
+          || highestOption.isSupportedByUser) ? [highestOption] : []),
+      ...optionsByUser,
+      ...optionsSupportedByUser,
+      // ...optionsByVipUsers,
+      ...(
+        highestOption
+        && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),
+      ...workingArrSorted,
+    ];
+
+    const workingSortedUnique = joinedArr.length > 0
+      ? [...new Set(joinedArr)] : [];
+
+    const highestOptionIdx = (
+      workingSortedUnique as TAcOptionWithHighestField[]
+    ).findIndex((o) => o.id === highestOption.id);
+
+    if (workingSortedUnique[highestOptionIdx]) {
+      (workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField).isHighest = true;
+    }
+
+    return workingSortedUnique;
+  }, [
+    user.userData?.userUuid,
+  ]);
+
   const fetchBids = useCallback(async (
     pageToken?: string,
   ) => {
-    if (bidsLoading) return;
+    if (optionsLoading) return;
     try {
-      setBidsLoading(true);
-      setLoadingBidsError('');
+      setOptionsLoading(true);
+      setLoadingOptionsError('');
 
       const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
         postUuid: post.postUuid,
@@ -117,85 +187,82 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       if (res.data && res.data.options) {
-        setSuggestions((curr) => {
-          const workingArr = [...curr, ...res.data?.options as TOptionWithHighestField[]];
+        setOptions((curr) => {
+          const workingArr = [...curr, ...res.data?.options as TAcOptionWithHighestField[]];
 
-          const highestOption = workingArr.sort((a, b) => (
-            (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
-          ))[0];
-
-          const optionsByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            : [];
-
-          const optionsSupportedByUser = user.userData?.userUuid
-            ? workingArr.filter((o) => o.isSupportedByUser)
-            : [];
-
-          // const optionsByVipUsers = [];
-
-          const workingArrSorted = workingArr.sort((a, b) => {
-            // Sort the rest by newest first
-            return (b.id as number) - (a.id as number);
-          });
-
-          const joinedArr = [
-            ...optionsByUser,
-            ...optionsSupportedByUser,
-            // ...optionsByVipUsers,
-            ...(highestOption ? [highestOption] : []),
-            ...workingArrSorted,
-          ];
-
-          const workingSortedUnique = joinedArr.length > 0
-            ? [...new Set(joinedArr)] : [];
-
-          const highestOptionIdx = (
-            workingSortedUnique as TOptionWithHighestField[]
-          ).findIndex((o) => o.id === highestOption.id);
-
-          if (workingSortedUnique[highestOptionIdx]) {
-            workingSortedUnique[highestOptionIdx].isHighest = true;
-          }
-
-          return workingSortedUnique;
+          return sortOptions(workingArr);
         });
-        setBidsNextPageToken(res.data.paging?.nextPageToken);
+        setOptionsNextPageToken(res.data.paging?.nextPageToken);
       }
 
-      setBidsLoading(false);
+      setOptionsLoading(false);
     } catch (err) {
-      setBidsLoading(false);
-      setLoadingBidsError((err as Error).message);
+      setOptionsLoading(false);
+      setLoadingOptionsError((err as Error).message);
       console.error(err);
     }
   }, [
-    setSuggestions, bidsLoading,
-    post, user.userData?.userUuid,
+    post,
+    setOptions,
+    sortOptions,
+    optionsLoading,
   ]);
 
-  const handleUpdateIsSupportedByUser = (id: number) => {
-    setSuggestions((curr) => {
-      const workingArr = [...curr];
-      const idx = workingArr.findIndex((o) => o.id === id);
-      workingArr[idx].isSupportedByUser = true;
-      return workingArr;
-    });
-  };
+  const fetchPostLatestData = useCallback(async () => {
+    try {
+      const fetchPostPayload = new newnewapi.GetPostRequest({
+        postUuid: post.postUuid,
+      });
 
-  const handleOpenSuggestionBidHistory = (
-    suggestionToOpen: newnewapi.Auction.Option,
+      const res = await fetchPostByUUID(fetchPostPayload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
+      setNumberOfOptions(res.data.auction!!.optionCount as number);
+    } catch (err) {
+      console.error(err);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleAddOrUpdateOptionFromResponse = useCallback((
+    newOption: newnewapi.Auction.Option,
   ) => {
-    setOverviewedSuggestion(suggestionToOpen);
+    setOptions((curr) => {
+      const workingArr = [...curr];
+      let workingArrUnsorted;
+      const idx = workingArr.findIndex((op) => op.id === newOption?.id);
+      if (idx === -1) {
+        workingArrUnsorted = [...workingArr, newOption as TAcOptionWithHighestField];
+      } else {
+        workingArr[idx]
+          .supporterCount = (newOption?.supporterCount as number);
+        workingArr[idx]
+          .totalAmount = (newOption?.totalAmount as newnewapi.IMoneyAmount);
+        workingArrUnsorted = workingArr;
+      }
+
+      return sortOptions(workingArrUnsorted);
+    });
+  }, [
+    setOptions,
+    sortOptions,
+  ]);
+
+  const handleOpenOptionBidHistory = (
+    optionToOpen: newnewapi.Auction.Option,
+  ) => {
+    setOverviewedOption(optionToOpen);
     window.history.pushState(
-      suggestionToOpen.id,
+      optionToOpen.id,
       'Post',
-      `${currLocation}&suggestion=${suggestionToOpen.id}`,
+      `${currLocation}&suggestion=${optionToOpen.id}`,
     );
   };
 
-  const handleCloseSuggestionBidHistory = () => {
-    setOverviewedSuggestion(undefined);
+  const handleCloseOptionBidHistory = () => {
+    setOverviewedOption(undefined);
     window.history.replaceState('', '', currLocation);
   };
 
@@ -212,29 +279,30 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   useEffect(() => {
     setComments([]);
-    setSuggestions([]);
-    setBidsNextPageToken('');
+    setOptions([]);
+    setOptionsNextPageToken('');
     fetchBids();
+    fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post]);
+  }, [post.postUuid]);
 
   useEffect(() => {
-    if (suggestionFromUrl) {
-      setOverviewedSuggestion(suggestionFromUrl);
+    if (optionFromUrl) {
+      setOverviewedOption(optionFromUrl);
     }
-  }, [suggestionFromUrl]);
+  }, [optionFromUrl]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
       const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostAcOptionCreatedOrUpdated.decode(arr);
+      const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
       if (decoded.option && decoded.postUuid === post.postUuid) {
-        setSuggestions((curr) => {
+        setOptions((curr) => {
           const workingArr = [...curr];
           let workingArrUnsorted;
           const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
           if (idx === -1) {
-            workingArrUnsorted = [...workingArr, decoded.option as TOptionWithHighestField];
+            workingArrUnsorted = [...workingArr, decoded.option as TAcOptionWithHighestField];
           } else {
             workingArr[idx]
               .supporterCount = (decoded.option?.supporterCount as number);
@@ -243,55 +311,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             workingArrUnsorted = workingArr;
           }
 
-          const highestOption = workingArrUnsorted.sort((a, b) => (
-            (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
-          ))[0];
-
-          workingArrUnsorted.forEach((option, i) => {
-            if (i > 0) {
-              // eslint-disable-next-line no-param-reassign
-              option.isHighest = false;
-            }
-          });
-
-          const optionsByUser = user.userData?.userUuid
-            ? workingArrUnsorted.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            : [];
-
-          const optionsSupportedByUser = user.userData?.userUuid
-            ? workingArrUnsorted.filter((o) => o.isSupportedByUser)
-            : [];
-
-          // const optionsByVipUsers = [];
-
-          const workingArrSorted = workingArrUnsorted.sort((a, b) => {
-            // Sort the rest by newest first
-            return (b.id as number) - (a.id as number);
-          });
-
-          const joinedArr = [
-            ...optionsByUser,
-            ...optionsSupportedByUser,
-            // ...optionsByVipUsers,
-            ...(highestOption ? [highestOption] : []),
-            ...workingArrSorted,
-          ];
-
-          const workingSortedUnique = joinedArr.length > 0
-            ? [...new Set(joinedArr)] : [];
-
-          const highestOptionIdx = (
-            workingSortedUnique as TOptionWithHighestField[]
-          ).findIndex((o) => o.id === highestOption.id);
-
-          if (workingSortedUnique[highestOptionIdx]) {
-            (workingSortedUnique[highestOptionIdx] as TOptionWithHighestField).isHighest = true;
-          }
-
-          return workingSortedUnique;
+          return sortOptions(workingArrUnsorted);
         });
 
-        setOverviewedSuggestion((curr) => {
+        setOverviewedOption((curr) => {
           if (curr === undefined) return curr;
           const workingObj = { ...curr };
           if (workingObj.totalAmount) {
@@ -316,13 +339,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on('PostAcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        socketConnection.off('PostAcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
       }
     };
@@ -331,13 +354,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     socketConnection,
     post,
     user.userData?.userUuid,
-    setSuggestions,
+    setOptions,
+    sortOptions,
   ]);
 
   return (
     <SWrapper>
       <SExpiresSection>
-        {isMobile && !overviewedSuggestion && (
+        {isMobile && !overviewedOption && (
           <GoBackButton
             style={{
               gridArea: 'closeBtnMobile',
@@ -345,13 +369,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             onClick={handleGoBack}
           />
         )}
-        {overviewedSuggestion && (
+        {overviewedOption && (
           <GoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
             onClick={() => {
-              handleCloseSuggestionBidHistory();
+              handleCloseOptionBidHistory();
             }}
           />
         )}
@@ -374,6 +398,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       </SExpiresSection>
       <PostVideo
         // NB! Will be changed for streaming format
+        // NB! Will support responses, as well!
         videoSrc={post.announcement?.originalVideoUrl ?? MockVideo}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
@@ -384,18 +409,18 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         }}
       >
         <PostTitle
-          shrink={overviewedSuggestion !== undefined}
+          shrink={overviewedOption !== undefined}
         >
           { post.title }
         </PostTitle>
-        {overviewedSuggestion && (
-          <SuggestionTitle
-            suggestion={overviewedSuggestion}
+        {overviewedOption && (
+          <OptionTitle
+            option={overviewedOption}
           />
         )}
       </div>
       <SActivitesContainer>
-        {!overviewedSuggestion ? (
+        {!overviewedOption ? (
           <PostTopInfo
             postType="ac"
             // Temp
@@ -407,20 +432,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             handleReportAnnouncement={() => {}}
           />
         ) : (
-          <SuggestionTopInfo
-            creator={overviewedSuggestion?.creator!!}
-            suggestion={overviewedSuggestion}
+          <AcOptionTopInfo
+            creator={overviewedOption?.creator!!}
+            option={overviewedOption}
             postId={post.postUuid}
             minAmount={post.minimalBid?.usdCents
               ? (
                 parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
               ) : 5}
-            amountInBids={overviewedSuggestion?.totalAmount?.usdCents!!}
-            createdAtSeconds={overviewedSuggestion?.createdAt?.seconds as number}
-            handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
+            amountInBids={overviewedOption?.totalAmount?.usdCents!!}
+            createdAtSeconds={overviewedOption?.createdAt?.seconds as number}
+            handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
         )}
-        {!overviewedSuggestion ? (
+        {!overviewedOption ? (
           <DecisionTabs
             tabs={[
               {
@@ -450,20 +475,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         )}
         {currentTab === 'bids'
           ? (
-            <BidsTab
+            <AcOptionsTab
               postId={post.postUuid}
-              suggestions={suggestions}
-              suggestionsLoading={bidsLoading}
-              pagingToken={bidsNextPageToken}
+              options={options}
+              optionsLoading={optionsLoading}
+              pagingToken={optionsNextPageToken}
               minAmount={post.minimalBid?.usdCents
                 ? (
                   parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
                 ) : 5}
               handleLoadBids={fetchBids}
-              overviewedSuggestion={overviewedSuggestion}
-              handleUpdateIsSupportedByUser={handleUpdateIsSupportedByUser}
-              handleOpenSuggestionBidHistory={handleOpenSuggestionBidHistory}
-              handleCloseSuggestionBidHistory={handleCloseSuggestionBidHistory}
+              overviewedOption={overviewedOption}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
+              handleOpenOptionBidHistory={handleOpenOptionBidHistory}
+              handleCloseOptionBidHistory={handleCloseOptionBidHistory}
             />
           ) : (
             <CommentsTab
@@ -476,7 +501,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 };
 
 PostViewAC.defaultProps = {
-  suggestionFromUrl: undefined,
+  optionFromUrl: undefined,
 };
 
 export default PostViewAC;
@@ -578,7 +603,6 @@ const SActivitesContainer = styled.div`
   }
 `;
 
-//
 const SHistoryLabel = styled.div`
   height: 32px;
   margin-bottom: 16px;
