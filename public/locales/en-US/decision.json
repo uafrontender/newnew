@@ -12,11 +12,17 @@
     "at_time": "at"
   },
   "socials": {
+    "share-to": "Share to",
     "twitter": "Twitter",
     "facebook": "Facebook",
     "instagram": "Instagram",
     "tiktok": "TikTok",
     "copy": "Copy Link"
+  },
+  "ellipse": {
+    "follow-creator": "Follow creator",
+    "follow-decision": "Follow decision",
+    "report": "Report"
   },
   "tabs": {
     "comments": "Comments",
@@ -41,6 +47,8 @@
         "by": "by",
         "bidders": "bidders",
         "supportBtn": "Support",
+        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
+        "doubleMyVoteButton": "Double my bid",
         "placeABidBtn": "Place a bid",
         "cancelBtn": "Cancel"
       },

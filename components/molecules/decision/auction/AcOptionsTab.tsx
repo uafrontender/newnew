@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, {
   useCallback, useEffect, useRef, useState,
@@ -27,6 +28,7 @@ import Button from '../../../atoms/Button';
 interface IAcOptionsTab {
   postId: string;
   options: newnewapi.Auction.Option[];
+  optionToAnimate?: string;
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
@@ -42,6 +44,7 @@ interface IAcOptionsTab {
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
   options,
+  optionToAnimate,
   optionsLoading,
   pagingToken,
   minAmount,
@@ -62,7 +65,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     inView,
   } = useInView();
 
+  const [shadowTop, setShadowTop] = useState(false);
+  const [shadowBottom, setShadowBottom] = useState(!isMobile);
+  const [heightDelta, setHeightDelta] = useState(56);
   const containerRef = useRef<HTMLDivElement>();
+  const actionSectionContainer = useRef<HTMLDivElement>();
 
   const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
@@ -131,14 +138,58 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   useEffect(() => {
     if (optionBeingSupported && containerRef.current) {
-      const optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
+      let optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
+      optIdx += 2;
       const childDiv = containerRef.current.children[optIdx];
-      childDiv.scrollIntoView({
-        block: 'center',
-        // behavior: 'smooth',
+
+      const childRect = childDiv.getBoundingClientRect();
+      const parentRect = containerRef.current.getBoundingClientRect();
+
+      const scrollBy = childRect.top - parentRect.top;
+
+      containerRef.current.scrollBy({
+        top: scrollBy,
       });
     }
   }, [options, optionBeingSupported]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolledToTop = (containerRef.current?.scrollTop ?? 0) < 10;
+      const isScrolledToBottom = (
+        (containerRef.current?.scrollTop ?? 0) + (containerRef.current?.clientHeight ?? 0))
+        >= (containerRef.current?.scrollHeight ?? 0);
+
+      if (!isScrolledToTop) {
+        setShadowTop(true);
+      } else {
+        setShadowTop(false);
+      }
+
+      if (!isScrolledToBottom) {
+        setShadowBottom(true);
+      } else {
+        setShadowBottom(false);
+      }
+    };
+
+    containerRef.current?.addEventListener('scroll', handleScroll);
+
+    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entry) => {
+      const size = entry[0]?.borderBoxSize
+        ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
+      if (size) {
+        setHeightDelta(size);
+      }
+    });
+
+    resizeObserver.observe(actionSectionContainer.current!!);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -154,11 +205,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               ref={(el) => {
                 containerRef.current = el!!;
               }}
+              heightDelta={heightDelta}
             >
+              <SShadowTop
+                style={{
+                  opacity: shadowTop && !optionBeingSupported ? 1 : 0,
+                }}
+              />
+              <SShadowBottom
+                heightDelta={heightDelta}
+                style={{
+                  opacity: shadowBottom && !optionBeingSupported ? 1 : 0,
+                }}
+              />
               {options.map((option, i) => (
                 <AcOptionCard
                   key={option.id.toString()}
                   option={option as TAcOptionWithHighestField}
+                  shouldAnimate={optionToAnimate === option.id.toString()}
                   postId={postId}
                   index={i}
                   minAmount={minAmount}
@@ -176,6 +240,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 pagingToken ? (
                   (
                     <SLoadMoreBtn
+                      view="secondary"
                       onClick={() => handleLoadBids(pagingToken)}
                     >
                       { t('AcPost.OptionsTab.loadMoreBtn') }
@@ -192,7 +257,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             />
           )
           }
-        <SActionSection>
+        <SActionSection
+          ref={(el) => {
+            actionSectionContainer.current = el!!;
+          }}
+        >
           <SuggestionTextArea
             value={newBidText}
             disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
@@ -293,6 +362,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
 AcOptionsTab.defaultProps = {
   overviewedOption: undefined,
+  optionToAnimate: undefined,
 };
 
 export default AcOptionsTab;
@@ -303,18 +373,81 @@ const STabContainer = styled(motion.div)`
   height: calc(100% - 112px);
 `;
 
-const SBidsContainer = styled.div`
+const SBidsContainer = styled.div<{
+  heightDelta: number;
+}>`
   width: 100%;
   height: 100%;
   overflow-y: auto;
 
   display: flex;
   flex-direction: column;
-  /* gap: 16px; */
+
+  padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 125px;
+    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+      transition: .2s linear;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 4px;
+      transition: .2s linear;
+    }
+
+    &:hover {
+      &::-webkit-scrollbar-track {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
+    }
   }
+`;
+
+const SShadowTop = styled.div`
+  position: absolute;
+  top: 0px;
+  left: 0;
+
+  width: calc(100% - 18px);
+  height: 0px;
+
+  z-index: 1;
+  box-shadow:
+    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
+  ;
+  clip-path: inset(0px 0px -100px 0px);
+
+  transition: linear .2s;
+`;
+
+const SShadowBottom = styled.div<{
+  heightDelta: number;
+}>`
+  position: absolute;
+  bottom: ${({ heightDelta }) => heightDelta}px;
+  left: 0;
+
+  width: calc(100% - 18px);
+  height: 0px;
+
+  z-index: 1;
+  box-shadow:
+    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
+  ;
+  clip-path: inset(-100px 0px 0px 0px);
+  transition: linear .2s;
 `;
 
 const SLoaderDiv = styled.div`
@@ -322,7 +455,8 @@ const SLoaderDiv = styled.div`
 `;
 
 const SLoadMoreBtn = styled(Button)`
-
+  width: calc(100% - 16px);
+  height: 56px;
 `;
 
 const SActionButton = styled(Button)`
@@ -352,16 +486,17 @@ const SActionSection = styled.div`
   ${({ theme }) => theme.media.tablet} {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
     gap: 16px;
 
     position: absolute;
-    min-height: 85px;
+    min-height: 50px;
     width: 100%;
     z-index: 5;
     bottom: 0;
 
+    padding-top: 8px;
+
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-    box-shadow: 0px -50px 18px 20px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 0.9)' : 'rgba(241, 243, 249, 0.9)')};
   }
 `;

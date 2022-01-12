@@ -80,6 +80,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
+  // Animating options
+  const [optionToAnimate, setOptionToAnimate] = useState('');
+
   // Option overview
   const [
     overviewedOption, setOverviewedOption,
@@ -245,6 +248,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       return sortOptions(workingArrUnsorted);
     });
+    setOptionToAnimate(newOption.id.toString());
+
+    setTimeout(() => {
+      setOptionToAnimate('');
+    }, 3000);
   }, [
     setOptions,
     sortOptions,
@@ -478,6 +486,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             <AcOptionsTab
               postId={post.postUuid}
               options={options}
+              optionToAnimate={optionToAnimate}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
               minAmount={post.minimalBid?.usdCents

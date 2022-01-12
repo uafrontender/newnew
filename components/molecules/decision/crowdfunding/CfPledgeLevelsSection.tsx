@@ -189,10 +189,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     });
 
     resizeObserver.observe(containerRef.current!!);
-
-    return () => {
-      // resizeObserver.unobserve(containerRef.current!!);
-    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

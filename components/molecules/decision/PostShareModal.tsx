@@ -83,7 +83,7 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = ({
           <Headline
             variant={6}
           >
-            {t('Share to')}
+            {t('socials.share-to')}
           </Headline>
           <SSocialsSection>
             <SSocials>
@@ -143,7 +143,6 @@ const SSocialsSection = styled.div`
 
 const SSocials = styled.div`
   display: flex;
-  margin-top: 16px;
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
