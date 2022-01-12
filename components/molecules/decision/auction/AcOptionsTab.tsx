@@ -73,6 +73,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
+  const mainContainer = useRef<HTMLDivElement>();
+  const overviewedRefId = useRef('');
+
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
   const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
@@ -176,7 +179,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     containerRef.current?.addEventListener('scroll', handleScroll);
 
     return () => containerRef.current?.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [overviewedOption]);
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
@@ -191,10 +194,48 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (overviewedOption) {
+      overviewedRefId.current = overviewedOption.id.toString();
+
+      if (isMobile) {
+        document.getElementById('post-modal-container')
+          ?.scrollTo({
+            top: window.innerHeight,
+            behavior: 'smooth',
+          });
+      }
+    } else if (!overviewedOption && overviewedRefId.current) {
+      let optIdx = options.findIndex((o) => o.id.toString() === overviewedRefId.current);
+      optIdx += 2;
+      const childDiv = containerRef.current!!.children[optIdx];
+
+      if (childDiv) {
+        if (isMobile) {
+          childDiv.scrollIntoView();
+        } else {
+          const childRect = childDiv.getBoundingClientRect();
+          const parentRect = containerRef.current!!.getBoundingClientRect();
+          const scrollBy = childRect.top - parentRect.top;
+
+          containerRef.current!!.scrollBy({
+            top: scrollBy,
+          });
+        }
+      }
+
+      overviewedRefId.current = '';
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overviewedOption, options]);
+
   return (
     <>
       <STabContainer
         key="bids"
+        ref={(el) => {
+          mainContainer.current = el!!;
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
