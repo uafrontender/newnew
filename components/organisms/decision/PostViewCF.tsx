@@ -22,7 +22,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import switchPostType from '../../../utils/switchPostType';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
@@ -232,6 +232,33 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mark post as viewed if logged in
+  useEffect(() => {
+    async function markAsViewed() {
+      if (
+        !user.loggedIn
+        || user.userData?.userUuid === post.creator?.uuid) return;
+      try {
+        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
+          postUuid: post.postUuid,
+        });
+
+        const res = await markPost(markAsViewedPayload);
+
+        console.log(res);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    markAsViewed();
+  }, [
+    post,
+    user.loggedIn,
+    user.userData?.userUuid,
+  ]);
 
   useEffect(() => {
     setPledges([]);

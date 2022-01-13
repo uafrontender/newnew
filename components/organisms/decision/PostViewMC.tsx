@@ -27,7 +27,7 @@ import CommentsTab from '../../molecules/decision/CommentsTab';
 import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -199,6 +199,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       } else {
         workingArr[idx]
           .voteCount = (newOrUpdatedption.voteCount as number);
+        workingArr[idx]
+          .isSupportedByUser = true;
         workingArrUnsorted = workingArr;
       }
 
@@ -237,6 +239,33 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mark post as viewed if logged in
+  useEffect(() => {
+    async function markAsViewed() {
+      if (
+        !user.loggedIn
+        || user.userData?.userUuid === post.creator?.uuid) return;
+      try {
+        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
+          postUuid: post.postUuid,
+        });
+
+        const res = await markPost(markAsViewedPayload);
+
+        console.log(res);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    markAsViewed();
+  }, [
+    post,
+    user.loggedIn,
+    user.userData?.userUuid,
+  ]);
 
   useEffect(() => {
     setComments([]);

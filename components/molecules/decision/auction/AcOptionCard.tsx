@@ -242,18 +242,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 `$${formatNumber((option?.totalAmount?.usdCents / 100) ?? 0, true)}`
               ) : '$0'}
           </SAmount>
-          {myVote || myBid ? (
-            <SDoubleMyVote>
-              <SDoubleMyVoteCaption>
-                { t('AcPost.OptionsTab.OptionCard.doubleMyVoteCaption') }
-              </SDoubleMyVoteCaption>
-              <SDoubleMyVoteButton>
-              { t('AcPost.OptionsTab.OptionCard.doubleMyVoteButton') }
-              </SDoubleMyVoteButton>
-            </SDoubleMyVote>
-          ) : null}
         </SBidDetails>
-        {(myBid || myVote) ? null : optionBeingSupported && !disabled ? (
+        {optionBeingSupported && !disabled ? (
           <div
             style={{
               minWidth: isMobileOrTablet ? '82px' : '92px',
@@ -496,47 +486,6 @@ const SAmount = styled.div`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
-const SDoubleMyVote = styled.div`
-  grid-area: doubleVote;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-
-  padding: 12px 16px;
-  gap: 8px;
-
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-wrap: nowrap;
-  }
-`;
-
-const SDoubleMyVoteCaption = styled.div`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: #FFFFFF;
-`;
-
-const SDoubleMyVoteButton = styled(Button)`
-  background: #FFFFFF;
-  color: #2C2C33;
-  width: 100%;
-  height: 48px;
-
-  &:focus:enabled,
-  &:hover:enabled  {
-    background: #FFFFFF;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-wrap: fit-content;
-  }
 `;
 
 const SSupportButton = styled(Button)`

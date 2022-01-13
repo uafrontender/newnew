@@ -47,8 +47,6 @@
         "by": "by",
         "bidders": "bidders",
         "supportBtn": "Support",
-        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
-        "doubleMyVoteButton": "Double my bid",
         "placeABidBtn": "Place a bid",
         "cancelBtn": "Cancel"
       },
@@ -80,6 +78,8 @@
       "OptionCard": {
         "votes": "votes",
         "supportBtn": "Vote",
+        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
+        "doubleMyVoteButton": "Double my vote",
         "placeABidBtn": "Vote",
         "cancelBtn": "Cancel"
       },

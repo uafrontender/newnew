@@ -30,7 +30,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -284,6 +284,33 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mark post as viewed if logged in
+  useEffect(() => {
+    async function markAsViewed() {
+      if (
+        !user.loggedIn
+        || user.userData?.userUuid === post.creator?.uuid) return;
+      try {
+        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
+          postUuid: post.postUuid,
+        });
+
+        const res = await markPost(markAsViewedPayload);
+
+        console.log(res);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    markAsViewed();
+  }, [
+    post,
+    user.loggedIn,
+    user.userData?.userUuid,
+  ]);
 
   useEffect(() => {
     setComments([]);
