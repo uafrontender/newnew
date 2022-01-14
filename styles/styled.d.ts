@@ -41,6 +41,8 @@ declare module 'styled-components' {
         backgroundErrorPopup: string;
         // Used for overlaydim
         overlayDim: string;
+        thumbLineHidden: string;
+        thumbLineVisible: string;
       },
       text: {
         // Used for both links and titles.

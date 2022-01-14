@@ -9,6 +9,8 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
+import UserAvatar from '../../../molecules/UserAvatar';
+import BitmovinPlayer from '../../../atoms/BitmovinPlayer';
 
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -27,14 +29,19 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-interface IPublishedContent {}
+interface IPublishedContent {
+}
 
 export const PublishedContent: React.FC<IPublishedContent> = () => {
   const { t } = useTranslation('creation');
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { post } = useAppSelector((state) => state.creation);
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const {
+    post,
+    videoProcessing,
+  } = useAppSelector((state) => state.creation);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const handleSubmit = useCallback(async () => {
@@ -83,19 +90,31 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   return (
     <>
       <SContent>
-        <SVideo
-          autoPlay
-          src={post.announcementVideoUrl}
-        />
+        <SPlayerWrapper>
+          <BitmovinPlayer
+            id="published"
+            muted={false}
+            resources={videoProcessing?.targetUrls}
+            thumbnails={post.thumbnailParameters}
+          />
+        </SPlayerWrapper>
+        <SUserBlock>
+          <SUserAvatar
+            avatarUrl={user.userData?.avatarUrl}
+          />
+          <SUserTitle variant={3} weight={600}>
+            {post?.title}
+          </SUserTitle>
+        </SUserBlock>
+        <STitle variant={6}>
+          {t('published.texts.title')}
+        </STitle>
         <SSubTitle variant={2} weight={500}>
           {t(`published.texts.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {
             value: formatStartsAt()
               .format('DD MMM [at] hh:mm A'),
           })}
         </SSubTitle>
-        <STitle variant={6}>
-          {t('published.texts.title')}
-        </STitle>
         <SSocials>
           {socialButtons.map(renderItem)}
         </SSocials>
@@ -104,7 +123,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
         <SButtonWrapper>
           <SButtonContent>
             <SButton
-              view="primaryGrad"
+              view="secondary"
               onClick={handleSubmit}
             >
               {t('published.button.submit')}
@@ -162,21 +181,47 @@ const SButtonContent = styled.div`
   width: 100%;
 `;
 
-const SVideo = styled.video`
-  height: auto;
-  margin: 0 44px;
+const SPlayerWrapper = styled.div`
+  width: 224px;
+  height: 320px;
+  margin: 0 auto;
   overflow: hidden;
   position: relative;
   border-radius: 16px;
 `;
 
 const STitle = styled(Headline)`
-  margin-top: 24px;
+  margin-top: 22px;
   text-align: center;
 `;
 
+const SUserBlock = styled.div`
+  width: 224px;
+  margin: 16px auto 0 auto;
+  display: flex;
+  flex-direction: row;
+`;
+
+const SUserAvatar = styled(UserAvatar)`
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+`;
+
+const SUserTitle = styled(Text)`
+  width: 188px;
+  display: -webkit-box;
+  overflow: hidden;
+  position: relative;
+  padding-left: 12px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
 const SSubTitle = styled(Text)`
-  margin-top: 16px;
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  margin-top: 4px;
   text-align: center;
 `;
 

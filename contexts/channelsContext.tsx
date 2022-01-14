@@ -14,7 +14,7 @@ interface IChannels {
 
 export const ChannelsContext = createContext({
   channelsWithSubs: {},
-  addChannel: (id: string) => {},
+  addChannel: (id: string, channel: newnewapi.IChannel) => {},
   removeChannel: (id: string) => {},
 });
 
@@ -23,7 +23,7 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
   const [channelsWithSubs, setChannelsWithSubs] = useState<IChannels>({});
   const [scheduledArr, setScheduledArr] = useState<string[]>([]);
 
-  const addChannel = (id: string) => {
+  const addChannel = (id: string, channel: newnewapi.IChannel) => {
     setChannelsWithSubs((curr) => {
       const workingObj = { ...curr };
       const shouldSubscribe = !workingObj[id] || workingObj[id] === 0;
@@ -39,11 +39,7 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
       ) {
         const subscribeMsg = new newnewapi.SubscribeToChannels({
           channels: [
-            {
-              postUpdates: {
-                postUuid: id,
-              },
-            },
+            channel,
           ],
         });
 

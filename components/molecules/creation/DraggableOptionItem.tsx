@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import TextArea from 'react-textarea-autosize';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { Reorder, useMotionValue, useDragControls } from 'framer-motion';
@@ -22,7 +23,12 @@ interface IOptionItem {
   };
   index: number;
   withDelete: boolean;
-  validation: (value: string, min: number, max: number) => string;
+  validation: (
+    value: string,
+    min: number,
+    max: number,
+    kind: newnewapi.ValidateTextRequest.Kind,
+  ) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
 
@@ -49,8 +55,13 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
       text: e.target.value,
     });
   };
-  const handleInputBlur = (e: any) => {
-    setError(validation(e.target.value, CREATION_OPTION_MIN, CREATION_OPTION_MAX));
+  const handleInputBlur = async (e: any) => {
+    setError(await validation(
+      e.target.value,
+      CREATION_OPTION_MIN,
+      CREATION_OPTION_MAX,
+      newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+    ));
   };
   const handleInputFocus = () => {
     setError('');
@@ -69,9 +80,18 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const validateTitleDebounced = useDebounce(value, 500);
 
   useEffect(() => {
-    if (validateTitleDebounced) {
-      setError(validation(validateTitleDebounced, CREATION_OPTION_MIN, CREATION_OPTION_MAX));
-    }
+    const func = async () => {
+      if (validateTitleDebounced) {
+        setError(await validation(
+          validateTitleDebounced,
+          CREATION_OPTION_MIN,
+          CREATION_OPTION_MAX,
+          newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        ));
+      }
+    };
+
+    func();
   }, [validation, validateTitleDebounced]);
 
   return (

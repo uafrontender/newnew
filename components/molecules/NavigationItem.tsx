@@ -76,13 +76,13 @@ const SNavItem = styled(Text)<ISNavItem>`
   padding: 12px;
   align-items: center;
   flex-direction: row;
-  
+
   &:hover {
     .navText {
       opacity: 1;
     }
   }
-  
+
   .navText {
     color: ${(props) => props.theme.colorsThemed.text.primary};
     opacity: 0.5;

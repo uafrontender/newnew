@@ -116,7 +116,6 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   useOnClickOutside(wrapperRef, handleClose);
 
   useEffect(() => {
-    console.log(visibleMonth);
     scroller.scrollTo(`month-item-${visibleMonth}`, {
       offset: 0,
       smooth: 'easeInOutQuart',
