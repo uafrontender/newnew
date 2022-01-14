@@ -232,7 +232,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
-    addChannel(post.postUuid);
+    addChannel(
+      post.postUuid,
+      {
+        postUpdates: {
+          postUuid: post.postUuid,
+        },
+      },
+    );
 
     return () => {
       removeChannel(post.postUuid);

@@ -27,3 +27,36 @@ export const getVideoUploadUrl = (
     'post',
     payload,
   );
+
+export const removeUploadedFile = (
+  payload: newnewapi.RemoveUploadedFileRequest,
+) => fetchProtobufProtectedIntercepted<
+  newnewapi.RemoveUploadedFileRequest, newnewapi.EmptyResponse>(
+    newnewapi.RemoveUploadedFileRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_UPLOAD}/remove_uploaded_file`,
+    'post',
+    payload,
+  );
+
+export const startVideoProcessing = (
+  payload: newnewapi.StartVideoProcessingRequest,
+) => fetchProtobufProtectedIntercepted<
+  newnewapi.StartVideoProcessingRequest, newnewapi.StartVideoProcessingResponse>(
+    newnewapi.StartVideoProcessingRequest,
+    newnewapi.StartVideoProcessingResponse,
+    `${BASE_URL_UPLOAD}/start_video_processing`,
+    'post',
+    payload,
+  );
+
+export const stopVideoProcessing = (
+  payload: newnewapi.StopVideoProcessingRequest,
+) => fetchProtobufProtectedIntercepted<
+  newnewapi.StopVideoProcessingRequest, newnewapi.StopVideoProcessingResponse>(
+    newnewapi.StopVideoProcessingRequest,
+    newnewapi.StopVideoProcessingResponse,
+    `${BASE_URL_UPLOAD}/stop_video_processing`,
+    'post',
+    payload,
+  );

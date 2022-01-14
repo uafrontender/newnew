@@ -5,6 +5,7 @@ interface ICaption {
   weight?: 600 | 700;
   variant?: 1 | 2 | 3;
   onClick?: () => void;
+  innerRef?: () => void;
   children: React.ReactNode;
 }
 
@@ -12,6 +13,7 @@ const Caption: React.FC<ICaption> = (props) => {
   const {
     variant,
     children,
+    innerRef,
     ...rest
   } = props;
 
@@ -22,13 +24,14 @@ const Caption: React.FC<ICaption> = (props) => {
   };
   const Component = components[variant ?? 1];
 
-  return <Component {...rest}>{children}</Component>;
+  return <Component ref={innerRef} {...rest}>{children}</Component>;
 };
 
 Caption.defaultProps = {
   weight: 600,
   variant: 1,
   onClick: () => {},
+  innerRef: () => {},
 };
 
 export default Caption;

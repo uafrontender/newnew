@@ -47,6 +47,8 @@ export const lightTheme: DefaultTheme = {
       backgroundFooter: '#F1F3F9',
       backgroundErrorPopup: '#434956',
       overlayDim: 'rgba(229, 233, 241, 0.5)',
+      thumbLineHidden: 'rgba(241, 243, 249, 0.9)',
+      thumbLineVisible: 'rgba(29, 106, 255, 0.2)',
     },
     text: {
       primary: '#2C2C33',
@@ -220,6 +222,8 @@ export const darkTheme: DefaultTheme = {
       backgroundHeader: 'rgba(11, 10, 19, 0.9)',
       backgroundErrorPopup: '#434956',
       overlayDim: 'rgba(11, 10, 19, 0.65)',
+      thumbLineHidden: 'rgba(20, 21, 31, 0.9)',
+      thumbLineVisible: 'rgba(255, 255, 255, 0.2)',
     },
     text: {
       primary: '#FFFFFF',

@@ -142,7 +142,14 @@ export const Card: React.FC<ICard> = ({
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
-    addChannel(postParsed.postUuid);
+    addChannel(
+      postParsed.postUuid,
+      {
+        postUpdates: {
+          postUuid: postParsed.postUuid,
+        },
+      },
+    );
 
     return () => {
       removeChannel(postParsed.postUuid);

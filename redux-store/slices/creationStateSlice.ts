@@ -4,6 +4,7 @@ import { newnewapi } from 'newnew-api';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 export type TPostData = Omit<newnewapi.Post, 'toJSON' | '_nickname' | '_email'>;
+export type TVideoProcessingData = Omit<newnewapi.StartVideoProcessingResponse, 'toJSON' | '_nickname' | '_email'>;
 export type TThumbnailParameters = {
   startTime: number;
   endTime: number;
@@ -41,6 +42,13 @@ export interface ICreationStateInterface {
     };
   },
   postData?: TPostData,
+  videoProcessing?: TVideoProcessingData,
+  fileUpload: {
+    error: boolean,
+    loading: boolean,
+    progress: number,
+    eta: number,
+  },
 }
 
 const defaultUIState: ICreationStateInterface = {
@@ -48,9 +56,12 @@ const defaultUIState: ICreationStateInterface = {
     title: '',
     startsAt: {
       type: 'right-away',
-      date: moment().format(),
-      time: moment().format('hh:mm'),
-      'hours-format': moment().format('a'),
+      date: moment()
+        .format(),
+      time: moment()
+        .format('hh:mm'),
+      'hours-format': moment()
+        .format('a'),
     },
     expiresAt: '1-hour',
     options: {
@@ -63,7 +74,7 @@ const defaultUIState: ICreationStateInterface = {
     },
   },
   auction: {
-    minimalBid: 1,
+    minimalBid: 5,
   },
   crowdfunding: {
     targetBackerCount: 1,
@@ -82,6 +93,16 @@ const defaultUIState: ICreationStateInterface = {
     options: {
       allowSuggestions: true,
     },
+  },
+  videoProcessing: {
+    taskUuid: '',
+    targetUrls: {},
+  },
+  fileUpload: {
+    error: false,
+    loading: false,
+    progress: 0,
+    eta: 0,
   },
 };
 
@@ -122,11 +143,29 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationAllowSuggestions(state, { payload }: PayloadAction<boolean>) {
       state.multiplechoice.options.allowSuggestions = payload;
     },
+    setCreationFileUploadLoading(state, { payload }: PayloadAction<boolean>) {
+      state.fileUpload.loading = payload;
+    },
+    setCreationFileUploadError(state, { payload }: PayloadAction<boolean>) {
+      state.fileUpload.error = payload;
+    },
+    setCreationFileUploadProgress(state, { payload }: PayloadAction<number>) {
+      state.fileUpload.progress = payload;
+    },
+    setCreationFileUploadETA(state, { payload }: PayloadAction<number>) {
+      state.fileUpload.eta = payload;
+    },
+    setCreationVideoProcessing(state, { payload }: PayloadAction<TVideoProcessingData>) {
+      state.videoProcessing = payload;
+    },
     clearCreation(state) {
       state.post = { ...defaultUIState.post };
       state.auction = { ...defaultUIState.auction };
       state.crowdfunding = { ...defaultUIState.crowdfunding };
       state.multiplechoice = { ...defaultUIState.multiplechoice };
+      state.fileUpload = { ...defaultUIState.fileUpload };
+      // @ts-ignore
+      state.videoProcessing = { ...defaultUIState.videoProcessing };
     },
   },
 });
@@ -141,9 +180,14 @@ export const {
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationFileUploadETA,
+  setCreationVideoProcessing,
   setCreationVideoThumbnails,
+  setCreationFileUploadError,
   setCreationAllowSuggestions,
   setCreationTargetBackerCount,
+  setCreationFileUploadLoading,
+  setCreationFileUploadProgress,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;
