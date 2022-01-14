@@ -15,12 +15,14 @@ import { TTokenCookie } from '../../api/apiConfigs';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostModal from '../../components/organisms/decision/PostModal';
 import List from '../../components/organisms/search/List';
+import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
+import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 
 interface IMyProfileFavorites {
   user: Omit<newnewapi.User, 'toJSON'>;
   pagedPosts?: newnewapi.PagedPostsResponse;
   posts?: newnewapi.Post[];
-  postsForPageFilter: newnewapi.Post.Filter;
+  postsFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
   pageToken: string | null | undefined;
   handleUpdatePageToken: (value: string | null | undefined) => void;
@@ -33,7 +35,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   pagedPosts,
   nextPageTokenFromServer,
   posts,
-  postsForPageFilter,
+  postsFilter,
   pageToken,
   handleUpdatePageToken,
   handleUpdateFilter,
@@ -75,7 +77,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
       setTriedLoading(true);
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_FAVORITES,
-        filter: postsForPageFilter,
+        filter: postsFilter,
         paging: {
           ...(token ? { pageToken: token } : {}),
         },
@@ -98,7 +100,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   }, [
     handleSetPosts,
     handleUpdatePageToken,
-    postsForPageFilter,
+    postsFilter,
     isLoading,
   ]);
 
@@ -113,9 +115,21 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading]);
 
+  useUpdateEffect(() => {
+    handleUpdatePageToken('');
+    handleSetPosts([]);
+    loadPosts(pageToken ?? undefined);
+  }, [postsFilter]);
+
   return (
     <div>
       <main>
+        <PostsFilterSection
+          // Temp
+          numDecisions={1000}
+          postsFilter={postsFilter}
+          handleUpdateFilter={handleUpdateFilter}
+        />
         <SCardsSection>
           {posts && (
             <List

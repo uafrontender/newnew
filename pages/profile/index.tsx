@@ -11,8 +11,10 @@ import { newnewapi } from 'newnew-api';
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 import { TTokenCookie } from '../../api/apiConfigs';
+import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
+import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import PostModal from '../../components/organisms/decision/PostModal';
 import List from '../../components/organisms/search/List';
 
@@ -20,7 +22,7 @@ interface IMyProfileIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
   pagedPosts?: newnewapi.PagedPostsResponse;
   posts?: newnewapi.Post[];
-  postsForPageFilter: newnewapi.Post.Filter;
+  postsFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
   pageToken: string | null | undefined;
   handleUpdatePageToken: (value: string | null | undefined) => void;
@@ -33,7 +35,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   pagedPosts,
   nextPageTokenFromServer,
   posts,
-  postsForPageFilter,
+  postsFilter,
   pageToken,
   handleUpdatePageToken,
   handleUpdateFilter,
@@ -75,7 +77,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
       setTriedLoading(true);
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_ACTIVE_BIDDINGS,
-        filter: postsForPageFilter,
+        filter: postsFilter,
         paging: {
           ...(token ? { pageToken: token } : {}),
         },
@@ -98,7 +100,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   }, [
     handleSetPosts,
     handleUpdatePageToken,
-    postsForPageFilter,
+    postsFilter,
     isLoading,
   ]);
 
@@ -113,9 +115,21 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading]);
 
+  useUpdateEffect(() => {
+    handleUpdatePageToken('');
+    handleSetPosts([]);
+    loadPosts(pageToken ?? undefined);
+  }, [postsFilter]);
+
   return (
     <div>
       <main>
+        <PostsFilterSection
+          // Temp
+          numDecisions={100}
+          postsFilter={postsFilter}
+          handleUpdateFilter={handleUpdateFilter}
+        />
         <SCardsSection>
           {posts && (
             <List
