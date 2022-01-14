@@ -465,13 +465,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       <SActivitesContainer>
         {!overviewedOption ? (
           <PostTopInfo
+            postId={post.postUuid}
             postType="ac"
-            // Temp
             amountInBids={totalAmount}
             creator={post.creator!!}
             startsAtSeconds={post.startsAt?.seconds as number}
             handleFollowCreator={() => {}}
-            handleFollowDecision={() => {}}
             handleReportAnnouncement={() => {}}
           />
         ) : (

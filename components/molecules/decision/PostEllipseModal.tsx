@@ -9,12 +9,14 @@ import Text from '../../atoms/Text';
 interface IPostEllipseModal {
   isOpen: boolean;
   zIndex: number;
+  handleFollowDecision: () => void;
   onClose: () => void;
 }
 
 const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
   isOpen,
   zIndex,
+  handleFollowDecision,
   onClose,
 }) => {
   const { t } = useTranslation('decision');
@@ -45,7 +47,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             </Text>
           </SButton>
           <SButton
-            onClick={() => {}}
+            onClick={() => handleFollowDecision()}
           >
             <Text
               variant={3}

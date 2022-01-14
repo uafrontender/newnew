@@ -9,11 +9,13 @@ import Text from '../../atoms/Text';
 
 interface IPostEllipseMenu {
   isVisible: boolean;
+  handleFollowDecision: () => {};
   handleClose: () => void;
 }
 
 const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
   isVisible,
+  handleFollowDecision,
   handleClose,
 }) => {
   const { t } = useTranslation('decision');
@@ -46,7 +48,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
             </Text>
           </SButton>
           <SButton
-            onClick={() => {}}
+            onClick={() => handleFollowDecision()}
           >
             <Text
               variant={3}

@@ -383,13 +383,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       </div>
       <SActivitesContainer>
         <PostTopInfo
+          postId={post.postUuid}
           postType="mc"
-          // Temp
           totalVotes={totalVotes}
           creator={post.creator!!}
           startsAtSeconds={post.startsAt?.seconds as number}
           handleFollowCreator={() => {}}
-          handleFollowDecision={() => {}}
           handleReportAnnouncement={() => {}}
         />
         <DecisionTabs

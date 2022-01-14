@@ -375,14 +375,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       </div>
       <SActivitesContainer>
         <PostTopInfo
+          postId={post.postUuid}
           postType="cf"
-          // Temp
           currentBackers={currentBackers}
           targetBackers={post.targetBackerCount}
           creator={post.creator!!}
           startsAtSeconds={post.startsAt?.seconds as number}
           handleFollowCreator={() => {}}
-          handleFollowDecision={() => {}}
           handleReportAnnouncement={() => {}}
         />
         <CfPledgeLevelsSection
