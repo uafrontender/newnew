@@ -132,7 +132,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
         <SProgress view={rest.view} progress={progress} />
       )}
       {loading && (
-        <SLoader>
+        <SLoader size={rest.size}>
           <Lottie
             width={25}
             height={20}
@@ -336,9 +336,13 @@ const SButton = styled.button<ISButton>`
   `)}
 `;
 
-const SLoader = styled.div`
+interface ISLoader {
+  size?: TSize
+}
+
+const SLoader = styled.div<ISLoader>`
   top: 50%;
-  right: 16px;
+  right: ${(props) => (props.size === 'sm' ? '0px' : '16px')};
   z-index: 20;
   position: absolute;
   transform: translateY(-50%);

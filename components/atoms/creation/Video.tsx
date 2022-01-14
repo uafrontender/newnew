@@ -9,7 +9,7 @@ import Button from '../Button';
 import InlineSVG from '../InlineSVG';
 
 import volumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import volumeOff from '../../../public/images/svg/icons/filled/VolumeOff.svg';
+import volumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 
 interface IVideo {
   src: string;

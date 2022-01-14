@@ -1,7 +1,9 @@
 import React, {
+  useRef,
   useMemo,
   useState,
   useEffect,
+  useContext,
   useCallback,
 } from 'react';
 import moment from 'moment';
@@ -16,21 +18,29 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
+import UserAvatar from '../../../molecules/UserAvatar';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import MobileField from '../../../molecules/creation/MobileField';
 import Tabs, { Tab } from '../../../molecules/Tabs';
+import BitmovinPlayer from '../../../atoms/BitmovinPlayer';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
 import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
 import TabletFieldBlock from '../../../molecules/creation/TabletFieldBlock';
 import DraggableMobileOptions from '../DraggableMobileOptions';
 
-import urltoFile from '../../../../utils/urlToFile';
 import useDebounce from '../../../../utils/hooks/useDebounce';
-import { getVideoUploadUrl } from '../../../../api/endpoints/upload';
+import { validateText } from '../../../../api/endpoints/infrastructure';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
-  clearCreation,
+  getVideoUploadUrl,
+  removeUploadedFile,
+  stopVideoProcessing,
+  startVideoProcessing,
+} from '../../../../api/endpoints/upload';
+import {
   setCreationVideo,
   setCreationTitle,
   setCreationMinBid,
@@ -38,9 +48,14 @@ import {
   setCreationComments,
   setCreationStartDate,
   setCreationExpireDate,
+  setCreationFileUploadETA,
+  setCreationFileUploadError,
   setCreationVideoThumbnails,
+  setCreationVideoProcessing,
   setCreationAllowSuggestions,
   setCreationTargetBackerCount,
+  setCreationFileUploadLoading,
+  setCreationFileUploadProgress,
 } from '../../../../redux-store/slices/creationStateSlice';
 
 import {
@@ -55,19 +70,28 @@ import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 interface ICreationSecondStepContent {
 }
 
+type CardType = 'ac' | 'mc' | 'cf';
+
 export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('creation');
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const playerRef: any = useRef(null);
   const {
     post,
     auction,
+    fileUpload,
     crowdfunding,
     multiplechoice,
+    videoProcessing,
   } = useAppSelector((state) => state.creation);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
+  const {
+    resizeMode,
+    overlay,
+  } = useAppSelector((state) => state.ui);
   const { query: { tab } } = router;
   const tabs: Tab[] = useMemo(() => [
     {
@@ -83,24 +107,76 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
       url: '/creation/crowdfunding',
     },
   ], []);
+  const typesOfPost: any = useMemo(() => ({
+    auction: 'ac',
+    'multiple-choice': 'mc',
+    crowdfunding: 'cf',
+  }), []);
+  const typeOfPost: CardType = typesOfPost[tab as string];
   const [titleError, setTitleError] = useState('');
 
-  const validateText = useCallback((text: string, min: number, max: number) => {
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const {
+    addChannel,
+    removeChannel,
+  } = useContext(ChannelsContext);
+
+  const validateTextAPI = useCallback(async (
+    text: string,
+    kind: newnewapi.ValidateTextRequest.Kind,
+  ) => {
+    if (!text) {
+      return '';
+    }
+
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        kind,
+        text,
+      });
+
+      const res = await validateText(payload);
+
+      if (!res?.data?.status) throw new Error('An error occured');
+
+      if (res?.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        return tCommon('error.text.badWords');
+      }
+
+      return '';
+    } catch (err) {
+      return '';
+    }
+  }, [tCommon]);
+  const validateT = useCallback(async (
+    text: string,
+    min: number,
+    max: number,
+    type: newnewapi.ValidateTextRequest.Kind,
+  ) => {
     let error = minLength(tCommon, text, min);
 
     if (!error) {
       error = maxLength(tCommon, text, max);
     }
 
-    return error;
-  }, [tCommon]);
+    if (!error) {
+      error = await validateTextAPI(text, type);
+    }
 
+    return error;
+  }, [tCommon, validateTextAPI]);
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) === -1;
-  const disabled = !!titleError || !post.title || !post.announcementVideoUrl || !optionsAreValid;
+  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)) === -1;
+  const disabled = !!titleError
+    || !post.title
+    || !post.announcementVideoUrl
+    || fileUpload.progress !== 100
+    || !optionsAreValid;
 
   const validateTitleDebounced = useDebounce(post.title, 500);
   const formatStartsAt = useCallback(() => {
@@ -143,10 +219,47 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     } else {
       router.push('/');
     }
-    dispatch(clearCreation({}));
-  }, [dispatch, router]);
+  }, [router]);
+  const handleVideoDelete = useCallback(async () => {
+    try {
+      const payload = new newnewapi.RemoveUploadedFileRequest({
+        publicUrl: post?.announcementVideoUrl,
+      });
+
+      const res = await removeUploadedFile(payload);
+
+      if (res?.error) {
+        throw new Error(res.error?.message ?? 'An error occurred');
+      }
+
+      const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
+        taskUuid: videoProcessing?.taskUuid,
+      });
+
+      const resProcessing = await stopVideoProcessing(payloadProcessing);
+
+      if (!resProcessing.data || resProcessing.error) {
+        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      }
+
+      removeChannel(videoProcessing?.taskUuid as string);
+
+      dispatch(setCreationVideo(''));
+      dispatch(setCreationFileUploadError(false));
+      dispatch(setCreationVideoProcessing({}));
+      dispatch(setCreationFileUploadLoading(false));
+      dispatch(setCreationFileUploadProgress(0));
+    } catch (error: any) {
+      toast.error(error?.message);
+    }
+  }, [dispatch, post?.announcementVideoUrl, removeChannel, videoProcessing?.taskUuid]);
   const handleVideoUpload = useCallback(async (value) => {
     try {
+      dispatch(setCreationFileUploadETA(100));
+      dispatch(setCreationFileUploadProgress(1));
+      dispatch(setCreationFileUploadLoading(true));
+      dispatch(setCreationFileUploadError(false));
+
       const payload = new newnewapi.GetVideoUploadUrlRequest({
         filename: value.name,
       });
@@ -154,16 +267,14 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
       const res = await getVideoUploadUrl(payload);
 
       if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'An error occured');
+        throw new Error(res.error?.message ?? 'An error occurred');
       }
-
-      const file = await urltoFile(value.url, value.name, value.type);
 
       const uploadResponse = await fetch(
         res.data.uploadUrl,
         {
           method: 'PUT',
-          body: file,
+          body: value,
           headers: {
             'Content-Type': value.type,
           },
@@ -174,22 +285,62 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
         throw new Error('Upload failed');
       }
 
-      return res.data;
+      dispatch(setCreationFileUploadProgress(5));
+      dispatch(setCreationFileUploadETA(90));
+
+      const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
+        publicUrl: res.data.publicUrl,
+      });
+
+      const resProcessing = await startVideoProcessing(payloadProcessing);
+
+      if (!resProcessing.data || resProcessing.error) {
+        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      }
+
+      addChannel(
+        resProcessing.data.taskUuid,
+        {
+          processingProgress: {
+            taskUuid: resProcessing.data.taskUuid,
+          },
+        },
+      );
+
+      dispatch(setCreationVideoProcessing({
+        taskUuid: resProcessing.data.taskUuid,
+        targetUrls: {
+          thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+          hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+          altStreamUrl: resProcessing?.data?.targetUrls?.altStreamUrl,
+          originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
+          thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+        },
+      }));
+      dispatch(setCreationFileUploadProgress(10));
+      dispatch(setCreationFileUploadETA(80));
+      dispatch(setCreationVideo(res.data.publicUrl ?? ''));
     } catch (error: any) {
+      dispatch(setCreationFileUploadError(true));
+      dispatch(setCreationFileUploadLoading(false));
       toast.error(error?.message);
-      return false;
     }
-  }, []);
+  }, [addChannel, dispatch]);
   const handleItemFocus = useCallback((key: string) => {
     if (key === 'title') {
       setTitleError('');
     }
   }, []);
-  const handleItemBlur = useCallback((key: string, value: string) => {
+  const handleItemBlur = useCallback(async (key: string, value: string) => {
     if (key === 'title') {
-      setTitleError(validateText(value, CREATION_TITLE_MIN, CREATION_TITLE_MAX));
+      setTitleError(await validateT(
+        value,
+        CREATION_TITLE_MIN,
+        CREATION_TITLE_MAX,
+        newnewapi.ValidateTextRequest.Kind.POST_TITLE,
+      ));
     }
-  }, [validateText]);
+  }, [validateT]);
   const handleItemChange = useCallback(async (key: string, value: any) => {
     if (key === 'title') {
       dispatch(setCreationTitle(value));
@@ -209,17 +360,14 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
       dispatch(setCreationChoices(value));
     } else if (key === 'video') {
       if (value) {
-        const res: any = await handleVideoUpload(value);
-        if (res?.publicUrl) {
-          dispatch(setCreationVideo(res?.publicUrl));
-        }
+        await handleVideoUpload(value);
       } else {
-        dispatch(setCreationVideo(''));
+        await handleVideoDelete();
       }
     } else if (key === 'thumbnailParameters') {
       dispatch(setCreationVideoThumbnails(value));
     }
-  }, [dispatch, handleVideoUpload]);
+  }, [dispatch, handleVideoUpload, handleVideoDelete]);
   const expireOptions = useMemo(() => [
     {
       id: '1-hour',
@@ -273,7 +421,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
               min={2}
               options={multiplechoice.choices}
               onChange={handleItemChange}
-              validation={validateText}
+              validation={validateT}
             />
             {isMobile && (
               <SSeparator margin="16px 0" />
@@ -332,7 +480,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     post?.title,
     auction?.minimalBid,
     crowdfunding?.targetBackerCount,
-    validateText,
+    validateT,
     handleItemBlur,
     handleItemFocus,
     handleItemChange,
@@ -464,12 +612,60 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     formatExpiresAt,
     handleItemChange,
   ]);
+  const handlerSocketUpdated = useCallback((data: any) => {
+    const arr = new Uint8Array(data);
+    const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+
+    if (!decoded) return;
+
+    if (decoded.taskUuid === videoProcessing?.taskUuid) {
+      dispatch(setCreationFileUploadETA(decoded.eta));
+
+      if (decoded.fractionCompleted > fileUpload.progress) {
+        dispatch(setCreationFileUploadProgress(decoded.fractionCompleted));
+      }
+
+      if (decoded.fractionCompleted === 100) {
+        removeChannel(videoProcessing?.taskUuid);
+        dispatch(setCreationFileUploadLoading(false));
+      }
+    }
+  }, [videoProcessing, fileUpload, dispatch, removeChannel]);
 
   useEffect(() => {
-    if (validateTitleDebounced) {
-      setTitleError(validateText(validateTitleDebounced, CREATION_TITLE_MIN, CREATION_TITLE_MAX));
+    const func = async () => {
+      if (validateTitleDebounced) {
+        setTitleError(await validateT(
+          validateTitleDebounced,
+          CREATION_TITLE_MIN,
+          CREATION_TITLE_MAX,
+          newnewapi.ValidateTextRequest.Kind.POST_TITLE,
+        ));
+      }
+    };
+    func();
+  }, [validateT, validateTextAPI, validateTitleDebounced]);
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
     }
-  }, [validateText, validateTitleDebounced]);
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('VideoProcessingProgress', handlerSocketUpdated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, handlerSocketUpdated]);
+  useEffect(() => {
+    if (playerRef.current && isDesktop) {
+      if (overlay) {
+        playerRef.current.pause();
+      } else {
+        playerRef.current.play();
+      }
+    }
+  }, [overlay, isDesktop]);
 
   return (
     <>
@@ -504,8 +700,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 </STabletBlockTitle>
               )}
               <FileUpload
+                {...fileUpload}
                 id="video"
-                value={post.announcementVideoUrl}
+                value={videoProcessing?.targetUrls}
                 onChange={handleItemChange}
                 thumbnails={post.thumbnailParameters}
               />
@@ -575,6 +772,58 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
               </SItemWrapper>
             )}
           </SLeftPart>
+          {isDesktop && (
+            <SRightPart>
+              <SFloatingPart>
+                <SItemWrapper noMargin={isDesktop}>
+                  <STabletBlockTitle variant={1} weight={700}>
+                    {t('secondStep.block.title.floating')}
+                  </STabletBlockTitle>
+                </SItemWrapper>
+                {fileUpload?.progress === 100 ? (
+                  <SFloatingSubSectionWithPlayer>
+                    <SFloatingSubSectionPlayer>
+                      <BitmovinPlayer
+                        withMuteControl
+                        id="floating-preview"
+                        innerRef={playerRef}
+                        resources={videoProcessing?.targetUrls}
+                        borderRadius="16px"
+                        mutePosition="left"
+                      />
+                    </SFloatingSubSectionPlayer>
+                    <SFloatingSubSectionUser>
+                      <SUserAvatar
+                        avatarUrl={user.userData?.avatarUrl}
+                      />
+                      <SUserTitle variant={3} weight={600}>
+                        {post?.title}
+                      </SUserTitle>
+                    </SFloatingSubSectionUser>
+                    <SBottomEnd>
+                      <SButtonUser
+                        view="primary"
+                      >
+                        {t(`secondStep.button.card.${typeOfPost}`)}
+                      </SButtonUser>
+                      <SCaption variant={2} weight={700}>
+                        {t('secondStep.card.left', {
+                          time: formatExpiresAt()
+                            .fromNow(true),
+                        })}
+                      </SCaption>
+                    </SBottomEnd>
+                  </SFloatingSubSectionWithPlayer>
+                ) : (
+                  <SFloatingSubSection>
+                    <SFloatingSubSectionDescription variant={3} weight={600}>
+                      {t('secondStep.block.subTitle.floating')}
+                    </SFloatingSubSectionDescription>
+                  </SFloatingSubSection>
+                )}
+              </SFloatingPart>
+            </SRightPart>
+          )}
         </SContent>
       </div>
     </>
@@ -593,7 +842,6 @@ const SContent = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     margin-top: 0;
-    flex-direction: column;
   }
 `;
 
@@ -603,6 +851,51 @@ const SLeftPart = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-width: 480px;
   }
+`;
+
+const SRightPart = styled.div`
+  position: relative;
+`;
+
+const SFloatingPart = styled.div`
+  top: 16px;
+  left: 0;
+  position: sticky;
+  padding-left: 32px;
+`;
+
+const SFloatingSubSection = styled.div`
+  width: 224px;
+  height: 396px;
+  padding: 25px;
+  display: flex;
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  align-items: center;
+  border-radius: 16px;
+  justify-content: center;
+`;
+
+const SFloatingSubSectionWithPlayer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SFloatingSubSectionUser = styled.div`
+  display: flex;
+  margin-top: 12px;
+  align-items: center;
+  flex-direction: row;
+`;
+
+const SFloatingSubSectionPlayer = styled.div`
+  width: 224px;
+  height: 396px;
+`;
+
+const SFloatingSubSectionDescription = styled(Text)`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  opacity: 0.33;
+  text-align: center;
 `;
 
 const STabsWrapper = styled.div`
@@ -736,3 +1029,47 @@ const STabletBlockTitle = styled(Caption)`
 `;
 
 const STabletBlockSubTitle = styled(Text)``;
+
+const SUserAvatar = styled(UserAvatar)`
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+`;
+
+const SUserTitle = styled(Text)`
+  width: 188px;
+  display: -webkit-box;
+  overflow: hidden;
+  position: relative;
+  padding-left: 12px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
+const SBottomEnd = styled.div`
+  display: flex;
+  margin-top: 12px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const SButtonUser = styled(Button)`
+  padding: 12px;
+  border-radius: 12px;
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 8px 12px;
+  }
+`;
+
+const SCaption = styled(Caption)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
