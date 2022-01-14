@@ -7,7 +7,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
-import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOff.svg';
+import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 
 interface IPostVideo {

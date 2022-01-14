@@ -6,13 +6,15 @@ import React, {
 } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
+import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
+import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -37,105 +39,127 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
   } = props;
   const theme = useTheme();
   const { t } = useTranslation('creation');
-  const videoRef: any = useRef();
   const videoThumbs: any = useRef({ ...thumbnails });
-  const constraintsRef: any = useRef(null);
-  const progressIndicator: any = useRef(null);
-  const constraintsLeftRef: any = useRef(null);
-  const constraintsRightRef: any = useRef(null);
-  const constraintsCenterRef: any = useRef(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoChanks, setVideoChanks] = useState([]);
+  const [chunks, setChunks] = useState<string[]>([]);
+  const [videoDuration, setVideoDuration] = useState<number>(0);
+  const progressRef: any = useRef(null);
+  const playerRef: any = useRef(null);
+  const endTimeRef: any = useRef(null);
+  const startTimeRef: any = useRef(null);
+  const progressIndicatorRef: any = useRef(null);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
-  const visiblePart = (3 * 100) / (videoRef?.current?.duration || 0);
-  const hiddenPartFirst = videoThumbs.current.startTime
-    ? (videoThumbs.current.startTime * 100) / (videoRef?.current?.duration || 0) : 0;
-  const hiddenPartSecond = 100 - visiblePart - hiddenPartFirst;
-
-  const preventCLick = (e: any) => {
+  const preventCLick = useCallback((e: any) => {
     e.preventDefault();
     e.stopPropagation();
-  };
-  const onSubmit = () => {
-    handleSubmit(videoThumbs.current);
-  };
-  const handleVideoSelectDrag = useCallback(() => {
-    const x = constraintsCenterRef.current.getBoundingClientRect().x - 16;
-    constraintsLeftRef.current.style.width = `${x}px`;
-    constraintsRightRef.current.style.width = `calc(${100 - visiblePart}% - ${x}px + 5px)`;
-    const xPositionPercent = ((x - 3) * 100) / (window.innerWidth - 36);
-    const startFrame = +((videoRef.current.duration * xPositionPercent) / 100).toFixed(2);
-
-    videoThumbs.current.startTime = startFrame;
-    videoThumbs.current.endTime = startFrame + 3;
-    videoRef.current.currentTime = startFrame;
-    videoRef.current.play();
-  }, [visiblePart]);
-
-  const handleVideoLoaded = useCallback(() => {
-    const { duration } = videoRef.current;
-    const onePart: any = (duration / 10).toFixed(2);
-    const chanks: any = [];
-
-    // eslint-disable-next-line no-plusplus
-    for (let i = 1; i <= 10; i++) {
-      chanks.push({
-        start: (onePart * (i - 1)).toFixed(2),
-        end: (onePart * i).toFixed(2),
-      });
-    }
-    setVideoChanks(chanks);
-    setVideoLoaded(true);
   }, []);
-  const handleVideoProgress = useCallback(() => {
-    if (open) {
-      const percentage = (videoRef.current.currentTime * 100) / videoRef.current.duration;
-      progressIndicator.current.style.transition = 'all ease 0.5s';
-      progressIndicator.current.style.left = `calc(${percentage}% - 3px)`;
-      progressIndicator.current.style.transform = 'translateX(-50%)';
+  const onSubmit = useCallback(() => {
+    handleSubmit(videoThumbs.current);
+  }, [handleSubmit]);
+  const renderChunks = useCallback((chunk, index) => (
+    <SProgressSeparator
+      key={`chunk-${index}`}
+      height={index % 5 === 0 ? '16px' : '6px'}
+    />
+  ), []);
+  const setDuration = useCallback((duration) => {
+    const percentage = (3 * 100) / duration;
+    const durationCount = 100 / percentage;
+    const separatorsCount = +(durationCount * 8).toFixed(0);
 
-      if (videoRef.current.currentTime >= videoThumbs.current.endTime) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
+    setChunks(Array(separatorsCount)
+      .fill('_'));
+    setVideoDuration(duration);
+  }, []);
+  const setCurrentTime = useCallback((time) => {
+    const percentage = ((time - videoThumbs.current.startTime) * 100) / 3;
+    const position = (percentage * 70) / 100;
+
+    progressIndicatorRef.current.style.transition = 'all ease 0.5s';
+    progressIndicatorRef.current.style.left = `calc(50% - 38px + ${position}px)`;
+    progressIndicatorRef.current.style.transform = 'translateX(-50%)';
+  }, []);
+
+  const getTime = useCallback((position) => {
+    let seconds = videoThumbs.current.endTime;
+
+    if (position === 'start') {
+      seconds = videoThumbs.current.startTime;
     }
-  }, [open]);
+
+    let minutes = (seconds / 60).toFixed(0);
+
+    if (+minutes) {
+      seconds -= +minutes * 60;
+    }
+
+    if (minutes.length === 1) {
+      minutes = `0${minutes}`;
+    }
+
+    if (seconds?.toString()?.length === 1) {
+      seconds = `0${seconds}`;
+    }
+
+    return `${minutes}:${seconds}`;
+  }, []);
+  const handleVideoSelectDrag = useCallback(() => {
+    const {
+      left,
+      width,
+    } = progressRef.current.getBoundingClientRect();
+    const initialPoint = (window.innerWidth / 2) - 36;
+    const percentage = ((initialPoint - left) * 100) / width;
+    const startTime = +((videoDuration * percentage) / 100).toFixed(0);
+    const endTime = startTime + 3;
+
+    videoThumbs.current = {
+      startTime,
+      endTime,
+    };
+    endTimeRef.current.innerHTML = getTime('end');
+    startTimeRef.current.innerHTML = getTime('start');
+
+    playerRef.current.off(
+      // @ts-ignore
+      window.bitmovin.player.PlayerEvent.TimeChanged,
+      playerRef.current.handleTimeChange,
+    );
+    const handleTimeChange = () => {
+      if (setCurrentTime) {
+        setCurrentTime(playerRef.current.getCurrentTime());
+      }
+
+      if (playerRef.current.getCurrentTime() >= videoThumbs.current.endTime) {
+        playerRef.current.pause();
+        playerRef.current.seek(videoThumbs.current.startTime);
+        playerRef.current.play();
+      }
+    };
+    playerRef.current.pause();
+    // @ts-ignore
+    playerRef.current.on(window.bitmovin.player.PlayerEvent.TimeChanged, handleTimeChange);
+    playerRef.current.handleTimeChange = handleTimeChange;
+
+    playerRef.current.seek(videoThumbs.current.startTime);
+    playerRef.current.play();
+  }, [getTime, videoDuration, setCurrentTime]);
+  const getInitialXPosition = useCallback(() => {
+    const generalWidth = (chunks.length * 7) - 5;
+    const startPointPercentage = (videoThumbs.current.startTime * 100) / videoDuration;
+    const startPoint = (generalWidth * startPointPercentage) / 100;
+
+    return -startPoint;
+  }, [chunks.length, videoDuration]);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.onloadeddata = handleVideoLoaded;
-      videoRef.current.ontimeupdate = handleVideoProgress;
-    }
-  }, [handleVideoLoaded, handleVideoProgress, videoRef]);
-  useEffect(() => {
-    if (open && progressIndicator.current) {
-      const percentage = videoThumbs.current.startTime
-        ? (videoThumbs.current.startTime * 100) / videoRef.current.duration : 0;
-      videoRef.current.currentTime = videoThumbs.current.startTime;
-      progressIndicator.current.style.left = `${percentage}%`;
-      if (percentage) {
-        progressIndicator.current.style.transform = 'translateX(-50%)';
-        progressIndicator.current.style.transition = 'all ease 0.5s';
-      } else {
-        progressIndicator.current.style.transform = 'unset';
-        progressIndicator.current.style.transition = 'unset';
-      }
-      setTimeout(() => {
-        videoRef.current?.play();
-      }, 500);
-    } else {
-      videoRef.current.pause();
-    }
-  }, [
-    open,
-    progressIndicator,
-    thumbnails.endTime,
-    thumbnails.startTime,
-    videoThumbs.current.startTime,
-  ]);
+    videoThumbs.current = { ...thumbnails };
+    setChunks([]);
+    setCurrentTime(videoThumbs.current.startTime);
+  }, [thumbnails, open, setCurrentTime]);
+
+  const initialX = getInitialXPosition();
 
   return (
     <Modal
@@ -175,50 +199,63 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
               />
             )}
           </SModalTopLine>
-          <SModalVideoEdit
-            ref={videoRef}
-            src={value}
-            onLoad={handleVideoLoaded}
-          />
-          {videoLoaded && (
-            <SModalSelectLine>
-              {videoChanks.map((chank: any) => (
-                <SModalVideoEditSmall
-                  muted
-                  key={chank.start}
-                  src={`${value}#t=${chank.start},${chank.end}`}
-                />
-              ))}
-              <SModalSelectTopWrapper ref={constraintsRef}>
-                <SProgressIndicator ref={progressIndicator} />
-                <SModalSelectTopWrapperHiddenLeftPart
-                  ref={constraintsLeftRef}
-                  style={{
-                    width: `${hiddenPartFirst}%`,
-                  }}
-                />
-                <SModalSelectTopWrapperVisiblePart
-                  ref={constraintsCenterRef}
-                  drag="x"
-                  style={{
-                    width: `${visiblePart}%`,
-                  }}
-                  onDrag={handleVideoSelectDrag}
-                  onDragEnd={handleVideoSelectDrag}
-                  onDragStart={handleVideoSelectDrag}
-                  dragElastic={0}
-                  dragMomentum={false}
-                  dragConstraints={constraintsRef}
-                />
-                <SModalSelectTopWrapperHiddenRightPart
-                  ref={constraintsRightRef}
-                  style={{
-                    width: `${hiddenPartSecond}%`,
-                  }}
-                />
-              </SModalSelectTopWrapper>
-            </SModalSelectLine>
-          )}
+          <SPlayerWrapper>
+            {open && (
+              <BitmovinPlayer
+                id="thumbnail-preview-edit"
+                muted={false}
+                innerRef={playerRef}
+                resources={value}
+                thumbnails={thumbnails}
+                setDuration={setDuration}
+                borderRadius="16px"
+                setCurrentTime={setCurrentTime}
+              />
+            )}
+          </SPlayerWrapper>
+          <STimeWrapper>
+            <STimeStart
+              variant={2}
+              weight={600}
+              innerRef={startTimeRef}
+            >
+              {getTime('start')}
+            </STimeStart>
+            <STimeEnd
+              weight={600}
+              variant={2}
+              innerRef={endTimeRef}
+            >
+              {getTime('end')}
+            </STimeEnd>
+          </STimeWrapper>
+          <SSelectLine>
+            <SProgressIndicator ref={progressIndicatorRef} />
+            <SInvisibleWrapper position="left">
+              <SProgressSeparator height="100%" />
+            </SInvisibleWrapper>
+            <SInvisibleWrapper position="right">
+              <SProgressSeparator height="100%" />
+            </SInvisibleWrapper>
+            {!!chunks.length && (
+              <SProgressLine
+                ref={progressRef}
+                drag="x"
+                style={{ x: initialX }}
+                onDrag={handleVideoSelectDrag}
+                onDragEnd={handleVideoSelectDrag}
+                onDragStart={handleVideoSelectDrag}
+                dragElastic={0}
+                dragMomentum={false}
+                dragConstraints={{
+                  left: -(((chunks.length - 9) * 7) - 5),
+                  right: 0,
+                }}
+              >
+                {chunks.map(renderChunks)}
+              </SProgressLine>
+            )}
+          </SSelectLine>
           {!isMobile && (
             <SDescription>
               <SText>
@@ -288,20 +325,6 @@ const SContainer = styled.div`
   }
 `;
 
-const SModalVideoEdit = styled.video`
-  width: calc(100% - 58px);
-  height: auto;
-  margin: 0 29px;
-  overflow: hidden;
-  max-height: 65vh;
-  border-radius: 16px;
-`;
-
-const SModalVideoEditSmall = styled.video`
-  width: 10%;
-  height: auto;
-`;
-
 const SModalTopLine = styled.div`
   display: flex;
   padding: 18px 0;
@@ -338,61 +361,6 @@ const SModalButtonContainer = styled.div`
   }
 `;
 
-const SModalSelectLine = styled.div`
-  position: relative;
-  margin-top: 24px;
-`;
-
-const SProgressIndicator = styled.div`
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: calc(100% - 3px);
-  z-index: 3;
-  position: absolute;
-  background: ${(props) => props.theme.colorsThemed.accent.yellow};
-  border-radius: 1px;
-`;
-
-const SModalSelectTopWrapper = styled.div`
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  position: absolute;
-`;
-
-const SModalSelectTopWrapperVisiblePart = styled(motion.div)`
-  width: 100%;
-  height: calc(100% - 3px);
-  border: 3px solid ${(props) => props.theme.colorsThemed.text.primary};
-  z-index: 2;
-  position: absolute;
-  overflow: hidden;
-  border-radius: 4px;
-`;
-
-const SModalSelectTopWrapperHiddenLeftPart = styled.div`
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1;
-  opacity: 0.5;
-  position: absolute;
-  background: ${(props) => props.theme.colorsThemed.background.primary};
-`;
-
-const SModalSelectTopWrapperHiddenRightPart = styled.div`
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  opacity: 0.5;
-  position: absolute;
-  background: ${(props) => props.theme.colorsThemed.background.primary};
-`;
-
 const SButtonsWrapper = styled.div`
   display: flex;
   margin-top: 30px;
@@ -419,4 +387,106 @@ const SText = styled.span`
     font-size: 14px;
     line-height: 20px;
   }
+`;
+
+const SPlayerWrapper = styled.div`
+  width: 282px;
+  height: 500px;
+  margin: 0 auto;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 236px;
+    height: 420px;
+  }
+`;
+
+const STimeWrapper = styled.div`
+  gap: 36px;
+  margin: 17px auto 7px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const STimeStart = styled(Caption)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const STimeEnd = styled(Caption)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SSelectLine = styled.div`
+  width: 100%;
+  height: 40px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  background: ${(props) => props.theme.colorsThemed.background.thumbLineVisible};
+  align-items: center;
+  justify-content: space-between;
+`;
+
+interface ISInvisibleWrapper {
+  position: 'left' | 'right';
+}
+
+const SInvisibleWrapper = styled.div<ISInvisibleWrapper>`
+  top: 0;
+  width: calc(50% - 34px);
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  position: absolute;
+  background: ${(props) => props.theme.colorsThemed.background.thumbLineHidden};
+  align-items: center;
+  pointer-events: none;
+
+  ${(props) => (props.position === 'left'
+    ? css`
+      left: 0;
+      justify-content: flex-end;
+    `
+    : css`
+      right: 0;
+      justify-content: flex-start;
+    `)};
+`;
+
+const SProgressLine = styled(motion.div)`
+  gap: 5px;
+  left: calc(50% - 36px);
+  bottom: 0;
+  cursor: grab;
+  display: flex;
+  position: absolute;
+  align-items: flex-end;
+  flex-direction: row;
+  padding-bottom: 12px;
+`;
+
+interface ISProgressSeparator {
+  height: string;
+}
+
+const SProgressSeparator = styled.div<ISProgressSeparator>`
+  width: 2px;
+  height: ${(props) => props.height};
+  overflow: hidden;
+  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.accent.blue : props.theme.colors.white)};
+  border-radius: 2px;
+  pointer-events: none;
+`;
+
+const SProgressIndicator = styled.div`
+  top: 0;
+  left: calc(50% - 34px);
+  width: 4px;
+  height: 100%;
+  z-index: 2;
+  position: absolute;
+  overflow: hidden;
+  background: ${(props) => props.theme.colorsThemed.accent.yellow};
+  border-radius: 2px;
+  pointer-events: none;
 `;

@@ -9,13 +9,33 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import CreationLayout from '../../../components/templates/CreationLayout';
 import SecondStepContent from '../../../components/organisms/creation/second';
 
+import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
+
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationSecondStep {}
+interface ICreationSecondStep {
+}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
   const { t } = useTranslation('creation');
   const router = useRouter();
+
+  useLeavePageConfirm(
+    true,
+    t('secondStep.modal.leave.message'),
+    [
+      '/creation',
+      '/creation/auction',
+      '/creation/multiple-choice',
+      '/creation/crowdfunding',
+      '/creation/auction/preview',
+      '/creation/multiple-choice/preview',
+      '/creation/crowdfunding/preview',
+      '/creation/auction/published',
+      '/creation/multiple-choice/published',
+      '/creation/crowdfunding/published',
+    ],
+  );
 
   return (
     <SWrapper>
@@ -30,29 +50,28 @@ export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
 };
 
 (CreationSecondStep as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout noHeader>
+  <CreationLayout>
     {page}
   </CreationLayout>
 );
 
 export default CreationSecondStep;
 
-export async function getStaticPaths() {
-  return {
-    paths: [
-      '/creation/auction',
-      '/creation/multiple-choice',
-      '/creation/crowdfunding',
-    ],
-    fallback: true,
-  };
-}
-
-export async function getStaticProps(context: NextPageContext): Promise<any> {
+export async function getServerSideProps(context: NextPageContext): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
     ['common', 'creation'],
   );
+
+  // @ts-ignore
+  if (!context?.req?.cookies?.accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   return {
     props: {

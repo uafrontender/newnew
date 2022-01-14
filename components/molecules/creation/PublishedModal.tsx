@@ -3,11 +3,13 @@ import moment from 'moment';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-import Modal from '../../organisms/Modal';
 import Text from '../../atoms/Text';
+import Modal from '../../organisms/Modal';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
+import UserAvatar from '../UserAvatar';
+import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -36,7 +38,11 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
     handleClose,
   } = props;
   const { t } = useTranslation('creation');
-  const { post } = useAppSelector((state) => state.creation);
+  const user = useAppSelector((state) => state.user);
+  const {
+    post,
+    videoProcessing,
+  } = useAppSelector((state) => state.creation);
 
   const preventCLick = (e: any) => {
     e.preventDefault();
@@ -88,12 +94,29 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
     >
       <SMobileContainer onClick={preventCLick}>
         <SContent>
-          <SVideo
-            autoPlay
-            src={post.announcementVideoUrl}
-          />
+          <SPlayerWrapper>
+            {
+              open && (
+                <BitmovinPlayer
+                  id="published-modal"
+                  muted={false}
+                  resources={videoProcessing?.targetUrls}
+                  thumbnails={post.thumbnailParameters}
+                  borderRadius="16px"
+                />
+              )
+            }
+          </SPlayerWrapper>
+          <SUserBlock>
+            <SUserAvatar
+              avatarUrl={user.userData?.avatarUrl}
+            />
+            <SUserTitle variant={3} weight={600}>
+              {post?.title}
+            </SUserTitle>
+          </SUserBlock>
           <SSubTitle variant={2} weight={500}>
-            {t(`published.texts.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {
+            {t(`published.texts.desktop.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {
               value: formatStartsAt()
                 .format('DD MMM [at] hh:mm A'),
             })}
@@ -139,19 +162,10 @@ const SContent = styled.div`
   flex-direction: column;
 `;
 
-const SVideo = styled.video`
-  width: auto;
-  height: auto;
-  margin: 0 auto;
-  overflow: hidden;
-  position: relative;
-  max-width: 224px;
-  max-height: 336px;
-  border-radius: 16px;
-
-  ${({ theme }) => theme.media.laptop} {
-    margin: 8px auto 0 auto;
-  }
+const SPlayerWrapper = styled.div`
+  width: 224px;
+  height: 336px;
+  margin: 8px auto 0 auto;
 `;
 
 const STitle = styled(Headline)`
@@ -170,11 +184,10 @@ const SSocials = styled.div`
   margin-top: 16px;
   align-items: center;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
 `;
 
 const SItem = styled.div`
-  flex: 1;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -213,4 +226,29 @@ const SButtonTitle = styled.div`
   font-size: 16px;
   line-height: 24px;
   font-weight: bold;
+`;
+
+const SUserBlock = styled.div`
+  width: 224px;
+  margin: 16px auto 0 auto;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+`;
+
+const SUserAvatar = styled(UserAvatar)`
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+`;
+
+const SUserTitle = styled(Text)`
+  width: 188px;
+  display: -webkit-box;
+  overflow: hidden;
+  position: relative;
+  padding-left: 12px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 `;

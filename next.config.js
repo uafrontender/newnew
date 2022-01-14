@@ -5,6 +5,7 @@ module.exports = {
   i18n,
   assetPrefix: process.env.NEXT_JS_ASSET_URL,
   reactStrictMode: true,
+  swcMinify: true,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
