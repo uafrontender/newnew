@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { debounce } from 'lodash';
 
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 import { useAppSelector } from '../../../../redux-store/store';
@@ -24,6 +25,7 @@ import PaymentModal from '../PaymentModal';
 import LoadingModal from '../LoadingModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import Button from '../../../atoms/Button';
+import { validateText } from '../../../../api/endpoints/infrastructure';
 
 interface IAcOptionsTab {
   postId: string;
@@ -78,6 +80,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
+  const [newBidTextValid, setNewBidTextValid] = useState(true);
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
@@ -86,12 +90,64 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
+    if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
       router.push('/sign-up?reason=bid');
       return;
     }
     setPaymentModalOpen(true);
   };
+
+  const validateTextViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        // NB! temp
+        kind: newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setNewBidTextValid(false);
+      } else {
+        setNewBidTextValid(true);
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+    }
+  }, []);
+
+  const validateTextViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateTextViaAPI(text);
+  }, 250),
+  [validateTextViaAPI]);
+
+  const handleUpdateNewOptionText = useCallback((
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setNewBidText(e.target.value);
+
+    if (e.target.value.length > 0) {
+      validateTextViaAPIDebounced(
+        e.target.value,
+      );
+    }
+  }, [
+    setNewBidText, validateTextViaAPIDebounced,
+  ]);
 
   const handleSubmitNewOption = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -307,7 +363,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             value={newBidText}
             disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
             placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
-            onChange={(e) => setNewBidText(e.target.value)}
+            onChange={handleUpdateNewOptionText}
           />
           <BidAmountTextInput
             value={newBidAmount}
@@ -326,7 +382,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             disabled={!newBidText
               || parseInt(newBidAmount, 10) < minAmount
               || optionBeingSupported !== ''
-              || overviewedOption !== undefined}
+              || overviewedOption !== undefined
+              || !newBidTextValid}
+            style={{
+              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+            }}
             onClick={() => handleTogglePaymentModalOpen()}
           >
             { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
@@ -345,7 +405,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               value={newBidText}
               disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
               placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
-              onChange={(e) => setNewBidText(e.target.value)}
+              onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
@@ -361,7 +421,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               disabled={!newBidText
                 || parseInt(newBidAmount, 10) < minAmount
                 || optionBeingSupported !== ''
-                || overviewedOption !== undefined}
+                || overviewedOption !== undefined
+                || !newBidTextValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
