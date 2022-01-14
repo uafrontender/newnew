@@ -12,34 +12,9 @@ import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 import { TTokenCookie } from '../../api/apiConfigs';
 
-import { Tab } from '../../components/molecules/Tabs';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostModal from '../../components/organisms/decision/PostModal';
 import List from '../../components/organisms/search/List';
-
-// Temp
-const tabs: Tab[] = [
-  {
-    nameToken: 'activelyBidding',
-    url: '/profile',
-  },
-  {
-    nameToken: 'purchases',
-    url: '/profile/purchases',
-  },
-  {
-    nameToken: 'viewHistory',
-    url: '/profile/view-history',
-  },
-  {
-    nameToken: 'subscriptions',
-    url: '/profile/subscriptions',
-  },
-  {
-    nameToken: 'favorites',
-    url: '/profile/favorites',
-  },
-];
 
 interface IMyProfileSubscriptions {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -47,15 +22,21 @@ interface IMyProfileSubscriptions {
   posts?: newnewapi.Post[];
   postsForPageFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
+  pageToken: string | null | undefined;
+  handleUpdatePageToken: (value: string | null | undefined) => void;
+  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
 
 const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   user,
   pagedPosts,
+  nextPageTokenFromServer,
   posts,
   postsForPageFilter,
-  nextPageTokenFromServer,
+  pageToken,
+  handleUpdatePageToken,
+  handleUpdateFilter,
   handleSetPosts,
 }) => {
   // Display post
@@ -63,7 +44,6 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
 
   // Loading state
-  const [pagingToken, setPagingToken] = useState<string | null | undefined>(nextPageTokenFromServer ?? '');
   const [isLoading, setIsLoading] = useState(false);
   const {
     ref: loadingRef,
@@ -87,7 +67,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 
   // TODO: filters and other parameters
   const loadPosts = useCallback(async (
-    pageToken?: string,
+    token?: string,
   ) => {
     if (isLoading) return;
     try {
@@ -97,7 +77,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_SUBSCRIPTIONS,
         filter: postsForPageFilter,
         paging: {
-          ...(pageToken ? { pageToken } : {}),
+          ...(token ? { pageToken: token } : {}),
         },
       });
       const postsResponse = await getMyPosts(
@@ -108,7 +88,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 
       if (postsResponse.data && postsResponse.data.posts) {
         handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
-        setPagingToken(postsResponse.data.paging?.nextPageToken);
+        handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
       }
       setIsLoading(false);
     } catch (err) {
@@ -117,20 +97,21 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
     }
   }, [
     handleSetPosts,
+    handleUpdatePageToken,
     postsForPageFilter,
     isLoading,
   ]);
 
   useEffect(() => {
     if (inView && !isLoading) {
-      if (pagingToken) {
-        loadPosts(pagingToken);
-      } else if (!triedLoading && !pagingToken && posts?.length === 0) {
+      if (pageToken) {
+        loadPosts(pageToken);
+      } else if (!triedLoading && !pageToken && posts?.length === 0) {
         loadPosts();
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, isLoading, triedLoading]);
+  }, [inView, pageToken, isLoading, triedLoading]);
 
   return (
     <div>
@@ -167,10 +148,10 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 (MyProfileSubscriptions as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
   return (
     <MyProfileLayout
-      tabs={tabs}
       renderedPage="subscriptions"
       postsCachedSubscriptions={page.props.pagedPosts.posts}
       postsCachedSubscriptionsFilter={newnewapi.Post.Filter.ALL}
+      postsCachedSubscriptionsPageToken={page.props.nextPageTokenFromServer}
     >
       { page }
     </MyProfileLayout>

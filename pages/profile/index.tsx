@@ -12,34 +12,9 @@ import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 import { TTokenCookie } from '../../api/apiConfigs';
 
-import { Tab } from '../../components/molecules/Tabs';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostModal from '../../components/organisms/decision/PostModal';
 import List from '../../components/organisms/search/List';
-
-// Temp
-const tabs: Tab[] = [
-  {
-    nameToken: 'activelyBidding',
-    url: '/profile',
-  },
-  {
-    nameToken: 'purchases',
-    url: '/profile/purchases',
-  },
-  {
-    nameToken: 'viewHistory',
-    url: '/profile/view-history',
-  },
-  {
-    nameToken: 'subscriptions',
-    url: '/profile/subscriptions',
-  },
-  {
-    nameToken: 'favorites',
-    url: '/profile/favorites',
-  },
-];
 
 interface IMyProfileIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -47,15 +22,21 @@ interface IMyProfileIndex {
   posts?: newnewapi.Post[];
   postsForPageFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
+  pageToken: string | null | undefined;
+  handleUpdatePageToken: (value: string | null | undefined) => void;
+  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
 
 const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   user,
   pagedPosts,
+  nextPageTokenFromServer,
   posts,
   postsForPageFilter,
-  nextPageTokenFromServer,
+  pageToken,
+  handleUpdatePageToken,
+  handleUpdateFilter,
   handleSetPosts,
 }) => {
   // Display post
@@ -63,7 +44,6 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
 
   // Loading state
-  const [pagingToken, setPagingToken] = useState<string | null | undefined>(nextPageTokenFromServer ?? '');
   const [isLoading, setIsLoading] = useState(false);
   const {
     ref: loadingRef,
@@ -87,7 +67,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
 
   // TODO: filters and other parameters
   const loadPosts = useCallback(async (
-    pageToken?: string,
+    token?: string,
   ) => {
     if (isLoading) return;
     try {
@@ -97,7 +77,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_ACTIVE_BIDDINGS,
         filter: postsForPageFilter,
         paging: {
-          ...(pageToken ? { pageToken } : {}),
+          ...(token ? { pageToken: token } : {}),
         },
       });
       const postsResponse = await getMyPosts(
@@ -108,7 +88,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
 
       if (postsResponse.data && postsResponse.data.posts) {
         handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
-        setPagingToken(postsResponse.data.paging?.nextPageToken);
+        handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
       }
       setIsLoading(false);
     } catch (err) {
@@ -117,20 +97,21 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
     }
   }, [
     handleSetPosts,
+    handleUpdatePageToken,
     postsForPageFilter,
     isLoading,
   ]);
 
   useEffect(() => {
     if (inView && !isLoading) {
-      if (pagingToken) {
-        loadPosts(pagingToken);
-      } else if (!triedLoading && !pagingToken && posts?.length === 0) {
+      if (pageToken) {
+        loadPosts(pageToken);
+      } else if (!triedLoading && !pageToken && posts?.length === 0) {
         loadPosts();
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, isLoading, triedLoading]);
+  }, [inView, pageToken, isLoading, triedLoading]);
 
   return (
     <div>
@@ -167,10 +148,10 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
 (MyProfileIndex as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
   return (
     <MyProfileLayout
-      tabs={tabs}
       renderedPage="activelyBidding"
       postsCachedActivelyBiddingOn={page.props.pagedPosts.posts}
       postsCachedActivelyBiddingOnFilter={newnewapi.Post.Filter.ALL}
+      postsCachedActivelyBiddingPageToken={page.props.nextPageTokenFromServer}
     >
       { page }
     </MyProfileLayout>

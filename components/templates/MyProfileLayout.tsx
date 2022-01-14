@@ -1,5 +1,5 @@
 import React, {
-  ReactElement, useCallback, useEffect, useState,
+  ReactElement, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -29,27 +29,32 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBroswer from '../../utils/isBrowser';
 
+export type TPageType = 'activelyBidding'
+  | 'purchases'
+  | 'viewHistory'
+  | 'subscriptions'
+  | 'favorites';
+
 interface IMyProfileLayout {
-  tabs: Tab[];
-  renderedPage: 'activelyBidding'
-    | 'purchases'
-    | 'viewHistory'
-    | 'subscriptions'
-    | 'favorites';
+  renderedPage: TPageType;
   postsCachedActivelyBiddingOn?: newnewapi.Post[];
   postsCachedActivelyBiddingOnFilter?: newnewapi.Post.Filter;
+  postsCachedActivelyBiddingPageToken?: string | null | undefined;
   postsCachedMyPurchases?: newnewapi.Post[];
   postsCachedMyPurchasesFilter?: newnewapi.Post.Filter;
+  postsCachedMyPurchasesPageToken?: string | null | undefined;
   postsCachedViewHistory?: newnewapi.Post[];
   postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
+  postsCachedViewHistoryPageToken?: string | null | undefined;
   postsCachedSubscriptions?: newnewapi.Post[];
   postsCachedSubscriptionsFilter?: newnewapi.Post.Filter;
+  postsCachedSubscriptionsPageToken?: string | null | undefined;
   postsCachedFavorites?: newnewapi.Post[];
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
+  postsCachedFavoritesPageToken?: string | null | undefined;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
-  tabs,
   renderedPage,
   postsCachedActivelyBiddingOn,
   postsCachedActivelyBiddingOnFilter,
@@ -61,6 +66,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedSubscriptionsFilter,
   postsCachedFavorites,
   postsCachedFavoritesFilter,
+  postsCachedActivelyBiddingPageToken,
+  postsCachedMyPurchasesPageToken,
+  postsCachedViewHistoryPageToken,
+  postsCachedSubscriptionsPageToken,
+  postsCachedFavoritesPageToken,
   children,
 }) => {
   const { t } = useTranslation('profile');
@@ -68,6 +78,31 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
+
+  const tabs: Tab[] = useMemo(() => (
+    [
+      {
+        nameToken: 'activelyBidding',
+        url: '/profile',
+      },
+      {
+        nameToken: 'purchases',
+        url: '/profile/purchases',
+      },
+      {
+        nameToken: 'viewHistory',
+        url: '/profile/view-history',
+      },
+      {
+        nameToken: 'subscriptions',
+        url: '/profile/subscriptions',
+      },
+      {
+        nameToken: 'favorites',
+        url: '/profile/favorites',
+      },
+    ]), []);
+
   // Show skeleton on route change
   const [routeChangeLoading, setRouteChangeLoading] = useState(false);
 
@@ -80,6 +115,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [
     postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter,
   ] = useState(postsCachedActivelyBiddingOnFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    activelyBiddingPageToken,
+    setActivelyBiddingPageToken,
+  ] = useState(postsCachedActivelyBiddingPageToken);
 
   const [
     postsMyPurchases, setPostsMyPurchases,
@@ -87,6 +126,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [
     postsMyPurchasesFilter, setPostsMyPurchasesFilter,
   ] = useState(postsCachedMyPurchasesFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    myPurchasesPageToken,
+    setMyPurchasesPageToken,
+  ] = useState(postsCachedMyPurchasesPageToken);
 
   const [
     postsViewHistory, setPostsViewHistory,
@@ -94,6 +137,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [
     postsViewHistoryFilter, setPostsViewHistoryFilter,
   ] = useState(postsCachedViewHistoryFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    viewHistoryPageToken,
+    setViewHistoryPageToken,
+  ] = useState(postsCachedViewHistoryPageToken);
 
   const [
     postsSubscriptions, setPostsSubscriptions,
@@ -101,6 +148,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [
     postsSubscriptionsFilter, setPostsSubscriptionsFilter,
   ] = useState(postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    subscriptionsPageToken,
+    setSubscriptionsPageToken,
+  ] = useState(postsCachedSubscriptionsPageToken);
 
   const [
     postsFavorites, setPostsFavorites,
@@ -108,6 +159,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const [
     postsFavoritesFilter, setPostsFavoritesFilter,
   ] = useState(postsCachedFavoritesFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    favoritesPageToken,
+    setFavoritesPageToken,
+  ] = useState(postsCachedFavoritesPageToken);
 
   // UpdateCachedPosts
   const handleSetPostsActivelyBiddingOn: React
@@ -135,10 +190,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     );
 
   const handleUpdateFilter = useCallback((
-    kind: 'activelyBidding' | 'purchases' | 'history' | 'subscriptions' | 'favorites',
     value: newnewapi.Post.Filter,
   ) => {
-    switch (kind) {
+    switch (renderedPage) {
       case 'activelyBidding': {
         setPostsActivelyBiddingOnFilter(value);
         break;
@@ -147,7 +201,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         setPostsMyPurchasesFilter(value);
         break;
       }
-      case 'history': {
+      case 'viewHistory': {
         setPostsViewHistoryFilter(value);
         break;
       }
@@ -163,41 +217,77 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         break;
       }
     }
-  }, []);
+  }, [renderedPage]);
+
+  const handleUpdatePageToken = useCallback((
+    value: string | null | undefined,
+  ) => {
+    switch (renderedPage) {
+      case 'activelyBidding': {
+        setActivelyBiddingPageToken(value);
+        break;
+      }
+      case 'purchases': {
+        setMyPurchasesPageToken(value);
+        break;
+      }
+      case 'viewHistory': {
+        setViewHistoryPageToken(value);
+        break;
+      }
+      case 'subscriptions': {
+        setSubscriptionsPageToken(value);
+        break;
+      }
+      case 'favorites': {
+        setFavoritesPageToken(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
 
   const renderChildren = () => {
     let postsForPage = {};
     let postsForPageFilter;
+    let pageToken;
     let handleSetPosts;
 
     switch (renderedPage) {
       case 'activelyBidding': {
         postsForPage = postsActivelyBiddingOn;
         postsForPageFilter = postsActivelyBiddingOnFilter;
+        pageToken = activelyBiddingPageToken;
         handleSetPosts = handleSetPostsActivelyBiddingOn;
         break;
       }
       case 'purchases': {
         postsForPage = postsMyPurchases;
         postsForPageFilter = postsMyPurchasesFilter;
+        pageToken = myPurchasesPageToken;
         handleSetPosts = handleSetPostsMyPurchases;
         break;
       }
       case 'viewHistory': {
         postsForPage = postsViewHistory;
         postsForPageFilter = postsViewHistoryFilter;
+        pageToken = viewHistoryPageToken;
         handleSetPosts = handleSetPostsViewHistory;
         break;
       }
       case 'subscriptions': {
         postsForPage = postsSubscriptions;
         postsForPageFilter = postsSubscriptionsFilter;
+        pageToken = subscriptionsPageToken;
         handleSetPosts = handleSetPostsSubscriptions;
         break;
       }
       case 'favorites': {
         postsForPage = postsFavorites;
         postsForPageFilter = postsFavoritesFilter;
+        pageToken = favoritesPageToken;
         handleSetPosts = handleSetPostsFavorites;
         break;
       }
@@ -211,7 +301,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       {
         ...(postsForPage ? { posts: postsForPage } : {}),
         ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
+        pageToken,
         handleSetPosts,
+        handleUpdatePageToken,
         handleUpdateFilter,
       },
     );
@@ -466,6 +558,11 @@ MyProfileLayout.defaultProps = {
   postsCachedSubscriptionsFilter: undefined,
   postsCachedFavorites: undefined,
   postsCachedFavoritesFilter: undefined,
+  postsCachedActivelyBiddingPageToken: undefined,
+  postsCachedMyPurchasesPageToken: undefined,
+  postsCachedViewHistoryPageToken: undefined,
+  postsCachedSubscriptionsPageToken: undefined,
+  postsCachedFavoritesPageToken: undefined,
 };
 
 export default MyProfileLayout;
