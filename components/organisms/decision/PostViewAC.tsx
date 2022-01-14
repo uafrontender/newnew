@@ -441,7 +441,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       <PostVideo
         // NB! Will be changed for streaming format
         // NB! Will support responses, as well!
-        videoSrc={post.announcement?.originalVideoUrl ?? MockVideo}
+        postId={post.postUuid}
+        announcement={post.announcement!!}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
