@@ -5,8 +5,8 @@
   "mobile-bottom-navigation-share": "Share",
   "mobile-bottom-navigation-dashboard": "Dashboard",
   "mobile-bottom-navigation-notifications": "Notifications",
-  "mobile-top-navigation-notifications": "Notifications{{counter}}",
-  "mobile-top-navigation-direct-messages": "DMs{{counter}}",
+  "mobile-top-navigation-notifications": "Notifications",
+  "mobile-top-navigation-direct-messages": "DMs",
   "mobile-top-navigation-share": "Share",
   "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
   "button-create-decision": "Create decision",
@@ -51,7 +51,8 @@
   "error": {
     "text": {
       "min": "Text is too short, min {{value}} chars",
-      "max": "Text is too long, max {{value}} chars"
+      "max": "Text is too long, max {{value}} chars",
+      "badWords": "Text contains swear words"
     }
   }
 }

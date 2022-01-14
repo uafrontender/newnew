@@ -1,5 +1,6 @@
 import React from 'react';
 import { Reorder } from 'framer-motion';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -13,7 +14,12 @@ interface IDraggableMobileOptions {
   min: number;
   options: {}[];
   onChange: (key: string, value: any) => void;
-  validation: (text: string, min: number, max: number) => string;
+  validation: (
+    text: string,
+    min: number,
+    max: number,
+    kind: newnewapi.ValidateTextRequest.Kind,
+  ) => Promise<string>;
 }
 
 export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props) => {

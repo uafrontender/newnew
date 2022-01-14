@@ -12,7 +12,8 @@ import PublishedContent from '../../../components/organisms/creation/published';
 import { useAppSelector } from '../../../redux-store/store';
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationPublished {}
+interface ICreationPublished {
+}
 
 export const CreationPublished: React.FC<ICreationPublished> = (props) => {
   const { t } = useTranslation('creation');
@@ -32,29 +33,28 @@ export const CreationPublished: React.FC<ICreationPublished> = (props) => {
 };
 
 (CreationPublished as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout noHeader>
+  <CreationLayout>
     {page}
   </CreationLayout>
 );
 
 export default CreationPublished;
 
-export async function getStaticPaths() {
-  return {
-    paths: [
-      '/creation/auction/published',
-      '/creation/multiple-choice/published',
-      '/creation/crowdfunding/published',
-    ],
-    fallback: true,
-  };
-}
-
-export async function getStaticProps(context: NextPageContext): Promise<any> {
+export async function getServerSideProps(context: NextPageContext): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
     ['common', 'creation'],
   );
+
+  // @ts-ignore
+  if (!context?.req?.cookies?.accessToken) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
 
   return {
     props: {

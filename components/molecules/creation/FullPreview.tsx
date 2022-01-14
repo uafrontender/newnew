@@ -3,13 +3,13 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import Modal from '../../organisms/Modal';
-import Video from '../../atoms/creation/Video';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
+import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 
-import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -25,6 +25,7 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
     value,
     handleClose,
   } = props;
+
   const theme = useTheme();
   const { t } = useTranslation('creation');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -57,13 +58,16 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
           </SModalTopLine>
         )}
         <SModalVideoWrapper>
-          <Video
-            muted
-            src={value}
-            play={open}
-          />
+          {open && (
+            <BitmovinPlayer
+              withMuteControl
+              id="full-preview"
+              resources={value}
+              borderRadius={isMobile ? '0' : '16px'}
+            />
+          )}
         </SModalVideoWrapper>
-        {isMobile ? (
+        {isMobile && (
           <SModalCloseIcon>
             <Button
               iconOnly
@@ -78,15 +82,6 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
               />
             </Button>
           </SModalCloseIcon>
-        ) : (
-          <SButtonsWrapper>
-            <Button
-              view="secondary"
-              onClick={handleClose}
-            >
-              {t('secondStep.button.cancel')}
-            </Button>
-          </SButtonsWrapper>
         )}
       </SMobileContainer>
     </Modal>
@@ -100,7 +95,6 @@ const SMobileContainer = styled.div`
   height: 100%;
   position: relative;
   min-height: 100vh;
-  background: ${(props) => props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.mobileL} {
     top: 50%;
@@ -126,13 +120,15 @@ const SMobileContainer = styled.div`
 const SModalVideoWrapper = styled.div`
   top: 50%;
   width: 100%;
+  height: 100%;
   position: relative;
   transform: translateY(-50%);
 
   ${({ theme }) => theme.media.mobileL} {
     top: unset;
-    width: calc(100% - 58px);
-    margin: 0 29px;
+    width: 284px;
+    height: 500px;
+    margin: 0 auto 20px auto;
     transform: unset;
   }
 `;
@@ -164,11 +160,4 @@ const SModalTopLine = styled.div`
 
 const SModalTopLineTitleTablet = styled(Headline)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
-`;
-
-const SButtonsWrapper = styled.div`
-  display: flex;
-  margin-top: 30px;
-  align-items: center;
-  justify-content: space-between;
 `;

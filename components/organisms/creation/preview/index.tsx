@@ -1,6 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import moment from 'moment';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import _compact from 'lodash/compact';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -8,9 +13,11 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../../atoms/Text';
-import Video from '../../../atoms/creation/Video';
 import Button from '../../../atoms/Button';
+import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
+import InlineSVG from '../../../atoms/InlineSVG';
+import BitmovinPlayer from '../../../atoms/BitmovinPlayer';
 import PublishedModal from '../../../molecules/creation/PublishedModal';
 
 import { createPost } from '../../../../api/endpoints/post';
@@ -25,22 +32,26 @@ import {
   CREATION_OPTION_MAX,
 } from '../../../../constants/general';
 
+import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+
 interface IPreviewContent {
 }
 
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
   const { t } = useTranslation('creation');
+  const theme = useTheme();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const playerRef: any = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [playVideo, setPlayVideo] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const {
     post,
     auction,
     crowdfunding,
     multiplechoice,
+    videoProcessing,
   } = useAppSelector((state) => state.creation);
   const validateText = useCallback((text: string, min: number, max: number) => {
     let error = minLength(tCommon, text, min);
@@ -117,7 +128,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           title: post.title,
           settings: post.options,
           startsAt: post.startsAt.type === 'right-away' ? null : {
-            seconds: formatStartsAt().unix(),
+            seconds: formatStartsAt()
+              .unix(),
           },
           expiresAfter: {
             seconds: formatExpiresAt(true),
@@ -159,7 +171,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (isMobile) {
         router.push(`/creation/${tab}/published`);
       } else {
-        setPlayVideo(false);
+        playerRef.current.pause();
         setShowModal(true);
       }
     } catch (err: any) {
@@ -215,6 +227,10 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     multiplechoice?.options?.allowSuggestions,
     formatExpiresAt,
   ]);
+  const handleGoBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
   const renderSetting = (item: any) => (
     <SItem key={item.key}>
       <SItemTitle variant={2} weight={600}>
@@ -242,9 +258,19 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     return (
       <>
         <SContent>
-          <SHeadline variant={5}>
-            {post.title}
-          </SHeadline>
+          <STopLine>
+            <SInlineSVG
+              clickable
+              svg={chevronLeftIcon}
+              fill={theme.colorsThemed.text.secondary}
+              width="20px"
+              height="20px"
+              onClick={handleGoBack}
+            />
+            <SHeadlineMobile variant={2} weight={600}>
+              {post.title}
+            </SHeadlineMobile>
+          </STopLine>
           {tab === 'multiple-choice' && (
             <SChoices>
               {multiplechoice.choices.map(renderChoice)}
@@ -253,11 +279,13 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           <SSettings>
             {settings.map(renderSetting)}
           </SSettings>
-          <SVideo
-            loop
-            autoPlay
-            src={post.announcementVideoUrl}
-          />
+          <SPlayerWrapper>
+            <BitmovinPlayer
+              id="preview-mobile"
+              muted={false}
+              resources={videoProcessing?.targetUrls}
+            />
+          </SPlayerWrapper>
         </SContent>
         <SButtonWrapper>
           <SButtonContent>
@@ -286,13 +314,16 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       </SHeadLine>
       <STabletContent>
         <SLeftPart>
-          <Video
-            loop
-            muted
-            src={post.announcementVideoUrl}
-            play={playVideo}
-            mutePosition="left"
-          />
+          <STabletPlayer>
+            <BitmovinPlayer
+              withMuteControl
+              id="preview"
+              innerRef={playerRef}
+              resources={videoProcessing?.targetUrls}
+              mutePosition="left"
+              borderRadius="16px"
+            />
+          </STabletPlayer>
         </SLeftPart>
         <SRightPart>
           <SHeadline variant={5}>
@@ -333,7 +364,7 @@ export default PreviewContent;
 
 const SContent = styled.div`
   display: flex;
-  margin-top: 16px;
+  margin-top: 20px;
   flex-direction: column;
 `;
 
@@ -362,6 +393,11 @@ const SLeftPart = styled.div`
     max-width: 352px;
     margin-right: 16px;
   }
+`;
+
+const STabletPlayer = styled.div`
+  width: 284px;
+  height: 500px;
 `;
 
 const SRightPart = styled.div`
@@ -418,6 +454,15 @@ const SHeadline = styled(Headline)`
   margin-bottom: 18px;
 `;
 
+const SHeadlineMobile = styled(Caption)`
+  display: -webkit-box;
+  overflow: hidden;
+  position: relative;
+  padding-left: 8px;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+`;
+
 const SSettings = styled.div`
   display: flex;
   flex-direction: column;
@@ -469,10 +514,10 @@ const SChoiceItemValue = styled.div`
   justify-content: center;
 `;
 
-const SVideo = styled.video`
+const SPlayerWrapper = styled.div`
   left: -16px;
   width: 100vw;
-  height: auto;
+  height: 635px;
   position: relative;
   margin-top: 42px;
 `;
@@ -483,4 +528,16 @@ const SButtonsWrapper = styled.div`
   margin-top: 26px;
   align-items: center;
   justify-content: space-between;
+`;
+
+const STopLine = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-direction: row;
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  min-width: 20px;
+  min-height: 20px;
 `;
