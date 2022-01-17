@@ -24,7 +24,6 @@ import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.s
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
-  loading: () => <p>Loading player...</p>,
 });
 
 interface IThumbnailPreviewEdit {

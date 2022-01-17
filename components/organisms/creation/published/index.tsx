@@ -31,7 +31,6 @@ const SOCIAL_ICONS: any = {
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
-  loading: () => <p>Loading player...</p>,
 });
 
 interface IPublishedContent {

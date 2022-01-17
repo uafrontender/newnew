@@ -24,11 +24,9 @@ import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
-  loading: () => <p>Loading player...</p>,
 });
 const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
   ssr: false,
-  loading: () => <p>Loading player...</p>,
 });
 
 interface IFileUpload {
