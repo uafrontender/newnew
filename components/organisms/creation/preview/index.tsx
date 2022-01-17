@@ -5,19 +5,19 @@ import React, {
   useCallback,
 } from 'react';
 import moment from 'moment';
-import dynamic from 'next/dynamic';
+import styled, { useTheme } from 'styled-components';
 import _compact from 'lodash/compact';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
+import BitmovinPlayer from '../../../atoms/BitmovinPlayer';
 import PublishedModal from '../../../molecules/creation/PublishedModal';
 
 import { createPost } from '../../../../api/endpoints/post';
@@ -33,11 +33,6 @@ import {
 } from '../../../../constants/general';
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-
-const BitmovinPlayer = dynamic(import('../../../atoms/BitmovinPlayer'), {
-  ssr: false,
-  loading: () => <p>Loading player...</p>,
-});
 
 interface IPreviewContent {
 }
