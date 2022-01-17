@@ -27,7 +27,7 @@ const SOCIAL_ICONS: any = {
   instagram: instagramIcon,
 };
 
-const BitmovinPlayer = dynamic(import('../../atoms/BitmovinPlayer'), {
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
   loading: () => <p>Loading player...</p>,
 });

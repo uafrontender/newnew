@@ -22,7 +22,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
-const BitmovinPlayer = dynamic(import('../../atoms/BitmovinPlayer'), {
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
   loading: () => <p>Loading player...</p>,
 });

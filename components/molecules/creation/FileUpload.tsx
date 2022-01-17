@@ -22,11 +22,11 @@ import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../..
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
-const BitmovinPlayer = dynamic(import('../../atoms/BitmovinPlayer'), {
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
   loading: () => <p>Loading player...</p>,
 });
-const ThumbnailPreviewEdit = dynamic(import('./ThumbnailPreviewEdit'), {
+const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
   ssr: false,
   loading: () => <p>Loading player...</p>,
 });
