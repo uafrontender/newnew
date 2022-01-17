@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 
@@ -10,7 +11,10 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import BitmovinPlayer from '../../atoms/BitmovinPlayer';
+
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+  ssr: false,
+});
 
 interface IPostVideo {
   postId: string;
@@ -45,8 +49,6 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         resources={announcement}
         muted={isMuted}
         // playsInline
-        autoplay
-        loop
       />
       <SSoundButton
         iconOnly
