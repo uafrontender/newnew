@@ -45,6 +45,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const [loaded, setLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoading, setIsLoading] = useState(false);
+  console.log('process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY', process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY);
   const playerConfig = useMemo<PlayerConfig>(() => ({
     ui: false,
     key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
