@@ -1,4 +1,5 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -6,12 +7,16 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
-import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 import { useAppSelector } from '../../../redux-store/store';
+
+const BitmovinPlayer = dynamic(import('../../atoms/BitmovinPlayer'), {
+  ssr: false,
+  loading: () => <p>Loading player...</p>,
+});
 
 interface IFullPreview {
   open: boolean;

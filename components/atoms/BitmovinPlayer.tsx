@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import { Player, PlayerConfig, PlayerEvent } from 'bitmovin-player';
 
 import Button from './Button';
 import InlineSVG from './InlineSVG';
@@ -44,9 +45,9 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const [loaded, setLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoading, setIsLoading] = useState(false);
-  const playerConfig = useMemo(() => ({
+  const playerConfig = useMemo<PlayerConfig>(() => ({
     ui: false,
-    key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY,
+    key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
     playback: {
       autoplay: true,
     },
@@ -86,17 +87,13 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     }
   }, []);
   const setupPlayer = useCallback(() => {
-    // @ts-ignore
-    if (typeof window?.bitmovin !== 'undefined') {
-      // @ts-ignore
-      player.current = new window.bitmovin.player.Player(playerRef.current, playerConfig);
+    player.current = new Player(playerRef.current, playerConfig);
 
-      if (innerRef) {
-        innerRef.current = player.current;
-      }
-
-      setInit(true);
+    if (innerRef) {
+      innerRef.current = player.current;
     }
+
+    setInit(true);
   }, [innerRef, playerConfig]);
   const loadSource = useCallback(() => {
     if (!isLoading && !loaded) {
@@ -124,14 +121,12 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const subscribe = useCallback(() => {
     if (player.current.handlePlaybackFinished) {
       player.current.off(
-        // @ts-ignore
-        window.bitmovin.player.PlayerEvent.PlaybackFinished,
+        PlayerEvent.PlaybackFinished,
         player.current.handlePlaybackFinished,
       );
     }
     player.current.on(
-      // @ts-ignore
-      window.bitmovin.player.PlayerEvent.PlaybackFinished,
+      PlayerEvent.PlaybackFinished,
       handlePlaybackFinished,
     );
     player.current.handlePlaybackFinished = handlePlaybackFinished;
@@ -139,13 +134,11 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     if (thumbnails?.endTime) {
       if (player.current.handleTimeChange) {
         player.current.off(
-          // @ts-ignore
-          window.bitmovin.player.PlayerEvent.TimeChanged,
+          PlayerEvent.TimeChanged,
           player.current.handleTimeChange,
         );
       }
-      // @ts-ignore
-      player.current.on(window.bitmovin.player.PlayerEvent.TimeChanged, handleTimeChange);
+      player.current.on(PlayerEvent.TimeChanged, handleTimeChange);
       player.current.handleTimeChange = handleTimeChange;
     }
   }, [handlePlaybackFinished, handleTimeChange, thumbnails?.endTime]);
@@ -255,22 +248,22 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
 `;
 
 const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  min-width: 100%;
-  min-height: 100%;
-  background: transparent;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  position: relative !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  background: transparent !important;
 
   &:before {
-    display: none;
+    display: none !important;
   }
 
   video {
-    top: 50%;
-    height: auto;
-    transform: translateY(-50%);
+    top: 50% !important;
+    height: auto !important;
+    transform: translateY(-50%) !important;
   }
 `;
 

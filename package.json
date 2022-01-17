@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.7.1",
+    "bitmovin-player": "8.24.3",
     "date-fns": "2.27.0",
     "framer-motion": "5.5.5",
     "jsonwebtoken": "8.5.1",

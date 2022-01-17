@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
@@ -10,7 +11,6 @@ import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../../molecules/UserAvatar';
-import BitmovinPlayer from '../../../atoms/BitmovinPlayer';
 
 import { clearCreation } from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -28,6 +28,11 @@ const SOCIAL_ICONS: any = {
   facebook: facebookIcon,
   instagram: instagramIcon,
 };
+
+const BitmovinPlayer = dynamic(import('../../../atoms/BitmovinPlayer'), {
+  ssr: false,
+  loading: () => <p>Loading player...</p>,
+});
 
 interface IPublishedContent {
 }
