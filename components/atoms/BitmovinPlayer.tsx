@@ -144,7 +144,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   }, [handlePlaybackFinished, handleTimeChange, thumbnails?.endTime]);
 
   useEffect(() => {
-    if (process.browser) {
+    if (process.browser && typeof window !== 'undefined') {
       setupPlayer();
     }
 

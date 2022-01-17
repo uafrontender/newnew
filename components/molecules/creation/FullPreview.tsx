@@ -13,7 +13,7 @@ import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.s
 
 import { useAppSelector } from '../../../redux-store/store';
 
-const BitmovinPlayer = dynamic(import('../../atoms/BitmovinPlayer'), {
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
   loading: () => <p>Loading player...</p>,
 });
