@@ -4,6 +4,7 @@ import React, {
   useCallback,
 } from 'react';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'next-i18next';
 
@@ -13,7 +14,6 @@ import Caption from '../../atoms/Caption';
 import InlineSVG from '../../atoms/InlineSVG';
 import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
-import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 import ThumbnailPreviewEdit from './ThumbnailPreviewEdit';
 
 import { loadVideo } from '../../../utils/loadVideo';
@@ -22,6 +22,11 @@ import { useAppSelector } from '../../../redux-store/store';
 import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+
+const BitmovinPlayer = dynamic(import('../../atoms/BitmovinPlayer'), {
+  ssr: false,
+  loading: () => <p>Loading player...</p>,
+});
 
 interface IFileUpload {
   id: string;

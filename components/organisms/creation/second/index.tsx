@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from 'react';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -22,7 +23,6 @@ import UserAvatar from '../../../molecules/UserAvatar';
 import FileUpload from '../../../molecules/creation/FileUpload';
 import MobileField from '../../../molecules/creation/MobileField';
 import Tabs, { Tab } from '../../../molecules/Tabs';
-import BitmovinPlayer from '../../../atoms/BitmovinPlayer';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
 import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
 import TabletFieldBlock from '../../../molecules/creation/TabletFieldBlock';
@@ -66,6 +66,11 @@ import {
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+
+const BitmovinPlayer = dynamic(import('../../../atoms/BitmovinPlayer'), {
+  ssr: false,
+  loading: () => <p>Loading player...</p>,
+});
 
 interface ICreationSecondStepContent {
 }
