@@ -12,11 +12,11 @@ import { useAppSelector } from '../redux-store/store';
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 
-interface ICreatorOnboardingStage1 {
+interface ICreatorOnboardingStage2 {
 
 }
 
-const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
+const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = () => {
   const { t } = useTranslation('verify-email');
 
   const { loggedIn } = useAppSelector((state) => state.user);
@@ -35,7 +35,7 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
   );
 };
 
-(CreatorOnboardingStage1 as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(CreatorOnboardingStage2 as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
   return (
     <CreatorOnboardingLayout>
       { page }
@@ -43,7 +43,7 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
   );
 };
 
-export default CreatorOnboardingStage1;
+export default CreatorOnboardingStage2;
 
 export async function getStaticProps(context: { locale: string }): Promise<any> {
   const translationContext = await serverSideTranslations(
