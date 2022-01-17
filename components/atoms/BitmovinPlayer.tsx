@@ -43,6 +43,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const [init, setInit] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
+  const [isLoading, setIsLoading] = useState(false);
   const playerConfig = useMemo(() => ({
     ui: false,
     key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY,
@@ -98,24 +99,27 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     }
   }, [innerRef, playerConfig]);
   const loadSource = useCallback(() => {
-    if (loaded) {
-      player.current.unload();
+    if (!isLoading && !loaded) {
+      setIsLoading(true);
+
+      player.current.load(playerSource)
+        .then(
+          () => {
+            setLoaded(true);
+            setIsLoading(false);
+
+            if (setDuration) {
+              setDuration(player.current.getDuration());
+            }
+          },
+          (reason: any) => {
+            setLoaded(true);
+            setIsLoading(false);
+            console.error(`Error while creating Bitmovin Player instance, ${reason}`);
+          },
+        );
     }
-
-    player.current.load(playerSource)
-      .then(
-        () => {
-          setLoaded(true);
-
-          if (setDuration) {
-            setDuration(player.current.getDuration());
-          }
-        },
-        (reason: any) => {
-          console.error(`Error while creating Bitmovin Player instance, ${reason}`);
-        },
-      );
-  }, [loaded, playerSource, setDuration]);
+  }, [isLoading, loaded, playerSource, setDuration]);
   const subscribe = useCallback(() => {
     if (player.current.handlePlaybackFinished) {
       player.current.off(
