@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import { Player, PlayerConfig, PlayerEvent } from 'bitmovin-player';
 
 import Button from './Button';
 import InlineSVG from './InlineSVG';
@@ -15,10 +16,7 @@ import volumeOff from '../../public/images/svg/icons/filled/VolumeOFF1.svg';
 
 interface IBitmovinPlayer {
   id: string;
-  play?: boolean;
-  loop?: boolean;
   muted?: boolean;
-  autoplay?: boolean;
   innerRef?: any;
   resources?: any,
   thumbnails?: any,
@@ -32,11 +30,8 @@ interface IBitmovinPlayer {
 export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const {
     id,
-    play,
-    loop,
     muted,
     innerRef,
-    autoplay,
     resources,
     thumbnails,
     mutePosition,
@@ -46,87 +41,110 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     setCurrentTime,
   } = props;
   const theme = useTheme();
+  const [init, setInit] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
-  const playerConfig = useMemo(() => ({
+  const [isLoading, setIsLoading] = useState(false);
+  const playerConfig = useMemo<PlayerConfig>(() => ({
     ui: false,
-    key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY,
+    key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
     playback: {
-      muted,
-      autoplay,
+      autoplay: true,
     },
-  }), [autoplay, muted]);
+  }), []);
   const playerSource = useMemo(() => ({
     hls: resources.hlsStreamUrl,
     poster: resources.thumbnailImageUrl,
     options: {
       startTime: thumbnails?.startTime || 0,
     },
-  }), [resources, thumbnails]);
+  }), [resources, thumbnails?.startTime]);
 
   const playerRef: any = useRef();
   const player: any = useRef(null);
 
+  const handleTimeChange = useCallback(() => {
+    if (setCurrentTime) {
+      setCurrentTime(player.current.getCurrentTime());
+    }
+
+    if (player.current.getCurrentTime() >= thumbnails.endTime) {
+      player.current.pause();
+      player.current.seek(thumbnails.startTime);
+      player.current.play();
+    }
+  }, [setCurrentTime, thumbnails]);
+  const handlePlaybackFinished = useCallback(() => {
+    player.current.play();
+  }, []);
   const toggleThumbnailVideoMuted = useCallback(() => {
     setIsMuted(!isMuted);
   }, [isMuted]);
   const destroyPlayer = useCallback(() => {
     if (player.current != null) {
+      setInit(false);
       player.current.destroy();
     }
   }, []);
   const setupPlayer = useCallback(() => {
-    // @ts-ignore
-    if (typeof window?.bitmovin !== 'undefined') {
-      // @ts-ignore
-      player.current = new window.bitmovin.player.Player(playerRef.current, playerConfig);
+    player.current = new Player(playerRef.current, playerConfig);
 
-      if (innerRef) {
-        innerRef.current = player.current;
-      }
+    if (innerRef) {
+      innerRef.current = player.current;
+    }
 
-      if (loop) {
-        // @ts-ignore
-        player.current.on(window.bitmovin.player.PlayerEvent.PlaybackFinished, () => {
-          player.current.play();
-        });
-      }
-
-      if (thumbnails?.endTime) {
-        const handleTimeChange = () => {
-          if (setCurrentTime) {
-            setCurrentTime(player.current.getCurrentTime());
-          }
-
-          if (player.current.getCurrentTime() >= thumbnails.endTime) {
-            player.current.pause();
-            player.current.seek(thumbnails.startTime);
-            player.current.play();
-          }
-        };
-        // @ts-ignore
-        player.current.on(window.bitmovin.player.PlayerEvent.TimeChanged, handleTimeChange);
-        player.current.handleTimeChange = handleTimeChange;
-      }
+    setInit(true);
+  }, [innerRef, playerConfig]);
+  const loadSource = useCallback(() => {
+    if (!isLoading && !loaded) {
+      console.log('load', playerSource);
+      setIsLoading(true);
 
       player.current.load(playerSource)
         .then(
           () => {
             setLoaded(true);
+            setIsLoading(false);
 
             if (setDuration) {
               setDuration(player.current.getDuration());
             }
           },
           (reason: any) => {
+            setLoaded(true);
+            setIsLoading(false);
             console.error(`Error while creating Bitmovin Player instance, ${reason}`);
           },
         );
     }
-  }, [thumbnails, loop, playerConfig, playerSource, innerRef, setDuration, setCurrentTime]);
+  }, [isLoading, loaded, playerSource, setDuration]);
+  const subscribe = useCallback(() => {
+    if (player.current.handlePlaybackFinished) {
+      player.current.off(
+        PlayerEvent.PlaybackFinished,
+        player.current.handlePlaybackFinished,
+      );
+    }
+    player.current.on(
+      PlayerEvent.PlaybackFinished,
+      handlePlaybackFinished,
+    );
+    player.current.handlePlaybackFinished = handlePlaybackFinished;
+
+    if (thumbnails?.endTime) {
+      if (player.current.handleTimeChange) {
+        player.current.off(
+          PlayerEvent.TimeChanged,
+          player.current.handleTimeChange,
+        );
+      }
+      player.current.on(PlayerEvent.TimeChanged, handleTimeChange);
+      player.current.handleTimeChange = handleTimeChange;
+    }
+  }, [handlePlaybackFinished, handleTimeChange, thumbnails?.endTime]);
 
   useEffect(() => {
-    if (process.browser) {
+    if (process.browser && typeof window !== 'undefined') {
       setupPlayer();
     }
 
@@ -134,17 +152,16 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
       destroyPlayer();
     };
   }, [destroyPlayer, setupPlayer]);
-
   useEffect(() => {
-    if (player.current && loaded) {
-      if (play) {
-        player.current.play();
-      } else {
-        player.current.pause();
-      }
+    if (init) {
+      subscribe();
     }
-  }, [play, player, loaded]);
-
+  }, [init, subscribe]);
+  useEffect(() => {
+    if (init) {
+      loadSource();
+    }
+  }, [init, loadSource]);
   useEffect(() => {
     if (player.current && loaded) {
       if (isMuted) {
@@ -192,10 +209,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
 export default BitmovinPlayer;
 
 BitmovinPlayer.defaultProps = {
-  loop: true,
-  play: true,
   muted: true,
-  autoplay: true,
   innerRef: undefined,
   resources: {},
   thumbnails: {},
@@ -234,22 +248,22 @@ const SVideoWrapper = styled.div<ISVideoWrapper>`
 `;
 
 const SWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  min-width: 100%;
-  min-height: 100%;
-  background: transparent;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  position: relative !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  background: transparent !important;
 
   &:before {
-    display: none;
+    display: none !important;
   }
 
   video {
-    top: 50%;
-    height: auto;
-    transform: translateY(-50%);
+    top: 50% !important;
+    height: auto !important;
+    transform: translateY(-50%) !important;
   }
 `;
 
