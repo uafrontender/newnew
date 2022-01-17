@@ -15,7 +15,6 @@ import { useAppSelector } from '../../../redux-store/store';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
-  loading: () => <p>Loading player...</p>,
 });
 
 interface IFullPreview {
