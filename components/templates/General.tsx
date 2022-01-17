@@ -45,7 +45,7 @@ export const General: React.FC<IGeneral> = (props) => {
     ];
 
     if (user.loggedIn) {
-      if (user.role === 'creator') {
+      if (user.userData?.options?.isCreator) {
         bottomNavigationShadow = [
           {
             key: 'home',
@@ -83,7 +83,7 @@ export const General: React.FC<IGeneral> = (props) => {
           },
           {
             key: 'add',
-            url: '/creation',
+            url: '/creator-onboarding-stage-1',
             width: '33%',
           },
           {
@@ -97,7 +97,7 @@ export const General: React.FC<IGeneral> = (props) => {
     }
 
     return bottomNavigationShadow;
-  }, [user.loggedIn, user.notificationsCount, user.role]);
+  }, [user.loggedIn, user.notificationsCount, user.userData?.options?.isCreator]);
 
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
