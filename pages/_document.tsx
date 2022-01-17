@@ -38,7 +38,6 @@ export default class MyDocument extends Document {
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-Medium.otf" as="font" type="font/otf" crossOrigin="anonymous" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-SemiBold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
           <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-          <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js" />
         </Head>
         <body>
           <Main />
