@@ -272,6 +272,10 @@ const SImageBG = styled.img<ISVideoWrapper>`
   height: 100%;
   object-fit: cover;
   border-radius: ${(props) => props.borderRadius};
+
+  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    filter: blur(16px);
+  }
 `;
 
 interface ISModalSoundIcon {

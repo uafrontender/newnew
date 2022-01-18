@@ -12,7 +12,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 
-const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
 });
 
@@ -44,11 +44,10 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         autoPlay
         loop
       /> */}
-      <BitmovinPlayer
+      <PostBitmovinPlayer
         id={postId}
         resources={announcement}
         muted={isMuted}
-        // playsInline
       />
       <SSoundButton
         iconOnly
