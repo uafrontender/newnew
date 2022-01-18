@@ -163,8 +163,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      console.log(res.data);
-
       if (res.data && res.data.options) {
         setOptions((curr) => {
           const workingArr = [...curr, ...res.data?.options as TMcOptionWithHighestField[]];

@@ -97,7 +97,6 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   }, [innerRef, playerConfig]);
   const loadSource = useCallback(() => {
     if (!isLoading && !loaded) {
-      console.log('load', playerSource);
       setIsLoading(true);
 
       player.current.load(playerSource)
@@ -115,7 +114,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           (reason: any) => {
             setLoaded(true);
             setIsLoading(false);
-            console.error(`Error while creating Bitmovin Player instance, ${reason}`);
+            console.error(`Error while creating Bitmovin Player instance -> ${reason}`);
           },
         );
     }
