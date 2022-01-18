@@ -145,7 +145,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         router.push('/');
       } catch (err) {
         // NB! Might need an error toast
-        console.log(err);
+        console.error(err);
         setIsLoading(false);
         router.push('/');
       }

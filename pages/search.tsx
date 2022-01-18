@@ -268,7 +268,6 @@ const Search: NextPage<ISearch> = ({
     const sort = router.query.sort?.toString() ? JSON.parse(router.query.sort?.toString()) : '';
 
     if (collectionLoaded) {
-      console.log(sort);
       if (!sort) {
         setCollectionSorted([...collectionLoaded]);
       } else {
