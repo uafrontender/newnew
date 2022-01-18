@@ -106,6 +106,8 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
             setLoaded(true);
             setIsLoading(false);
 
+            player.current.play();
+
             if (setDuration) {
               setDuration(player.current.getDuration());
             }
