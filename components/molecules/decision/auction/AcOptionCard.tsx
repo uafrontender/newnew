@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable quotes */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
@@ -8,8 +9,10 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import React, {
+  useCallback, useMemo, useRef, useState,
+} from 'react';
+import styled, { css } from 'styled-components';
 import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import { useAppSelector } from '../../../../redux-store/store';
@@ -24,8 +27,15 @@ import PlaceBidForm from './PlaceAcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import { formatNumber } from '../../../../utils/format';
 
+import Lottie from '../../../atoms/Lottie';
+
+// NB! temp sample
+import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
+import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
+
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
+  shouldAnimate: boolean;
   postId: string;
   index: number;
   optionBeingSupported?: string;
@@ -37,6 +47,7 @@ interface IAcOptionCard {
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
+  shouldAnimate,
   postId,
   index,
   optionBeingSupported,
@@ -51,6 +62,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const highest = useMemo(() => option.isHighest, [option.isHighest]);
+  const myVote = useMemo(() => option.isSupportedByUser, [option.isSupportedByUser]);
+  const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
+    option.creator?.uuid,
+    user.userData?.userUuid,
+  ]);
+  const bgVariant = highest ? 'yellow' : (
+    myBid ? 'blue' : myVote ? 'green' : undefined);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -137,8 +157,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
         marginBottom: '16px',
+        ...(!isMobile && isSupportFormOpen ? {
+          gap: '16px',
+        } : {}),
       }}
     >
       <SContainer
@@ -151,24 +173,38 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         isDisabled={disabled}
       >
         <SBidDetails
+          bgVariant={bgVariant}
           onClick={() => {
             if (optionBeingSupported) return;
             handleOpenOptionBidHistory();
           }}
         >
+          <SLottieAnimationContainer>
+            {shouldAnimate ? (
+              <Lottie
+                width={80}
+                height={80}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: highest ? CoinsSampleAnimation : HeartsSampleAnimation,
+                }}
+              />
+            ) : null}
+          </SLottieAnimationContainer>
           <SBidInfo>
-            {option.isSupportedByUser
-              && option.creator?.uuid !== user.userData?.userUuid
+            {highest
+              ? (
+                <STag>{t('AcPost.OptionsTab.tags.highest')}</STag>
+              ) : null}
+            {myVote
+              && !myBid
               ? (
                 <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag>
               ) : null}
-            {option.creator?.uuid === user.userData?.userUuid
+            {myBid
               ? (
                 <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag>
-              ) : null}
-            {option.isHighest
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.highest')}</STag>
               ) : null}
             {/* Comment out for now */}
             {/* {option.creator.isVIP
@@ -185,6 +221,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               draggable={false}
             />
             <SUsername
+              isColored={bgVariant !== undefined}
               onClick={(e) => {
                 e.stopPropagation();
                 handleRedirectToUser();
@@ -332,9 +369,16 @@ const SContainer = styled(motion.div)<{
   }
 `;
 
-const SBidDetails = styled.div`
+const SBidDetails = styled.div<{
+  bgVariant?: 'yellow' | 'green' | 'blue';
+}>`
+  position: relative;
+
   display: grid;
-  grid-template-areas: 'info amount';
+  grid-template-areas:
+    'info amount'
+    'doubleVote doubleVote'
+  ;
   grid-template-columns: 7fr 1fr;
   gap: 16px;
 
@@ -344,9 +388,24 @@ const SBidDetails = styled.div`
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
+  ${({ bgVariant }) => (
+    bgVariant
+      ? css`
+        background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
+      ` : null
+  )};
+
   &:hover {
     cursor: pointer;
   }
+`;
+
+const SLottieAnimationContainer = styled.div`
+  position: absolute;
+  top: -29px;
+  left: -20px;
+
+  z-index: 100;
 `;
 
 const SBidInfo = styled.div`
@@ -390,12 +449,14 @@ const SAvatar = styled.img`
   cursor: pointer;
 `;
 
-const SUsername = styled.div`
+const SUsername = styled.div<{
+  isColored?: boolean;
+}>`
   display: inline;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme, isColored }) => (isColored ? 'rgba(255, 255, 255, 0.8)' : theme.colorsThemed.text.secondary)};
   margin-right: 8px;
 
   transition: 0.2s linear;

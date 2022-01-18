@@ -123,13 +123,10 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
     };
 
     if (socketConnection) {
-      // console.log('Listening for bids updates events');
-
       socketConnection.on('AcBidCreated', socketHandler);
     }
 
     return () => {
-      // console.log('Stop listening for bids updates events');
       socketConnection.off('AcBidCreated', socketHandler);
     };
   }, [

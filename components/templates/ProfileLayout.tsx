@@ -31,19 +31,25 @@ interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
   tabs: Tab[];
   postsCachedCreatorDecisions?: newnewapi.Post[];
+  postsCachedActivity?: newnewapi.Post[];
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
   tabs,
   postsCachedCreatorDecisions,
+  postsCachedActivity,
   children,
 }) => {
   const [routeChangeLoading, setRouteChangeLoading] = useState(false);
 
+  // Cached posts
   const [
     creatorsDecisions, setCreatorsDecisions,
   ] = useState(postsCachedCreatorDecisions ?? []);
+  const [
+    activityDecisions, setActivityDecisions,
+  ] = useState(postsCachedActivity ?? []);
 
   const { t } = useTranslation('profile');
   const theme = useTheme();
@@ -55,9 +61,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   // Add new posts to cached ones
-  const addNewPosts = useCallback((newPosts: newnewapi.Post[]) => {
+  const addNewPostsCreatorsDecisions = useCallback((newPosts: newnewapi.Post[]) => {
     setCreatorsDecisions((curr) => [...curr, ...newPosts]);
   }, [setCreatorsDecisions]);
+
+  const addNewPostsAcitvity = useCallback((newPosts: newnewapi.Post[]) => {
+    setActivityDecisions((curr) => [...curr, ...newPosts]);
+  }, [setActivityDecisions]);
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(() => {
@@ -74,6 +84,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
 
+  // Skeletons for surfing the tabs
   useEffect(() => {
     const start = (url: string) => {
       if (url.includes(user.username)) {
@@ -222,8 +233,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             React.cloneElement(
               children as ReactElement,
               {
-                ...(creatorsDecisions ? { cachedPosts: creatorsDecisions } : {}),
-                handleAddNewPosts: addNewPosts,
+                ...(creatorsDecisions ? { cachedCreatorsPosts: creatorsDecisions } : {}),
+                ...(activityDecisions ? { cachedActivityPosts: activityDecisions } : {}),
+                handleAddNewPostsCreatorsDecisions: addNewPostsCreatorsDecisions,
+                handleAddNewPostsActivity: addNewPostsAcitvity,
               },
             )
           ) : (
@@ -241,6 +254,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
 ProfileLayout.defaultProps = {
   postsCachedCreatorDecisions: undefined,
+  postsCachedActivity: undefined,
 };
 
 export default ProfileLayout;

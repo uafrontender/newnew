@@ -1,7 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  ReactElement, useCallback, useEffect, useMemo, useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Router, { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -17,7 +20,7 @@ import ProfileImage from '../molecules/profile/ProfileImage';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
-import CardSkeleton from '../molecules/CardSkeleton';
+import { CardSkeletonList } from '../molecules/CardSkeleton';
 
 // Icons
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
@@ -26,12 +29,48 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBroswer from '../../utils/isBrowser';
 
+export type TPageType = 'activelyBidding'
+  | 'purchases'
+  | 'viewHistory'
+  | 'subscriptions'
+  | 'favorites';
+
 interface IMyProfileLayout {
-  tabs: Tab[];
+  renderedPage: TPageType;
+  postsCachedActivelyBiddingOn?: newnewapi.Post[];
+  postsCachedActivelyBiddingOnFilter?: newnewapi.Post.Filter;
+  postsCachedActivelyBiddingPageToken?: string | null | undefined;
+  postsCachedMyPurchases?: newnewapi.Post[];
+  postsCachedMyPurchasesFilter?: newnewapi.Post.Filter;
+  postsCachedMyPurchasesPageToken?: string | null | undefined;
+  postsCachedViewHistory?: newnewapi.Post[];
+  postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
+  postsCachedViewHistoryPageToken?: string | null | undefined;
+  postsCachedSubscriptions?: newnewapi.Post[];
+  postsCachedSubscriptionsFilter?: newnewapi.Post.Filter;
+  postsCachedSubscriptionsPageToken?: string | null | undefined;
+  postsCachedFavorites?: newnewapi.Post[];
+  postsCachedFavoritesFilter?: newnewapi.Post.Filter;
+  postsCachedFavoritesPageToken?: string | null | undefined;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
-  tabs,
+  renderedPage,
+  postsCachedActivelyBiddingOn,
+  postsCachedActivelyBiddingOnFilter,
+  postsCachedMyPurchases,
+  postsCachedMyPurchasesFilter,
+  postsCachedViewHistory,
+  postsCachedViewHistoryFilter,
+  postsCachedSubscriptions,
+  postsCachedSubscriptionsFilter,
+  postsCachedFavorites,
+  postsCachedFavoritesFilter,
+  postsCachedActivelyBiddingPageToken,
+  postsCachedMyPurchasesPageToken,
+  postsCachedViewHistoryPageToken,
+  postsCachedSubscriptionsPageToken,
+  postsCachedFavoritesPageToken,
   children,
 }) => {
   const { t } = useTranslation('profile');
@@ -39,10 +78,236 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
+
+  const tabs: Tab[] = useMemo(() => (
+    [
+      {
+        nameToken: 'activelyBidding',
+        url: '/profile',
+      },
+      {
+        nameToken: 'purchases',
+        url: '/profile/purchases',
+      },
+      {
+        nameToken: 'viewHistory',
+        url: '/profile/view-history',
+      },
+      {
+        nameToken: 'subscriptions',
+        url: '/profile/subscriptions',
+      },
+      {
+        nameToken: 'favorites',
+        url: '/profile/favorites',
+      },
+    ]), []);
+
   // Show skeleton on route change
   const [routeChangeLoading, setRouteChangeLoading] = useState(false);
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  // Cached posts
+  const [
+    postsActivelyBiddingOn, setPostsActivelyBiddingOn,
+  ] = useState(postsCachedActivelyBiddingOn ?? []);
+  const [
+    postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter,
+  ] = useState(postsCachedActivelyBiddingOnFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    activelyBiddingPageToken,
+    setActivelyBiddingPageToken,
+  ] = useState(postsCachedActivelyBiddingPageToken);
+
+  const [
+    postsMyPurchases, setPostsMyPurchases,
+  ] = useState(postsCachedMyPurchases ?? []);
+  const [
+    postsMyPurchasesFilter, setPostsMyPurchasesFilter,
+  ] = useState(postsCachedMyPurchasesFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    myPurchasesPageToken,
+    setMyPurchasesPageToken,
+  ] = useState(postsCachedMyPurchasesPageToken);
+
+  const [
+    postsViewHistory, setPostsViewHistory,
+  ] = useState(postsCachedViewHistory ?? []);
+  const [
+    postsViewHistoryFilter, setPostsViewHistoryFilter,
+  ] = useState(postsCachedViewHistoryFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    viewHistoryPageToken,
+    setViewHistoryPageToken,
+  ] = useState(postsCachedViewHistoryPageToken);
+
+  const [
+    postsSubscriptions, setPostsSubscriptions,
+  ] = useState(postsCachedSubscriptions ?? []);
+  const [
+    postsSubscriptionsFilter, setPostsSubscriptionsFilter,
+  ] = useState(postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    subscriptionsPageToken,
+    setSubscriptionsPageToken,
+  ] = useState(postsCachedSubscriptionsPageToken);
+
+  const [
+    postsFavorites, setPostsFavorites,
+  ] = useState(postsCachedFavorites ?? []);
+  const [
+    postsFavoritesFilter, setPostsFavoritesFilter,
+  ] = useState(postsCachedFavoritesFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    favoritesPageToken,
+    setFavoritesPageToken,
+  ] = useState(postsCachedFavoritesPageToken);
+
+  // UpdateCachedPosts
+  const handleSetPostsActivelyBiddingOn: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setPostsActivelyBiddingOn, [setPostsActivelyBiddingOn],
+    );
+
+  const handleSetPostsMyPurchases: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setPostsMyPurchases, [setPostsMyPurchases],
+    );
+
+  const handleSetPostsViewHistory: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setPostsViewHistory, [setPostsViewHistory],
+    );
+  const handleSetPostsSubscriptions: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setPostsSubscriptions, [setPostsSubscriptions],
+    );
+
+  const handleSetPostsFavorites: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setPostsFavorites, [setPostsFavorites],
+    );
+
+  const handleUpdateFilter = useCallback((
+    value: newnewapi.Post.Filter,
+  ) => {
+    switch (renderedPage) {
+      case 'activelyBidding': {
+        setPostsActivelyBiddingOnFilter(value);
+        break;
+      }
+      case 'purchases': {
+        setPostsMyPurchasesFilter(value);
+        break;
+      }
+      case 'viewHistory': {
+        setPostsViewHistoryFilter(value);
+        break;
+      }
+      case 'subscriptions': {
+        setPostsSubscriptionsFilter(value);
+        break;
+      }
+      case 'favorites': {
+        setPostsFavoritesFilter(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
+
+  const handleUpdatePageToken = useCallback((
+    value: string | null | undefined,
+  ) => {
+    switch (renderedPage) {
+      case 'activelyBidding': {
+        setActivelyBiddingPageToken(value);
+        break;
+      }
+      case 'purchases': {
+        setMyPurchasesPageToken(value);
+        break;
+      }
+      case 'viewHistory': {
+        setViewHistoryPageToken(value);
+        break;
+      }
+      case 'subscriptions': {
+        setSubscriptionsPageToken(value);
+        break;
+      }
+      case 'favorites': {
+        setFavoritesPageToken(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
+
+  const renderChildren = () => {
+    let postsForPage = {};
+    let postsForPageFilter;
+    let pageToken;
+    let handleSetPosts;
+
+    switch (renderedPage) {
+      case 'activelyBidding': {
+        postsForPage = postsActivelyBiddingOn;
+        postsForPageFilter = postsActivelyBiddingOnFilter;
+        pageToken = activelyBiddingPageToken;
+        handleSetPosts = handleSetPostsActivelyBiddingOn;
+        break;
+      }
+      case 'purchases': {
+        postsForPage = postsMyPurchases;
+        postsForPageFilter = postsMyPurchasesFilter;
+        pageToken = myPurchasesPageToken;
+        handleSetPosts = handleSetPostsMyPurchases;
+        break;
+      }
+      case 'viewHistory': {
+        postsForPage = postsViewHistory;
+        postsForPageFilter = postsViewHistoryFilter;
+        pageToken = viewHistoryPageToken;
+        handleSetPosts = handleSetPostsViewHistory;
+        break;
+      }
+      case 'subscriptions': {
+        postsForPage = postsSubscriptions;
+        postsForPageFilter = postsSubscriptionsFilter;
+        pageToken = subscriptionsPageToken;
+        handleSetPosts = handleSetPostsSubscriptions;
+        break;
+      }
+      case 'favorites': {
+        postsForPage = postsFavorites;
+        postsForPageFilter = postsFavoritesFilter;
+        pageToken = favoritesPageToken;
+        handleSetPosts = handleSetPostsFavorites;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+
+    return React.cloneElement(
+      children as ReactElement,
+      {
+        ...(postsForPage ? { posts: postsForPage } : {}),
+        ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
+        pageToken,
+        handleSetPosts,
+        handleUpdatePageToken,
+        handleUpdateFilter,
+      },
+    );
+  };
 
   // Edit Profile menu
   const [isEditProfileMenuOpen, setIsEditProfileMenuOpen] = useState(false);
@@ -55,21 +320,20 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleCloseEditProfileMenu = useCallback(() => {
     if (isBroswer()) {
-      router.push({
-        pathname: window.location.pathname,
-        hash: undefined,
-      }, undefined, { shallow: true });
+      // window.history.back();
     }
     setIsEditProfileMenuOpen(false);
-  }, [setIsEditProfileMenuOpen, router]);
+  }, [setIsEditProfileMenuOpen]);
 
   const handleOpenEditProfileMenu = () => {
     // Allow closing with browser back button
     if (isBroswer()) {
-      router.push({
-        pathname: window.location.pathname,
-        hash: 'edit-profile',
-      }, undefined, { shallow: true });
+      window.history.pushState(
+        {
+          stage: 'edit-general',
+        },
+        '',
+      );
     }
     setEditingStage('edit-general');
     setIsEditProfileMenuOpen(true);
@@ -77,20 +341,24 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleSetStageToEditingProfilePicture = () => {
     if (isBroswer()) {
-      router.push({
-        pathname: window.location.pathname,
-        hash: 'edit-profile-image',
-      }, undefined, { shallow: true });
+      window.history.pushState(
+        {
+          stage: 'edit-profile-picture',
+        },
+        '',
+      );
     }
     setEditingStage('edit-profile-picture');
   };
 
   const handleSetStageToEditingGeneral = () => {
     if (isBroswer()) {
-      router.push({
-        pathname: window.location.pathname,
-        hash: 'edit-profile',
-      }, undefined, { shallow: true });
+      window.history.replaceState(
+        {
+          stage: 'edit-general',
+        },
+        '',
+      );
     }
     setEditingStage('edit-general');
   };
@@ -115,28 +383,13 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [router, user]);
 
-  // Allow back button behavior
   useEffect(() => {
-    const verify = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        setIsEditProfileMenuOpen(false);
-      } else if (hash === '#edit-profile') {
-        setEditingStage('edit-general');
-      }
-    };
-
-    router.events.on('hashChangeComplete', verify);
-
-    return () => router.events.off('hashChangeComplete', verify);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const start = () => {
+    const start = (url: string) => {
+      console.log(url);
       setRouteChangeLoading(true);
     };
-    const end = () => {
+    const end = (url: string) => {
+      console.log(url);
       setRouteChangeLoading(false);
     };
     Router.events.on('routeChangeStart', start);
@@ -281,14 +534,35 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           </Modal>
         </SMyProfileLayout>
         {!routeChangeLoading
-          ? children : (
-            <CardSkeleton
+          ? renderChildren() : (
+            <CardSkeletonList
               count={8}
+              wrapperStyle={{
+                left: 0,
+              }}
             />
           )}
       </SGeneral>
     </ErrorBoundary>
   );
+};
+
+MyProfileLayout.defaultProps = {
+  postsCachedActivelyBiddingOn: undefined,
+  postsCachedActivelyBiddingOnFilter: undefined,
+  postsCachedMyPurchases: undefined,
+  postsCachedMyPurchasesFilter: undefined,
+  postsCachedViewHistory: undefined,
+  postsCachedViewHistoryFilter: undefined,
+  postsCachedSubscriptions: undefined,
+  postsCachedSubscriptionsFilter: undefined,
+  postsCachedFavorites: undefined,
+  postsCachedFavoritesFilter: undefined,
+  postsCachedActivelyBiddingPageToken: undefined,
+  postsCachedMyPurchasesPageToken: undefined,
+  postsCachedViewHistoryPageToken: undefined,
+  postsCachedSubscriptionsPageToken: undefined,
+  postsCachedFavoritesPageToken: undefined,
 };
 
 export default MyProfileLayout;

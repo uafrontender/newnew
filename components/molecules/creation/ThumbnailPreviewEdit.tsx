@@ -4,7 +4,9 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
+import { PlayerEvent } from 'bitmovin-player';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -14,12 +16,15 @@ import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
-import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+  ssr: false,
+});
 
 interface IThumbnailPreviewEdit {
   open: boolean;
@@ -122,8 +127,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     startTimeRef.current.innerHTML = getTime('start');
 
     playerRef.current.off(
-      // @ts-ignore
-      window.bitmovin.player.PlayerEvent.TimeChanged,
+      PlayerEvent.TimeChanged,
       playerRef.current.handleTimeChange,
     );
     const handleTimeChange = () => {
@@ -138,8 +142,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
       }
     };
     playerRef.current.pause();
-    // @ts-ignore
-    playerRef.current.on(window.bitmovin.player.PlayerEvent.TimeChanged, handleTimeChange);
+    playerRef.current.on(PlayerEvent.TimeChanged, handleTimeChange);
     playerRef.current.handleTimeChange = handleTimeChange;
 
     playerRef.current.seek(videoThumbs.current.startTime);

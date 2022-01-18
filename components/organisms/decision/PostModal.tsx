@@ -252,6 +252,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     >
       {postParsed && typeOfPost ? (
         <SPostModalContainer
+          id="post-modal-container"
           onClick={(e) => e.stopPropagation()}
           ref={(el) => {
             modalContainerRef.current = el!!;

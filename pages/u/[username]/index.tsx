@@ -20,17 +20,17 @@ import List from '../../../components/organisms/search/List';
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
   pagedPosts?: newnewapi.PagedPostsResponse;
-  cachedPosts?: newnewapi.Post[];
+  cachedCreatorsPosts?: newnewapi.Post[];
   nextPageTokenFromServer?: string;
-  handleAddNewPosts: (newPosts: newnewapi.Post[]) => void;
+  handleAddNewPostsCreatorsDecisions: (newPosts: newnewapi.Post[]) => void;
 }
 
 const UserPageIndex: NextPage<IUserPageIndex> = ({
   user,
   pagedPosts,
-  cachedPosts,
+  cachedCreatorsPosts,
   nextPageTokenFromServer,
-  handleAddNewPosts,
+  handleAddNewPostsCreatorsDecisions,
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
@@ -68,16 +68,15 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
         userUuid: user.uuid,
         filter: newnewapi.Post.Filter.ALL,
+        relation: newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
         paging: {
           ...(pageToken ? { pageToken } : {}),
         },
       });
       const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
 
-      console.log(postsResponse);
-
       if (postsResponse.data && postsResponse.data.posts) {
-        handleAddNewPosts(postsResponse.data?.posts as newnewapi.Post[]);
+        handleAddNewPostsCreatorsDecisions(postsResponse.data?.posts as newnewapi.Post[]);
         setPagingToken(postsResponse.data.paging?.nextPageToken);
       }
       setIsLoading(false);
@@ -86,7 +85,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       console.error(err);
     }
   }, [
-    handleAddNewPosts, user.uuid,
+    handleAddNewPostsCreatorsDecisions, user.uuid,
     isLoading,
   ]);
 
@@ -95,7 +94,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       if (pagingToken) {
         // loadPostsDebounced(pagingToken);
         loadPosts(pagingToken);
-      } else if (!pagingToken && cachedPosts?.length === 0) {
+      } else if (!pagingToken && cachedCreatorsPosts?.length === 0) {
         // loadPostsDebounced();
         loadPosts();
       }
@@ -107,11 +106,11 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
     <div>
       <main>
         <SCardsSection>
-          {cachedPosts && (
+          {cachedCreatorsPosts && (
             <List
               category=""
               loading={isLoading}
-              collection={cachedPosts}
+              collection={cachedCreatorsPosts}
               wrapperStyle={{
                 left: 0,
               }}
@@ -197,6 +196,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
       userUuid: res.data.uuid,
       filter: newnewapi.Post.Filter.ALL,
+      relation: newnewapi.GetUserPostsRequest.Relation.THEY_CREATED,
       paging: {
         limit: 10,
       },

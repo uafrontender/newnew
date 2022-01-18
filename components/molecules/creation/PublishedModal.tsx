@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../atoms/Text';
@@ -9,7 +10,6 @@ import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-import BitmovinPlayer from '../../atoms/BitmovinPlayer';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -26,6 +26,10 @@ const SOCIAL_ICONS: any = {
   facebook: facebookIcon,
   instagram: instagramIcon,
 };
+
+const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
+  ssr: false,
+});
 
 interface IPublishedModal {
   open: boolean;

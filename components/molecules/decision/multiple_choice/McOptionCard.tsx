@@ -1,15 +1,18 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable quotes */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
+import styled, { css } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -50,6 +53,15 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const highest = useMemo(() => option.isHighest, [option.isHighest]);
+  const myVote = useMemo(() => option.isSupportedByUser, [option.isSupportedByUser]);
+  const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
+    option.creator?.uuid,
+    user.userData?.userUuid,
+  ]);
+  const bgVariant = highest ? 'yellow' : (
+    myBid ? 'blue' : myVote ? 'green' : undefined);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -147,7 +159,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }}
         isDisabled={disabled}
       >
-        <SBidDetails>
+        <SBidDetails
+          bgVariant={bgVariant}
+        >
           <SBidInfo>
             {option.isSupportedByUser
               && creator?.uuid !== user.userData?.userUuid
@@ -177,6 +191,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               draggable={false}
             />
             <SUsername
+              isColored={bgVariant !== undefined}
               onClick={(e) => {
                 e.stopPropagation();
                 handleRedirectToUser();
@@ -196,8 +211,18 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             { ' ' }
             { t('McPost.OptionsTab.OptionCard.votes') }
           </SAmount>
+          {myVote || myBid ? (
+            <SDoubleMyVote>
+              <SDoubleMyVoteCaption>
+                { t('McPost.OptionsTab.OptionCard.doubleMyVoteCaption') }
+              </SDoubleMyVoteCaption>
+              <SDoubleMyVoteButton>
+              { t('McPost.OptionsTab.OptionCard.doubleMyVoteButton') }
+              </SDoubleMyVoteButton>
+            </SDoubleMyVote>
+          ) : null}
         </SBidDetails>
-        {optionBeingSupported && !disabled ? (
+        {(myBid || myVote) ? null : optionBeingSupported && !disabled ? (
           <div
             style={{
               minWidth: isMobileOrTablet ? '82px' : '92px',
@@ -317,9 +342,16 @@ const SContainer = styled(motion.div)<{
   }
 `;
 
-const SBidDetails = styled.div`
+const SBidDetails = styled.div<{
+  bgVariant?: 'yellow' | 'green' | 'blue';
+}>`
+  position: relative;
+
   display: grid;
-  grid-template-areas: 'info amount';
+  grid-template-areas:
+    'info amount'
+    'doubleVote doubleVote'
+  ;
   grid-template-columns: 7fr 2fr;
   gap: 16px;
 
@@ -328,6 +360,13 @@ const SBidDetails = styled.div`
   padding: 14px;
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  ${({ bgVariant }) => (
+    bgVariant
+      ? css`
+        background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
+      ` : null
+  )};
 
   &:hover {
     cursor: pointer;
@@ -375,12 +414,14 @@ const SAvatar = styled.img`
   cursor: pointer;
 `;
 
-const SUsername = styled.div`
+const SUsername = styled.div<{
+  isColored?: boolean;
+}>`
   display: inline;
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  color: ${({ theme, isColored }) => (isColored ? 'rgba(255, 255, 255, 0.8)' : theme.colorsThemed.text.secondary)};
   margin-right: 8px;
 
   transition: 0.2s linear;
@@ -410,6 +451,47 @@ const SAmount = styled.div`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+`;
+
+const SDoubleMyVote = styled.div`
+  grid-area: doubleVote;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  padding: 12px 16px;
+  gap: 8px;
+
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-wrap: nowrap;
+  }
+`;
+
+const SDoubleMyVoteCaption = styled.div`
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+
+  color: #FFFFFF;
+`;
+
+const SDoubleMyVoteButton = styled(Button)`
+  background: #FFFFFF;
+  color: #2C2C33;
+  width: 100%;
+  height: 48px;
+
+  &:focus:enabled,
+  &:hover:enabled  {
+    background: #FFFFFF;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-wrap: fit-content;
+  }
 `;
 
 const SSupportButton = styled(Button)`
