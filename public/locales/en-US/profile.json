@@ -8,6 +8,13 @@
     "userInitial": "Creator’s decisions",
     "activity": "Activity"
   },
+  "posts-filter": {
+    "decisions": "decisions",
+    "filter-0": "All",
+    "filter-1": "Auctions",
+    "filter-2": "Crowdfunding",
+    "filter-3": "Multiple choices"
+  },
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",

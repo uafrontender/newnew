@@ -39,38 +39,19 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   const sortEnabled = !!Object.keys(sort).length;
   const sortOptions: any = useMemo(() => [
     {
-      key: 'bid',
+      key: 'sortingtype',
       options: [
         {
-          key: 'lowest',
+          key: 'all',
         },
         {
-          key: 'highest',
+          key: 'num_bids',
         },
-      ],
-    },
-    {
-      key: 'time',
-      options: [
         {
-          key: 'ending-soon',
+          key: 'most_funded',
         },
         {
           key: 'newest',
-        },
-        {
-          key: 'oldest',
-        },
-      ],
-    },
-    {
-      key: 'numbers-of-bids',
-      options: [
-        {
-          key: 'fewest',
-        },
-        {
-          key: 'most-first',
         },
       ],
     },
@@ -108,6 +89,10 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
     });
   };
   const handleSortChange = useCallback((newSort: object = {}) => {
+    if ((newSort as any).sortingtype === 'all') {
+      handleClearSorting();
+      return;
+    }
     const newQuery = {
       ...router.query,
       sort: JSON.stringify(newSort),
@@ -116,7 +101,9 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       query: newQuery,
       pathname: router.pathname,
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
   const handleClearSorting = useCallback(() => {
     const newQuery = { ...router.query };
 

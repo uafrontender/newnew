@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useRef } from 'react';
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -10,24 +12,29 @@ import InlineSvg from '../../atoms/InlineSVG';
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 
+const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
+  ssr: false,
+});
+
 interface IPostVideo {
-  videoSrc: string;
+  postId: string;
+  announcement: newnewapi.IVideoUrls;
   isMuted: boolean;
   handleToggleMuted: () => void;
 }
 
 const PostVideo: React.FunctionComponent<IPostVideo> = ({
-  videoSrc,
+  postId,
+  announcement,
   isMuted,
   handleToggleMuted,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const videoRef = useRef<HTMLVideoElement>();
 
   return (
     <SVideoWrapper>
-      <video
+      {/* <video
         ref={(el) => {
           videoRef.current = el!!;
         }}
@@ -36,6 +43,11 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
         playsInline
         autoPlay
         loop
+      /> */}
+      <PostBitmovinPlayer
+        id={postId}
+        resources={announcement}
+        muted={isMuted}
       />
       <SSoundButton
         iconOnly

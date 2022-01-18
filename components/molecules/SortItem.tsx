@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -25,8 +27,11 @@ export const SortItem: React.FC<ISortItem> = (props) => {
   const renderItemOption = useCallback((option: any, index: number, parentOption: any) => {
     let optionSelected: boolean = false;
 
-    // @ts-ignore
-    if (selected[parentOption.key] === option.key) {
+    if (
+      // @ts-ignore
+      selected[parentOption.key] === option.key
+      || (!selected && option.key === 'all')
+    ) {
       optionSelected = true;
     }
 
@@ -47,7 +52,7 @@ export const SortItem: React.FC<ISortItem> = (props) => {
   return (
     <SItemHolder>
       <SItemTitle variant={3} weight={600}>
-        {t(`sort-title-option-${item.key}`)}
+        {/* {t(`sort-title-option-${item.key}`)} */}
       </SItemTitle>
       {item.options.map(
         (option: any, optIndex: number) => renderItemOption(option, optIndex, item),

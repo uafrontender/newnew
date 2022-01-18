@@ -173,4 +173,6 @@ const SItemButtonWide = styled.div<ISItemButton>`
   font-weight: bold;
   font-size: 14px;
   line-height: 24px;
+
+  color: #FFFFFF;
 `;
