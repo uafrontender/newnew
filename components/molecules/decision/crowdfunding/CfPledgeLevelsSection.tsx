@@ -150,16 +150,12 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
         ) : {}),
       });
 
-      console.log(makePledgePayload);
-
       const res = await doPledgeCrowdfunding(makePledgePayload);
 
       if (!res.data
         || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
         || res.error
       ) throw new Error(res.error?.message ?? 'Request failed');
-
-      console.log(res.data);
 
       handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
 

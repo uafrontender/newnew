@@ -73,7 +73,7 @@ export async function getServerSideProps(
       relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_ACTIVE_BIDDINGS,
       filter: newnewapi.Post.Filter.ALL,
     });
-    const res = await getMyPosts(
+    await getMyPosts(
       payload,
       {
         accessToken: req.cookies?.accessToken,
@@ -88,15 +88,13 @@ export async function getServerSideProps(
       },
     );
 
-    console.log(res);
-
     return {
       props: {
         ...translationContext,
       },
     };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return {
       props: {
         error: {

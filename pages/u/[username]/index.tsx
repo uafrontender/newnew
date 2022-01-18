@@ -74,8 +74,6 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       });
       const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
 
-      console.log(postsResponse);
-
       if (postsResponse.data && postsResponse.data.posts) {
         handleAddNewPosts(postsResponse.data?.posts as newnewapi.Post[]);
         setPagingToken(postsResponse.data.paging?.nextPageToken);

@@ -52,8 +52,6 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, pledgesLoading]);
 
-  // console.log(heightDelta);
-
   return (
     <SSectionContainer
       key="pledges"
