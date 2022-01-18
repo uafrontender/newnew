@@ -30,7 +30,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID } from '../../../api/endpoints/post';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -79,6 +79,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+  // Animating options
+  const [optionToAnimate, setOptionToAnimate] = useState('');
 
   // Option overview
   const [
@@ -245,6 +248,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       return sortOptions(workingArrUnsorted);
     });
+    setOptionToAnimate(newOption.id.toString());
+
+    setTimeout(() => {
+      setOptionToAnimate('');
+    }, 3000);
   }, [
     setOptions,
     sortOptions,
@@ -283,6 +291,33 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mark post as viewed if logged in
+  useEffect(() => {
+    async function markAsViewed() {
+      if (
+        !user.loggedIn
+        || user.userData?.userUuid === post.creator?.uuid) return;
+      try {
+        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
+          postUuid: post.postUuid,
+        });
+
+        const res = await markPost(markAsViewedPayload);
+
+        console.log(res);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    markAsViewed();
+  }, [
+    post,
+    user.loggedIn,
+    user.userData?.userUuid,
+  ]);
 
   useEffect(() => {
     setComments([]);
@@ -406,7 +441,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       <PostVideo
         // NB! Will be changed for streaming format
         // NB! Will support responses, as well!
-        videoSrc={post.announcement?.originalVideoUrl ?? MockVideo}
+        postId={post.postUuid}
+        announcement={post.announcement!!}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
@@ -429,13 +465,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       <SActivitesContainer>
         {!overviewedOption ? (
           <PostTopInfo
+            postId={post.postUuid}
             postType="ac"
-            // Temp
             amountInBids={totalAmount}
             creator={post.creator!!}
             startsAtSeconds={post.startsAt?.seconds as number}
             handleFollowCreator={() => {}}
-            handleFollowDecision={() => {}}
             handleReportAnnouncement={() => {}}
           />
         ) : (
@@ -485,6 +520,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             <AcOptionsTab
               postId={post.postUuid}
               options={options}
+              optionToAnimate={optionToAnimate}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
               minAmount={post.minimalBid?.usdCents

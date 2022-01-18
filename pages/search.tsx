@@ -29,6 +29,7 @@ import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import switchPostType from '../utils/switchPostType';
 
 export type TCollectionType = 'ac' | 'mc' | 'cf' | 'biggest' | 'for-you';
+export type TSortingType = 'all' | 'num_bids' | 'most_funded' | 'newest';
 
 interface ISearch {
   top10posts: newnewapi.NonPagedPostsResponse,
@@ -42,7 +43,7 @@ const Search: NextPage<ISearch> = ({
 
   const router = useRouter();
   const categoryRef = useRef('');
-  // const category = router.query.category?.toString() ?? '';
+  const sortingRef = useRef<string | undefined>('');
 
   // Posts
   // Top section/Curated posts
@@ -59,13 +60,15 @@ const Search: NextPage<ISearch> = ({
     inView,
   } = useInView();
 
-  const [collectionSorted, setCollectionSorted] = useState<newnewapi.Post[]>([]);
-  const [isCollectionSorting, setIsCollectionSorting] = useState(false);
-
-  const loadPosts = useCallback(async (
+  const loadPosts = useCallback(async ({
+    categoryToFetch,
+    sorting,
+    pageToken,
+  }: {
     categoryToFetch: TCollectionType,
+    sorting?: newnewapi.PostSorting,
     pageToken?: string,
-  ) => {
+  }) => {
     if (isCollectionLoading) return;
     try {
       setIsCollectionLoading(true);
@@ -82,6 +85,9 @@ const Search: NextPage<ISearch> = ({
             paging: {
               pageToken,
             },
+          } : {}),
+          ...(sorting ? {
+            sorting,
           } : {}),
         });
 
@@ -107,6 +113,9 @@ const Search: NextPage<ISearch> = ({
             paging: {
               pageToken,
             },
+          } : {}),
+          ...(sorting ? {
+            sorting,
           } : {}),
         });
 
@@ -134,6 +143,9 @@ const Search: NextPage<ISearch> = ({
               pageToken,
             },
           } : {}),
+          ...(sorting ? {
+            sorting,
+          } : {}),
         });
 
         res = await fetchTopMultipleChoices(multichoicePayload);
@@ -160,6 +172,9 @@ const Search: NextPage<ISearch> = ({
               pageToken,
             },
           } : {}),
+          ...(sorting ? {
+            sorting,
+          } : {}),
         });
 
         res = await fetchTopCrowdfundings(cfPayload);
@@ -185,6 +200,9 @@ const Search: NextPage<ISearch> = ({
             paging: {
               pageToken,
             },
+          } : {}),
+          ...(sorting ? {
+            sorting,
           } : {}),
         });
 
@@ -246,50 +264,58 @@ const Search: NextPage<ISearch> = ({
   // Load collection on category change && scroll
   useEffect(() => {
     const category = router.query.category?.toString() ?? '';
-    if (inView && category && !isCollectionLoading && !isCollectionSorting) {
+    const sort = router.query.sort?.toString() ? JSON.parse(router.query.sort?.toString()) : '';
+    // eslint-disable-next-line no-undef-init
+    let sorting: newnewapi.PostSorting | undefined = undefined;
+    if (sort.sortingtype) {
+      if (sort.sortingtype as TSortingType === 'most_funded') {
+        sorting = newnewapi.PostSorting.MOST_FUNDED_FIRST;
+      } else if (sort.sortingtype as TSortingType === 'num_bids') {
+        sorting = newnewapi.PostSorting.MOST_VOTED_FIRST;
+      } else {
+        sorting = newnewapi.PostSorting.NEWEST_FIRST;
+      }
+    }
+
+    console.log(sorting);
+
+    if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {
-        loadPosts(category as TCollectionType, nextPageToken);
+        loadPosts({
+          categoryToFetch: category as TCollectionType,
+          pageToken: nextPageToken,
+          ...(sorting ? {
+            sorting,
+          } : {}),
+        });
       } else if (!nextPageToken && category !== categoryRef.current) {
-        loadPosts(category as TCollectionType);
+        loadPosts({
+          categoryToFetch: category as TCollectionType,
+          ...(sorting ? {
+            sorting,
+          } : {}),
+        });
         categoryRef.current = category;
+        sortingRef.current = sorting?.toString();
+      } else if (sorting?.toString() !== sortingRef.current) {
+        loadPosts({
+          categoryToFetch: category as TCollectionType,
+          ...(sorting ? {
+            sorting,
+          } : {}),
+        });
+        categoryRef.current = category;
+        sortingRef.current = sorting?.toString();
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     inView,
     nextPageToken,
-    isCollectionLoading, isCollectionSorting,
+    isCollectionLoading,
     router.query.category,
+    router.query.sort,
   ]);
-
-  // NB! Will be removed as we'll be fetching sorted data from the API NB!
-  // Sort collection after collectionLoaded and on sort changes
-  useEffect(() => {
-    const sort = router.query.sort?.toString() ? JSON.parse(router.query.sort?.toString()) : '';
-
-    if (collectionLoaded) {
-      if (!sort) {
-        setCollectionSorted([...collectionLoaded]);
-      } else {
-        setIsCollectionSorting(true);
-        const workingArray = [...collectionLoaded];
-        if (sort.time) {
-          const workingArray2 = workingArray.sort((a, b) => {
-            const [A, typeA] = switchPostType(a);
-            const [B, typeB] = switchPostType(b);
-            if (sort.time === 'newest') return (B.expiresAt?.seconds as number) - (A.expiresAt?.seconds as number);
-            if (sort.time === 'oldest') return (A.expiresAt?.seconds as number) - (B.expiresAt?.seconds as number);
-            return (A.expiresAt?.seconds as number) - (B.expiresAt?.seconds as number);
-          });
-          setCollectionSorted(() => [...workingArray2]);
-          setIsCollectionSorting(false);
-          return;
-        }
-        setCollectionSorted(() => [...workingArray]);
-        setIsCollectionSorting(false);
-      }
-    }
-  }, [router.query.sort, collectionLoaded]);
 
   return (
     <>
@@ -307,12 +333,12 @@ const Search: NextPage<ISearch> = ({
       <SWrapper name={router.query.category?.toString() ?? ''}>
         <TitleBlock
           authenticated={loggedIn}
-          disabled={isCollectionSorting || isCollectionLoading}
+          disabled={isCollectionLoading}
         />
         <SListContainer>
           <List
             category={router.query.category?.toString() ?? ''}
-            collection={collectionSorted}
+            collection={collectionLoaded}
             loading={isCollectionLoading}
             handlePostClicked={handleOpenPostModal}
           />

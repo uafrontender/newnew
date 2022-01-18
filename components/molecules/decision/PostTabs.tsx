@@ -104,6 +104,8 @@ const STabsContainer = styled.div`
   justify-content: flex-start;
   gap: 24px;
 
+  z-index: 2;
+
   width: min-content;
   overflow: hidden;
   position: relative;

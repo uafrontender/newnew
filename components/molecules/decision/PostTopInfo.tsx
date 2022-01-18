@@ -21,8 +21,12 @@ import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { formatNumber } from '../../../utils/format';
 import PostShareMenu from './PostShareMenu';
 import PostShareModal from './PostShareModal';
+import PostEllipseMenu from './PostEllipseMenu';
+import PostEllipseModal from './PostEllipseModal';
+import { markPost } from '../../../api/endpoints/post';
 
 interface IPostTopInfo {
+  postId: string;
   creator: newnewapi.IUser;
   postType: TPostType;
   startsAtSeconds: number;
@@ -31,11 +35,11 @@ interface IPostTopInfo {
   currentBackers?: number;
   targetBackers?: number;
   handleFollowCreator: () => void;
-  handleFollowDecision: () => void;
   handleReportAnnouncement: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
+  postId,
   creator,
   postType,
   startsAtSeconds,
@@ -44,13 +48,13 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   currentBackers,
   targetBackers,
   handleFollowCreator,
-  handleFollowDecision,
   handleReportAnnouncement,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
   const startingDateParsed = new Date(startsAtSeconds * 1000);
+  const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -64,8 +68,26 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleOpenShareMenu = () => setShareMenuOpen(true);
   const handleCloseShareMenu = () => setShareMenuOpen(false);
 
-  const handleOpenEllipseMenu = () => setShareMenuOpen(true);
-  const handleCloseEllipseMenu = () => setShareMenuOpen(false);
+  const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
+  const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+
+  const handleFollowDecision = async () => {
+    try {
+      if (!user.loggedIn) {
+        router.push('/sign-up?reason=follow-decision');
+      }
+      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+        postUuid: postId,
+      });
+
+      const res = await markPost(markAsViewedPayload);
+
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <SWrapper>
@@ -119,13 +141,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           style={{
             padding: '8px',
           }}
-          onClick={() => {
-            if (shareMenuOpen) {
-              handleCloseShareMenu();
-              return;
-            }
-            handleOpenShareMenu();
-          }}
+          onClick={() => handleOpenShareMenu()}
         >
           <InlineSvg
             svg={ShareIconFilled}
@@ -137,8 +153,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         <SMoreButton
           view="transparent"
           iconOnly
-          onClick={() => {
-          }}
+          onClick={() => handleOpenEllipseMenu()}
         >
           <InlineSvg
             svg={MoreIconFilled}
@@ -147,6 +162,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             height="20px"
           />
         </SMoreButton>
+        {/* Share menu */}
         {!isMobile && (
           <PostShareMenu
             isVisible={shareMenuOpen}
@@ -158,6 +174,22 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             isOpen={shareMenuOpen}
             zIndex={11}
             onClose={handleCloseShareMenu}
+          />
+        ) : null}
+        {/* Ellipse menu */}
+        {!isMobile && (
+          <PostEllipseMenu
+            isVisible={ellipseMenuOpen}
+            handleFollowDecision={handleFollowDecision}
+            handleClose={handleCloseEllipseMenu}
+          />
+        )}
+        {isMobile && ellipseMenuOpen ? (
+          <PostEllipseModal
+            isOpen={ellipseMenuOpen}
+            zIndex={11}
+            handleFollowDecision={handleFollowDecision}
+            onClose={handleCloseEllipseMenu}
           />
         ) : null}
       </SActionsDiv>

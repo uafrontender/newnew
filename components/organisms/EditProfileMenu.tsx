@@ -3,6 +3,7 @@
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -39,6 +40,8 @@ import { updateMe, validateUsernameTextField } from '../../api/endpoints/user';
 import { validateText } from '../../api/endpoints/infrastructure';
 import { getImageUploadUrl } from '../../api/endpoints/upload';
 import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper';
+import isBrowser from '../../utils/isBrowser';
+import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture'
 
@@ -133,6 +136,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('profile');
+  const router = useRouter();
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
@@ -594,6 +598,25 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   ]);
 
   // Effects
+  useEffect(() => {
+    const verify = () => {
+      if (!isBrowser()) return;
+
+      const { stage: currStage } = window.history.state;
+
+      if (!currStage) {
+        handleClose();
+      } else if (currStage === 'edit-general') {
+        handleSetStageToEditingGeneral();
+      }
+    };
+
+    window.addEventListener('popstate', verify);
+
+    return () => window.removeEventListener('popstate', verify);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Check if data was modified
   useEffect(() => {
     // Temp

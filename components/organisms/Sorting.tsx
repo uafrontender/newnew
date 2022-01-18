@@ -106,7 +106,7 @@ export const Sorting: React.FC<ISorting> = (props) => {
         onClick={handleToggleSortingClick}
       >
         <SButtonContent>
-          {t('sort-title')}
+          {/* {t('sort-title')} */}
           {!!selectedCount && isMobile && (
             <SSelectedCounter>
               <SSelectedCounterText variant={2} weight={700}>

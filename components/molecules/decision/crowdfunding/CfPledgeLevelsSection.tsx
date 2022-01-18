@@ -67,7 +67,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     try {
       const payload = new newnewapi.ValidateTextRequest({
         // NB! temp
-        kind: newnewapi.ValidateTextRequest.Kind.USER_BIO,
+        kind: newnewapi.ValidateTextRequest.Kind.POST_PLEDGE_MESSAGE,
         text,
       });
 
@@ -102,9 +102,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   ) => {
     setPledgeMessage(e.target.value);
 
-    validateTextViaAPIDebounced(
-      e.target.value,
-    );
+    if (e.target.value.length > 0) {
+      validateTextViaAPIDebounced(
+        e.target.value,
+      );
+    }
   },
   [
     setPledgeMessage, validateTextViaAPIDebounced,
@@ -185,10 +187,6 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     });
 
     resizeObserver.observe(containerRef.current!!);
-
-    return () => {
-      // resizeObserver.unobserve(containerRef.current!!);
-    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -239,7 +237,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
           <SNewPledgeForm>
             <SuggestionTextArea
               value={pledgeMessage}
-              placeholder={t('McPost.PledgeLevelsSection.messagePlaceholder')}
+              placeholder={t('Say something nice')}
               onChange={handleMessageInputChange}
             />
             <Button
@@ -251,7 +249,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+              { t('Make pledge') }
             </Button>
             <SCancelButton
               view="secondary"
