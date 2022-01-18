@@ -1,3 +1,9 @@
 {
-
+  "meta": {
+    "title": "Become creator",
+    "description": "Become creator and get paid"
+  },
+  "progressbar": {
+    "of": "of"
+  }
 }

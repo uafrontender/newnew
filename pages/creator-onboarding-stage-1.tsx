@@ -17,7 +17,7 @@ interface ICreatorOnboardingStage1 {
 }
 
 const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
-  const { t } = useTranslation('verify-email');
+  const { t } = useTranslation('creator-onboarding');
 
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
