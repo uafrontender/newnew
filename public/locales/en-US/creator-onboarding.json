@@ -5,5 +5,12 @@
   },
   "progressbar": {
     "of": "of"
+  },
+  "TosSection": {
+    "heading": "Join the community and start earning",
+    "subheading": "Agree to NewNew community guidelines",
+    "submitMobile": "I have read statement and agree",
+    "submitDesktop": "Submit",
+    "agreenToTosCheckbox": "I agree to the terms and conditions."
   }
 }

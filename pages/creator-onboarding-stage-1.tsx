@@ -11,6 +11,7 @@ import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
+import OnboardingSectionTos from '../components/molecules/creator-onboarding/OnboardingSectionTos';
 
 interface ICreatorOnboardingStage1 {
 
@@ -22,15 +23,19 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
+  const goToNext = () => {
+    router.push('/creator-onboarding-stage-2');
+  };
+
   return (
     <>
       <Head>
         <title>{ t('meta.title') }</title>
         <meta name="description" content={t('meta.description')} />
       </Head>
-      <div>
-        hey
-      </div>
+      <OnboardingSectionTos
+        handleGoToNext={goToNext}
+      />
     </>
   );
 };

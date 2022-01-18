@@ -109,7 +109,14 @@ const SProgressBar = styled.div<{
   progress: number;
 }>`
   position: relative;
+  border-radius: 16px;
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
+  height: 6px;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: calc(100% - 104px);
+  }
 
   &:before {
     content: '';
