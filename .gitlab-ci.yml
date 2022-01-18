@@ -42,10 +42,10 @@ variables:
   CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
   NEXT_PUBLIC_BITMOVIN_PLAYER_KEY: "$BITMOVIN_PLAYER_KEY"
 
-stages:
+#  stages:
   #  - test
-  - build
-  - deploy
+  #  - build
+  #  - deploy
 
 # Cache using branch name
 # cache:
@@ -57,17 +57,17 @@ stages:
 #    - .next
 
 # Test using Cypress tests
-#test:
-#  rules:
-#    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-#  image: cypress/browsers:node16.5.0-chrome94-ff93
-#  stage: test
-#  script:
-#    - npm ci --include=dev
-#    - npm run lint
-#    - npm run dev & npx wait-on http://localhost:4000
-#    - npm run test -- --record
-#    - npm run test:mobile -- --record
+test:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  image: cypress/browsers:node16.5.0-chrome94-ff93
+  stage: test
+  script:
+    - npm ci --include=dev
+    - npm run lint
+    - npm run dev & npx wait-on http://localhost:4000
+    - npm run test -- --record
+    - npm run test:mobile -- --record
 
 # Build docker image, push image to amazon ecr, and upload static assets to amazon s3
 build:
