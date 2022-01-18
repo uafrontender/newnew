@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -10,9 +10,11 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { debounce } from 'lodash';
 
-import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
 import { useAppSelector } from '../../../../redux-store/store';
+import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
+import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import McOptionCard from './McOptionCard';
 import Button from '../../../atoms/Button';
@@ -58,6 +60,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // New option/bid
   const [newOptionText, setNewOptionText] = useState('');
+  const [newOptionTextValid, setNewOptionTextValid] = useState(true);
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
   const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
@@ -66,12 +70,64 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
+    if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
       router.push('/sign-up?reason=vote');
       return;
     }
     setPaymentModalOpen(true);
   };
+
+  const validateTextViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        // NB! temp
+        kind: newnewapi.ValidateTextRequest.Kind.POST_OPTION,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setNewOptionTextValid(false);
+      } else {
+        setNewOptionTextValid(true);
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+    }
+  }, []);
+
+  const validateTextViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateTextViaAPI(text);
+  }, 250),
+  [validateTextViaAPI]);
+
+  const handleUpdateNewOptionText = useCallback((
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setNewOptionText(e.target.value);
+
+    if (e.target.value.length > 0) {
+      validateTextViaAPIDebounced(
+        e.target.value,
+      );
+    }
+  }, [
+    setNewOptionText, validateTextViaAPIDebounced,
+  ]);
 
   const handleSubmitNewOption = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -167,7 +223,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
               placeholder="Add a option ..."
-              onChange={(e) => setNewOptionText(e.target.value)}
+              onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
@@ -185,7 +241,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               size="sm"
               disabled={!newOptionText
                 || parseInt(newBidAmount, 10) < minAmount
-                || optionBeingSupported !== ''}
+                || optionBeingSupported !== ''
+                || !newOptionTextValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               Place a bid
@@ -205,7 +265,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
               placeholder="Add a option ..."
-              onChange={(e) => setNewOptionText(e.target.value)}
+              onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
@@ -220,7 +280,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               size="sm"
               disabled={!newOptionText
                 || parseInt(newBidAmount, 10) < minAmount
-                || optionBeingSupported !== ''}
+                || optionBeingSupported !== ''
+                || !newOptionTextValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
               Place a bid
