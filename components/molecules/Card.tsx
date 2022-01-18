@@ -140,9 +140,11 @@ export const Card: React.FC<ICard> = ({
     };
 
     videoRef.current?.addEventListener('canplay', handleCanplay);
+    videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
 
     return () => {
       videoRef.current?.removeEventListener('canplay', handleCanplay);
+      videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
     };
   }, []);
 
