@@ -112,7 +112,7 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
           (reason: any) => {
             setLoaded(true);
             setIsLoading(false);
-            console.error(`Error while creating Bitmovin Player instance, ${reason}`);
+            console.error(`Error while creating Bitmovin Player instance -> ${reason}`);
           },
         );
     }
