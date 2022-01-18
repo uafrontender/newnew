@@ -188,6 +188,11 @@ declare module 'styled-components' {
       calendarTop: string,
       calendarBottom: string,
       creationSubmit: string,
+      decisionOption: {
+        yellow: string,
+        blue: string,
+        green: string,
+      },
     },
     borderRadius: {
       small: string,

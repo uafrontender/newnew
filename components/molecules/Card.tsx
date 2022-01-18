@@ -94,6 +94,9 @@ export const Card: React.FC<ICard> = ({
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  // Check if video is ready to avoid errors
+  const [videoReady, setVideoReady] = useState(false);
+
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
@@ -132,12 +135,30 @@ export const Card: React.FC<ICard> = ({
   };
 
   useEffect(() => {
-    if (inView) {
-      videoRef.current?.play();
-    } else {
-      videoRef.current?.pause();
+    const handleCanplay = () => {
+      setVideoReady(true);
+    };
+
+    videoRef.current?.addEventListener('canplay', handleCanplay);
+
+    return () => {
+      videoRef.current?.removeEventListener('canplay', handleCanplay);
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (videoReady) {
+        if (inView) {
+          videoRef.current?.play();
+        } else {
+          videoRef.current?.pause();
+        }
+      }
+    } catch (err) {
+      console.error(err);
     }
-  }, [inView]);
+  }, [inView, videoReady]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -210,16 +231,7 @@ export const Card: React.FC<ICard> = ({
           )}
           <SImageHolder index={index}>
             <video
-              // src={postParsed.announcement?.thumbnailUrl as string}
-              // src="/video/mock/mock_video_1.mp4"
-              // Temp
-              src={
-                postParsed.announcement?.thumbnailUrl
-                  ? postParsed.announcement?.thumbnailUrl
-                  : (
-                    index % 2 === 0 ? '/video/mock/mock_video_1.mp4' : '/video/mock/mock_video_2.mp4'
-                  )
-                }
+              src={postParsed.announcement?.thumbnailUrl ?? ''}
               ref={(el) => {
                 videoRef.current = el!!;
               }}
@@ -279,13 +291,7 @@ export const Card: React.FC<ICard> = ({
             // src={postParsed.announcement?.thumbnailUrl as string}
             // src="/video/mock/mock_video_1.mp4"
             // Temp
-            src={
-              postParsed.announcement?.thumbnailUrl
-                ? postParsed.announcement?.thumbnailUrl
-                : (
-                  index % 2 === 0 ? '/video/mock/mock_video_1.mp4' : '/video/mock/mock_video_2.mp4'
-                )
-              }
+            src={postParsed.announcement?.thumbnailUrl ?? ''}
             ref={(el) => {
               videoRef.current = el!!;
             }}
