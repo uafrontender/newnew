@@ -231,7 +231,6 @@ export const Card: React.FC<ICard> = ({
           )}
           <SImageHolder index={index}>
             <video
-              src={postParsed.announcement?.thumbnailUrl ?? ''}
               ref={(el) => {
                 videoRef.current = el!!;
               }}
@@ -241,7 +240,12 @@ export const Card: React.FC<ICard> = ({
               loop
               muted
               playsInline
-            />
+            >
+              <source
+                src={postParsed.announcement?.thumbnailUrl ?? ''}
+                type="video/mp4"
+              />
+            </video>
             <SImageMask />
             <STopContent>
               <SButtonIcon
@@ -291,7 +295,7 @@ export const Card: React.FC<ICard> = ({
             // src={postParsed.announcement?.thumbnailUrl as string}
             // src="/video/mock/mock_video_1.mp4"
             // Temp
-            src={postParsed.announcement?.thumbnailUrl ?? ''}
+            // src={postParsed.announcement?.thumbnailUrl ?? ''}
             ref={(el) => {
               videoRef.current = el!!;
             }}
@@ -301,7 +305,12 @@ export const Card: React.FC<ICard> = ({
             loop
             muted
             playsInline
-          />
+          >
+            <source
+              src={postParsed.announcement?.thumbnailUrl ?? ''}
+              type="video/mp4"
+            />
+          </video>
           <STopContent>
             <SButtonIcon
               iconOnly
