@@ -12,5 +12,41 @@
     "submitMobile": "I have read statement and agree",
     "submitDesktop": "Submit",
     "agreenToTosCheckbox": "I agree to the terms and conditions."
+  },
+  "DetailsSection": {
+    "side": {
+      "heading": "Tell us a little about yourself.",
+      "subheading": "This is the description that will show on your profile page."
+    },
+    "heading": "Few more details",
+    "form": {
+      "email": {
+        "label": "Email",
+        "placeholder": "email@email.com",
+        "errors": {
+          "invalidEmail": "Please, enter a valid email"
+        }
+      },
+      "CoR": {
+        "label": "Country of residence"
+      },
+      "DoB": {
+        "label": "Date of birth",
+        "captions": {
+          "twoTimesOnly": "Birthdate can be changed 2 times only.",
+          "cannotChange": "You can’t change birthdate."
+        }
+      },
+      "profilePicture": {
+        "label": "Profile photo",
+        "captionMobile": "*recommended resolution 200x200 px",
+        "captionDesktop": "Recommended resolution 200x200 px",
+        "uploadBtn": "Upload image",
+        "uploadNewBtn": "Upload new image"
+      }
+    },
+    "backButton": "Back",
+    "submitDesktop": "Save and continue",
+    "submitMobile": "Set up and continue"
   }
 }

@@ -11,6 +11,7 @@ import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
+import OnboardingSectionDetails from '../components/molecules/creator-onboarding/OnboardingSectionDetails';
 
 interface ICreatorOnboardingStage2 {
 
@@ -22,15 +23,20 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = () => {
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
+  // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
+  const goToNext = () => {
+    router.push('/dashboard');
+  };
+
   return (
     <>
       <Head>
         <title>{ t('meta.title') }</title>
         <meta name="description" content={t('meta.description')} />
       </Head>
-      <div>
-        hey
-      </div>
+      <OnboardingSectionDetails
+        goToDashboard={goToNext}
+      />
     </>
   );
 };

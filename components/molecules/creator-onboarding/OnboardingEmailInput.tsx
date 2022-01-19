@@ -6,13 +6,13 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
-type TSettingsEmailInput = React.ComponentPropsWithoutRef<'input'> & {
+type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   labelCaption: string;
   errorCaption: string;
 }
 
-const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
+const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   value,
   isValid,
   labelCaption,
@@ -30,7 +30,7 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
       >
         { labelCaption }
       </SLabel>
-      <SSettingsEmailInput
+      <SOnboardingEmailInput
         id="settings_email_input"
         type="email"
         value={value}
@@ -70,21 +70,21 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
   );
 };
 
-SettingsEmailInput.defaultProps = {
+OnboardingEmailInput.defaultProps = {
   isValid: undefined,
 };
 
-export default SettingsEmailInput;
+export default OnboardingEmailInput;
 
 const SContainer = styled.div`
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 344px;
+    width: 284px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 352px;
+    width: 296px;
   }
 `;
 
@@ -99,11 +99,11 @@ const SLabel = styled.label`
   margin-bottom: 6px;
 `;
 
-interface ISSettingsEmailInput {
+interface ISOnboardingEmailInput {
   errorBordersShown?: boolean
 }
 
-const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
+const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
   display: block;
 
   height: 44px;
