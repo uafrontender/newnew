@@ -31,7 +31,25 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
   const [shadowTop, setShadowTop] = useState(false);
   const [shadowBottom, setShadowBottom] = useState(!isMobile);
 
+  const [hasRead, setHasRead] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolledToBottom = (
+        (document.body.scrollHeight - (window.innerHeight + window.pageYOffset)) < 10
+      );
+
+      if (isScrolledToBottom) {
+        setHasRead(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,6 +119,7 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
         />
       </SContainer>
       <OnboardingTosSubmitForm
+        hasScrolledDown={hasRead}
         handleGoToNext={handleGoToNext}
       />
     </>

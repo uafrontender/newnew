@@ -23,6 +23,7 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
+  // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
   const goToNext = () => {
     router.push('/creator-onboarding-stage-2');
   };

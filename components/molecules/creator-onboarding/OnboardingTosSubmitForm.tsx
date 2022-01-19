@@ -9,14 +9,16 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
-import CheckBox from '../CheckBox';
+import CheckMark from '../CheckMark';
 
 interface IOnboardingTosSubmitForm {
   handleGoToNext: () => void;
+  hasScrolledDown?: boolean;
 }
 
 const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm> = ({
   handleGoToNext,
+  hasScrolledDown,
 }) => {
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -26,12 +28,15 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
 
   if (isMobile) {
     return (
-      <SMobileButton
-        view="primaryGrad"
-        onClick={() => handleGoToNext()}
-      >
-        { t('TosSection.submitMobile') }
-      </SMobileButton>
+      <SMobileButtonContainer>
+        <SMobileButton
+          view="primaryGrad"
+          disabled={!hasScrolledDown}
+          onClick={() => handleGoToNext()}
+        >
+          { t('TosSection.submitMobile') }
+        </SMobileButton>
+      </SMobileButtonContainer>
     );
   }
 
@@ -53,15 +58,31 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
   );
 };
 
+OnboardingTosSubmitForm.defaultProps = {
+  hasScrolledDown: undefined,
+};
+
 export default OnboardingTosSubmitForm;
 
-const SMobileButton = styled(Button)`
+const SMobileButtonContainer = styled.div`
   position: fixed;
   left: 16px;
   bottom: 24px;
 
-  height: 56px;
   width: calc(100% - 32px);
+
+  border-radius: 16px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+
+  box-shadow:
+    0px 0px 32px 36px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, .9)' : 'rgba(241, 243, 249, 1)')};
+  ;
+`;
+
+const SMobileButton = styled(Button)`
+  height: 56px;
+  width: 100%;
 `;
 
 const STabletForm = styled.div`
@@ -82,7 +103,7 @@ const STabletForm = styled.div`
   }
 `;
 
-const SCheckBox = styled(CheckBox)`
+const SCheckBox = styled(CheckMark)`
   position: relative;
   top: 12px;
 `;
