@@ -1,5 +1,8 @@
 import React, { useRef, useMemo } from 'react';
-import styled from 'styled-components';
+import Head from 'next/head';
+import { useCookies } from 'react-cookie';
+import styled, { useTheme } from 'styled-components';
+import { SkeletonTheme } from 'react-loading-skeleton';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -7,6 +10,7 @@ import Footer from '../organisms/Footer';
 import Header from '../organisms/Header';
 import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
+import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -28,6 +32,8 @@ export const General: React.FC<IGeneral> = (props) => {
     banner,
     resizeMode,
   } = useAppSelector((state) => state.ui);
+  const theme = useTheme();
+  const [cookies] = useCookies();
   const wrapperRef: any = useRef();
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
@@ -54,7 +60,7 @@ export const General: React.FC<IGeneral> = (props) => {
           },
           {
             key: 'add',
-            url: '/add',
+            url: '/creation',
             width: '20%',
           },
           {
@@ -77,7 +83,7 @@ export const General: React.FC<IGeneral> = (props) => {
           },
           {
             key: 'add',
-            url: '/add',
+            url: '/creation',
             width: '33%',
           },
           {
@@ -100,33 +106,48 @@ export const General: React.FC<IGeneral> = (props) => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   return (
-    <SWrapper
-      id="generalScrollContainer"
-      ref={wrapperRef}
-      withBanner={!!banner?.show}
-      {...props}
-    >
-      <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
-      <SContent>
-        <Container>
-          <Row>
-            <Col>
-              {children}
-            </Col>
-          </Row>
-        </Container>
-      </SContent>
-      <Footer />
-      <BottomNavigation
-        visible={isMobile && scrollDirection !== 'down'}
-        collection={bottomNavigation}
-      />
-      <CookieContainer
-        bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+    <ErrorBoundary>
+      <SkeletonTheme
+        baseColor={theme.colorsThemed.background.secondary}
+        highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <Cookie />
-      </CookieContainer>
-    </SWrapper>
+        <SWrapper
+          id="generalScrollContainer"
+          ref={wrapperRef}
+          withBanner={!!banner?.show}
+          {...props}
+        >
+          <Head>
+            <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
+          </Head>
+          <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
+          <SContent>
+            <Container noMaxContent>
+              <Row>
+                <Col>
+                  {children}
+                </Col>
+              </Row>
+            </Container>
+          </SContent>
+          <Footer />
+          <BottomNavigation
+            visible={isMobile && scrollDirection !== 'down'}
+            collection={bottomNavigation}
+          />
+          <SortingContainer
+            id="sorting-container"
+            withCookie={cookies.accepted !== 'true'}
+            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+          />
+          <CookieContainer
+            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+          >
+            <Cookie />
+          </CookieContainer>
+        </SWrapper>
+      </SkeletonTheme>
+    </ErrorBoundary>
   );
 };
 
@@ -141,7 +162,7 @@ const SWrapper = styled.div<ISWrapper>`
   height: 100vh;
   display: flex;
   overflow-y: auto;
-  transition: all ease 1s;
+  transition: padding ease 0.5s;
   padding-top: ${(props) => (props.withBanner ? 96 : 56)}px;
   padding-bottom: 56px;
   flex-direction: column;
@@ -175,7 +196,7 @@ interface ICookieContainer {
 
 const CookieContainer = styled.div<ICookieContainer>`
   left: 50%;
-  bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
+  bottom: ${(props) => (props.bottomNavigationVisible ? 62 : 6)}px;
   z-index: 10;
   position: fixed;
   transform: translateX(-50%);
@@ -184,5 +205,24 @@ const CookieContainer = styled.div<ICookieContainer>`
 
   ${(props) => props.theme.media.tablet} {
     bottom: ${(props) => (props.bottomNavigationVisible ? 80 : 24)}px;
+  }
+`;
+
+interface ISortingContainer {
+  withCookie: boolean;
+  bottomNavigationVisible: boolean;
+}
+
+const SortingContainer = styled.div<ISortingContainer>`
+  left: 50%;
+  bottom: ${(props) => (props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`)}px;
+  z-index: 10;
+  position: fixed;
+  transform: translateX(-50%);
+  transition: bottom ease 0.5s;
+  pointer-events: none;
+
+  ${(props) => props.theme.media.tablet} {
+    bottom: -100px;
   }
 `;

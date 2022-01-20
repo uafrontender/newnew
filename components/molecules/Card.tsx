@@ -1,12 +1,15 @@
-import React, { useCallback } from 'react';
-import Image from 'next/image';
+/* eslint-disable no-nested-ternary */
+import React, {
+  useContext, useEffect, useRef, useState,
+} from 'react';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../atoms/Text';
 import Button from '../atoms/Button';
-import Caption from '../atoms/Caption';
 import InlineSVG from '../atoms/InlineSVG';
 import UserAvatar from './UserAvatar';
 
@@ -34,6 +37,12 @@ import iconDark8 from '../../public/images/svg/numbers/8_dark.svg';
 import iconDark9 from '../../public/images/svg/numbers/9_dark.svg';
 import iconDark10 from '../../public/images/svg/numbers/10_dark.svg';
 import moreIcon from '../../public/images/svg/icons/filled/More.svg';
+
+// Utils
+import switchPostType from '../../utils/switchPostType';
+import { SocketContext } from '../../contexts/socketContext';
+import { ChannelsContext } from '../../contexts/channelsContext';
+import CardTimer from '../atoms/CardTimer';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -63,111 +72,247 @@ const NUMBER_ICONS: any = {
 };
 
 interface ICard {
-  item: any;
+  item: newnewapi.Post;
   type?: 'inside' | 'outside';
   index: number;
-  preventClick?: boolean;
-  restore?: () => void;
-  onMouseDownCapture?: (e: any) => void;
-  onMouseLeave?: () => void;
+  width?: string;
+  height?: string;
 }
 
-export const Card: React.FC<ICard> = (props) => {
-  const {
-    item,
-    type,
-    index,
-    preventClick,
-    restore,
-    onMouseDownCapture,
-    onMouseLeave,
-  } = props;
+export const Card: React.FC<ICard> = ({
+  item,
+  type,
+  index,
+  width,
+  height,
+}) => {
   const { t } = useTranslation('home');
   const theme = useTheme();
   const router = useRouter();
   const {
     resizeMode,
-    colorMode,
   } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const handleUserClick = () => {
-    router.push('/profile');
+  // Check if video is ready to avoid errors
+  const [videoReady, setVideoReady] = useState(false);
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const {
+    addChannel,
+    removeChannel,
+  } = useContext(ChannelsContext);
+
+  const {
+    ref: cardRef,
+    inView,
+  } = useInView({
+    threshold: 0.55,
+  });
+  const videoRef = useRef<HTMLVideoElement>();
+
+  const [postParsed, typeOfPost] = switchPostType(item);
+  // Live updates stored in local state
+  const [totalAmount, setTotalAmount] = useState<number>(() => (typeOfPost === 'ac'
+    ? (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0
+    : 0));
+  const [totalVotes, setTotalVotes] = useState<number>(() => (typeOfPost === 'mc'
+    ? (postParsed as newnewapi.MultipleChoice).totalVotes ?? 0
+    : 0));
+  const [currentBackerCount, setCurrentBackerCount] = useState<number>(() => (typeOfPost === 'cf'
+    ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
+    : 0));
+
+  const handleUserClick = (username: string) => {
+    router.push(`/u/${username}`);
   };
   const handleMoreClick = () => {
     router.push('/post-detailed');
   };
-  const handleItemClick = useCallback(() => {
-    router.push('/post-detailed');
-  }, [router]);
   const handleBidClick = () => {
     router.push('/post-detailed');
   };
 
-  const onClick = useCallback((e) => {
-    if (preventClick) {
-      e.preventDefault();
-      restore?.();
-      return;
+  useEffect(() => {
+    const handleCanplay = () => {
+      setVideoReady(true);
+    };
+
+    videoRef.current?.addEventListener('canplay', handleCanplay);
+    videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
+
+    return () => {
+      videoRef.current?.removeEventListener('canplay', handleCanplay);
+      videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (videoReady) {
+        if (inView) {
+          videoRef.current?.play();
+        } else {
+          videoRef.current?.pause();
+        }
+      }
+    } catch (err) {
+      console.error(err);
     }
-    handleItemClick();
-  }, [handleItemClick, preventClick, restore]);
+  }, [inView, videoReady]);
+
+  // Increment channel subs after mounting
+  // Decrement when unmounting
+  useEffect(() => {
+    addChannel(
+      postParsed.postUuid,
+      {
+        postUpdates: {
+          postUuid: postParsed.postUuid,
+        },
+      },
+    );
+
+    return () => {
+      removeChannel(postParsed.postUuid);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Subscribe to post updates event
+  useEffect(() => {
+    const handlerSocketPostUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostUpdated.decode(arr);
+
+      if (!decoded) return;
+      const [decodedParsed] = switchPostType(
+        decoded.post as newnewapi.IPost);
+      if (decodedParsed.postUuid === postParsed.postUuid) {
+        if (typeOfPost === 'ac') {
+          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+        }
+        if (typeOfPost === 'cf') {
+          setCurrentBackerCount(decoded.post?.crowdfunding?.currentBackerCount!!);
+        }
+        if (typeOfPost === 'mc') {
+          setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
+        }
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection.on('PostUpdated', handlerSocketPostUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('PostUpdated', handlerSocketPostUpdated);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   if (type === 'inside') {
     return (
       <SWrapper
+        ref={cardRef}
         index={index}
-        onClick={onClick}
-        onMouseLeave={onMouseLeave}
-        onMouseDownCapture={onMouseDownCapture}
+        width={width}
       >
-        {!isMobile && (
-          <SNumberImageHolder index={index}>
-            <InlineSVG
-              svg={NUMBER_ICONS[colorMode][index]}
-              width="100%"
-              height="100%"
-            />
-          </SNumberImageHolder>
-        )}
-        <SImageHolder>
-          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
-          <SImageMask />
-          <STopContent>
-            <SButtonIcon
-              iconOnly
-              id="showMore"
-              view="transparent"
-              onClick={handleMoreClick}
-            >
+        <SContent>
+          {!isMobile && (
+            <SNumberImageHolder index={index}>
               <InlineSVG
-                svg={moreIcon}
-                fill={theme.colors.white}
-                width="20px"
-                height="20px"
+                svg={NUMBER_ICONS[theme.name][index]}
+                width="100%"
+                height="100%"
               />
-            </SButtonIcon>
-          </STopContent>
-          <SBottomContent>
-            <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
-            <SText variant={3} weight={600}>
-              {item.title}
-            </SText>
-          </SBottomContent>
-        </SImageHolder>
+            </SNumberImageHolder>
+          )}
+          <SImageHolder index={index}>
+            <video
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              // NB! Might use this one to avoid waisting user's resources
+              // and use a poster here NB!
+              // preload="none"
+              loop
+              muted
+              playsInline
+            >
+              <source
+                src={postParsed.announcement?.thumbnailUrl ?? ''}
+                type="video/mp4"
+              />
+            </video>
+            <SImageMask />
+            <STopContent>
+              <SButtonIcon
+                iconOnly
+                id="showMore"
+                view="transparent"
+                onClick={handleMoreClick}
+              >
+                <InlineSVG
+                  svg={moreIcon}
+                  fill={theme.colors.white}
+                  width="20px"
+                  height="20px"
+                />
+              </SButtonIcon>
+            </STopContent>
+            <SBottomContent>
+              <SUserAvatar
+                withClick
+                avatarUrl={postParsed.creator?.avatarUrl!!}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUserClick(postParsed.creator?.username!!);
+                }}
+              />
+              <SText variant={3} weight={600}>
+                {postParsed.title}
+              </SText>
+            </SBottomContent>
+          </SImageHolder>
+        </SContent>
       </SWrapper>
     );
   }
 
   return (
     <SWrapperOutside
-      onClick={onClick}
-      onMouseLeave={onMouseLeave}
-      onMouseDownCapture={onMouseDownCapture}
+      ref={cardRef}
+      width={width}
     >
-      <SImageBG id="backgroundPart">
+      <SImageBG
+        id="backgroundPart"
+        height={height}
+      >
         <SImageHolderOutside id="animatedPart">
-          <Image src={item.url} objectFit="cover" layout="fill" draggable={false} />
+          <video
+            // src={postParsed.announcement?.thumbnailUrl as string}
+            // src="/video/mock/mock_video_1.mp4"
+            // Temp
+            // src={postParsed.announcement?.thumbnailUrl ?? ''}
+            ref={(el) => {
+              videoRef.current = el!!;
+            }}
+            // NB! Might use this one to avoid waisting user's resources
+            // and use a poster here NB!
+            // preload="none"
+            loop
+            muted
+            playsInline
+          >
+            <source
+              src={postParsed.announcement?.thumbnailUrl ?? ''}
+              type="video/mp4"
+            />
+          </video>
           <STopContent>
             <SButtonIcon
               iconOnly
@@ -187,31 +332,49 @@ export const Card: React.FC<ICard> = (props) => {
       </SImageBG>
       <SBottomContentOutside>
         <SBottomStart>
-          <SUserAvatar user={item.user} withClick onClick={handleUserClick} />
+          <SUserAvatar
+            avatarUrl={postParsed?.creator?.avatarUrl!!}
+            withClick
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUserClick(postParsed.creator?.username!!);
+            }}
+          />
           <STextOutside variant={3} weight={600}>
-            {item.title}
+            {postParsed.title}
           </STextOutside>
         </SBottomStart>
-        <SBottomEnd type={item.type}>
+        <SBottomEnd
+          type={typeOfPost}
+        >
           <SButton
             withDim
             withShrink
-            view={item.type === 'cf' ? 'primaryProgress' : 'primary'}
+            view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
             onClick={handleBidClick}
-            cardType={item.type}
-            progress={item.type === 'cf' ? (item.backed * 100) / item.total : 0}
-            withProgress={item.type === 'cf'}
+            cardType={typeOfPost}
+            progress={typeOfPost === 'cf' ? (
+              Math.floor((currentBackerCount * 100)
+              / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
+            ) : 0}
+            withProgress={typeOfPost === 'cf'}
           >
-            {t(`button-card-${item.type}`, {
-              votes: item.votes,
-              total: formatNumber(item.total),
-              backed: formatNumber(item.backed),
-              amount: `$${formatNumber(item.amount)}`,
+            {t(`button-card-${typeOfPost}`, {
+              votes: totalVotes,
+              total: formatNumber(
+                (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
+                true,
+              ),
+              backed: formatNumber(
+                currentBackerCount ?? 0,
+                true,
+              ),
+              amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
             })}
           </SButton>
-          <SCaption variant={2} weight={700}>
-            {t('card-time-left', { time: '24h 40m' })}
-          </SCaption>
+          <CardTimer
+            timestampSeconds={new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()}
+          />
         </SBottomEnd>
       </SBottomContentOutside>
     </SWrapperOutside>
@@ -222,17 +385,13 @@ export default Card;
 
 Card.defaultProps = {
   type: 'outside',
-  preventClick: false,
-  restore: () => {
-  },
-  onMouseDownCapture: () => {
-  },
-  onMouseLeave: () => {
-  },
+  width: '',
+  height: '',
 };
 
 interface ISWrapper {
   index?: number;
+  width?: string;
 }
 
 const SWrapper = styled.div<ISWrapper>`
@@ -243,6 +402,14 @@ const SWrapper = styled.div<ISWrapper>`
   position: relative;
   align-items: flex-end;
   flex-direction: row;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   ${(props) => props.theme.media.tablet} {
     width: ${(props) => {
@@ -272,12 +439,28 @@ const SWrapper = styled.div<ISWrapper>`
     return '406px';
   }};
     height: 384px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    width: 25vw;
+    height: unset;
 
     :hover {
       #showMore {
         opacity: 1;
       }
     }
+  }
+
+  ${(props) => props.theme.media.desktop} {
+    width: 20vw;
+  }
+`;
+
+const SContent = styled.div`
+  ${(props) => props.theme.media.laptopL} {
+    width: 100%;
+    padding: 50% 0;
   }
 `;
 
@@ -307,9 +490,23 @@ const SNumberImageHolder = styled.div<ISWrapper>`
   }};
     height: 280px;
   }
+
+  ${(props) => props.theme.media.laptopL} {
+    left: 0;
+    bottom: 0;
+    height: 70%;
+    position: absolute;
+    width: ${(props) => {
+    if (props.index === 10) {
+      return '90%';
+    }
+
+    return '55%';
+  }};
+  }
 `;
 
-const SImageHolder = styled.div`
+const SImageHolder = styled.div<ISWrapper>`
   top: 0;
   right: 0;
   width: 254px;
@@ -325,10 +522,35 @@ const SImageHolder = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     width: 212px;
+    padding: 12px;
   }
 
   ${(props) => props.theme.media.laptop} {
     width: 256px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    width: ${(props) => {
+    if (props.index === 1) {
+      return '70%';
+    }
+
+    if (props.index === 10) {
+      return '55%';
+    }
+
+    return '65%';
+  }};
+  }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
   }
 `;
 
@@ -362,21 +584,28 @@ const SText = styled(Text)`
   color: ${(props) => props.theme.colors.white};
   display: -webkit-box;
   overflow: hidden;
+  position: relative;
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `;
 
 const SWrapperOutside = styled.div<ISWrapper>`
-  width: 100vw;
+  width: ${(props) => props.width};
   cursor: pointer;
   display: flex;
   position: relative;
   flex-direction: column;
 
-  ${(props) => props.theme.media.tablet} {
-    width: 200px;
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
+  ${(props) => props.theme.media.tablet} {
     :hover {
       #animatedPart {
         transform: translateY(-10px);
@@ -385,8 +614,6 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: 224px;
-
     :hover {
       #showMore {
         opacity: 1;
@@ -395,18 +622,17 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 `;
 
-const SImageBG = styled.div`
+interface ISImageBG {
+  height?: string;
+}
+
+const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  height: 564px;
+  padding: 75% 0;
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
-    height: 300px;
     border-radius: ${(props) => props.theme.borderRadius.medium};
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    height: 336px;
   }
 `;
 
@@ -421,8 +647,19 @@ const SImageHolderOutside = styled.div`
   transition: all ease 0.5s;
 
   ${(props) => props.theme.media.tablet} {
+    padding: 12px;
     overflow: hidden;
     border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
   }
 `;
 
@@ -440,6 +677,7 @@ const STextOutside = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   display: -webkit-box;
   overflow: hidden;
+  position: relative;
   margin-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -505,10 +743,6 @@ const SButton = styled(Button)<ISButtonSpan>`
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
   }
-`;
-
-const SCaption = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
 const SUserAvatar = styled(UserAvatar)`

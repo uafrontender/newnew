@@ -21,6 +21,7 @@ export const Desktop: React.FC<IDesktop> = () => {
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const handleCreateClick = () => {
+    router.push('/creation');
   };
   const handleDashboardClick = () => {
     router.push('/dashboard');
@@ -99,7 +100,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 <SItemWithMargin>
                   <UserAvatar
                     withClick
-                    user={user}
+                    avatarUrl={user.userData?.avatarUrl}
                     onClick={handleUserClick}
                   />
                 </SItemWithMargin>
@@ -120,7 +121,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 <SItemWithMargin>
                   <UserAvatar
                     withClick
-                    user={user}
+                    avatarUrl={user.userData?.avatarUrl}
                     onClick={handleUserClick}
                   />
                 </SItemWithMargin>
@@ -172,12 +173,4 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
-
-  ${(props) => props.theme.media.tablet} {
-    margin-left: 24px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-left: 16px;
-  }
 `;

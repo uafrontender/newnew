@@ -4,15 +4,30 @@ import { debounce } from 'lodash';
 import { useInView } from 'react-intersection-observer';
 import styled, { css } from 'styled-components';
 
+import Lottie from './Lottie';
 import RippleAnimation from './RippleAnimation';
 
+import logoAnimation from '../../public/animations/mobile_logo.json';
+
 type TButton = React.ComponentPropsWithoutRef<'button'>;
-type TView = 'primary' | 'primaryGrad' | 'primaryProgress' | 'secondary' | 'tertiary' | 'quaternary' | 'changeLanguage' | 'transparent';
+type TView =
+  'primary'
+  | 'primaryGrad'
+  | 'primaryProgress'
+  | 'secondary'
+  | 'modalSecondary'
+  | 'modalSecondarySelected'
+  | 'tertiary'
+  | 'quaternary'
+  | 'changeLanguage'
+  | 'transparent'
+  | 'danger';
 type TSize = 'sm' | 'lg';
 
 interface IButton {
   size?: TSize,
   view?: TView,
+  loading?: boolean,
   progress?: number,
   iconOnly?: boolean,
   withDim?: boolean,
@@ -24,6 +39,7 @@ interface IButton {
 
 const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   const {
+    loading,
     children,
     disabled,
     withRipple,
@@ -31,7 +47,10 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     onClick,
     ...rest
   } = props;
-  const { ref, inView }: { ref: any, inView: boolean } = useInView();
+  const {
+    ref,
+    inView,
+  }: { ref: any, inView: boolean } = useInView();
   // Progress effect
   const [progress, setProgress] = useState(0);
   // Ripple effect
@@ -112,6 +131,19 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
       {withProgress && (
         <SProgress view={rest.view} progress={progress} />
       )}
+      {loading && (
+        <SLoader size={rest.size}>
+          <Lottie
+            width={25}
+            height={20}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: logoAnimation,
+            }}
+          />
+        </SLoader>
+      )}
     </SButton>
   );
 };
@@ -120,6 +152,7 @@ Button.defaultProps = {
   size: 'sm',
   view: 'primary',
   withDim: false,
+  loading: false,
   progress: 0,
   iconOnly: false,
   withShadow: false,
@@ -175,7 +208,7 @@ const SButton = styled.button<ISButton>`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   white-space: nowrap;
 
   font-size: 14px;
@@ -211,29 +244,44 @@ const SButton = styled.button<ISButton>`
   -ms-user-select: none;
   user-select: none;
 
-  ${(props) => props.withShadow && css`
-    box-shadow: ${props.theme.shadows.mediumBlue};
+  // for gradient button background animation on hover
+  ${(props) => props.view === 'primaryGrad' && css`
+    :after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+      opacity: 0;
+      z-index: 1;
+      position: absolute;
+      background: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+      transition: opacity 0.2s linear;
+    }
   `}
-
   &:active:enabled {
     outline: none;
     background: ${(props) => props.theme.colorsThemed.button.active[props.view ?? 'primary']};
-    
-    ${(props) => props.withShadow && css`
-      box-shadow: none;
-    `}
   }
-  
+
   &:focus:enabled,
   &:hover:enabled {
     outline: none;
-    background: ${(props) => props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+
+    ${(props) => (props.view === 'primaryGrad' ? css`
+      // for gradient button background animation on hover
+      :after {
+        opacity: 1;
+      }
+    ` : css`
+      background: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
+    `)}
 
     ${(props) => props.withShadow && css`
       box-shadow: ${props.theme.shadows.intenseBlue};
     `}
   }
-  
+
   &:disabled {
     cursor: default;
     opacity: .5;
@@ -241,38 +289,40 @@ const SButton = styled.button<ISButton>`
   }
 
   span {
-    z-index: 1;
+    z-index: 3;
     font-weight: 700;
   }
-  
+
   ${(props) => props.withRipple && css`
     &::before {
-    position: absolute;
-    
-    top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
-    left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
+      position: absolute;
 
-    border-radius: 50%;
+      top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
+      left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
 
-    width: ${props.elementWidth * 2}px;
-    height: ${props.elementWidth * 2}px;
+      border-radius: 50%;
 
-    transform: scale(0);
-    transform-origin: center;
+      z-index: 2;
+      
+      width: ${props.elementWidth * 2}px;
+      height: ${props.elementWidth * 2}px;
 
-    // NB! Temp
-    content: '';
+      transform: scale(0);
+      transform-origin: center;
 
-    background: ${props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
+      // NB! Temp
+      content: '';
 
-    ${(props.isRippling && css`
-      animation-duration: .9s;
-      animation-fill-mode: forwards;
-      animation-name: ${RippleAnimation};
-  `)}
-  }
+      background: ${props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
+
+      ${(props.isRippling && css`
+        animation-duration: .9s;
+        animation-fill-mode: forwards;
+        animation-name: ${RippleAnimation};
+      `)}
+    }
   `}
-  
+
   ${(props) => (props.withShrink && css`
     &:active {
       transform: scale(0.9);
@@ -284,4 +334,16 @@ const SButton = styled.button<ISButton>`
       opacity: 0.5;
     }
   `)}
+`;
+
+interface ISLoader {
+  size?: TSize
+}
+
+const SLoader = styled.div<ISLoader>`
+  top: 50%;
+  right: ${(props) => (props.size === 'sm' ? '0px' : '16px')};
+  z-index: 20;
+  position: absolute;
+  transform: translateY(-50%);
 `;

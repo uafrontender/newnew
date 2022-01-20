@@ -1,8 +1,12 @@
 // Configuration & helper functions file for the RESTful API endpoints
 import { newnewapi } from 'newnew-api';
 import * as $protobuf from 'protobufjs';
+import { Cookies } from 'react-cookie';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+// Initialize global Cookies instance available throughout the whole app
+export const cookiesInstance = new Cookies();
 
 /**
  * Universal interface for RESTful API responses
@@ -35,14 +39,18 @@ export interface EncDec<T = keyof NewnewapiType> {
  * returns an Array Buffer that can be decoded in the outer function.
  * @param response browser Fetch API response
  */
-export const handleProtobufResponse = (response: Response) => {
+export const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
   const contentType = response.headers.get('content-type');
 
-  if (response.ok && contentType && contentType.indexOf('application/x-protobuf') !== -1) {
-    return response.arrayBuffer();
-  }
-
-  throw new Error('Request failed');
+  return new Promise((resolve, reject) => {
+    if (response.ok && contentType && contentType.indexOf('application/x-protobuf') !== -1) {
+      resolve(response.arrayBuffer());
+    }
+    if (response.status >= 401 && response.status < 404) {
+      reject(new Error('Access token invalid'));
+    }
+    reject(new Error('An error occured'));
+  });
 };
 
 /**
@@ -67,7 +75,7 @@ ResponseType = keyof NewnewapiType>(
   reqT: EncDec<RequestType>,
   resT: EncDec<ResponseType>,
   url: string,
-  method: Request['method'] = 'get',
+  method: Request['method'],
   payload?: RequestType,
   headers: any = {},
   mode: Request['mode'] = 'cors',
@@ -86,7 +94,10 @@ ResponseType = keyof NewnewapiType>(
       credentials,
       ...(encoded ? { body: encoded } : {}),
     })
-      .then((response) => handleProtobufResponse(response));
+      .then((response) => handleProtobufResponse(response))
+      .catch((err) => {
+        throw err;
+      });
 
     return {
       data: resT.decode(new Uint8Array(buff)),
@@ -94,6 +105,168 @@ ResponseType = keyof NewnewapiType>(
   } catch (err) {
     return {
       error: err as Error,
+    };
+  }
+}
+
+// Tries to refresh credentials if access token has expired
+export const refreshCredentials = (
+  payload: newnewapi.RefreshCredentialRequest,
+) => fetchProtobuf<newnewapi.RefreshCredentialRequest, newnewapi.RefreshCredentialResponse>(
+  newnewapi.RefreshCredentialRequest,
+  newnewapi.RefreshCredentialResponse,
+  `${BASE_URL}/auth/refresh_credential`,
+  'post',
+  payload,
+);
+
+export type TTokenCookie = {
+  name: string,
+  value: string,
+  expires?: string,
+  maxAge?: string,
+}
+
+/**
+ * This function is wrapper around `fetchProtobuf` function,
+ * but is aimed at the requests to protected routes. It can
+ * a) Try to get credential tokens from react-cookie instance
+ * b) Use the credentials tokens passed to it, if the request
+ * happens server-side, it will then update cookies using callback
+ * @template RequestType request type defined in `newnew-api`
+ * @template ResponseType response type defined in `newnew-api`
+ * @param reqT the request protobuf message
+ * @param resT the response protobuf message
+ * @param url resource string, necessary query params are also set here
+ * @param method HTTP method
+ * @param payload payload to be sent to the API
+ * @param serverSideTokens access and refresh tokens, when used server-side
+ * @param updateCookieServerSideCallback used to update cookies server-side
+ */
+export async function fetchProtobufProtectedIntercepted<
+RequestType = keyof NewnewapiType,
+ResponseType = keyof NewnewapiType>(
+  reqT: EncDec<RequestType>,
+  resT: EncDec<ResponseType>,
+  url: string,
+  method: Request['method'],
+  payload?: RequestType,
+  serverSideTokens?: {
+    accessToken: string;
+    refreshToken: string;
+  },
+  updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void,
+): Promise<APIResponse<ResponseType>> {
+  // Declare response
+  let res: APIResponse<ResponseType>;
+  // Try to get tokens - from react-cookie instance or from passed params
+  const accessToken = serverSideTokens?.accessToken ?? cookiesInstance.get('accessToken');
+  const refreshToken = serverSideTokens?.refreshToken ?? cookiesInstance.get('refreshToken');
+
+  try {
+    if (!accessToken && !refreshToken) throw new Error('No token');
+    if (!accessToken && refreshToken) throw new Error('Access token invalid');
+
+    // Try to make request if access and refresh tokens are present
+    res = await fetchProtobuf<
+    RequestType, ResponseType>(
+      reqT,
+      resT,
+      url,
+      method,
+      payload,
+      {
+        'x-auth-token': accessToken,
+      },
+    );
+
+    // Throw an error if the access token was invalid
+    if (!res.data && res.error?.message === 'Access token invalid') {
+      throw new Error(res.error?.message);
+    }
+
+    return res;
+  } catch (errFirstAttempt) {
+    // Invalid acces token, refresh and try again
+    if ((errFirstAttempt as Error).message === 'Access token invalid') {
+      try {
+        const refreshPayload = new newnewapi.RefreshCredentialRequest({
+          refreshToken,
+        });
+        const resRefresh = await refreshCredentials(refreshPayload);
+
+        // Refresh failed, session "expired"
+        // (i.e. user probably logged in from another device, or exceeded
+        // max number of logged in devices/browsers)
+        if (!resRefresh.data || resRefresh.error) throw new Error('Refresh token invalid');
+
+        // Refreshed succeded, re-set access and refresh tokens
+        // Client side
+        if (!serverSideTokens) {
+          cookiesInstance.set(
+            'accessToken',
+            resRefresh.data.credential?.accessToken,
+            {
+              expires: new Date((
+                resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000),
+            },
+          );
+          cookiesInstance.set(
+            'refreshToken',
+            resRefresh.data.credential?.refreshToken,
+            {
+              // Expire in 10 years
+              maxAge: (10 * 365 * 24 * 60 * 60),
+            },
+          );
+        } else {
+          // Server-side
+          updateCookieServerSideCallback?.([
+            {
+              name: 'accessToken',
+              value: resRefresh.data.credential?.accessToken!!,
+              expires: new Date((
+                resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000)
+                .toUTCString(),
+            },
+            {
+              name: 'refreshToken',
+              value: resRefresh.data.credential?.refreshToken!!,
+              maxAge: (10 * 365 * 24 * 60 * 60).toString(),
+            },
+          ]);
+        }
+        // Try request again with new credentials
+        res = await fetchProtobuf<
+          RequestType, ResponseType>(
+            reqT,
+            resT,
+            url,
+            method,
+            payload,
+            {
+              'x-auth-token': resRefresh.data.credential?.accessToken,
+            },
+          );
+        return res;
+      } catch (errSecondAttempt) {
+        // If error is auth-related - throw
+        if (
+          (errSecondAttempt as Error).message === 'Refresh token invalid'
+        ) throw new Error((errSecondAttempt as Error).message);
+        // Return as APIResponse.error
+        return {
+          error: errSecondAttempt as Error,
+        };
+      }
+    }
+    // If error is auth-related - throw
+    if (
+      (errFirstAttempt as Error).message === 'No token'
+    ) throw new Error((errFirstAttempt as Error).message);
+    // Return as APIResponse.error
+    return {
+      error: errFirstAttempt as Error,
     };
   }
 }

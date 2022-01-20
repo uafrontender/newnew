@@ -1,8 +1,10 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
-import { useAppSelector } from '../redux-store/store';
 import GlobalStyle from './globalStyles';
+
+import getColorMode from '../utils/getColorMode';
+import { useAppSelector } from '../redux-store/store';
 import { darkTheme, lightTheme } from './themes';
 
 const GlobalTheme: React.FunctionComponent = ({ children }) => {
@@ -10,10 +12,10 @@ const GlobalTheme: React.FunctionComponent = ({ children }) => {
 
   return (
     <ThemeProvider
-      theme={colorMode === 'light' ? lightTheme : darkTheme}
+      theme={getColorMode(colorMode) === 'light' ? lightTheme : darkTheme}
     >
       <GlobalStyle />
-      { children }
+      {children}
     </ThemeProvider>
   );
 };

@@ -5,24 +5,35 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import InlineSVG from '../atoms/InlineSVG';
-import AnimatedPresence from '../atoms/AnimatedPresence';
+import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
+import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
 
 export const Cookie = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();
+  const [animation, setAnimation] = useState('trans-06');
   const [animateCookie, setAnimateCookie] = useState(false);
-  const [animationDirection, setAnimationDirection] = useState('up');
 
   const handleClose = () => {
-    setAnimationDirection('down');
+    setAnimation('trans-06-reverse');
     setAnimateCookie(true);
     setCookie('accepted', true);
   };
   const handleAnimationEnd = () => {
     setAnimateCookie(false);
+  };
+  const handleMouseOver = () => {
+    setAnimation('o-11');
+    setAnimateCookie(true);
+  };
+  const handleMouseLeave = () => {
+    if (animation === 'o-11') {
+      setAnimation('o-11-reverse');
+      setAnimateCookie(true);
+    }
   };
 
   useEffect(() => {
@@ -36,13 +47,22 @@ export const Cookie = () => {
   return (
     <AnimatedPresence
       start={animateCookie}
-      animation={animationDirection === 'down' ? 'trans-06-reverse' : 'trans-06'}
+      animation={animation as TAnimation}
       onAnimationEnd={handleAnimationEnd}
+      animateWhenInView={false}
     >
-      <SContainer>
+      <SContainer
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
+      >
         <SText>
           {t('cookie-text')}
         </SText>
+        <SInlineSVG
+          svg={cookieIcon}
+          width="20px"
+          height="20px"
+        />
         <Link href="/cookies">
           <a>
             <STextLink>
@@ -67,10 +87,11 @@ export const Cookie = () => {
 export default Cookie;
 
 const SContainer = styled.div`
+  margin: 10px;
   display: flex;
-  padding: 12px 20px;
+  padding: 12px 12px 12px 20px;
   box-shadow: ${(props) => props.theme.shadows.cookie};
-  background: ${(props) => props.theme.colorsThemed.grayscale.backgroundCookie};
+  background: ${(props) => props.theme.colorsThemed.background.backgroundCookie};
   align-items: center;
   border-radius: 50px;
   pointer-events: all;
@@ -83,6 +104,7 @@ const SText = styled.div`
   font-weight: bold;
   line-height: 24px;
   white-space: nowrap;
+  margin-right: 2px;
 `;
 
 const STextLink = styled.div`
@@ -98,4 +120,9 @@ const STextLink = styled.div`
   ${(props) => props.theme.media.tablet} {
     margin: 0 8px;
   }
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  top: -1px;
+  position: relative;
 `;

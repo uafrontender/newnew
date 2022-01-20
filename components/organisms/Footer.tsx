@@ -202,20 +202,12 @@ export const Footer: React.FC<IFooter> = () => {
 export default Footer;
 
 const SWrapper = styled.footer`
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundFooter};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundFooter};
 `;
 
 const SContent = styled.div`
   padding: 32px 0;
   position: relative;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 32px 0;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    padding: 32px 0;
-  }
 `;
 
 const STopContent = styled.div`
@@ -245,7 +237,7 @@ const SBlock = styled.div`
 const SSeparator = styled.div`
   margin-top: 12px;
   margin-bottom: 24px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.grayscale.outlines1};
+  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 36px;

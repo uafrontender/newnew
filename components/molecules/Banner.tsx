@@ -40,7 +40,10 @@ export const Banner: React.FC<IBanner> = () => {
       </SText>
       {!isMobile && (
         <SIconHolder>
-          <AnimatedPresence start animation="t-10">
+          <AnimatedPresence
+            animation="t-10"
+            animateWhenInView={false}
+          >
             <InlineSVG
               svg={arrowIcon}
               fill={theme.colors.white}
@@ -72,15 +75,11 @@ interface ISContainer {
 }
 
 const SContainer = styled.div<ISContainer>`
-  top: ${(props) => (props.active ? 0 : -40)}px;
-  left: 0;
-  right: 0;
   height: 40px;
   cursor: pointer;
   display: flex;
   overflow: hidden;
-  position: absolute;
-  transition: all ease 1s;
+  position: relative;
   background: ${(props) => props.theme.colorsThemed.accent.pink};
   align-items: center;
   justify-content: center;
@@ -110,6 +109,7 @@ const SText = styled(Text)`
   color: ${(props) => props.theme.colors.white};
   z-index: 2;
   overflow: hidden;
+  position: relative;
   max-width: 70%;
   text-align: center;
   white-space: nowrap;

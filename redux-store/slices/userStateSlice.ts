@@ -1,13 +1,13 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { newnewapi } from 'newnew-api';
+import router from 'next/router';
+import { cookiesInstance } from '../../api/apiConfigs';
 
 import { DEFAULT_CURRENCY } from '../../constants/general';
+import { AppThunk } from '../store';
 
-export type TUserData = Omit<newnewapi.Me, 'toJSON' | '_displayname' | '_email'>;
-export type TCredentialsData = Omit<newnewapi.Credential, 'toJSON' | 'expiresAt'> & {
-  expiresAt: string;
-};
+export type TUserData = Omit<newnewapi.Me, 'toJSON' | '_nickname' | '_email'>;
 
 export interface IUserStateInterface {
   role: string;
@@ -21,7 +21,6 @@ export interface IUserStateInterface {
   notificationsCount: number;
   directMessagesCount: number;
   userData?: TUserData;
-  credentialsData?: TCredentialsData;
 }
 
 const defaultUIState: IUserStateInterface = {
@@ -59,8 +58,19 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setUserData(state, { payload }: PayloadAction<TUserData>) {
       state.userData = { ...state.userData, ...payload };
     },
-    setCredentialsData(state, { payload }: PayloadAction<TCredentialsData>) {
-      state.credentialsData = { ...state.credentialsData, ...payload };
+    logoutUser(state) {
+      state.loggedIn = false;
+      state.userData = {
+        avatarUrl: '',
+        userUuid: '',
+        username: '',
+        usernameChangedAt: undefined,
+        email: '',
+        coverUrl: '',
+        nickname: '',
+        bio: '',
+        options: {},
+      };
     },
   },
 });
@@ -72,7 +82,17 @@ export const {
   setUserCurrency,
   setSignupEmailInput,
   setUserData,
-  setCredentialsData,
+  logoutUser,
 } = userSlice.actions;
 
 export default userSlice.reducer;
+
+// Thunks
+export const logoutUserClearCookiesAndRedirect = (
+  redirectUrl?: string,
+): AppThunk => (dispatch) => {
+  dispatch(logoutUser(''));
+  cookiesInstance.remove('accessToken');
+  cookiesInstance.remove('refreshToken');
+  router.push(redirectUrl ?? '/');
+};

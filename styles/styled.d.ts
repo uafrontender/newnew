@@ -15,12 +15,18 @@ declare module 'styled-components' {
       white: string,
       black: string,
       blue: string,
+      dark: string,
     };
     colorsThemed: {
-      grayscale: {
-        background1: string;
-        background2: string;
-        background3: string;
+      statusBar: {
+        background: string;
+      },
+      background: {
+        primary: string;
+        secondary: string;
+        tertiary: string;
+        quaternary: string;
+        quinary: string;
         backgroundT: string;
         backgroundDD: string;
         backgroundDDSelected: string;
@@ -32,6 +38,11 @@ declare module 'styled-components' {
         numbers: string;
         backgroundFooter: string;
         backgroundHeader: string;
+        backgroundErrorPopup: string;
+        // Used for overlaydim
+        overlayDim: string;
+        thumbLineHidden: string;
+        thumbLineVisible: string;
       },
       text: {
         // Used for both links and titles.
@@ -72,6 +83,21 @@ declare module 'styled-components' {
           hover: string;
           pressed: string;
         },
+        instagram: {
+          main: string,
+          hover: string,
+          pressed: string,
+        },
+        tiktok: {
+          main: string,
+          hover: string,
+          pressed: string,
+        },
+        copy: {
+          main: string,
+          hover: string,
+          pressed: string,
+        },
       },
       tag: {
         color: {
@@ -87,40 +113,52 @@ declare module 'styled-components' {
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         background: {
           primary: string,
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         hover: {
           primary: string,
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         active: {
           primary: string,
           primaryGrad: string,
           primaryProgress: string,
           secondary: string,
+          modalSecondary: string,
+          modalSecondarySelected: string,
           tertiary: string,
           quaternary: string,
           transparent: string,
           changeLanguage: string,
+          danger: string,
         },
         ripple: {
           primary: string,
@@ -130,6 +168,7 @@ declare module 'styled-components' {
         progress: {
           primaryProgress: string,
         },
+        disabled: string,
       },
     },
     shadows: {
@@ -146,6 +185,14 @@ declare module 'styled-components' {
       heroNotifications: string,
       heroNotificationsTablet: string,
       bannerPink: string,
+      calendarTop: string,
+      calendarBottom: string,
+      creationSubmit: string,
+      decisionOption: {
+        yellow: string,
+        blue: string,
+        green: string,
+      },
     },
     borderRadius: {
       small: string,

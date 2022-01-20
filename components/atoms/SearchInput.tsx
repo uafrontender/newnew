@@ -83,7 +83,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       // eslint-disable-next-line max-len
-      setInputRightPosition(-(window.innerWidth - inputContainerRef.current?.getBoundingClientRect()?.right - (isMobile ? 16 : 32)));
+      setInputRightPosition(-(window.innerWidth - (inputContainerRef.current?.getBoundingClientRect()?.right || 0) - (isMobile ? 16 : 32)));
     });
 
     resizeObserver.observe(document.body);
@@ -155,7 +155,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   top: 50%;
   width: ${(props) => (props.active ? 'calc(100vw - 32px)' : '36px')};
   right: ${(props) => (props.active ? props.rightPosition : 0)}px;
-  border: 1.5px solid ${(props) => (props.active ? props.theme.colorsThemed.grayscale.outlines2 : 'transparent')};
+  border: 1.5px solid ${(props) => (props.active ? props.theme.colorsThemed.background.outlines2 : 'transparent')};
   z-index: 3;
   padding: 6.5px;
   display: flex;
@@ -164,7 +164,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   transform: translateY(-50%);
   max-height: 100%;
   transition: all ease 0.5s;
-  background: ${(props) => props.theme.colorsThemed.grayscale[props.active ? 'background1' : 'background2']};
+  background: ${(props) => props.theme.colorsThemed.background[props.active ? 'primary' : 'secondary']};
   border-radius: 12px;
   flex-direction: row;
   justify-content: space-between;

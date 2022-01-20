@@ -192,7 +192,7 @@ const SSignInButton = styled.button<SISignInButton>`
   padding: 16px 20px 16px 22%;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   ${({ theme, hoverBgColor, hoverContentColor }) => (hoverBgColor && hoverContentColor
     ? css`& path {
@@ -285,12 +285,12 @@ const SSignInButton = styled.button<SISignInButton>`
   ` : null)}
 
   &:enabled:active {
-    transform: scale(.9);
+    transform: scale(0.9);
     background: ${({ noRipple, pressedBgColor }) => (
     noRipple ? (
       pressedBgColor
     ) : 'initial')};
-    transition: .2s ease-in-out;
+    transition: .2s linear;
   }
 
   &:disabled {

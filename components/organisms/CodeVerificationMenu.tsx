@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
@@ -7,13 +5,16 @@ import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useCookies } from 'react-cookie';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setSignupEmailInput, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import {
+  setSignupEmailInput, setUserData, setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 
 // API
-import { signInWithEmail } from '../../api/endpoints/auth';
+import { sendVerificationEmail, signInWithEmail } from '../../api/endpoints/auth';
 
 // Components
 import Text from '../atoms/Text';
@@ -25,7 +26,6 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
-import sleep from '../../utils/sleep';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
 export interface ICodeVerificationMenu {
@@ -44,6 +44,12 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
+  // useCookies
+  const [, setCookie] = useCookies();
+
+  // isSuccess - no bottom sections
+  const [isSucces, setIsSuccess] = useState(false);
+
   // Code input
   const [isSigninWithEmailLoading, setIsSigninWithEmailLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>('');
@@ -55,49 +61,84 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   // Timer
   const [timerSeconds, setTimerSeconds] = useState(expirationTime);
   const [timerActive, setTimerActive] = useState(false);
+  const [timerHidden, setTimerHidden] = useState(false);
   const interval = useRef<number>();
 
   const onCodeComplete = useCallback(async (completeCode: string) => {
+    if (!signupEmailInput) return;
     try {
-      setTimerActive(false);
       setSubmitError('');
+      setTimerHidden(true);
       setIsSigninWithEmailLoading(true);
 
-      // NB! Temp
-      await sleep(2000);
-
-      if (completeCode !== '123456') throw new Error('Request failed');
-
-      /* const signInRequest = new newnewapi.EmailSignInRequest({
+      const signInRequest = new newnewapi.EmailSignInRequest({
         emailAddress: signupEmailInput,
         verificationCode: completeCode,
       });
 
       const { data, error } = await signInWithEmail(signInRequest);
 
-      if (!data || !error) throw new Error(error?.message ?? 'Request failed'); */
+      if (
+        !data
+        || data.status !== newnewapi.SignInResponse.Status.SUCCESS
+        || error
+      ) throw new Error(error?.message ?? 'Request failed');
+
+      dispatch(setUserData({
+        username: data.me?.username,
+        nickname: data.me?.nickname,
+        email: data.me?.email,
+        avatarUrl: data.me?.avatarUrl,
+        coverUrl: data.me?.coverUrl,
+        userUuid: data.me?.userUuid,
+        bio: data.me?.bio,
+        options: {
+          isActivityPrivate: data.me?.options?.isActivityPrivate,
+          isCreator: data.me?.options?.isCreator,
+          isVerified: data.me?.options?.isVerified,
+        },
+      }));
+      // Set credential cookies
+      setCookie(
+        'accessToken',
+        data.credential?.accessToken,
+        {
+          expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+        },
+      );
+      setCookie(
+        'refreshToken',
+        data.credential?.refreshToken,
+        {
+          // Expire in 10 years
+          maxAge: (10 * 365 * 24 * 60 * 60),
+        },
+      );
+
+      // Set logged in and
+      dispatch(setUserLoggedIn(true));
+      dispatch(setSignupEmailInput(''));
 
       // Clean up email state, sign in the user with the response & redirect home
       setTimerActive(false);
 
       setIsSigninWithEmailLoading(false);
-
-      dispatch(setSignupEmailInput(''));
-      dispatch(setUserLoggedIn(true));
+      setIsSuccess(true);
 
       router.push('/');
     } catch (err: any) {
       setIsSigninWithEmailLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
       setTimerActive(true);
+      setTimerHidden(false);
     }
   },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   [
     setIsSigninWithEmailLoading,
     setSubmitError,
-    signupEmailInput,
     setTimerActive,
+    setCookie,
+    signupEmailInput,
     dispatch,
     router,
   ]);
@@ -106,14 +147,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     setIsResendCodeLoading(true);
     setSubmitError('');
     try {
-      // Temp commented out for dev purposes
-      /* const payload = new newnewapi.SendVerificationEmailRequest({
+      const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: signupEmailInput,
       });
 
       const { data, error } = await sendVerificationEmail(payload);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed'); */
+      if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       setIsResendCodeLoading(false);
       setCodeInital(new Array(6).join('.').split('.'));
@@ -163,7 +203,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
   return (
     <SCodeVerificationMenu
-      onClick={(e) => {
+      onClick={() => {
         if (submitError) {
           handleTryAgain();
         }
@@ -195,7 +235,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         onComplete={onCodeComplete}
       />
       {
-        timerActive && !submitError ? (
+        timerActive && !timerHidden && !submitError && !isSucces ? (
           <STimeoutDiv
             isAlertColor={timerSeconds < 11}
           >
@@ -206,6 +246,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           && !isSigninWithEmailLoading
           && !isResendCodeLoading && (
           <AnimatedPresence
+            animateWhenInView={false}
             animation="t-01"
             delay={0.3}
           >
@@ -224,8 +265,9 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         )
       }
       {
-        !isSigninWithEmailLoading && !isResendCodeLoading && submitError ? (
+        !isSigninWithEmailLoading && !isResendCodeLoading && submitError && !isSucces ? (
           <AnimatedPresence
+            animateWhenInView={false}
             animation="t-09"
           >
             <SErrorDiv>
@@ -278,7 +320,7 @@ const SCodeVerificationMenu = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.xxxLarge};
     border-style: 1px transparent solid;
 
-    background-color: ${({ theme }) => theme.colorsThemed.grayscale.background2};
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
 `;
 

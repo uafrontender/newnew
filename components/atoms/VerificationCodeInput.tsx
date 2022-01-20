@@ -25,7 +25,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
     e.preventDefault();
     const newValue = e.target.value;
     // if (/[^1-9]/.test(newValue)) return;
-    if (/[^1-9]/.test(newValue)) return;
+    if (/[^0-9]/.test(newValue)) return;
 
     const workingCode = [...code];
     workingCode[slot] = newValue;
@@ -60,7 +60,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
 
     if (!data) return;
 
-    const regex = /[1-9]/;
+    const regex = /[0-9]/;
 
     if (data && !Array.isArray(data) && data.length === 6 && regex.test(data)) {
       const pastedCode = data.split('');
@@ -183,7 +183,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       // NB! Temp
-      return theme.colorsThemed.grayscale.outlines1;
+      return theme.colorsThemed.background.outlines1;
     }
     return theme.colorsThemed.accent.error;
   }};
@@ -191,7 +191,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     width: 52px;
     height: 72px;
 
-    padding: 16px;
+    padding: 14px;
 
     font-weight: 600;
     font-size: 32px;
@@ -221,7 +221,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
 
     border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
-      return theme.colorsThemed.grayscale.outlines2;
+      return theme.colorsThemed.background.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
     }

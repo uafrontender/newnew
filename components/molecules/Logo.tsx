@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Lottie from 'react-lottie';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
+import Lottie from '../atoms/Lottie';
 import InlineSVG from '../atoms/InlineSVG';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -11,7 +11,7 @@ import { useAppSelector } from '../../redux-store/store';
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
 import logoText from '../../public/images/svg/logo_text.svg';
-import logoAnimation from '../../public/animations/mobile_logo_animation.json';
+import logoAnimation from '../../public/animations/mobile_logo.json';
 
 export const Logo = () => {
   const [loading, setLoading] = useState(false);

@@ -1,14 +1,10 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
-import Link from 'next/link';
+/* eslint-disable no-nested-ternary */
+import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 
 import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
@@ -17,11 +13,15 @@ import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
 import ScrollArrow from '../../atoms/ScrollArrow';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
+import { formatString } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
+import switchPostType from '../../../utils/switchPostType';
+import { CardSkeletonSection } from '../../molecules/CardSkeleton';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -29,21 +29,27 @@ const SCROLL_STEP = {
 };
 
 interface ICardSection {
-  user?: any,
-  type?: 'default' | 'creator'
-  title?: string,
-  category: string,
-  collection: {}[],
+  user?: {
+    avatarUrl: string;
+    username: string;
+  };
+  type?: 'default' | 'creator';
+  title?: string;
+  category: string;
+  collection: newnewapi.Post[];
+  loading?: boolean;
+  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const CardsSection: React.FC<ICardSection> = (props) => {
-  const {
-    user,
-    type,
-    title,
-    category,
-    collection,
-  } = props;
+export const CardsSection: React.FC<ICardSection> = ({
+  user,
+  type,
+  title,
+  category,
+  collection,
+  loading,
+  handlePostClicked,
+}) => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const ref: any = useRef();
@@ -53,22 +59,22 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
-  const [isDragging, setIsDragging] = useState(false);
   const [clientX, setClientX] = useState<number>(0);
   const [scrollX, setScrollX] = useState<number>(0);
-
-  // To check if we're really dragging and avoid clicks on children
-  const [wasDragged, setWasDragged] = useState(false);
-  const [mouseInitial, setMouseInitial] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isLaptop = ['laptop'].includes(resizeMode);
+  const isDesktop = ['laptopL'].includes(resizeMode);
 
   let collectionToRender = collection;
   let renderShowMore = false;
   let scrollStep = SCROLL_STEP.desktop;
 
-  if (isMobile && collection.length > 3) {
+  if (isMobile && collection?.length > 3) {
     renderShowMore = true;
     collectionToRender = collection.slice(0, 3);
   }
@@ -77,7 +83,6 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     scrollStep = SCROLL_STEP.tablet;
   }
 
-  const restore = useCallback(() => setWasDragged(false), []);
   const handleUserClick = () => {
     router.push(`/${category}`);
   };
@@ -92,8 +97,8 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
 
     if (to < 0) {
       scrollTo = 0;
-    } else if (scrollTo > collection.length - 1) {
-      scrollTo = collection.length - 1;
+    } else if (scrollTo > (collection?.length || 0) - 1) {
+      scrollTo = (collection?.length || 0) - 1;
     }
 
     scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
@@ -105,68 +110,64 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
     });
   };
   const mouseDownHandler = (e: any) => {
-    setIsDragging(true);
+    setMouseIsDown(true);
     setClientX(e.clientX);
     setScrollX(scrollContainerRef.current.scrollLeft);
-    setMouseInitial(e.clientX);
   };
   const mouseMoveHandler = (e: any) => {
-    if (!isDragging) {
+    if (!mouseIsDown) {
       return;
-    }
-
-    if (mouseInitial && e.clientX !== mouseInitial) {
-      setWasDragged(true);
     }
 
     scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
     setClientX(e.clientX);
     setScrollX(scrollX - e.clientX + clientX);
+    setIsDragging(true);
   };
   const mouseUpHandler = () => {
-    if (!isDragging) return;
+    setMouseIsDown(false);
 
-    // if (mouseInitial < clientX) {
-    //   if (canScrollLeft) {
-    //     handleLeftClick();
-    //   }
-    // } else if (mouseInitial > clientX) {
-    //   if (canScrollRight) {
-    //     handleRightClick();
-    //   }
-    // }
-
-    setIsDragging(false);
+    if (isDragging) {
+      setTimeout(() => {
+        setIsDragging(false);
+      }, 0);
+    }
   };
 
-  // Handlers for cards to avoid unncessary clicks
-  const handleItemMouseDownCapture = useCallback((e: any) => {
-    setMouseInitial(e.clientX);
-  }, []);
+  const renderItem = (item: any, index: number) => {
+    const handleItemClick = () => {
+      if (!isDragging) {
+        handlePostClicked(item);
+      }
+    };
 
-  const handleItemMouseLeave = useCallback(() => {
-    if (wasDragged) {
-      setWasDragged(false);
-      setMouseInitial(0);
-    }
-  }, [wasDragged]);
-  const renderItem = useCallback((item: any, index: number) => (
-    <SItemWrapper key={`${category}-${item.id}`} name={`cards-section-${category}-${index}`}>
-      <Card
-        item={item}
-        index={index + 1}
-        restore={restore}
-        preventClick={wasDragged}
-        onMouseLeave={handleItemMouseLeave}
-        onMouseDownCapture={handleItemMouseDownCapture}
-      />
-    </SItemWrapper>
-  ), [handleItemMouseLeave, handleItemMouseDownCapture, restore, category, wasDragged]);
+    return (
+      <SItemWrapper
+        key={switchPostType(item)[0].postUuid}
+        name={`cards-section-${category}-${index}`}
+        onClick={handleItemClick}
+      >
+        <Card
+          item={item}
+          index={index + 1}
+          width={isMobile ? '100vw' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
+          height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+        />
+      </SItemWrapper>
+    );
+  };
 
   const {
     renderLeftArrow,
     renderRightArrow,
   } = useHoverArrows(ref);
+  const handleSeeMoreCLick = () => {
+    if (type === 'default') {
+      router.push(`/search?category=${category}`);
+    } else {
+      handleUserClick();
+    }
+  };
 
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
@@ -178,35 +179,43 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem <= collection.length - scrollStep);
+    setCanScrollRight(visibleListItem <= (collection?.length || 0) - scrollStep);
   }, [visibleListItem, collection, scrollStep]);
 
   return (
-    <SWrapper>
+    <SWrapper name={category}>
       <STopWrapper>
         {type === 'default' ? (
-          <Headline animation="t01" variant={4}>
+          <Headline
+            variant={4}
+            animation="t-01"
+          >
             {title}
           </Headline>
         ) : (
-          <SCreatorHeadline onClick={handleUserClick}>
-            <UserAvatar user={user} />
-            <SHeadline animation="t01" variant={4}>
-              {user.username}
-            </SHeadline>
-            <Tag>
-              {t('button-creator-on-the-rise')}
-            </Tag>
-          </SCreatorHeadline>
+          <AnimatedPresence
+            animation="t-01"
+          >
+            <SCreatorHeadline onClick={handleUserClick}>
+              <UserAvatar
+                avatarUrl={user?.avatarUrl!!}
+              />
+              <SHeadline variant={4}>
+                {user?.username!!}
+              </SHeadline>
+              <Tag>
+                {t('button-creator-on-the-rise')}
+              </Tag>
+            </SCreatorHeadline>
+          </AnimatedPresence>
         )}
         {!isMobile && (
-          <Link href={`/search?category=${category}`}>
-            <a>
-              <SCaption weight={700}>
-                {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator')}
-              </SCaption>
-            </a>
-          </Link>
+          <SCaption
+            weight={700}
+            onClick={handleSeeMoreCLick}
+          >
+            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
+          </SCaption>
         )}
       </STopWrapper>
       <SListContainer ref={ref}>
@@ -218,7 +227,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
           onMouseMove={mouseMoveHandler}
           onMouseLeave={mouseUpHandler}
         >
-          {collectionToRender.map(renderItem)}
+          {!loading
+            ? collectionToRender?.map(renderItem)
+            : (
+              <CardSkeletonSection
+                count={5}
+              />
+            )}
         </SListWrapper>
         {!isMobile && (
           <>
@@ -241,13 +256,13 @@ export const CardsSection: React.FC<ICardSection> = (props) => {
       </SListContainer>
       {renderShowMore && (
         <SButtonHolder>
-          <Link href={`/search?category=${category}`}>
-            <a style={{ width: '100%' }}>
-              <Button size="lg" view="secondary">
-                {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator')}
-              </Button>
-            </a>
-          </Link>
+          <Button
+            size="lg"
+            view="secondary"
+            onClick={handleSeeMoreCLick}
+          >
+            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
+          </Button>
         </SButtonHolder>
       )}
     </SWrapper>
@@ -258,11 +273,19 @@ export default CardsSection;
 
 CardsSection.defaultProps = {
   type: 'default',
-  user: {},
+  user: {
+    avatarUrl: '',
+    username: '',
+  },
   title: '',
+  loading: undefined,
 };
 
-const SWrapper = styled.section`
+interface ISWrapper {
+  name: string;
+}
+
+const SWrapper = styled.div<ISWrapper>`
   padding: 24px 0;
 
   /* No select */
@@ -296,14 +319,14 @@ const SListWrapper = styled.div`
   overflow-x: auto;
   flex-direction: column;
 
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
   ${(props) => props.theme.media.tablet} {
     left: -32px;
     padding: 24px 24px 0 24px;
     flex-direction: row;
-
-    ::-webkit-scrollbar {
-      display: none;
-    }
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -349,6 +372,7 @@ const STopWrapper = styled.div`
 
 const SCaption = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+  cursor: pointer;
   transition: color ease 0.5s;
 
   &:hover {

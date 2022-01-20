@@ -1,28 +1,58 @@
-/* eslint-disable react/no-array-index-key */
 import React from 'react';
-import { motion, AnimatePresence as FMAnimatedPresence, Variants } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
+
+export type TAnimation =
+  't-01'
+  | 't-01-reverse'
+  | 't-02'
+  | 't-08'
+  | 't-09'
+  | 't-10'
+  | 'trans-06'
+  | 'trans-06-reverse'
+  | 'o-02'
+  | 'o-11'
+  | 'o-11-reverse'
+  | 'o-12'
+  | 'o-12-reverse';
 
 interface IAnimatedWords {
   start?: boolean;
   delay?: number;
-  animation: 't-01' | 't-02' | 't-08' | 't-09' | 't-10' | 'trans-06' | 'trans-06-reverse';
+  duration?: number;
+  animation: TAnimation;
   onAnimationEnd?: () => void;
+  animateWhenInView?: boolean;
 }
 
 export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
   const {
     start,
     delay,
+    duration,
     animation,
+    animateWhenInView,
     onAnimationEnd,
   } = props;
   let { children } = props;
+  const {
+    ref,
+    inView,
+  } = useInView();
 
-  const variants: Variants = {
+  let startAnimation = start;
+
+  if (animateWhenInView) {
+    startAnimation = start && inView;
+  }
+
+  const variants: any = {
     't-01': {
       opacity: 1,
       transition: {
         delay: delay ?? 0.5,
+        duration: duration ?? 1,
       },
     },
     't-01_initial': {
@@ -31,20 +61,35 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     't-01_exit': {
       opacity: 0,
     },
+    't-01-reverse': {
+      opacity: 0,
+      transition: {
+        delay: delay ?? 0.5,
+        duration: duration ?? 1,
+      },
+    },
+    't-01_initial-reverse': {
+      opacity: 1,
+    },
+    't-01_exit-reverse': {
+      opacity: 1,
+    },
     't-02': {
       y: 0,
       opacity: 1,
       transition: {
+        ease: 'easeInOut',
+        type: 'spring',
         delay: delay ?? 0.5,
         bounce: 0,
       },
     },
     't-02_initial': {
-      y: 100,
+      y: 50,
       opacity: 0,
     },
     't-02_exit': {
-      y: 100,
+      y: 50,
       opacity: 0,
     },
     't-08': {
@@ -97,15 +142,17 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
       y: 0,
       opacity: 1,
       transition: {
+        type: 'spring',
         delay: delay ?? 0.5,
+        bounce: 0.5,
       },
     },
     'trans-06_initial': {
-      y: 120,
+      y: 20,
       opacity: 0,
     },
     'trans-06_exit': {
-      y: 120,
+      y: 20,
       opacity: 0,
     },
     'trans-06-reverse': {
@@ -120,6 +167,113 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     'trans-06_exit-reverse': {
       y: 0,
       opacity: 1,
+    },
+    'o-02': {
+      x: 0,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+        duration: duration ?? 1,
+      },
+    },
+    'o-02_initial': {
+      x: 10,
+      opacity: 0,
+    },
+    'o-02_exit': {
+      x: 10,
+      opacity: 0,
+    },
+    'o-11': {
+      y: -5,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-11_initial': {
+      y: 0,
+      opacity: 1,
+    },
+    'o-11_exit': {
+      y: 0,
+      opacity: 1,
+    },
+    'o-11-reverse': {
+      y: 0,
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-11_initial-reverse': {
+      y: -5,
+      opacity: 1,
+    },
+    'o-11_exit-reverse': {
+      y: -5,
+      opacity: 1,
+    },
+    'o-12': {
+      height: 'auto',
+      visibility: 'visible',
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-12_initial': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
+    },
+    'o-12_exit': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
+    },
+    'o-12-reverse': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
+    },
+    'o-12_initial-reverse': {
+      height: 'auto',
+      visibility: 'visible',
+      opacity: 1,
+      transition: {
+        delay: delay ?? 0.1,
+        bounce: 0,
+      },
+    },
+    'o-12_exit-reverse': {
+      height: 0,
+      visibility: 'hidden',
+      opacity: 0,
+      transition: {
+        opacity: {
+          duration: 0,
+        },
+      },
     },
   };
 
@@ -148,8 +302,9 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
   return (
     <FMAnimatedPresence>
       <motion.div
+        ref={ref}
         exit={`${animation}_exit`}
-        animate={start && animation}
+        animate={startAnimation && animation}
         initial={`${animation}_initial`}
         variants={variants}
         onAnimationComplete={onAnimationEnd}
@@ -165,6 +320,8 @@ export default AnimatedPresence;
 AnimatedPresence.defaultProps = {
   start: true,
   delay: undefined,
+  duration: undefined,
+  animateWhenInView: true,
   onAnimationEnd: () => {
   },
 };

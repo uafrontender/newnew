@@ -1,10 +1,8 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useRef, useState, useEffect } from 'react';
+import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
 
@@ -16,6 +14,7 @@ import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TOP_10 } from '../../../constants/timings';
+import switchPostType from '../../../utils/switchPostType';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -24,11 +23,14 @@ const SCROLL_STEP = {
 };
 
 interface ITopSection {
-  collection: {}[],
+  collection: newnewapi.Post[],
+  handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const TopSection: React.FC<ITopSection> = (props) => {
-  const { collection } = props;
+export const TopSection: React.FC<ITopSection> = ({
+  collection,
+  handlePostClicked,
+}) => {
   const { t } = useTranslation('home');
   const ref: any = useRef();
   const scrollContainerRef: any = useRef();
@@ -37,25 +39,23 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
-  const [isDragging, setIsDragging] = useState(false);
   const [clientX, setClientX] = useState<number>(0);
   const [scrollX, setScrollX] = useState<number>(0);
-
-  // To check if we're really dragging and avoid clicks on children
-  const [wasDragged, setWasDragged] = useState(false);
-  const [mouseInitial, setMouseInitial] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
   const country = 'USA';
   let scrollStep = SCROLL_STEP.desktop;
 
-  if (['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode)) {
+  if (isMobile) {
     scrollStep = SCROLL_STEP.mobile;
-  } else if (resizeMode === 'tablet') {
+  } else if (isTablet) {
     scrollStep = SCROLL_STEP.tablet;
   }
 
-  const restore = useCallback(() => setWasDragged(false), []);
   const handleLeftClick = () => {
     scrollListTo(visibleListItem - scrollStep - 1);
   };
@@ -67,8 +67,8 @@ export const TopSection: React.FC<ITopSection> = (props) => {
 
     if (to < 0) {
       scrollTo = 0;
-    } else if (scrollTo > collection.length - 1) {
-      scrollTo = collection.length - 1;
+    } else if (scrollTo > (collection?.length || 0) - 1) {
+      scrollTo = (collection?.length || 0) - 1;
     }
 
     scroller.scrollTo(`top-section-${scrollTo}`, {
@@ -80,64 +80,51 @@ export const TopSection: React.FC<ITopSection> = (props) => {
     });
   };
   const mouseDownHandler = (e: any) => {
-    setIsDragging(true);
+    setMouseIsDown(true);
     setClientX(e.clientX);
     setScrollX(scrollContainerRef.current.scrollLeft);
-    setMouseInitial(e.clientX);
   };
   const mouseMoveHandler = (e: any) => {
-    if (!isDragging) {
+    if (!mouseIsDown) {
       return;
     }
 
     scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
-    if (mouseInitial && e.clientX !== mouseInitial) {
-      setWasDragged(true);
-    }
     setClientX(e.clientX);
     setScrollX(scrollX - e.clientX + clientX);
+    setIsDragging(true);
   };
   const mouseUpHandler = () => {
-    if (!isDragging) return;
+    setMouseIsDown(false);
 
-    // if (mouseInitial < clientX) {
-    //   if (canScrollLeft) {
-    //     handleLeftClick();
-    //   }
-    // } else if (mouseInitial > clientX) {
-    //   if (canScrollRight) {
-    //     handleRightClick();
-    //   }
-    // }
-
-    setIsDragging(false);
+    if (isDragging) {
+      setTimeout(() => {
+        setIsDragging(false);
+      }, 0);
+    }
   };
 
-  // Handlers for cards to avoid unncessary clicks
-  const handleItemMouseDownCapture = useCallback((e: any) => {
-    setMouseInitial(e.clientX);
-  }, []);
+  const renderItem = (item: any, index: number) => {
+    const handleItemClick = () => {
+      if (!isDragging) {
+        handlePostClicked(item);
+      }
+    };
 
-  const handleItemMouseLeave = useCallback(() => {
-    if (wasDragged) {
-      setWasDragged(false);
-      setMouseInitial(0);
-    }
-  }, [wasDragged]);
-
-  const renderItem = useCallback((item: any, index: number) => (
-    <SItemWrapper key={item.id} name={`top-section-${index}`}>
-      <Card
-        type="inside"
-        item={item}
-        index={index + 1}
-        restore={restore}
-        preventClick={wasDragged}
-        onMouseLeave={handleItemMouseLeave}
-        onMouseDownCapture={handleItemMouseDownCapture}
-      />
-    </SItemWrapper>
-  ), [handleItemMouseDownCapture, handleItemMouseLeave, restore, wasDragged]);
+    return (
+      <SItemWrapper
+        key={switchPostType(item)[0].postUuid}
+        name={`top-section-${index}`}
+        onClick={handleItemClick}
+      >
+        <Card
+          type="inside"
+          item={item}
+          index={index + 1}
+        />
+      </SItemWrapper>
+    );
+  };
 
   const {
     renderLeftArrow,
@@ -154,12 +141,22 @@ export const TopSection: React.FC<ITopSection> = (props) => {
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem < collection.length - 1);
+    setCanScrollRight(visibleListItem < (collection?.length || 0) - 1);
   }, [visibleListItem, collection]);
 
   return (
-    <SWrapper name="topSection">
-      <Headline animation="t01" variant={4}>
+    <SWrapper
+      name="topSection"
+      layoutId="topSection"
+      transition={{
+        ease: 'easeInOut',
+        duration: 1,
+      }}
+    >
+      <Headline
+        variant={4}
+        animation="t-01"
+      >
         {t('top-block-title', { country })}
       </Headline>
       <SListContainer ref={ref}>
@@ -171,7 +168,7 @@ export const TopSection: React.FC<ITopSection> = (props) => {
           onMouseMove={mouseMoveHandler}
           onMouseLeave={mouseUpHandler}
         >
-          {collection.map(renderItem)}
+          {collection?.map(renderItem)}
         </SListWrapper>
         {!isDragging && canScrollLeft && (
           <ScrollArrow
@@ -198,7 +195,7 @@ interface ISWrapper {
   name: string;
 }
 
-const SWrapper = styled.section<ISWrapper>`
+const SWrapper = styled(motion.section)<ISWrapper>`
   padding: 0 0 48px 0;
 
   /* No select */

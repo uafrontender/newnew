@@ -11,7 +11,7 @@
   "button-create-decision": "ES Create decision",
   "button-create": "ES Create",
   "button-login-in": "ES Log in",
-  "button-sign-up": "ES Sign up",
+  "button-sign-up": "ES Sign  up",
   "button-dashboard": "ES Dashboard",
   "button-create-on-newnew": "ES Create on NewNew",
   "button-cancel": "ES Cancel",
@@ -45,6 +45,6 @@
   "dd-currency-subTitle-eur": "ES EUR - €",
   "selected-currency-title-usd": "ES USD",
   "selected-currency-title-eur": "ES EUR",
-  "cookie-text": "ES We use \uD83C\uDF6A",
+  "cookie-text": "ES We use",
   "cookie-link": "ES Learn more"
 }

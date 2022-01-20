@@ -1,14 +1,16 @@
 /* eslint-disable camelcase */
 import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
-import Lottie from 'react-lottie';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import { useCookies } from 'react-cookie';
+
+import Lottie from '../../components/atoms/Lottie';
 
 import { signInWithTwitter } from '../../api/endpoints/auth';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setCredentialsData, setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import { setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -21,9 +23,10 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
   oauth_token,
   oauth_verifier,
 }) => {
+  const router = useRouter();
+  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -49,21 +52,42 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         const { data } = res!!;
 
-        if (!data) throw new Error('No data');
+        if (
+          !data
+          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
+        ) throw new Error('No data');
 
         dispatch(setUserData({
           username: data.me?.username,
-          displayName: data.me?.displayName,
+          nickname: data.me?.nickname,
           email: data.me?.email,
           avatarUrl: data.me?.avatarUrl,
+          coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
-          options: data.me?.options,
+          bio: data.me?.bio,
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+          },
         }));
-        dispatch(setCredentialsData({
-          accessToken: data.credential?.accessToken,
-          refreshToken: data.credential?.refreshToken,
-          expiresAt: data.credential?.expiresAt?.seconds,
-        }));
+        // Set credential cookies
+        setCookie(
+          'accessToken',
+          data.credential?.accessToken,
+          {
+            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+          },
+        );
+        setCookie(
+          'refreshToken',
+          data.credential?.refreshToken,
+          {
+            // Expire in 10 years
+            maxAge: (10 * 365 * 24 * 60 * 60),
+          },
+        );
+
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
