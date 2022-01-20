@@ -1,17 +1,24 @@
 {
+  "tabs": {
+    "activelyBidding": "Actively bidding on",
+    "purchases": "My purchases",
+    "viewHistory": "My view history",
+    "subscriptions": "My subscriptions",
+    "favorites": "My favorites",
+    "userInitial": "Creator’s decisions",
+    "activity": "Activity"
+  },
+  "posts-filter": {
+    "decisions": "decisions",
+    "filter-0": "All",
+    "filter-1": "Auctions",
+    "filter-2": "Crowdfunding",
+    "filter-3": "Multiple choices"
+  },
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",
       "settings": "Settings"
-    },
-    "tabs": {
-      "activelyBidding": "Actively bidding on",
-      "purchases": "My purchases",
-      "viewHistory": "My view history",
-      "subscriptions": "My subscriptions",
-      "favorites": "My favorites",
-      "userInitial": "Creator’s decisions",
-      "activity": "Activity"
     },
     "buttons": {
       "favorites": "Favorites",
@@ -27,13 +34,32 @@
     "confirmationWindow": "Closing will discard changes. Are you sure you want to leave?",
     "saveButton": "Save changes",
     "cancelButton": "Cancel",
+    "dragToReposition": "Drag to reposition image",
     "inputs": {
-      "displayName": {
-        "placeholder": "Nickname"
+      "coverImage": {
+        "changeCoverImage": "Change cover image"
+      },
+      "nickname": {
+        "placeholder": "Nickname",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Name is too long",
+          "tooShort": "Name is too short",
+          "invalidChar": "Name has invalid characters",
+          "innappropriate": "Offensive words are forbidden"
+        }
       },
       "username": {
         "placeholder": "@username",
         "frequencyCaption": "Username can be changed once a month.",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Username is too long",
+          "tooShort": "Username is too short",
+          "invalidChar": "Username has invalid characters",
+          "innappropriate": "Offensive words are forbidden",
+          "taken": "Username is taken"
+        },
         "points": {
           "1": "8-15 characters length",
           "2": "Lower case only",
@@ -41,8 +67,97 @@
         }
       },
       "bio": {
-        "placeholder": "Bio"
+        "placeholder": "Bio",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Bio is too long",
+          "tooShort": "Bio is too short",
+          "innappropriate": "Offensive words are forbidden"
+        }
       }
+    }
+  },
+  "Settings": {
+    "heading": "General settings",
+    "goBackBtn": "Go back",
+    "colorModeSwitch": {
+      "options": {
+        "light": "Light",
+        "dark": "Dark",
+        "auto": "Auto"
+      }
+    },
+    "sections": {
+      "Wallet": {
+        "empty": {
+          "balance": "Balance",
+          "caption": "Use your NewNew wallet and make your bets with no fees.",
+          "topUpBtn": "Top up my wallet"
+        }
+      },
+      "PersonalInformation": {
+        "title": "Personal information",
+        "emailInput": {
+          "label": "Email Address",
+          "placeholder": "email@email.com",
+          "errors": {
+            "invalidEmail": "Please enter a valid email",
+            "emailTaken": "Email taken"
+          }
+        },
+        "birthDateInput": {
+          "label": "Date of birth",
+          "captions": {
+            "twoTimesOnly": "Birthdate can be changed 2 times only.",
+            "cannotChange": "You can’t change birthdate."
+          },
+          "saveBtn": "Save",
+          "cancelBtn": "Cancel"
+        },
+        "saveBtn": "Save changes",
+        "cancelBtn": "Cancel"
+      },
+      "Notifications": {
+        "title": "Notifications"
+      },
+      "Transactions": {
+        "title": "Transactions",
+        "you": "You",
+        "actions": {
+          "topup": "top-up your wallet.",
+          "decision": "decision.",
+          "bid": "bid on",
+          "vote": "voted for",
+          "support": "supported"
+        }
+      },
+      "Privacy": {
+        "title": "Privacy",
+        "privacySubsections": {
+          "spendings": {
+            "title": "Hide spending from other users.",
+            "caption": "People will not be able to see how much you spent on votes and bids."
+          },
+          "private": {
+            "title": "Make private account.",
+            "caption": "People will not be able to see your bids."
+          }
+        },
+        "blockedusers": {
+          "title": "Blocked uses",
+          "unblockBtn": "Unblock"
+        },
+        "closeAccount": {
+          "title": "Close account",
+          "caption": "Delete your account and account data.",
+          "closeBtn": "Delete"
+        }
+      }
+    },
+    "bottomDiv": {
+      "languageTitle": "Choose language",
+      "help": "Help",
+      "logout": "Log out"
     }
   }
 }

@@ -14,9 +14,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
   return (
     <SWrapper>
       <SUserAvatar
-        user={{
-          avatar: item.bidUser.avatar,
-        }}
+        avatarUrl={item.bidForUser.avatar}
       />
       <SCenterContent>
         <STitle>
@@ -45,9 +43,7 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
         </SSubTitle>
       </SCenterContent>
       <SUserAvatarRight
-        user={{
-          avatar: item.bidForUser.avatar,
-        }}
+        avatarUrl={item.bidForUser.avatar}
       />
     </SWrapper>
   );
@@ -62,7 +58,7 @@ const SWrapper = styled.div`
   border-radius: ${(props) => props.theme.borderRadius.medium};
   flex-direction: row;
   justify-content: space-between;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background2};
+  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
 `;
 
 const SCenterContent = styled.div`
@@ -98,22 +94,25 @@ const SUserAvatar = styled(UserAvatar)`
   height: 32px;
   min-width: 32px;
   min-height: 32px;
+  border-radius: 16px;
 
   ${(props) => props.theme.media.laptop} {
     width: 56px;
     height: 56px;
     min-width: 56px;
     min-height: 56px;
+    border-radius: 28px;
   }
 `;
 
 const SUserAvatarRight = styled(SUserAvatar)`
   border-radius: 8px;
-  
+
   ${(props) => props.theme.media.laptop} {
     width: 72px;
     height: 72px;
     min-width: 72px;
     min-height: 72px;
+    border-radius: 16px;
   }
 `;

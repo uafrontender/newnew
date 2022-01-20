@@ -6,7 +6,6 @@ import { useTranslation } from 'next-i18next';
 import Text from './Text';
 import Modal from '../organisms/Modal';
 import Button from './Button';
-import Caption from './Caption';
 
 import { useOnClickEsc } from '../../utils/hooks/useOnClickEsc';
 import { useAppSelector } from '../../redux-store/store';
@@ -30,8 +29,9 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
 
   const options = SUPPORTED_LANGUAGES;
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
-  const ddHeight = (options.length > 6 ? 432 : options.length * 72) + 12;
+  const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
 
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
@@ -45,18 +45,16 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
     };
 
     return (
-      <SItemHolder
+      <SButton
         key={`change-language-${item}`}
+        view={item === locale ? 'modalSecondarySelected' : 'modalSecondary'}
         onClick={handleItemClick}
         selected={item === locale}
       >
-        <SItemTitle variant={3}>
+        <SItemTitle variant={3} weight={600}>
           {t(`dd-language-title-${item}`)}
         </SItemTitle>
-        <SItemSubTitle variant={2}>
-          {t(`dd-language-subTitle-${item}`)}
-        </SItemSubTitle>
-      </SItemHolder>
+      </SButton>
     );
   };
 
@@ -77,15 +75,16 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
       </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
-          <SMobileListContainer focused={focused} height={ddHeight}>
-            <SMobileList height={ddHeight} focused={focused}>
+          <SMobileListContainer focused={focused}>
+            <SMobileList>
               {options.map(renderItem)}
             </SMobileList>
-            <SCancelItemHolder onClick={handleCloseClick}>
-              <SCancelItemTitleHolder>
-                {t('button-cancel')}
-              </SCancelItemTitleHolder>
-            </SCancelItemHolder>
+            <SCancelButton
+              view="modalSecondary"
+              onClick={handleCloseClick}
+            >
+              {t('button-cancel')}
+            </SCancelButton>
           </SMobileListContainer>
         </Modal>
       ) : (
@@ -115,15 +114,15 @@ const SListHolder = styled.div<ISListHolder>`
   left: 0;
   height: ${(props) => (props.focused ? `${props.height}px` : '0px')};
   bottom: 52px;
+  padding: ${(props) => (props.focused ? '12px' : '0 12px')};
   z-index: 1;
-  overflow: auto;
+  overflow: hidden;
   position: absolute;
-  min-width: 160px;
   transition: all ease 0.5s;
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundDD};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -131,43 +130,21 @@ const SListHolder = styled.div<ISListHolder>`
   }
 `;
 
-interface ISItemHolder {
-  selected: boolean;
-}
-
-const SItemHolder = styled.div<ISItemHolder>`
-  cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
-  margin: 12px 12px 0;
-  padding: 12px;
-  border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale[props.selected ? 'backgroundDDSelected' : 'backgroundDD']};
-`;
-
 const SItemTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   text-align: center;
-  font-weight: 600;
   white-space: nowrap;
 
   ${(props) => props.theme.media.tablet} {
     text-align: start;
-    font-weight: 500;
   }
 `;
 
-const SItemSubTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  text-align: center;
-  font-weight: 600;
-  white-space: nowrap;
+interface ISMobileListContainer {
+  focused: boolean;
+}
 
-  ${(props) => props.theme.media.tablet} {
-    text-align: start;
-    font-weight: 500;
-  }
-`;
-
-const SMobileListContainer = styled.div<ISListHolder>`
+const SMobileListContainer = styled.div<ISMobileListContainer>`
   width: 100%;
   bottom: ${(props) => (props.focused ? 0 : '-100vh')};
   height: 100%;
@@ -180,28 +157,30 @@ const SMobileListContainer = styled.div<ISListHolder>`
   background-color: transparent;
 `;
 
-const SMobileList = styled.div<ISListHolder>`
-  height: ${(props) => props.height}px;
+const SMobileList = styled.div`
   display: flex;
-  overflow: auto;
+  padding: 12px;
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
+  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
 `;
 
-const SCancelItemHolder = styled.div`
-  cursor: pointer;
-  margin: 4px 0 0;
+interface ISButton {
+  selected: boolean;
+}
+
+const SButton = styled(Button)<ISButton>`
+  cursor: ${(props) => (props.selected ? 'not-allowed' : 'pointer')};
+  padding: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    min-width: 136px;
+    justify-content: flex-start;
+  }
+`;
+
+const SCancelButton = styled(Button)`
   padding: 16px 32px;
-  border-radius: 16px;
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.background1};
-`;
-
-const SCancelItemTitleHolder = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-size: 14px;
-  text-align: center;
-  font-weight: bold;
-  line-height: 24px;
+  margin-top: 4px;
 `;

@@ -1,0 +1,119 @@
+# The following variables are set in the gitlab UI under "Settings" > "CI/CD" > "Variables"
+#
+#  - AWS_ACCESS_KEY_ID
+#  - AWS_SECRET_ACCESS_KEY
+#  - ECR_HOST
+#
+# Notes:
+#  - the git branch must be "protected" to use the above variables. (The default branch (e.g. "main") is protected by default.)
+#  - the AWS IAM user must have ECR, ECS, and S3 permissions
+#  - setting `DOCKER_TLS_CERTDIR: "/certs"` gives me the following error:
+#    `Cannot connect to the Docker daemon at tcp://docker:2375. Is the docker daemon running?` so I set it to "" as done here: https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/Build.gitlab-ci.yml#L5
+#    I also failed to connect using port 2376.
+#  - uses a custom docker image that includes the `aws` command line tools and `docker`. See https://github.com/saltycrane/aws-cli-and-docker
+#
+variables:
+  # When using dind service, we need to instruct docker to talk with
+  # the daemon started inside of the service. The daemon is available
+  # with a network connection instead of the default
+  # /var/run/docker.sock socket. Docker 19.03 does this automatically
+  # by setting the DOCKER_HOST in
+  # https://github.com/docker-library/docker/blob/d45051476babc297257df490d22cbd806f1b11e4/19.03/docker-entrypoint.sh#L23-L29
+  #
+  # The 'docker' hostname is the alias of the service container as described at
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services.
+  BRANCH_ENV: "$CI_COMMIT_REF_NAME"
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_TLS_CERTDIR: ""
+  # AWS_DEFAULT_REGION (and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY configured in the gitlab UI) are used by the AWS CLI which are used by `./bin/build-and-push-image-to-ecr`, `./bin/upload-assets-to-s3`, and `./bin/ecs`
+  AWS_DEFAULT_REGION: "us-east-2"
+  # the below variables are used by `./bin/build-and-push-image-to-ecr`, `./bin/upload-assets-to-s3`, and `./bin/ecs`
+  CI_APPLICATION_REPOSITORY: "$ECR_HOST/web"
+  CI_APPLICATION_TAG: "$CI_PIPELINE_IID"
+  # the below variable is used by `./bin/upload-assets-to-s3`
+  CI_AWS_S3_BUCKET: "web-$CI_COMMIT_REF_NAME-aws-ecr-ecs-gitlab-ci-cd"
+  # the below variables are used by `./bin/ecs`
+  CI_AWS_ECS_CLUSTER: "web"
+  CI_AWS_ECS_SERVICE: "web-$CI_COMMIT_REF_NAME"
+  CI_AWS_ECS_TASK_DEFINITION: "web-$CI_COMMIT_REF_NAME"
+  # the below variable is used by `./bin/build-and-push-image-to-ecr`
+  NEXT_JS_ASSET_URL: "https://$CI_AWS_S3_BUCKET.s3.amazonaws.com"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+  NEXT_PUBLIC_BITMOVIN_PLAYER_KEY: "$BITMOVIN_PLAYER_KEY"
+
+stages:
+  - test
+  - build
+  - deploy
+
+# Cache using branch name
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .cache/*
+    - cache/Cypress
+    - node_modules
+    - .next
+
+# Test using Cypress tests
+test:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  image: cypress/browsers:node16.5.0-chrome94-ff93
+  stage: test
+  script:
+    - npm ci --include=dev
+    - npm run lint
+    - npm run dev & npx wait-on http://localhost:4000
+    - npm run test -- --record
+    - npm run test:mobile -- --record
+
+# Build docker image, push image to amazon ecr, and upload static assets to amazon s3
+build:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "false"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: manual
+      allow_failure: true
+      variables:
+        NEXT_PUBLIC_BASE_URL: "https://api-dev.newnew.co/v1"
+        NEXT_PUBLIC_SOCKET_URL: "https://api-dev.newnew.co"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+      variables:
+        NEXT_PUBLIC_BASE_URL: "https://api.newnew.co/v1"
+        NEXT_PUBLIC_SOCKET_URL: "https://api.newnew.co"
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: always
+      variables:
+        NEXT_PUBLIC_BASE_URL: "https://api-staging.newnew.co/v1"
+        NEXT_PUBLIC_SOCKET_URL: "https://api-staging.newnew.co"
+  needs: []
+  stage: build
+  image: saltycrane/aws-cli-and-docker
+  services:
+    - docker:dind
+  script:
+    - ./bin/build-and-push-image-to-ecr
+    - ./bin/upload-assets-to-s3
+
+# Deploy docker image to amazon ecs
+deploy:
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "false"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: manual
+      allow_failure: true
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: always
+  needs: ["build"]
+  stage: deploy
+  image: saltycrane/aws-cli-and-docker
+  services:
+    - docker:dind
+  script:
+    - ./bin/ecs update-task-definition

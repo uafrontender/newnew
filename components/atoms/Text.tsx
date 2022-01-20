@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface IText {
   weight?: 500 | 600;
   variant?: 1 | 2 | 3;
+  onClick?: (e: any) => void;
   children: React.ReactNode;
 }
 
@@ -27,11 +28,13 @@ const Text: React.FC<IText> = (props) => {
 Text.defaultProps = {
   weight: 500,
   variant: 1,
+  onClick: () => {},
 };
 
 export default Text;
 
 const SText = styled.p<IText>`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: ${(props) => props.weight};
 `;
 
@@ -56,7 +59,7 @@ const SText2 = styled(SText)`
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
-    line-height: 20px;
+    line-height: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {

@@ -10,12 +10,43 @@
   "cf-block-title": "Top Crowdfunding",
   "biggest-block-title": "Biggest of All Time",
   "button-show-more": "See more",
-  "button-show-more-creator": "See more from creator",
+  "button-show-more-creator": "See more from {{name}}",
   "button-creator-on-the-rise": "Creator on the rise",
   "button-card-ac": "{{amount}} in bids",
   "button-card-mc": "{{votes}} votes",
   "button-card-cf": "{{backed}} of {{total}} backers",
   "card-time-left": "{{time}} left",
+  "card-time-left-days": "d",
+  "card-time-left-hours": "h",
+  "card-time-left-minutes": "m",
+  "card-time-expired-ended-on": "Ended on ",
   "for-you-block-title": "For you",
-  "filter-title": "Sort"
+  "sort-title": "Sort",
+  "button-show-results": "Show results",
+  "button-cancel": "Cancel",
+  "sort-title-option-sortingtype": "Order",
+  "sort-title-option-sortingtype-all": "All",
+  "sort-title-option-sortingtype-num_bids": "Number of bids",
+  "sort-title-option-sortingtype-most_funded": "Most funded",
+  "sort-title-option-sortingtype-newest": "Newest",
+  "sort-title-option-bid": "Bid",
+  "sort-title-option-bid-lowest": "Lowest",
+  "sort-title-option-bid-highest": "Highest",
+  "sort-title-option-time": "Time",
+  "sort-title-option-time-ending-soon": "Ending soonest",
+  "sort-title-option-time-newest": "Newest",
+  "sort-title-option-time-oldest": "Oldest",
+  "sort-title-option-numbers-of-bids": "Numbers of bids",
+  "sort-title-option-numbers-of-bids-fewest": "Fewest",
+  "sort-title-option-numbers-of-bids-most-first": "Most first",
+  "home": {
+    "meta": {
+      "title": "Home"
+    }
+  },
+  "search": {
+    "meta": {
+      "title": "See more"
+    }
+  }
 }

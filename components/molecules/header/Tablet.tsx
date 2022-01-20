@@ -27,6 +27,7 @@ export const Tablet: React.FC<ITablet> = () => {
   const handleMenuClick = () => {
   };
   const handleCreateClick = () => {
+    router.push('/creation');
   };
   const handleUserClick = () => {
     router.push('/profile');
@@ -120,7 +121,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 <SItemWithMargin>
                   <UserAvatar
                     withClick
-                    user={user}
+                    avatarUrl={user.userData?.avatarUrl}
                     onClick={handleUserClick}
                   />
                 </SItemWithMargin>
@@ -172,12 +173,4 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
-
-  ${(props) => props.theme.media.tablet} {
-    margin-left: 24px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    margin-left: 16px;
-  }
 `;

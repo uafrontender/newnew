@@ -1,6 +1,7 @@
 import React from 'react';
-import Lottie from 'react-lottie';
 import styled from 'styled-components';
+
+import Lottie from '../../atoms/Lottie';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 // import NewnewLogoBlue from '../../../public/images/svg/auth/newnew-logo-blue.svg';

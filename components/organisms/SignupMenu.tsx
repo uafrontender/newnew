@@ -1,14 +1,13 @@
 // Temp disabled until backend is in place
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import isEmail from 'validator/lib/isEmail';
-import Skeleton from 'react-loading-skeleton';
+// import Skeleton from 'react-loading-skeleton';
 
 // Redux
 import { useAppSelector, useAppDispatch } from '../../redux-store/store';
@@ -74,14 +73,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
     setIsSubmitLoading(true);
     setSubmitError('');
     try {
-      // Temp commented out for dev purposes
-      /* const payload = new newnewapi.SendVerificationEmailRequest({
+      const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
       });
 
       const { data, error } = await sendVerificationEmail(payload);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed'); */
+      if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
       dispatch(setSignupEmailInput(emailInput));
       setIsSubmitLoading(false);
@@ -120,10 +118,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
         <SHeadline
           variant={3}
         >
-          {reason ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}` : t('heading.sign_in')}
+          {reason && reason !== 'session_expired' ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}` : t('heading.sign_in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
-          {t('heading.subheading')}
+          { reason !== 'session_expired' ? t('heading.subheading') : t('heading.subheadingSessionExpired') }
         </SSubheading>
         <MSContentWrapper
           variants={container}
@@ -188,7 +186,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
             variants={item}
           >
             <TextWithLine
-              lineColor={theme.colorsThemed.text.tertiary}
+              lineColor={theme.colorsThemed.background.outlines1}
               innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
             />
           </motion.div>
@@ -213,6 +211,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           {
             submitError ? (
               <AnimatedPresence
+                animateWhenInView={false}
                 animation="t-09"
               >
                 <SErrorDiv>
@@ -240,6 +239,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
           </motion.div>
         </MSContentWrapper>
         <AnimatedPresence
+          animateWhenInView={false}
           animation="t-01"
           delay={1.1}
         >
@@ -381,7 +381,7 @@ const SSignInBackButton = styled(GoBackButton)`
 
   padding: 8px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   span {
     display: none;
@@ -470,16 +470,12 @@ const SContinueWithSpan = styled.span`
   padding-right: 8px;
 
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  background-color: ${({ theme }) => theme.colorsThemed.grayscale.background1};
-
-  ${({ theme }) => theme.media.tablet} {
-    font-size: 16px;
-  }
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 `;
 
 const SErrorDiv = styled.div`
@@ -505,7 +501,7 @@ const SLegalText = styled(Text)`
 
   text-align: center;
 
-  font-weight: 500;
+  font-weight: 600;
   font-size: 12px;
   line-height: 16px;
 

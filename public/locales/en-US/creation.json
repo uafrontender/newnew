@@ -1,0 +1,231 @@
+{
+  "back": "Back",
+  "first-step-title": "Create a decision that gets noticed",
+  "first-step-sub-title": "It takes 2 mins to post your decision, try building one of the following",
+  "first-step-auction-title": "Auction",
+  "first-step-auction-sub-title": "The audience send bids with their suggestions.",
+  "first-step-multiple-choice-title": "Multiple Choice",
+  "first-step-multiple-choice-sub-title": "The audience pay to vote on options presented by you.",
+  "first-step-crowdfunding-title": "Crowdfunding",
+  "first-step-crowdfunding-sub-title": "The audience fund your single goal together.",
+  "second-step-auction-title": "Auction",
+  "second-step-multiple-choice-title": "Multiple Choice",
+  "second-step-crowdfunding-title": "Crowdfunding",
+  "tabs": {
+    "auction": "Auction",
+    "multiple-choice": "Multiple Choice",
+    "crowdfunding": "Crowdfunding"
+  },
+  "firstStep": {
+    "meta": {
+      "title": "Creation"
+    }
+  },
+  "secondStep": {
+    "meta": {
+      "title-auction": "Creation | Auction",
+      "title-multiple-choice": "Creation | Multiple Choice",
+      "title-crowdfunding": "Creation | Crowdfunding"
+    },
+    "input": {
+      "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
+    },
+    "fileUpload": {
+      "description": "Max size of the video 100 MB",
+      "button": "Select file"
+    },
+    "block": {
+      "title": {
+        "file": "Upload file",
+        "decision": "Decision information",
+        "advanced": "Advanced settings",
+        "floating": "Preview"
+      },
+      "subTitle": {
+        "votesInfo": "All votes start at a $1 dollar by default",
+        "floating": "Upload file to preview your brand new decision"
+      }
+    },
+    "modal": {
+      "leave": {
+        "message": "Are you sure want to leave this page?"
+      },
+      "deleteFile": {
+        "title": "Delete file",
+        "description": "Are you sure you want to permanently delete this file? You can’t undo the action."
+      }
+    },
+    "card": {
+      "left": "{{time}} left"
+    },
+    "button": {
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "submit": "Publish",
+      "preview": "Preview post",
+      "schedule": "Schedule",
+      "delete": "Delete permanently",
+      "card": {
+        "ac": "Place a bid",
+        "mc": "Place a bid",
+        "cf": "Place a bid"
+      }
+    },
+    "field": {
+      "minimalBid": {
+        "title": "Minimum bid",
+        "value": "${{value}}",
+        "label": "$",
+        "placeholder": "1",
+        "description": "Starting bid is ${{value}}"
+      },
+      "targetBackerCount": {
+        "title": "Minimum backers",
+        "value": "{{value}}",
+        "label": "",
+        "placeholder": "10",
+        "description": "No less than {{value}}"
+      },
+      "expiresAt": {
+        "title": "Expire after",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "options": {
+          "1-hour": "1 hour",
+          "6-hours": "6 hours",
+          "12-hours": "12 hours",
+          "1-day": "1 day",
+          "3-days": "3 days",
+          "5-days": "5 days",
+          "7-days": "7 days"
+        }
+      },
+      "startsAt": {
+        "title": "Start date",
+        "value": "{{value}}",
+        "description": "{{value}}",
+        "modal": {
+          "title": "Start date",
+          "type": {
+            "schedule": "Schedule",
+            "right-away": "Right away"
+          },
+          "hours-format": {
+            "pm": "PM",
+            "am": "AM"
+          },
+          "days": {
+            "sunday": "S",
+            "monday": "M",
+            "tuesday": "T",
+            "wednesday": "W",
+            "thursday": "T",
+            "friday": "F",
+            "saturday": "S"
+          }
+        },
+        "tablet": {
+          "title": "Start date",
+          "type": {
+            "schedule": "Schedule publishing",
+            "right-away": "Right away after I publish my decision"
+          }
+        }
+      },
+      "comments": {
+        "title": "Commenting turned on"
+      },
+      "allowSuggestions": {
+        "title": "Allow suggestions from VIP subscribers"
+      },
+      "choices": {
+        "add": "Add another option",
+        "option": {
+          "label": "Option {{value}}"
+        }
+      }
+    },
+    "video": {
+      "error": {
+        "minLength": "Video duration too small, choose from 10 seconds",
+        "maxLength": "Video duration too long, choose up to 5 minutes",
+        "maxSize": "Video size too big, choose up to 100mb",
+        "title": "Ooops...",
+        "description": "There was an error and your file could not be uploaded. Would you like to try again."
+      },
+      "setThumbnail": "Set thumbnail",
+      "deleteFile": "Delete file",
+      "previewFull": "Preview",
+      "thumbnail": {
+        "info": "Learn more",
+        "title": "Set thumbnail preview",
+        "submit": "Save changes",
+        "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
+      },
+      "full": {
+        "title": "Video preview"
+      },
+      "loading":  {
+        "title": "Just a minute",
+        "description": "Your file is uploading. Just give us a second to finish your upload.",
+        "process": "{{progress}}% • {{time}} left"
+      }
+    }
+  },
+  "preview": {
+    "meta": {
+      "title-auction": "Creation | Auction | Preview",
+      "title-multiple-choice": "Creation | Multiple Choice | Preview",
+      "title-crowdfunding": "Creation | Crowdfunding | Preview"
+    },
+    "title": "Post preview",
+    "button": {
+      "submit": "Publish",
+      "edit": "Edit"
+    },
+    "settings": {
+      "minimalBid": "Minimum bid",
+      "targetBackerCount": "Backers",
+      "expiresAt": "Expire after",
+      "startsAt": "Start date",
+      "comments": "Commenting",
+      "allowSuggestions": "Suggestions"
+    },
+    "values": {
+      "minimalBid": "${{value}}",
+      "comments-allowed": "Allowed",
+      "comments-forbidden": "Forbidden",
+      "allowSuggestions-allowed": "Allowed",
+      "allowSuggestions-forbidden": "Forbidden"
+    }
+  },
+  "published": {
+    "meta": {
+      "title-auction-published": "Creation | Auction | Published",
+      "title-multiple-choice-published": "Creation | Multiple Choice | Published",
+      "title-crowdfunding-published": "Creation | Crowdfunding | Published",
+      "title-auction-scheduled": "Creation | Auction | Scheduled",
+      "title-multiple-choice-scheduled": "Creation | Multiple Choice | Scheduled",
+      "title-crowdfunding-scheduled": "Creation | Crowdfunding | Scheduled"
+    },
+    "button": {
+      "submit": "View decision"
+    },
+    "texts": {
+      "subTitle-published": "Expand your reach and share decision with others.",
+      "subTitle-scheduled": "Your decision scheduled on {{value}}. Expand your reach and share decision with others.",
+      "desktop": {
+        "subTitle-published": "Your decision is successfully created. Expand your reach and share decision with others.",
+        "subTitle-scheduled": "Your decision is successfully created and scheduled on {{value}}. Expand your reach and share decision with others."
+      },
+      "title": "Let’s show-off a little"
+    },
+    "socials": {
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "copy": "Copy Link"
+    }
+  }
+}

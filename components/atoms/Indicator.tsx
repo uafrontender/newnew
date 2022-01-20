@@ -4,16 +4,21 @@ import CountUp from 'react-countup';
 
 export interface IIndicator {
   counter: number,
+  animate?: boolean,
   minified?: boolean,
+  onAnimationEnd?: () => void,
 }
 
 export const Indicator: React.FC<IIndicator> = (props) => {
   const {
     counter,
+    animate,
     minified,
+    onAnimationEnd,
   } = props;
 
   const bigCounter = counter >= 100;
+  const valueToDisplay = bigCounter ? 99 : counter;
 
   if (minified) {
     return <SMinifiedIndicator />;
@@ -21,11 +26,14 @@ export const Indicator: React.FC<IIndicator> = (props) => {
 
   return (
     <SIndicator bigCounter={bigCounter}>
-      <CountUp
-        useEasing
-        end={bigCounter ? 99 : counter}
-        duration={5}
-      />
+      {animate ? (
+        <CountUp
+          useEasing
+          end={valueToDisplay}
+          onEnd={onAnimationEnd}
+          duration={5}
+        />
+      ) : valueToDisplay}
       {bigCounter ? '+' : ''}
     </SIndicator>
   );
@@ -34,7 +42,9 @@ export const Indicator: React.FC<IIndicator> = (props) => {
 export default Indicator;
 
 Indicator.defaultProps = {
+  animate: true,
   minified: false,
+  onAnimationEnd: () => {},
 };
 
 interface ISIndicator {
@@ -57,10 +67,11 @@ const SIndicator = styled.div<ISIndicator>`
 
 const SMinifiedIndicator = styled.div`
   width: 6px;
-  border: 3px solid ${(props) => props.theme.colorsThemed.grayscale.background1};
+  border: 3px solid ${(props) => props.theme.colorsThemed.background.primary};
   height: 6px;
   padding: 3px;
   overflow: hidden;
+  position: relative;
   border-radius: 50px;
   background-color: ${(props) => props.theme.colorsThemed.accent.pink};
 `;

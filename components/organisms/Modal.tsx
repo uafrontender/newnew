@@ -9,6 +9,8 @@ import { useAppDispatch } from '../../redux-store/store';
 interface IModal {
   show: boolean;
   transitionSpeed?: number;
+  overlayDim?: boolean;
+  additionalZ?: number;
   onClose: () => void;
   children: ReactNode;
 }
@@ -17,6 +19,8 @@ const Modal: React.FC<IModal> = (props) => {
   const {
     show,
     transitionSpeed,
+    overlayDim,
+    additionalZ,
     onClose,
     children,
   } = props;
@@ -25,13 +29,22 @@ const Modal: React.FC<IModal> = (props) => {
   useEffect(() => {
     dispatch(setOverlay(show));
   }, [show, dispatch]);
+  useEffect(() => {
+    const blurredBody = document.getElementById('__next');
+
+    if (blurredBody) {
+      blurredBody.classList.toggle('blurred', show);
+    }
+  }, [show]);
 
   if (isBrowser()) {
     return ReactDOM.createPortal(
       <StyledModalOverlay
         show={show}
-        transitionSpeed={transitionSpeed ?? 0.5}
         onClick={onClose}
+        overlayDim={overlayDim ?? false}
+        additionalZ={additionalZ ?? undefined}
+        transitionSpeed={transitionSpeed ?? 0.5}
       >
         {children}
       </StyledModalOverlay>,
@@ -45,6 +58,8 @@ const Modal: React.FC<IModal> = (props) => {
 interface IStyledModalOverlay {
   show: boolean;
   transitionSpeed?: number;
+  overlayDim?: boolean;
+  additionalZ?: number;
 }
 
 const StyledModalOverlay = styled.div<IStyledModalOverlay>`
@@ -52,20 +67,30 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   width: 100vw;
   bottom: 0;
   height: ${(props) => (props.show ? '100%' : 0)};
-  z-index: 10;
+  z-index: ${({ additionalZ }) => additionalZ ?? 10};
   overflow: hidden;
   position: fixed;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
-  background-color: ${(props) => props.theme.colorsThemed.grayscale.backgroundT};
+  // To avoid overlapping dim color with this bg color
+  background-color: ${({ theme, overlayDim }) => (overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT)};
 
   ::before {
+    top: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    height: 100%;
+    bottom: 0;
+    height: 100vh;
     content: '';
     z-index: -1;
     position: absolute;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+
+    /* Some screens have dimmed overlay */
+    background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.background.overlayDim : null)};
   }
 `;
 

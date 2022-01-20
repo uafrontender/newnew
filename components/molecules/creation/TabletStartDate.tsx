@@ -1,0 +1,118 @@
+import React, { useCallback, useState } from 'react';
+import moment from 'moment';
+import styled from 'styled-components';
+import { useTranslation } from 'next-i18next';
+
+import CheckBox from '../CheckBox';
+import TimePicker from '../../atoms/creation/TimePicker';
+import CalendarPicker from '../../atoms/creation/calendar/Simple';
+import AnimatedPresence, { TAnimation } from '../../atoms/AnimatedPresence';
+
+interface ITabletStartDate {
+  id: string;
+  value: any;
+  onChange: (key: string, value: string | number | boolean | object) => void;
+}
+
+export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
+  const {
+    id,
+    value,
+    onChange,
+  } = props;
+  const { t } = useTranslation('creation');
+  const [animate, setAnimate] = useState(value.type === 'schedule');
+  const [animation, setAnimation] = useState('o-12');
+
+  const handleAnimationEnd = useCallback(() => {
+    setAnimate(false);
+  }, []);
+  const handleTimeChange = useCallback((key, time: any) => {
+    onChange(id, { [key]: time });
+  }, [id, onChange]);
+  const handleDateChange = useCallback((date: any) => {
+    onChange(id, { date });
+  }, [id, onChange]);
+  const handleTypeChange = useCallback((e, type) => {
+    const changeBody: any = { type };
+    if (type === 'right-away') {
+      changeBody.date = moment()
+        .format();
+      changeBody.time = moment()
+        .format('hh:mm');
+      changeBody['hours-format'] = moment()
+        .format('a');
+    }
+
+    onChange(id, changeBody);
+    setAnimate(true);
+    setAnimation(type === 'schedule' ? 'o-12' : 'o-12-reverse');
+  }, [id, onChange]);
+
+  return (
+    <SContainer>
+      <SCheckBoxWrapper>
+        <CheckBox
+          id="right-away"
+          label={t('secondStep.field.startsAt.tablet.type.right-away')}
+          selected={value.type === 'right-away'}
+          handleChange={handleTypeChange}
+        />
+      </SCheckBoxWrapper>
+      <CheckBox
+        id="schedule"
+        label={t('secondStep.field.startsAt.tablet.type.schedule')}
+        selected={value.type === 'schedule'}
+        handleChange={handleTypeChange}
+      />
+      <AnimatedPresence
+        start={animate}
+        animation={animation as TAnimation}
+        onAnimationEnd={handleAnimationEnd}
+      >
+        <SCalendarWrapper>
+          <SCalendarInput>
+            <CalendarPicker
+              date={value?.date}
+              onChange={handleDateChange}
+            />
+          </SCalendarInput>
+          <STimeInput>
+            <TimePicker
+              time={value?.time}
+              format={value?.['hours-format']}
+              onChange={handleTimeChange}
+            />
+          </STimeInput>
+        </SCalendarWrapper>
+      </AnimatedPresence>
+    </SContainer>
+  );
+};
+
+export default TabletStartDate;
+
+TabletStartDate.defaultProps = {};
+
+const SContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SCheckBoxWrapper = styled.div`
+  margin-bottom: 16px;
+`;
+
+const SCalendarWrapper = styled.div`
+  gap: 16px;
+  display: flex;
+  margin-top: 16px;
+`;
+
+const SCalendarInput = styled.div`
+  width: 65%;
+`;
+
+const STimeInput = styled.div`
+  width: 35%;
+`;

@@ -117,6 +117,7 @@ const SCaption = styled(Caption)<ISTitle>`
   color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
   width: 100%;
   overflow: hidden;
+  position: relative;
   margin-top: 4px;
   text-align: center;
   white-space: nowrap;

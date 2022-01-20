@@ -10,16 +10,14 @@ import { useAppSelector } from '../../redux-store/store';
 import userIcon from '../../public/images/svg/icons/filled/UnregisteredUser.svg';
 
 interface IUserAvatar {
-  user: {
-    avatar?: string,
-  },
-  onClick?: () => any,
+  avatarUrl?: string,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => any,
   withClick?: boolean,
 }
 
 export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const {
-    user,
+    avatarUrl,
     onClick,
     withClick,
     ...rest
@@ -29,7 +27,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
   const theme = useTheme();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  if (!user.avatar) {
+  if (!avatarUrl) {
     return (
       <SButton
         iconOnly
@@ -54,7 +52,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       withClick={withClick ?? false}
     >
       <Image
-        src={user.avatar}
+        src={avatarUrl}
         alt="User avatar"
         width="100%"
         height="100%"
@@ -67,9 +65,9 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
 export default UserAvatar;
 
 UserAvatar.defaultProps = {
+  avatarUrl: undefined,
   withClick: false,
-  onClick: () => {
-  },
+  onClick: () => {},
 };
 
 interface ISContainer {
@@ -79,6 +77,7 @@ interface ISContainer {
 const SContainer = styled.div<ISContainer>`
   width: 36px;
   height: 36px;
+  position: relative;
   overflow: hidden;
   min-width: 36px;
   min-height: 36px;

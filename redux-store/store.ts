@@ -1,10 +1,12 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import {
+  Action,
   combineReducers,
   configureStore,
   EnhancedStore,
   ReducerFromReducersMapObject,
   StateFromReducersMapObject,
+  ThunkAction,
 } from '@reduxjs/toolkit';
 
 // React-persist
@@ -20,6 +22,7 @@ import { createWrapper } from 'next-redux-wrapper';
 // Import reducers
 import uiReducer from './slices/uiStateSlice';
 import userReducer from './slices/userStateSlice';
+import creationReducer from './slices/creationStateSlice';
 
 import isBrowser from '../utils/isBrowser';
 
@@ -28,7 +31,7 @@ import isBrowser from '../utils/isBrowser';
 const rootPersistConfig = {
   key: 'root',
   storage,
-  blacklist: ['ui', 'user'],
+  blacklist: ['ui', 'user', 'creation'],
 };
 
 const uiPersistConfig = {
@@ -36,6 +39,7 @@ const uiPersistConfig = {
   storage,
   whitelist: [
     'colorMode',
+    'mutedMode',
   ],
 };
 
@@ -44,14 +48,22 @@ const userPersistConfig = {
   storage,
 };
 
+const creationPersistConfig = {
+  key: 'creation',
+  storage,
+  whitelist: [],
+};
+
 const reducers = {
   ui: persistReducer(uiPersistConfig, uiReducer),
   user: persistReducer(userPersistConfig, userReducer),
+  creation: persistReducer(creationPersistConfig, creationReducer),
 };
 
 const combinedReducer = combineReducers({
   ui: uiReducer,
   user: userReducer,
+  creation: creationReducer,
 });
 
 export type EnhancedStoreWithPersistor = EnhancedStore & {
@@ -99,6 +111,8 @@ const makeStore = () => {
 
 export type RootState = StateFromReducersMapObject<typeof reducers>
 export type AppDispatch = ReducerFromReducersMapObject<typeof reducers>
+export type AppThunk<ReturnType = void> =
+  ThunkAction<ReturnType, RootState, unknown, Action<string>>
 
 export const useAppDispatch = (): any => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

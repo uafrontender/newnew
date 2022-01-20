@@ -6,9 +6,13 @@ import { useStore } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
+import { ToastContainer } from 'react-toastify';
 import { CookiesProvider } from 'react-cookie';
 import { parse, UserAgent } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
+
+// Custom error page
+import Error from './_error';
 
 // Global CSS configurations
 import ResizeMode from '../HOC/ResizeMode';
@@ -21,11 +25,17 @@ import { EnhancedStoreWithPersistor, wrapper } from '../redux-store/store';
 import isBrowser from '../utils/isBrowser';
 
 // Socket context
-// import SocketContextProvider from '../contexts/socketContext';
+import SocketContextProvider from '../contexts/socketContext';
+
+// Global Cookies instance
+import { cookiesInstance } from '../api/apiConfigs';
+
+import 'react-toastify/dist/ReactToastify.css';
+import ChannelsContextProvider from '../contexts/channelsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode
+  getLayout?: (page: ReactElement) => ReactNode,
 }
 
 interface IMyApp extends AppProps {
@@ -40,6 +50,8 @@ const MyApp = (props: IMyApp): ReactElement => {
     uaString,
   } = props;
   const ua: UserAgent = parse(uaString || (isBrowser() ? window?.navigator?.userAgent : ''));
+  const store = useStore();
+  const currentResizeMode = store.getState()?.ui?.resizeMode;
   const getInitialResizeMode = () => {
     let resizeMode = 'mobile';
 
@@ -47,11 +59,18 @@ const MyApp = (props: IMyApp): ReactElement => {
       resizeMode = 'tablet';
     } else if (ua.isDesktop) {
       resizeMode = 'laptop';
+
+      if (['laptopL', 'desktop'].includes(currentResizeMode)) {
+        // keep old mode in case laptop
+        resizeMode = currentResizeMode;
+      }
+    } else if (['mobileL', 'mobileM', 'mobileS'].includes(currentResizeMode)) {
+      // keep old mode in case mobile
+      resizeMode = currentResizeMode;
     }
 
     return resizeMode;
   };
-  const store = useStore();
 
   store.dispatch(setResizeMode(getInitialResizeMode()));
 
@@ -65,17 +84,34 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="robots" content="noindex" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
-      {/* <SocketContextProvider> */}
-      <CookiesProvider>
-        <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
-          <ResizeMode>
-            <GlobalTheme>
-              { getLayout(<Component {...pageProps} />) }
-            </GlobalTheme>
-          </ResizeMode>
-        </PersistGate>
+      <CookiesProvider
+        cookies={cookiesInstance}
+      >
+        <SocketContextProvider>
+          <ChannelsContextProvider>
+            <PersistGate
+              loading={null}
+              persistor={(store as EnhancedStoreWithPersistor).__persistor}
+            >
+              <ResizeMode>
+                <GlobalTheme>
+                  <div>
+                    <ToastContainer />
+                    {!pageProps.error ? (
+                      getLayout(<Component {...pageProps} />)
+                    ) : (
+                      <Error
+                        errorMsg={pageProps.error?.message}
+                        statusCode={pageProps.error?.statusCode ?? 500}
+                      />
+                    )}
+                  </div>
+                </GlobalTheme>
+              </ResizeMode>
+            </PersistGate>
+          </ChannelsContextProvider>
+        </SocketContextProvider>
       </CookiesProvider>
-      {/* </SocketContextProvider> */}
     </>
   );
 };

@@ -7,7 +7,7 @@ const users: User[] = [
   {
     uuid: '12345',
     username: 'johndoe12345',
-    displayName: 'John',
+    nickname: 'John',
     avatarUrl: 'https://randomuser.me/api/portraits/women/21.jpg',
     bio: '',
     coverUrl: '/images/mock/profile-bg.png',
@@ -18,7 +18,7 @@ const users: User[] = [
   {
     uuid: '1',
     username: 'unicornbabe',
-    displayName: 'UnicornBabe',
+    nickname: 'UnicornBabe',
     avatarUrl: 'https://randomuser.me/api/portraits/women/34.jpg',
     bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     coverUrl: '/images/mock/profile-bg.png',
@@ -30,7 +30,7 @@ const users: User[] = [
   {
     uuid: '2',
     username: '0xa463sugardaddy8080',
-    displayName: 'SugarDaddy',
+    nickname: 'SugarDaddy',
     avatarUrl: 'https://randomuser.me/api/portraits/men/19.jpg',
     bio: '',
     coverUrl: '/images/mock/profile-bg.png',

@@ -13,7 +13,7 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 // NB!
 
 export type TOverlay = true | false;
-export type TColorMode = 'light' | 'dark';
+export type TColorMode = 'light' | 'dark' | 'auto';
 export type TGlobalSearchActive = true | false;
 export type TResizeMode =
   'mobile'
@@ -34,6 +34,7 @@ export interface UIStateInterface {
   overlay: TOverlay;
   colorMode: TColorMode;
   resizeMode: TResizeMode;
+  mutedMode: boolean;
   globalSearchActive: TGlobalSearchActive;
 }
 
@@ -43,8 +44,9 @@ export const defaultUIState: UIStateInterface = {
     title: 'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
   },
   overlay: false,
-  colorMode: 'light',
+  colorMode: 'auto',
   resizeMode: 'mobile',
+  mutedMode: true,
   globalSearchActive: false,
 };
 
@@ -67,6 +69,9 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     setBanner(state, { payload }: PayloadAction<TBanner>) {
       state.banner = payload;
     },
+    toggleMutedMode(state) {
+      state.mutedMode = !state.mutedMode;
+    },
   },
 });
 
@@ -75,6 +80,7 @@ export const {
   setOverlay,
   setColorMode,
   setResizeMode,
+  toggleMutedMode,
   setGlobalSearchActive,
 } = uiSlice.actions;
 

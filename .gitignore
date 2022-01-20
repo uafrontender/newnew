@@ -38,3 +38,6 @@ yarn-error.log*
 /cypress/screenshots/*
 /cypress/videos/*
 /cypress/downloads/*
+
+# storybook dist
+/storybook-static
