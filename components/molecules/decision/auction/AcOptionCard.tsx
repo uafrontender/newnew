@@ -21,7 +21,7 @@ import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import Text from '../../../atoms/Text';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceAcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';

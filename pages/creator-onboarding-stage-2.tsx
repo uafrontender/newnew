@@ -13,11 +13,36 @@ import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import OnboardingSectionDetails from '../components/molecules/creator-onboarding/OnboardingSectionDetails';
 
-interface ICreatorOnboardingStage2 {
-
+export type CountryOption = {
+  value: string;
+  en: string;
 }
 
-const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = () => {
+const countriesMock: CountryOption[] = [
+  {
+    value: 'US',
+    en: 'United States',
+  },
+  {
+    value: 'Canada',
+    en: 'Canada',
+  },
+];
+
+const genericAvatarsMock = [
+  'someurl',
+  'anotherurl',
+];
+
+interface ICreatorOnboardingStage2 {
+  genericAvatarsUrls: string[];
+  availableCountries: any[];
+}
+
+const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
+  genericAvatarsUrls,
+  availableCountries,
+}) => {
   const { t } = useTranslation('creator-onboarding');
 
   const { loggedIn } = useAppSelector((state) => state.user);
@@ -35,6 +60,8 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = () => {
         <meta name="description" content={t('meta.description')} />
       </Head>
       <OnboardingSectionDetails
+        genericAvatarsUrls={genericAvatarsUrls}
+        availableCountries={availableCountries}
         goToDashboard={goToNext}
       />
     </>
@@ -51,15 +78,17 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = () => {
 
 export default CreatorOnboardingStage2;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
+export const getServerSideProps:GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(
-    context.locale,
+    context.locale!!,
     ['creator-onboarding', 'profile'],
   );
 
   return {
     props: {
+      availableCountries: countriesMock,
+      genericAvatarsUrls: genericAvatarsMock,
       ...translationContext,
     },
   };
-}
+};

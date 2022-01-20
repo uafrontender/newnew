@@ -22,7 +22,7 @@ import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import PlaceBidForm from './PlaceAcBidForm';
 import PaymentModal from '../PaymentModal';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import Button from '../../../atoms/Button';
 import { validateText } from '../../../../api/endpoints/infrastructure';

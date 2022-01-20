@@ -20,7 +20,7 @@ import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import Text from '../../../atoms/Text';
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceMcBidForm from './PlaceMcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';

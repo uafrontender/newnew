@@ -1,13 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { Area, Point } from 'react-easy-crop/types';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { useAppSelector } from '../../../redux-store/store';
 import getCroppedImg from '../../../utils/cropImage';
-import { getImageUploadUrl } from '../../../api/endpoints/upload';
 
 import Modal from '../../organisms/Modal';
 import GoBackButton from '../GoBackButton';
@@ -17,8 +15,6 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import ZoomOutIcon from '../../../public/images/svg/icons/outlined/Minus.svg';
 import ZoomInIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 import Button from '../../atoms/Button';
-import { updateMe } from '../../../api/endpoints/user';
-import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-store/slices/userStateSlice';
 import ProfileImageZoomSlider from '../../atoms/profile/ProfileImageZoomSlider';
 
 interface IOnboardingEditProfileImageModal {
@@ -26,6 +22,7 @@ interface IOnboardingEditProfileImageModal {
   avatarUrlInEdit: string;
   originalProfileImageWidth: number;
   setAvatarUrlInEdit: (value: string) => void;
+  handleSetImageToSave: (value: File) => void;
   onClose: () => void;
 }
 
@@ -35,12 +32,11 @@ IOnboardingEditProfileImageModal> = ({
   avatarUrlInEdit,
   originalProfileImageWidth,
   setAvatarUrlInEdit,
+  handleSetImageToSave,
   onClose,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('creator-onboarding');
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -48,7 +44,7 @@ IOnboardingEditProfileImageModal> = ({
   const [cropProfileImage, setCropProfileImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaProfileImage, setCroppedAreaProfileImage] = useState<Area>();
   const [zoomProfileImage, setZoomProfileImage] = useState(1);
-  const [updateProfileImageLoading, setUpdateProfileImageLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSetStageToEditingGeneralUnsetPicture = () => {
     onClose();
@@ -80,75 +76,23 @@ IOnboardingEditProfileImageModal> = ({
     }, [],
   );
 
-  const completeProfileImageCropAndSave = useCallback(async () => {
+  const completeProfileImageCropAndUpdateImageToSave = useCallback(async () => {
     try {
-      setUpdateProfileImageLoading(true);
+      setLoading(true);
       const croppedImage = await getCroppedImg(
         avatarUrlInEdit,
         croppedAreaProfileImage!!,
         0,
         'avatarImage.jpeg',
       );
-
-      // Get upload and public URLs
-      const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
-        filename: croppedImage.name,
-      });
-
-      const res = await getImageUploadUrl(
-        imageUrlPayload,
-      );
-
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
-
-      const uploadResponse = await fetch(
-        res.data.uploadUrl,
-        {
-          method: 'PUT',
-          body: croppedImage,
-          headers: {
-            'Content-Type': 'image/png',
-          },
-        },
-      );
-
-      if (!uploadResponse.ok) throw new Error('Upload failed');
-
-      const updateMePayload = new newnewapi.UpdateMeRequest({
-        avatarUrl: res.data.publicUrl,
-      });
-
-      const updateMeRes = await updateMe(
-        updateMePayload,
-      );
-
-      if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
-
-      // Update Redux state
-      dispatch(setUserData({
-        ...user.userData,
-        avatarUrl: updateMeRes.data.me?.avatarUrl,
-      }));
-
-      setUpdateProfileImageLoading(false);
+      handleSetImageToSave(croppedImage);
+      setLoading(false);
       onClose();
     } catch (err) {
       console.error(err);
-      setUpdateProfileImageLoading(false);
-      if ((err as Error).message === 'No token') {
-        dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
-        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
-      }
+      setLoading(false);
     }
-  }, [
-    croppedAreaProfileImage,
-    avatarUrlInEdit, onClose, dispatch,
-    user.userData,
-  ]);
+  }, [avatarUrlInEdit, croppedAreaProfileImage, handleSetImageToSave, onClose]);
 
   return (
     <Modal
@@ -184,7 +128,7 @@ IOnboardingEditProfileImageModal> = ({
           zoom={zoomProfileImage}
           avatarUrlInEdit={avatarUrlInEdit}
           originalImageWidth={originalProfileImageWidth}
-          disabled={updateProfileImageLoading}
+          disabled={loading}
           onCropChange={setCropProfileImage}
           onCropComplete={onCropCompleteProfileImage}
           onZoomChange={setZoomProfileImage}
@@ -194,7 +138,7 @@ IOnboardingEditProfileImageModal> = ({
             iconOnly
             size="sm"
             view="transparent"
-            disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
+            disabled={zoomProfileImage <= 1 || loading}
             onClick={handleZoomOutProfileImage}
           >
             <InlineSvg
@@ -210,14 +154,14 @@ IOnboardingEditProfileImageModal> = ({
             max={3}
             step={0.1}
             ariaLabel="Zoom"
-            disabled={updateProfileImageLoading}
+            disabled={loading}
             onChange={(e) => setZoomProfileImage(Number(e.target.value))}
           />
           <Button
             iconOnly
             size="sm"
             view="transparent"
-            disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
+            disabled={zoomProfileImage >= 3 || loading}
             onClick={handleZoomInProfileImage}
           >
             <InlineSvg
@@ -231,15 +175,15 @@ IOnboardingEditProfileImageModal> = ({
         <SControlsWrapperPicture>
           <Button
             view="secondary"
-            disabled={updateProfileImageLoading}
+            disabled={loading}
             onClick={handleSetStageToEditingGeneralUnsetPicture}
           >
             { t('DetailsSection.EditProfileImageModal.cancelButton') }
           </Button>
           <Button
             withShadow
-            disabled={updateProfileImageLoading}
-            onClick={completeProfileImageCropAndSave}
+            disabled={loading}
+            onClick={completeProfileImageCropAndUpdateImageToSave}
           >
             { t('DetailsSection.EditProfileImageModal.saveButton') }
           </Button>

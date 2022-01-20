@@ -14,7 +14,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceAcBidForm';
 
