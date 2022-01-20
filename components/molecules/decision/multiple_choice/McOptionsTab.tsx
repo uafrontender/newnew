@@ -146,7 +146,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setNewBidAmount('');

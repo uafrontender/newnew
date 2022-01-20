@@ -89,9 +89,9 @@ export const fetchBiggestPosts = (
 );
 
 export const fetchMoreLikePosts = (
-  payload: newnewapi.GetMoreLikePostsRequest,
-) => fetchProtobuf<newnewapi.GetMoreLikePostsRequest, newnewapi.PagedPostsResponse>(
-  newnewapi.GetMoreLikePostsRequest,
+  payload: newnewapi.GetSimilarPostsRequest,
+) => fetchProtobuf<newnewapi.GetSimilarPostsRequest, newnewapi.PagedPostsResponse>(
+  newnewapi.GetSimilarPostsRequest,
   newnewapi.PagedPostsResponse,
   `${BASE_URL_POST}/get_more_like_posts`,
   'post',

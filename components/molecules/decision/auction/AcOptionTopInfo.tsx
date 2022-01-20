@@ -93,7 +93,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setSupportBidAmount('');

@@ -55,7 +55,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
-  const myVote = useMemo(() => option.isSupportedByUser, [option.isSupportedByUser]);
+  const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
   const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
     option.creator?.uuid,
     user.userData?.userUuid,
@@ -109,7 +109,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       handleSetSupportedBid('');
@@ -163,7 +163,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           bgVariant={bgVariant}
         >
           <SBidInfo>
-            {option.isSupportedByUser
+            {option.isSupportedByMe
               && creator?.uuid !== user.userData?.userUuid
               ? (
                 <STag>{t('McPost.OptionsTab.tags.my_vote')}</STag>

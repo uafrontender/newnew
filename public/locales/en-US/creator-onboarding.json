@@ -45,6 +45,11 @@
         "uploadNewBtn": "Upload new image"
       }
     },
+    "EditProfileImageModal": {
+      "goBackButton": "Edit Profile Image",
+      "saveButton": "Save changes",
+      "cancelButton": "Cancel"
+    },
     "backButton": "Back",
     "submitDesktop": "Save and continue",
     "submitMobile": "Set up and continue"

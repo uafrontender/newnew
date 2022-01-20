@@ -54,7 +54,7 @@ export default CreatorOnboardingStage2;
 export async function getStaticProps(context: { locale: string }): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale,
-    ['creator-onboarding'],
+    ['creator-onboarding', 'profile'],
   );
 
   return {

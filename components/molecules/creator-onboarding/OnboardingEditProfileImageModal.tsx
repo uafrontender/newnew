@@ -164,13 +164,13 @@ IOnboardingEditProfileImageModal> = ({
           <SGoBackButtonMobile
             onClick={() => onClose()}
           >
-            { t('EditProfileMenu.goBackBtn.profilePicture') }
+            { t('DetailsSection.EditProfileImageModal.goBackButton') }
           </SGoBackButtonMobile>
         ) : (
           <SGoBackButtonDesktop
             onClick={() => onClose()}
           >
-            <div>{ t('EditProfileMenu.goBackBtn.profilePicture') }</div>
+            <div>{ t('DetailsSection.EditProfileImageModal.goBackButton') }</div>
             <InlineSvg
               svg={CancelIcon}
               fill={theme.colorsThemed.text.primary}
@@ -234,14 +234,14 @@ IOnboardingEditProfileImageModal> = ({
             disabled={updateProfileImageLoading}
             onClick={handleSetStageToEditingGeneralUnsetPicture}
           >
-            { t('EditProfileMenu.cancelButton') }
+            { t('DetailsSection.EditProfileImageModal.cancelButton') }
           </Button>
           <Button
             withShadow
             disabled={updateProfileImageLoading}
             onClick={completeProfileImageCropAndSave}
           >
-            { t('EditProfileMenu.saveButton') }
+            { t('DetailsSection.EditProfileImageModal.saveButton') }
           </Button>
         </SControlsWrapperPicture>
       </SEditPictureMenu>
