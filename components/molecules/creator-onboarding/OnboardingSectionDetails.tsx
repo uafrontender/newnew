@@ -267,7 +267,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // Image
   useUpdateEffect(() => {
     setFieldsToBeUpdated((curr) => {
-      const working = curr;
+      const working = { ...curr };
       working.image = true;
       return working;
     });
@@ -276,7 +276,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // Validate fields
   useEffect(() => {
     setFieldsValid((curr) => {
-      const working = curr;
+      const working = { ...curr };
       working.email = validator.isEmail(emailInEdit);
       working.dateOfBirth = dateInEdit ? true : false;
       working.image = imageInEdit !== '';
@@ -357,7 +357,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           </GoBackButton>
         )}
         <Button
-          disabled={Object.values(fieldsValid).some((v) => !v)}
+          disabled={Object.values(fieldsValid).some((v) => v === false)}
           view="primaryGrad"
         >
           {isMobile ? (
