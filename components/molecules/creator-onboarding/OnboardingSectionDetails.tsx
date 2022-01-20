@@ -151,7 +151,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
   const handleSaveChangesAndGoToDashboard = useCallback(async () => {
     try {
-      setLoadingModalOpen(false);
+      setLoadingModalOpen(true);
 
       if (fieldsToBeUpdated.image) {
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
@@ -195,7 +195,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       }
 
       setLoadingModalOpen(false);
-      // router.push('/')
+      router.push('/');
       // goToDashboard();
     } catch (err) {
       console.error(err);
@@ -213,6 +213,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     fieldsToBeUpdated,
     user.userData,
     imageToSave,
+    router,
     dispatch,
     setLoadingModalOpen,
   ]);
@@ -357,8 +358,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           </GoBackButton>
         )}
         <Button
-          disabled={Object.values(fieldsValid).some((v) => v === false)}
           view="primaryGrad"
+          disabled={Object.values(fieldsValid).some((v) => v === false)}
+          onClick={() => handleSaveChangesAndGoToDashboard()}
         >
           {isMobile ? (
             t('DetailsSection.submitMobile')
