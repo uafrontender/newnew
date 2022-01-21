@@ -71,7 +71,7 @@ const signs: IAstrologySigns = {
   Capricorn: CapricornIcon,
 };
 
-interface ISettingsBirthDateInput {
+interface IOnboardingBirthDateInput {
   value?: Date;
   locale?: string;
   disabled: boolean;
@@ -81,7 +81,7 @@ interface ISettingsBirthDateInput {
   handleSetActive?: () => void;
 }
 
-const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> = ({
+const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInput> = ({
   value,
   locale,
   disabled,
@@ -269,24 +269,24 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
   );
 };
 
-SettingsBirthDateInput.defaultProps = {
+OnboardingBirthDateInput.defaultProps = {
   value: undefined,
   locale: 'en-US',
   handleSetActive: () => {},
 };
 
-export default SettingsBirthDateInput;
+export default OnboardingBirthDateInput;
 
 const SContainer = styled.div`
   position: relative;
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 272px;
+    width: 284px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 224px;
+    width: 296px;
   }
 `;
 
@@ -321,7 +321,7 @@ const SAstrologyImg = styled.img`
   width: 24px;
   height: 24px;
 
-  z-index: 5;
+  z-index: 1;
 `;
 
 const CalendarButton = styled.button`

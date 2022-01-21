@@ -13,7 +13,11 @@ import { SCROLL_TO_TOP } from '../../constants/timings';
 import logoText from '../../public/images/svg/logo_text.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 
-export const Logo = () => {
+export const Logo: React.FunctionComponent<{
+  style?: React.CSSProperties,
+}> = ({
+  style,
+}) => {
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
@@ -44,7 +48,14 @@ export const Logo = () => {
   });
 
   return (
-    <SWrapper onClick={handleClick}>
+    <SWrapper
+      {...{
+        ...(style ? {
+          style,
+        } : {}),
+      }}
+      onClick={handleClick}
+    >
       <SAnimationWrapper>
         <Lottie
           width={isMobile ? 55 : 65}
@@ -65,6 +76,10 @@ export const Logo = () => {
       />
     </SWrapper>
   );
+};
+
+Logo.defaultProps = {
+  style: {},
 };
 
 export default Logo;

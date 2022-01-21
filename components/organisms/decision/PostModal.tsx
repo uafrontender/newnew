@@ -99,7 +99,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     try {
       setRecommenedPostsLoading(true);
 
-      const fetchRecommenedPostsPayload = new newnewapi.GetMoreLikePostsRequest({
+      const fetchRecommenedPostsPayload = new newnewapi.GetSimilarPostsRequest({
         postUuid: postParsed?.postUuid,
         ...(pageToken ? {
           paging: {

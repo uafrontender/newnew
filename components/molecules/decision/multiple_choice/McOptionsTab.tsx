@@ -21,7 +21,7 @@ import Button from '../../../atoms/Button';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import PaymentModal from '../PaymentModal';
 import PlaceMcBidForm from './PlaceMcBidForm';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 import OptionActionMobileModal from '../OptionActionMobileModal';
@@ -146,7 +146,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setNewBidAmount('');

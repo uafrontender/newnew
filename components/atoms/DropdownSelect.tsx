@@ -165,7 +165,7 @@ const SLabelButton = styled.button`
     line-height: 24px;
   }
 
-  padding: 12px 12px 12px 20px;
+  padding: 12px 20px 12px 20px;
 
   span {
     margin-right: 8px;
