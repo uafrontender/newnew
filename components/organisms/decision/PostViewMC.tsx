@@ -103,7 +103,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       : [];
 
     const optionsSupportedByUser = user.userData?.userUuid
-      ? unsortedArr.filter((o) => o.isSupportedByUser)
+      ? unsortedArr.filter((o) => o.isSupportedByMe)
         .sort((a, b) => (
           (b?.voteCount as number) - (a?.voteCount as number)
         ))
@@ -198,7 +198,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         workingArr[idx]
           .voteCount = (newOrUpdatedption.voteCount as number);
         workingArr[idx]
-          .isSupportedByUser = true;
+          .isSupportedByMe = true;
         workingArrUnsorted = workingArr;
       }
 

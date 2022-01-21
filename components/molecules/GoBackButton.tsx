@@ -7,16 +7,19 @@ import InlineSvg from '../atoms/InlineSVG';
 
 // Icons
 import BackButtonIcon from '../../public/images/svg/auth/icon-back.svg';
+import ArrowLeftIcon from '../../public/images/svg/icons/outlined/ArrowLeft.svg';
 
 type TGoBackButton = {
   children?: React.ReactNode;
   defer?: number;
+  longArrow?: boolean;
   onClick: () => void;
 } & React.ComponentPropsWithoutRef<'button'>;
 
 const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
   children,
   defer,
+  longArrow,
   onClick,
   ...rest
 }) => {
@@ -29,7 +32,7 @@ const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
       {...rest}
     >
       <InlineSvg
-        svg={BackButtonIcon}
+        svg={longArrow ? ArrowLeftIcon : BackButtonIcon}
         width="24px"
         height="24px"
       />
@@ -41,6 +44,7 @@ const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
 GoBackButton.defaultProps = {
   children: undefined,
   defer: undefined,
+  longArrow: undefined,
 };
 
 export default GoBackButton;

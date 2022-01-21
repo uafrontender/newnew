@@ -13,7 +13,7 @@ export const fetchLiveAuctions = (
 ) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedAuctionsResponse>(
   newnewapi.PagedRequest,
   newnewapi.PagedAuctionsResponse,
-  `${BASE_URL_AUCTION}/get_live_auctions`,
+  `${BASE_URL_AUCTION}/get_top_auctions`,
   'post',
   payload,
 );

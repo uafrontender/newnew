@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Modal from '../../organisms/Modal';
-import Lottie from '../../atoms/Lottie';
+import Modal from '../organisms/Modal';
+import Lottie from '../atoms/Lottie';
 
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import loadingAnimation from '../../public/animations/logo-loading-blue.json';
 
 interface ILoadingModal {
   isOpen: boolean;

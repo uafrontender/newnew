@@ -21,7 +21,7 @@ import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import Text from '../../../atoms/Text';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceAcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
@@ -64,7 +64,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
-  const myVote = useMemo(() => option.isSupportedByUser, [option.isSupportedByUser]);
+  const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
   const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
     option.creator?.uuid,
     user.userData?.userUuid,
@@ -120,7 +120,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       handleSetSupportedBid('');

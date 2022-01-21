@@ -21,7 +21,7 @@ import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
 import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceCfBidForm from './PlaceCfBidForm';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';

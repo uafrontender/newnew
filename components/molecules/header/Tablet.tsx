@@ -27,7 +27,11 @@ export const Tablet: React.FC<ITablet> = () => {
   const handleMenuClick = () => {
   };
   const handleCreateClick = () => {
-    router.push('/creation');
+    if (!user.userData?.options?.isCreator) {
+      router.push('/creator-onboarding-stage-1');
+    } else {
+      router.push('/creation');
+    }
   };
   const handleUserClick = () => {
     router.push('/profile');
