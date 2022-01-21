@@ -28,7 +28,7 @@ export const Desktop: React.FC<IDesktop> = () => {
     }
   };
   const handleDashboardClick = () => {
-    router.push('/dashboard');
+    router.push('/creator/dashboard');
   };
   const handleUserClick = () => {
     router.push('/profile');
@@ -55,7 +55,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 }}
               />
             </SItemWithMargin>
-            {user.role === 'creator' ? (
+            {user.userData?.options?.isCreator ? (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
@@ -82,7 +82,7 @@ export const Desktop: React.FC<IDesktop> = () => {
         </SItemWithMargin>
         {user.loggedIn ? (
           <>
-            {user.role === 'creator' ? (
+            {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
                   <Button
