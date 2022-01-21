@@ -12,6 +12,7 @@ import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
+import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
 import { useAppSelector } from '../../redux-store/store';
 import useOverlay from '../../utils/hooks/useOverlay';
@@ -23,10 +24,14 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 
 interface IGeneral {
   children: React.ReactNode;
+  withChat?: boolean;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { children } = props;
+  const {
+    children,
+    withChat,
+  } = props;
   const user = useAppSelector((state) => state.user);
   const {
     banner,
@@ -53,10 +58,9 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '20%',
           },
           {
-            key: 'notifications',
-            url: '/notifications',
+            key: 'dashboard',
+            url: '/creator/dashboard',
             width: '20%',
-            counter: user.notificationsCount,
           },
           {
             key: 'add',
@@ -64,13 +68,14 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '20%',
           },
           {
-            key: 'dashboard',
-            url: '/dashboard',
+            key: 'notifications',
+            url: '/notifications',
             width: '20%',
+            counter: user.notificationsCount,
           },
           {
-            key: 'share',
-            url: '/share',
+            key: 'more',
+            url: '/more',
             width: '20%',
           },
         ];
@@ -145,6 +150,13 @@ export const General: React.FC<IGeneral> = (props) => {
           >
             <Cookie />
           </CookieContainer>
+          {withChat && (
+            <ChatContainer
+              bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+            >
+              <FloatingMessages withCounter />
+            </ChatContainer>
+          )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>
@@ -152,6 +164,10 @@ export const General: React.FC<IGeneral> = (props) => {
 };
 
 export default General;
+
+General.defaultProps = {
+  withChat: false,
+};
 
 interface ISWrapper {
   withBanner: boolean;
@@ -206,6 +222,18 @@ const CookieContainer = styled.div<ICookieContainer>`
   ${(props) => props.theme.media.tablet} {
     bottom: ${(props) => (props.bottomNavigationVisible ? 80 : 24)}px;
   }
+`;
+
+interface IChatContainer {
+  bottomNavigationVisible: boolean;
+}
+
+const ChatContainer = styled.div<IChatContainer>`
+  right: 16px;
+  bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
+  z-index: 10;
+  position: fixed;
+  transition: bottom ease 0.5s;
 `;
 
 interface ISortingContainer {

@@ -36,7 +36,6 @@ declare module 'styled-components' {
         // Used for both hover and focus states.
         outlines2: string;
         numbers: string;
-        backgroundFooter: string;
         backgroundHeader: string;
         backgroundErrorPopup: string;
         // Used for overlaydim

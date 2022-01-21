@@ -17,8 +17,7 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = (props) => {
   const { visible } = props;
-  const { banner } = useAppSelector((state) => state.ui);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode } = useAppSelector((state) => state.ui);
 
   return (
     <SWrapper

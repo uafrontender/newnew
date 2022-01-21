@@ -58,7 +58,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 }}
               />
             </SItemWithMargin>
-            {user.role === 'creator' ? (
+            {user.userData?.options?.isCreator ? (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
@@ -85,7 +85,7 @@ export const Tablet: React.FC<ITablet> = () => {
         </SItemWithMargin>
         {user.loggedIn ? (
           <>
-            {user.role === 'creator' ? (
+            {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
                   <Button
