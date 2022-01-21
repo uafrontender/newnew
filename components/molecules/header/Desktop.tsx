@@ -21,7 +21,11 @@ export const Desktop: React.FC<IDesktop> = () => {
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const handleCreateClick = () => {
-    router.push('/creation');
+    if (!user.userData?.options?.isCreator) {
+      router.push('/creator-onboarding-stage-1');
+    } else {
+      router.push('/creation');
+    }
   };
   const handleDashboardClick = () => {
     router.push('/dashboard');

@@ -14,7 +14,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../PaymentModal';
 import PlaceBidForm from './PlaceAcBidForm';
 
@@ -93,7 +93,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setSupportBidAmount('');
