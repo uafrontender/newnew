@@ -127,7 +127,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const handleSubmit = useCallback(async () => {
     setLoading(true);
     try {
-      const body: any = {
+      const body: Omit<newnewapi.CreatePostRequest, 'toJSON'> = {
         post: {
           title: post.title,
           settings: post.options,
@@ -138,14 +138,23 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           expiresAfter: {
             seconds: formatExpiresAt(true),
           },
-          thumbnailParameters: post.thumbnailParameters,
+          thumbnailParameters: {
+            startTime: {
+              seconds: post.thumbnailParameters.startTime,
+            },
+            endTime: {
+              seconds: post.thumbnailParameters.endTime,
+            },
+          },
           announcementVideoUrl: post.announcementVideoUrl,
         },
       };
 
       if (tab === 'auction') {
         body.auction = {
-          minimalBid: auction.minimalBid,
+          minimalBid: {
+            usdCents: auction.minimalBid * 100,
+          },
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {

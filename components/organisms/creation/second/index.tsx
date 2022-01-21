@@ -316,7 +316,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
         targetUrls: {
           thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
           hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-          altStreamUrl: resProcessing?.data?.targetUrls?.altStreamUrl,
+          dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
           originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
           thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
         },
@@ -623,7 +623,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     if (!decoded) return;
 
     if (decoded.taskUuid === videoProcessing?.taskUuid) {
-      dispatch(setCreationFileUploadETA(decoded.eta));
+      dispatch(setCreationFileUploadETA(decoded.estimatedTimeLeft?.seconds));
 
       if (decoded.fractionCompleted > fileUpload.progress) {
         dispatch(setCreationFileUploadProgress(decoded.fractionCompleted));
