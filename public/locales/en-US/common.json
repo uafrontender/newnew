@@ -2,6 +2,7 @@
   "welcome": "Welcome to {{NEXT_PUBLIC_APP_NAME}}!",
   "mobile-bottom-navigation-add": "Create",
   "mobile-bottom-navigation-home": "Home",
+  "mobile-bottom-navigation-more": "More",
   "mobile-bottom-navigation-share": "Share",
   "mobile-bottom-navigation-dashboard": "Dashboard",
   "mobile-bottom-navigation-notifications": "Notifications",

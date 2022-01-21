@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import CountUp from 'react-countup';
 
 export interface IIndicator {
-  counter: number,
+  counter?: number,
   animate?: boolean,
   minified?: boolean,
   onAnimationEnd?: () => void,
@@ -11,21 +11,25 @@ export interface IIndicator {
 
 export const Indicator: React.FC<IIndicator> = (props) => {
   const {
-    counter,
+    counter = 0,
     animate,
     minified,
     onAnimationEnd,
+    ...rest
   } = props;
 
   const bigCounter = counter >= 100;
   const valueToDisplay = bigCounter ? 99 : counter;
 
   if (minified) {
-    return <SMinifiedIndicator />;
+    return <SMinifiedIndicator {...rest} />;
   }
 
   return (
-    <SIndicator bigCounter={bigCounter}>
+    <SIndicator
+      bigCounter={bigCounter}
+      {...rest}
+    >
       {animate ? (
         <CountUp
           useEasing
@@ -42,9 +46,11 @@ export const Indicator: React.FC<IIndicator> = (props) => {
 export default Indicator;
 
 Indicator.defaultProps = {
+  counter: 0,
   animate: true,
   minified: false,
-  onAnimationEnd: () => {},
+  onAnimationEnd: () => {
+  },
 };
 
 interface ISIndicator {
