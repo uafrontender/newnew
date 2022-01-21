@@ -125,7 +125,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       : [];
 
     const optionsSupportedByUser = user.userData?.userUuid
-      ? unsortedArr.filter((o) => o.isSupportedByUser)
+      ? unsortedArr.filter((o) => o.isSupportedByMe)
         .sort((a, b) => {
           return (b.id as number) - (a.id as number);
         })
@@ -142,7 +142,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       ...(
         highestOption
         && (highestOption.creator?.uuid === user.userData?.userUuid
-          || highestOption.isSupportedByUser) ? [highestOption] : []),
+          || highestOption.isSupportedByMe) ? [highestOption] : []),
       ...optionsByUser,
       ...optionsSupportedByUser,
       // ...optionsByVipUsers,

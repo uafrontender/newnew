@@ -22,7 +22,7 @@ import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import PlaceBidForm from './PlaceAcBidForm';
 import PaymentModal from '../PaymentModal';
-import LoadingModal from '../LoadingModal';
+import LoadingModal from '../../LoadingModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import Button from '../../../atoms/Button';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -168,7 +168,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       ) throw new Error(res.error?.message ?? 'Request failed');
 
       const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByUser = true;
+      optionFromResponse.isSupportedByMe = true;
       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
       setNewBidAmount('');
