@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
 
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
 
-type TSettingsEmailInput = React.ComponentPropsWithoutRef<'input'> & {
+type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   labelCaption: string;
   errorCaption: string;
 }
 
-const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
+const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   value,
   isValid,
   labelCaption,
   errorCaption,
+  readOnly,
   onChange,
   onFocus,
   ...rest
 }) => {
+  const theme = useTheme();
   const [errorBordersShown, setErrorBordersShown] = useState(false);
 
   return (
@@ -30,10 +33,21 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
       >
         { labelCaption }
       </SLabel>
-      <SSettingsEmailInput
+      {readOnly && (
+        <SReadonlyLock>
+          <InlineSvg
+            svg={LockIcon}
+            width="24px"
+            height="24px"
+            fill={theme.colorsThemed.text.secondary}
+          />
+        </SReadonlyLock>
+      )}
+      <SOnboardingEmailInput
         id="settings_email_input"
         type="email"
         value={value}
+        readOnly={readOnly}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
         onBlur={() => {
@@ -70,21 +84,22 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
   );
 };
 
-SettingsEmailInput.defaultProps = {
+OnboardingEmailInput.defaultProps = {
   isValid: undefined,
 };
 
-export default SettingsEmailInput;
+export default OnboardingEmailInput;
 
 const SContainer = styled.div`
+  position: relative;
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 344px;
+    width: 284px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 352px;
+    width: 296px;
   }
 `;
 
@@ -99,11 +114,11 @@ const SLabel = styled.label`
   margin-bottom: 6px;
 `;
 
-interface ISSettingsEmailInput {
+interface ISOnboardingEmailInput {
   errorBordersShown?: boolean
 }
 
-const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
+const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
   display: block;
 
   height: 44px;
@@ -174,4 +189,11 @@ const SErrorDiv = styled.div`
   & > div {
     margin-right: 4px;
   }
+`;
+
+const SReadonlyLock = styled.div`
+  position: absolute;
+
+  right: 20px;
+  top: 34px;
 `;
