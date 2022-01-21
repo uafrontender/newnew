@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
 
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
 
 type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
@@ -17,10 +18,12 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   isValid,
   labelCaption,
   errorCaption,
+  readOnly,
   onChange,
   onFocus,
   ...rest
 }) => {
+  const theme = useTheme();
   const [errorBordersShown, setErrorBordersShown] = useState(false);
 
   return (
@@ -30,10 +33,21 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
       >
         { labelCaption }
       </SLabel>
+      {readOnly && (
+        <SReadonlyLock>
+          <InlineSvg
+            svg={LockIcon}
+            width="24px"
+            height="24px"
+            fill={theme.colorsThemed.text.secondary}
+          />
+        </SReadonlyLock>
+      )}
       <SOnboardingEmailInput
         id="settings_email_input"
         type="email"
         value={value}
+        readOnly={readOnly}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
         onBlur={() => {
@@ -77,6 +91,7 @@ OnboardingEmailInput.defaultProps = {
 export default OnboardingEmailInput;
 
 const SContainer = styled.div`
+  position: relative;
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
@@ -174,4 +189,11 @@ const SErrorDiv = styled.div`
   & > div {
     margin-right: 4px;
   }
+`;
+
+const SReadonlyLock = styled.div`
+  position: absolute;
+
+  right: 20px;
+  top: 34px;
 `;

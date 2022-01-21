@@ -8,6 +8,8 @@ import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.s
 import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 
+import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
+
 interface IOnboardingProfileImageInput {
   imageInEditUrl: string;
   handleChangeImageInEdit: (newValue: any) => void;
@@ -50,6 +52,12 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
           view="secondary"
           onClick={() => imageInputRef.current?.click()}
         >
+          <InlineSvg
+            svg={DownloadIcon}
+            width="24px"
+            height="24px"
+            fill={theme.colorsThemed.text.primary}
+          />
           {!imageInEditUrl ? (
             t('DetailsSection.form.profilePicture.uploadBtn')
           ) : (
@@ -128,7 +136,10 @@ const SImageInput = styled.input`
 `;
 
 const SUploadButton = styled(Button)`
-
+  span {
+    display: flex;
+    gap: 4px;
+  }
 `;
 
 const SProfileImage = styled.div`

@@ -99,7 +99,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     ...(
       (
         !emailInEdit
-        // || (emailInEdit && !user.userData?.options?.isVerified)
+        // || (emailInEdit && !user.userData?.options?.isEmailVerified)
       ) ? { email: true } : {}
     ),
     countryOfResidence: true,
@@ -315,6 +315,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
             labelCaption={t('DetailsSection.form.email.label')}
             placeholder={t('DetailsSection.form.email.placeholder')}
+            // @ts-ignore
+            // readOnly={!user.userData?.options?.isEmailVerified}
+            // readOnly
             // Temp
             errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
             onChange={handleEmailInput}
@@ -352,6 +355,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       <SControlsDiv>
         {!isMobile && (
           <GoBackButton
+            longArrow
             onClick={() => router.back()}
           >
             { t('DetailsSection.backButton') }
@@ -392,9 +396,10 @@ const SContainer = styled.div`
 
   padding-bottom: 88px;
 
+  z-index: 2;
+
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 0;
-    overflow-y: scroll;
 
     padding-left: 152px;
     padding-right: 152px;

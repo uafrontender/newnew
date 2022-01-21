@@ -9,6 +9,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import Text from '../../atoms/Text';
 import GoBackButton from '../GoBackButton';
+import Logo from '../Logo';
 
 interface IOnboardingProgressBar {
   numStages: number;
@@ -23,9 +24,19 @@ const OnboardingProgressBar: React.FunctionComponent<IOnboardingProgressBar> = (
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   return (
     <SOnboardingProgressBarContainer>
+      {isTablet ? (
+        <Logo
+          style={{
+            position: 'absolute',
+            top: 12,
+            left: 32,
+          }}
+        />
+      ) : null}
       <SBackButton
         defer={isMobile ? 250 : undefined}
         onClick={() => router.back()}

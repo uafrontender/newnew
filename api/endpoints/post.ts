@@ -93,7 +93,7 @@ export const fetchMoreLikePosts = (
 ) => fetchProtobuf<newnewapi.GetSimilarPostsRequest, newnewapi.PagedPostsResponse>(
   newnewapi.GetSimilarPostsRequest,
   newnewapi.PagedPostsResponse,
-  `${BASE_URL_POST}/get_more_like_posts`,
+  `${BASE_URL_POST}/get_similar_posts`,
   'post',
   payload,
 );
