@@ -101,7 +101,7 @@ export const Navigation = () => {
 export default Navigation;
 
 const SContainer = styled.aside`
-  top: 16px;
+  top: 32px;
   left: 0;
   float: left;
   width: 156px;
@@ -109,7 +109,7 @@ const SContainer = styled.aside`
   margin-right: 24px;
 
   ${(props) => props.theme.media.laptop} {
-    top: 20px;
+    top: 40px;
     width: 200px;
   }
 `;

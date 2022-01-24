@@ -80,7 +80,7 @@ export const ExpirationPosts = () => {
             >
               <InlineSVG
                 svg={infoIcon}
-                fill={theme.colorsThemed.background.primary}
+                fill={theme.colorsThemed.text.primary}
                 width="20px"
                 height="20px"
               />
@@ -104,7 +104,6 @@ export const ExpirationPosts = () => {
     collection.length,
     user.userData?.avatarUrl,
     theme.colorsThemed.text.primary,
-    theme.colorsThemed.background.primary,
   ]);
 
   const handleSubmit = useCallback(() => {

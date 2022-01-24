@@ -4,6 +4,10 @@
       "title": "Creator Dashboard"
     },
     "title": "Dashboard",
+    "button": {
+      "notifications": "Notifications",
+      "dms": "DMs"
+    },
     "enableSubscription": {
       "title": "Grow your passive income with  timely subscriptions",
       "description": "Add a subscription to your channel button and start earning a fixed income.",
@@ -72,5 +76,9 @@
     "earnings": "Earnings",
     "getPaid": "Get Paid",
     "transactions": "Transactions"
+  },
+  "tabs": {
+    "chat": "DMs",
+    "notifications": "Notifications"
   }
 }
