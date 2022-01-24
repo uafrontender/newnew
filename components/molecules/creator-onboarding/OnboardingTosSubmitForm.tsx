@@ -14,11 +14,13 @@ import CheckMark from '../CheckMark';
 interface IOnboardingTosSubmitForm {
   handleGoToNext: () => void;
   hasScrolledDown?: boolean;
+  hasScrolledDownDesktop?: boolean;
 }
 
 const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm> = ({
   handleGoToNext,
   hasScrolledDown,
+  hasScrolledDownDesktop,
 }) => {
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -43,8 +45,11 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
   return (
     <STabletForm>
       <SCheckBox
-        label={t('TosSection.agreenToTosCheckbox')}
+        label={hasScrolledDownDesktop ? (
+          t('TosSection.agreenToTosCheckbox')
+        ) : t('TosSection.scrollDownToContinue')}
         selected={agreed}
+        disabled={!hasScrolledDownDesktop}
         handleChange={(e) => setAgreed(!agreed)}
       />
       <Button
@@ -60,6 +65,7 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
 
 OnboardingTosSubmitForm.defaultProps = {
   hasScrolledDown: undefined,
+  hasScrolledDownDesktop: undefined,
 };
 
 export default OnboardingTosSubmitForm;

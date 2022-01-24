@@ -11,6 +11,7 @@ type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   labelCaption: string;
   errorCaption: string;
+  cantChangeInfoCaption: string;
 }
 
 const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
@@ -18,6 +19,7 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   isValid,
   labelCaption,
   errorCaption,
+  cantChangeInfoCaption,
   readOnly,
   onChange,
   onFocus,
@@ -50,6 +52,12 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
         readOnly={readOnly}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
+        style={{
+          ...(readOnly ? {
+            cursor: 'default',
+            userSelect: 'none',
+          } : {}),
+        }}
         onBlur={() => {
           if (value && (value as string).length > 0 && !isValid) {
             setErrorBordersShown(true);
@@ -63,6 +71,11 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
         }}
         {...rest}
       />
+      {readOnly && (
+      <SReadonlyCaption>
+        { cantChangeInfoCaption }
+      </SReadonlyCaption>
+      )}
       {
         errorBordersShown ? (
           <AnimatedPresence
@@ -95,7 +108,8 @@ const SContainer = styled.div`
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 284px;
+    /* width: 284px; */
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -112,6 +126,18 @@ const SLabel = styled.label`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   margin-bottom: 6px;
+`;
+
+const SReadonlyCaption = styled.div`
+  display: block;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  margin-bottom: 6px;
+  margin-top: 6px;
 `;
 
 interface ISOnboardingEmailInput {

@@ -55,6 +55,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   // Email
   const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
@@ -309,53 +310,60 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         >
           {t('DetailsSection.heading')}
         </SHeading>
-        <SFormItemContainer>
-          <OnboardingEmailInput
-            value={emailInEdit}
-            isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
-            labelCaption={t('DetailsSection.form.email.label')}
-            placeholder={t('DetailsSection.form.email.placeholder')}
-            // @ts-ignore
-            // readOnly={!user.userData?.options?.isEmailVerified}
-            // readOnly
-            // Temp
-            errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
-            onChange={handleEmailInput}
+        <STopContainer>
+          <SFormItemContainer>
+            <OnboardingEmailInput
+              value={emailInEdit}
+              isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
+              labelCaption={t('DetailsSection.form.email.label')}
+              placeholder={t('DetailsSection.form.email.placeholder')}
+              cantChangeInfoCaption={t('DetailsSection.form.email.cantChangeInfoCaption')}
+              // @ts-ignore
+              // readOnly={!user.userData?.options?.isEmailVerified}
+              readOnly
+              // Temp
+              errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
+              onChange={handleEmailInput}
+            />
+          </SFormItemContainer>
+          <SFormItemContainer>
+            <SLabel>
+              {t('DetailsSection.form.CoR.label')}
+            </SLabel>
+            <DropdownSelect<string>
+              label={countries[countries.findIndex((o) => o.value === selectedCountry)].name}
+              width="100%"
+              selected={selectedCountry}
+              options={countries}
+              onSelect={(val) => setSelectedCountry(val)}
+              closeOnSelect
+            />
+          </SFormItemContainer>
+          <SFormItemContainer>
+            <OnboardingBirthDateInput
+              value={dateInEdit}
+              locale={router.locale}
+              disabled={false}
+              labelCaption={t('DetailsSection.form.DoB.label')}
+              bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
+              onChange={handleDateInput}
+            />
+          </SFormItemContainer>
+        </STopContainer>
+        {!isTablet && (
+          <SSeparator />
+        )}
+        <STopContainer>
+          <OnboardingProfileImageInput
+            imageInEditUrl={imageInEdit}
+            handleChangeImageInEdit={handleSetProfilePictureInEdit}
           />
-        </SFormItemContainer>
-        <SFormItemContainer>
-          <SLabel>
-            {t('DetailsSection.form.CoR.label')}
-          </SLabel>
-          <DropdownSelect<string>
-            label={countries[countries.findIndex((o) => o.value === selectedCountry)].name}
-            width="100%"
-            selected={selectedCountry}
-            options={countries}
-            onSelect={(val) => setSelectedCountry(val)}
-            closeOnSelect
-          />
-        </SFormItemContainer>
-        <SFormItemContainer>
-          <OnboardingBirthDateInput
-            value={dateInEdit}
-            locale={router.locale}
-            disabled={false}
-            labelCaption={t('DetailsSection.form.DoB.label')}
-            bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
-            onChange={handleDateInput}
-          />
-        </SFormItemContainer>
-        <SSeparator />
-        <OnboardingProfileImageInput
-          imageInEditUrl={imageInEdit}
-          handleChangeImageInEdit={handleSetProfilePictureInEdit}
-        />
+        </STopContainer>
       </SContainer>
       <SControlsDiv>
         {!isMobile && (
           <GoBackButton
-            longArrow
+            longArrow={!isTablet}
             onClick={() => router.back()}
           >
             { t('DetailsSection.backButton') }
@@ -427,16 +435,33 @@ const SHeading = styled(Headline)`
   }
 `;
 
+const STopContainer = styled.div`
+  ${({ theme }) => theme.media.tablet} {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    background-color: initial;
+    padding: initial;
+    border-radius: initial;
+    margin-bottom: initial;
+  }
+`;
+
 const SFormItemContainer = styled.div`
   width: 100%;
 
   margin-bottom: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 284px;
+    /* width: 284px; */
+    width: 100%;
   }
 
-  ${({ theme }) => theme.media.tablet} {
+  ${({ theme }) => theme.media.laptop} {
     width: 296px;
   }
 `;
