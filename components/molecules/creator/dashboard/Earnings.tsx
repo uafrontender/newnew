@@ -152,6 +152,13 @@ const SContainer = styled.div`
   position: relative;
   background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
   flex-direction: column;
+
+  ${(props) => props.theme.media.tablet} {
+    left: unset;
+    width: 100%;
+    padding: 24px;
+    border-radius: 24px;
+  }
 `;
 
 const STitle = styled(Headline)``;
@@ -163,6 +170,12 @@ const SCashOutContainer = styled.div`
   align-items: center;
   border-radius: 16px;
   flex-direction: column;
+
+  ${(props) => props.theme.media.tablet} {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
 `;
 
 const SCashOutTopBlock = styled.div`
@@ -190,8 +203,16 @@ const SDescription = styled(Text)`
 const SButton = styled(Button)`
   width: 100%;
   color: ${(props) => props.theme.colors.black};
+  padding: 16px 20px;
   margin-top: 16px;
   background: ${(props) => props.theme.colors.white};
+
+  ${(props) => props.theme.media.tablet} {
+    width: unset;
+    padding: 12px 24px;
+    margin-top: unset;
+    margin-left: 16px;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -206,6 +227,10 @@ const SHeaderLine = styled.div`
   margin-bottom: 20px;
   flex-direction: row;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 14px;
+  }
 `;
 
 const STotalLine = styled.div`
@@ -263,11 +288,23 @@ const SListItem = styled.div`
   padding: 16px;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    width: calc(25% - 12px);
+    margin: 6px;
+  }
 `;
 
 const SListItemTitle = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   margin-bottom: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-bottom: 12px;
+  }
 `;
 
 const SListItemValue = styled(Headline)``;

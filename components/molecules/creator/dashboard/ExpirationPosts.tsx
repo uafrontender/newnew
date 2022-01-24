@@ -11,32 +11,37 @@ import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
+import infoIcon from '../../../../public/images/svg/icons/filled/Info.svg';
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 
 export const ExpirationPosts = () => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
 
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const collection = useMemo(() => ([
     {
       id: 1,
-      title: 'Should I get a forefjksdljlkfds',
+      title: 'Should I get a forehead',
       date: '15m 10s left',
     },
     {
       id: 2,
-      title: 'Should I get a forefhjsdjkfndjs',
+      title: 'Should I get a forehead',
       date: '15m 10s left',
     },
     {
       id: 3,
-      title: 'Should I get a forehfhdshjfjds',
+      title: 'Should I get a forehead',
       date: '15m 10s left',
     },
   ]), []);
   const renderItem = useCallback((item, index) => {
     const handleUserClick = () => {
+    };
+    const handleInfoClick = () => {
     };
     const handleDecideClick = () => {
     };
@@ -68,6 +73,19 @@ export const ExpirationPosts = () => {
               height="20px"
             />
           </SListShareButton>
+          {!isMobile && (
+            <SListShareButton
+              view="secondary"
+              onClick={handleInfoClick}
+            >
+              <InlineSVG
+                svg={infoIcon}
+                fill={theme.colorsThemed.background.primary}
+                width="20px"
+                height="20px"
+              />
+            </SListShareButton>
+          )}
           <SListDecideButton
             view="secondary"
             onClick={handleDecideClick}
@@ -80,7 +98,14 @@ export const ExpirationPosts = () => {
         )}
       </SListItemWrapper>
     );
-  }, [t, collection.length, theme.colorsThemed.text.primary, user.userData?.avatarUrl]);
+  }, [
+    t,
+    isMobile,
+    collection.length,
+    user.userData?.avatarUrl,
+    theme.colorsThemed.text.primary,
+    theme.colorsThemed.background.primary,
+  ]);
 
   const handleSubmit = useCallback(() => {
     console.log('load more 10');
@@ -116,6 +141,13 @@ const SContainer = styled.div`
   position: relative;
   background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
   flex-direction: column;
+
+  ${(props) => props.theme.media.tablet} {
+    left: unset;
+    width: 100%;
+    padding: 24px;
+    border-radius: 24px;
+  }
 `;
 
 const STitle = styled(Headline)``;
@@ -126,11 +158,20 @@ const SHeaderLine = styled.div`
   margin-bottom: 20px;
   flex-direction: row;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 12px;
+  }
 `;
 
 const SButton = styled(Button)`
   width: 100%;
+  padding: 16px 20px;
   margin-top: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 12px 24px;
+  }
 `;
 
 const SListWrapper = styled.div`
@@ -143,20 +184,26 @@ const SListItem = styled.div`
   display: flex;
   align-items: center;
   flex-direction: row;
-  justify-content: space-between;
 `;
 
 const SAvatar = styled(UserAvatar)`
   width: 36px;
   height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 12px;
 `;
 
 const SListItemTitleWrapper = styled.div`
+  width: 100%;
   display: flex;
   padding: 0 12px;
   max-width: calc(100% - 178px);
   flex-direction: column;
+
+  ${(props) => props.theme.media.tablet} {
+    max-width: calc(100% - 226px);
+  }
 `;
 
 const SListItemTitle = styled(Text)`
@@ -174,6 +221,7 @@ const SListShareButton = styled(Button)`
   padding: 8px;
   min-width: 36px;
   margin-right: 12px;
+  border-radius: 12px;
 `;
 
 const SListDecideButton = styled(Button)`

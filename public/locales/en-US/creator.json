@@ -44,6 +44,7 @@
       "newTitle": "New subscribers",
       "newLink": "Subscriptions",
       "seeAll": "See all new subs",
+      "prevWeek": "vs prev week",
       "banner": {
         "description": "Send welcome message to greet your new subscribers.",
         "submit": "Send message"
@@ -62,5 +63,14 @@
         "last_12_months": "Last 12 months"
       }
     }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "subscriptions": "Subscriptions",
+    "myPosts": "My Posts",
+    "insights": "Insights",
+    "earnings": "Earnings",
+    "getPaid": "Get Paid",
+    "transactions": "Transactions"
   }
 }
