@@ -29,6 +29,7 @@ import LibraIcon from '../../../public/images/png/astrology-signs/Libra.png';
 import ScorpioIcon from '../../../public/images/png/astrology-signs/Scorpio.png';
 import SagittariusIcon from '../../../public/images/png/astrology-signs/Sagittarius.png';
 import CapricornIcon from '../../../public/images/png/astrology-signs/Capricorn.png';
+import InputInvalidIcon from '../../../public/images/png/astrology-signs/InputInvalid.png';
 
 // Datepicker utils
 import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
@@ -69,6 +70,7 @@ const signs: IAstrologySigns = {
   Scorpio: ScorpioIcon,
   Sagittarius: SagittariusIcon,
   Capricorn: CapricornIcon,
+  Invalid: InputInvalidIcon,
 };
 
 interface ISettingsBirthDateInput {

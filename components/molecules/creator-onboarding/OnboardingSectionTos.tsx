@@ -202,7 +202,7 @@ const SShadowTop = styled.div`
 
   z-index: 1;
   box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : 'rgba(241, 243, 249, 1)')};
+    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff')};
   ;
   clip-path: inset(0px 0px -100px 0px);
 
@@ -223,7 +223,7 @@ const SShadowBottom = styled.div`
 
   z-index: 1;
   box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : 'rgba(241, 243, 249, 1)')};
+    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff')};
   ;
   clip-path: inset(-100px 0px 0px 0px);
   transition: linear .2s;

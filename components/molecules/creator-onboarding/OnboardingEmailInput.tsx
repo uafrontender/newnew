@@ -41,7 +41,7 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
             svg={LockIcon}
             width="24px"
             height="24px"
-            fill={theme.colorsThemed.text.secondary}
+            fill={theme.colorsThemed.text.tertiary}
           />
         </SReadonlyLock>
       )}
@@ -179,7 +179,15 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   }
 
-  &:hover:enabled, &:focus, &:active {
+  &:hover:enabled,
+  &:focus,
+  &:active {
+    outline: none;
+  }
+
+  &:hover:enabled:not(:read-only),
+  &:focus:not(:read-only),
+  &:active:not(:read-only) {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {

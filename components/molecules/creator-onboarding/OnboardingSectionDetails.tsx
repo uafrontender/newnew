@@ -31,6 +31,8 @@ import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 
+const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+
 type TFieldsToBeUpdated = {
   email?: boolean;
   countryOfResidence: boolean;
@@ -75,6 +77,16 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // Birthdate
   // @ts-ignore
   const [dateInEdit, setDateInEdit] = useState(user?.userData?.dateOfBirth ?? undefined);
+  const [isDateValid, setIsDateValid] = useState(
+    // @ts-ignore
+    (user?.userData?.dateOfBirth ? (
+      // @ts-ignore
+      user?.userData?.dateOfBirth instanceof Date
+      // @ts-ignore
+      && (user?.userData?.dateOfBirth as Date) < maxDate
+    ) : false),
+  );
+
   const handleDateInput = (value: Date) => {
     if (value === null) {
       setDateInEdit(undefined);
@@ -82,6 +94,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     }
     setDateInEdit(value);
   };
+  const handleSetIsDateValid = useCallback((value: boolean) => {
+    setIsDateValid(value);
+  }, []);
 
   // Profile image
   const [imageToSave, setImageToSave] = useState<File | null>(null);
@@ -114,7 +129,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [fieldsValid, setFieldsValid] = useState({
     email: validator.isEmail(emailInEdit),
     countryOfResidence: true,
-    dateOfBirth: dateInEdit ? true : false,
+    dateOfBirth: isDateValid,
     image: imageInEdit ? true : false,
   });
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -280,23 +295,24 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     setFieldsValid((curr) => {
       const working = { ...curr };
       working.email = validator.isEmail(emailInEdit);
-      working.dateOfBirth = dateInEdit ? true : false;
+      working.dateOfBirth = isDateValid;
       working.image = imageInEdit !== '';
       return working;
     });
   }, [
     emailInEdit,
     dateInEdit,
+    isDateValid,
     imageInEdit,
     setFieldsValid,
   ]);
 
   // Test
   useEffect(() => {
-    console.log('FIELDS TO BE UPDATED: ');
-    console.log(JSON.stringify(fieldsToBeUpdated));
-    console.log('FIELDS VALIDITY: ');
-    console.log(JSON.stringify(fieldsValid));
+    // console.log('FIELDS TO BE UPDATED: ');
+    // console.log(JSON.stringify(fieldsToBeUpdated));
+    // console.log('FIELDS VALIDITY: ');
+    // console.log(JSON.stringify(fieldsValid));
   }, [
     fieldsToBeUpdated,
     fieldsValid,
@@ -320,7 +336,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               cantChangeInfoCaption={t('DetailsSection.form.email.cantChangeInfoCaption')}
               // @ts-ignore
               // readOnly={!user.userData?.options?.isEmailVerified}
-              readOnly
+              // readOnly
               // Temp
               errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
               onChange={handleEmailInput}
@@ -342,10 +358,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           <SFormItemContainer>
             <OnboardingBirthDateInput
               value={dateInEdit}
+              maxDate={maxDate}
               locale={router.locale}
               disabled={false}
               labelCaption={t('DetailsSection.form.DoB.label')}
               bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
+              handleSetIsDateValid={handleSetIsDateValid}
               onChange={handleDateInput}
             />
           </SFormItemContainer>

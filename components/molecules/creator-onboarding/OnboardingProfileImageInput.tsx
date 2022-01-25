@@ -139,6 +139,7 @@ const SUploadButton = styled(Button)`
   span {
     display: flex;
     gap: 4px;
+    font-weight: 600;
   }
 `;
 

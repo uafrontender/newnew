@@ -227,9 +227,14 @@ const SOption = styled.button<{
   background-color: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'transparent')};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 14px;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
+  line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 
   /* width: 100%; */
   padding: 8px 10px;
