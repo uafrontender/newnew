@@ -7,7 +7,7 @@ export const useDropDownDirection = (ref: any, listHeight: number) => {
     if (ref.current) {
       const pos = ref.current.getBoundingClientRect();
 
-      setDirection(window.innerHeight - pos.y < listHeight ? 'up' : ' down');
+      setDirection(window.innerHeight - pos.y < listHeight ? 'up' : 'down');
     }
   }, [ref, listHeight]);
 

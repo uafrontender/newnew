@@ -28,27 +28,29 @@ export const EnableSubscription = () => {
       <Image
         src={acImage}
         alt="Enable subscription"
-        width={isMobile ? 232 : 120}
-        height={isMobile ? 240 : 120}
+        width={isMobile ? 232 : 206}
+        height={isMobile ? 240 : 202}
         objectFit="cover"
       />
-      <STitle variant={6}>
-        {t('dashboard.enableSubscription.title')}
-      </STitle>
-      <SDescriptionWrapper>
-        <SDescription variant={3} weight={600}>
-          {t('dashboard.enableSubscription.description')}
-        </SDescription>
-        <SLearnMore onClick={handleLearnMore}>
-          {t('dashboard.enableSubscription.learnMore')}
-        </SLearnMore>
-      </SDescriptionWrapper>
-      <SButton
-        view="primaryGrad"
-        onClick={handleSubmit}
-      >
-        {t('dashboard.enableSubscription.submit')}
-      </SButton>
+      <SContent>
+        <STitle variant={6}>
+          {t('dashboard.enableSubscription.title')}
+        </STitle>
+        <SDescriptionWrapper>
+          <SDescription variant={3} weight={600}>
+            {t('dashboard.enableSubscription.description')}
+          </SDescription>
+          <SLearnMore onClick={handleLearnMore}>
+            {t('dashboard.enableSubscription.learnMore')}
+          </SLearnMore>
+        </SDescriptionWrapper>
+        <SButton
+          view="primaryGrad"
+          onClick={handleSubmit}
+        >
+          {t('dashboard.enableSubscription.submit')}
+        </SButton>
+      </SContent>
     </SContainer>
   );
 };
@@ -63,26 +65,60 @@ const SContainer = styled.div`
   border-radius: 16px;
   flex-direction: column;
   justify-content: center;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 24px;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+`;
+
+const SContent = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  ${(props) => props.theme.media.tablet} {
+    width: 100%;
+    max-width: calc(100% - 222px);
+    align-items: flex-start;
+  }
 `;
 
 const STitle = styled(Headline)`
   margin-top: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: unset;
+  }
 `;
 
 const SButton = styled(Button)`
   width: 100%;
+  padding: 16px 20px;
   margin-top: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    width: unset;
+    padding: 12px 24px;
+    margin-top: 20px;
+  }
 `;
 
 const SDescriptionWrapper = styled.div`
+  margin-top: 8px;
+
   p {
     display: inline;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 12px;
   }
 `;
 
 const SDescription = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-top: 8px;
 `;
 
 const SLearnMore = styled.p`

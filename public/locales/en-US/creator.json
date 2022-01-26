@@ -4,6 +4,14 @@
       "title": "Creator Dashboard"
     },
     "title": "Dashboard",
+    "button": {
+      "notifications": "Notifications",
+      "dms": "DMs",
+      "markAllAsRead": "Mark all as read",
+      "minimize": "Minimize",
+      "new": "New",
+      "earlier": "Earlier"
+    },
     "enableSubscription": {
       "title": "Grow your passive income with  timely subscriptions",
       "description": "Add a subscription to your channel button and start earning a fixed income.",
@@ -14,6 +22,7 @@
       "title": "Earnings",
       "earned": "earned in last 7 days",
       "insights": "Insights",
+      "insights_tablet": "Go to insights",
       "cashOut": {
         "amount": "You have",
         "date": ", will be available to cash out on {{date}}.",
@@ -44,6 +53,7 @@
       "newTitle": "New subscribers",
       "newLink": "Subscriptions",
       "seeAll": "See all new subs",
+      "prevWeek": "vs prev week",
       "banner": {
         "description": "Send welcome message to greet your new subscribers.",
         "submit": "Send message"
@@ -62,5 +72,18 @@
         "last_12_months": "Last 12 months"
       }
     }
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "subscriptions": "Subscriptions",
+    "myPosts": "My Posts",
+    "insights": "Insights",
+    "earnings": "Earnings",
+    "getPaid": "Get Paid",
+    "transactions": "Transactions"
+  },
+  "tabs": {
+    "chat": "DMs",
+    "notifications": "Notifications"
   }
 }

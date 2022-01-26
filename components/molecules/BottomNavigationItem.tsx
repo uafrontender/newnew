@@ -15,8 +15,8 @@ import homeIconFilled from '../../public/images/svg/icons/filled/Home.svg';
 import homeIconOutlined from '../../public/images/svg/icons/outlined/Home.svg';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import shareIconOutlined from '../../public/images/svg/icons/outlined/Share.svg';
-import dashboardIconFilled from '../../public/images/svg/icons/filled/Dashboard.svg';
-import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Dashboard.svg';
+import dashboardIconFilled from '../../public/images/svg/icons/filled/Earnings.svg';
+import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Earnings.svg';
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
 
