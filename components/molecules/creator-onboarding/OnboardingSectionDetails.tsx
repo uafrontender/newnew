@@ -30,6 +30,7 @@ import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-s
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
+import isBrowser from '../../../utils/isBrowser';
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
 
@@ -159,6 +160,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             // eslint-disable-next-line react/no-this-in-sfc
             setOriginalProfileImageWidth(this.width);
             setCropMenuOpen(true);
+            if (isBrowser()) {
+              window.history.pushState(
+                {
+                  stage: 'edit-profile-picture',
+                },
+                '',
+              );
+            }
           });
         }
       });
@@ -403,7 +412,18 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         originalProfileImageWidth={originalProfileImageWidth}
         handleSetImageToSave={(val) => setImageToSave(val)}
         setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
-        onClose={() => setCropMenuOpen(false)}
+        onClose={() => {
+          setCropMenuOpen(false);
+          // window.history.back();
+          if (isBrowser()) {
+            window.history.replaceState(
+              {
+                stage: 'edit-profile-picture',
+              },
+              '',
+            );
+          }
+        }}
       />
       {/* Upload loading Modal */}
       <LoadingModal

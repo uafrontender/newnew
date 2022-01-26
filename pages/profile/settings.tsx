@@ -85,12 +85,12 @@ const MyProfileSettginsIndex: NextPage = () => {
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Log out failed');
 
-        dispatch(logoutUser(''));
         // Unset credential cookies
         removeCookie('accessToken');
         removeCookie('refreshToken');
-
         setIsLogoutLoading(false);
+
+        dispatch(logoutUser(''));
       } catch (err) {
         console.error(err);
         setIsLogoutLoading(false);
