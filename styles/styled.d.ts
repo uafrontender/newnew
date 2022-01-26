@@ -175,6 +175,7 @@ declare module 'styled-components' {
       intenseBlue: string,
       mediumGrey: string,
       cookie: string,
+      dashboardNotifications: string,
     },
     gradients: {
       arrowLeft: string,
@@ -187,6 +188,7 @@ declare module 'styled-components' {
       calendarTop: string,
       calendarBottom: string,
       creationSubmit: string,
+      dashboardNotifications: string,
       decisionOption: {
         yellow: string,
         blue: string,

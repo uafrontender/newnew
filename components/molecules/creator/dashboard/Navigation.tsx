@@ -10,10 +10,6 @@ import dashboardFilledIcon from '../../../../public/images/svg/icons/filled/Dash
 import dashboardOutlinedIcon from '../../../../public/images/svg/icons/outlined/Dashboard.svg';
 import subscriptionsFilledIcon from '../../../../public/images/svg/icons/filled/Subscriptions.svg';
 import subscriptionsOutlinedIcon from '../../../../public/images/svg/icons/outlined/Subscriptions.svg';
-import myPostsFilledIcon from '../../../../public/images/svg/icons/filled/MyPosts.svg';
-import myPostsOutlinedIcon from '../../../../public/images/svg/icons/outlined/MyPosts.svg';
-import insightsFilledIcon from '../../../../public/images/svg/icons/filled/Insights.svg';
-import insightsOutlinedIcon from '../../../../public/images/svg/icons/outlined/Insights.svg';
 import earningsFilledIcon from '../../../../public/images/svg/icons/filled/Earnings.svg';
 import earningsOutlinedIcon from '../../../../public/images/svg/icons/outlined/Earnings.svg';
 import walletFilledIcon from '../../../../public/images/svg/icons/filled/Wallet.svg';
@@ -38,18 +34,6 @@ export const Navigation = () => {
       label: t('navigation.subscriptions'),
       iconFilled: subscriptionsFilledIcon,
       iconOutlined: subscriptionsOutlinedIcon,
-    },
-    {
-      url: '/creator/my-posts',
-      label: t('navigation.myPosts'),
-      iconFilled: myPostsFilledIcon,
-      iconOutlined: myPostsOutlinedIcon,
-    },
-    {
-      url: '/creator/insights',
-      label: t('navigation.insights'),
-      iconFilled: insightsFilledIcon,
-      iconOutlined: insightsOutlinedIcon,
     },
     {
       url: '/creator/earnings',

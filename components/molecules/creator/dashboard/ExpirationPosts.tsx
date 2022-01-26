@@ -120,12 +120,14 @@ export const ExpirationPosts = () => {
       <SListWrapper>
         {collection.map(renderItem)}
       </SListWrapper>
-      <SButton
-        view="secondary"
-        onClick={handleSubmit}
-      >
-        {t('dashboard.expirationPosts.submit')}
-      </SButton>
+      {isMobile && (
+        <SButton
+          view="secondary"
+          onClick={handleSubmit}
+        >
+          {t('dashboard.expirationPosts.submit')}
+        </SButton>
+      )}
     </SContainer>
   );
 };

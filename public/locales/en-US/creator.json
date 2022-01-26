@@ -6,7 +6,11 @@
     "title": "Dashboard",
     "button": {
       "notifications": "Notifications",
-      "dms": "DMs"
+      "dms": "DMs",
+      "markAllAsRead": "Mark all as read",
+      "minimize": "Minimize",
+      "new": "New",
+      "earlier": "Earlier"
     },
     "enableSubscription": {
       "title": "Grow your passive income with  timely subscriptions",

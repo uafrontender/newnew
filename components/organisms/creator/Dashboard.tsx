@@ -17,7 +17,7 @@ export const Dashboard = () => {
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   return (
     <SContainer>
