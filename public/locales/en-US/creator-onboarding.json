@@ -11,6 +11,7 @@
     "subheading": "Agree to NewNew community guidelines",
     "submitMobile": "I have read statement and agree",
     "submitDesktop": "Submit",
+    "scrollDownToContinue": "Scroll to bottom to continue.",
     "agreenToTosCheckbox": "I agree to the terms and conditions."
   },
   "DetailsSection": {
@@ -18,11 +19,12 @@
       "heading": "Tell us a little about yourself.",
       "subheading": "This is the description that will show on your profile page."
     },
-    "heading": "Few more details",
+    "heading": "Few more details...",
     "form": {
       "email": {
         "label": "Email",
         "placeholder": "email@email.com",
+        "cantChangeInfoCaption": "You can't change this info.",
         "errors": {
           "invalidEmail": "Please, enter a valid email"
         }

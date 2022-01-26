@@ -50,7 +50,7 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
 
   // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
   const goToNext = () => {
-    router.push('/dashboard');
+    router.push('/creator/dashboard');
   };
 
   return (
