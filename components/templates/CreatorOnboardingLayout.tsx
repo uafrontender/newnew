@@ -35,7 +35,7 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
   const router = useRouter();
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
 
   return (
     <ErrorBoundary>

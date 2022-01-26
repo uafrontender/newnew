@@ -30,6 +30,9 @@ import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-s
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
+import isBrowser from '../../../utils/isBrowser';
+
+const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
 
 type TFieldsToBeUpdated = {
   email?: boolean;
@@ -55,6 +58,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   // Email
   const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
@@ -74,6 +78,16 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // Birthdate
   // @ts-ignore
   const [dateInEdit, setDateInEdit] = useState(user?.userData?.dateOfBirth ?? undefined);
+  const [isDateValid, setIsDateValid] = useState(
+    // @ts-ignore
+    (user?.userData?.dateOfBirth ? (
+      // @ts-ignore
+      user?.userData?.dateOfBirth instanceof Date
+      // @ts-ignore
+      && (user?.userData?.dateOfBirth as Date) < maxDate
+    ) : false),
+  );
+
   const handleDateInput = (value: Date) => {
     if (value === null) {
       setDateInEdit(undefined);
@@ -81,6 +95,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     }
     setDateInEdit(value);
   };
+  const handleSetIsDateValid = useCallback((value: boolean) => {
+    setIsDateValid(value);
+  }, []);
 
   // Profile image
   const [imageToSave, setImageToSave] = useState<File | null>(null);
@@ -113,7 +130,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [fieldsValid, setFieldsValid] = useState({
     email: validator.isEmail(emailInEdit),
     countryOfResidence: true,
-    dateOfBirth: dateInEdit ? true : false,
+    dateOfBirth: isDateValid,
     image: imageInEdit ? true : false,
   });
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -143,6 +160,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             // eslint-disable-next-line react/no-this-in-sfc
             setOriginalProfileImageWidth(this.width);
             setCropMenuOpen(true);
+            if (isBrowser()) {
+              window.history.pushState(
+                {
+                  stage: 'edit-profile-picture',
+                },
+                '',
+              );
+            }
           });
         }
       });
@@ -195,8 +220,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       }
 
       setLoadingModalOpen(false);
-      router.push('/');
-      // goToDashboard();
+      // router.push('/');
+      goToDashboard();
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -213,8 +238,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     fieldsToBeUpdated,
     user.userData,
     imageToSave,
-    router,
     dispatch,
+    goToDashboard,
     setLoadingModalOpen,
   ]);
 
@@ -279,23 +304,24 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     setFieldsValid((curr) => {
       const working = { ...curr };
       working.email = validator.isEmail(emailInEdit);
-      working.dateOfBirth = dateInEdit ? true : false;
+      working.dateOfBirth = isDateValid;
       working.image = imageInEdit !== '';
       return working;
     });
   }, [
     emailInEdit,
     dateInEdit,
+    isDateValid,
     imageInEdit,
     setFieldsValid,
   ]);
 
   // Test
   useEffect(() => {
-    console.log('FIELDS TO BE UPDATED: ');
-    console.log(JSON.stringify(fieldsToBeUpdated));
-    console.log('FIELDS VALIDITY: ');
-    console.log(JSON.stringify(fieldsValid));
+    // console.log('FIELDS TO BE UPDATED: ');
+    // console.log(JSON.stringify(fieldsToBeUpdated));
+    // console.log('FIELDS VALIDITY: ');
+    // console.log(JSON.stringify(fieldsValid));
   }, [
     fieldsToBeUpdated,
     fieldsValid,
@@ -309,53 +335,62 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         >
           {t('DetailsSection.heading')}
         </SHeading>
-        <SFormItemContainer>
-          <OnboardingEmailInput
-            value={emailInEdit}
-            isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
-            labelCaption={t('DetailsSection.form.email.label')}
-            placeholder={t('DetailsSection.form.email.placeholder')}
-            // @ts-ignore
-            // readOnly={!user.userData?.options?.isEmailVerified}
-            // readOnly
-            // Temp
-            errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
-            onChange={handleEmailInput}
+        <STopContainer>
+          <SFormItemContainer>
+            <OnboardingEmailInput
+              value={emailInEdit}
+              isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
+              labelCaption={t('DetailsSection.form.email.label')}
+              placeholder={t('DetailsSection.form.email.placeholder')}
+              cantChangeInfoCaption={t('DetailsSection.form.email.cantChangeInfoCaption')}
+              // @ts-ignore
+              // readOnly={!user.userData?.options?.isEmailVerified}
+              // readOnly
+              // Temp
+              errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
+              onChange={handleEmailInput}
+            />
+          </SFormItemContainer>
+          <SFormItemContainer>
+            <SLabel>
+              {t('DetailsSection.form.CoR.label')}
+            </SLabel>
+            <DropdownSelect<string>
+              label={countries[countries.findIndex((o) => o.value === selectedCountry)].name}
+              width="100%"
+              selected={selectedCountry}
+              options={countries}
+              onSelect={(val) => setSelectedCountry(val)}
+              closeOnSelect
+            />
+          </SFormItemContainer>
+          <SFormItemContainer>
+            <OnboardingBirthDateInput
+              value={dateInEdit}
+              maxDate={maxDate}
+              locale={router.locale}
+              disabled={false}
+              labelCaption={t('DetailsSection.form.DoB.label')}
+              bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
+              handleSetIsDateValid={handleSetIsDateValid}
+              onChange={handleDateInput}
+            />
+          </SFormItemContainer>
+        </STopContainer>
+        {!isTablet && (
+          <SSeparator />
+        )}
+        <STopContainer>
+          <OnboardingProfileImageInput
+            imageInEditUrl={imageInEdit}
+            handleChangeImageInEdit={handleSetProfilePictureInEdit}
           />
-        </SFormItemContainer>
-        <SFormItemContainer>
-          <SLabel>
-            {t('DetailsSection.form.CoR.label')}
-          </SLabel>
-          <DropdownSelect<string>
-            label={countries[countries.findIndex((o) => o.value === selectedCountry)].name}
-            width="100%"
-            selected={selectedCountry}
-            options={countries}
-            onSelect={(val) => setSelectedCountry(val)}
-            closeOnSelect
-          />
-        </SFormItemContainer>
-        <SFormItemContainer>
-          <OnboardingBirthDateInput
-            value={dateInEdit}
-            locale={router.locale}
-            disabled={false}
-            labelCaption={t('DetailsSection.form.DoB.label')}
-            bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
-            onChange={handleDateInput}
-          />
-        </SFormItemContainer>
-        <SSeparator />
-        <OnboardingProfileImageInput
-          imageInEditUrl={imageInEdit}
-          handleChangeImageInEdit={handleSetProfilePictureInEdit}
-        />
+        </STopContainer>
       </SContainer>
       <SControlsDiv>
         {!isMobile && (
           <GoBackButton
-            longArrow
+            longArrow={!isTablet}
             onClick={() => router.back()}
           >
             { t('DetailsSection.backButton') }
@@ -377,7 +412,16 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         originalProfileImageWidth={originalProfileImageWidth}
         handleSetImageToSave={(val) => setImageToSave(val)}
         setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
-        onClose={() => setCropMenuOpen(false)}
+        onClose={() => {
+          setCropMenuOpen(false);
+          // window.history.back();
+          if (isBrowser()) {
+            window.history.replaceState(
+              null,
+              '',
+            );
+          }
+        }}
       />
       {/* Upload loading Modal */}
       <LoadingModal
@@ -427,16 +471,33 @@ const SHeading = styled(Headline)`
   }
 `;
 
+const STopContainer = styled.div`
+  ${({ theme }) => theme.media.tablet} {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    background-color: initial;
+    padding: initial;
+    border-radius: initial;
+    margin-bottom: initial;
+  }
+`;
+
 const SFormItemContainer = styled.div`
   width: 100%;
 
   margin-bottom: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 284px;
+    /* width: 284px; */
+    width: 100%;
   }
 
-  ${({ theme }) => theme.media.tablet} {
+  ${({ theme }) => theme.media.laptop} {
     width: 296px;
   }
 `;
