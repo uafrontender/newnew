@@ -220,8 +220,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       }
 
       setLoadingModalOpen(false);
-      router.push('/');
-      // goToDashboard();
+      // router.push('/');
+      goToDashboard();
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -238,8 +238,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     fieldsToBeUpdated,
     user.userData,
     imageToSave,
-    router,
     dispatch,
+    goToDashboard,
     setLoadingModalOpen,
   ]);
 
@@ -417,9 +417,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           // window.history.back();
           if (isBrowser()) {
             window.history.replaceState(
-              {
-                stage: 'edit-profile-picture',
-              },
+              null,
               '',
             );
           }
