@@ -187,7 +187,7 @@ export const SubscriptionStats = () => {
         </STotalTextWrapper>
         <STotalInsights>
           <STotalInsightsText>
-            {t('dashboard.subscriptionStats.newLink')}
+            {t(`dashboard.subscriptionStats.${isMobile ? 'newLink' : 'newLink_tablet'}`)}
           </STotalInsightsText>
           <STotalInsightsArrow
             svg={arrowRightIcon}

@@ -173,6 +173,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 10,
     },
     {
       id: '3',
@@ -180,6 +181,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 2,
     },
     {
       id: '4',
@@ -208,6 +210,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 1,
     },
     {
       id: '8',
@@ -222,6 +225,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 6,
     },
     {
       id: '10',
@@ -229,6 +233,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 11,
     },
     {
       id: '11',
@@ -236,6 +241,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 15,
     },
     {
       id: '12',
@@ -243,6 +249,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 6,
     },
     {
       id: '13',
@@ -250,6 +257,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 12,
     },
     {
       id: '14',
@@ -257,6 +265,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 14,
     },
     {
       id: '15',
@@ -264,6 +273,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 15,
     },
     {
       id: '16',
@@ -271,6 +281,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 1,
     },
     {
       id: '17',
@@ -278,6 +289,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 16,
     },
     {
       id: '18',
@@ -285,6 +297,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 20,
     },
     {
       id: '19',
@@ -292,6 +305,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 100,
     },
   ], []);
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
@@ -343,7 +357,7 @@ export const DynamicSection = () => {
               {item.time}
             </SChatItemTime>
             {!!item.unread && (
-              <SChatItemIndicator minified />
+              <SChatItemIndicator counter={item.unreadCount} />
             )}
           </SChatItemRight>
         </SChatItem>
@@ -679,10 +693,7 @@ const SChatItemTime = styled(Text)`
   margin-bottom: 4px;
 `;
 
-const SChatItemIndicator = styled(Indicator)`
-  border: 3px solid ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
-  padding: 5px;
-`;
+const SChatItemIndicator = styled(Indicator)``;
 
 const SChatSeparator = styled.div`
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};

@@ -52,6 +52,7 @@
       "title": "Subscriptions",
       "newTitle": "New subscribers",
       "newLink": "Subscriptions",
+      "newLink_tablet": "Go to subscriptions",
       "seeAll": "See all new subs",
       "prevWeek": "vs prev week",
       "banner": {
