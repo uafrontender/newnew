@@ -23,12 +23,12 @@ export const Dashboard = () => {
     <SContainer>
       {!isMobile && <Navigation />}
       <SContent>
-        <SBlock>
+        <STitleBlock>
           <STitle variant={4}>
             {t('dashboard.title')}
           </STitle>
           {isTablet && <DynamicSection />}
-        </SBlock>
+        </STitleBlock>
         <SBlock>
           <ExpirationPosts />
         </SBlock>
@@ -67,6 +67,10 @@ const SContent = styled.div`
 const STitle = styled(Headline)``;
 
 const SBlock = styled.section`
+  margin-bottom: 24px;
+`;
+
+const STitleBlock = styled.section`
   display: flex;
   align-items: center;
   margin-bottom: 24px;
