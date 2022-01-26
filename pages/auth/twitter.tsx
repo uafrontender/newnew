@@ -77,6 +77,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           data.credential?.accessToken,
           {
             expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+            path: '/',
           },
         );
         setCookie(
@@ -85,6 +86,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
           {
             // Expire in 10 years
             maxAge: (10 * 365 * 24 * 60 * 60),
+            path: '/',
           },
         );
 

@@ -228,6 +228,8 @@ const Home: NextPage<IHome> = ({
         const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(creatorOnRisePayload);
 
         if (resCreatorOnRisePayload) {
+          // TODO: change logic and layout here, because we have multiple creators on the rise
+          console.log(resCreatorOnRisePayload.data?.posts);
           setCollectionCreator(() => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]);
           setCollectionCreatorInitialLoading(false);
         } else {

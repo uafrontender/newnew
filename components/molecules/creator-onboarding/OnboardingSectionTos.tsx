@@ -32,6 +32,7 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
   const [shadowBottom, setShadowBottom] = useState(!isMobile);
 
   const [hasRead, setHasRead] = useState(false);
+  const [hasReadDesktop, setHasReadDesktop] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>();
 
@@ -68,6 +69,7 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
         setShadowBottom(true);
       } else {
         setShadowBottom(false);
+        setHasReadDesktop(true);
       }
     };
 
@@ -78,6 +80,17 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
 
   return (
     <>
+      <SHeading
+        variant={5}
+      >
+        {t('TosSection.heading')}
+      </SHeading>
+      <SSubheading
+        variant={1}
+        weight={600}
+      >
+        {t('TosSection.subheading')}
+      </SSubheading>
       <SContainer
         ref={(el) => {
           containerRef.current = el!!;
@@ -101,17 +114,6 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
             />
           )
         }
-        <SHeading
-          variant={5}
-        >
-          {t('TosSection.heading')}
-        </SHeading>
-        <SSubheading
-          variant={1}
-          weight={600}
-        >
-          {t('TosSection.subheading')}
-        </SSubheading>
         <STosText
           dangerouslySetInnerHTML={{
             __html: mockToS,
@@ -120,6 +122,7 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
       </SContainer>
       <OnboardingTosSubmitForm
         hasScrolledDown={hasRead}
+        hasScrolledDownDesktop={hasReadDesktop}
         handleGoToNext={handleGoToNext}
       />
     </>
@@ -137,7 +140,7 @@ const SContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 0;
 
-    height: calc(100vh - 102px - 88px - 24px);
+    height: calc(100vh - 102px - 88px - 24px - 92px);
     overflow-y: scroll;
 
     padding-left: 152px;
@@ -145,7 +148,7 @@ const SContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: calc(100vh - 118px - 88px - 24px);
+    height: calc(100vh - 118px - 88px - 24px - 100px);
 
     padding-left: 0;
     padding-right: 104px;
@@ -154,6 +157,16 @@ const SContainer = styled.div`
 
 const SHeading = styled(Headline)`
   padding-right: 32px;
+
+  padding-left: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: 152px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    padding-left: 0;
+  }
 `;
 
 const SSubheading = styled(Caption)`
@@ -163,19 +176,25 @@ const SSubheading = styled(Caption)`
   margin-top: 4px;
   margin-bottom: 24px;
 
+  padding-left: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     margin-top: 8px;
     margin-bottom: 32px;
+
+    padding-left: 152px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 40px;
+
+    padding-left: 0;
   }
 `;
 
 const SShadowTop = styled.div`
   position: absolute;
-  top: 100;
+  top: 192px;
   left: 0;
 
   width: 100%;
@@ -183,11 +202,15 @@ const SShadowTop = styled.div`
 
   z-index: 1;
   box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : 'rgba(241, 243, 249, 1)')};
+    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff')};
   ;
   clip-path: inset(0px 0px -100px 0px);
 
   transition: linear .2s;
+
+  ${({ theme }) => theme.media.laptop} {
+    top: 200px;
+  }
 `;
 
 const SShadowBottom = styled.div`
@@ -200,7 +223,7 @@ const SShadowBottom = styled.div`
 
   z-index: 1;
   box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : 'rgba(241, 243, 249, 1)')};
+    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff')};
   ;
   clip-path: inset(-100px 0px 0px 0px);
   transition: linear .2s;
@@ -218,4 +241,6 @@ const STosText = styled.div`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+
 `;

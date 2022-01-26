@@ -3,7 +3,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
 import React, {
-  forwardRef, useState, useEffect, useRef,
+  forwardRef, useState, useEffect, useRef, useMemo,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import DatePicker, { ReactDatePickerCustomHeaderProps, registerLocale } from 'react-datepicker';
@@ -29,6 +29,7 @@ import LibraIcon from '../../../public/images/png/astrology-signs/Libra.png';
 import ScorpioIcon from '../../../public/images/png/astrology-signs/Scorpio.png';
 import SagittariusIcon from '../../../public/images/png/astrology-signs/Sagittarius.png';
 import CapricornIcon from '../../../public/images/png/astrology-signs/Capricorn.png';
+import InputInvalidIcon from '../../../public/images/png/astrology-signs/InputInvalid.png';
 
 // Datepicker utils
 import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
@@ -46,14 +47,6 @@ for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
   registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
 }
 const minDate = new Date(new Date().setFullYear(1900));
-const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
-const years: TDropdownSelectItem<number>[] = [];
-for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
-  years.push({
-    name: i.toString(),
-    value: i,
-  });
-}
 
 const signs: IAstrologySigns = {
   Cake: CakeIcon,
@@ -69,10 +62,12 @@ const signs: IAstrologySigns = {
   Scorpio: ScorpioIcon,
   Sagittarius: SagittariusIcon,
   Capricorn: CapricornIcon,
+  Invalid: InputInvalidIcon,
 };
 
 interface ISettingsBirthDateInput {
   value?: Date;
+  maxDate: Date;
   locale?: string;
   disabled: boolean;
   labelCaption: string;
@@ -83,6 +78,7 @@ interface ISettingsBirthDateInput {
 
 const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> = ({
   value,
+  maxDate,
   locale,
   disabled,
   labelCaption,
@@ -98,6 +94,16 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       value: i,
     };
   });
+  const years: TDropdownSelectItem<number>[] = useMemo(() => {
+    const workingArr = [];
+    for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
+      workingArr.push({
+        name: i.toString(),
+        value: i,
+      });
+    }
+    return workingArr;
+  }, [maxDate]);
 
   const handleToggleCalendarOpen = () => setCalendarOpen((curr) => !curr);
 
@@ -136,6 +142,28 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
 
     const [placeholder, setPlaceholder] = useState(props.placeholder);
     const explicitInputRef = useRef<HTMLInputElement>();
+
+    const imageSrc = useMemo(() => {
+      if (props.value && props.value instanceof Date && props.value === inputData) {
+        return signs[findAstrologySign(props.value)].src;
+      }
+
+      if (inputData?.toString().length === 0) {
+        return CakeIcon.src;
+      }
+
+      let replaced: any = inputData?.toString().split('-');
+      replaced = [replaced[1], replaced[0], replaced[2]].join('/');
+
+      const parsedDate = new Date(replaced);
+      if (parsedDate instanceof Date
+        && !Number.isNaN((parsedDate as Date).valueOf())
+        && (parsedDate as Date) < maxDate
+      ) {
+        return signs[findAstrologySign(value)].src;
+      }
+      return InputInvalidIcon.src;
+    }, [props.value, inputData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       // Input contains invalid characters
@@ -184,36 +212,41 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     }, [inputData, props.placeholder]);
 
     return (
-      <SCustomInput>
-        <input
-          ref={(node) => {
-            explicitInputRef.current = node!!;
-            (ref as Function)(node);
-          }}
-          inputMode="numeric"
-          value={inputData}
-          onChange={handleChange}
-          onPaste={(e) => e.preventDefault()}
+      <>
+        <SAstrologyImg
+          src={imageSrc}
         />
-        <SPseudoPlaceholder
-          dangerouslySetInnerHTML={{
-            __html: placeholder ?? '',
-          }}
-          onClick={() => explicitInputRef.current?.focus()}
-        />
-        <CalendarButton
-          type="button"
-          onClick={props.onClick as any}
-        >
-          <InlineSvg
-            svg={CalendarIcon}
-            width="24px"
-            height="24px"
-            fill={!calendarOpen
-              ? theme.colorsThemed.text.quaternary : theme.colorsThemed.text.primary}
+        <SCustomInput>
+          <input
+            ref={(node) => {
+              explicitInputRef.current = node!!;
+              (ref as Function)(node);
+            }}
+            inputMode="numeric"
+            value={inputData}
+            onChange={handleChange}
+            onPaste={(e) => e.preventDefault()}
           />
-        </CalendarButton>
-      </SCustomInput>
+          <SPseudoPlaceholder
+            dangerouslySetInnerHTML={{
+              __html: placeholder ?? '',
+            }}
+            onClick={() => explicitInputRef.current?.focus()}
+          />
+          <CalendarButton
+            type="button"
+            onClick={props.onClick as any}
+          >
+            <InlineSvg
+              svg={CalendarIcon}
+              width="24px"
+              height="24px"
+              fill={!calendarOpen
+                ? theme.colorsThemed.text.quaternary : theme.colorsThemed.text.primary}
+            />
+          </CalendarButton>
+        </SCustomInput>
+      </>
     );
   });
 
@@ -224,9 +257,9 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       <SLabel>
         { labelCaption }
       </SLabel>
-      <SAstrologyImg
+      {/* <SAstrologyImg
         src={signs[findAstrologySign(value)].src}
-      />
+      /> */}
       <SDatePicker>
         <DatePicker
           disabled={disabled}

@@ -34,6 +34,9 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
     key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
     playback: {
       autoplay: true,
+      // NB! Need to be initially muted in order to comply with autoplay policies
+      // when opening the link from URL
+      muted: true,
     },
   }), []);
 
