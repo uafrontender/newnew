@@ -139,8 +139,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
     React.DetailedHTMLProps<
       React.InputHTMLAttributes<HTMLInputElement>,
       HTMLInputElement
-  // eslint-disable-next-line react/no-unused-prop-types
-  > & {handleSetValid:(val: boolean) => void;}>((props, ref) => {
+  >>((props, ref) => {
     const [inputData, setInputData] = useState(props.value);
 
     const [placeholder, setPlaceholder] = useState(props.placeholder);
@@ -286,7 +285,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
           formatWeekDay={(d) => d[0].toUpperCase()}
           // Custom render elements
           renderCustomHeader={handleRenderCustomHeader}
-          customInput={<CustomInputForwardRef handleSetValid={handleSetIsDateValid} />}
+          customInput={<CustomInputForwardRef />}
           // Calendar
           popperPlacement="top-end"
           popperModifiers={[
