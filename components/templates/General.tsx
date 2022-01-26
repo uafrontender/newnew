@@ -1,8 +1,8 @@
 import React, { useRef, useMemo } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
-import styled, { useTheme } from 'styled-components';
 import { SkeletonTheme } from 'react-loading-skeleton';
+import styled, { useTheme } from 'styled-components';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -14,9 +14,9 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
 import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
-import { useAppSelector } from '../../redux-store/store';
 import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
+import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
 import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
@@ -150,7 +150,7 @@ export const General: React.FC<IGeneral> = (props) => {
           >
             <Cookie />
           </CookieContainer>
-          {withChat && (
+          {withChat && isMobile && (
             <ChatContainer
               bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
             >

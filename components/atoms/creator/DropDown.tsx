@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../Text';
 import Modal from '../../organisms/Modal';
@@ -9,6 +9,7 @@ import InlineSvg from '../InlineSVG';
 
 import { useOnClickEsc } from '../../../utils/hooks/useOnClickEsc';
 import { useAppSelector } from '../../../redux-store/store';
+import useDropDownDirection from '../../../utils/hooks/useDropDownDirection';
 import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 
 import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
@@ -43,6 +44,8 @@ export const DropDown: React.FC<IDropDown> = (props) => {
   const isTablet = ['tablet'].includes(resizeMode);
 
   const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
+
+  const direction = useDropDownDirection(ref, ddHeight);
 
   const handleDropDownClick = () => {
     setFocused(!focused);
@@ -112,6 +115,7 @@ export const DropDown: React.FC<IDropDown> = (props) => {
         <SListHolder
           height={ddHeight}
           focused={focused}
+          direction={direction}
         >
           {options.map(renderItem)}
         </SListHolder>
@@ -133,12 +137,12 @@ const SContainer = styled.div`
 interface ISListHolder {
   height: number;
   focused: boolean;
+  direction: string;
 }
 
 const SListHolder = styled.div<ISListHolder>`
   left: 0;
   height: ${(props) => (props.focused ? `${props.height}px` : '0px')};
-  bottom: 52px;
   padding: ${(props) => (props.focused ? '12px' : '0 12px')};
   z-index: 1;
   overflow: hidden;
@@ -153,6 +157,18 @@ const SListHolder = styled.div<ISListHolder>`
     left: unset;
     right: 0;
   }
+
+  ${(props) => {
+    if (props.direction === 'down') {
+      return css`
+        top: 54px;
+      `;
+    }
+
+    return css`
+      bottom: 54px;
+    `;
+  }}
 `;
 
 const SItemTitle = styled(Text)`
@@ -219,7 +235,7 @@ const SLabelButton = styled.button`
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-size: 14px;
@@ -246,10 +262,11 @@ const SLabelButton = styled.button`
     outline: none;
   }
 
-  &:hover:enabled, &:focus:active {
+  &:hover:enabled,
+  &:focus:active {
     cursor: pointer;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+    background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
   }
 
   &:disabled {
