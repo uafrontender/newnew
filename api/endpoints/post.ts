@@ -63,7 +63,7 @@ export const fetchFeaturedCreatorPosts = (
 ) => fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedPostsResponse>(
   newnewapi.EmptyRequest,
   newnewapi.NonPagedPostsResponse,
-  `${BASE_URL_POST}/get_featured_creator_posts`,
+  `${BASE_URL_POST}/get_featured_creators_posts`,
   'post',
   payload,
 );

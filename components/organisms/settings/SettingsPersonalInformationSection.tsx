@@ -15,6 +15,8 @@ import Button from '../../atoms/Button';
 import SettingsBirthDateInput from '../../molecules/profile/SettingsBirthDateInput';
 import SettingsEmailInput from '../../molecules/profile/SettingsEmailInput';
 
+const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+
 type TSettingsPersonalInformationSection = {
   currentEmail?: string;
   currentDate?: Date;
@@ -78,6 +80,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         />
         <SettingsBirthDateInput
           value={dateInEdit}
+          maxDate={maxDate}
           locale={router.locale}
           disabled={false}
           labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
