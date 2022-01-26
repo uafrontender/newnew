@@ -7,6 +7,8 @@ import React, {
 import { useRouter } from 'next/router';
 import styled, { keyframes } from 'styled-components';
 
+import Indicator from '../atoms/Indicator';
+
 import isBrowser from '../../utils/isBrowser';
 
 interface ITabs {
@@ -19,6 +21,7 @@ interface ITabs {
 
 export interface Tab {
   url: string;
+  counter?: number;
   nameToken: string;
 }
 
@@ -310,6 +313,11 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
             onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
           >
             {t(`tabs.${tab.nameToken}`)}
+            {!!tab.counter && (
+              <SIndicatorContainer>
+                <Indicator counter={tab.counter} />
+              </SIndicatorContainer>
+            )}
           </STab>
         ))}
         {withTabIndicator && (
@@ -360,8 +368,11 @@ interface ISTab {
 }
 
 const STab = styled.button<ISTab>`
-  position: relative;
   width: min-content;
+  display: flex;
+  position: relative;
+  align-items: center;
+  flex-direction: row;
 
   background: transparent;
   border: transparent;
@@ -375,7 +386,7 @@ const STab = styled.button<ISTab>`
 
   font-size: 14px;
   line-height: 24px;
-  
+
   color: ${({
     activeTab,
     theme,
@@ -421,4 +432,9 @@ const SActiveTabIndicator = styled.div`
   background: ${({ theme }) => theme.gradients.blueHorizontal};
 
   transition: opacity .35s ease-in-out, left .25s linear, width .27s linear;
+`;
+
+const SIndicatorContainer = styled.div`
+  position: relative;
+  margin-left: 8px;
 `;

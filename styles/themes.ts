@@ -177,6 +177,7 @@ export const lightTheme: DefaultTheme = {
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
     cookie: '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
+    dashboardNotifications: '0px 0px 35px rgba(100, 110, 129, 0.1)',
   },
   gradients: {
     arrowLeft: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
@@ -189,6 +190,7 @@ export const lightTheme: DefaultTheme = {
     calendarTop: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)',
     calendarBottom: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 98.96%)',
     creationSubmit: 'linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);',
+    dashboardNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
     decisionOption: {
       yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%);',
       blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%);',
@@ -351,6 +353,7 @@ export const darkTheme: DefaultTheme = {
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
     mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
     cookie: '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
+    dashboardNotifications: 'unset',
   },
   gradients: {
     arrowLeft: 'linear-gradient(90deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
@@ -362,11 +365,12 @@ export const darkTheme: DefaultTheme = {
     bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
     calendarTop: 'linear-gradient(180deg, #14151F 0%, rgba(20, 21, 31, 0) 100%)',
     calendarBottom: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, #14151F 100%)',
-    creationSubmit: 'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%);',
+    creationSubmit: 'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
+    dashboardNotifications: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
     decisionOption: {
-      yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%);',
-      blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%);',
-      green: 'linear-gradient(225deg, #0FF34F 0%, #07DF74 44.27%, #00C291 100%);',
+      yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%)',
+      blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%)',
+      green: 'linear-gradient(225deg, #0FF34F 0%, #07DF74 44.27%, #00C291 100%)',
     },
   },
 };
