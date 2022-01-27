@@ -37,8 +37,12 @@ export const DynamicSection = () => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const { query: { tab } } = router;
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet;
+  const { query: { tab = isDesktop ? 'notifications' : '' } } = router;
   const tabs: Tab[] = useMemo(() => [
     {
       url: '/creator/dashboard?tab=notifications',
@@ -392,57 +396,61 @@ export const DynamicSection = () => {
   }, [user.userData?.avatarUrl]);
 
   useOnClickEsc(containerRef, () => {
-    if (tab) {
+    if (tab && !isDesktop) {
       handleMinimizeClick();
     }
   });
   useOnClickOutside(containerRef, () => {
-    if (tab) {
+    if (tab && !isDesktop) {
       handleMinimizeClick();
     }
   });
   useEffect(() => {
-    dispatch(setOverlay(!!tab));
+    dispatch(setOverlay(isDesktop ? false : !!tab));
     setAnimate(true);
     setAnimation(tab ? 'o-12' : 'o-12-reverse');
-  }, [tab, dispatch]);
+  }, [tab, dispatch, isDesktop]);
 
   return (
     <STopButtons>
-      <SButton
-        view="secondary"
-        onClick={handleNotificationsClick}
-      >
-        <SIconHolder>
-          <SInlineSVG
-            svg={notificationsIcon}
-            fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-            width="24px"
-            height="24px"
-          />
-          <SIndicatorContainer>
-            <SIndicator minified />
-          </SIndicatorContainer>
-        </SIconHolder>
-        {t('dashboard.button.notifications')}
-      </SButton>
-      <SButton
-        view="secondary"
-        onClick={handleChatClick}
-      >
-        <SIconHolder>
-          <SInlineSVG
-            svg={chatIcon}
-            fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-            width="24px"
-            height="24px"
-          />
-          <SIndicatorContainer>
-            <SIndicator minified />
-          </SIndicatorContainer>
-        </SIconHolder>
-        {t('dashboard.button.dms')}
-      </SButton>
+      {!isDesktop && (
+        <>
+          <SButton
+            view="secondary"
+            onClick={handleNotificationsClick}
+          >
+            <SIconHolder>
+              <SInlineSVG
+                svg={notificationsIcon}
+                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
+                width="24px"
+                height="24px"
+              />
+              <SIndicatorContainer>
+                <SIndicator minified />
+              </SIndicatorContainer>
+            </SIconHolder>
+            {t('dashboard.button.notifications')}
+          </SButton>
+          <SButton
+            view="secondary"
+            onClick={handleChatClick}
+          >
+            <SIconHolder>
+              <SInlineSVG
+                svg={chatIcon}
+                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
+                width="24px"
+                height="24px"
+              />
+              <SIndicatorContainer>
+                <SIndicator minified />
+              </SIndicatorContainer>
+            </SIconHolder>
+            {t('dashboard.button.dms')}
+          </SButton>
+        </>
+      )}
       <AnimatedPresence
         start={animate}
         animation={animation as TAnimation}
@@ -468,12 +476,14 @@ export const DynamicSection = () => {
                   >
                     {t('dashboard.button.markAllAsRead')}
                   </STopLineButton>
-                  <STopLineButton
-                    view="secondary"
-                    onClick={handleMinimizeClick}
-                  >
-                    {t('dashboard.button.minimize')}
-                  </STopLineButton>
+                  {!isDesktop && (
+                    <STopLineButton
+                      view="secondary"
+                      onClick={handleMinimizeClick}
+                    >
+                      {t('dashboard.button.minimize')}
+                    </STopLineButton>
+                  )}
                 </>
               ) : (
                 <>
@@ -580,6 +590,18 @@ const SAnimatedContainer = styled.div`
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
   border-radius: 24px;
+
+  ${(props) => props.theme.media.laptop} {
+    left: unset;
+    width: 500px;
+    height: 800px;
+    bottom: unset;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    top: 120px;
+    width: 432px;
+  }
 `;
 
 const STabsWrapper = styled.div`

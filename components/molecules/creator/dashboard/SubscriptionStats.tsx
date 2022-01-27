@@ -303,9 +303,17 @@ const SInlineSVG = styled(InlineSVG)`
 const SHeaderLine = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   flex-direction: row;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 10px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-bottom: 18px;
+  }
 `;
 
 const STotalLine = styled.div`
@@ -314,6 +322,10 @@ const STotalLine = styled.div`
   margin-bottom: 8px;
   flex-direction: row;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.laptop} {
+    margin-bottom: 12px;
+  }
 `;
 
 const STotalTextWrapper = styled.div`
@@ -344,18 +356,19 @@ const STotalInsightsArrow = styled(InlineSVG)`
 `;
 
 const SListHolder = styled.div`
-  left: -8px;
-  width: calc(100% + 16px);
+  gap: 16px;
   display: flex;
   position: relative;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   flex-direction: row;
+
+  ${(props) => props.theme.media.laptop} {
+    gap: 24px;
+  }
 `;
 
 const SListItem = styled.div`
-  width: calc(33% - 16px);
-  margin: 8px;
+  flex: 1;
   padding: 16px;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
@@ -408,6 +421,11 @@ const SSubscribersList = styled.div`
   flex-wrap: wrap;
   margin-bottom: 16px;
   flex-direction: row;
+
+  ${(props) => props.theme.media.laptop} {
+    left: -12px;
+    width: calc(100% + 24px);
+  }
 `;
 
 const SSubscribersItem = styled.div`
@@ -419,6 +437,12 @@ const SSubscribersItem = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     width: calc(33% - 16px);
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    left: -12px;
+    width: calc(33% - 24px);
+    margin: 12px;
   }
 `;
 
