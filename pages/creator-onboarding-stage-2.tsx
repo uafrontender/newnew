@@ -27,6 +27,22 @@ const countriesMock: CountryOption[] = [
     value: 'Canada',
     en: 'Canada',
   },
+  {
+    value: 'MS',
+    en: 'Mexico',
+  },
+  {
+    value: 'UK',
+    en: 'United Kingdom',
+  },
+  {
+    value: 'AU',
+    en: 'Australia',
+  },
+  {
+    value: 'FR',
+    en: 'France',
+  },
 ];
 
 const genericAvatarsMock = [
