@@ -59,14 +59,25 @@ export const Tablet: React.FC<ITablet> = () => {
               />
             </SItemWithMargin>
             {user.userData?.options?.isCreator ? (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/share',
-                    key: 'share',
-                  }}
-                />
-              </SItemWithMargin>
+              <>
+                <SItemWithMargin>
+                  <NavigationItem
+                    item={{
+                      url: '/direct-messages',
+                      key: 'direct-messages',
+                      counter: user.notificationsCount,
+                    }}
+                  />
+                </SItemWithMargin>
+                <SItemWithMargin>
+                  <NavigationItem
+                    item={{
+                      url: '/share',
+                      key: 'share',
+                    }}
+                  />
+                </SItemWithMargin>
+              </>
             ) : (
               <SItemWithMargin>
                 <NavigationItem

@@ -46,12 +46,21 @@
     "expirationPosts": {
       "title": "Expiration Posts",
       "submit": "Show 10 more posts",
-      "decide": "Decide"
+      "decide": "Decide",
+      "table": {
+        "header": {
+          "post": "Post",
+          "total": "Total",
+          "contributions": "Contributions",
+          "actions": "Actions"
+        }
+      }
     },
     "subscriptionStats": {
       "title": "Subscriptions",
       "newTitle": "New subscribers",
       "newLink": "Subscriptions",
+      "newLink_tablet": "Go to subscriptions",
       "seeAll": "See all new subs",
       "prevWeek": "vs prev week",
       "banner": {
@@ -72,6 +81,30 @@
         "last_12_months": "Last 12 months"
       }
     }
+  },
+  "subscriptions": {
+    "meta": {
+      "title": "Creator Subscriptions"
+    },
+    "title": "Subscriptions"
+  },
+  "earnings": {
+    "meta": {
+      "title": "Creator Earnings"
+    },
+    "title": "Earnings"
+  },
+  "getPaid": {
+    "meta": {
+      "title": "Creator Get Paid"
+    },
+    "title": "Get Paid"
+  },
+  "transactions": {
+    "meta": {
+      "title": "Creator Transactions"
+    },
+    "title": "Transactions"
   },
   "navigation": {
     "dashboard": "Dashboard",

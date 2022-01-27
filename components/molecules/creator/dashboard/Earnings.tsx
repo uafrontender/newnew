@@ -171,7 +171,6 @@ const SCashOutContainer = styled.div`
   padding: 16px;
   display: flex;
   background: ${(props) => props.theme.colorsThemed.accent.blue};
-  align-items: center;
   border-radius: 16px;
   flex-direction: column;
 
@@ -211,6 +210,15 @@ const SButton = styled(Button)`
   margin-top: 16px;
   background: ${(props) => props.theme.colors.white};
 
+  &:after {
+    display: none;
+  }
+
+  &:focus:enabled,
+  &:hover:enabled {
+    background: ${(props) => props.theme.colors.white};
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
@@ -235,6 +243,10 @@ const SHeaderLine = styled.div`
   ${(props) => props.theme.media.tablet} {
     margin-bottom: 14px;
   }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-bottom: 18px;
+  }
 `;
 
 const STotalLine = styled.div`
@@ -243,6 +255,10 @@ const STotalLine = styled.div`
   margin-bottom: 8px;
   flex-direction: row;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.laptop} {
+    margin-bottom: 14px;
+  }
 `;
 
 const STotalTextWrapper = styled.div`
@@ -284,6 +300,10 @@ const SListHolder = styled.div`
   flex-wrap: wrap;
   margin-bottom: 8px;
   flex-direction: row;
+
+  ${(props) => props.theme.media.laptop} {
+    margin-bottom: 14px;
+  }
 `;
 
 const SListItem = styled.div`
@@ -296,6 +316,11 @@ const SListItem = styled.div`
   ${(props) => props.theme.media.tablet} {
     width: calc(25% - 12px);
     margin: 6px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    width: calc(25% - 20px);
+    margin: 10px;
   }
 `;
 
