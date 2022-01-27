@@ -1,18 +1,13 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import Headline from '../../atoms/Headline';
-import Earnings from '../../molecules/creator/dashboard/Earnings';
 import Navigation from '../../molecules/creator/Navigation';
-import DynamicSection from '../../molecules/creator/dashboard/DynamicSection';
-import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
-import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
-import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-export const Dashboard = () => {
+export const Earnings = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -24,30 +19,15 @@ export const Dashboard = () => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>
-            {t('dashboard.title')}
+            {t('earnings.title')}
           </STitle>
-          {!isMobile && (
-            <DynamicSection />
-          )}
         </STitleBlock>
-        <SBlock>
-          <ExpirationPosts />
-        </SBlock>
-        <SBlock>
-          <Earnings />
-        </SBlock>
-        <SBlock>
-          <SubscriptionStats />
-        </SBlock>
-        <SBlock noMargin>
-          <EnableSubscription />
-        </SBlock>
       </SContent>
     </SContainer>
   );
 };
 
-export default Dashboard;
+export default Earnings;
 
 const SContainer = styled.div`
   position: relative;
@@ -79,23 +59,6 @@ const SContent = styled.div`
 `;
 
 const STitle = styled(Headline)``;
-
-interface ISBlock {
-  noMargin?: boolean;
-}
-
-const SBlock = styled.section<ISBlock>`
-  ${(props) => !props.noMargin && css`
-    margin-bottom: 24px;
-  `}
-  ${(props) => props.theme.media.tablet} {
-    min-width: 608px;
-    max-width: 100%;
-  }
-  ${(props) => props.theme.media.laptopL} {
-    max-width: calc(100% - 464px);
-  }
-`;
 
 const STitleBlock = styled.section`
   display: flex;
