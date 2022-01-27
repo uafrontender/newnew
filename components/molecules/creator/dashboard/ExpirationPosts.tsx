@@ -251,7 +251,7 @@ const SContainer = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    background: ${(props) => props.theme.colorsThemed.background.secondary};
+    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
   }
 `;
 

@@ -200,12 +200,12 @@ export const SubscriptionStats = () => {
       <SSubscribersList>
         {newSubscribersCollection.map(renderSubscriber)}
       </SSubscribersList>
-      <SButton
+      <SButtonSubmit
         view="secondary"
         onClick={handleSubmit}
       >
         {t('dashboard.subscriptionStats.seeAll')}
-      </SButton>
+      </SButtonSubmit>
       <SBannerContainer>
         <SBannerTopBlock>
           <SInlineSVG
@@ -290,6 +290,17 @@ const SButton = styled(Button)`
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
+  }
+`;
+
+const SButtonSubmit = styled(Button)`
+  padding: 16px 20px;
+
+  ${(props) => props.theme.media.tablet} {
+    width: unset;
+    margin: 0 auto;
+    padding: 12px 24px;
+    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
   }
 `;
 

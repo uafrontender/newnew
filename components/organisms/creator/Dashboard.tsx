@@ -59,6 +59,7 @@ const SContainer = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: -40px;
+    margin-bottom: -40px;
   }
 `;
 
