@@ -24,8 +24,8 @@ export const GetPaid = () => {
   const handleRedirectToStripesetup = async () => {
     try {
       const payload = new newnewapi.SetupStripeCreatorAccountRequest({
-        refreshUrl: 'http://localhost:4000/creator/get-paid?setup=failure',
-        returnUrl: 'http://localhost:4000/creator/get-paid?setup=success',
+        refreshUrl: `${process.env.NEXT_PUBLIC_APP_URL}/creator/get-paid?setup=failure`,
+        returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/creator/get-paid?setup=success`,
       });
 
       const res = await fetchSetStripeLinkCreator(payload);
@@ -53,8 +53,7 @@ export const GetPaid = () => {
           </STitle>
         </STitleBlock>
         {/* @ts-ignore */}
-        {user.userData?.options.isCreatorConnectedToStripe && (
-        // {!user.userData?.options.isCreatorConnectedToStripe && (
+        {!user.userData?.options.isCreatorConnectedToStripe && (
           <>
             <SHeadline
               variant={5}
@@ -94,8 +93,7 @@ export const GetPaid = () => {
           </>
         )}
         {/* @ts-ignore */}
-        {true && (
-        // {user.userData?.options.isCreatorConnectedToStripe && (
+        {user.userData?.options.isCreatorConnectedToStripe && (
           <>
             <SHeadline
               variant={5}
