@@ -4,18 +4,18 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
-import InlineSVG from '../../../atoms/InlineSVG';
+import InlineSVG from '../../atoms/InlineSVG';
 
-import dashboardFilledIcon from '../../../../public/images/svg/icons/filled/Dashboard.svg';
-import dashboardOutlinedIcon from '../../../../public/images/svg/icons/outlined/Dashboard.svg';
-import subscriptionsFilledIcon from '../../../../public/images/svg/icons/filled/Subscriptions.svg';
-import subscriptionsOutlinedIcon from '../../../../public/images/svg/icons/outlined/Subscriptions.svg';
-import earningsFilledIcon from '../../../../public/images/svg/icons/filled/Earnings.svg';
-import earningsOutlinedIcon from '../../../../public/images/svg/icons/outlined/Earnings.svg';
-import walletFilledIcon from '../../../../public/images/svg/icons/filled/Wallet.svg';
-import walletOutlinedIcon from '../../../../public/images/svg/icons/outlined/Wallet.svg';
-import transactionsFilledIcon from '../../../../public/images/svg/icons/filled/Transactions.svg';
-import transactionsOutlinedIcon from '../../../../public/images/svg/icons/outlined/Transactions.svg';
+import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboard.svg';
+import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
+import subscriptionsFilledIcon from '../../../public/images/svg/icons/filled/Subscriptions.svg';
+import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Subscriptions.svg';
+import earningsFilledIcon from '../../../public/images/svg/icons/filled/Earnings.svg';
+import earningsOutlinedIcon from '../../../public/images/svg/icons/outlined/Earnings.svg';
+import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
+import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
+import transactionsFilledIcon from '../../../public/images/svg/icons/filled/Transactions.svg';
+import transactionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Transactions.svg';
 
 export const Navigation = () => {
   const theme = useTheme();
@@ -95,6 +95,7 @@ const SContainer = styled.aside`
   ${(props) => props.theme.media.laptop} {
     top: 40px;
     width: 200px;
+    margin-right: unset;
   }
 `;
 

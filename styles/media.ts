@@ -3,6 +3,7 @@ const customMediaQuery = (minWidth: number) => `@media (min-width: ${minWidth}px
 interface ISIZES {
   desktop: number;
   laptopL: number;
+  laptopM: number;
   laptop: number;
   tablet: number;
   mobileL: number;
@@ -14,6 +15,7 @@ interface ISIZES {
 export const sizes: ISIZES = {
   desktop: 2560,
   laptopL: 1440,
+  laptopM: 1150,
   laptop: 1024,
   tablet: 768,
   mobileL: 425,
@@ -34,6 +36,8 @@ const tablet = customMediaQuery(sizes.tablet);
 
 const laptop = customMediaQuery(sizes.laptop);
 
+const laptopM = customMediaQuery(sizes.laptopM);
+
 const laptopL = customMediaQuery(sizes.laptopL);
 
 const desktop = customMediaQuery(sizes.desktop);
@@ -45,6 +49,7 @@ export interface IMedia {
   mobileL: string;
   tablet: string;
   laptop: string;
+  laptopM: string;
   laptopL: string;
   desktop: string;
 }
@@ -56,6 +61,7 @@ const media: IMedia = {
   mobileL,
   tablet,
   laptop,
+  laptopM,
   laptopL,
   desktop,
 };

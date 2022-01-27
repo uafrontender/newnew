@@ -101,7 +101,7 @@ const SButton = styled(Button)`
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
-    margin-top: 20px;
+    margin-top: 24px;
   }
 `;
 
@@ -114,6 +114,10 @@ const SDescriptionWrapper = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 12px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: 8px;
   }
 `;
 
