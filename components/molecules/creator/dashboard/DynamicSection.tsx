@@ -37,8 +37,12 @@ export const DynamicSection = () => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const { query: { tab } } = router;
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet;
+  const { query: { tab = isDesktop ? 'notifications' : '' } } = router;
   const tabs: Tab[] = useMemo(() => [
     {
       url: '/creator/dashboard?tab=notifications',
@@ -173,6 +177,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 10,
     },
     {
       id: '3',
@@ -180,6 +185,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 2,
     },
     {
       id: '4',
@@ -208,6 +214,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 1,
     },
     {
       id: '8',
@@ -222,6 +229,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 6,
     },
     {
       id: '10',
@@ -229,6 +237,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 11,
     },
     {
       id: '11',
@@ -236,6 +245,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 15,
     },
     {
       id: '12',
@@ -243,6 +253,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 6,
     },
     {
       id: '13',
@@ -250,6 +261,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 12,
     },
     {
       id: '14',
@@ -257,6 +269,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 14,
     },
     {
       id: '15',
@@ -264,6 +277,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 15,
     },
     {
       id: '16',
@@ -271,6 +285,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 1,
     },
     {
       id: '17',
@@ -278,6 +293,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 16,
     },
     {
       id: '18',
@@ -285,6 +301,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 20,
     },
     {
       id: '19',
@@ -292,6 +309,7 @@ export const DynamicSection = () => {
       title: 'Dark Moon 🌚',
       lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
       unread: true,
+      unreadCount: 100,
     },
   ], []);
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
@@ -343,7 +361,7 @@ export const DynamicSection = () => {
               {item.time}
             </SChatItemTime>
             {!!item.unread && (
-              <SChatItemIndicator minified />
+              <SChatItemIndicator counter={item.unreadCount} />
             )}
           </SChatItemRight>
         </SChatItem>
@@ -378,57 +396,61 @@ export const DynamicSection = () => {
   }, [user.userData?.avatarUrl]);
 
   useOnClickEsc(containerRef, () => {
-    if (tab) {
+    if (tab && !isDesktop) {
       handleMinimizeClick();
     }
   });
   useOnClickOutside(containerRef, () => {
-    if (tab) {
+    if (tab && !isDesktop) {
       handleMinimizeClick();
     }
   });
   useEffect(() => {
-    dispatch(setOverlay(!!tab));
+    dispatch(setOverlay(isDesktop ? false : !!tab));
     setAnimate(true);
     setAnimation(tab ? 'o-12' : 'o-12-reverse');
-  }, [tab, dispatch]);
+  }, [tab, dispatch, isDesktop]);
 
   return (
     <STopButtons>
-      <SButton
-        view="secondary"
-        onClick={handleNotificationsClick}
-      >
-        <SIconHolder>
-          <SInlineSVG
-            svg={notificationsIcon}
-            fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-            width="24px"
-            height="24px"
-          />
-          <SIndicatorContainer>
-            <SIndicator minified />
-          </SIndicatorContainer>
-        </SIconHolder>
-        {t('dashboard.button.notifications')}
-      </SButton>
-      <SButton
-        view="secondary"
-        onClick={handleChatClick}
-      >
-        <SIconHolder>
-          <SInlineSVG
-            svg={chatIcon}
-            fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-            width="24px"
-            height="24px"
-          />
-          <SIndicatorContainer>
-            <SIndicator minified />
-          </SIndicatorContainer>
-        </SIconHolder>
-        {t('dashboard.button.dms')}
-      </SButton>
+      {!isDesktop && (
+        <>
+          <SButton
+            view="secondary"
+            onClick={handleNotificationsClick}
+          >
+            <SIconHolder>
+              <SInlineSVG
+                svg={notificationsIcon}
+                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
+                width="24px"
+                height="24px"
+              />
+              <SIndicatorContainer>
+                <SIndicator minified />
+              </SIndicatorContainer>
+            </SIconHolder>
+            {t('dashboard.button.notifications')}
+          </SButton>
+          <SButton
+            view="secondary"
+            onClick={handleChatClick}
+          >
+            <SIconHolder>
+              <SInlineSVG
+                svg={chatIcon}
+                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
+                width="24px"
+                height="24px"
+              />
+              <SIndicatorContainer>
+                <SIndicator minified />
+              </SIndicatorContainer>
+            </SIconHolder>
+            {t('dashboard.button.dms')}
+          </SButton>
+        </>
+      )}
       <AnimatedPresence
         start={animate}
         animation={animation as TAnimation}
@@ -454,12 +476,14 @@ export const DynamicSection = () => {
                   >
                     {t('dashboard.button.markAllAsRead')}
                   </STopLineButton>
-                  <STopLineButton
-                    view="secondary"
-                    onClick={handleMinimizeClick}
-                  >
-                    {t('dashboard.button.minimize')}
-                  </STopLineButton>
+                  {!isDesktop && (
+                    <STopLineButton
+                      view="secondary"
+                      onClick={handleMinimizeClick}
+                    >
+                      {t('dashboard.button.minimize')}
+                    </STopLineButton>
+                  )}
                 </>
               ) : (
                 <>
@@ -566,6 +590,18 @@ const SAnimatedContainer = styled.div`
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
   border-radius: 24px;
+
+  ${(props) => props.theme.media.laptop} {
+    left: unset;
+    width: 500px;
+    height: 800px;
+    bottom: unset;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    top: 120px;
+    width: 432px;
+  }
 `;
 
 const STabsWrapper = styled.div`
@@ -679,10 +715,7 @@ const SChatItemTime = styled(Text)`
   margin-bottom: 4px;
 `;
 
-const SChatItemIndicator = styled(Indicator)`
-  border: 3px solid ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
-  padding: 5px;
-`;
+const SChatItemIndicator = styled(Indicator)``;
 
 const SChatSeparator = styled.div`
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
