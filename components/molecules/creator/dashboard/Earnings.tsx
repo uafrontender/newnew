@@ -171,7 +171,6 @@ const SCashOutContainer = styled.div`
   padding: 16px;
   display: flex;
   background: ${(props) => props.theme.colorsThemed.accent.blue};
-  align-items: center;
   border-radius: 16px;
   flex-direction: column;
 

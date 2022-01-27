@@ -88,8 +88,11 @@ const SBlock = styled.section<ISBlock>`
   ${(props) => !props.noMargin && css`
     margin-bottom: 24px;
   `}
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.tablet} {
     min-width: 608px;
+    max-width: 100%;
+  }
+  ${(props) => props.theme.media.laptopL} {
     max-width: calc(100% - 464px);
   }
 `;

@@ -254,7 +254,6 @@ const SBannerContainer = styled.div`
   display: flex;
   margin-top: 16px;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
-  align-items: center;
   border-radius: 16px;
   flex-direction: column;
 
