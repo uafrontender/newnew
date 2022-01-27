@@ -6,18 +6,18 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import General from '../../components/templates/General';
-import Content from '../../components/organisms/creator/Dashboard';
+import Content from '../../components/organisms/creator/Subscriptions';
 
 import { NextPageWithLayout } from '../_app';
 
-export const Dashboard = () => {
+export const Subscriptions = () => {
   const { t } = useTranslation('creator');
 
   return (
     <>
       <Head>
         <title>
-          {t('dashboard.meta.title')}
+          {t('subscriptions.meta.title')}
         </title>
       </Head>
       <Content />
@@ -25,13 +25,13 @@ export const Dashboard = () => {
   );
 };
 
-(Dashboard as NextPageWithLayout).getLayout = (page: ReactElement) => (
+(Subscriptions as NextPageWithLayout).getLayout = (page: ReactElement) => (
   <SGeneral withChat>
     {page}
   </SGeneral>
 );
 
-export default Dashboard;
+export default Subscriptions;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(
