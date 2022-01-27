@@ -30,6 +30,17 @@ export const updateMe = (
   payload,
 );
 
+export const fetchSetStripeLinkCreator = (
+  payload: newnewapi.SetupStripeCreatorAccountRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.SetupStripeCreatorAccountRequest, newnewapi.SetupStripeCreatorAccountResponse>(
+  newnewapi.SetupStripeCreatorAccountRequest,
+  newnewapi.SetupStripeCreatorAccountResponse,
+  `${BASE_URL_USER}/stripe_connect_setup`,
+  'post',
+  payload,
+);
+
 export const logout = (
   payload: newnewapi.EmptyRequest,
 ) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(

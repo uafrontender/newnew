@@ -98,7 +98,17 @@
     "meta": {
       "title": "Creator Get Paid"
     },
-    "title": "Get Paid"
+    "title": "Get Paid",
+    "title-set-up-stripe": "Set payment system",
+    "title-stripe-active": "account is active",
+    "bullets": {
+      "1": "$2.00 USD NewNew withdrawal fee.",
+      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
+      "3": "Set up will take you to Stripe."
+    },
+    "requestSetupLinkBtn": "Connect with Stripe",
+    "getPaidBtn": "Get paid",
+    "updateBtn": "Update account"
   },
   "transactions": {
     "meta": {
