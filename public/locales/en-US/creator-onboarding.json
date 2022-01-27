@@ -15,6 +15,7 @@
     "agreenToTosCheckbox": "I agree to the terms and conditions."
   },
   "DetailsSection": {
+    "leaveMsg": "Are you sure you want to leave? The changes will be discarded",
     "side": {
       "heading": "Tell us a little about yourself.",
       "subheading": "This is the description that will show on your profile page."
