@@ -76,8 +76,30 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
 
   // Birthdate
-  // @ts-ignore
-  const [dateInEdit, setDateInEdit] = useState(user?.userData?.dateOfBirth ?? undefined);
+
+  // NB! temp
+  const parsed: newnewapi.IDateComponents = {
+    day: 1,
+    month: 5,
+    year: 1990,
+  };
+
+  const [dateInEdit, setDateInEdit] = useState<
+    Date | undefined
+  >(user?.userData?.dateOfBirth ? (
+    new Date(
+      user?.userData.dateOfBirth.year!!,
+      user?.userData.dateOfBirth.month!!,
+      user?.userData.dateOfBirth.day!!,
+    )
+  // ) : undefined}
+  ) : (
+    new Date(
+      parsed.year!!,
+      parsed.month!!,
+      parsed.day!!,
+    )
+  ));
   const [isDateValid, setIsDateValid] = useState(
     // @ts-ignore
     (user?.userData?.dateOfBirth ? (
