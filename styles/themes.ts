@@ -190,7 +190,8 @@ export const lightTheme: DefaultTheme = {
     calendarTop: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)',
     calendarBottom: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 98.96%)',
     creationSubmit: 'linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);',
-    dashboardNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
+    listTop: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
+    listBottom: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
     decisionOption: {
       yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%);',
       blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%);',
@@ -366,7 +367,8 @@ export const darkTheme: DefaultTheme = {
     calendarTop: 'linear-gradient(180deg, #14151F 0%, rgba(20, 21, 31, 0) 100%)',
     calendarBottom: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, #14151F 100%)',
     creationSubmit: 'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
-    dashboardNotifications: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+    listTop: 'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+    listBottom: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
     decisionOption: {
       yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%)',
       blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%)',
