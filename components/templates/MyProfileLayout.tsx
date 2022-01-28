@@ -28,7 +28,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBroswer from '../../utils/isBrowser';
 
-export type TPageType = 'activelyBidding'
+type TPageType = 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
   | 'subscriptions'

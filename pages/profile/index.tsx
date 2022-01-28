@@ -71,7 +71,6 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
     setDisplayedPost(undefined);
   };
 
-  // TODO: filters and other parameters
   const loadPosts = useCallback(async (
     token?: string,
     needCount?: boolean,
