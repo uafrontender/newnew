@@ -67,11 +67,8 @@ const ProfilePostTypeFilterModal: React.FunctionComponent<IProfilePostTypeFilter
         >
           {options.map((o) => (
             <SButton
-              selected={o.value === selected}
+              selected={o.value.toString() === (selected?.toString() ?? '0')}
               onClick={() => handleClick(o.value)}
-              style={{
-                marginBottom: '16px',
-              }}
             >
               <Text
                 variant={3}
@@ -116,8 +113,9 @@ const SContentContainer = styled.div`
 
   display: flex;
   flex-direction: column;
+  gap: 8px;
 
-  padding: 16px;
+  padding: 8px;
   padding-bottom: 30px;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
@@ -134,12 +132,18 @@ const SContentContainer = styled.div`
 const SButton = styled.button<{
   selected: boolean;
 }>`
-  background: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.secondary : 'transparent')};
   border: transparent;
 
   text-align: center;
 
   cursor: pointer;
+
+  border-radius: 8px;
+  padding: 8px;
+
+  color: ${({ selected, theme }) => (selected ? theme.colorsThemed.text.primary : 'initial')} !important;
+  background: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'initial')} !important;
+
 
   &:focus {
     outline: none;
