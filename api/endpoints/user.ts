@@ -60,9 +60,9 @@ export const getMyPosts = (
   },
   updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void,
 ) => fetchProtobufProtectedIntercepted<
-newnewapi.GetRelatedToMePostsRequest, newnewapi.PagedPostsResponse>(
+newnewapi.GetRelatedToMePostsRequest, newnewapi.PagedCountedPostsResponse>(
   newnewapi.GetRelatedToMePostsRequest,
-  newnewapi.PagedPostsResponse,
+  newnewapi.PagedCountedPostsResponse,
   `${BASE_URL}/post/get_related_to_me_posts`,
   'post',
   payload,
