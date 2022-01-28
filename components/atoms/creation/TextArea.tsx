@@ -10,9 +10,9 @@ import alertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 interface ITextArea {
   id?: string;
   value: string;
-  error: string;
-  onBlur: (key: string, value: string) => void;
-  onFocus: (key: string) => void;
+  error?: string;
+  onBlur?: (key: string, value: string) => void;
+  onFocus?: (key: string) => void;
   onChange: (key: string, value: string | boolean) => void;
   placeholder: string;
 }
@@ -22,8 +22,8 @@ export const TextArea: React.FC<ITextArea> = (props) => {
     id = '',
     value,
     error,
-    onBlur,
-    onFocus,
+    onBlur = () => {},
+    onFocus = () => {},
     onChange,
     placeholder,
   } = props;
@@ -73,6 +73,9 @@ export default TextArea;
 
 TextArea.defaultProps = {
   id: '',
+  error: '',
+  onBlur: (key, value) => console.log(key, value),
+  onFocus: (key) => console.log(key),
 };
 
 const SWrapper = styled.div`
