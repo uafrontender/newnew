@@ -82,8 +82,8 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
         userUuid: user.uuid,
         filter: postsFilter,
-        // relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-        relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+        relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+        // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
         paging: {
           ...(token ? { pageToken: token } : {}),
         },
@@ -174,7 +174,6 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 };
 
 (UserPageActivity as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  console.log(page.props.user);
   // const renderedPage = page.props.user?.options?.isActivityPrivate ? (
   //   'activityHidden'
   // ) : 'activity';
@@ -250,8 +249,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
       userUuid: res.data.uuid,
       filter: newnewapi.Post.Filter.ALL,
-      // relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-      relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+      relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+      // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
       needTotalCount: true,
       paging: {
         limit: 10,

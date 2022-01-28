@@ -174,7 +174,6 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 };
 
 (UserPageIndex as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  console.log(page.props.user);
   // const renderedPage = page.props.user?.options?.isCreator ? (
   //   'creatorsDecisions'
   // ) : (
