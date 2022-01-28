@@ -129,7 +129,9 @@ export const Earnings = () => {
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.amount')}
             </SDescription>
-            <SAmount>$456.98</SAmount>
+            <SAmount variant={3} weight={600}>
+              $456.98
+            </SAmount>
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', { date: 'Nov 3, 2021' })}
             </SDescription>

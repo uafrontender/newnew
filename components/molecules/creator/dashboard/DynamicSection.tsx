@@ -9,13 +9,13 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
-import Text from '../../../atoms/Text';
+import Chat from './Chat';
 import Button from '../../../atoms/Button';
-import Caption from '../../../atoms/Caption';
+import ChatList from './ChatList';
 import InlineSVG from '../../../atoms/InlineSVG';
 import Indicator from '../../../atoms/Indicator';
-import UserAvatar from '../../UserAvatar';
 import Tabs, { Tab } from '../../Tabs';
+import NotificationsList from './NotificationsList';
 import AnimatedPresence, { TAnimation } from '../../../atoms/AnimatedPresence';
 
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
@@ -36,7 +36,6 @@ export const DynamicSection = () => {
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
-  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -53,263 +52,6 @@ export const DynamicSection = () => {
       url: '/creator/dashboard?tab=chat',
       counter: 6,
       nameToken: 'chat',
-    },
-  ], []);
-  const notifications = useMemo(() => ({
-    new: [
-      {
-        id: '1',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '2',
-        text: 'Bugaboo👻😈 subscribed on you.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '3',
-        text: 'SandyCandy posted a new comment on  ‘Where to dine tonight’?. ',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '4',
-        text: 'SugarDaddy subscribed on you.',
-        time: '30m ago',
-        unread: true,
-      },
-    ],
-    earlier: [
-      {
-        id: '5',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '6',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '7',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '8',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '9',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '10',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '11',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '12',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '13',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '14',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '15',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '16',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '17',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-    ],
-  }), []);
-  const chats = useMemo(() => [
-    {
-      id: '1',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: false,
-    },
-    {
-      id: '2',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 10,
-    },
-    {
-      id: '3',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 2,
-    },
-    {
-      id: '4',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: false,
-    },
-    {
-      id: '5',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: false,
-    },
-    {
-      id: '6',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: false,
-    },
-    {
-      id: '7',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 1,
-    },
-    {
-      id: '8',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: false,
-    },
-    {
-      id: '9',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 6,
-    },
-    {
-      id: '10',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 11,
-    },
-    {
-      id: '11',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 15,
-    },
-    {
-      id: '12',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 6,
-    },
-    {
-      id: '13',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 12,
-    },
-    {
-      id: '14',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 14,
-    },
-    {
-      id: '15',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 15,
-    },
-    {
-      id: '16',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 1,
-    },
-    {
-      id: '17',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 16,
-    },
-    {
-      id: '18',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 20,
-    },
-    {
-      id: '19',
-      time: '30 min',
-      title: 'Dark Moon 🌚',
-      lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-      unread: true,
-      unreadCount: 100,
     },
   ], []);
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
@@ -335,65 +77,6 @@ export const DynamicSection = () => {
   const handleBulkMessageClick = useCallback(() => {
     console.log('search');
   }, []);
-
-  const renderChatItem = useCallback((item) => {
-    const handleUserClick = () => {
-    };
-
-    return (
-      <SChatItemContainer key={`chat-item-${item.id}`}>
-        <SChatItem>
-          <SChatItemAvatar
-            withClick
-            onClick={handleUserClick}
-            avatarUrl={user.userData?.avatarUrl}
-          />
-          <SChatItemCenter>
-            <SChatItemText variant={3} weight={600}>
-              {item.title}
-            </SChatItemText>
-            <SChatItemLastMessage variant={3} weight={600}>
-              {item.lastMessage}
-            </SChatItemLastMessage>
-          </SChatItemCenter>
-          <SChatItemRight>
-            <SChatItemTime variant={3} weight={600}>
-              {item.time}
-            </SChatItemTime>
-            {!!item.unread && (
-              <SChatItemIndicator counter={item.unreadCount} />
-            )}
-          </SChatItemRight>
-        </SChatItem>
-        <SChatSeparator />
-      </SChatItemContainer>
-    );
-  }, [user.userData?.avatarUrl]);
-  const renderNotificationItem = useCallback((item) => {
-    const handleUserClick = () => {
-    };
-
-    return (
-      <SNotificationItem key={`notification-item-${item.id}`}>
-        <SNotificationItemAvatar
-          withClick
-          onClick={handleUserClick}
-          avatarUrl={user.userData?.avatarUrl}
-        />
-        <SNotificationItemCenter>
-          <SNotificationItemText variant={3} weight={600}>
-            {item.text}
-          </SNotificationItemText>
-          <SNotificationItemTime variant={2} weight={600}>
-            {item.time}
-          </SNotificationItemTime>
-        </SNotificationItemCenter>
-        {!!item.unread && (
-          <SNotificationItemIndicator minified />
-        )}
-      </SNotificationItem>
-    );
-  }, [user.userData?.avatarUrl]);
 
   useOnClickEsc(containerRef, () => {
     if (tab && !isDesktop) {
@@ -458,76 +141,66 @@ export const DynamicSection = () => {
         animateWhenInView={false}
       >
         <SAnimatedContainer ref={containerRef}>
-          <SSectionTopLine tab={tab as string}>
-            <STabsWrapper>
-              <Tabs
-                t={t}
-                tabs={tabs}
-                draggable={false}
-                activeTabIndex={activeTabIndex}
-              />
-            </STabsWrapper>
-            <SSectionTopLineButtons>
-              {tab === 'notifications' ? (
-                <>
-                  <STopLineButton
-                    view="secondary"
-                    onClick={handleMarkAllAsRead}
-                  >
-                    {t('dashboard.button.markAllAsRead')}
-                  </STopLineButton>
-                  {!isDesktop && (
-                    <STopLineButton
-                      view="secondary"
-                      onClick={handleMinimizeClick}
-                    >
-                      {t('dashboard.button.minimize')}
-                    </STopLineButton>
+          {tab === 'direct-messages' ? <Chat /> : (
+            <>
+              <SSectionTopLine tab={tab as string}>
+                <STabsWrapper>
+                  <Tabs
+                    t={t}
+                    tabs={tabs}
+                    draggable={false}
+                    activeTabIndex={activeTabIndex}
+                  />
+                </STabsWrapper>
+                <SSectionTopLineButtons>
+                  {tab === 'notifications' ? (
+                    <>
+                      <STopLineButton
+                        view="secondary"
+                        onClick={handleMarkAllAsRead}
+                      >
+                        {t('dashboard.button.markAllAsRead')}
+                      </STopLineButton>
+                      {!isDesktop && (
+                        <STopLineButton
+                          view="secondary"
+                          onClick={handleMinimizeClick}
+                        >
+                          {t('dashboard.button.minimize')}
+                        </STopLineButton>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <SChatButton
+                        view="secondary"
+                        onClick={handleSearchClick}
+                      >
+                        <SChatInlineSVG
+                          svg={searchIcon}
+                          fill={theme.colorsThemed.text.primary}
+                          width="20px"
+                          height="20px"
+                        />
+                      </SChatButton>
+                      <SChatButton
+                        view="secondary"
+                        onClick={handleBulkMessageClick}
+                      >
+                        <SChatInlineSVG
+                          svg={bulkMessageIcon}
+                          fill={theme.colorsThemed.text.primary}
+                          width="20px"
+                          height="20px"
+                        />
+                      </SChatButton>
+                    </>
                   )}
-                </>
-              ) : (
-                <>
-                  <SChatButton
-                    view="secondary"
-                    onClick={handleSearchClick}
-                  >
-                    <SChatInlineSVG
-                      svg={searchIcon}
-                      fill={theme.colorsThemed.text.primary}
-                      width="20px"
-                      height="20px"
-                    />
-                  </SChatButton>
-                  <SChatButton
-                    view="secondary"
-                    onClick={handleBulkMessageClick}
-                  >
-                    <SChatInlineSVG
-                      svg={bulkMessageIcon}
-                      fill={theme.colorsThemed.text.primary}
-                      width="20px"
-                      height="20px"
-                    />
-                  </SChatButton>
-                </>
-              )}
-            </SSectionTopLineButtons>
-          </SSectionTopLine>
-          <SSectionContent>
-            {tab === 'notifications' && (
-              <SSectionTitle variant={2} weight={600}>
-                {t('dashboard.button.new')}
-              </SSectionTitle>
-            )}
-            {tab === 'notifications' ? notifications.new.map(renderNotificationItem) : chats.map(renderChatItem)}
-            {tab === 'notifications' && (
-              <SSectionTitle variant={2} weight={600}>
-                {t('dashboard.button.earlier')}
-              </SSectionTitle>
-            )}
-            {tab === 'notifications' && notifications.earlier.map(renderNotificationItem)}
-          </SSectionContent>
-          <GradientMask />
+                </SSectionTopLineButtons>
+              </SSectionTopLine>
+              {tab === 'notifications' ? <NotificationsList /> : <ChatList />}
+            </>
+          )}
         </SAnimatedContainer>
       </AnimatedPresence>
     </STopButtons>
@@ -637,107 +310,4 @@ const STopLineButton = styled(Button)`
 const SChatButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
-`;
-
-const SSectionContent = styled.div`
-  height: calc(100% - 48px);
-  padding: 0 24px;
-  display: flex;
-  position: relative;
-  overflow-y: auto;
-  flex-direction: column;
-`;
-
-const SNotificationItem = styled.div`
-  cursor: pointer;
-  display: flex;
-  padding: 8px 0;
-`;
-
-const SNotificationItemAvatar = styled(UserAvatar)``;
-
-const SNotificationItemCenter = styled.div`
-  width: 100%;
-  display: flex;
-  padding: 0 12px;
-  flex-direction: column;
-`;
-
-const SNotificationItemText = styled(Text)`
-  margin-bottom: 4px;
-`;
-
-const SNotificationItemTime = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`;
-
-const SNotificationItemIndicator = styled(Indicator)`
-  border: 3px solid ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
-  padding: 5px;
-`;
-
-const SChatItem = styled.div`
-  cursor: pointer;
-  display: flex;
-  padding: 8px 0;
-`;
-
-const SChatItemAvatar = styled(UserAvatar)``;
-
-const SChatItemCenter = styled.div`
-  width: 100%;
-  display: flex;
-  padding: 2px 12px;
-  flex-direction: column;
-`;
-
-const SChatItemText = styled(Text)`
-  margin-bottom: 4px;
-`;
-
-const SChatItemLastMessage = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-`;
-
-const SChatItemRight = styled.div`
-  display: flex;
-  padding: 2px 0;
-  align-items: flex-end;
-  flex-direction: column;
-`;
-
-const SChatItemTime = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  white-space: nowrap;
-  margin-bottom: 4px;
-`;
-
-const SChatItemIndicator = styled(Indicator)``;
-
-const SChatSeparator = styled.div`
-  border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
-  margin-left: 60px;
-  border-radius: 2px;
-`;
-
-const SChatItemContainer = styled.div``;
-
-const GradientMask = styled.div`
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 200px;
-  z-index: 1;
-  position: absolute;
-  background: ${(props) => props.theme.gradients.dashboardNotifications};
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  pointer-events: none;
-`;
-
-const SSectionTitle = styled(Text)`
-  padding: 16px 0 8px 0;
 `;

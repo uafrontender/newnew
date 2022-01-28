@@ -118,5 +118,9 @@
   "tabs": {
     "chat": "DMs",
     "notifications": "Notifications"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Write a message..."
   }
 }
