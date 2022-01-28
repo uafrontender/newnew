@@ -17,7 +17,6 @@ import { newnewapi } from 'newnew-api';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Headline from '../../atoms/Headline';
-import DropdownSelect from '../../atoms/DropdownSelect';
 import OnboardingEmailInput from './OnboardingEmailInput';
 import OnboardingBirthDateInput from './OnboardingBirthDateInput';
 import OnboardingProfileImageInput from './OnboardingProfileImageInput';
@@ -31,6 +30,7 @@ import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import isBrowser from '../../../utils/isBrowser';
+import OnboardingCountrySelect from './OnboardingCountrySelect';
 
 const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
 
@@ -76,8 +76,30 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
 
   // Birthdate
-  // @ts-ignore
-  const [dateInEdit, setDateInEdit] = useState(user?.userData?.dateOfBirth ?? undefined);
+
+  // NB! temp
+  const parsed: newnewapi.IDateComponents = {
+    day: 1,
+    month: 5,
+    year: 1990,
+  };
+
+  const [dateInEdit, setDateInEdit] = useState<
+    Date | undefined
+  >(user?.userData?.dateOfBirth ? (
+    new Date(
+      user?.userData.dateOfBirth.year!!,
+      user?.userData.dateOfBirth.month!!,
+      user?.userData.dateOfBirth.day!!,
+    )
+  // ) : undefined}
+  ) : (
+    new Date(
+      parsed.year!!,
+      parsed.month!!,
+      parsed.day!!,
+    )
+  ));
   const [isDateValid, setIsDateValid] = useState(
     // @ts-ignore
     (user?.userData?.dateOfBirth ? (
@@ -351,19 +373,15 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               onChange={handleEmailInput}
             />
           </SFormItemContainer>
-          <SFormItemContainer>
-            <SLabel>
-              {t('DetailsSection.form.CoR.label')}
-            </SLabel>
-            <DropdownSelect<string>
-              label={countries[countries.findIndex((o) => o.value === selectedCountry)].name}
-              width="100%"
-              selected={selectedCountry}
-              options={countries}
-              onSelect={(val) => setSelectedCountry(val)}
-              closeOnSelect
-            />
-          </SFormItemContainer>
+          <OnboardingCountrySelect<string>
+            label={countries[countries.findIndex((o) => o.value === selectedCountry)].name}
+            width="100%"
+            selected={selectedCountry}
+            options={countries}
+            onSelect={(val) => setSelectedCountry(val)}
+            closeOnSelect
+          />
+
           <SFormItemContainer>
             <OnboardingBirthDateInput
               value={dateInEdit}

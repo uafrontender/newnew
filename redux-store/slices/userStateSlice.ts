@@ -6,7 +6,8 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { AppThunk } from '../store';
 import { cookiesInstance } from '../../api/apiConfigs';
 
-export type TUserData = Omit<newnewapi.Me, 'toJSON' | '_nickname' | '_email'>;
+export type TUserData = Omit<
+  newnewapi.Me, 'toJSON' | '_nickname' | '_email' | '_dateOfBirth'>;
 
 export interface IUserStateInterface {
   loggedIn: boolean;

@@ -68,11 +68,8 @@ const ProfilePostTypeFilterMenu: React.FunctionComponent<IProfilePostTypeFilterM
         >
           {options.map((o) => (
             <SButton
-              selected={o.value === selected}
+              selected={o.value.toString() === (selected?.toString() ?? '0')}
               onClick={() => handleClick(o.value)}
-              style={{
-                marginBottom: '16px',
-              }}
             >
               <Text
                 variant={3}
@@ -91,22 +88,23 @@ export default ProfilePostTypeFilterMenu;
 
 const SContainer = styled(motion.div)`
   position: absolute;
-  top: calc(100% - 10px);
+  top: calc(100%);
   z-index: 2;
-  right: 16px;
+  right: 0px;
   width: 216px;
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 8px;
 
-  padding: 16px;
+  padding: 8px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   ${({ theme }) => theme.media.laptop} {
-    right: 16px;
+    right: 0;
   }
 `;
 
@@ -116,9 +114,17 @@ const SButton = styled.button<{
   background: none;
   border: transparent;
 
+  width: 100%;
+
+  text-align: left;
+
   cursor: pointer;
 
+  border-radius: 8px;
+  padding: 8px;
+
   color: ${({ selected, theme }) => (selected ? theme.colorsThemed.text.primary : 'initial')} !important;
+  background: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'initial')} !important;
 
   &:focus {
     outline: none;
