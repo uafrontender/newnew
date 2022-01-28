@@ -157,13 +157,32 @@ const MyProfileSettginsIndex: NextPage = () => {
   const [spendingHidden, setSpendingHidden] = useState(false);
   const [accountPrivate, setAccountPrivate] = useState(false);
 
+  // NB! temp
+  const parsed: newnewapi.IDateComponents = {
+    day: 1,
+    month: 5,
+    year: 1990,
+  };
+
   const accordionSections: AccordionSection[] = [
     {
       title: t('Settings.sections.PersonalInformation.title'),
       content: <SettingsPersonalInformationSection
         currentEmail={userData?.email ?? ''}
-        currentDate={undefined}
-        // currentDate={userData?.birthDate ?? ''}
+        currentDate={userData?.dateOfBirth ? (
+          new Date(
+            userData.dateOfBirth.year!!,
+            userData.dateOfBirth.month!!,
+            userData.dateOfBirth.day!!,
+          )
+        // ) : undefined}
+        ) : (
+          new Date(
+            parsed.year!!,
+            parsed.month!!,
+            parsed.day!!,
+          )
+        )}
         isMobile={isMobile}
         handleSetActive={() => {}}
       />,

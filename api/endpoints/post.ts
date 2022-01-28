@@ -39,9 +39,9 @@ export const fetchPostByUUID = (
 
 export const fetchUsersPosts = (
   payload: newnewapi.GetUserPostsRequest,
-) => fetchProtobuf<newnewapi.GetUserPostsRequest, newnewapi.PagedPostsResponse>(
+) => fetchProtobuf<newnewapi.GetUserPostsRequest, newnewapi.PagedCountedPostsResponse>(
   newnewapi.GetUserPostsRequest,
-  newnewapi.PagedPostsResponse,
+  newnewapi.PagedCountedPostsResponse,
   `${BASE_URL_POST}/get_user_posts`,
   'post',
   payload,

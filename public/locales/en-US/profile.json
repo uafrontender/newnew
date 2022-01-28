@@ -10,6 +10,7 @@
   },
   "posts-filter": {
     "decisions": "decisions",
+    "no-decisions": "No decisions yet",
     "filter-0": "All",
     "filter-1": "Auctions",
     "filter-2": "Crowdfunding",

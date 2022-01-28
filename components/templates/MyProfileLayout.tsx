@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -20,7 +20,6 @@ import ProfileImage from '../molecules/profile/ProfileImage';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
 import EditProfileMenu, { TEditingStage } from '../organisms/EditProfileMenu';
-import { CardSkeletonList } from '../molecules/CardSkeleton';
 
 // Icons
 import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
@@ -29,7 +28,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBroswer from '../../utils/isBrowser';
 
-export type TPageType = 'activelyBidding'
+type TPageType = 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
   | 'subscriptions'
@@ -40,32 +39,42 @@ interface IMyProfileLayout {
   postsCachedActivelyBiddingOn?: newnewapi.Post[];
   postsCachedActivelyBiddingOnFilter?: newnewapi.Post.Filter;
   postsCachedActivelyBiddingPageToken?: string | null | undefined;
+  postsCachedActivelyBiddingCount?: number;
   postsCachedMyPurchases?: newnewapi.Post[];
   postsCachedMyPurchasesFilter?: newnewapi.Post.Filter;
   postsCachedMyPurchasesPageToken?: string | null | undefined;
+  postsCachedMyPurchasesCount?: number;
   postsCachedViewHistory?: newnewapi.Post[];
   postsCachedViewHistoryFilter?: newnewapi.Post.Filter;
   postsCachedViewHistoryPageToken?: string | null | undefined;
+  postsCachedViewHistoryCount?: number;
   postsCachedSubscriptions?: newnewapi.Post[];
   postsCachedSubscriptionsFilter?: newnewapi.Post.Filter;
   postsCachedSubscriptionsPageToken?: string | null | undefined;
+  postsCachedSubscriptionsCount?: number;
   postsCachedFavorites?: newnewapi.Post[];
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
   postsCachedFavoritesPageToken?: string | null | undefined;
+  postsCachedFavoritesCount?: number;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   renderedPage,
   postsCachedActivelyBiddingOn,
   postsCachedActivelyBiddingOnFilter,
+  postsCachedActivelyBiddingCount,
   postsCachedMyPurchases,
   postsCachedMyPurchasesFilter,
+  postsCachedMyPurchasesCount,
   postsCachedViewHistory,
   postsCachedViewHistoryFilter,
+  postsCachedViewHistoryCount,
   postsCachedSubscriptions,
   postsCachedSubscriptionsFilter,
+  postsCachedSubscriptionsCount,
   postsCachedFavorites,
   postsCachedFavoritesFilter,
+  postsCachedFavoritesCount,
   postsCachedActivelyBiddingPageToken,
   postsCachedMyPurchasesPageToken,
   postsCachedViewHistoryPageToken,
@@ -104,7 +113,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     ]), []);
 
   // Show skeleton on route change
-  const [routeChangeLoading, setRouteChangeLoading] = useState(false);
+  // const [routeChangeLoading, setRouteChangeLoading] = useState(false);
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
@@ -119,6 +128,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     activelyBiddingPageToken,
     setActivelyBiddingPageToken,
   ] = useState(postsCachedActivelyBiddingPageToken);
+  const [
+    activelyBiddingCount,
+    setActivelyBiddingCount,
+  ] = useState(postsCachedActivelyBiddingCount);
 
   const [
     postsMyPurchases, setPostsMyPurchases,
@@ -130,6 +143,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     myPurchasesPageToken,
     setMyPurchasesPageToken,
   ] = useState(postsCachedMyPurchasesPageToken);
+  const [
+    myPurchasesCount,
+    setMyPurchasesCount,
+  ] = useState(postsCachedMyPurchasesCount);
 
   const [
     postsViewHistory, setPostsViewHistory,
@@ -141,6 +158,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     viewHistoryPageToken,
     setViewHistoryPageToken,
   ] = useState(postsCachedViewHistoryPageToken);
+  const [
+    viewHistoryCount,
+    setViewHistoryCount,
+  ] = useState(postsCachedViewHistoryCount);
 
   const [
     postsSubscriptions, setPostsSubscriptions,
@@ -152,6 +173,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     subscriptionsPageToken,
     setSubscriptionsPageToken,
   ] = useState(postsCachedSubscriptionsPageToken);
+  const [
+    subscriptionsCount,
+    setSubscriptionsCount,
+  ] = useState(postsCachedSubscriptionsCount);
 
   const [
     postsFavorites, setPostsFavorites,
@@ -163,6 +188,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     favoritesPageToken,
     setFavoritesPageToken,
   ] = useState(postsCachedFavoritesPageToken);
+  const [
+    postsFavoritesCount,
+    setFavoritesCount,
+  ] = useState(postsCachedFavoritesCount);
 
   // UpdateCachedPosts
   const handleSetPostsActivelyBiddingOn: React
@@ -249,17 +278,49 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [renderedPage]);
 
+  const handleUpdateCount = useCallback((
+    value: number,
+  ) => {
+    switch (renderedPage) {
+      case 'activelyBidding': {
+        setActivelyBiddingCount(value);
+        break;
+      }
+      case 'purchases': {
+        setMyPurchasesCount(value);
+        break;
+      }
+      case 'viewHistory': {
+        setViewHistoryCount(value);
+        break;
+      }
+      case 'subscriptions': {
+        setSubscriptionsCount(value);
+        break;
+      }
+      case 'favorites': {
+        setFavoritesCount(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
+
   const renderChildren = () => {
     let postsForPage = {};
     let postsForPageFilter;
     let pageToken;
     let handleSetPosts;
+    let totalCount;
 
     switch (renderedPage) {
       case 'activelyBidding': {
         postsForPage = postsActivelyBiddingOn;
         postsForPageFilter = postsActivelyBiddingOnFilter;
         pageToken = activelyBiddingPageToken;
+        totalCount = activelyBiddingCount;
         handleSetPosts = handleSetPostsActivelyBiddingOn;
         break;
       }
@@ -267,6 +328,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         postsForPage = postsMyPurchases;
         postsForPageFilter = postsMyPurchasesFilter;
         pageToken = myPurchasesPageToken;
+        totalCount = myPurchasesCount;
         handleSetPosts = handleSetPostsMyPurchases;
         break;
       }
@@ -274,6 +336,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         postsForPage = postsViewHistory;
         postsForPageFilter = postsViewHistoryFilter;
         pageToken = viewHistoryPageToken;
+        totalCount = viewHistoryCount;
         handleSetPosts = handleSetPostsViewHistory;
         break;
       }
@@ -281,6 +344,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         postsForPage = postsSubscriptions;
         postsForPageFilter = postsSubscriptionsFilter;
         pageToken = subscriptionsPageToken;
+        totalCount = subscriptionsCount;
         handleSetPosts = handleSetPostsSubscriptions;
         break;
       }
@@ -288,6 +352,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         postsForPage = postsFavorites;
         postsForPageFilter = postsFavoritesFilter;
         pageToken = favoritesPageToken;
+        totalCount = postsFavoritesCount;
         handleSetPosts = handleSetPostsFavorites;
         break;
       }
@@ -302,8 +367,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         ...(postsForPage ? { posts: postsForPage } : {}),
         ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
         pageToken,
+        totalCount,
         handleSetPosts,
         handleUpdatePageToken,
+        handleUpdateCount,
         handleUpdateFilter,
       },
     );
@@ -383,25 +450,25 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     }
   }, [router, user]);
 
-  useEffect(() => {
-    const start = (url: string) => {
-      console.log(url);
-      setRouteChangeLoading(true);
-    };
-    const end = (url: string) => {
-      console.log(url);
-      setRouteChangeLoading(false);
-    };
-    Router.events.on('routeChangeStart', start);
-    Router.events.on('routeChangeComplete', end);
-    Router.events.on('routeChangeError', end);
-    return () => {
-      Router.events.off('routeChangeStart', start);
-      Router.events.off('routeChangeComplete', end);
-      Router.events.off('routeChangeError', end);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   const start = (url: string) => {
+  //     console.log(url);
+  //     setRouteChangeLoading(true);
+  //   };
+  //   const end = (url: string) => {
+  //     console.log(url);
+  //     setRouteChangeLoading(false);
+  //   };
+  //   Router.events.on('routeChangeStart', start);
+  //   Router.events.on('routeChangeComplete', end);
+  //   Router.events.on('routeChangeError', end);
+  //   return () => {
+  //     Router.events.off('routeChangeStart', start);
+  //     Router.events.off('routeChangeComplete', end);
+  //     Router.events.off('routeChangeError', end);
+  //   };
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <ErrorBoundary>
@@ -533,7 +600,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               ) : null}
           </Modal>
         </SMyProfileLayout>
-        {!routeChangeLoading
+        { renderChildren() }
+        {/* {!routeChangeLoading
           ? renderChildren() : (
             <CardSkeletonList
               count={8}
@@ -541,7 +609,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 left: 0,
               }}
             />
-          )}
+          )} */}
       </SGeneral>
     </ErrorBoundary>
   );
@@ -550,14 +618,19 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 MyProfileLayout.defaultProps = {
   postsCachedActivelyBiddingOn: undefined,
   postsCachedActivelyBiddingOnFilter: undefined,
+  postsCachedActivelyBiddingCount: undefined,
   postsCachedMyPurchases: undefined,
   postsCachedMyPurchasesFilter: undefined,
+  postsCachedMyPurchasesCount: undefined,
   postsCachedViewHistory: undefined,
   postsCachedViewHistoryFilter: undefined,
+  postsCachedViewHistoryCount: undefined,
   postsCachedSubscriptions: undefined,
   postsCachedSubscriptionsFilter: undefined,
+  postsCachedSubscriptionsCount: undefined,
   postsCachedFavorites: undefined,
   postsCachedFavoritesFilter: undefined,
+  postsCachedFavoritesCount: undefined,
   postsCachedActivelyBiddingPageToken: undefined,
   postsCachedMyPurchasesPageToken: undefined,
   postsCachedViewHistoryPageToken: undefined,

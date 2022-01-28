@@ -12,6 +12,7 @@ import { useAppSelector } from '../redux-store/store';
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import OnboardingSectionDetails from '../components/molecules/creator-onboarding/OnboardingSectionDetails';
+import useLeavePageConfirm from '../utils/hooks/useLeavePageConfirm';
 
 export type CountryOption = {
   value: string;
@@ -26,6 +27,22 @@ const countriesMock: CountryOption[] = [
   {
     value: 'Canada',
     en: 'Canada',
+  },
+  {
+    value: 'MS',
+    en: 'Mexico',
+  },
+  {
+    value: 'UK',
+    en: 'United Kingdom',
+  },
+  {
+    value: 'AU',
+    en: 'Australia',
+  },
+  {
+    value: 'FR',
+    en: 'France',
   },
 ];
 
@@ -47,6 +64,15 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
 
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
+
+  useLeavePageConfirm(
+    true,
+    t('DetailsSection.leaveMsg'),
+    [
+      '/creator/dashboard',
+      '/verify-email',
+    ],
+  );
 
   // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
   const goToNext = () => {
