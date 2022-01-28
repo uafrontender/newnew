@@ -11,8 +11,8 @@ interface ITextArea {
   id?: string;
   value: string;
   error?: string;
-  onBlur?: (key?: string, value?: string) => void;
-  onFocus?: (key?: string) => void;
+  onBlur?: (key: string, value: string) => void;
+  onFocus?: (key: string) => void;
   onChange: (key: string, value: string | boolean) => void;
   placeholder: string;
 }
@@ -74,8 +74,8 @@ export default TextArea;
 TextArea.defaultProps = {
   id: '',
   error: '',
-  onBlur: () => {},
-  onFocus: () => {},
+  onBlur: (key, value) => console.log(key, value),
+  onFocus: (key) => console.log(key),
 };
 
 const SWrapper = styled.div`
