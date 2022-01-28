@@ -1,11 +1,9 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  ReactElement, useCallback, useEffect, useState,
+  ReactElement, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../redux-store/store';
@@ -20,37 +18,42 @@ import ProfileTabs from '../molecules/profile/ProfileTabs';
 import ProfileImage from '../molecules/profile/ProfileImage';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import ProfileBackground from '../molecules/profile/ProfileBackground';
-import { CardSkeletonList } from '../molecules/CardSkeleton';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 
+type TPageType = 'creatorsDecisions'
+  | 'activity'
+  | 'activityHidden';
+
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
-  tabs: Tab[];
+  renderedPage: TPageType;
   postsCachedCreatorDecisions?: newnewapi.Post[];
+  postsCachedCreatorDecisionsFilter?: newnewapi.Post.Filter;
+  postsCachedCreatorDecisionsPageToken?: string | null | undefined;
+  postsCachedCreatorDecisionsCount?: number;
   postsCachedActivity?: newnewapi.Post[];
+  postsCachedActivityFilter?: newnewapi.Post.Filter;
+  postsCachedActivityPageToken?: string | null | undefined;
+  postsCachedActivityCount?: number;
 }
 
 const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   user,
-  tabs,
+  renderedPage,
   postsCachedCreatorDecisions,
+  postsCachedCreatorDecisionsFilter,
+  postsCachedCreatorDecisionsPageToken,
+  postsCachedCreatorDecisionsCount,
   postsCachedActivity,
+  postsCachedActivityFilter,
+  postsCachedActivityPageToken,
+  postsCachedActivityCount,
   children,
 }) => {
-  const [routeChangeLoading, setRouteChangeLoading] = useState(false);
-
-  // Cached posts
-  const [
-    creatorsDecisions, setCreatorsDecisions,
-  ] = useState(postsCachedCreatorDecisions ?? []);
-  const [
-    activityDecisions, setActivityDecisions,
-  ] = useState(postsCachedActivity ?? []);
-
   const { t } = useTranslation('profile');
   const theme = useTheme();
 
@@ -60,14 +63,129 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
-  // Add new posts to cached ones
-  const addNewPostsCreatorsDecisions = useCallback((newPosts: newnewapi.Post[]) => {
-    setCreatorsDecisions((curr) => [...curr, ...newPosts]);
-  }, [setCreatorsDecisions]);
+  const tabs: Tab[] = useMemo(() => {
+    // if (user.options?.isCreator) {
+    if (true) {
+      return [
+        {
+          nameToken: 'userInitial',
+          url: `/u/${user.username}`,
+        },
+        {
+          nameToken: 'activity',
+          url: `/u/${user.username}/activity`,
+        },
+      ];
+    }
+    return [];
+  }, [user]);
 
-  const addNewPostsAcitvity = useCallback((newPosts: newnewapi.Post[]) => {
-    setActivityDecisions((curr) => [...curr, ...newPosts]);
-  }, [setActivityDecisions]);
+  // Posts
+  const [
+    creatorsDecisions, setCreatorsDecisions,
+  ] = useState(postsCachedCreatorDecisions ?? []);
+  const [
+    creatorsDecisionsFilter, setCreatorsDecisionsFilter,
+  ] = useState(postsCachedCreatorDecisionsFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    creatorsDecisionsToken,
+    setCreatorsDecisionsPageToken,
+  ] = useState(postsCachedCreatorDecisionsPageToken);
+  const [
+    creatorsDecisionsCount,
+    setCreatorsDecisionsCount,
+  ] = useState(postsCachedCreatorDecisionsCount);
+
+  const [
+    activityDecisions, setActivityDecisions,
+  ] = useState(postsCachedActivity ?? []);
+  const [
+    activityDecisionsFilter, setActivityDecisionsFilter,
+  ] = useState(postsCachedActivityFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    activityDecisionsToken,
+    setActivityDecisionsPageToken,
+  ] = useState(postsCachedActivityPageToken);
+  const [
+    activityDecisionsCount,
+    setActivityDecisionsCount,
+  ] = useState(postsCachedActivityCount);
+
+  const handleSetPostsCreatorsDecisions: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setCreatorsDecisions, [setCreatorsDecisions],
+    );
+
+  const handleSetActivityDecisions: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setActivityDecisions, [setActivityDecisions],
+    );
+
+  const handleUpdateFilter = useCallback((
+    value: newnewapi.Post.Filter,
+  ) => {
+    switch (renderedPage) {
+      case 'activity': {
+        setActivityDecisionsFilter(value);
+        break;
+      }
+      case 'activityHidden': {
+        setActivityDecisionsFilter(value);
+        break;
+      }
+      case 'creatorsDecisions': {
+        setCreatorsDecisionsFilter(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
+
+  const handleUpdatePageToken = useCallback((
+    value: string | null | undefined,
+  ) => {
+    switch (renderedPage) {
+      case 'activity': {
+        setActivityDecisionsPageToken(value);
+        break;
+      }
+      case 'activityHidden': {
+        setActivityDecisionsPageToken(value);
+        break;
+      }
+      case 'creatorsDecisions': {
+        setCreatorsDecisionsPageToken(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
+
+  const handleUpdateCount = useCallback((
+    value: number,
+  ) => {
+    switch (renderedPage) {
+      case 'activity': {
+        setActivityDecisionsCount(value);
+        break;
+      }
+      case 'activityHidden': {
+        setActivityDecisionsCount(value);
+        break;
+      }
+      case 'creatorsDecisions': {
+        setCreatorsDecisionsCount(value);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [renderedPage]);
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(() => {
@@ -76,6 +194,58 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
   }, [currentUser, router]);
 
+  const renderChildren = () => {
+    let postsForPage = {};
+    let postsForPageFilter;
+    let pageToken;
+    let handleSetPosts;
+    let totalCount;
+
+    switch (renderedPage) {
+      case 'creatorsDecisions': {
+        postsForPage = creatorsDecisions;
+        postsForPageFilter = creatorsDecisionsFilter;
+        pageToken = creatorsDecisionsToken;
+        totalCount = creatorsDecisionsCount;
+        handleSetPosts = handleSetPostsCreatorsDecisions;
+        break;
+      }
+      case 'activity': {
+        postsForPage = activityDecisions;
+        postsForPageFilter = activityDecisionsFilter;
+        pageToken = activityDecisionsToken;
+        totalCount = activityDecisionsCount;
+        handleSetPosts = handleSetActivityDecisions;
+        break;
+      }
+      case 'activityHidden': {
+        postsForPage = [];
+        postsForPageFilter = activityDecisionsFilter;
+        pageToken = undefined;
+        totalCount = 0;
+        handleSetPosts = handleSetActivityDecisions;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+
+    return React.cloneElement(
+      children as ReactElement,
+      {
+        ...(postsForPage ? { posts: postsForPage } : {}),
+        ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
+        pageToken,
+        totalCount,
+        handleSetPosts,
+        handleUpdatePageToken,
+        handleUpdateCount,
+        handleUpdateFilter,
+      },
+    );
+  };
+
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (currentUser.loggedIn
@@ -83,27 +253,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       router.push('/profile');
     }
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
-
-  // Skeletons for surfing the tabs
-  useEffect(() => {
-    const start = (url: string) => {
-      if (url.includes(user.username)) {
-        setRouteChangeLoading(true);
-      }
-    };
-    const end = () => {
-      setRouteChangeLoading(false);
-    };
-    Router.events.on('routeChangeStart', start);
-    Router.events.on('routeChangeComplete', end);
-    Router.events.on('routeChangeError', end);
-    return () => {
-      Router.events.off('routeChangeStart', start);
-      Router.events.off('routeChangeComplete', end);
-      Router.events.off('routeChangeError', end);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <ErrorBoundary>
@@ -219,7 +368,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           </div>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {user
+          {tabs.length > 0
             ? (
               <ProfileTabs
                 pageType="othersProfile"
@@ -227,26 +376,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               />
             ) : null}
         </SProfileLayout>
-        {/* {children} */}
-        {!routeChangeLoading
-          ? (
-            React.cloneElement(
-              children as ReactElement,
-              {
-                ...(creatorsDecisions ? { cachedCreatorsPosts: creatorsDecisions } : {}),
-                ...(activityDecisions ? { cachedActivityPosts: activityDecisions } : {}),
-                handleAddNewPostsCreatorsDecisions: addNewPostsCreatorsDecisions,
-                handleAddNewPostsActivity: addNewPostsAcitvity,
-              },
-            )
-          ) : (
-            <CardSkeletonList
-              count={8}
-              wrapperStyle={{
-                left: 0,
-              }}
-            />
-          )}
+        { renderChildren() }
       </SGeneral>
     </ErrorBoundary>
   );
@@ -254,7 +384,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
 ProfileLayout.defaultProps = {
   postsCachedCreatorDecisions: undefined,
+  postsCachedCreatorDecisionsFilter: undefined,
+  postsCachedCreatorDecisionsPageToken: undefined,
+  postsCachedCreatorDecisionsCount: undefined,
   postsCachedActivity: undefined,
+  postsCachedActivityFilter: undefined,
+  postsCachedActivityPageToken: undefined,
+  postsCachedActivityCount: undefined,
 };
 
 export default ProfileLayout;

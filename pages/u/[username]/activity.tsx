@@ -8,7 +8,6 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 
-import { Tab } from '../../../components/molecules/Tabs';
 import ProfileLayout from '../../../components/templates/ProfileLayout';
 import { NextPageWithLayout } from '../../_app';
 import { getUserByUsername } from '../../../api/endpoints/user';
@@ -16,33 +15,47 @@ import { fetchUsersPosts } from '../../../api/endpoints/post';
 
 import PostModal from '../../../components/organisms/decision/PostModal';
 import List from '../../../components/organisms/search/List';
+import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
+import PostsFilterSection from '../../../components/molecules/profile/PostsFilterSection';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
   pagedPosts?: newnewapi.PagedPostsResponse;
-  cachedActivityPosts?: newnewapi.Post[];
+  posts?: newnewapi.Post[];
+  postsFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
-  handleAddNewPostsActivity: (newPosts: newnewapi.Post[]) => void;
+  pageToken: string | null | undefined;
+  totalCount: number;
+  handleUpdatePageToken: (value: string | null | undefined) => void;
+  handleUpdateCount: (value: number) => void;
+  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
+  handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
 
 const UserPageActivity: NextPage<IUserPageActivity> = ({
   user,
   pagedPosts,
-  cachedActivityPosts,
   nextPageTokenFromServer,
-  handleAddNewPostsActivity,
+  posts,
+  postsFilter,
+  pageToken,
+  totalCount,
+  handleUpdatePageToken,
+  handleUpdateCount,
+  handleUpdateFilter,
+  handleSetPosts,
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
 
   // Loading state
-  const [pagingToken, setPagingToken] = useState<string | null | undefined>(nextPageTokenFromServer ?? '');
   const [isLoading, setIsLoading] = useState(false);
   const {
     ref: loadingRef,
     inView,
   } = useInView();
+  const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     setDisplayedPost(post);
@@ -58,29 +71,38 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
     setDisplayedPost(undefined);
   };
 
-  // TODO: filters and other parameters
   const loadPosts = useCallback(async (
-    pageToken?: string,
+    token?: string,
+    needCount?: boolean,
   ) => {
     if (isLoading) return;
     try {
       setIsLoading(true);
+      setTriedLoading(true);
       const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
         userUuid: user.uuid,
-        filter: newnewapi.Post.Filter.ALL,
-        // NB! TODO
-        relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+        filter: postsFilter,
+        relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+        // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
         paging: {
-          ...(pageToken ? { pageToken } : {}),
+          ...(token ? { pageToken: token } : {}),
         },
+        ...(needCount ? {
+          needTotalCount: true,
+        } : {}),
       });
+
       const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
 
-      console.log(postsResponse);
-
       if (postsResponse.data && postsResponse.data.posts) {
-        handleAddNewPostsActivity(postsResponse.data?.posts as newnewapi.Post[]);
-        setPagingToken(postsResponse.data.paging?.nextPageToken);
+        handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
+        handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
+
+        if (postsResponse.data.totalCount) {
+          handleUpdateCount(postsResponse.data.totalCount);
+        } else if (needCount) {
+          handleUpdateCount(0);
+        }
       }
       setIsLoading(false);
     } catch (err) {
@@ -88,32 +110,46 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       console.error(err);
     }
   }, [
-    handleAddNewPostsActivity, user.uuid,
+    user.uuid,
+    handleSetPosts,
+    handleUpdatePageToken,
+    handleUpdateCount,
+    postsFilter,
     isLoading,
   ]);
 
   useEffect(() => {
     if (inView && !isLoading) {
-      if (pagingToken) {
-        // loadPostsDebounced(pagingToken);
-        loadPosts(pagingToken);
-      } else if (!pagingToken && cachedActivityPosts?.length === 0) {
-        // loadPostsDebounced();
-        loadPosts();
+      if (pageToken) {
+        loadPosts(pageToken);
+      } else if (!triedLoading && !pageToken && posts?.length === 0) {
+        loadPosts(undefined, true);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, isLoading]);
+  }, [inView, pageToken, isLoading, triedLoading]);
+
+  useUpdateEffect(() => {
+    handleUpdatePageToken('');
+    handleSetPosts([]);
+    loadPosts(undefined, true);
+  }, [postsFilter]);
 
   return (
     <div>
-      <main>
+      <SMain>
+        <PostsFilterSection
+          numDecisions={totalCount}
+          isLoading={isLoading}
+          postsFilter={postsFilter}
+          handleUpdateFilter={handleUpdateFilter}
+        />
         <SCardsSection>
-          {cachedActivityPosts && (
+          {posts && (
             <List
               category=""
               loading={isLoading}
-              collection={cachedActivityPosts}
+              collection={posts}
               wrapperStyle={{
                 left: 0,
               }}
@@ -124,7 +160,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
         <div
           ref={loadingRef}
         />
-      </main>
+      </SMain>
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}
@@ -138,22 +174,35 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 };
 
 (UserPageActivity as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  const tabs: Tab[] = [
-    {
-      nameToken: 'userInitial',
-      url: `/u/${page.props.user.username}`,
-    },
-    {
-      nameToken: 'activity',
-      url: `/u/${page.props.user.username}/activity`,
-    },
-  ];
+  // const renderedPage = page.props.user?.options?.isActivityPrivate ? (
+  //   'activityHidden'
+  // ) : 'activity';
+
+  // TEMP!
+  const renderedPage = 'activity';
 
   return (
     <ProfileLayout
+      renderedPage={renderedPage}
       user={page.props.user}
-      postsCachedActivity={page.props.pagedPosts.posts}
-      tabs={tabs}
+      {...{
+        ...(
+          // @ts-ignore
+          renderedPage !== 'activityHidden' ? (
+            {
+              postsCachedActivity: page.props.pagedPosts.posts,
+              postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
+              postsCachedActivityPageToken: page.props.nextPageTokenFromServer,
+              postsCachedActivityCount: page.props.pagedPosts.totalCount,
+            }
+          ) : {
+            postsCachedActivity: [],
+            postsCachedActivityFilter: newnewapi.Post.Filter.ALL,
+            postsCachedActivityPageToken: undefined,
+            postsCachedActivityCount: undefined,
+          }
+        ),
+      }}
     >
       { page }
     </ProfileLayout>
@@ -192,15 +241,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
+  // const isActivityPrivate = res.data.options?.isActivityPrivate;
+  const isActivityPrivate = false;
 
   // will fetch only for users with open activity history
-  if (!res.data.options?.isActivityPrivate && !context.req.url?.startsWith('/_next')) {
-  // if (res.data && !context.req.url?.startsWith('/_next')) {
+  if (!isActivityPrivate && !context.req.url?.startsWith('/_next')) {
     const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
       userUuid: res.data.uuid,
       filter: newnewapi.Post.Filter.ALL,
-      // NB! TODO
-      relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+      relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+      // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+      needTotalCount: true,
       paging: {
         limit: 10,
       },
@@ -209,7 +260,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
 
     if (postsResponse.data) {
-      console.log(postsResponse);
       return {
         props: {
           user: res.data.toJSON(),
@@ -231,6 +281,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
+
+const SMain = styled.main`
+  min-height: 60vh;
+`;
 
 const SCardsSection = styled.div`
   display: flex;

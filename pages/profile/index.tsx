@@ -25,7 +25,9 @@ interface IMyProfileIndex {
   postsFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
   pageToken: string | null | undefined;
+  totalCount: number;
   handleUpdatePageToken: (value: string | null | undefined) => void;
+  handleUpdateCount: (value: number) => void;
   handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
@@ -37,7 +39,9 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   posts,
   postsFilter,
   pageToken,
+  totalCount,
   handleUpdatePageToken,
+  handleUpdateCount,
   handleUpdateFilter,
   handleSetPosts,
 }) => {
@@ -67,9 +71,9 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
     setDisplayedPost(undefined);
   };
 
-  // TODO: filters and other parameters
   const loadPosts = useCallback(async (
     token?: string,
+    needCount?: boolean,
   ) => {
     if (isLoading) return;
     try {
@@ -81,16 +85,23 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
         paging: {
           ...(token ? { pageToken: token } : {}),
         },
+        ...(needCount ? {
+          needTotalCount: true,
+        } : {}),
       });
       const postsResponse = await getMyPosts(
         payload,
       );
 
-      console.log(postsResponse);
-
       if (postsResponse.data && postsResponse.data.posts) {
         handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
         handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
+
+        if (postsResponse.data.totalCount) {
+          handleUpdateCount(postsResponse.data.totalCount);
+        } else if (needCount) {
+          handleUpdateCount(0);
+        }
       }
       setIsLoading(false);
     } catch (err) {
@@ -100,6 +111,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   }, [
     handleSetPosts,
     handleUpdatePageToken,
+    handleUpdateCount,
     postsFilter,
     isLoading,
   ]);
@@ -109,7 +121,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
       if (pageToken) {
         loadPosts(pageToken);
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts();
+        loadPosts(undefined, true);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,15 +130,15 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   useUpdateEffect(() => {
     handleUpdatePageToken('');
     handleSetPosts([]);
-    loadPosts(pageToken ?? undefined);
+    loadPosts(undefined, true);
   }, [postsFilter]);
 
   return (
     <div>
-      <main>
+      <SMain>
         <PostsFilterSection
-          // Temp
-          numDecisions={100}
+          numDecisions={totalCount}
+          isLoading={isLoading}
           postsFilter={postsFilter}
           handleUpdateFilter={handleUpdateFilter}
         />
@@ -146,7 +158,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
         <div
           ref={loadingRef}
         />
-      </main>
+      </SMain>
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}
@@ -166,6 +178,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
       postsCachedActivelyBiddingOn={page.props.pagedPosts.posts}
       postsCachedActivelyBiddingOnFilter={newnewapi.Post.Filter.ALL}
       postsCachedActivelyBiddingPageToken={page.props.nextPageTokenFromServer}
+      postsCachedActivelyBiddingCount={page.props.pagedPosts.totalCount}
     >
       { page }
     </MyProfileLayout>
@@ -190,6 +203,7 @@ export async function getServerSideProps(
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_ACTIVE_BIDDINGS,
         filter: newnewapi.Post.Filter.ALL,
+        needTotalCount: true,
       });
       const res = await getMyPosts(
         payload,
@@ -205,8 +219,6 @@ export async function getServerSideProps(
           );
         },
       );
-
-      console.log(res);
 
       if (res.data) {
         return {
@@ -239,6 +251,10 @@ export async function getServerSideProps(
     };
   }
 }
+
+const SMain = styled.main`
+  min-height: 60vh;
+`;
 
 const SCardsSection = styled.div`
   display: flex;

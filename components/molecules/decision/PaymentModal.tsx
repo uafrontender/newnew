@@ -27,7 +27,9 @@ const PaymentModal: React.FunctionComponent<IPaymentModal> = ({
           e.stopPropagation();
         }}
       >
-        { children }
+        <SHeaderContainer>
+          { children }
+        </SHeaderContainer>
       </SContentContainer>
     </SWrapper>
   </Modal>
@@ -57,4 +59,8 @@ const SContentContainer = styled.div`
     height: 480px;
     margin: auto;
   }
+`;
+
+const SHeaderContainer = styled.div`
+  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
