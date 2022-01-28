@@ -188,7 +188,8 @@ declare module 'styled-components' {
       calendarTop: string,
       calendarBottom: string,
       creationSubmit: string,
-      dashboardNotifications: string,
+      listTop: string,
+      listBottom: string,
       decisionOption: {
         yellow: string,
         blue: string,
