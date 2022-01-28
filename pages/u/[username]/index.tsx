@@ -187,6 +187,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 
   return (
     <ProfileLayout
+      key={page.props.user.uuid}
       renderedPage={renderedPage}
       user={page.props.user}
       {...{

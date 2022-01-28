@@ -183,6 +183,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 
   return (
     <ProfileLayout
+      key={page.props.user.uuid}
       renderedPage={renderedPage}
       user={page.props.user}
       {...{
