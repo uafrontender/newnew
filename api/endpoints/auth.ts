@@ -19,9 +19,9 @@ sendVerificationEmail(email) -> redirect to verification code page -> sendSignIn
 */
 export const sendVerificationEmail = (
   payload: newnewapi.SendVerificationEmailRequest,
-) => fetchProtobuf<newnewapi.SendVerificationEmailRequest, newnewapi.EmptyResponse>(
+) => fetchProtobuf<newnewapi.SendVerificationEmailRequest, newnewapi.SendVerificationEmailResponse>(
   newnewapi.SendVerificationEmailRequest,
-  newnewapi.EmptyResponse,
+  newnewapi.SendVerificationEmailResponse,
   `${BASE_URL_AUTH}/send_verification_email`,
   'post',
   payload,

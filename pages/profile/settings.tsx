@@ -86,8 +86,18 @@ const MyProfileSettginsIndex: NextPage = () => {
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Log out failed');
 
         // Unset credential cookies
-        removeCookie('accessToken');
-        removeCookie('refreshToken');
+        removeCookie(
+          'accessToken',
+          {
+            path: '/',
+          },
+        );
+        removeCookie(
+          'refreshToken',
+          {
+            path: '/',
+          },
+        );
         setIsLogoutLoading(false);
 
         dispatch(logoutUser(''));
@@ -157,13 +167,6 @@ const MyProfileSettginsIndex: NextPage = () => {
   const [spendingHidden, setSpendingHidden] = useState(false);
   const [accountPrivate, setAccountPrivate] = useState(false);
 
-  // NB! temp
-  const parsed: newnewapi.IDateComponents = {
-    day: 1,
-    month: 5,
-    year: 1990,
-  };
-
   const accordionSections: AccordionSection[] = [
     {
       title: t('Settings.sections.PersonalInformation.title'),
@@ -172,17 +175,17 @@ const MyProfileSettginsIndex: NextPage = () => {
         currentDate={userData?.dateOfBirth ? (
           new Date(
             userData.dateOfBirth.year!!,
-            userData.dateOfBirth.month!!,
+            userData.dateOfBirth.month!! - 1,
             userData.dateOfBirth.day!!,
           )
-        // ) : undefined}
-        ) : (
-          new Date(
-            parsed.year!!,
-            parsed.month!!,
-            parsed.day!!,
-          )
-        )}
+        ) : undefined}
+        // ) : (
+        //   new Date(
+        //     parsed.year!!,
+        //     parsed.month!!,
+        //     parsed.day!!,
+        //   )
+        // )}
         isMobile={isMobile}
         handleSetActive={() => {}}
       />,

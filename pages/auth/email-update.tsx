@@ -16,12 +16,14 @@ import {
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
-interface IEmailAuthRedirectPage {
+// NB! To be done
+
+interface IEmailUpdateRedirectPage {
   email_address: string;
   token: string;
 }
 
-const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
+const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
   email_address,
   token,
 }) => {
@@ -152,7 +154,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
   );
 };
 
-export default EmailAuthRedirectPage;
+export default EmailUpdateRedirectPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { email_address, token } = context.query;

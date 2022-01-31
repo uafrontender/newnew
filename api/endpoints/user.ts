@@ -30,6 +30,18 @@ export const updateMe = (
   payload,
 );
 
+// Same endpoint, but different method, for convenience
+export const sendVerificationNewEmail = (
+  payload: newnewapi.SendVerificationEmailRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.SendVerificationEmailRequest, newnewapi.SendVerificationEmailResponse>(
+  newnewapi.SendVerificationEmailRequest,
+  newnewapi.SendVerificationEmailResponse,
+  `${BASE_URL}/auth/send_verification_email`,
+  'post',
+  payload,
+);
+
 // NB! Maybe the auth should be optional
 export const setMyEmail = (
   payload: newnewapi.SetMyEmailRequest,
