@@ -75,6 +75,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
+        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP,
       });
 
       const { data, error } = await sendVerificationEmail(payload);

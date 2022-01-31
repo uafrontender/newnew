@@ -151,6 +151,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: signupEmailInput,
+        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP,
       });
 
       const { data, error } = await sendVerificationEmail(payload);

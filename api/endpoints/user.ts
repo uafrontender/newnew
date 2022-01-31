@@ -30,6 +30,38 @@ export const updateMe = (
   payload,
 );
 
+// NB! Maybe the auth should be optional
+export const setMyEmail = (
+  payload: newnewapi.SetMyEmailRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.SetMyEmailRequest, newnewapi.SetMyEmailResponse>(
+  newnewapi.SetMyEmailRequest,
+  newnewapi.SetMyEmailResponse,
+  `${BASE_URL_USER}/set_my_email`,
+  'post',
+  payload,
+);
+
+export const acceptCreatorTerms = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_USER}/accept_creator_terms`,
+  'post',
+  payload,
+);
+
+export const getMyOnboardingState = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.EmptyRequest, newnewapi.GetMyOnboardingStateResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.GetMyOnboardingStateResponse,
+  `${BASE_URL_USER}/get_my_onboarding_state`,
+  'post',
+  payload,
+);
+
 export const fetchSetStripeLinkCreator = (
   payload: newnewapi.SetupStripeCreatorAccountRequest,
 ) => fetchProtobufProtectedIntercepted<

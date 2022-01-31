@@ -43,7 +43,7 @@ type TFieldsToBeUpdated = {
 
 interface IOnboardingSectionDetails {
   genericAvatarsUrls: string[];
-  availableCountries: any[];
+  availableCountries: newnewapi.Country[];
   goToDashboard: () => void;
 }
 
@@ -69,8 +69,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // CoR
   const countries = useMemo(() => (
     availableCountries.map((o, i) => ({
-      name: o.en,
-      value: o.value,
+      name: o.name,
+      value: o.code,
     }))
   ), [availableCountries]);
   const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
