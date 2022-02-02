@@ -226,6 +226,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
             }}
             inputMode="numeric"
             value={inputData}
+            readOnly
             onChange={handleChange}
             onBlur={(e) => {
               const rawVal = e?.target?.value;

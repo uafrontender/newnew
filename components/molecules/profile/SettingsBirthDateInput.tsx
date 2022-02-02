@@ -35,6 +35,8 @@ import InputInvalidIcon from '../../../public/images/png/astrology-signs/InputIn
 import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
 import getLocalizedMonth from '../../../utils/getMonth';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
+import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -69,22 +71,26 @@ interface ISettingsBirthDateInput {
   value?: Date;
   maxDate: Date;
   locale?: string;
+  submitError?: string;
   disabled: boolean;
   labelCaption: string;
   bottomCaption: string;
   onChange: (date: Date) => void;
   handleSetActive?: () => void;
+  handleResetSubmitError: () => void;
 }
 
 const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> = ({
   value,
   maxDate,
   locale,
+  submitError,
   disabled,
   labelCaption,
   bottomCaption,
   onChange,
   handleSetActive,
+  handleResetSubmitError,
 }) => {
   const theme = useTheme();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -105,7 +111,12 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     return workingArr;
   }, [maxDate]);
 
-  const handleToggleCalendarOpen = () => setCalendarOpen((curr) => !curr);
+  const handleToggleCalendarOpen = () => {
+    if (submitError) {
+      handleResetSubmitError();
+    }
+    setCalendarOpen((curr) => !curr);
+  };
 
   const handleRenderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
     return (
@@ -222,6 +233,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               explicitInputRef.current = node!!;
               (ref as Function)(node);
             }}
+            readOnly
             inputMode="numeric"
             value={inputData}
             onChange={handleChange}
@@ -298,6 +310,23 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       <SBottomCaption>
         { bottomCaption }
       </SBottomCaption>
+      {
+        submitError ? (
+          <AnimatedPresence
+            animateWhenInView={false}
+            animation="t-09"
+          >
+            <SErrorDiv>
+              <InlineSvg
+                svg={AlertIcon}
+                width="16px"
+                height="16px"
+              />
+              { submitError }
+            </SErrorDiv>
+          </AnimatedPresence>
+        ) : null
+      }
     </SContainer>
   );
 };
@@ -306,6 +335,7 @@ SettingsBirthDateInput.defaultProps = {
   value: undefined,
   locale: 'en-US',
   handleSetActive: () => {},
+  submitError: undefined,
 };
 
 export default SettingsBirthDateInput;
@@ -608,4 +638,23 @@ const SPseudoPlaceholder = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+`;
+
+const SErrorDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
 `;

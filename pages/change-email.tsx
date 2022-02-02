@@ -3,20 +3,17 @@ import React, { useEffect, useState } from 'react';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { useCookies } from 'react-cookie';
 
-import Lottie from '../../components/atoms/Lottie';
+import Lottie from '../components/atoms/Lottie';
 
-import { signInWithEmail } from '../../api/endpoints/auth';
+import { setMyEmail } from '../api/endpoints/user';
 
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 import {
-  setUserData, setUserLoggedIn, setSignupEmailInput,
-} from '../../redux-store/slices/userStateSlice';
+  setUserData,
+} from '../redux-store/slices/userStateSlice';
 
-import logoAnimation from '../../public/animations/logo-loading-blue.json';
-
-// NB! To be done
+import logoAnimation from '../public/animations/logo-loading-blue.json';
 
 interface IEmailUpdateRedirectPage {
   email_address: string;
@@ -28,16 +25,10 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
   token,
 }) => {
   const router = useRouter();
-  const [, setCookie] = useCookies();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(false);
   const [signInError, setSignInError] = useState(false);
-
-  useEffect(() => {
-    if (user.loggedIn) router.push('/');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     async function handleAuth() {
@@ -46,12 +37,12 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 
         if (!email_address || !token) throw new Error('No token');
 
-        const requestPayload = new newnewapi.EmailSignInRequest({
+        const requestPayload = new newnewapi.SetMyEmailRequest({
           emailAddress: email_address,
           token,
         });
 
-        const res = await signInWithEmail(requestPayload);
+        const res = await setMyEmail(requestPayload);
 
         if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
 
@@ -59,51 +50,19 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 
         if (
           !data
-          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
-        ) throw new Error('No data');
+          || data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
+        ) throw new Error('Request failed');
 
-        dispatch(setUserData({
-          username: data.me?.username,
-          nickname: data.me?.nickname,
-          email: data.me?.email,
-          avatarUrl: data.me?.avatarUrl,
-          coverUrl: data.me?.coverUrl,
-          userUuid: data.me?.userUuid,
-          bio: data.me?.bio,
-          dateOfBirth: data.me?.dateOfBirth,
-          countryCode: data.me?.countryCode,
-          options: {
-            isActivityPrivate: data.me?.options?.isActivityPrivate,
-            isCreator: data.me?.options?.isCreator,
-            isVerified: data.me?.options?.isVerified,
-          },
-        }));
-        // Set credential cookies
-        setCookie(
-          'accessToken',
-          data.credential?.accessToken,
-          {
-            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
-            path: '/',
-          },
-        );
-        setCookie(
-          'refreshToken',
-          data.credential?.refreshToken,
-          {
-            // Expire in 10 years
-            maxAge: (10 * 365 * 24 * 60 * 60),
-            path: '/',
-          },
-        );
+        if (user.loggedIn) {
+          dispatch(setUserData({
+            email: email_address,
+          }));
+        }
 
-        dispatch(setSignupEmailInput(''));
-        dispatch(setUserLoggedIn(true));
-
-        setIsLoading(false);
         router.push('/');
       } catch (err) {
         // NB! Might need an error toast
+        console.log(err);
         setIsLoading(false);
         setSignInError(true);
         // router.push('/');

@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  cookiesInstance,
   fetchProtobuf,
   fetchProtobufProtectedIntercepted,
   TTokenCookie,
@@ -45,12 +46,16 @@ newnewapi.SendVerificationEmailRequest, newnewapi.SendVerificationEmailResponse>
 // NB! Maybe the auth should be optional
 export const setMyEmail = (
   payload: newnewapi.SetMyEmailRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.SetMyEmailRequest, newnewapi.SetMyEmailResponse>(
+) => fetchProtobuf<newnewapi.SetMyEmailRequest, newnewapi.SetMyEmailResponse>(
   newnewapi.SetMyEmailRequest,
   newnewapi.SetMyEmailResponse,
   `${BASE_URL_USER}/set_my_email`,
   'post',
   payload,
+  // Optional authentication
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
 );
 
 export const acceptCreatorTerms = (

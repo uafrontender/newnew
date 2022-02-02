@@ -19,8 +19,9 @@ import SettingsEmailInput from '../../molecules/profile/SettingsEmailInput';
 import { sendVerificationNewEmail, updateMe } from '../../../api/endpoints/user';
 import { useAppDispatch } from '../../../redux-store/store';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
+import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 
-const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+const maxDate = new Date();
 
 type TSettingsPersonalInformationSection = {
   currentEmail?: string;
@@ -40,10 +41,13 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
   const router = useRouter();
   const { t } = useTranslation('profile');
   const [wasModifed, setWasModified] = useState(false);
+
   const [emailInEdit, setEmailInEdit] = useState(currentEmail ?? '');
   const [emailError, setEmailError] = useState('');
   const [wasEmailModified, setWasEmailModified] = useState(false);
+
   const [dateInEdit, setDateInEdit] = useState(currentDate ?? undefined);
+  const [dateError, setDateError] = useState('');
   const [wasDateModified, setWasDateModified] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +84,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         const updateDateResponse = await updateMe(updateDatePayload);
 
         if (!updateDateResponse.data || updateDateResponse.error) {
-          throw new Error(updateDateResponse.error?.message ?? 'Request failed');
+          throw new Error('Date update error');
         }
 
         dispatch(setUserData({
@@ -115,6 +119,9 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     } catch (err) {
       console.error(err);
       setIsLoading(false);
+      if ((err as Error).message === 'Date update error') {
+        setDateError('tooYoung');
+      }
     }
   };
 
@@ -156,6 +163,12 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     setWasModified,
   ]);
 
+  useUpdateEffect(() => {
+    if (currentEmail) {
+      setEmailInEdit(currentEmail);
+    }
+  }, [currentEmail]);
+
   return (
     <SWrapper>
       <SInputsWrapper>
@@ -178,6 +191,10 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
           maxDate={maxDate}
           locale={router.locale}
           disabled={false}
+          submitError={dateError ? (
+            t(`Settings.sections.PersonalInformation.birthDateInput.errors.${dateError}`)
+          ) : undefined}
+          handleResetSubmitError={() => setDateError('')}
           labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
           bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly')}
           onChange={handleDateInput}

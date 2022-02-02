@@ -1,17 +1,20 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/dist/client/router';
+import { newnewapi } from 'newnew-api';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
 import CodeVerificationMenuNewEmail from '../components/organisms/CodeVerificationMenuNewEmail';
+import { SocketContext } from '../contexts/socketContext';
+import { setUserData } from '../redux-store/slices/userStateSlice';
 
 interface IVerifyNewEmail {
 }
@@ -19,18 +22,53 @@ interface IVerifyNewEmail {
 const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
   const { t } = useTranslation('verify-email');
 
-  const { loggedIn } = useAppSelector((state) => state.user);
-  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
+  const router = useRouter();
   const { email, redirect } = router.query;
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
 
   // Redirect if the user is not logged in
   useEffect(() => {
-    if (!loggedIn) router.push('/');
+    if (!user.loggedIn) router.push('/');
   }, [
-    loggedIn,
+    user.loggedIn,
     router,
   ]);
+
+  // Listen to Me update event
+  useEffect(() => {
+    const handlerSocketMeUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MeUpdated.decode(arr);
+
+      if (!decoded) return;
+
+      dispatch(setUserData({
+        email: decoded.me?.email,
+      }));
+
+      if (redirect === 'settings') {
+        router.push('/profile/settings');
+      } else {
+        router.push('/creator/dashboard');
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection.on('MeUpdated', handlerSocketMeUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('MeUpdated', handlerSocketMeUpdated);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   if (!email || !redirect) {
     return (
@@ -48,7 +86,7 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
       <CodeVerificationMenuNewEmail
         newEmail={email as string}
         redirect={redirect as 'settings' | 'dashboard'}
-        expirationTime={10}
+        expirationTime={60}
       />
     </>
   );
