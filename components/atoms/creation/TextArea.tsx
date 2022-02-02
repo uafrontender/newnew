@@ -11,6 +11,7 @@ interface ITextArea {
   id?: string;
   value: string;
   error?: string;
+  maxlength?: number;
   onBlur?: (key: string, value: string) => void;
   onFocus?: (key: string) => void;
   onChange: (key: string, value: string | boolean) => void;
@@ -20,6 +21,7 @@ interface ITextArea {
 export const TextArea: React.FC<ITextArea> = (props) => {
   const {
     id = '',
+    maxlength,
     value,
     error,
     onBlur = () => {},
@@ -47,6 +49,7 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           onFocus={handleFocus}
           onChange={handleChange}
           placeholder={placeholder}
+          maxLength={maxlength}
         />
       </SContent>
       {
@@ -74,6 +77,7 @@ export default TextArea;
 TextArea.defaultProps = {
   id: '',
   error: '',
+  maxlength: 524288,
   onBlur: (key, value) => console.log(key, value),
   onFocus: (key) => console.log(key),
 };

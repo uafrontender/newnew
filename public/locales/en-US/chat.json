@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "title": "Chat with Creator"
+  },
+  "ellipse": {
+    "report-user": "Report user",
+    "block-user": "Block user"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Write a message..."
+  }
+}
