@@ -79,6 +79,17 @@ newnewapi.EmptyRequest, newnewapi.GetMyOnboardingStateResponse>(
   payload,
 );
 
+export const becomeCreator = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.EmptyRequest, newnewapi.BecomeCreatorResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.BecomeCreatorResponse,
+  `${BASE_URL_USER}/become_creator`,
+  'post',
+  payload,
+);
+
 export const fetchSetStripeLinkCreator = (
   payload: newnewapi.SetupStripeCreatorAccountRequest,
 ) => fetchProtobufProtectedIntercepted<
@@ -100,7 +111,6 @@ export const logout = (
   payload,
 );
 
-// Test
 export const getMyPosts = (
   payload: newnewapi.GetRelatedToMePostsRequest,
   tokens?: {

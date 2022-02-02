@@ -13,7 +13,7 @@ import {
 } from '../../redux-store/slices/userStateSlice';
 
 // API
-import { setMyEmail, sendVerificationNewEmail } from '../../api/endpoints/user';
+import { setMyEmail, sendVerificationNewEmail, becomeCreator } from '../../api/endpoints/user';
 
 // Components
 import Text from '../atoms/Text';
@@ -83,11 +83,36 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
         || error
       ) throw new Error(error?.message ?? 'Request failed');
 
-      dispatch(setUserData({
-        email: newEmail,
-      }));
-
       setTimerActive(false);
+
+      if (redirect === 'settings') {
+        dispatch(setUserData({
+          email: newEmail,
+        }));
+      }
+
+      if (redirect === 'dashboard') {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+        console.log(becomeCreatorRes);
+
+        if (
+          !becomeCreatorRes.data
+          || becomeCreatorRes.error
+        ) throw new Error('Become creator failed');
+
+        dispatch(setUserData({
+          email: newEmail,
+          options: {
+            isActivityPrivate: becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+          },
+        }));
+      }
 
       setIsSigninWithEmailLoading(false);
       setIsSuccess(true);

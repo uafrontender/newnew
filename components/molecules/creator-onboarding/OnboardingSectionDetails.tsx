@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unneeded-ternary */
 /* eslint-disable react/no-danger */
 /* eslint-disable no-unused-vars */
@@ -24,7 +25,7 @@ import isImage from '../../../utils/isImage';
 import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
 import LoadingModal from '../LoadingModal';
 import { getImageUploadUrl } from '../../../api/endpoints/upload';
-import { updateMe } from '../../../api/endpoints/user';
+import { becomeCreator, sendVerificationNewEmail, updateMe } from '../../../api/endpoints/user';
 import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-store/slices/userStateSlice';
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import GoBackButton from '../GoBackButton';
@@ -32,7 +33,7 @@ import Button from '../../atoms/Button';
 import isBrowser from '../../../utils/isBrowser';
 import OnboardingCountrySelect from './OnboardingCountrySelect';
 
-const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+const maxDate = new Date();
 
 type TFieldsToBeUpdated = {
   email?: boolean;
@@ -76,38 +77,19 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
 
   // Birthdate
-
-  // NB! temp
-  const parsed: newnewapi.IDateComponents = {
-    day: 1,
-    month: 5,
-    year: 1990,
-  };
-
-  const [dateInEdit, setDateInEdit] = useState<
-    Date | undefined
-  >(user?.userData?.dateOfBirth ? (
-    new Date(
+  const currentDate = useMemo(() => {
+    if (!user?.userData?.dateOfBirth) return undefined;
+    return new Date(
       user?.userData.dateOfBirth.year!!,
       user?.userData.dateOfBirth.month!!,
       user?.userData.dateOfBirth.day!!,
-    )
-  // ) : undefined}
-  ) : (
-    new Date(
-      parsed.year!!,
-      parsed.month!!,
-      parsed.day!!,
-    )
-  ));
+    );
+  }, [user?.userData?.dateOfBirth]);
+  const [dateInEdit, setDateInEdit] = useState<
+    Date | undefined
+  >(currentDate);
   const [isDateValid, setIsDateValid] = useState(
-    // @ts-ignore
-    (user?.userData?.dateOfBirth ? (
-      // @ts-ignore
-      user?.userData?.dateOfBirth instanceof Date
-      // @ts-ignore
-      && (user?.userData?.dateOfBirth as Date) < maxDate
-    ) : false),
+    user?.userData?.dateOfBirth ? true : false,
   );
 
   const handleDateInput = (value: Date) => {
@@ -197,6 +179,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   };
 
   const handleSaveChangesAndGoToDashboard = useCallback(async () => {
+    let newAvatarUrl;
     try {
       setLoadingModalOpen(true);
 
@@ -205,14 +188,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           filename: imageToSave?.name,
         });
 
-        const res = await getImageUploadUrl(
+        const imgUploadRes = await getImageUploadUrl(
           imageUrlPayload,
         );
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
+        if (!imgUploadRes.data || imgUploadRes.error) throw new Error(imgUploadRes.error?.message ?? 'An error occured');
 
         const uploadResponse = await fetch(
-          res.data.uploadUrl,
+          imgUploadRes.data.uploadUrl,
           {
             method: 'PUT',
             body: imageToSave,
@@ -224,26 +207,82 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
         if (!uploadResponse.ok) throw new Error('Upload failed');
 
-        const updateMePayload = new newnewapi.UpdateMeRequest({
-          avatarUrl: res.data.publicUrl,
-        });
-
-        const updateMeRes = await updateMe(
-          updateMePayload,
-        );
-
-        if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
-
-        // Update Redux state
-        dispatch(setUserData({
-          ...user.userData,
-          avatarUrl: updateMeRes.data.me?.avatarUrl,
-        }));
+        newAvatarUrl = imgUploadRes.data.publicUrl;
       }
 
-      setLoadingModalOpen(false);
-      // router.push('/');
-      goToDashboard();
+      const updateMePayload = new newnewapi.UpdateMeRequest({
+        countryCode: selectedCountry,
+        ...(fieldsToBeUpdated.dateOfBirth ? {
+          dateOfBirth: {
+            year: dateInEdit?.getFullYear(),
+            month: dateInEdit?.getMonth()!! + 1,
+            day: dateInEdit?.getDate(),
+          },
+        } : {}),
+        ...(newAvatarUrl ? {
+          avatarUrl: newAvatarUrl,
+        } : {}),
+      });
+
+      const updateMeRes = await updateMe(
+        updateMePayload,
+      );
+
+      if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
+
+      // Update Redux state
+      dispatch(setUserData({
+        ...user.userData,
+        avatarUrl: updateMeRes.data.me?.avatarUrl,
+        countryCode: updateMeRes.data.me?.countryCode,
+        dateOfBirth: updateMeRes.data.me?.dateOfBirth,
+      }));
+
+      // make actual call
+
+      if (fieldsToBeUpdated.email) {
+        console.log('Email was modified :)');
+
+        const sendVerificationCodePayload = new newnewapi.SendVerificationEmailRequest({
+          emailAddress: emailInEdit,
+          useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+        });
+
+        const res = await sendVerificationNewEmail(sendVerificationCodePayload);
+
+        if (
+          res.data?.status === newnewapi.SendVerificationEmailResponse.Status.SUCCESS
+          && !res.error) {
+          router.push(
+            `/verify-new-email?email=${emailInEdit}&redirect=dashboard`,
+          );
+          return;
+        // eslint-disable-next-line no-else-return
+        }
+        throw new Error('Email taken');
+      } else {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+        console.log(becomeCreatorRes);
+
+        if (
+          !becomeCreatorRes.data
+          || becomeCreatorRes.error
+        ) throw new Error('Become creator failed');
+
+        dispatch(setUserData({
+          options: {
+            isActivityPrivate: becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+          },
+        }));
+
+        goToDashboard();
+      }
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
@@ -256,8 +295,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     fieldsToBeUpdated,
+    dateInEdit,
+    selectedCountry,
+    emailInEdit,
     user.userData,
     imageToSave,
     dispatch,
@@ -296,8 +339,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // Date of birth
   useUpdateEffect(() => {
     if (
-      // @ts-ignore
-      user.userData?.dateOfBirth && dateInEdit !== user.userData?.dateOfBirth
+      dateInEdit?.getTime() !== currentDate?.getTime()
     ) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;

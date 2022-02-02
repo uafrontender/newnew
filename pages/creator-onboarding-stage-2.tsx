@@ -47,7 +47,7 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
     t('DetailsSection.leaveMsg'),
     [
       '/creator/dashboard',
-      '/verify-email',
+      '/verify-new-email',
     ],
   );
 

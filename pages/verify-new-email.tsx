@@ -15,6 +15,7 @@ import AuthLayout from '../components/templates/AuthLayout';
 import CodeVerificationMenuNewEmail from '../components/organisms/CodeVerificationMenuNewEmail';
 import { SocketContext } from '../contexts/socketContext';
 import { setUserData } from '../redux-store/slices/userStateSlice';
+import { becomeCreator } from '../api/endpoints/user';
 
 interface IVerifyNewEmail {
 }
@@ -41,15 +42,40 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
   // Listen to Me update event
   useEffect(() => {
-    const handlerSocketMeUpdated = (data: any) => {
+    const handlerSocketMeUpdated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.MeUpdated.decode(arr);
 
       if (!decoded) return;
 
-      dispatch(setUserData({
-        email: decoded.me?.email,
-      }));
+      if (redirect === 'settings') {
+        dispatch(setUserData({
+          email: decoded.me?.email,
+        }));
+      }
+
+      if (redirect === 'dashboard') {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+        console.log(becomeCreatorRes);
+
+        if (
+          !becomeCreatorRes.data
+          || becomeCreatorRes.error
+        ) throw new Error('Become creator failed');
+
+        dispatch(setUserData({
+          email: decoded.me?.email,
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
+          },
+        }));
+      }
 
       if (redirect === 'settings') {
         router.push('/profile/settings');
