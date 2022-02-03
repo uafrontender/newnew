@@ -4,7 +4,7 @@ import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';

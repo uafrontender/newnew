@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import validator from 'validator';
+import { debounce, isEqual } from 'lodash';
 import { newnewapi } from 'newnew-api';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -25,17 +26,82 @@ import isImage from '../../../utils/isImage';
 import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
 import LoadingModal from '../LoadingModal';
 import { getImageUploadUrl } from '../../../api/endpoints/upload';
-import { becomeCreator, sendVerificationNewEmail, updateMe } from '../../../api/endpoints/user';
+import {
+  becomeCreator, sendVerificationNewEmail, updateMe, validateUsernameTextField,
+} from '../../../api/endpoints/user';
 import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-store/slices/userStateSlice';
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import isBrowser from '../../../utils/isBrowser';
 import OnboardingCountrySelect from './OnboardingCountrySelect';
+import OnboardingSectionUsernameInput from './OnboardingSectionUsernameInput';
+import OnboardingSectionNicknameInput from './OnboardingSectionNicknameInput';
+import { validateText } from '../../../api/endpoints/infrastructure';
 
 const maxDate = new Date();
 
+const errorSwitch = (
+  status: newnewapi.ValidateTextResponse.Status) => {
+  let errorMsg = 'generic';
+
+  switch (status) {
+    case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
+      errorMsg = 'tooLong';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
+      errorMsg = 'tooShort';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
+      errorMsg = 'innappropriate';
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+
+  return errorMsg;
+};
+
+const errorSwitchUsername = (
+  status: newnewapi.ValidateUsernameResponse.Status) => {
+  let errorMsg = 'generic';
+
+  switch (status) {
+    case newnewapi.ValidateUsernameResponse.Status.TOO_LONG: {
+      errorMsg = 'tooLong';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.TOO_SHORT: {
+      errorMsg = 'tooShort';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.INVALID_CHARACTER: {
+      errorMsg = 'invalidChar';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.INAPPROPRIATE: {
+      errorMsg = 'innappropriate';
+      break;
+    }
+    case newnewapi.ValidateUsernameResponse.Status.USERNAME_TAKEN: {
+      errorMsg = 'taken';
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+
+  return errorMsg;
+};
+
 type TFieldsToBeUpdated = {
+  username?: boolean;
+  nickname?: boolean;
   email?: boolean;
   countryOfResidence: boolean;
   dateOfBirth?: boolean;
@@ -61,6 +127,116 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
+  // Username
+  const [usernameInEdit, setUsernameInEdit] = useState(user.userData?.username ?? '');
+  const [usernameError, setUsernameError] = useState('');
+  const handleUpdateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsernameInEdit(e.target.value);
+
+    validateUsernameViaAPIDebounced(
+      e.target.value,
+    );
+  };
+
+  // Nickname
+  const [nicknameInEdit, setNicknameInEdit] = useState(user.userData?.nickname ?? '');
+  const [nicknameError, setNicknameError] = useState('');
+  const handleUpdateNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNicknameInEdit(e.target.value);
+
+    validateNicknameViaAPIDebounced(
+      e.target.value,
+    );
+  };
+
+  // API validations
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+  const validateUsernameViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateUsernameRequest({
+        username: text,
+      });
+
+      const res = await validateUsernameTextField(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+      if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
+        setUsernameError(errorSwitchUsername(res.data?.status!!));
+      } else {
+        setUsernameError('');
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
+    }
+  }, [setUsernameError, dispatch]);
+
+  const validateUsernameViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateUsernameViaAPI(text);
+  }, 250),
+  [validateUsernameViaAPI]);
+
+  const validateNicknameViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        kind: newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setNicknameError(errorSwitch(res.data?.status!!));
+      } else {
+        setNicknameError('');
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
+    }
+  }, [setNicknameError, dispatch]);
+
+  const validateNicknameViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateNicknameViaAPI(text);
+  }, 250),
+  [validateNicknameViaAPI]);
+
   // Email
   const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,31 +253,17 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [selectedCountry, setSelectedCountry] = useState(countries[0].value);
 
   // Birthdate
-  const currentDate = useMemo(() => {
-    if (!user?.userData?.dateOfBirth) return undefined;
-    return new Date(
-      user?.userData.dateOfBirth.year!!,
-      user?.userData.dateOfBirth.month!!,
-      user?.userData.dateOfBirth.day!!,
-    );
-  }, [user?.userData?.dateOfBirth]);
-  const [dateInEdit, setDateInEdit] = useState<
-    Date | undefined
-  >(currentDate);
-  const [isDateValid, setIsDateValid] = useState(
-    user?.userData?.dateOfBirth ? true : false,
-  );
+  const [dateInEdit, setDateInEdit] = useState<newnewapi.IDateComponents
+    >(user?.userData?.dateOfBirth ? user?.userData?.dateOfBirth : {
+      day: undefined,
+      month: undefined,
+      year: undefined,
+    });
+  const [dateError, setDateError] = useState('');
 
-  const handleDateInput = (value: Date) => {
-    if (value === null) {
-      setDateInEdit(undefined);
-      return;
-    }
+  const handleDateInput = (value: newnewapi.IDateComponents) => {
     setDateInEdit(value);
   };
-  const handleSetIsDateValid = useCallback((value: boolean) => {
-    setIsDateValid(value);
-  }, []);
 
   // Profile image
   const [imageToSave, setImageToSave] = useState<File | null>(null);
@@ -132,13 +294,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     } : {}),
   });
   const [fieldsValid, setFieldsValid] = useState({
+    username: usernameInEdit.length > 0,
+    nickname: nicknameInEdit.length > 0,
     email: validator.isEmail(emailInEdit),
     countryOfResidence: true,
-    dateOfBirth: isDateValid,
+    dateOfBirth: !Object.values(dateInEdit).find((o) => o === undefined),
     image: imageInEdit ? true : false,
   });
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [errorModalOpen, setErrorModalOpen] = useState(false);
 
   const handleSetProfilePictureInEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -179,9 +342,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   };
 
   const handleSaveChangesAndGoToDashboard = useCallback(async () => {
+    if (isAPIValidateLoading) return;
     let newAvatarUrl;
     try {
       setLoadingModalOpen(true);
+
+      console.log(fieldsToBeUpdated);
 
       if (fieldsToBeUpdated.image) {
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
@@ -212,23 +378,27 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
       const updateMePayload = new newnewapi.UpdateMeRequest({
         countryCode: selectedCountry,
+        ...(fieldsToBeUpdated.username ? {
+          username: usernameInEdit,
+        } : {}),
+        ...(fieldsToBeUpdated.nickname ? {
+          nickname: nicknameInEdit,
+        } : {}),
         ...(fieldsToBeUpdated.dateOfBirth ? {
-          dateOfBirth: {
-            year: dateInEdit?.getFullYear(),
-            month: dateInEdit?.getMonth()!! + 1,
-            day: dateInEdit?.getDate(),
-          },
+          dateOfBirth: dateInEdit,
         } : {}),
         ...(newAvatarUrl ? {
           avatarUrl: newAvatarUrl,
         } : {}),
       });
 
+      console.log(updateMePayload);
+
       const updateMeRes = await updateMe(
         updateMePayload,
       );
 
-      if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
+      if (!updateMeRes.data || updateMeRes.error) throw new Error(updateMeRes.error?.message ?? 'Request failed');
 
       // Update Redux state
       dispatch(setUserData({
@@ -286,6 +456,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     } catch (err) {
       console.error(err);
       setLoadingModalOpen(false);
+
+      // if ((err as Error).message === 'Too young') {
+      if ((err as Error).message) {
+        setDateError('tooYoung');
+      }
+
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
       }
@@ -304,6 +480,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     user.userData,
     imageToSave,
     dispatch,
+    isAPIValidateLoading,
     goToDashboard,
     setLoadingModalOpen,
   ]);
@@ -317,11 +494,46 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   }, [imageToSave]);
 
   // Update what fields should be updated
+  // Username
+  useUpdateEffect(() => {
+    if (
+      usernameInEdit !== user.userData?.username
+    ) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.username = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.username = false;
+        return working;
+      });
+    }
+  }, [usernameInEdit, setFieldsToBeUpdated]);
+  // Nickname
+  useUpdateEffect(() => {
+    if (
+      nicknameInEdit !== user.userData?.nickname
+    ) {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.nickname = true;
+        return working;
+      });
+    } else {
+      setFieldsToBeUpdated((curr) => {
+        const working = curr;
+        working.nickname = false;
+        return working;
+      });
+    }
+  }, [nicknameInEdit, setFieldsToBeUpdated]);
   // Email
   useUpdateEffect(() => {
     if (
       emailInEdit !== user.userData?.email
-      // || (emailInEdit !== user.userData?.email && !user.userData?.options?.isVerified)
     ) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
@@ -339,7 +551,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   // Date of birth
   useUpdateEffect(() => {
     if (
-      dateInEdit?.getTime() !== currentDate?.getTime()
+      !isEqual(user.userData?.dateOfBirth, dateInEdit)
     ) {
       setFieldsToBeUpdated((curr) => {
         const working = curr;
@@ -353,42 +565,38 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         return working;
       });
     }
-  }, [emailInEdit, setFieldsToBeUpdated]);
+  }, [dateInEdit, setFieldsToBeUpdated]);
   // Image
   useUpdateEffect(() => {
-    setFieldsToBeUpdated((curr) => {
-      const working = { ...curr };
-      working.image = true;
-      return working;
-    });
+    if (imageInEdit !== user.userData?.avatarUrl) {
+      setFieldsToBeUpdated((curr) => {
+        const working = { ...curr };
+        working.image = true;
+        return working;
+      });
+    }
   }, [imageInEdit, setFieldsToBeUpdated]);
 
   // Validate fields
   useEffect(() => {
     setFieldsValid((curr) => {
       const working = { ...curr };
+      working.username = usernameInEdit.length > 0 && !usernameError;
+      working.nickname = nicknameInEdit.length > 0 && !nicknameError;
       working.email = validator.isEmail(emailInEdit);
-      working.dateOfBirth = isDateValid;
+      working.dateOfBirth = !Object.values(dateInEdit).find((o) => o === undefined);
       working.image = imageInEdit !== '';
       return working;
     });
   }, [
+    usernameInEdit,
+    usernameError,
+    nicknameInEdit,
+    nicknameError,
     emailInEdit,
     dateInEdit,
-    isDateValid,
     imageInEdit,
     setFieldsValid,
-  ]);
-
-  // Test
-  useEffect(() => {
-    // console.log('FIELDS TO BE UPDATED: ');
-    // console.log(JSON.stringify(fieldsToBeUpdated));
-    // console.log('FIELDS VALIDITY: ');
-    // console.log(JSON.stringify(fieldsValid));
-  }, [
-    fieldsToBeUpdated,
-    fieldsValid,
   ]);
 
   return (
@@ -400,6 +608,53 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           {t('DetailsSection.heading')}
         </SHeading>
         <STopContainer>
+          <SUsernameNicknameContainer>
+            <OnboardingSectionUsernameInput
+              type="text"
+              value={usernameInEdit}
+              disabled={loadingModalOpen}
+              popupCaption={(
+                <UsernamePopupList
+                  points={[
+                    {
+                      text: t('DetailsSection.form.username.points.1'),
+                      isValid: usernameInEdit ? (
+                        usernameInEdit.length >= 8 && usernameInEdit.length <= 15
+                      ) : false,
+                    },
+                    {
+                      text: t('DetailsSection.form.username.points.2'),
+                      isValid: usernameInEdit ? (
+                        validator.isLowercase(usernameInEdit)
+                      ) : false,
+                    },
+                    {
+                      text: t('DetailsSection.form.username.points.3'),
+                      isValid: usernameInEdit ? (
+                        validator.isAlphanumeric(usernameInEdit)
+                      ) : false,
+                    },
+                  ]}
+                />
+              )}
+              labelCaption={t('DetailsSection.form.username.labelCaption')}
+              frequencyCaption={t('DetailsSection.form.username.frequencyCaption')}
+              errorCaption={t(`DetailsSection.form.username.errors.${usernameError}`)}
+              placeholder={t('DetailsSection.form.username.placeholder')}
+              isValid={usernameError === ''}
+              onChange={handleUpdateUsername}
+            />
+            <OnboardingSectionNicknameInput
+              type="text"
+              value={nicknameInEdit}
+              disabled={loadingModalOpen}
+              placeholder={t('DetailsSection.form.nickname.placeholder')}
+              labelCaption={t('DetailsSection.form.nickname.labelCaption')}
+              errorCaption={t(`DetailsSection.form.nickname.errors.${nicknameError}`)}
+              isValid={nicknameError === ''}
+              onChange={handleUpdateNickname}
+            />
+          </SUsernameNicknameContainer>
           <SFormItemContainer>
             <OnboardingEmailInput
               value={emailInEdit}
@@ -407,10 +662,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               labelCaption={t('DetailsSection.form.email.label')}
               placeholder={t('DetailsSection.form.email.placeholder')}
               cantChangeInfoCaption={t('DetailsSection.form.email.cantChangeInfoCaption')}
-              // @ts-ignore
-              // readOnly={!user.userData?.options?.isEmailVerified}
-              // readOnly
-              // Temp
               errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
               onChange={handleEmailInput}
             />
@@ -423,17 +674,18 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             onSelect={(val) => setSelectedCountry(val)}
             closeOnSelect
           />
-
           <SFormItemContainer>
             <OnboardingBirthDateInput
               value={dateInEdit}
               maxDate={maxDate}
               locale={router.locale}
               disabled={false}
+              isValid={dateError === ''}
               labelCaption={t('DetailsSection.form.DoB.label')}
               bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
-              handleSetIsDateValid={handleSetIsDateValid}
+              errorCaption={t('DetailsSection.form.DoB.errors.tooYoung')}
               onChange={handleDateInput}
+              handleResetIsValid={() => setDateError('')}
             />
           </SFormItemContainer>
         </STopContainer>
@@ -450,7 +702,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       <SControlsDiv>
         {!isMobile && (
           <GoBackButton
-            longArrow={!isTablet}
+            longArrow
             onClick={() => router.back()}
           >
             { t('DetailsSection.backButton') }
@@ -459,6 +711,10 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         <Button
           view="primaryGrad"
           disabled={Object.values(fieldsValid).some((v) => v === false)}
+          style={{
+            width: isMobile ? '100%' : 'initial',
+            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+          }}
           onClick={() => handleSaveChangesAndGoToDashboard()}
         >
           {isMobile ? (
@@ -547,6 +803,21 @@ const STopContainer = styled.div`
   }
 `;
 
+const SUsernameNicknameContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 100%;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-direction: row;
+    gap: 16px;
+  }
+`;
+
 const SFormItemContainer = styled.div`
   width: 100%;
 
@@ -558,7 +829,7 @@ const SFormItemContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 296px;
+    /* width: 296px; */
   }
 `;
 
@@ -611,4 +882,67 @@ const SControlsDiv = styled.div`
     padding-left: 0;
     padding-right: 104px;
   }
+`;
+
+type TUsernamePopupListItem = {
+  text: string;
+  isValid: boolean;
+}
+
+const UsernamePopupList = ({ points } : { points: TUsernamePopupListItem[] }) => (
+  <SUsernamePopupList>
+    {points.map((p) => (
+      <SUsernamePopupListItem
+        key={p.text}
+        isValid={p.isValid}
+      >
+        { p.text }
+      </SUsernamePopupListItem>
+    ))}
+  </SUsernamePopupList>
+);
+
+const SUsernamePopupListItem = styled.div<{
+  isValid: boolean;
+}>`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  &:before {
+    content: '✓';
+    color: ${({ isValid }) => (isValid ? '#FFFFFF' : 'transparent')};
+    font-size: 8px;
+    text-align: center;
+    line-height: 13px;
+    display: block;
+
+    position: relative;
+    top: -1px;
+
+    width: 13px;
+    height: 13px;
+    margin-right: 4px;
+
+    border-radius: 50%;
+    border-width: 1.5px;
+    border-style: solid;
+    border-color: ${({ theme, isValid }) => (isValid ? 'transparent' : theme.colorsThemed.text.secondary)};
+
+    background-color: ${({ theme, isValid }) => (isValid ? theme.colorsThemed.accent.success : 'transparent')};
+
+    transition: .2s ease-in-out;
+  }
+`;
+
+const SUsernamePopupList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #FFFFFF;
 `;
