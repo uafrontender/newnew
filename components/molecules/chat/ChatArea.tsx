@@ -8,6 +8,7 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/creation/TextArea';
 import InlineSVG from '../../atoms/InlineSVG';
+import UserAvatar from '../UserAvatar';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import ChatEllipseMenu from './ChatEllipseMenu';
@@ -16,98 +17,21 @@ import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
 
+import { IUser, IMessage, IChatData } from '../../interfaces/chat';
 import { useAppSelector } from '../../../redux-store/store';
 
-export const ChatArea = () => {
+export const ChatArea: React.FC<IChatData> = ({ userData, messages }) => {
   const [message, setMessage] = useState('');
-  const [collection, setCollection] = useState([
-    {
-      id: '1',
-      message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-      mine: true,
-      date: moment(),
-    },
-    {
-      id: '2',
-      message: 'Hiii, Lance 😃',
-      mine: true,
-      date: moment(),
-    },
-    {
-      id: '3',
-      message: 'I don’t beleive...',
-      mine: false,
-      date: moment(),
-    },
-    {
-      id: '4',
-      message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-      mine: false,
-      date: moment(),
-    },
-    {
-      id: '5',
-      message: 'Hey, Annie 👋',
-      mine: false,
-      date: moment(),
-    },
-    {
-      id: '6',
-      message: 'Hey there, Ya, me too 😏',
-      mine: false,
-      date: moment().subtract(2, 'days'),
-    },
-    {
-      id: '7',
-      message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-      mine: true,
-      date: moment().subtract(2, 'days'),
-    },
-    {
-      id: '8',
-      message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-      mine: true,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '9',
-      message: 'Hiii, Lance 😃',
-      mine: true,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '10',
-      message: 'I don’t beleive...',
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '11',
-      message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '12',
-      message: 'Hey, Annie 👋',
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '13',
-      message: 'Hey there, Ya, me too 😏',
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '14',
-      message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-      mine: true,
-      date: moment().subtract(3, 'days'),
-    },
-  ]);
-
+  const [localUserData, setUserData] = useState<IUser | null>(null);
+  const [collection, setCollection] = useState<IMessage[]>([]);
+  useEffect(() => {
+    if (userData && messages) {
+      setUserData(userData);
+      setCollection(messages);
+    }
+  }, [userData, messages]);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -123,7 +47,7 @@ export const ChatArea = () => {
   }, []);
 
   const handleSubmit = useCallback(() => {
-    const newItem = {
+    const newItem: IMessage = {
       id: (collection.length + 1).toString(),
       mine: true,
       date: moment(),
@@ -137,13 +61,14 @@ export const ChatArea = () => {
       const prevElement = collection[index - 1];
       const nextElement = collection[index + 1];
 
+      const prevSameUser = prevElement?.mine === item.mine;
+      const nextSameUser = prevElement?.mine === item.mine;
+
       const content = (
         <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={`message-${item.id}`} mine={item.mine}>
-          <SMessageContent
-            mine={item.mine}
-            prevSameUser={prevElement?.mine === item.mine}
-            nextSameUser={nextElement?.mine === item.mine}
-          >
+          {!nextSameUser && !item.mine && <SUserAvatar avatarUrl={localUserData?.avatar} />}
+          {!nextSameUser && item.mine && <SUserAvatar avatarUrl={user.userData?.avatarUrl} />}
+          <SMessageContent mine={item.mine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
             <SMessageText mine={item.mine} weight={600} variant={3}>
               {item.message}
             </SMessageText>
@@ -178,7 +103,7 @@ export const ChatArea = () => {
 
       return content;
     },
-    [collection, t]
+    [collection, t, localUserData?.avatar, user.userData?.avatarUrl]
   );
 
   useEffect(() => {
@@ -193,39 +118,31 @@ export const ChatArea = () => {
     <SContainer>
       <STopPart>
         <SUserData>
-          <SUserName>🦄Unicornbabe</SUserName>
-          <SUserAlias>@unicornbabe</SUserAlias>
+          <SUserName>{localUserData?.userName}</SUserName>
+          <SUserAlias>@{localUserData?.userAlias}</SUserAlias>
         </SUserData>
         <SActionsDiv>
-          <SMoreButton
-          view="transparent"
-          iconOnly
-          onClick={() => handleOpenEllipseMenu()}
-        >
-          <InlineSVG
-            svg={MoreIconFilled}
-            fill={theme.colorsThemed.text.secondary}
-            width="20px"
-            height="20px"
-          />
-        </SMoreButton>
+          <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
+            <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
+          </SMoreButton>
           {/* Ellipse menu */}
-          {!isMobile && (
-            <ChatEllipseMenu
-              isVisible={ellipseMenuOpen}
-              handleClose={handleCloseEllipseMenu}
-            />
-          )}
+          {!isMobile && <ChatEllipseMenu isVisible={ellipseMenuOpen} handleClose={handleCloseEllipseMenu} />}
           {isMobile && ellipseMenuOpen ? (
-            <ChatEllipseModal
-              isOpen={ellipseMenuOpen}
-              zIndex={11}
-              onClose={handleCloseEllipseMenu}
-            />
+            <ChatEllipseModal isOpen={ellipseMenuOpen} zIndex={11} onClose={handleCloseEllipseMenu} />
           ) : null}
         </SActionsDiv>
       </STopPart>
       <SCenterPart id="messagesScrollContainer" ref={scrollRef}>
+        {localUserData?.justSubscribed && (
+          <SWelcomeMessage>
+            <div>
+              <span>🎉</span>
+              <p>
+                {t('chat.welcome-message')} @{localUserData.userAlias}.
+              </p>
+            </div>
+          </SWelcomeMessage>
+        )}
         {collection.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
@@ -308,6 +225,7 @@ const SCenterPart = styled.div`
   overflow-y: auto;
   flex-direction: column-reverse;
   padding: 0 24px;
+  position: relative;
 `;
 
 const SBottomPart = styled.div`
@@ -319,6 +237,17 @@ const SBottomPart = styled.div`
 
 const STextArea = styled.div`
   flex: 1;
+`;
+
+const SUserAvatar = styled(UserAvatar)`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -343,6 +272,13 @@ interface ISMessage {
 
 const SMessage = styled.div<ISMessage>`
   width: 100%;
+  position: relative;
+  padding-left: ${(props) => {
+    if (props.type !== 'info') {
+      return '44px';
+    }
+    return '0px';
+  }};
   display: flex;
   flex-direction: row;
   justify-content: ${(props) => {
@@ -467,6 +403,8 @@ interface ISMessageText {
 }
 
 const SMessageText = styled(Text)<ISMessageText>`
+  line-height: 20px;
+  max-width: 412px;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -478,4 +416,27 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+`;
+
+const SWelcomeMessage = styled.div`
+  position: absolute;
+  left: 0;
+  top: 48px;
+  right: 0;
+  padding: 0 20px;
+  font-size: 14px;
+  line-height: 20px;
+  display: flex;
+  text-align: center;
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  div {
+    max-width: 352px;
+    margin: 0 auto;
+  }
+  span {
+    font-size: 48px;
+  }
+  p {
+    margin: 12px 0 0;
+  }
 `;

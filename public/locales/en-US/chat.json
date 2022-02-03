@@ -8,6 +8,10 @@
   },
   "chat": {
     "today": "Today",
-    "placeholder": "Write a message..."
+    "placeholder": "Type a message...",
+    "welcome-message": "You successfully subscribed! Now you can send a message to"
+  },
+  "toolbar": {
+    "search-placeholder": "Search for messages or users"
   }
 }

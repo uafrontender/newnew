@@ -1,20 +1,33 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
+import SearchInput from '../atoms/chat/SearchInput';
+import NewMessage from '../atoms/chat/NewMessage';
+import { IChatData } from '../interfaces/chat';
 
-export const Chat = () => (
-  <SContainer>
-    <SSidebar>
-      <ChatList />
-    </SSidebar>
-    <SContent>
-      <ChatArea />
-    </SContent>
-  </SContainer>
-);
+export const Chat = () => {
+  const [chatData, setChatData] = useState<IChatData>({ userData: null, messages: [] });
+  const openChat = ({ userData, messages }: IChatData) => {
+    setChatData({ userData, messages });
+  };
+  return (
+    <SContainer>
+      <SSidebar>
+        <SToolbar>
+          <SearchInput />
+          <NewMessage />
+        </SToolbar>
+        <ChatList openChat={openChat} />
+      </SSidebar>
+      <SContent>
+        <ChatArea {...chatData} />
+      </SContent>
+    </SContainer>
+  );
+};
 
 export default Chat;
 
@@ -35,12 +48,12 @@ const SContainer = styled.div`
 
 const SSidebar = styled.aside`
   top: 32px;
+  padding-top: 16px;
   left: 0;
   float: left;
   width: 352px;
   position: sticky;
-  margin-right: 32px;
-  height:100%;
+  height: 100%;
 
   /* ${(props) => props.theme.media.laptop} {
     top: 40px;
@@ -49,9 +62,15 @@ const SSidebar = styled.aside`
   } */
 `;
 
+const SToolbar = styled.div`
+  display: flex;
+  margin-bottom: 24px;
+  justify-content: space-between;
+`;
+
 const SContent = styled.div`
   position: relative;
-  height:100%;
+  height: 100%;
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 354px;
