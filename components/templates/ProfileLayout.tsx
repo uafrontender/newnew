@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import React, {
   ReactElement, useCallback, useEffect, useMemo, useState,
 } from 'react';
@@ -23,6 +24,7 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import { getSubscriptionStatus } from '../../api/endpoints/payments';
 
 type TPageType = 'creatorsDecisions'
   | 'activity'
@@ -64,8 +66,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const tabs: Tab[] = useMemo(() => {
-    // if (user.options?.isCreator) {
-    if (true) {
+    if (user.options?.isCreator) {
+    // if (true) {
       return [
         {
           nameToken: 'userInitial',
@@ -188,11 +190,42 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   }, [renderedPage]);
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
-  const handleClickSendMessage = useCallback(() => {
-    if (!currentUser.loggedIn) {
-      router.push('/sign-up?reason=subscribe');
+  const handleClickSendMessage = useCallback(async () => {
+    try {
+      if (!currentUser.loggedIn) {
+        router.push(`/u/${user.username}/subscribe`);
+      } else {
+        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+          creatorUuid: user.uuid,
+        });
+
+        const res = await getSubscriptionStatus(getStatusPayload);
+
+        console.log(res.data);
+
+        if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
+          router.push(`/u/${user.username}/subscribe`);
+        } else if (res.data?.status?.activeRenewsAt) {
+          console.log('Subscribed! Redirect to chat will be here');
+          // Testing
+          // const unsubPayload = new newnewapi.UnsubscribeFromCreatorRequest({
+          //   creatorUuid: user.uuid,
+          // });
+          // const unsubRes = await unsubscribeFromCreator(unsubPayload);
+
+          // console.log(unsubRes);
+
+          // console.log('Unsubscribed!');
+        }
+      }
+    } catch (err) {
+      console.error(err);
     }
-  }, [currentUser, router]);
+  }, [
+    currentUser.loggedIn,
+    router,
+    user,
+  ]);
 
   const renderChildren = () => {
     let postsForPage = {};

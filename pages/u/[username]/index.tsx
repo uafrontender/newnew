@@ -174,16 +174,16 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 };
 
 (UserPageIndex as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  // const renderedPage = page.props.user?.options?.isCreator ? (
-  //   'creatorsDecisions'
-  // ) : (
-  //   page.props.user?.options?.isActivityPrivate ? (
-  //     'activityHidden'
-  //   ) : 'activity'
-  // );
+  const renderedPage = page.props.user?.options?.isCreator ? (
+    'creatorsDecisions'
+  ) : (
+    page.props.user?.options?.isActivityPrivate ? (
+      'activityHidden'
+    ) : 'activity'
+  );
 
   // TEMP!
-  const renderedPage = 'creatorsDecisions';
+  // const renderedPage = 'creatorsDecisions';
 
   return (
     <ProfileLayout
@@ -251,10 +251,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // const isCreator = res.data.options?.isCreator;
-  // const isActivityPrivate = res.data.options?.isActivityPrivate;
-  const isCreator = true;
-  const isActivityPrivate = false;
+  const isCreator = res.data.options?.isCreator;
+  const isActivityPrivate = res.data.options?.isActivityPrivate;
+  // const isCreator = true;
+  // const isActivityPrivate = false;
 
   // will fetch only for creators
   if (isCreator && !context.req.url?.startsWith('/_next')) {
