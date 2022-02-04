@@ -109,13 +109,13 @@ type TFieldsToBeUpdated = {
 };
 
 interface IOnboardingSectionDetails {
-  genericAvatarsUrls: string[];
+  isAvatarCustom: boolean;
   availableCountries: newnewapi.Country[];
   goToDashboard: () => void;
 }
 
 const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetails> = ({
-  genericAvatarsUrls,
+  isAvatarCustom,
   availableCountries,
   goToDashboard,
 }) => {
@@ -239,7 +239,9 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
   // Email
   const [emailInEdit, setEmailInEdit] = useState(user.userData?.email ?? '');
+  const [emailError, setEmailError] = useState('');
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (emailError) setEmailError('');
     setEmailInEdit(e.target.value);
   };
 
@@ -272,7 +274,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
   const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
   // Determine whether or not the profile image is generic
   const [imageInEdit, setImageInEdit] = useState(
-    user.userData?.avatarUrl && !genericAvatarsUrls.includes(user.userData?.avatarUrl) ? (
+    user.userData?.avatarUrl && isAvatarCustom ? (
       user.userData?.avatarUrl
     ) : '',
   );
@@ -347,8 +349,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     try {
       setLoadingModalOpen(true);
 
-      console.log(fieldsToBeUpdated);
-
       if (fieldsToBeUpdated.image) {
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
           filename: imageToSave?.name,
@@ -358,7 +358,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           imageUrlPayload,
         );
 
-        if (!imgUploadRes.data || imgUploadRes.error) throw new Error(imgUploadRes.error?.message ?? 'An error occured');
+        if (!imgUploadRes.data || imgUploadRes.error) throw new Error(imgUploadRes.error?.message ?? 'Upload error');
 
         const uploadResponse = await fetch(
           imgUploadRes.data.uploadUrl,
@@ -392,8 +392,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         } : {}),
       });
 
-      console.log(updateMePayload);
-
       const updateMeRes = await updateMe(
         updateMePayload,
       );
@@ -403,16 +401,14 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       // Update Redux state
       dispatch(setUserData({
         ...user.userData,
+        username: updateMeRes.data.me?.username,
+        nickname: updateMeRes.data.me?.nickname,
         avatarUrl: updateMeRes.data.me?.avatarUrl,
         countryCode: updateMeRes.data.me?.countryCode,
         dateOfBirth: updateMeRes.data.me?.dateOfBirth,
       }));
 
-      // make actual call
-
       if (fieldsToBeUpdated.email) {
-        console.log('Email was modified :)');
-
         const sendVerificationCodePayload = new newnewapi.SendVerificationEmailRequest({
           emailAddress: emailInEdit,
           useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
@@ -435,8 +431,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        console.log(becomeCreatorRes);
-
         if (
           !becomeCreatorRes.data
           || becomeCreatorRes.error
@@ -457,8 +451,10 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       console.error(err);
       setLoadingModalOpen(false);
 
-      // if ((err as Error).message === 'Too young') {
-      if ((err as Error).message) {
+      if ((err as Error).message === 'Email taken') {
+        setEmailError('emailTaken');
+      // } else if ((err as Error).message === 'Too young') {
+      } else if ((err as Error).message) {
         setDateError('tooYoung');
       }
 
@@ -583,7 +579,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       const working = { ...curr };
       working.username = usernameInEdit.length > 0 && !usernameError;
       working.nickname = nicknameInEdit.length > 0 && !nicknameError;
-      working.email = validator.isEmail(emailInEdit);
+      working.email = validator.isEmail(emailInEdit) && !emailError;
       working.dateOfBirth = !Object.values(dateInEdit).find((o) => o === undefined);
       working.image = imageInEdit !== '';
       return working;
@@ -594,6 +590,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     nicknameInEdit,
     nicknameError,
     emailInEdit,
+    emailError,
     dateInEdit,
     imageInEdit,
     setFieldsValid,
@@ -659,10 +656,13 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             <OnboardingEmailInput
               value={emailInEdit}
               isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
+              isTaken={emailError === 'emailTaken'}
               labelCaption={t('DetailsSection.form.email.label')}
               placeholder={t('DetailsSection.form.email.placeholder')}
               cantChangeInfoCaption={t('DetailsSection.form.email.cantChangeInfoCaption')}
-              errorCaption={t('DetailsSection.form.email.errors.invalidEmail')}
+              errorCaption={emailError ? (
+                t('DetailsSection.form.email.errors.emailTaken')
+              ) : t('DetailsSection.form.email.errors.invalidEmail')}
               onChange={handleEmailInput}
             />
           </SFormItemContainer>

@@ -59,8 +59,6 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        console.log(becomeCreatorRes);
-
         if (
           !becomeCreatorRes.data
           || becomeCreatorRes.error
@@ -69,10 +67,10 @@ const VerifyNewEmail: NextPage<IVerifyNewEmail> = () => {
         dispatch(setUserData({
           email: decoded.me?.email,
           options: {
-            isActivityPrivate: data.me?.options?.isActivityPrivate,
-            isCreator: data.me?.options?.isCreator,
-            isVerified: data.me?.options?.isVerified,
-            creatorStatus: data.me?.options?.creatorStatus,
+            isActivityPrivate: becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
           },
         }));
       }

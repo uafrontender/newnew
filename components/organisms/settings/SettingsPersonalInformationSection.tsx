@@ -93,8 +93,6 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
       }
 
       if (wasEmailModified) {
-        console.log('Email was modified :)');
-
         const sendVerificationCodePayload = new newnewapi.SendVerificationEmailRequest({
           emailAddress: emailInEdit,
           useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
@@ -148,13 +146,9 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     } else {
       setWasEmailModified(false);
     }
-    console.log(dateInEdit);
-    console.log(currentDate);
     if (dateInEdit?.getTime() !== currentDate?.getTime()) {
-      console.log('MODIFED!');
       setWasDateModified(true);
     } else {
-      console.log('NOT MODIFED!');
       setWasDateModified(false);
     }
   }, [

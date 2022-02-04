@@ -96,8 +96,6 @@ const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMen
 
         const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
 
-        console.log(becomeCreatorRes);
-
         if (
           !becomeCreatorRes.data
           || becomeCreatorRes.error

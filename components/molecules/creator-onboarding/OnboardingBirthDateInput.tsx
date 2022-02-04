@@ -140,7 +140,9 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
           { labelCaption }
         </SLabel>
         {!isMobile ? (
-          <SDropdownsContainer>
+          <SDropdownsContainer
+            isValid={isValid}
+          >
             <DropdownSelect<number>
               closeOnSelect
               width="120px"
@@ -172,6 +174,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
         ) : (
           <SLabelButton
             disabled={disabled ?? false}
+            isValid={isValid}
             onClick={() => setIsModalOpen(true)}
           >
             <span>
@@ -277,10 +280,19 @@ const SErrorDiv = styled.div`
 `;
 
 // Desktop
-const SDropdownsContainer = styled.div`
+const SDropdownsContainer = styled.div<{
+  isValid: boolean;
+}>`
   display: flex;
   flex-direction: row;
   gap: 16px;
+
+  button {
+    border-width: 1.5px;
+    border-style: solid;
+    border-color: ${({ isValid, theme }) => (isValid ? 'transparent' : theme.colorsThemed.accent.error)};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
 
   ${({ theme }) => theme.media.tablet} {
     justify-content: space-between;
@@ -292,7 +304,9 @@ const SDropdownsContainer = styled.div`
 `;
 
 // Mobile
-const SLabelButton = styled.button`
+const SLabelButton = styled.button<{
+  isValid: boolean;
+}>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -300,7 +314,9 @@ const SLabelButton = styled.button`
   width: 100%;
 
 
-  border: transparent;
+  border-width: 1.5px;
+  border-style: solid;
+  border-color: ${({ isValid, theme }) => (isValid ? 'transparent' : theme.colorsThemed.accent.error)};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};

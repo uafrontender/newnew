@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -9,6 +9,7 @@ import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
 
 type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
+  isTaken?: boolean;
   labelCaption: string;
   errorCaption: string;
   cantChangeInfoCaption: string;
@@ -17,6 +18,7 @@ type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
 const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   value,
   isValid,
+  isTaken,
   labelCaption,
   errorCaption,
   cantChangeInfoCaption,
@@ -27,6 +29,10 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
 }) => {
   const theme = useTheme();
   const [errorBordersShown, setErrorBordersShown] = useState(false);
+
+  useEffect(() => {
+    if (isTaken) setErrorBordersShown(true);
+  }, [isTaken]);
 
   return (
     <SContainer>
@@ -97,6 +103,7 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
 
 OnboardingEmailInput.defaultProps = {
   isValid: undefined,
+  isTaken: undefined,
 };
 
 export default OnboardingEmailInput;

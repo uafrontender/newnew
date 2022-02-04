@@ -56,7 +56,8 @@
         "placeholder": "email@email.com",
         "cantChangeInfoCaption": "You can't change this info.",
         "errors": {
-          "invalidEmail": "Please, enter a valid email"
+          "invalidEmail": "Please, enter a valid email",
+          "emailTaken": "Email taken"
         }
       },
       "CoR": {
