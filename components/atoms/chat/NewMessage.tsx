@@ -1,0 +1,36 @@
+import React, { useCallback } from 'react';
+import styled, { useTheme } from 'styled-components';
+import Button from '../Button';
+import InlineSVG from '../InlineSVG';
+import NewMessageIcon from '../../../public/images/svg/icons/filled/NewMessage.svg';
+
+export const NewMessage: React.FC = () => {
+  const theme = useTheme();
+
+  const handleClick = useCallback(() => {
+    console.log('New message');
+  }, []);
+  return (
+    <SButton onClick={handleClick}>
+      <SInlineSVG svg={NewMessageIcon} fill={theme.colors.white} width="24px" height="24px" />
+    </SButton>
+  );
+};
+
+const SInlineSVG = styled(InlineSVG)`
+  min-width: 20px;
+  min-height: 20px;
+`;
+
+const SButton = styled(Button)`
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+`;
+
+export default NewMessage;
