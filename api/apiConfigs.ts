@@ -209,6 +209,7 @@ ResponseType = keyof NewnewapiType>(
             {
               expires: new Date((
                 resRefresh.data.credential?.expiresAt?.seconds as number)!! * 1000),
+              path: '/',
             },
           );
           cookiesInstance.set(
@@ -217,6 +218,7 @@ ResponseType = keyof NewnewapiType>(
             {
               // Expire in 10 years
               maxAge: (10 * 365 * 24 * 60 * 60),
+              path: '/',
             },
           );
         } else {
