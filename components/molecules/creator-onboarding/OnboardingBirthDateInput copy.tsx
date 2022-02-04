@@ -35,8 +35,6 @@ import InputInvalidIcon from '../../../public/images/png/astrology-signs/InputIn
 import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
 import getLocalizedMonth from '../../../utils/getMonth';
 import { SUPPORTED_LANGUAGES } from '../../../constants/general';
-import AnimatedPresence from '../../atoms/AnimatedPresence';
-import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 
 // Import and register locales (for weekdays)
 for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
@@ -67,30 +65,28 @@ const signs: IAstrologySigns = {
   Invalid: InputInvalidIcon,
 };
 
-interface ISettingsBirthDateInput {
+interface IOnboardingBirthDateInput {
   value?: Date;
   maxDate: Date;
   locale?: string;
-  submitError?: string;
   disabled: boolean;
   labelCaption: string;
   bottomCaption: string;
   onChange: (date: Date) => void;
+  handleSetIsDateValid: (value: boolean) => void;
   handleSetActive?: () => void;
-  handleResetSubmitError: () => void;
 }
 
-const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> = ({
+const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInput> = ({
   value,
   maxDate,
   locale,
-  submitError,
   disabled,
   labelCaption,
   bottomCaption,
   onChange,
+  handleSetIsDateValid,
   handleSetActive,
-  handleResetSubmitError,
 }) => {
   const theme = useTheme();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -111,12 +107,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
     return workingArr;
   }, [maxDate]);
 
-  const handleToggleCalendarOpen = () => {
-    if (submitError) {
-      handleResetSubmitError();
-    }
-    setCalendarOpen((curr) => !curr);
-  };
+  const handleToggleCalendarOpen = () => setCalendarOpen((curr) => !curr);
 
   const handleRenderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
     return (
@@ -198,7 +189,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       ) {
         e.target.value += '-';
         setInputData(e.target.value);
-        props.onChange?.(e);
+        // props.onChange?.(e);
         return;
       }
 
@@ -233,10 +224,18 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               explicitInputRef.current = node!!;
               (ref as Function)(node);
             }}
-            readOnly
             inputMode="numeric"
             value={inputData}
+            readOnly
             onChange={handleChange}
+            onBlur={(e) => {
+              const rawVal = e?.target?.value;
+
+              if (!rawVal) return;
+              if (rawVal.toString().length !== 8) {
+                handleSetIsDateValid(false);
+              }
+            }}
             onPaste={(e) => e.preventDefault()}
           />
           <SPseudoPlaceholder
@@ -269,9 +268,6 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       <SLabel>
         { labelCaption }
       </SLabel>
-      {/* <SAstrologyImg
-        src={signs[findAstrologySign(value)].src}
-      /> */}
       <SDatePicker>
         <DatePicker
           disabled={disabled}
@@ -302,7 +298,39 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
             },
           ]}
           // Handlers
-          onChange={onChange}
+          onChangeRaw={(e) => {
+            const rawVal = e?.target?.value;
+
+            if (!rawVal) return;
+
+            if (rawVal?.toString().length === 0) {
+              handleSetIsDateValid(false);
+              return;
+            }
+            let replaced: any = rawVal?.toString().split('-');
+            replaced = [replaced[1], replaced[0], replaced[2]].join('/');
+
+            const parsedDate = new Date(replaced);
+            if (parsedDate instanceof Date
+              && !Number.isNaN((parsedDate as Date).valueOf())
+              && (parsedDate as Date) < maxDate
+            ) {
+              handleSetIsDateValid(true);
+              return;
+            }
+            handleSetIsDateValid(false);
+          }}
+          onChange={(e) => {
+            onChange(e as any);
+            if (
+              e instanceof Date
+              && e < maxDate
+            ) {
+              handleSetIsDateValid(true);
+            } else {
+              handleSetIsDateValid(false);
+            }
+          }}
           onCalendarOpen={() => handleToggleCalendarOpen()}
           onCalendarClose={() => handleToggleCalendarOpen()}
         />
@@ -310,46 +338,28 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
       <SBottomCaption>
         { bottomCaption }
       </SBottomCaption>
-      {
-        submitError ? (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { submitError }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
     </SContainer>
   );
 };
 
-SettingsBirthDateInput.defaultProps = {
+OnboardingBirthDateInput.defaultProps = {
   value: undefined,
   locale: 'en-US',
   handleSetActive: () => {},
-  submitError: undefined,
 };
 
-export default SettingsBirthDateInput;
+export default OnboardingBirthDateInput;
 
 const SContainer = styled.div`
   position: relative;
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 272px;
+    width: 284px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 224px;
+    width: 296px;
   }
 `;
 
@@ -384,7 +394,7 @@ const SAstrologyImg = styled.img`
   width: 24px;
   height: 24px;
 
-  z-index: 5;
+  z-index: 1;
 `;
 
 const CalendarButton = styled.button`
@@ -638,23 +648,4 @@ const SPseudoPlaceholder = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-`;
-
-const SErrorDiv = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  margin-top: 6px;
-
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.accent.error};
-
-  & > div {
-    margin-right: 4px;
-  }
 `;

@@ -1,69 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
 
+import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
-
-type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
+type TOnboardingSectionNicknameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
-  isTaken?: boolean;
   labelCaption: string;
   errorCaption: string;
-  cantChangeInfoCaption: string;
 }
 
-const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
+const OnboardingSectionNicknameInput: React.FunctionComponent<TOnboardingSectionNicknameInput> = ({
   value,
-  isValid,
-  isTaken,
   labelCaption,
+  isValid,
   errorCaption,
-  cantChangeInfoCaption,
-  readOnly,
   onChange,
   onFocus,
   ...rest
 }) => {
-  const theme = useTheme();
   const [errorBordersShown, setErrorBordersShown] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    if (isTaken) setErrorBordersShown(true);
-  }, [isTaken]);
+    if (focused) return;
+    if (isValid) setErrorBordersShown(false);
+  }, [focused, isValid]);
 
   return (
-    <SContainer>
-      <SLabel>
+    <SWrapper>
+      <SLabel
+        isVisible={(value as string)?.length > 0}
+      >
         { labelCaption }
       </SLabel>
-      {readOnly && (
-        <SReadonlyLock>
-          <InlineSvg
-            svg={LockIcon}
-            width="24px"
-            height="24px"
-            fill={theme.colorsThemed.text.tertiary}
-          />
-        </SReadonlyLock>
-      )}
-      <SOnboardingEmailInput
-        id="settings_email_input"
-        type="email"
+      <SOnboardingSectionNicknameInput
         value={value}
-        readOnly={readOnly}
+        id="nickname_input"
         errorBordersShown={errorBordersShown}
         onChange={onChange}
-        style={{
-          ...(readOnly ? {
-            cursor: 'default',
-            userSelect: 'none',
-          } : {}),
-        }}
         onBlur={() => {
-          if (value && (value as string).length > 0 && !isValid) {
+          setFocused(false);
+          if (!isValid) {
             setErrorBordersShown(true);
           } else {
             setErrorBordersShown(false);
@@ -71,19 +50,14 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
         }}
         onFocus={(e) => {
           if (onFocus) onFocus(e);
+          setFocused(true);
           setErrorBordersShown(false);
         }}
         {...rest}
       />
-      {readOnly && (
-      <SReadonlyCaption>
-        { cantChangeInfoCaption }
-      </SReadonlyCaption>
-      )}
       {
         errorBordersShown ? (
           <AnimatedPresence
-            animateWhenInView={false}
             animation="t-09"
           >
             <SErrorDiv>
@@ -97,32 +71,30 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
           </AnimatedPresence>
         ) : null
       }
-    </SContainer>
+    </SWrapper>
   );
 };
 
-OnboardingEmailInput.defaultProps = {
+OnboardingSectionNicknameInput.defaultProps = {
   isValid: undefined,
-  isTaken: undefined,
 };
 
-export default OnboardingEmailInput;
+export default OnboardingSectionNicknameInput;
 
-const SContainer = styled.div`
+const SWrapper = styled.div`
   position: relative;
-  width: 100%;
-
-  ${({ theme }) => theme.media.tablet} {
-    /* width: 284px; */
-    width: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
 
   ${({ theme }) => theme.media.laptop} {
-    /* width: 296px; */
+    width: 50%;
   }
 `;
 
-const SLabel = styled.div`
+const SLabel = styled.div<{
+  isVisible: boolean;
+}>`
   display: block;
 
   font-weight: 600;
@@ -131,29 +103,23 @@ const SLabel = styled.div`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   margin-bottom: 6px;
+
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
+  height: ${({ isVisible }) => (isVisible ? 'fit-content' : 0)};
+  transition: linear .2s;
+
+  ${({ theme }) => theme.media.laptop} {
+    height: fit-content !important;
+    opacity: 1;
+  }
 `;
 
-const SReadonlyCaption = styled.div`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
-  margin-top: 6px;
-`;
-
-interface ISOnboardingEmailInput {
+interface ISOnboardingSectionNicknameInput {
   errorBordersShown?: boolean
 }
 
-const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
+const SOnboardingSectionNicknameInput = styled.input<ISOnboardingSectionNicknameInput>`
   display: block;
-
-  height: 44px;
-  width: 100%;
 
   font-weight: 500;
   font-size: 14px;
@@ -166,7 +132,6 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
   border-style: solid;
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
-      // NB! Temp
       return 'transparent';
     } return (theme.colorsThemed.accent.error);
   }};
@@ -175,24 +140,16 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   &::placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
   &::-ms-input-placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled,
-  &:focus,
-  &:active {
-    outline: none;
-  }
-
-  &:hover:enabled:not(:read-only),
-  &:focus:not(:read-only),
-  &:active:not(:read-only) {
+  &:hover:enabled, &:focus:enabled, &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
@@ -201,6 +158,10 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
       return theme.colorsThemed.background.outlines2;
     } return (theme.colorsThemed.accent.error);
   }};
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -216,7 +177,7 @@ const SErrorDiv = styled.div`
   justify-content: flex-start;
   align-items: center;
 
-  margin-top: 6px;
+  margin-top: 16px;
 
   text-align: center;
   font-weight: 600;
@@ -228,11 +189,4 @@ const SErrorDiv = styled.div`
   & > div {
     margin-right: 4px;
   }
-`;
-
-const SReadonlyLock = styled.div`
-  position: absolute;
-
-  right: 20px;
-  top: 34px;
 `;

@@ -22,12 +22,42 @@
     },
     "heading": "Few more details...",
     "form": {
+      "username": {
+        "placeholder": "@username",
+        "labelCaption": "Username",
+        "frequencyCaption": "Username can be changed once a month.",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Username is too long",
+          "tooShort": "Username is too short",
+          "invalidChar": "Username has invalid characters",
+          "innappropriate": "Offensive words are forbidden",
+          "taken": "Username is taken"
+        },
+        "points": {
+          "1": "8-15 characters length",
+          "2": "Lower case only",
+          "3": "No space and special characters"
+        }
+      },
+      "nickname": {
+        "placeholder": "Create your nickname",
+        "labelCaption": "Nickname",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Name is too long",
+          "tooShort": "Name is too short",
+          "invalidChar": "Name has invalid characters",
+          "innappropriate": "Offensive words are forbidden"
+        }
+      },
       "email": {
         "label": "Email",
         "placeholder": "email@email.com",
         "cantChangeInfoCaption": "You can't change this info.",
         "errors": {
-          "invalidEmail": "Please, enter a valid email"
+          "invalidEmail": "Please, enter a valid email",
+          "emailTaken": "Email taken"
         }
       },
       "CoR": {
@@ -38,6 +68,9 @@
         "captions": {
           "twoTimesOnly": "Birthdate can be changed 2 times only.",
           "cannotChange": "You can’t change birthdate."
+        },
+        "errors": {
+          "tooYoung": "You must be 18 years or older."
         }
       },
       "profilePicture": {

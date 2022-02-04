@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/dist/client/router';
+import { newnewapi } from 'newnew-api';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppSelector } from '../redux-store/store';
@@ -12,6 +13,7 @@ import { useAppSelector } from '../redux-store/store';
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import OnboardingSectionTos from '../components/molecules/creator-onboarding/OnboardingSectionTos';
+import { acceptCreatorTerms } from '../api/endpoints/user';
 
 interface ICreatorOnboardingStage1 {
 
@@ -24,8 +26,18 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
   const router = useRouter();
 
   // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
-  const goToNext = () => {
-    router.push('/creator-onboarding-stage-2');
+  const goToNext = async () => {
+    try {
+      const acceptTermsPayload = new newnewapi.EmptyRequest({});
+
+      const res = await acceptCreatorTerms(acceptTermsPayload);
+
+      if (res.error) throw new Error('Request failed');
+
+      router.push('/creator-onboarding-stage-2');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

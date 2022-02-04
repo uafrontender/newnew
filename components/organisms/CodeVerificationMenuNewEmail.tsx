@@ -5,16 +5,15 @@ import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useCookies } from 'react-cookie';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
-  setSignupEmailInput, setUserData, setUserLoggedIn,
+  setUserData,
 } from '../../redux-store/slices/userStateSlice';
 
 // API
-import { sendVerificationEmail, signInWithEmail } from '../../api/endpoints/auth';
+import { setMyEmail, sendVerificationNewEmail, becomeCreator } from '../../api/endpoints/user';
 
 // Components
 import Text from '../atoms/Text';
@@ -28,12 +27,16 @@ import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
 import AnimatedPresence from '../atoms/AnimatedPresence';
 
-export interface ICodeVerificationMenu {
+export interface ICodeVerificationMenuNewEmail {
   expirationTime: number;
+  newEmail: string;
+  redirect: 'settings' | 'dashboard',
 }
 
-const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
+const CodeVerificationMenuNewEmail: React.FunctionComponent<ICodeVerificationMenuNewEmail> = ({
   expirationTime,
+  newEmail,
+  redirect,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('verify-email');
@@ -41,11 +44,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
-  const { signupEmailInput } = useAppSelector((state) => state.user);
+  // const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-
-  // useCookies
-  const [, setCookie] = useCookies();
 
   // isSuccess - no bottom sections
   const [isSucces, setIsSuccess] = useState(false);
@@ -65,72 +65,61 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   const interval = useRef<number>();
 
   const onCodeComplete = useCallback(async (completeCode: string) => {
-    if (!signupEmailInput) return;
+    if (!newEmail) return;
     try {
       setSubmitError('');
       setTimerHidden(true);
       setIsSigninWithEmailLoading(true);
 
-      const signInRequest = new newnewapi.EmailSignInRequest({
-        emailAddress: signupEmailInput,
+      const signInRequest = new newnewapi.SetMyEmailRequest({
+        emailAddress: newEmail,
         verificationCode: completeCode,
       });
 
-      const { data, error } = await signInWithEmail(signInRequest);
+      const { data, error } = await setMyEmail(signInRequest);
 
       if (
-        !data
-        || data.status !== newnewapi.SignInResponse.Status.SUCCESS
+        data?.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
         || error
       ) throw new Error(error?.message ?? 'Request failed');
 
-      dispatch(setUserData({
-        username: data.me?.username,
-        nickname: data.me?.nickname,
-        email: data.me?.email,
-        avatarUrl: data.me?.avatarUrl,
-        coverUrl: data.me?.coverUrl,
-        userUuid: data.me?.userUuid,
-        bio: data.me?.bio,
-        dateOfBirth: data.me?.dateOfBirth,
-        countryCode: data.me?.countryCode,
-        options: {
-          isActivityPrivate: data.me?.options?.isActivityPrivate,
-          isCreator: data.me?.options?.isCreator,
-          isVerified: data.me?.options?.isVerified,
-          creatorStatus: data.me?.options?.creatorStatus,
-        },
-      }));
-      // Set credential cookies
-      setCookie(
-        'accessToken',
-        data.credential?.accessToken,
-        {
-          expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
-          path: '/',
-        },
-      );
-      setCookie(
-        'refreshToken',
-        data.credential?.refreshToken,
-        {
-          // Expire in 10 years
-          maxAge: (10 * 365 * 24 * 60 * 60),
-          path: '/',
-        },
-      );
-
-      // Set logged in and
-      dispatch(setUserLoggedIn(true));
-      dispatch(setSignupEmailInput(''));
-
-      // Clean up email state, sign in the user with the response & redirect home
       setTimerActive(false);
+
+      if (redirect === 'settings') {
+        dispatch(setUserData({
+          email: newEmail,
+        }));
+      }
+
+      if (redirect === 'dashboard') {
+        const becomeCreatorPayload = new newnewapi.EmptyRequest({});
+
+        const becomeCreatorRes = await becomeCreator(becomeCreatorPayload);
+
+        if (
+          !becomeCreatorRes.data
+          || becomeCreatorRes.error
+        ) throw new Error('Become creator failed');
+
+        dispatch(setUserData({
+          email: newEmail,
+          options: {
+            isActivityPrivate: becomeCreatorRes.data.me?.options?.isActivityPrivate,
+            isCreator: becomeCreatorRes.data.me?.options?.isCreator,
+            isVerified: becomeCreatorRes.data.me?.options?.isVerified,
+            creatorStatus: becomeCreatorRes.data.me?.options?.creatorStatus,
+          },
+        }));
+      }
 
       setIsSigninWithEmailLoading(false);
       setIsSuccess(true);
 
-      router.push('/');
+      if (redirect === 'settings') {
+        router.push('/profile/settings');
+      } else {
+        router.push('/creator/dashboard');
+      }
     } catch (err: any) {
       setIsSigninWithEmailLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -142,8 +131,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     setIsSigninWithEmailLoading,
     setSubmitError,
     setTimerActive,
-    setCookie,
-    signupEmailInput,
+    newEmail,
+    redirect,
     dispatch,
     router,
   ]);
@@ -153,13 +142,16 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     setSubmitError('');
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
-        emailAddress: signupEmailInput,
-        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP,
+        emailAddress: newEmail,
+        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
       });
 
-      const { data, error } = await sendVerificationEmail(payload);
+      const { data, error } = await sendVerificationNewEmail(payload);
 
-      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+      if (
+        data?.status !== newnewapi.SendVerificationEmailResponse.Status.SUCCESS
+        || error
+      ) throw new Error(error?.message ?? 'Request failed');
 
       setIsResendCodeLoading(false);
       setCodeInital(new Array(6).join('.').split('.'));
@@ -208,7 +200,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   }, [timerActive, timerSeconds]);
 
   return (
-    <SCodeVerificationMenu
+    <SCodeVerificationMenuNewEmail
       onClick={() => {
         if (submitError) {
           handleTryAgain();
@@ -231,7 +223,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         {t('heading.subheading')}
         <br />
         {/* NB! Temp */}
-        {signupEmailInput.length > 0 ? signupEmailInput : 'email@email.com'}
+        {newEmail}
       </SSubheading>
       <VerficationCodeInput
         initialValue={codeInitial}
@@ -282,17 +274,17 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
           </AnimatedPresence>
         ) : null
       }
-    </SCodeVerificationMenu>
+    </SCodeVerificationMenuNewEmail>
   );
 };
 
-CodeVerificationMenu.defaultProps = {
+CodeVerificationMenuNewEmail.defaultProps = {
   expirationTime: 60,
 };
 
-export default CodeVerificationMenu;
+export default CodeVerificationMenuNewEmail;
 
-const SCodeVerificationMenu = styled.div`
+const SCodeVerificationMenuNewEmail = styled.div`
   position: absolute;
   top: 0;
   right: 0;
