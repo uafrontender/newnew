@@ -9,20 +9,27 @@ import Text from '../../atoms/Text';
 
 interface IChatEllipseMenu {
   isVisible: boolean;
-  // handleFollowDecision: () => {};
   handleClose: () => void;
+  onUserBlock: () => void;
+  userBlocked?: boolean;
 }
 
 const ChatEllipseMenu: React.FunctionComponent<IChatEllipseMenu> = ({
   isVisible,
-  // handleFollowDecision,
   handleClose,
+  userBlocked,
+  onUserBlock,
 }) => {
   const { t } = useTranslation('chat');
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
+
+  const blockUserHandler = () => {
+    onUserBlock();
+    handleClose();
+  };
 
   return (
     <AnimatePresence>
@@ -38,13 +45,17 @@ const ChatEllipseMenu: React.FunctionComponent<IChatEllipseMenu> = ({
           <SButton onClick={() => {}}>
             <Text variant={2}>{t('ellipse.report-user')}</Text>
           </SButton>
-          <SButton onClick={() => console.log('clicked')}>
-            <Text variant={2}>{t('ellipse.block-user')}</Text>
+          <SButton onClick={blockUserHandler}>
+            <Text variant={2}>{userBlocked ? t('ellipse.unblock-user') : t('ellipse.block-user')}</Text>
           </SButton>
         </SContainer>
       )}
     </AnimatePresence>
   );
+};
+
+ChatEllipseMenu.defaultProps = {
+  userBlocked: false,
 };
 
 export default ChatEllipseMenu;

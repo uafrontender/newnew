@@ -1,11 +1,11 @@
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import Text from '../../atoms/Text';
 import Indicator from '../../atoms/Indicator';
 import UserAvatar from '../UserAvatar';
 
-import { IChatData, IUser, IMessage } from '../../interfaces/chat';
+import { IChatData, IUser, IMessage } from '../../interfaces/ichat';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -15,7 +15,7 @@ interface IFunctionProps {
 
 export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   const user = useAppSelector((state) => state.user);
-  // const scrollRef: any = useRef();
+  const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
 
   const lastMessageTrim = (str: string): string => {
     if (str.length > 35) {
@@ -32,8 +32,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
         userData: {
           userName: '🦄Unicornbabe',
           userAlias: 'unicornbabe',
-          justSubscribed: false,
-          blockedUser: false,
+          blockedUser: true,
           avatar: '/images/mock/test_user_1.jpg',
         },
         messages: [
@@ -130,9 +129,8 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
         userData: {
           userName: 'Caramella🍬',
           userAlias: 'caramella',
-          justSubscribed: false,
-          blockedUser: false,
           avatar: '/images/mock/test_user_2.jpg',
+          subscriptionExpired: true,
         },
         messages: [
           {
@@ -225,12 +223,11 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
       },
       {
         id: '3',
-        time: '30 min',
+        time: '50 min',
         userData: {
           userName: 'Girly👧',
           userAlias: 'girly',
           justSubscribed: true,
-          blockedUser: false,
           avatar: '/images/mock/test_user_3.jpg',
         },
         messages: [
@@ -249,9 +246,8 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
         userData: {
           userName: 'Dolly🪆',
           userAlias: 'dolly',
-          justSubscribed: true,
-          blockedUser: false,
           avatar: '/images/mock/test_user_4.jpg',
+          messagingDisabled: true,
         },
         messages: [
           {
@@ -343,12 +339,10 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
       },
       {
         id: '5',
-        time: '30 min',
+        time: '2 min',
         userData: {
           userName: 'Cuttie🍰Pie',
           userAlias: 'cuttiepie',
-          justSubscribed: true,
-          blockedUser: false,
           avatar: '/images/mock/test_user_1.jpg',
         },
         messages: [
@@ -446,6 +440,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     openChat({ userData: collection[0].userData, messages: collection[0].messages });
+    setActiveChatIndex(collection[0].id);
   }, []);
 
   interface IItem {
@@ -461,11 +456,12 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
     (item: IItem, index: number) => {
       const handleItemClick = () => {
         openChat({ userData: item.userData, messages: item.messages });
+        setActiveChatIndex(item.id);
       };
 
       return (
         <SChatItemContainer key={`chat-item-${item.id}`}>
-          <SChatItem onClick={handleItemClick}>
+          <SChatItem onClick={handleItemClick} className={activeChatIndex === item.id ? 'active' : ''}>
             <UserAvatar avatarUrl={item.userData.avatar} />
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
@@ -498,7 +494,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
 export default ChatList;
 
 const SSectionContent = styled.div`
-  height: 100%;
+  height: calc(100% - 74px);
   display: flex;
   position: relative;
   overflow-y: auto;
@@ -509,6 +505,7 @@ const SChatItem = styled.div`
   cursor: pointer;
   display: flex;
   padding: 12px;
+  &.active,
   &:hover {
     background: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: ${(props) => props.theme.borderRadius.medium};

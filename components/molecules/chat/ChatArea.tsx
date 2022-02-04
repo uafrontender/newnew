@@ -8,21 +8,28 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/creation/TextArea';
 import InlineSVG from '../../atoms/InlineSVG';
+import BlockUserModal from '../../atoms/chat/BlockUserModal';
 import UserAvatar from '../UserAvatar';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import ChatEllipseMenu from './ChatEllipseMenu';
 import ChatEllipseModal from './ChatEllipseModal';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
 
-import { IUser, IMessage, IChatData } from '../../interfaces/chat';
+import { IUser, IMessage, IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 
-export const ChatArea: React.FC<IChatData> = ({ userData, messages }) => {
+export const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => {
   const [message, setMessage] = useState('');
-  const [localUserData, setUserData] = useState<IUser | null>(null);
+  const [localUserData, setUserData] = useState<IUser>({
+    userName: '',
+    userAlias: '',
+    avatar: '',
+  });
+  const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [collection, setCollection] = useState<IMessage[]>([]);
   useEffect(() => {
     if (userData && messages) {
@@ -33,10 +40,19 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+  const onUserBlock = () => {
+    if (!localUserData.blockedUser) {
+      /* eslint-disable no-unused-expressions */
+      !confirmBlockUser ? setConfirmBlockUser(true) : setUserData({ ...localUserData, blockedUser: true });
+    } else {
+      setUserData({ ...localUserData, blockedUser: false });
+    }
+  };
 
   const theme = useTheme();
   const { t } = useTranslation('chat');
@@ -117,6 +133,16 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages }) => {
   return (
     <SContainer>
       <STopPart>
+        {isMobileOrTablet && (
+          <SBackButton
+            clickable
+            svg={chevronLeftIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width="24px"
+            height="24px"
+            onClick={showChatList}
+          />
+        )}
         <SUserData>
           <SUserName>{localUserData?.userName}</SUserName>
           <SUserAlias>@{localUserData?.userAlias}</SUserAlias>
@@ -126,9 +152,22 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages }) => {
             <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
           </SMoreButton>
           {/* Ellipse menu */}
-          {!isMobile && <ChatEllipseMenu isVisible={ellipseMenuOpen} handleClose={handleCloseEllipseMenu} />}
+          {!isMobile && (
+            <ChatEllipseMenu
+              isVisible={ellipseMenuOpen}
+              handleClose={handleCloseEllipseMenu}
+              userBlocked={localUserData?.blockedUser}
+              onUserBlock={onUserBlock}
+            />
+          )}
           {isMobile && ellipseMenuOpen ? (
-            <ChatEllipseModal isOpen={ellipseMenuOpen} zIndex={11} onClose={handleCloseEllipseMenu} />
+            <ChatEllipseModal
+              isOpen={ellipseMenuOpen}
+              zIndex={11}
+              onClose={handleCloseEllipseMenu}
+              userBlocked={localUserData?.blockedUser}
+              onUserBlock={onUserBlock}
+            />
           ) : null}
         </SActionsDiv>
       </STopPart>
@@ -146,17 +185,92 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages }) => {
         {collection.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        <STextArea>
-          <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
-        </STextArea>
-        <SButton withShadow view={message ? 'primaryGrad' : 'secondary'} onClick={handleSubmit} disabled={!message}>
-          <SInlineSVG
-            svg={sendIcon}
-            fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
-          />
-        </SButton>
+        {localUserData.blockedUser === true && (
+          <>
+            <SBottomAction>
+              <SBottomActionLeft>
+                <SBottomActionIcon>🤐</SBottomActionIcon>
+                <SBottomActionText>
+                  <SBottomActionTitle>{t('user-blocked.title')}</SBottomActionTitle>
+                  <SBottomActionMessage>{t('user-blocked.message')}</SBottomActionMessage>
+                </SBottomActionText>
+              </SBottomActionLeft>
+              <SBottomActionButton withDim withShadow withShrink view="primaryGrad" onClick={onUserBlock}>
+                {t('user-blocked.button-text')}
+              </SBottomActionButton>
+            </SBottomAction>
+          </>
+        )}
+        <BlockUserModal
+          confirmBlockUser={confirmBlockUser}
+          onUserBlock={onUserBlock}
+          userName={localUserData?.userName}
+          closeModal={() => {
+            setConfirmBlockUser(false);
+          }}
+        />
+        {localUserData.subscriptionExpired && (
+          <SBottomAction>
+            <SBottomActionLeft>
+              <SBottomActionIcon>🤐</SBottomActionIcon>
+              <SBottomActionText>
+                <SBottomActionTitle>{t('subscription-expired.title')}</SBottomActionTitle>
+                <SBottomActionMessage>
+                  {t('subscription-expired.message-first-part')} {localUserData.userName}{' '}
+                  {t('subscription-expired.message-second-part')}
+                </SBottomActionMessage>
+              </SBottomActionText>
+            </SBottomActionLeft>
+            <SBottomActionButton
+              withDim
+              withShadow
+              withShrink
+              view="primaryGrad"
+              onClick={() => {
+                console.log('Renew subscription');
+              }}
+            >
+              {t('subscription-expired.button-text')}
+            </SBottomActionButton>
+          </SBottomAction>
+        )}
+        {localUserData.messagingDisabled && (
+          <SBottomAction>
+            <SBottomActionLeft>
+              <SBottomActionIcon>🤐</SBottomActionIcon>
+              <SBottomActionText>
+                <SBottomActionTitle>{t('messaging-disabled.title')}</SBottomActionTitle>
+                <SBottomActionMessage>{t('messaging-disabled.message')}</SBottomActionMessage>
+              </SBottomActionText>
+            </SBottomActionLeft>
+            <SBottomActionButton
+              withDim
+              withShadow
+              withShrink
+              view="primaryGrad"
+              onClick={() => {
+                console.log('Check user’s profile');
+              }}
+            >
+              {t('messaging-disabled.button-text')}
+            </SBottomActionButton>
+          </SBottomAction>
+        )}
+        {!localUserData.blockedUser && !localUserData.subscriptionExpired && !localUserData.messagingDisabled && (
+          <SBottomTextarea>
+            <STextArea>
+              <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
+            </STextArea>
+            <SButton withShadow view={message ? 'primaryGrad' : 'secondary'} onClick={handleSubmit} disabled={!message}>
+              <SInlineSVG
+                svg={sendIcon}
+                fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
+            </SButton>
+          </SBottomTextarea>
+        )}
       </SBottomPart>
     </SContainer>
   );
@@ -184,6 +298,7 @@ const SUserData = styled.div`
   display: flex;
   flex-direction: column;
   font-weight: 600;
+  margin-right: auto;
 `;
 
 const SUserName = styled.strong`
@@ -230,9 +345,14 @@ const SCenterPart = styled.div`
 
 const SBottomPart = styled.div`
   display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+`;
+
+const SBottomTextarea = styled.div`
+  display: flex;
   align-items: center;
   flex-direction: row;
-  padding: 0 24px;
 `;
 
 const STextArea = styled.div`
@@ -302,9 +422,12 @@ const SMessageContent = styled.div<ISMessageContent>`
     if (props.type === 'info') {
       return 'transparent';
     }
-
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
+    }
+
+    if (props.theme.name === 'light') {
+      return props.theme.colors.white;
     }
 
     return props.theme.colorsThemed.background.tertiary;
@@ -439,4 +562,72 @@ const SWelcomeMessage = styled.div`
   p {
     margin: 12px 0 0;
   }
+`;
+
+const SBottomAction = styled.div`
+  display: flex;
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+  border-radius: ${(props) => props.theme.borderRadius.medium};
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  flex-wrap: wrap;
+  & + & {
+    margin-top: 20px;
+  }
+  ${(props) => props.theme.media.laptop} {
+    flex-wrap: nowrap;
+  }
+`;
+
+const SBottomActionLeft = styled.div`
+  display: flex;
+  margin-bottom: 24px;
+  align-items: center;
+  ${(props) => props.theme.media.tablet} {
+    margin-bottom: 0;
+  }
+`;
+
+const SBottomActionIcon = styled.span`
+  font-size: 48px;
+  line-height: 1;
+  margin-right: 24px;
+`;
+
+const SBottomActionText = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  margin-right: 12px;
+`;
+
+const SBottomActionTitle = styled.strong`
+  font-size: 16px;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+`;
+
+const SBottomActionMessage = styled.span`
+  font-size: 14px;
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+`;
+
+const SBottomActionButton = styled(Button)`
+  padding: 12px 24px;
+  line-height: 24px;
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 100%;
+  ${(props) => props.theme.media.tablet} {
+    width: auto;
+  }
+`;
+
+const SBackButton = styled(SInlineSVG)`
+  margin-right: 20px;
 `;

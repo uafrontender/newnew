@@ -11,8 +11,7 @@ import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-interface IDesktop {
-}
+interface IDesktop {}
 
 export const Desktop: React.FC<IDesktop> = () => {
   const { t } = useTranslation();
@@ -55,6 +54,16 @@ export const Desktop: React.FC<IDesktop> = () => {
                 }}
               />
             </SItemWithMargin>
+            {user.loggedIn && (
+              <SItemWithMargin>
+                <NavigationItem
+                  item={{
+                    url: '/chat',
+                    key: 'direct-messages',
+                  }}
+                />
+              </SItemWithMargin>
+            )}
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
@@ -96,49 +105,28 @@ export const Desktop: React.FC<IDesktop> = () => {
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button
-                    view="quaternary"
-                    onClick={handleDashboardClick}
-                  >
+                  <Button view="quaternary" onClick={handleDashboardClick}>
                     {t('button-dashboard')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    withShadow
-                    view="primaryGrad"
-                    onClick={handleCreateClick}
-                  >
+                  <Button withShadow view="primaryGrad" onClick={handleCreateClick}>
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar
-                    withClick
-                    avatarUrl={user.userData?.avatarUrl}
-                    onClick={handleUserClick}
-                  />
+                  <UserAvatar withClick avatarUrl={user.userData?.avatarUrl} onClick={handleUserClick} />
                 </SItemWithMargin>
               </>
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button
-                    withDim
-                    withShadow
-                    withShrink
-                    view="primaryGrad"
-                    onClick={handleCreateClick}
-                  >
+                  <Button withDim withShadow withShrink view="primaryGrad" onClick={handleCreateClick}>
                     {t('button-create-on-newnew')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar
-                    withClick
-                    avatarUrl={user.userData?.avatarUrl}
-                    onClick={handleUserClick}
-                  />
+                  <UserAvatar withClick avatarUrl={user.userData?.avatarUrl} onClick={handleUserClick} />
                 </SItemWithMargin>
               </>
             )}
@@ -146,21 +134,12 @@ export const Desktop: React.FC<IDesktop> = () => {
         ) : (
           <>
             <SItemWithMargin>
-              <Button
-                view="quaternary"
-                onClick={handleSignInClick}
-              >
+              <Button view="quaternary" onClick={handleSignInClick}>
                 {t('button-login-in')}
               </Button>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button
-                withDim
-                withShrink
-                withShadow
-                view="primaryGrad"
-                onClick={handleSignUpClick}
-              >
+              <Button withDim withShrink withShadow view="primaryGrad" onClick={handleSignUpClick}>
                 {t('button-sign-up')}
               </Button>
             </SItemWithMargin>

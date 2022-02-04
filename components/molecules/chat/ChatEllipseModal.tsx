@@ -9,17 +9,24 @@ import Text from '../../atoms/Text';
 interface IChatEllipseModal {
   isOpen: boolean;
   zIndex: number;
-  // handleFollowDecision: () => void;
   onClose: () => void;
+  userBlocked?: boolean;
+  onUserBlock: () => void;
 }
 
-const PostEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
+const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   isOpen,
   zIndex,
-  // handleFollowDecision,
   onClose,
+  userBlocked,
+  onUserBlock,
 }) => {
   const { t } = useTranslation('chat');
+
+  const blockUserHandler = () => {
+    onUserBlock();
+    onClose();
+  };
 
   return (
     <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
@@ -37,8 +44,8 @@ const PostEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
           >
             <Text variant={2}>{t('ellipse.report-user')}</Text>
           </SButton>
-          <SButton onClick={() => console.log('clicked')}>
-            <Text variant={2}>{t('ellipse.block-user')}</Text>
+          <SButton onClick={blockUserHandler}>
+            <Text variant={2}>{userBlocked ? t('ellipse.unblock-user') : t('ellipse.block-user')}</Text>
           </SButton>
         </SContentContainer>
         <Button
@@ -55,7 +62,11 @@ const PostEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
   );
 };
 
-export default PostEllipseModal;
+ChatEllipseModal.defaultProps = {
+  userBlocked: false,
+};
+
+export default ChatEllipseModal;
 
 const SWrapper = styled.div`
   width: 100%;
