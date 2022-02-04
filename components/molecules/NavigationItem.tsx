@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import _map from 'lodash/map';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
@@ -10,11 +9,11 @@ import Text from '../atoms/Text';
 import Indicator from '../atoms/Indicator';
 
 export type TNavigationItem = {
-  key: string,
-  url: string,
-  value?: number,
-  counter?: number,
-}
+  key: string;
+  url: string;
+  value?: number;
+  counter?: number;
+};
 
 export interface INavigationItem {
   item: TNavigationItem;
@@ -33,13 +32,13 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
     setCookie(cookieKey, true);
   };
 
-  useEffect(() => {
-    _map(cookies, (value, key) => {
-      if (key.includes(item.key) && key !== cookieKey) {
-        setCookie(key, '');
-      }
-    });
-  }, [cookieKey, cookies, item.counter, item.key, setCookie]);
+  // useEffect(() => {
+  //   _map(cookies, (value, key) => {
+  //     if (key.includes(item.key) && key !== cookieKey) {
+  //       setCookie(key, '');
+  //     }
+  //   });
+  // }, [cookieKey, cookies, item.counter, item.key, setCookie]);
 
   return (
     <Link href={item.url}>
@@ -52,11 +51,7 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
           </div>
           {!!item.counter && (
             <SIndicatorContainer bigCounter={item.counter > 9}>
-              <Indicator
-                counter={item.counter}
-                animate={!cookies[cookieKey]}
-                onAnimationEnd={handleAnimationEnd}
-              />
+              <Indicator counter={item.counter} animate={!cookies[cookieKey]} onAnimationEnd={handleAnimationEnd} />
             </SIndicatorContainer>
           )}
         </SNavItem>

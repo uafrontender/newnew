@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "title": "Chat with Creator"
+  },
+  "ellipse": {
+    "report-user": "Report user",
+    "block-user": "Block user",
+    "unblock-user": "Unblock user"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Type a message...",
+    "welcome-message": "You successfully subscribed! Now you can send a message to"
+  },
+  "user-blocked": {
+    "title": "User blocked",
+    "message": "Unblock the user, to continue conversation.",
+    "button-text": "Unblock user"
+  },
+  "subscription-expired": {
+    "title": "Subscription expired",
+    "message-first-part": "To keep your communication with",
+    "message-second-part": "renew your subscription.",
+    "button-text": "Renew subscription"
+  },
+  "messaging-disabled": {
+    "title": "Messaging temporarily disabled",
+    "message": "Creator is not accepting messages at this moment. Stay tuned!",
+    "button-text": "Check user’s profile"
+  },
+  "toolbar": {
+    "search-placeholder": "Search for messages or users"
+  },
+  "modal": {
+    "block-user": {
+      "title": "Block user",
+      "message-first-part": "Do you really want to block",
+      "message-second-part": "from messaging you on NewNew?",
+      "button-cancel": "Cancel",
+      "button-confirm": "Block user"
+    }
+  }
+}
