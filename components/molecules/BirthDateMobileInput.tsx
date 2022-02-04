@@ -125,6 +125,19 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
   ]);
 
   useEffect(() => {
+    daysScrollerRef.current?.scrollBy({
+      top: ((availableDays.findIndex((i) => i.value === currentDate.day)) * 28),
+    });
+    monthsScrollerRef.current?.scrollBy({
+      top: ((months.findIndex((i) => i.value === currentDate.month)) * 28),
+    });
+    yearsScrollerRef.current?.scrollBy({
+      top: ((years.findIndex((i) => i.value === currentDate.year)) * 28),
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     setAvailableDays(() => {
       if (!innerDate?.month || !innerDate?.year) {
         return Array(31).fill('').map((_, i) => ({

@@ -208,7 +208,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
         customBackdropFilterValue={1}
         onClose={() => setIsModalOpen(false)}
       >
-        {true && (
+        {isModalOpen && (
           <BirthDateMobileInput
             currentDate={value!!}
             months={months}
