@@ -69,15 +69,6 @@ export const Desktop: React.FC<IDesktop> = () => {
                 <SItemWithMargin>
                   <NavigationItem
                     item={{
-                      url: '/direct-messages',
-                      key: 'direct-messages',
-                      counter: user.notificationsCount,
-                    }}
-                  />
-                </SItemWithMargin>
-                <SItemWithMargin>
-                  <NavigationItem
-                    item={{
                       url: '/share',
                       key: 'share',
                     }}
