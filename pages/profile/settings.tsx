@@ -1,5 +1,5 @@
 import React, {
-  ReactElement, useCallback, useEffect, useState,
+  ReactElement, useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -13,7 +13,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice';
-import { logoutUser, logoutUserClearCookiesAndRedirect } from '../../redux-store/slices/userStateSlice';
+import { logoutUser, logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
 
 // API
 import { logout } from '../../api/endpoints/user';
@@ -30,6 +30,7 @@ import SettingsPersonalInformationSection from '../../components/organisms/setti
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
 import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../components/organisms/settings/PrivacySection';
+import { SocketContext } from '../../contexts/socketContext';
 
 // Mock
 const unicornbabe = {
@@ -53,6 +54,8 @@ const MyProfileSettginsIndex: NextPage = () => {
   const { t: commonT } = useTranslation('common');
   // useCookies
   const [, , removeCookie] = useCookies();
+  // Socket
+  const socketConnection = useContext(SocketContext);
   // Redux
   const dispatch = useAppDispatch();
   const { userData, loggedIn } = useAppSelector((state) => state.user);
@@ -86,8 +89,18 @@ const MyProfileSettginsIndex: NextPage = () => {
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Log out failed');
 
         // Unset credential cookies
-        removeCookie('accessToken');
-        removeCookie('refreshToken');
+        removeCookie(
+          'accessToken',
+          {
+            path: '/',
+          },
+        );
+        removeCookie(
+          'refreshToken',
+          {
+            path: '/',
+          },
+        );
         setIsLogoutLoading(false);
 
         dispatch(logoutUser(''));
@@ -157,13 +170,6 @@ const MyProfileSettginsIndex: NextPage = () => {
   const [spendingHidden, setSpendingHidden] = useState(false);
   const [accountPrivate, setAccountPrivate] = useState(false);
 
-  // NB! temp
-  const parsed: newnewapi.IDateComponents = {
-    day: 1,
-    month: 5,
-    year: 1990,
-  };
-
   const accordionSections: AccordionSection[] = [
     {
       title: t('Settings.sections.PersonalInformation.title'),
@@ -172,17 +178,17 @@ const MyProfileSettginsIndex: NextPage = () => {
         currentDate={userData?.dateOfBirth ? (
           new Date(
             userData.dateOfBirth.year!!,
-            userData.dateOfBirth.month!!,
+            userData.dateOfBirth.month!! - 1,
             userData.dateOfBirth.day!!,
           )
-        // ) : undefined}
-        ) : (
-          new Date(
-            parsed.year!!,
-            parsed.month!!,
-            parsed.day!!,
-          )
-        )}
+        ) : undefined}
+        // ) : (
+        //   new Date(
+        //     parsed.year!!,
+        //     parsed.month!!,
+        //     parsed.day!!,
+        //   )
+        // )}
         isMobile={isMobile}
         handleSetActive={() => {}}
       />,
@@ -245,6 +251,31 @@ const MyProfileSettginsIndex: NextPage = () => {
   useEffect(() => {
     if (!loggedIn) router.push('/');
   }, [loggedIn, router]);
+
+  // Listen to Me update event
+  useEffect(() => {
+    const handlerSocketMeUpdated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.MeUpdated.decode(arr);
+
+      if (!decoded) return;
+
+      dispatch(setUserData({
+        email: decoded.me?.email,
+      }));
+    };
+
+    if (socketConnection) {
+      socketConnection.on('MeUpdated', handlerSocketMeUpdated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('MeUpdated', handlerSocketMeUpdated);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   return (
     <div>

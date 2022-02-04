@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
@@ -10,12 +11,17 @@ import { useTranslation } from 'next-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import styled from 'styled-components';
 import validator from 'validator';
+import { newnewapi } from 'newnew-api';
 
 import Button from '../../atoms/Button';
 import SettingsBirthDateInput from '../../molecules/profile/SettingsBirthDateInput';
 import SettingsEmailInput from '../../molecules/profile/SettingsEmailInput';
+import { sendVerificationNewEmail, updateMe } from '../../../api/endpoints/user';
+import { useAppDispatch } from '../../../redux-store/store';
+import { setUserData } from '../../../redux-store/slices/userStateSlice';
+import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 
-const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+const maxDate = new Date();
 
 type TSettingsPersonalInformationSection = {
   currentEmail?: string;
@@ -31,11 +37,20 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
   isMobile,
   handleSetActive,
 }) => {
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const { t } = useTranslation('profile');
   const [wasModifed, setWasModified] = useState(false);
+
   const [emailInEdit, setEmailInEdit] = useState(currentEmail ?? '');
+  const [emailError, setEmailError] = useState('');
+  const [wasEmailModified, setWasEmailModified] = useState(false);
+
   const [dateInEdit, setDateInEdit] = useState(currentDate ?? undefined);
+  const [dateError, setDateError] = useState('');
+  const [wasDateModified, setWasDateModified] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmailInEdit(e.target.value);
@@ -53,11 +68,88 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     setDateInEdit(currentDate ?? undefined);
   };
 
+  const handleSaveModifications = async () => {
+    try {
+      setIsLoading(true);
+
+      if (wasDateModified) {
+        const updateDatePayload = new newnewapi.UpdateMeRequest({
+          dateOfBirth: {
+            year: dateInEdit?.getFullYear(),
+            month: dateInEdit?.getMonth()!! + 1,
+            day: dateInEdit?.getDate(),
+          },
+        });
+
+        const updateDateResponse = await updateMe(updateDatePayload);
+
+        if (!updateDateResponse.data || updateDateResponse.error) {
+          throw new Error('Date update error');
+        }
+
+        dispatch(setUserData({
+          dateOfBirth: updateDateResponse.data.me?.dateOfBirth,
+        }));
+      }
+
+      if (wasEmailModified) {
+        const sendVerificationCodePayload = new newnewapi.SendVerificationEmailRequest({
+          emailAddress: emailInEdit,
+          useCase: newnewapi.SendVerificationEmailRequest.UseCase.SET_MY_EMAIL,
+        });
+
+        const res = await sendVerificationNewEmail(sendVerificationCodePayload);
+
+        if (
+          res.data?.status === newnewapi.SendVerificationEmailResponse.Status.SUCCESS
+          && !res.error) {
+          router.push(
+            `/verify-new-email?email=${emailInEdit}&redirect=settings`,
+          );
+          return;
+        // eslint-disable-next-line no-else-return
+        } else {
+          setEmailError('Taken');
+        }
+      }
+
+      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+      if ((err as Error).message === 'Date update error') {
+        setDateError('tooYoung');
+      }
+    }
+  };
+
   useEffect(() => {
-    if (emailInEdit !== currentEmail || dateInEdit !== currentDate) {
+    if (emailInEdit.length > 0) {
+      if (!validator.isEmail(emailInEdit)) {
+        setEmailError('Invalid');
+      } else {
+        setEmailError('');
+      }
+    } else {
+      setEmailError('');
+    }
+  }, [emailInEdit]);
+
+  useEffect(() => {
+    if (emailInEdit !== currentEmail || dateInEdit?.getTime() !== currentDate?.getTime()) {
       setWasModified(true);
     } else {
       setWasModified(false);
+    }
+    if (emailInEdit !== currentEmail) {
+      setWasEmailModified(true);
+    } else {
+      setWasEmailModified(false);
+    }
+    if (dateInEdit?.getTime() !== currentDate?.getTime()) {
+      setWasDateModified(true);
+    } else {
+      setWasDateModified(false);
     }
   }, [
     emailInEdit, currentEmail,
@@ -65,16 +157,26 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
     setWasModified,
   ]);
 
+  useUpdateEffect(() => {
+    if (currentEmail) {
+      setEmailInEdit(currentEmail);
+    }
+  }, [currentEmail]);
+
   return (
     <SWrapper>
       <SInputsWrapper>
         <SettingsEmailInput
           value={emailInEdit}
-          isValid={emailInEdit.length > 0 ? validator.isEmail(emailInEdit) : true}
+          isValid={emailInEdit.length > 0 ? emailError === '' : true}
           labelCaption={t('Settings.sections.PersonalInformation.emailInput.label')}
           placeholder={t('Settings.sections.PersonalInformation.emailInput.placeholder')}
           // Temp
-          errorCaption={t('Settings.sections.PersonalInformation.emailInput.errors.invalidEmail')}
+          errorCaption={
+            emailError === 'Taken'
+              ? t('Settings.sections.PersonalInformation.emailInput.errors.emailTaken')
+              : t('Settings.sections.PersonalInformation.emailInput.errors.invalidEmail')
+          }
           onChange={handleEmailInput}
           onFocus={() => handleSetActive()}
         />
@@ -83,6 +185,10 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
           maxDate={maxDate}
           locale={router.locale}
           disabled={false}
+          submitError={dateError ? (
+            t(`Settings.sections.PersonalInformation.birthDateInput.errors.${dateError}`)
+          ) : undefined}
+          handleResetSubmitError={() => setDateError('')}
           labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
           bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly')}
           onChange={handleDateInput}
@@ -98,6 +204,8 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
           >
             <Button
               view="primaryGrad"
+              onClick={() => handleSaveModifications()}
+              disabled={isLoading || emailError !== ''}
             >
               {t('Settings.sections.PersonalInformation.saveBtn')}
             </Button>
