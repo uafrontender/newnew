@@ -14,8 +14,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 
-interface ITablet {
-}
+interface ITablet {}
 
 export const Tablet: React.FC<ITablet> = () => {
   const { t } = useTranslation();
@@ -24,8 +23,7 @@ export const Tablet: React.FC<ITablet> = () => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
-  const handleMenuClick = () => {
-  };
+  const handleMenuClick = () => {};
   const handleCreateClick = () => {
     if (!user.userData?.options?.isCreator) {
       router.push('/creator-onboarding-stage-1');
@@ -58,17 +56,18 @@ export const Tablet: React.FC<ITablet> = () => {
                 }}
               />
             </SItemWithMargin>
+            {user.loggedIn && (
+              <SItemWithMargin>
+                <NavigationItem
+                  item={{
+                    url: '/chat',
+                    key: 'direct-messages',
+                  }}
+                />
+              </SItemWithMargin>
+            )}
             {user.userData?.options?.isCreator ? (
               <>
-                <SItemWithMargin>
-                  <NavigationItem
-                    item={{
-                      url: '/direct-messages',
-                      key: 'direct-messages',
-                      counter: user.notificationsCount,
-                    }}
-                  />
-                </SItemWithMargin>
                 <SItemWithMargin>
                   <NavigationItem
                     item={{
@@ -99,46 +98,25 @@ export const Tablet: React.FC<ITablet> = () => {
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button
-                    view="primaryGrad"
-                    onClick={handleCreateClick}
-                    withShadow={!globalSearchActive}
-                  >
+                  <Button view="primaryGrad" onClick={handleCreateClick} withShadow={!globalSearchActive}>
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    iconOnly
-                    view="quaternary"
-                    onClick={handleMenuClick}
-                  >
-                    <InlineSVG
-                      svg={menuIcon}
-                      fill={theme.colorsThemed.text.primary}
-                      width="24px"
-                      height="24px"
-                    />
+                  <Button iconOnly view="quaternary" onClick={handleMenuClick}>
+                    <InlineSVG svg={menuIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
                   </Button>
                 </SItemWithMargin>
               </>
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button
-                    view="primaryGrad"
-                    onClick={handleCreateClick}
-                    withShadow={!globalSearchActive}
-                  >
+                  <Button view="primaryGrad" onClick={handleCreateClick} withShadow={!globalSearchActive}>
                     {t('button-create')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar
-                    withClick
-                    avatarUrl={user.userData?.avatarUrl}
-                    onClick={handleUserClick}
-                  />
+                  <UserAvatar withClick avatarUrl={user.userData?.avatarUrl} onClick={handleUserClick} />
                 </SItemWithMargin>
               </>
             )}
@@ -146,10 +124,7 @@ export const Tablet: React.FC<ITablet> = () => {
         ) : (
           <>
             <SItemWithMargin>
-              <Button
-                view="quaternary"
-                onClick={handleSignInClick}
-              >
+              <Button view="quaternary" onClick={handleSignInClick}>
                 {t('button-login-in')}
               </Button>
             </SItemWithMargin>

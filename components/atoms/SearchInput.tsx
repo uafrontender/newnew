@@ -168,7 +168,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   border-radius: 12px;
   flex-direction: row;
   justify-content: space-between;
-  
+
   ${(props) => !props.active && css`
     cursor: pointer;
     background: ${(props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary)};
