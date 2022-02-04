@@ -166,7 +166,7 @@ const SFormItemContainer = styled.div<{
       height: 30vh;
       position: fixed;
       z-index: 5;
-      transform: translateY(-146px);
+      transform: translateY(-286px);
       background-color: ${({ theme }) => theme.colorsThemed.background.primary};
     `
   ) : null)}
@@ -177,7 +177,7 @@ const SFormItemContainer = styled.div<{
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 296px;
+    /* width: 296px; */
   }
 `;
 

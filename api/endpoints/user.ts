@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  cookiesInstance,
   fetchProtobuf,
   fetchProtobufProtectedIntercepted,
   TTokenCookie,
@@ -30,6 +31,65 @@ export const updateMe = (
   payload,
 );
 
+// Same endpoint, but different method, for convenience
+export const sendVerificationNewEmail = (
+  payload: newnewapi.SendVerificationEmailRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.SendVerificationEmailRequest, newnewapi.SendVerificationEmailResponse>(
+  newnewapi.SendVerificationEmailRequest,
+  newnewapi.SendVerificationEmailResponse,
+  `${BASE_URL}/auth/send_verification_email`,
+  'post',
+  payload,
+);
+
+// NB! Maybe the auth should be optional
+export const setMyEmail = (
+  payload: newnewapi.SetMyEmailRequest,
+) => fetchProtobuf<newnewapi.SetMyEmailRequest, newnewapi.SetMyEmailResponse>(
+  newnewapi.SetMyEmailRequest,
+  newnewapi.SetMyEmailResponse,
+  `${BASE_URL_USER}/set_my_email`,
+  'post',
+  payload,
+  // Optional authentication
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
+);
+
+export const acceptCreatorTerms = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_USER}/accept_creator_terms`,
+  'post',
+  payload,
+);
+
+export const getMyOnboardingState = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.EmptyRequest, newnewapi.GetMyOnboardingStateResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.GetMyOnboardingStateResponse,
+  `${BASE_URL_USER}/get_my_onboarding_state`,
+  'post',
+  payload,
+);
+
+export const becomeCreator = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.EmptyRequest, newnewapi.BecomeCreatorResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.BecomeCreatorResponse,
+  `${BASE_URL_USER}/become_creator`,
+  'post',
+  payload,
+);
+
 export const fetchSetStripeLinkCreator = (
   payload: newnewapi.SetupStripeCreatorAccountRequest,
 ) => fetchProtobufProtectedIntercepted<
@@ -51,7 +111,6 @@ export const logout = (
   payload,
 );
 
-// Test
 export const getMyPosts = (
   payload: newnewapi.GetRelatedToMePostsRequest,
   tokens?: {

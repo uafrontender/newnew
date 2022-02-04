@@ -71,6 +71,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
             isActivityPrivate: data.me?.options?.isActivityPrivate,
             isCreator: data.me?.options?.isCreator,
             isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
           },
         }));
         // Set credential cookies

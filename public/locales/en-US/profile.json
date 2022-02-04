@@ -108,6 +108,9 @@
         },
         "birthDateInput": {
           "label": "Date of birth",
+          "errors": {
+            "tooYoung": "You must be 18 years or older."
+          },
           "captions": {
             "twoTimesOnly": "Birthdate can be changed 2 times only.",
             "cannotChange": "You can’t change birthdate."
