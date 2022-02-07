@@ -22,7 +22,7 @@ import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../PaymentModal';
+import PaymentModal from '../../checkout/PaymentModal';
 import PlaceCfBidForm from './PlaceCfBidForm';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import { validateText } from '../../../../api/endpoints/infrastructure';

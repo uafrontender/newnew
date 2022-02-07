@@ -12,7 +12,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
-import { fetchSetStripeLinkCreator } from '../../../api/endpoints/user';
+import { fetchSetStripeLinkCreator, getMyOnboardingState } from '../../../api/endpoints/user';
 
 export const GetPaid = () => {
   const { t } = useTranslation('creator');
@@ -23,10 +23,16 @@ export const GetPaid = () => {
 
   const handleRedirectToStripesetup = async () => {
     try {
+      const resStatus = await getMyOnboardingState(new newnewapi.EmptyRequest({}))
+
+      console.log(resStatus)
+
       const payload = new newnewapi.SetupStripeCreatorAccountRequest({
         refreshUrl: `${process.env.NEXT_PUBLIC_APP_URL}/creator/get-paid?setup=failure`,
         returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/creator/get-paid?setup=success`,
       });
+
+      console.log(payload)
 
       const res = await fetchSetStripeLinkCreator(payload);
 

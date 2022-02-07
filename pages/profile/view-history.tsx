@@ -194,7 +194,7 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(
       context.locale!!,
-      ['common', 'profile', 'home', 'decision'],
+      ['common', 'profile', 'home', 'decision', 'payment-modal'],
     );
 
     const { req } = context;
