@@ -850,9 +850,8 @@ const SSeparator = styled.div`
 `;
 
 const SControlsDiv = styled.div`
-  position: fixed;
-  bottom: 32px;
-  left: 16px;
+  /* position: fixed; */
+  margin-left: 16px;
   width: calc(100% - 32px);
 
   display: flex;

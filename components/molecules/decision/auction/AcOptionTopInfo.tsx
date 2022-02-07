@@ -15,7 +15,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../PaymentModal';
+import PaymentModal from '../../checkout/PaymentModal';
 import PlaceBidForm from './PlaceAcBidForm';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';

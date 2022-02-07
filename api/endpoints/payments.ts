@@ -16,3 +16,5 @@ newnewapi.EmptyRequest, newnewapi.GetSupportedCreatorCountriesResponse>(
   'post',
   payload,
 );
+
+// Payments
