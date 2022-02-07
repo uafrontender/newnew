@@ -33,6 +33,8 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 }) => {
   const { t } = useTranslation('profile');
 
+  console.log(isAccountPrivate)
+
   return (
     <SWrapper
       onMouseEnter={() => handleSetActive()}
@@ -200,7 +202,7 @@ const SAvatar = styled.div`
 
   overflow: hidden;
   position: relative;
-  
+
   grid-area: avatar;
   justify-self: left;
 

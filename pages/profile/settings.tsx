@@ -16,7 +16,7 @@ import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice'
 import { logoutUser, logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
 
 // API
-import { logout } from '../../api/endpoints/user';
+import { logout, updateMe } from '../../api/endpoints/user';
 
 import { NextPageWithLayout } from '../_app';
 import MyProfileSettingsLayout from '../../components/templates/MyProfileSettingsLayout';
@@ -168,7 +168,33 @@ const MyProfileSettginsIndex: NextPage = () => {
     ],
   );
   const [spendingHidden, setSpendingHidden] = useState(false);
-  const [accountPrivate, setAccountPrivate] = useState(false);
+
+  const handleToggleAccountPrivate = async () => {
+    try {
+      const updateMePayload = new newnewapi.UpdateMeRequest({
+        isActivityPrivate: !userData?.options?.isActivityPrivate,
+      })
+
+      const res = await updateMe(updateMePayload);
+
+      const { data, error } = res;
+
+      if (!data || error) throw new Error(error?.message ?? 'Request failed');
+
+      console.log(data);
+
+      dispatch(setUserData({
+        options: {
+          isActivityPrivate: data.me?.options?.isActivityPrivate,
+          isCreator: data.me?.options?.isCreator,
+          isVerified: data.me?.options?.isVerified,
+          creatorStatus: data.me?.options?.creatorStatus,
+        },
+      }))
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const accordionSections: AccordionSection[] = [
     {
@@ -235,12 +261,12 @@ const MyProfileSettginsIndex: NextPage = () => {
       title: t('Settings.sections.Privacy.title'),
       content: <PrivacySection
         isSpendingHidden={spendingHidden}
-        isAccountPrivate={accountPrivate}
+        isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
         blockedUsers={[
           unicornbabe,
         ]}
         handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
-        handleToggleAccountPrivate={() => setAccountPrivate((curr) => !curr)}
+        handleToggleAccountPrivate={handleToggleAccountPrivate}
         handleUnblockUser={() => {}}
         handleCloseAccount={() => {}}
         handleSetActive={() => {}}

@@ -1,0 +1,17 @@
+{
+  "paymentMethodTitle": "Payment method",
+  "options": {
+    "wallet": {
+      "subtitle": "Save and pay with",
+      "name": "NewNew wallet",
+      "fees": "No fees"
+    },
+    "card": {
+      "name": "Credit or debit card",
+      "fees": "up to 3% fees"
+    }
+  },
+  "payButton": "Pay",
+  "tocApplyLink": "Terms and conditions",
+  "tocApplyText": "apply"
+}

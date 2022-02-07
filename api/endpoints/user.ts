@@ -129,6 +129,26 @@ newnewapi.GetRelatedToMePostsRequest, newnewapi.PagedCountedPostsResponse>(
   updateCookieServerSideCallback,
 );
 
+export const markUser = (
+  payload: newnewapi.MarkUserRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.MarkUserRequest, newnewapi.EmptyResponse>(
+  newnewapi.MarkUserRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_USER}/mark_user`,
+  'post',
+  payload,
+);
+
+export const getCreatorsIFollow = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetCreatorsIFollowResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.GetCreatorsIFollowResponse,
+  `${BASE_URL_USER}/get_creators_i_follow`,
+  'post',
+  payload,
+);
+
 // Other users
 export const getUserByUsername = (
   payload: newnewapi.GetUserRequest,

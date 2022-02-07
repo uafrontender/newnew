@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import ProfileLayout from '../../../components/templates/ProfileLayout';
@@ -46,6 +47,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   handleUpdateFilter,
   handleSetPosts,
 }) => {
+  const { t } = useTranslation('profile');
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
@@ -137,30 +139,39 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 
   return (
     <div>
-      <SMain>
-        <PostsFilterSection
-          numDecisions={totalCount}
-          isLoading={isLoading}
-          postsFilter={postsFilter}
-          handleUpdateFilter={handleUpdateFilter}
-        />
-        <SCardsSection>
-          {posts && (
-            <List
-              category=""
-              loading={isLoading}
-              collection={posts}
-              wrapperStyle={{
-                left: 0,
-              }}
-              handlePostClicked={handleOpenPostModal}
+      {
+        !user.options?.isActivityPrivate ? (
+          <SMain>
+            <PostsFilterSection
+              numDecisions={totalCount}
+              isLoading={isLoading}
+              postsFilter={postsFilter}
+              handleUpdateFilter={handleUpdateFilter}
             />
-          )}
-        </SCardsSection>
-        <div
-          ref={loadingRef}
-        />
-      </SMain>
+            <SCardsSection>
+              {posts && (
+                <List
+                  category=""
+                  loading={isLoading}
+                  collection={posts}
+                  wrapperStyle={{
+                    left: 0,
+                  }}
+                  handlePostClicked={handleOpenPostModal}
+                />
+              )}
+            </SCardsSection>
+            <div
+              ref={loadingRef}
+            />
+          </SMain>
+
+        ) : (
+          <SMain>
+            { t('AccountPrivate') }
+          </SMain>
+        )
+      }
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}
@@ -174,16 +185,13 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 };
 
 (UserPageIndex as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  // const renderedPage = page.props.user?.options?.isCreator ? (
-  //   'creatorsDecisions'
-  // ) : (
-  //   page.props.user?.options?.isActivityPrivate ? (
-  //     'activityHidden'
-  //   ) : 'activity'
-  // );
-
-  // TEMP!
-  const renderedPage = 'creatorsDecisions';
+  const renderedPage = page.props.user?.options?.isCreator ? (
+    'creatorsDecisions'
+  ) : (
+    page.props.user?.options?.isActivityPrivate ? (
+      'activityHidden'
+    ) : 'activity'
+  );
 
   return (
     <ProfileLayout
@@ -224,7 +232,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'profile', 'home', 'decision'],
+    ['common', 'profile', 'home', 'decision', 'payment-modal'],
   );
 
   if (!username || Array.isArray(username)) {
@@ -251,10 +259,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // const isCreator = res.data.options?.isCreator;
-  // const isActivityPrivate = res.data.options?.isActivityPrivate;
-  const isCreator = true;
-  const isActivityPrivate = false;
+  const isCreator = res.data.options?.isCreator;
+  const isActivityPrivate = res.data.options?.isActivityPrivate;
+  // const isCreator = true;
+  // const isActivityPrivate = false;
 
   // will fetch only for creators
   if (isCreator && !context.req.url?.startsWith('/_next')) {

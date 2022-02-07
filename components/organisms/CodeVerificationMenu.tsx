@@ -228,10 +228,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         { t('heading.heading') }
       </SHeadline>
       <SSubheading variant={2} weight={600}>
-        {t('heading.subheading')}
-        <br />
-        {/* NB! Temp */}
-        {signupEmailInput.length > 0 ? signupEmailInput : 'email@email.com'}
+        {signupEmailInput.length > 0 ? (
+          <>
+            {t('heading.subheading')}
+            <br />
+            { signupEmailInput }
+          </>
+        ) : null}
       </SSubheading>
       <VerficationCodeInput
         initialValue={codeInitial}
