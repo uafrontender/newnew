@@ -174,12 +174,9 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 };
 
 (UserPageActivity as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  // const renderedPage = page.props.user?.options?.isActivityPrivate ? (
-  //   'activityHidden'
-  // ) : 'activity';
-
-  // TEMP!
-  const renderedPage = 'activity';
+  const renderedPage = page.props.user?.options?.isActivityPrivate ? (
+    'activityHidden'
+  ) : 'activity';
 
   return (
     <ProfileLayout
@@ -216,7 +213,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'profile', 'home', 'decision'],
+    ['common', 'profile', 'home', 'decision', 'payment-modal'],
   );
 
   if (!username || Array.isArray(username)) {

@@ -19,7 +19,7 @@ import { validateText } from '../../../../api/endpoints/infrastructure';
 import McOptionCard from './McOptionCard';
 import Button from '../../../atoms/Button';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import PaymentModal from '../PaymentModal';
+import PaymentModal from '../../checkout/PaymentModal';
 import PlaceMcBidForm from './PlaceMcBidForm';
 import LoadingModal from '../../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
