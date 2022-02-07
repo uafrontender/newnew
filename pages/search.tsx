@@ -370,7 +370,7 @@ export default Search;
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'home', 'decision'],
+    ['common', 'home', 'decision', 'payment-modal'],
   );
 
   const top10payload = new newnewapi.EmptyRequest({});

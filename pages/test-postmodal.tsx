@@ -112,7 +112,7 @@ const TestPostModal: NextPage = () => {
 export async function getStaticProps(context: NextPageContext): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'home', 'decision'],
+    ['common', 'home', 'decision', 'payment-modal'],
   );
 
   return {

@@ -4,6 +4,7 @@ import React, { ReactElement, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
+import styled from 'styled-components';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { getUserByUsername } from '../../../api/endpoints/user';
@@ -13,6 +14,7 @@ import HomeLayout from '../../../components/templates/HomeLayout';
 import Button from '../../../components/atoms/Button';
 import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
 import { subscribeToCreator } from '../../../api/endpoints/payments';
+import Text from '../../../components/atoms/Text';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -21,7 +23,7 @@ interface ISubscribeToUserPage {
 const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   user,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('subscribe-to-user');
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
@@ -66,12 +68,38 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       <PaymentModal
         isOpen={isPaymentModalOpen}
         zIndex={10}
+        // amount="$5"
+        showTocApply
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayWithCard}
       >
-        You are going subscribe to
-        {' '}
-        {user.username}
+        <SPaymentModalHeader>
+          <SPaymentModalTitle
+            variant={3}
+          >
+            { t('paymenModalHeader.subtitle') }
+          </SPaymentModalTitle>
+          <SPaymentModalCreatorInfo>
+            <SAvatar>
+              <img
+                src={user.avatarUrl}
+                alt={user.username}
+              />
+            </SAvatar>
+            <SCreatorInfo>
+              <SCreatorUsername>
+                {`@${user.username}`}
+              </SCreatorUsername>
+              {' '}
+              <SSubscriberInfo>
+                {/* @ts-ignore */}
+                {user.numSubscribers ?? 20}
+                {' '}
+                { t('paymenModalHeader.numSubscribers') }
+              </SSubscriberInfo>
+            </SCreatorInfo>
+          </SPaymentModalCreatorInfo>
+        </SPaymentModalHeader>
       </PaymentModal>
     </>
   );
@@ -123,3 +151,59 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
+
+
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalCreatorInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const SAvatar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  position: relative;
+
+  grid-area: avatar;
+  justify-self: left;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  img {
+    display: block;
+    width: 36px;
+    height: 36px;
+  }
+`;
+
+const SCreatorInfo = styled.div`
+
+`;
+
+const SCreatorUsername = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+`;
+
+const SSubscriberInfo = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+`;

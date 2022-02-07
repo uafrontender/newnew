@@ -224,7 +224,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'profile', 'home', 'decision'],
+    ['common', 'profile', 'home', 'decision', 'payment-modal'],
   );
 
   if (!username || Array.isArray(username)) {
