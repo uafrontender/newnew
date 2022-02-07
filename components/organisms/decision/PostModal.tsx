@@ -23,6 +23,8 @@ import PostViewCF from './PostViewCF';
 import List from '../search/List';
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
+import { useAppDispatch } from '../../../redux-store/store';
+import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 
 interface IPostModal {
   isOpen: boolean;
@@ -41,7 +43,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
-  const router = useRouter();
+  const dispatch = useAppDispatch();
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
 
   const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
@@ -169,6 +171,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return () => {
       setOpen(false);
       innerHistoryStack.current = [];
+      dispatch(setOverlay(false));
       // eslint-disable-next-line no-useless-return
       return;
     };
