@@ -2,5 +2,6 @@
   "paymenModalHeader": {
     "subtitle": "Subscribe to",
     "numSubscribers": "subscribers"
-  }
+  },
+  "subscribeBtn": "Subscribe for ${{amount}}/mo"
 }
