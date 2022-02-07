@@ -16,6 +16,7 @@
     "filter-2": "Crowdfunding",
     "filter-3": "Multiple choices"
   },
+  "AccountPrivate": "User preferred to hide their activity",
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",

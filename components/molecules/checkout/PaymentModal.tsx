@@ -142,6 +142,14 @@ const SWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 `;
 
 const SContentContainer = styled.div`

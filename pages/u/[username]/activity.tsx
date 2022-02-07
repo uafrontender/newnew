@@ -174,12 +174,9 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 };
 
 (UserPageActivity as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  // const renderedPage = page.props.user?.options?.isActivityPrivate ? (
-  //   'activityHidden'
-  // ) : 'activity';
-
-  // TEMP!
-  const renderedPage = 'activity';
+  const renderedPage = page.props.user?.options?.isActivityPrivate ? (
+    'activityHidden'
+  ) : 'activity';
 
   return (
     <ProfileLayout

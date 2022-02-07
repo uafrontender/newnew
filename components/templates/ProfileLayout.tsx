@@ -24,7 +24,7 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
-import { getSubscriptionStatus } from '../../api/endpoints/payments';
+import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 
 type TPageType = 'creatorsDecisions'
   | 'activity'

@@ -13,7 +13,7 @@ import { NextPageWithLayout } from '../../_app';
 import HomeLayout from '../../../components/templates/HomeLayout';
 import Button from '../../../components/atoms/Button';
 import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
-import { subscribeToCreator } from '../../../api/endpoints/payments';
+import { subscribeToCreator } from '../../../api/endpoints/subscription';
 import Text from '../../../components/atoms/Text';
 
 interface ISubscribeToUserPage {
@@ -31,8 +31,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     try {
       const payload = new newnewapi.SubscribeToCreatorRequest({
         creatorUuid: user.uuid,
-        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-redirect-success`,
-        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-redirect-failure`,
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&`,
+        cancelUrl: window.location.href,
       });
 
       const res = await subscribeToCreator(payload);

@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import ProfileLayout from '../../../components/templates/ProfileLayout';
@@ -46,6 +47,7 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   handleUpdateFilter,
   handleSetPosts,
 }) => {
+  const { t } = useTranslation('profile');
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
@@ -137,30 +139,39 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
 
   return (
     <div>
-      <SMain>
-        <PostsFilterSection
-          numDecisions={totalCount}
-          isLoading={isLoading}
-          postsFilter={postsFilter}
-          handleUpdateFilter={handleUpdateFilter}
-        />
-        <SCardsSection>
-          {posts && (
-            <List
-              category=""
-              loading={isLoading}
-              collection={posts}
-              wrapperStyle={{
-                left: 0,
-              }}
-              handlePostClicked={handleOpenPostModal}
+      {
+        !user.options?.isActivityPrivate ? (
+          <SMain>
+            <PostsFilterSection
+              numDecisions={totalCount}
+              isLoading={isLoading}
+              postsFilter={postsFilter}
+              handleUpdateFilter={handleUpdateFilter}
             />
-          )}
-        </SCardsSection>
-        <div
-          ref={loadingRef}
-        />
-      </SMain>
+            <SCardsSection>
+              {posts && (
+                <List
+                  category=""
+                  loading={isLoading}
+                  collection={posts}
+                  wrapperStyle={{
+                    left: 0,
+                  }}
+                  handlePostClicked={handleOpenPostModal}
+                />
+              )}
+            </SCardsSection>
+            <div
+              ref={loadingRef}
+            />
+          </SMain>
+
+        ) : (
+          <SMain>
+            { t('AccountPrivate') }
+          </SMain>
+        )
+      }
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}
@@ -181,9 +192,6 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
       'activityHidden'
     ) : 'activity'
   );
-
-  // TEMP!
-  // const renderedPage = 'creatorsDecisions';
 
   return (
     <ProfileLayout
