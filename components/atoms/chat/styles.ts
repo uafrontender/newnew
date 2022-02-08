@@ -137,3 +137,17 @@ export const SUserAlias = styled.span`
   font-size: 12px;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
+
+export const SUserAvatar = styled.div`
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  & > * {
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+  }
+`;

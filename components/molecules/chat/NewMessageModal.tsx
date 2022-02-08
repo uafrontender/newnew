@@ -12,6 +12,7 @@ import {
   SChatSeparator,
   SUserAlias,
   SChatItemM,
+  SUserAvatar,
 } from '../../atoms/chat/styles';
 import UserAvatar from '../UserAvatar';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
@@ -227,7 +228,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
       return (
         <SChatItemContainer key={item.id}>
           <SChatItemM onClick={handleItemClick}>
-            <UserAvatar avatarUrl={item.userData.avatar} />
+            <SUserAvatar>
+              <UserAvatar avatarUrl={item.userData.avatar} />
+            </SUserAvatar>
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {item.userData.userName}
@@ -308,8 +311,11 @@ export default NewMessageModal;
 
 const SWrapper = styled.div`
   position: relative;
-  overflow: hidden;
   height: 100%;
+  overflow-y: auto;
+  ${(props) => props.theme.media.tablet} {
+    overflow: hidden;
+  }
 `;
 
 const SContainer = styled.div`
@@ -324,47 +330,53 @@ const SSectionContent = styled.div`
   display: flex;
   overflow-y: auto;
   flex-direction: column;
-  padding: 0 24px;
-  margin: 0 -24px;
+  ${(props) => props.theme.media.tablet} {
+    padding: 0 24px;
+    margin: 0 -24px;
+  }
 `;
 
 const SModal = styled.div`
-  max-width: 480px;
   width: 100%;
-  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
     props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
-  padding: 24px;
+  padding: 24px 16px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   line-height: 24px;
-  max-height: 80vh;
   height: 100%;
+  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
+  max-width: 100%;
+  max-height: 100vh;
 
-  ${(props) => props.theme.media.mobile} {
+  ${(props) => props.theme.media.tablet} {
+    max-width: 480px;
+    max-height: 80vh;
     background-color: ${(props) => props.theme.colorsThemed.background.secondary};
-    border-radius: 0;
-    max-width: 100%;
-    max-height: 100vh;
+    border-radius: ${(props) => props.theme.borderRadius.medium};
+    padding: 24px;
   }
 `;
 
 const SModalHeader = styled.header`
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
+  flex-direction: row-reverse;
   align-items: center;
   padding: 0 0 20px;
 
-  ${(props) => props.theme.media.mobile} {
-    justify-content: start;
-    flex-direction: row-reverse;
+  ${(props) => props.theme.media.tablet} {
+    flex-direction: row;
+    justify-content: space-between;
   }
 `;
 
 const SModalTitle = styled.strong`
-  font-size: 20px;
+  font-size: 14px;
+  ${(props) => props.theme.media.tablet} {
+    font-size: 20px;
+  }
 `;
 
 const SLetter = styled.div`

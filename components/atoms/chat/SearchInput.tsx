@@ -69,13 +69,8 @@ interface ISContainer {
 }
 
 const SContainer = styled.div<ISContainer>`
-  height: 36px;
   position: relative;
   width: 100%;
-
-  ${({ theme }) => theme.media.tablet} {
-    height: 48px;
-  }
 `;
 
 interface ISInputWrapper {
@@ -85,8 +80,9 @@ interface ISInputWrapper {
 const SInputWrapper = styled.div<ISInputWrapper>`
   width: 100%;
   z-index: 3;
-  padding: 6.5px;
+  padding: 0 0 0 6.5px;
   display: flex;
+  align-items: center;
   overflow: hidden;
   max-height: 100%;
   border-radius: 12px;
@@ -111,7 +107,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
     }};
 
   ${({ theme }) => theme.media.tablet} {
-    padding: 10.5px;
+    padding: 0 0 0 10.5px;
     border-radius: 16px;
   }
 `;
@@ -123,8 +119,10 @@ const SInput = styled.input<ISInput>`
   width: 100%;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
+  height: 100%;
   border: none;
-  margin: 0 8px;
+  padding: 0 8px;
+  height: 44px;
   outline: none;
   font-size: ${(props) => {
     if (props.fontSize) {

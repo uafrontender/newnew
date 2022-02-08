@@ -19,6 +19,7 @@ import {
   SChatItemTime,
   SChatItemIndicator,
   SChatSeparator,
+  SUserAvatar,
 } from '../../atoms/chat/styles';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
@@ -568,7 +569,9 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
       return (
         <SChatItemContainer key={`chat-item-${item.id}`}>
           <SChatItem onClick={handleItemClick} className={activeChatIndex === item.id ? 'active' : ''}>
-            <UserAvatar avatarUrl={item.userData.avatar} />
+            <SUserAvatar>
+              <UserAvatar avatarUrl={item.userData.avatar} />
+            </SUserAvatar>
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {item.userData.userName}

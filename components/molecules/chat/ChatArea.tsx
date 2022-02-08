@@ -46,8 +46,8 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
   }, [userData, messages]);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
@@ -89,8 +89,9 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
 
       const content = (
         <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={`message-${item.id}`} mine={item.mine}>
-          {!nextSameUser && !item.mine && <SUserAvatar avatarUrl={localUserData?.avatar} />}
-          {!nextSameUser && item.mine && <SUserAvatar avatarUrl={user.userData?.avatarUrl} />}
+          {!nextSameUser && (
+            <SUserAvatar mine={item.mine} avatarUrl={!item.mine ? localUserData?.avatar : user.userData?.avatarUrl} />
+          )}
           <SMessageContent mine={item.mine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
             <SMessageText mine={item.mine} weight={600} variant={3}>
               {item.message}
@@ -302,15 +303,33 @@ const STextArea = styled.div`
   flex: 1;
 `;
 
-const SUserAvatar = styled(UserAvatar)`
+interface ISUserAvatar {
+  mine?: boolean;
+}
+const SUserAvatar = styled(UserAvatar)<ISUserAvatar>`
   position: absolute;
-  left: 0;
   bottom: 0;
   width: 36px;
   height: 36px;
   min-width: 36px;
   min-height: 36px;
   padding: 0;
+  display: none;
+
+  ${(props) => {
+    if (props.mine) {
+      return css`
+        right: 0;
+      `;
+    }
+    return css`
+      left: 0;
+    `;
+  }}
+
+  ${(props) => props.theme.media.tablet} {
+    display: block;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -335,17 +354,32 @@ interface ISMessage {
 const SMessage = styled.div<ISMessage>`
   width: 100%;
   position: relative;
-  padding-left: ${(props) => {
+
+  ${(props) => {
     if (props.type !== 'info') {
-      return '44px';
+      if (props.mine) {
+        return css`
+          ${props.theme.media.tablet} {
+            padding-right: 44px;
+          }
+        `;
+      }
+      return css`
+        ${props.theme.media.tablet} {
+          padding-left: 44px;
+        }
+      `;
     }
-    return '0px';
-  }};
+    return css``;
+  }}
   display: flex;
   flex-direction: row;
   justify-content: ${(props) => {
     if (props.type === 'info') {
       return 'center';
+    }
+    if (props.mine) {
+      return 'flex-end';
     }
     return 'flex-start';
   }};
