@@ -89,5 +89,11 @@
     "backButton": "Back",
     "submitDesktop": "Save and continue",
     "submitMobile": "Set up and continue"
+  },
+  "AboutSection": {
+    "heading": "This what your fans see",
+    "backButton": "Close",
+    "submitMobile": "Save changes",
+    "submitDesktop": "Save changes"
   }
 }

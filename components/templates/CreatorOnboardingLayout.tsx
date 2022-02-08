@@ -18,7 +18,7 @@ import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 
 export interface ICreatorOnboardingLayout {
-
+  hideProgressBar?: boolean;
 }
 
 const SCreatorOnboardingLayout = styled.div`
@@ -29,6 +29,7 @@ const SCreatorOnboardingLayout = styled.div`
 `;
 
 const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout> = ({
+  hideProgressBar,
   children,
 }) => {
   const theme = useTheme();
@@ -46,10 +47,12 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
         <SCreatorOnboardingLayout>
           <HomeLogoButton />
           <SContentContainer>
-            <OnboardingProgressBar
-              numStages={2}
-              currentStage={router.pathname.includes('creator-onboarding-stage-1') ? 1 : 2}
-            />
+            {!hideProgressBar && (
+              <OnboardingProgressBar
+                numStages={2}
+                currentStage={router.pathname.includes('creator-onboarding-stage-1') ? 1 : 2}
+              />
+            )}
             {children}
           </SContentContainer>
           {!isMobileOrTablet && router.pathname.includes('creator-onboarding-stage-2') && (
