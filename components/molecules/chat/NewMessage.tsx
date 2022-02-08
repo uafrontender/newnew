@@ -3,7 +3,7 @@ import NewMessageButton from '../../atoms/chat/NewMessageButton';
 import NewMessageModal from './NewMessageModal';
 
 const NewMessage: React.FC = () => {
-  const [showModal, setShowModal] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const openModal = () => {
     setShowModal(true);

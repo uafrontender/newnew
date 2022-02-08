@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import dynamic from 'next/dynamic';
 import randomID from '../../../utils/randomIdGenerator';
 import Modal from '../../organisms/Modal';
-import CloseModalButton from '../../atoms/chat/CloseModalButton';
 import SearchInput from '../../atoms/chat/SearchInput';
-import NewAnnouncement from '../../atoms/chat/NewAnnouncement';
 import {
   SChatItemContainer,
   SChatItemCenter,
@@ -18,7 +17,14 @@ import UserAvatar from '../UserAvatar';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import GradientMask from '../../atoms/GradientMask';
 import clearNameFromEmoji from '../../../utils/clearNameFromEmoji';
-import NoResults from '../../atoms/chat/NoResults';
+import { useAppSelector } from '../../../redux-store/store';
+import InlineSVG from '../../atoms/InlineSVG';
+
+import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+
+const CloseModalButton = dynamic(() => import('../../atoms/chat/CloseModalButton'));
+const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
+const NewAnnouncement = dynamic(() => import('../../atoms/chat/NewAnnouncement'));
 
 interface INewMessageModal {
   showModal: boolean;
@@ -46,6 +52,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const scrollRef: any = useRef();
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [usersSortedList, setuUsersSortedList] = useState<IUsersSorted[]>([]);
   const [searchValue, setSearchValue] = useState('');
@@ -242,7 +250,18 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
         <SModal>
           <SModalHeader>
             <SModalTitle>{t('modal.new-message.title')}</SModalTitle>
-            <CloseModalButton handleClick={closeModal} />
+            {!isMobile ? (
+              <CloseModalButton handleClick={closeModal} />
+            ) : (
+              <SBackButton
+                clickable
+                svg={chevronLeftIcon}
+                fill={theme.colorsThemed.text.tertiary}
+                width="24px"
+                height="24px"
+                onClick={closeModal}
+              />
+            )}
           </SModalHeader>
           <SearchInput
             placeholderText={t('modal.new-message.search-placeholder')}
@@ -321,8 +340,15 @@ const SModal = styled.div`
   display: flex;
   flex-direction: column;
   line-height: 24px;
-  max-height: 60vw;
+  max-height: 80vh;
   height: 100%;
+
+  ${(props) => props.theme.media.mobile} {
+    background-color: ${(props) => props.theme.colorsThemed.background.secondary};
+    border-radius: 0;
+    max-width: 100%;
+    max-height: 100vh;
+  }
 `;
 
 const SModalHeader = styled.header`
@@ -330,6 +356,11 @@ const SModalHeader = styled.header`
   justify-content: space-between;
   align-items: center;
   padding: 0 0 20px;
+
+  ${(props) => props.theme.media.mobile} {
+    justify-content: start;
+    flex-direction: row-reverse;
+  }
 `;
 
 const SModalTitle = styled.strong`
@@ -350,4 +381,13 @@ const SSection = styled.div`
   & ${SChatItemContainer}:last-child ${SChatSeparator} {
     display: none;
   }
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  min-width: 24px;
+  min-height: 24px;
+`;
+
+const SBackButton = styled(SInlineSVG)`
+  margin-right: 20px;
 `;
