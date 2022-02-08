@@ -1,16 +1,21 @@
 {
   "meta": {
-    "title": "Chat with Creator"
+    "title": "Direct Messages"
   },
   "ellipse": {
     "report-user": "Report user",
     "block-user": "Block user",
-    "unblock-user": "Unblock user"
+    "unblock-user": "Unblock user",
+    "view-profile": "View profile"
   },
   "chat": {
     "today": "Today",
     "placeholder": "Type a message...",
-    "welcome-message": "You successfully subscribed! Now you can send a message to"
+    "welcome-message": "You successfully subscribed! Now you can send a message to",
+    "no-messages-first-line": "No messages here yet...",
+    "no-messages-second-line": "Send a message to start conversation.",
+    "select-chat": "Select a chat to start messaging",
+    "typing": "Typing..."
   },
   "user-blocked": {
     "title": "User blocked",
@@ -28,6 +33,11 @@
     "message": "Creator is not accepting messages at this moment. Stay tuned!",
     "button-text": "Check user’s profile"
   },
+  "account-deleted": {
+    "title": "Account deleted",
+    "message": "Account is no longer available.",
+    "button-text": "Delete chat"
+  },
   "toolbar": {
     "search-placeholder": "Search for messages or users"
   },
@@ -38,6 +48,32 @@
       "message-second-part": "from messaging you on NewNew?",
       "button-cancel": "Cancel",
       "button-confirm": "Block user"
+    },
+    "delete-group": {
+      "title": "Delete group",
+      "message-first-part": "Do you really want to delete",
+      "message-second-part": "group? You will not be able to undo this action.",
+      "button-cancel": "Keep it",
+      "button-confirm": "Delete permanently"
+    },
+    "new-message": {
+      "title": "New message",
+      "search-placeholder": "Search",
+      "no-results-title": "No results",
+      "no-results-text": "There were no results for",
+      "no-results-search-text": "Try a new search."
     }
+  },
+  "empty-inbox": {
+    "title": "Your inbox is empty",
+    "text": "Once you start a new conversation, you’ll see it listed here"
+  },
+  "new-announcement": {
+    "title": "New announcement",
+    "text": "Only you can send messages to the group.",
+    "created": "You created the announcement"
+  },
+  "default": {
+    "search-placeholder": "Search"
   }
 }

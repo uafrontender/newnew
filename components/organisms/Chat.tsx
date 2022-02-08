@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
 import SearchInput from '../atoms/chat/SearchInput';
-import NewMessage from '../atoms/chat/NewMessage';
+import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
 
@@ -14,7 +15,7 @@ export const Chat = () => {
   const openChat = ({ userData, messages }: IChatData) => {
     setChatData({ userData, messages });
   };
-
+  const { t } = useTranslation('chat');
   const [chatListHidden, setChatListHidden] = useState<boolean>(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -36,11 +37,19 @@ export const Chat = () => {
     setChatListHidden(false);
   };
 
+  const passInputValue = (str: string) => {
+    console.log(str);
+  };
+
   return (
     <SContainer>
       <SSidebar style={{ left: chatListHidden ? '-352px' : 0 }}>
         <SToolbar>
-          <SearchInput />
+          <SearchInput
+            placeholderText={t('toolbar.search-placeholder')}
+            style={{ marginRight: '16px', fontSize: '16px' }}
+            passInputValue={passInputValue}
+          />
           <NewMessage />
         </SToolbar>
         <ChatList openChat={openChat} />
@@ -78,7 +87,7 @@ const SSidebar = styled.aside<ISSidebar>`
   height: 100%;
   width: 352px;
   position: relative;
-  z-index: 12;
+  z-index: 1;
   background: ${(props) => props.theme.colors.black};
   ${(props) => props.theme.media.laptop} {
     background: none;

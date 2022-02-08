@@ -1,13 +1,27 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 import moment from 'moment';
-import Text from '../../atoms/Text';
-import Indicator from '../../atoms/Indicator';
+
 import UserAvatar from '../UserAvatar';
+import textTrim from '../../../utils/textTrim';
 
 import { IChatData, IUser, IMessage } from '../../interfaces/ichat';
 
 import { useAppSelector } from '../../../redux-store/store';
+import {
+  SChatItemContainer,
+  SChatItem,
+  SChatItemCenter,
+  SChatItemText,
+  SChatItemLastMessage,
+  SChatItemRight,
+  SChatItemTime,
+  SChatItemIndicator,
+  SChatSeparator,
+} from '../../atoms/chat/styles';
+
+const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
@@ -16,13 +30,6 @@ interface IFunctionProps {
 export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   const user = useAppSelector((state) => state.user);
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
-
-  const lastMessageTrim = (str: string): string => {
-    if (str.length > 35) {
-      return `${str.substring(0, 35)} ...`;
-    }
-    return str;
-  };
 
   const collection = useMemo(
     () => [
@@ -34,6 +41,102 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
           userAlias: 'unicornbabe',
           blockedUser: true,
           avatar: '/images/mock/test_user_1.jpg',
+        },
+        messages: [
+          {
+            id: '1',
+            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
+            mine: true,
+            date: moment(),
+          },
+          {
+            id: '2',
+            message: 'Hiii, Lance 😃',
+            mine: true,
+            date: moment(),
+          },
+          {
+            id: '3',
+            message: 'I don’t beleive...',
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '4',
+            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '5',
+            message: 'Hey, Annie 👋',
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '6',
+            message: 'Hey there, Ya, me too 😏',
+            mine: false,
+            date: moment().subtract(2, 'days'),
+          },
+          {
+            id: '7',
+            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
+            mine: true,
+            date: moment().subtract(2, 'days'),
+          },
+          {
+            id: '8',
+            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
+            mine: true,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '9',
+            message: 'Hiii, Lance 😃',
+            mine: true,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '10',
+            message: 'I don’t beleive...',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '11',
+            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '12',
+            message: 'Hey, Annie 👋',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '13',
+            message: 'Hey there, Ya, me too 😏',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '14',
+            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
+            mine: true,
+            date: moment().subtract(3, 'days'),
+          },
+        ],
+        unread: false,
+      },
+      {
+        id: '6',
+        time: '30 min',
+        userData: {
+          userName: '🦄Unicornbabe1',
+          userAlias: 'unicornbabe1',
+          avatar: '/images/mock/test_user_3.jpg',
         },
         messages: [
           {
@@ -344,6 +447,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
           userName: 'Cuttie🍰Pie',
           userAlias: 'cuttiepie',
           avatar: '/images/mock/test_user_1.jpg',
+          accountDeleted: true,
         },
         messages: [
           {
@@ -439,8 +543,10 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    openChat({ userData: collection[0].userData, messages: collection[0].messages });
-    setActiveChatIndex(collection[0].id);
+    if (collection && collection.length > 0) {
+      openChat({ userData: collection[0].userData, messages: collection[0].messages });
+      setActiveChatIndex(collection[0].id);
+    }
   }, []);
 
   interface IItem {
@@ -468,7 +574,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
                 {item.userData.userName}
               </SChatItemText>
               <SChatItemLastMessage variant={3} weight={600}>
-                {lastMessageTrim(item.messages[0].message)}
+                {textTrim(item.messages[0].message)}
               </SChatItemLastMessage>
             </SChatItemCenter>
             <SChatItemRight>
@@ -486,7 +592,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   );
   return (
     <>
-      <SSectionContent>{collection.map(renderChatItem)}</SSectionContent>
+      <SSectionContent>{collection.length > 0 ? collection.map(renderChatItem) : <EmptyInbox />}</SSectionContent>
     </>
   );
 };
@@ -500,58 +606,3 @@ const SSectionContent = styled.div`
   overflow-y: auto;
   flex-direction: column;
 `;
-
-const SChatItem = styled.div`
-  cursor: pointer;
-  display: flex;
-  padding: 12px;
-  &.active,
-  &:hover {
-    background: ${(props) => props.theme.colorsThemed.background.secondary};
-    border-radius: ${(props) => props.theme.borderRadius.medium};
-  }
-`;
-
-const SChatItemCenter = styled.div`
-  width: 100%;
-  display: flex;
-  padding: 2px 12px;
-  flex-direction: column;
-`;
-
-const SChatItemText = styled(Text)`
-  margin-bottom: 4px;
-  max-width: 228px;
-  overflow: hidden;
-`;
-
-const SChatItemLastMessage = styled(Text)`
-  white-space: nowrap;
-  max-width: 228px;
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-`;
-
-const SChatItemRight = styled.div`
-  display: flex;
-  padding: 2px 0;
-  align-items: flex-end;
-  flex-direction: column;
-  margin-left: -12px;
-`;
-
-const SChatItemTime = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  white-space: nowrap;
-  margin-bottom: 4px;
-`;
-
-const SChatItemIndicator = styled(Indicator)``;
-
-const SChatSeparator = styled.div`
-  border-top: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
-  margin-left: 72px;
-  border-radius: 2px;
-  margin-right: 15px;
-`;
-
-const SChatItemContainer = styled.div``;
