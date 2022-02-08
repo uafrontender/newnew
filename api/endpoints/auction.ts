@@ -26,7 +26,7 @@ export const fetchCurrentBidsForPost = (
   `${BASE_URL_AUCTION}/get_ac_options`,
   'post',
   payload,
-  // Optional authentication to get indidualized list of options
+  // Optional authentication to get individualized list of options
   (cookiesInstance.get('accessToken') ? {
     'x-auth-token': cookiesInstance.get('accessToken'),
   } : {}),
@@ -50,16 +50,16 @@ export const fetchAcOptionById = (
   `${BASE_URL_AUCTION}/get_ac_option`,
   'post',
   payload,
-  // Optional authentication to get indidualized list of options
+  // Optional authentication to get individualized list of options
   (cookiesInstance.get('accessToken') ? {
     'x-auth-token': cookiesInstance.get('accessToken'),
   } : {}),
 );
 
 export const placeBidOnAuction = (
-  payload: newnewapi.PlaceBidRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.PlaceBidRequest, newnewapi.PlaceBidResponse>(
-  newnewapi.PlaceBidRequest,
+  payload: newnewapi.FulfillPaymentPurposeRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.FulfillPaymentPurposeRequest, newnewapi.PlaceBidResponse>(
+  newnewapi.FulfillPaymentPurposeRequest,
   newnewapi.PlaceBidResponse,
   `${BASE_URL_AUCTION}/place_bid`,
   'post',

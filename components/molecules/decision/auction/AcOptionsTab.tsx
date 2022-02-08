@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, {
@@ -20,12 +22,13 @@ import AcOptionCard from './AcOptionCard';
 import OptionOverview from './AcOptionOverview';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import PlaceBidForm from './PlaceAcBidForm';
 import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import Button from '../../../atoms/Button';
 import { validateText } from '../../../../api/endpoints/infrastructure';
+import Text from '../../../atoms/Text';
+import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface IAcOptionsTab {
   postId: string;
@@ -186,6 +189,40 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     newBidText,
     postId,
     handleAddOrUpdateOptionFromResponse,
+  ]);
+
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href}&`,
+        cancelUrl: `${window.location.href}&`,
+        acBidRequest: {
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(newBidAmount, 10) * 100,
+          }),
+          optionTitle: newBidText,
+          postUuid: postId,
+        }
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data
+        || !res.data.sessionUrl
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [
+    newBidAmount,
+    newBidText,
+    postId,
   ]);
 
   useEffect(() => {
@@ -438,13 +475,22 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${newBidAmount}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={() => {}}
         >
-          <PlaceBidForm
-            optionTitle={newBidText}
-            amountRounded={newBidAmount}
-            handlePlaceBid={handleSubmitNewOption}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle
+              variant={3}
+            >
+              { t('paymenModalHeader.subtitle') }
+            </SPaymentModalTitle>
+            <SPaymentModalOptionText>
+              { newBidText }
+            </SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
       {/* Loading Modal */}
@@ -604,4 +650,20 @@ const SActionSection = styled.div`
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
+`;
+
+// Payment modal header
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

@@ -82,8 +82,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       });
 
       const res = await markPost(markAsViewedPayload);
-
-      console.log(res);
     } catch (err) {
       console.error(err);
     }
