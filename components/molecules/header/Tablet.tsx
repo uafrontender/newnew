@@ -60,7 +60,7 @@ export const Tablet: React.FC<ITablet> = () => {
               <SItemWithMargin>
                 <NavigationItem
                   item={{
-                    url: '/chat',
+                    url: '/direct-messages',
                     key: 'direct-messages',
                   }}
                 />

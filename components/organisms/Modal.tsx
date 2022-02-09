@@ -12,20 +12,12 @@ interface IModal {
   overlayDim?: boolean;
   additionalZ?: number;
   customBackdropFilterValue?: number;
-  onClose: () => void;
+  onClose?: () => void;
   children: ReactNode;
 }
 
 const Modal: React.FC<IModal> = (props) => {
-  const {
-    show,
-    transitionSpeed,
-    overlayDim,
-    additionalZ,
-    customBackdropFilterValue,
-    onClose,
-    children,
-  } = props;
+  const { show, transitionSpeed, overlayDim, additionalZ, customBackdropFilterValue, onClose, children } = props;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -51,7 +43,7 @@ const Modal: React.FC<IModal> = (props) => {
       >
         {children}
       </StyledModalOverlay>,
-      document.getElementById('modal-root') as HTMLElement,
+      document.getElementById('modal-root') as HTMLElement
     );
   }
 
@@ -74,11 +66,14 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
   z-index: ${({ additionalZ }) => additionalZ ?? 10};
   overflow: hidden;
   position: fixed;
-  backdrop-filter: ${({ customBackdropFilterValue }) => (customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)')};
-  -webkit-backdrop-filter: ${({ customBackdropFilterValue }) => (customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)')};
+  backdrop-filter: ${({ customBackdropFilterValue }) =>
+    customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)'};
+  -webkit-backdrop-filter: ${({ customBackdropFilterValue }) =>
+    customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)'};
   transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
   // To avoid overlapping dim color with this bg color
-  background-color: ${({ theme, overlayDim }) => (overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT)};
+  background-color: ${({ theme, overlayDim }) =>
+    overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT};
 
   ::before {
     top: 0;
