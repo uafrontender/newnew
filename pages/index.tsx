@@ -339,6 +339,8 @@ export default Home;
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const { post } = context.query;
 
+  // console.log(context.query['?session_id']);
+
   const translationContext = await serverSideTranslations(
     context.locale!!,
     ['common', 'home', 'decision', 'payment-modal'],

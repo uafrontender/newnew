@@ -15,6 +15,11 @@ import Button from '../../../components/atoms/Button';
 import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
 import { subscribeToCreator } from '../../../api/endpoints/subscription';
 import Text from '../../../components/atoms/Text';
+import Headline from '../../../components/atoms/Headline';
+import ProfileBackground from '../../../components/molecules/profile/ProfileBackground';
+import InlineSvg from '../../../components/atoms/InlineSVG';
+import ProfileImage from '../../../components/molecules/profile/ProfileImage';
+import General from '../../../components/templates/General';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -48,23 +53,46 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
 
   return (
     <>
-      <div>
-        <main>
-          <h1>
-            I am subscribe to
-            {' '}
-            {user.username}
-            {' '}
-            page
-          </h1>
-          <Button
-            view="primaryGrad"
-            onClick={() => setIsPaymentModalOpen(true)}
-          >
-            Subscribe now
-          </Button>
-        </main>
-      </div>
+      <SGeneral>
+        <div>
+          <main>
+          <SProfileLayout>
+            <ProfileBackground
+              // Temp
+              pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
+            />
+            <ProfileImage
+              src={user.avatarUrl ?? ''}
+            />
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <SUsername
+                variant={4}
+              >
+                {user.nickname}
+              </SUsername>
+              <Button
+                withShadow
+                view="primaryGrad"
+                style={{
+                  marginBottom: '16px',
+                }}
+                onClick={() => setIsPaymentModalOpen(true)}
+              >
+                {/* @ts-ignore */}
+                {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+              </Button>
+              </div>
+            </SProfileLayout>
+          </main>
+        </div>
+      </SGeneral>
       <PaymentModal
         isOpen={isPaymentModalOpen}
         zIndex={10}
@@ -105,11 +133,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   );
 };
 
-(SubscribeToUserPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <HomeLayout>
-    {page}
-  </HomeLayout>
-);
+// (SubscribeToUserPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
+//   <HomeLayout>
+//     {page}
+//   </HomeLayout>
+// );
 
 export default SubscribeToUserPage;
 
@@ -151,6 +179,140 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
+
+const SGeneral = styled(General)`
+  position: relative;
+
+  header {
+    z-index: 6;
+  }
+
+  @media (max-width: 768px) {
+    main {
+      div:first-child {
+        padding-left: 0;
+        padding-right: 0;
+
+        div:first-child {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+`;
+
+
+const SUsername = styled(Headline)`
+  text-align: center;
+
+  margin-bottom: 12px;
+`;
+
+const SShareDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+`;
+
+const SUsernameButtonText = styled(Text)`
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SBioText = styled(Text)`
+  text-align: center;
+  overflow-wrap: break-word;
+
+  padding-left: 16px;
+  padding-right: 16px;
+  margin-bottom: 54px;
+
+  max-width: 480px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SFavoritesButton = styled(Button)`
+  position: absolute;
+  top: 164px;
+  right: 4px;
+
+  background: none;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    top: 204px;
+    right: calc(4px + 56px);
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    top: 244px;
+  }
+`;
+
+const SMoreButton = styled(Button)`
+  position: absolute;
+  top: 164px;
+  left: 4px;
+
+  background: none;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    top: 204px;
+    left: initial;
+    right: 4px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    top: 244px;
+  }
+`;
+
+const SProfileLayout = styled.div`
+  position: relative;
+  overflow: hidden;
+
+  margin-top: -28px;
+  margin-bottom: 24px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: -8px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    margin-top: -16px;
+  }
+`;
+
 
 
 const SPaymentModalHeader = styled.div`

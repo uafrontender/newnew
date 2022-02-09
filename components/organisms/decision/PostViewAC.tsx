@@ -10,7 +10,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
-import { fetchCurrentBidsForPost } from '../../../api/endpoints/auction';
+import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
@@ -31,6 +31,7 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import LoadingModal from '../../molecules/LoadingModal';
 
 // Temp
 const MockVideo = '/video/mock/mock_video_1.mp4';
@@ -42,12 +43,14 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 interface IPostViewAC {
   post: newnewapi.Auction;
   optionFromUrl?: newnewapi.Auction.Option;
+  sessionId?: string;
   handleGoBack: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   post,
   optionFromUrl,
+  sessionId,
   handleGoBack,
 }) => {
   const theme = useTheme();
@@ -69,6 +72,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [currentTab, setCurrentTab] = useState<
     'bids' | 'comments'
   >('bids');
+
+  // Vote from sessionId
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Total amount
   const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
@@ -305,8 +311,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         });
 
         const res = await markPost(markAsViewedPayload);
-
-        console.log(res);
       } catch (err) {
         console.error(err);
       }
@@ -327,6 +331,37 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    const makeBidFromSessionId = async () => {
+      if (!sessionId) return;
+      try {
+        setLoadingModalOpen(true);
+        const payload = new newnewapi.FulfillPaymentPurposeRequest({
+          paymentSuccessUrl: `session_id=${sessionId}`,
+        });
+
+        const res = await placeBidOnAuction(payload);
+
+        if (!res.data
+          || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setLoadingModalOpen(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingModalOpen(false);
+      }
+    };
+
+    makeBidFromSessionId();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (optionFromUrl) {
@@ -539,12 +574,18 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             />
           )}
       </SActivitesContainer>
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
     </SWrapper>
   );
 };
 
 PostViewAC.defaultProps = {
   optionFromUrl: undefined,
+  sessionId: undefined,
 };
 
 export default PostViewAC;

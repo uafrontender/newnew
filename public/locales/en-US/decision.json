@@ -31,6 +31,9 @@
     "options": "Options"
   },
   "AcPost": {
+    "paymenModalHeader": {
+      "subtitle": "You bid on"
+    },
     "PostTopInfo": {
       "in_bids": "in bids"
     },
@@ -66,6 +69,9 @@
     "PostTopInfo": {
       "votes": "votes"
     },
+    "paymenModalHeader": {
+      "subtitle": "You vote for"
+    },
     "OptionsTab": {
       "me": "me",
       "tags": {
@@ -96,7 +102,9 @@
     }
   },
   "CfPost": {
-
+    "paymenModalHeader": {
+      "subtitle": "You pledge for"
+    }
   },
   "RecommendationsSection": {
     "heading": "More like this"
