@@ -1,48 +1,39 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState } from 'react';
+import React, { ReactEventHandler, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
 import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
 import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
 
-interface ISearchInput {}
+interface ISearchInput {
+  placeholderText: string;
+  bgColor?: string;
+  fontSize?: string;
+  style?: React.CSSProperties;
+  passInputValue?: (str: string) => void;
+}
 
-export const SearchInput: React.FC<ISearchInput> = () => {
+const SearchInput: React.FC<ISearchInput> = ({ placeholderText, bgColor, style, fontSize, passInputValue }) => {
   const theme = useTheme();
   const inputRef: any = useRef();
-  // const inputContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
-  const [inputRightPosition, setInputRightPosition] = useState(0);
+  const [focusedInput, setFocusedInput] = useState<boolean>(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
-
-  const { t } = useTranslation('chat');
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const handleSearchClick = () => {};
-  const handleInoutChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
-  const handleSubmit = () => {};
 
-  // useEffect(() => {
-  //   const resizeObserver = new ResizeObserver(() => {
-  //     // eslint-disable-next-line max-len
-  //     setInputRightPosition(-(window.innerWidth - (inputContainerRef.current?.getBoundingClientRect()?.right || 0) - (isMobile ? 16 : 32)));
-  //   });
-
-  //   resizeObserver.observe(document.body);
-
-  //   return () => {
-  //     resizeObserver.disconnect();
-  //   };
-  // }, [isMobile]);
+  useEffect(() => {
+    if (passInputValue) passInputValue(searchValue);
+  }, [searchValue, passInputValue]);
 
   return (
-    <SContainer>
-      <SInputWrapper rightPosition={inputRightPosition}>
+    <SContainer style={style}>
+      <SInputWrapper bgColor={bgColor} focus={focusedInput}>
         <SLeftInlineSVG
           svg={searchIcon}
           fill={theme.colorsThemed.text.quaternary}
@@ -50,66 +41,104 @@ export const SearchInput: React.FC<ISearchInput> = () => {
           height={isMobile ? '20px' : '24px'}
         />
         <SInput
+          onFocus={() => {
+            setFocusedInput(true);
+          }}
+          onBlur={() => {
+            setFocusedInput(false);
+          }}
+          fontSize={fontSize}
           ref={inputRef}
           value={searchValue}
-          onChange={handleInoutChange}
-          placeholder={t('toolbar.search-placeholder')}
+          onChange={handleInputChange}
+          placeholder={placeholderText}
         />
       </SInputWrapper>
     </SContainer>
   );
 };
 
-SearchInput.defaultProps = {
-  fixed: false,
-};
-
 export default SearchInput;
 
-const SContainer = styled.div`
-  height: 36px;
-  position: relative;
+SearchInput.defaultProps = {
+  passInputValue: () => {},
+};
 
-  ${({ theme }) => theme.media.tablet} {
-    height: 48px;
-  }
+interface ISContainer {
+  style?: React.CSSProperties;
+}
+
+const SContainer = styled.div<ISContainer>`
+  position: relative;
+  width: 100%;
 `;
 
 interface ISInputWrapper {
-  rightPosition: number;
+  bgColor?: string;
+  focus: boolean;
 }
-
 const SInputWrapper = styled.div<ISInputWrapper>`
-  width: 288px;
+  width: 100%;
   z-index: 3;
-  padding: 6.5px;
+  padding: 0 0 0 6.5px;
   display: flex;
+  align-items: center;
   overflow: hidden;
   max-height: 100%;
   border-radius: 12px;
   flex-direction: row;
   justify-content: space-between;
-  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
+  background-color: ${(props) => {
+    if (props.bgColor) {
+      return props.bgColor;
+    }
+    return props.theme.colorsThemed.background.secondary;
+  }};
+
+  border: 1px solid
+    ${(props) => {
+      if (props.focus) {
+        return props.theme.colorsThemed.background.outlines2;
+      }
+      if (props.bgColor) {
+        return props.bgColor;
+      }
+      return props.theme.colorsThemed.background.secondary;
+    }};
 
   ${({ theme }) => theme.media.tablet} {
-    padding: 10.5px;
+    padding: 0 0 0 10.5px;
     border-radius: 16px;
   }
 `;
 
-const SInput = styled.input`
+interface ISInput {
+  fontSize?: string;
+}
+const SInput = styled.input<ISInput>`
+  width: 100%;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   width: 100%;
+  height: 100%;
   border: none;
-  margin: 0 8px;
+  padding: 0 8px;
+  height: 44px;
   outline: none;
-  font-size: 14px;
+  font-size: ${(props) => {
+    if (props.fontSize) {
+      return props.fontSize;
+    }
+    return '14px';
+  }};
   background: transparent;
   font-weight: 500;
   line-height: 24px;
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
+  }
+  ::focus {
+    border-color: ;
   }
 `;
 
@@ -122,3 +151,10 @@ const SLeftInlineSVG = styled(InlineSVG)`
     min-height: 24px;
   }
 `;
+
+SearchInput.defaultProps = {
+  bgColor: undefined,
+  style: undefined,
+  fontSize: undefined,
+  passInputValue: () => {},
+};

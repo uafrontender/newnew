@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
@@ -15,6 +10,7 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
+import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
@@ -48,7 +44,7 @@ export const Chat = () => {
     },
     {
       id: '4',
-      message: 'Your new decision of getting a tattoo on your face is crazy. I\'m shocked! 😱',
+      message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
       mine: false,
       date: moment(),
     },
@@ -62,64 +58,55 @@ export const Chat = () => {
       id: '6',
       message: 'Hey there, Ya, me too 😏',
       mine: false,
-      date: moment()
-        .subtract(2, 'days'),
+      date: moment().subtract(2, 'days'),
     },
     {
       id: '7',
       message: 'Weeelcome 🎉 Happy that you joined NewNew!',
       mine: true,
-      date: moment()
-        .subtract(2, 'days'),
+      date: moment().subtract(2, 'days'),
     },
     {
       id: '8',
       message: 'Yeah, I know🙈 But I think it’s awesome idea!',
       mine: true,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
     {
       id: '9',
       message: 'Hiii, Lance 😃',
       mine: true,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
     {
       id: '10',
       message: 'I don’t beleive...',
       mine: false,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
     {
       id: '11',
-      message: 'Your new decision of getting a tattoo on your face is crazy. I\'m shocked! 😱',
+      message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
       mine: false,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
     {
       id: '12',
       message: 'Hey, Annie 👋',
       mine: false,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
     {
       id: '13',
       message: 'Hey there, Ya, me too 😏',
       mine: false,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
     {
       id: '14',
       message: 'Weeelcome 🎉 Happy that you joined NewNew!',
       mine: true,
-      date: moment()
-        .subtract(3, 'days'),
+      date: moment().subtract(3, 'days'),
     },
   ]);
   const theme = useTheme();
@@ -131,8 +118,7 @@ export const Chat = () => {
   const handleChange = useCallback((id, value) => {
     setMessage(value);
   }, []);
-  const handleUserClick = useCallback(() => {
-  }, []);
+  const handleUserClick = useCallback(() => {}, []);
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
   }, [router]);
@@ -147,76 +133,56 @@ export const Chat = () => {
     setMessage('');
     setCollection([newItem, ...collection]);
   }, [message, collection]);
-  const renderMessage = useCallback((item, index) => {
-    const prevElement = collection[index - 1];
-    const nextElement = collection[index + 1];
+  const renderMessage = useCallback(
+    (item, index) => {
+      const prevElement = collection[index - 1];
+      const nextElement = collection[index + 1];
 
-    const content = (
-      <SMessage
-        id={index === 0 ? 'first-element' : `message-${index}`}
-        key={`message-${item.id}`}
-        mine={item.mine}
-      >
-        <SMessageContent
-          mine={item.mine}
-          prevSameUser={prevElement?.mine === item.mine}
-          nextSameUser={nextElement?.mine === item.mine}
-        >
-          <SMessageText
+      const content = (
+        <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={`message-${item.id}`} mine={item.mine}>
+          <SMessageContent
             mine={item.mine}
-            weight={600}
-            variant={3}
+            prevSameUser={prevElement?.mine === item.mine}
+            nextSameUser={nextElement?.mine === item.mine}
           >
-            {item.message}
-          </SMessageText>
-        </SMessageContent>
-      </SMessage>
-    );
+            <SMessageText mine={item.mine} weight={600} variant={3}>
+              {item.message}
+            </SMessageText>
+          </SMessageContent>
+        </SMessage>
+      );
 
-    if (moment(item.date)
-      .format('DD.MM.YYYY') !== moment(nextElement?.date)
-      .format('DD.MM.YYYY')) {
-      let date = moment(item.date)
-        .format('MMM DD');
+      if (moment(item.date).format('DD.MM.YYYY') !== moment(nextElement?.date).format('DD.MM.YYYY')) {
+        let date = moment(item.date).format('MMM DD');
 
-      if (date === moment()
-        .format('MMM DD')) {
-        date = t('chat.today');
+        if (date === moment().format('MMM DD')) {
+          date = t('chat.today');
+        }
+
+        return (
+          <>
+            {content}
+            <SMessage key={`message-date-${moment(item.date).format('DD.MM.YYYY')}`} type="info">
+              <SMessageContent
+                type="info"
+                prevSameUser={prevElement?.mine === item.mine}
+                nextSameUser={nextElement?.mine === item.mine}
+              >
+                <SMessageText type="info" weight={600} variant={3}>
+                  {date}
+                </SMessageText>
+              </SMessageContent>
+            </SMessage>
+          </>
+        );
       }
 
-      return (
-        <>
-          {content}
-          <SMessage
-            key={`message-date-${moment(item.date)
-              .format('DD.MM.YYYY')}`}
-            type="info"
-          >
-            <SMessageContent
-              type="info"
-              prevSameUser={prevElement?.mine === item.mine}
-              nextSameUser={nextElement?.mine === item.mine}
-            >
-              <SMessageText
-                type="info"
-                weight={600}
-                variant={3}
-              >
-                {date}
-              </SMessageText>
-            </SMessageContent>
-          </SMessage>
-        </>
-      );
-    }
+      return content;
+    },
+    [collection, t]
+  );
 
-    return content;
-  }, [collection, t]);
-
-  const {
-    showTopGradient,
-    showBottomGradient,
-  } = useScrollGradients(scrollRef, true);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
 
   useEffect(() => {
     scroller.scrollTo('first-element', {
@@ -237,11 +203,7 @@ export const Chat = () => {
           height="24px"
           onClick={handleGoBack}
         />
-        <SUserAvatar
-          withClick
-          onClick={handleUserClick}
-          avatarUrl={user.userData?.avatarUrl}
-        />
+        <SUserAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
         <SUserDescription>
           <SUserNickName variant={3} weight={600}>
             {user.userData?.nickname}
@@ -256,18 +218,9 @@ export const Chat = () => {
       </SCenterPart>
       <SBottomPart>
         <STextArea>
-          <TextArea
-            value={message}
-            onChange={handleChange}
-            placeholder={t('chat.placeholder')}
-          />
+          <TextArea value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
         </STextArea>
-        <SButton
-          withShadow
-          view={message ? 'primaryGrad' : 'secondary'}
-          onClick={handleSubmit}
-          disabled={!message}
-        >
+        <SButton withShadow view={message ? 'primaryGrad' : 'secondary'} onClick={handleSubmit} disabled={!message}>
           <SInlineSVG
             svg={sendIcon}
             fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
@@ -276,8 +229,8 @@ export const Chat = () => {
           />
         </SButton>
       </SBottomPart>
-      <SGradientMaskTop active={showTopGradient} />
-      <SGradientMaskBottom active={showBottomGradient} />
+      <GradientMask positionTop active={showTopGradient} />
+      <GradientMask active={showBottomGradient} />
     </SContainer>
   );
 };
@@ -329,7 +282,8 @@ const SButton = styled(Button)`
   margin-left: 12px;
 
   &:disabled {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
   }
 `;
 
@@ -496,49 +450,5 @@ const SMessageText = styled(Text)<ISMessageText>`
     }
 
     return props.theme.colorsThemed.text.primary;
-  }}
-`;
-
-interface ISGradientMask {
-  active: boolean;
-}
-
-const SGradientMaskTop = styled.div<ISGradientMask>`
-  top: 72px;
-  left: 0;
-  right: 0;
-  height: ${(props) => (props.active ? '40px' : 0)};
-  z-index: 1;
-  position: absolute;
-  transition: height ease 0.5s;
-  background: ${(props) => props.theme.gradients.listTop};
-  pointer-events: none;
-
-  ${(props) => props.theme.media.tablet} {
-    height: ${(props) => (props.active ? '60px' : 0)};
-  }
-
-  ${(props) => props.theme.media.laptopL} {
-    height: ${(props) => (props.active ? '80px' : 0)};
-  }
-`;
-
-const SGradientMaskBottom = styled.div<ISGradientMask>`
-  left: 0;
-  right: 0;
-  bottom: 72px;
-  height: ${(props) => (props.active ? '40px' : 0)};
-  z-index: 1;
-  position: absolute;
-  transition: height ease 0.5s;
-  background: ${(props) => props.theme.gradients.listBottom};
-  pointer-events: none;
-
-  ${(props) => props.theme.media.tablet} {
-    height: ${(props) => (props.active ? '60px' : 0)};
-  }
-
-  ${(props) => props.theme.media.laptopL} {
-    height: ${(props) => (props.active ? '80px' : 0)};
-  }
+  }};
 `;

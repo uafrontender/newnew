@@ -7,6 +7,8 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
+import { useAppSelector } from '../../../redux-store/store';
+
 interface IChatEllipseMenu {
   isVisible: boolean;
   handleClose: () => void;
@@ -14,14 +16,10 @@ interface IChatEllipseMenu {
   userBlocked?: boolean;
 }
 
-const ChatEllipseMenu: React.FunctionComponent<IChatEllipseMenu> = ({
-  isVisible,
-  handleClose,
-  userBlocked,
-  onUserBlock,
-}) => {
+const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, userBlocked, onUserBlock }) => {
   const { t } = useTranslation('chat');
   const containerRef = useRef<HTMLDivElement>();
+  const user = useAppSelector((state) => state.user);
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -42,6 +40,11 @@ const ChatEllipseMenu: React.FunctionComponent<IChatEllipseMenu> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          {user.userData?.options?.isCreator && (
+            <SButton onClick={() => {}}>
+              <Text variant={2}>{t('ellipse.view-profile')}</Text>
+            </SButton>
+          )}
           <SButton onClick={() => {}}>
             <Text variant={2}>{t('ellipse.report-user')}</Text>
           </SButton>
