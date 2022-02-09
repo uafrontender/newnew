@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import Modal from '../../organisms/Modal';
-import Button from '../Button';
+import Button from '../../atoms/Button';
 
 interface IBlockUserModal {
   confirmBlockUser: boolean;
@@ -11,7 +11,7 @@ interface IBlockUserModal {
   closeModal: () => void;
 }
 
-export const BlockUserModal: React.FC<IBlockUserModal> = ({ confirmBlockUser, onUserBlock, userName, closeModal }) => {
+const BlockUserModal: React.FC<IBlockUserModal> = ({ confirmBlockUser, onUserBlock, userName, closeModal }) => {
   const { t } = useTranslation('chat');
 
   const handleConfirmClick = () => {
