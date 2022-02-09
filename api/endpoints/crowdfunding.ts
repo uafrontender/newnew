@@ -26,7 +26,7 @@ export const fetchPledges = (
   `${BASE_URL_CROWDFUNDING}/get_pledges`,
   'post',
   payload,
-  // Optional authentication to get indidualized list of options
+  // Optional authentication to get individualized list of options
   (cookiesInstance.get('accessToken') ? {
     'x-auth-token': cookiesInstance.get('accessToken'),
   } : {}),
@@ -43,9 +43,9 @@ export const fetchPledgeLevels = (
 );
 
 export const doPledgeCrowdfunding = (
-  payload: newnewapi.DoPledgeRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.DoPledgeRequest, newnewapi.DoPledgeResponse>(
-  newnewapi.DoPledgeRequest,
+  payload: newnewapi.FulfillPaymentPurposeRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.FulfillPaymentPurposeRequest, newnewapi.DoPledgeResponse>(
+  newnewapi.FulfillPaymentPurposeRequest,
   newnewapi.DoPledgeResponse,
   `${BASE_URL_CROWDFUNDING}/do_pledge`,
   'post',

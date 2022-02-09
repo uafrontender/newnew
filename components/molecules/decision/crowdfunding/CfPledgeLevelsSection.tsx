@@ -26,6 +26,8 @@ import PaymentModal from '../../checkout/PaymentModal';
 import PlaceCfBidForm from './PlaceCfBidForm';
 import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
 import { validateText } from '../../../../api/endpoints/infrastructure';
+import Text from '../../../atoms/Text';
+import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
@@ -179,6 +181,44 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     handleAddPledgeFromResponse,
   ]);
 
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href}&`,
+        cancelUrl: `${window.location.href}&`,
+        cfPledgeRequest: {
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(pledgeAmount?.toString()!!, 10),
+          }),
+          postUuid: post.postUuid,
+          ...(pledgeMessage ? (
+            {
+              message: pledgeMessage,
+            }
+          ) : {}),
+        }
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data
+        || !res.data.sessionUrl
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      console.error(err);
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+    }
+  }, [
+    pledgeAmount,
+    pledgeMessage,
+    post.postUuid,
+  ]);
+
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
       if (entry[0]?.borderBoxSize[0]?.blockSize) {
@@ -255,7 +295,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
               view="secondary"
               onClick={() => handleClosePledgeForm()}
             >
-              { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
+              { t('McPost.OptionsTab.OptionCard.cancelBtn') }
             </SCancelButton>
           </SNewPledgeForm>
         ) : null}
@@ -265,13 +305,22 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={() => {}}
         >
-          <PlaceCfBidForm
-            optionTitle={pledgeMessage}
-            amountRounded={pledgeAmount?.toString() ?? ''}
-            handlePlaceBid={handleMakePledge}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle
+              variant={3}
+            >
+              { t('CfPost.paymenModalHeader.subtitle') }
+            </SPaymentModalTitle>
+            <SPaymentModalOptionText>
+              { post.title }
+            </SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
       {/* Loading Modal */}
@@ -336,4 +385,20 @@ const SCancelButton = styled(Button)`
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
+`;
+
+// Payment modal header
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

@@ -26,16 +26,16 @@ export const fetchCurrentOptionsForMCPost = (
   `${BASE_URL_MULTICHOICE}/get_mc_options`,
   'post',
   payload,
-  // Optional authentication to get indidualized list of options
+  // Optional authentication to get individualized list of options
   (cookiesInstance.get('accessToken') ? {
     'x-auth-token': cookiesInstance.get('accessToken'),
   } : {}),
 );
 
 export const voteOnPost = (
-  payload: newnewapi.VoteOnPostRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.VoteOnPostRequest, newnewapi.VoteOnPostResponse>(
-  newnewapi.VoteOnPostRequest,
+  payload: newnewapi.FulfillPaymentPurposeRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.FulfillPaymentPurposeRequest, newnewapi.VoteOnPostResponse>(
+  newnewapi.FulfillPaymentPurposeRequest,
   newnewapi.VoteOnPostResponse,
   `${BASE_URL_MULTICHOICE}/vote_on_post`,
   'post',

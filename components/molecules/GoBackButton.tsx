@@ -13,6 +13,7 @@ type TGoBackButton = {
   children?: React.ReactNode;
   defer?: number;
   longArrow?: boolean;
+  noArrow?: boolean;
   onClick: () => void;
 } & React.ComponentPropsWithoutRef<'button'>;
 
@@ -20,6 +21,7 @@ const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
   children,
   defer,
   longArrow,
+  noArrow,
   onClick,
   ...rest
 }) => {
@@ -31,11 +33,13 @@ const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
       onClick={!defer ? onClick : handleClickDebounced}
       {...rest}
     >
-      <InlineSvg
-        svg={longArrow ? ArrowLeftIcon : BackButtonIcon}
-        width="24px"
-        height="24px"
-      />
+      {!noArrow && (
+        <InlineSvg
+          svg={longArrow ? ArrowLeftIcon : BackButtonIcon}
+          width="24px"
+          height="24px"
+        />
+      )}
       { children }
     </SGoBackButton>
   );
@@ -45,6 +49,7 @@ GoBackButton.defaultProps = {
   children: undefined,
   defer: undefined,
   longArrow: undefined,
+  noArrow: undefined,
 };
 
 export default GoBackButton;

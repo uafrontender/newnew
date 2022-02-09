@@ -21,15 +21,13 @@ import InlineSvg from '../../atoms/InlineSVG';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import { fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
+import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import switchPostType from '../../../utils/switchPostType';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
 import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
-
-// Temp
-const MockVideo = '/video/mock/mock_video_1.mp4';
+import LoadingModal from '../../molecules/LoadingModal';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -37,11 +35,13 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 
 interface IPostViewCF {
   post: newnewapi.Crowdfunding;
+  sessionId?: string;
   handleGoBack: () => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   post,
+  sessionId,
   handleGoBack,
 }) => {
   const theme = useTheme();
@@ -59,6 +59,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
+
+  // Vote from sessionId
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Current backers
   const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
@@ -253,8 +256,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         });
 
         const res = await markPost(markAsViewedPayload);
-
-        console.log(res);
       } catch (err) {
         console.error(err);
       }
@@ -275,6 +276,34 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    const makePledgeFromSessionId = async () => {
+      if (!sessionId) return;
+      try {
+        setLoadingModalOpen(true);
+        const payload = new newnewapi.FulfillPaymentPurposeRequest({
+          paymentSuccessUrl: `session_id=${sessionId}`,
+        });
+
+        const res = await doPledgeCrowdfunding(payload);
+
+        if (!res.data
+          || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
+        setLoadingModalOpen(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingModalOpen(false);
+      }
+    };
+
+    makePledgeFromSessionId();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const socketHandlerPledgeCreated = (data: any) => {
@@ -399,8 +428,17 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           handleLoadPledges={fetchPledgesForPost}
         />
       </SActivitesContainer>
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
     </SWrapper>
   );
+};
+
+PostViewCF.defaultProps = {
+  sessionId: undefined,
 };
 
 export default PostViewCF;
