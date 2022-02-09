@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
 import InlineSvg from '../../atoms/InlineSVG';
@@ -19,6 +20,7 @@ const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> = (
   onChange,
   ...rest
 }) => {
+  const { t } = useTranslation('creator-onboarding');
   const [charCounter, setCharCounter] = useState((value as string).length);
 
   const [errorBordersShown, setErrorBordersShown] = useState(false);
@@ -35,6 +37,16 @@ const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> = (
 
   return (
     <SWrapper>
+      <SLabelDiv>
+        <div>
+          { t('AboutSection.bio.title') }
+        </div>
+        <SCharCounter>
+          { charCounter }
+          /
+          { maxChars }
+        </SCharCounter>
+      </SLabelDiv>
       <SOnboardingBioTextareaDiv>
         <textarea
           value={value}
@@ -61,11 +73,6 @@ const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> = (
           }}
           {...rest}
         />
-        <SCharCounter>
-          { charCounter }
-          /
-          { maxChars }
-        </SCharCounter>
       </SOnboardingBioTextareaDiv>
       {
         errorBordersShown ? (
@@ -93,6 +100,23 @@ const SWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
+`;
+
+
+const SLabelDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  margin-bottom: 6px;
+`;
+
+const SCharCounter = styled.div`
+
 `;
 
 interface ISOnboardingBioTextareaDiv {
@@ -156,18 +180,6 @@ const SOnboardingBioTextareaDiv = styled.div<ISOnboardingBioTextareaDiv>`
     }
   }
 
-`;
-
-const SCharCounter = styled.div`
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  background: ${({ theme }) => (theme.name === 'light' ? 'rgba(241, 243, 249, 0.8)' : 'rgba(20, 21, 31, 0.8)')};
 `;
 
 const SErrorDiv = styled.div`

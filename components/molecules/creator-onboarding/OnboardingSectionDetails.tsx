@@ -833,17 +833,6 @@ const SFormItemContainer = styled.div`
   }
 `;
 
-const SLabel = styled.label`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
-`;
-
 const SSeparator = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   margin-bottom: 16px;

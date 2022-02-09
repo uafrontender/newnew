@@ -37,6 +37,7 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
 
   return (
     <ErrorBoundary>
@@ -46,6 +47,21 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
       >
         <SCreatorOnboardingLayout>
           <HomeLogoButton />
+          {
+            isTablet && hideProgressBar ? (
+              <SHomeLogoButton
+                style={{
+                  display: 'block',
+                }}
+              >
+                <Row>
+                  <Col>
+                    <SLogo />
+                  </Col>
+                </Row>
+              </SHomeLogoButton>
+            ) : null
+          }
           <SContentContainer>
             {!hideProgressBar && (
               <OnboardingProgressBar
@@ -55,7 +71,7 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
             )}
             {children}
           </SContentContainer>
-          {!isMobileOrTablet && router.pathname.includes('creator-onboarding-stage-2') && (
+          {!isMobileOrTablet && !router.pathname.includes('creator-onboarding-stage-1') && (
             <SSideMessage>
               <SHeadline
                 variant={3}
@@ -91,8 +107,6 @@ const SHomeLogoButton = styled(Container)`
   display: none;
 
   ${({ theme }) => theme.media.tablet} {
-    /* display: block; */
-
     position: relative;
     margin: 12px 0px;
   }
