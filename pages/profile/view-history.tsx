@@ -260,8 +260,6 @@ const SCardsSection = styled.div`
   display: flex;
   flex-wrap: wrap;
 
-  margin-right: -16px !important;
-
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
   }

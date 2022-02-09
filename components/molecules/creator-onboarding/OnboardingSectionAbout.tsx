@@ -1,0 +1,379 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
+import { debounce } from 'lodash';
+import styled from 'styled-components';
+
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+
+import LoadingModal from '../LoadingModal';
+import GoBackButton from '../GoBackButton';
+import Button from '../../atoms/Button';
+import Headline from '../../atoms/Headline';
+import OnboardingBioTextarea from './OnboardingBioTextarea';
+import OnboardingTagsSelection from './OnboardingTagsSelection';
+import { setMyCreatorTags, updateMe, validateUsernameTextField } from '../../../api/endpoints/user';
+import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-store/slices/userStateSlice';
+import { validateText } from '../../../api/endpoints/infrastructure';
+
+const errorSwitch = (
+  status: newnewapi.ValidateTextResponse.Status) => {
+  let errorMsg = 'generic';
+
+  switch (status) {
+    case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
+      errorMsg = 'tooLong';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
+      errorMsg = 'tooShort';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
+      errorMsg = 'innappropriate';
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+
+  return errorMsg;
+};
+
+interface IOnboardingSectionAbout {
+  availableTags: newnewapi.ICreatorTag[];
+  currentTags: newnewapi.ICreatorTag[];
+}
+
+const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> = ({
+  availableTags,
+  currentTags,
+}) => {
+  const router = useRouter();
+  const { t } = useTranslation('creator-onboarding');
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+
+  // Bio
+  const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
+  const [bioError, setBioError] = useState('');
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+  const validateBioViaApi = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setBioError(errorSwitch(res.data?.status!!));
+      } else {
+        setBioError('');
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
+    }
+  }, [setBioError, dispatch]);
+
+  const validateBioViaApiDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateBioViaApi(text);
+  }, 250),
+  [validateBioViaApi]);
+
+  const handleUpdateBioInEdit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBioInEdit(e.target.value);
+
+    validateBioViaApiDebounced(
+      e.target.value,
+    );
+  };
+
+  // Tags
+  const [selectedTags, setSelectedTags] = useState(currentTags);
+
+  const handleAddTag = (tag: newnewapi.ICreatorTag) => {
+    if (selectedTags.find((i) => i.id?.toString() === tag.id?.toString())) return;
+    setSelectedTags((tags) => [...tags, tag])
+  }
+
+  const handleRemoveTag = (tag: newnewapi.ICreatorTag) => {
+    setSelectedTags((tags) => tags.filter((i) => i.id?.toString() !== tag.id?.toString()));
+  }
+
+  // Is form valid
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  const handleSubmit = useCallback(async () => {
+    try {
+      setLoadingModalOpen(true);
+
+      const updateBioPayload = new newnewapi.UpdateMeRequest({
+        bio: bioInEdit,
+      });
+
+      const updateMeRes = await updateMe(updateBioPayload);
+
+      if (!updateMeRes.data || updateMeRes.error) throw new Error(updateMeRes.error?.message ?? 'Request failed');
+
+      dispatch(setUserData({
+        bio: updateMeRes.data.me?.bio,
+      }));
+
+      const updateTagsPayload = new newnewapi.SetMyCreatorTagsRequest({
+        tagIds: selectedTags.map((i) => i.id) as number[],
+      });
+
+      const updateTagsRes = await setMyCreatorTags(updateTagsPayload);
+
+      if (!updateTagsRes.data || updateTagsRes.error) throw new Error(updateTagsRes.error?.message ?? 'Request failed');
+
+      router.push('/creator-onboarding-stripe');
+
+      setLoadingModalOpen(false);
+    } catch (err) {
+      console.log(err)
+      setLoadingModalOpen(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
+      }
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      }
+    }
+  }, [bioInEdit, dispatch, selectedTags, router]);
+
+  useEffect(() => {
+    if (
+      selectedTags.length >= 3
+      && bioInEdit.length > 0
+      && bioError === ''
+    ) {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  }, [selectedTags, bioError, bioInEdit]);
+
+  return (
+    <>
+      <SContainer>
+        {isMobile && (
+          <SGoBackButton
+            onClick={() => router.back()}
+          />
+        )}
+        <SHeading
+          variant={5}
+        >
+          {t('AboutSection.heading')}
+        </SHeading>
+        <STopContainer>
+          <SFormItemContainer>
+            <OnboardingBioTextarea
+              value={bioInEdit}
+              isValid={bioError === ''}
+              errorCaption={t(`AboutSection.bio.errors.${bioError}`)}
+              placeholder={t('AboutSection.bio.placeholder')}
+              maxChars={150}
+              onChange={handleUpdateBioInEdit}
+            />
+          </SFormItemContainer>
+          <SSeparator />
+          <SFormItemContainer>
+            <OnboardingTagsSelection
+              availableTags={availableTags}
+              selectedTags={selectedTags}
+              handleAddTag={handleAddTag}
+              handleRemoveTag={handleRemoveTag}
+            />
+          </SFormItemContainer>
+        </STopContainer>
+      <SControlsDiv>
+        {!isMobile && (
+          <GoBackButton
+            noArrow
+            onClick={() => router.back()}
+          >
+            { t('AboutSection.backButton') }
+          </GoBackButton>
+        )}
+        <Button
+          view="primaryGrad"
+          disabled={!isFormValid}
+          style={{
+            width: isMobile ? '100%' : 'initial',
+            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+          }}
+          onClick={() => handleSubmit()}
+        >
+          {isMobile ? (
+            t('AboutSection.submitMobile')
+          ) : t('AboutSection.submitDesktop') }
+        </Button>
+      </SControlsDiv>
+      </SContainer>
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
+    </>
+  );
+};
+
+export default OnboardingSectionAbout;
+
+const SContainer = styled.div`
+  padding-left: 16px;
+  padding-right: 16px;
+
+  padding-bottom: 88px;
+
+  z-index: 2;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-bottom: 0;
+
+    padding-left: 152px;
+    padding-right: 152px;
+
+    margin-bottom: 44px;
+
+    margin-top: 114px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height: fit-content;
+
+    padding-left: 0;
+    padding-right: 104px;
+
+    margin-bottom: 190px;
+    margin-top: 44px;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  padding-top: 16px;
+  padding-bottom: 22px;
+  margin-left: -4px;
+`;
+
+const SHeading = styled(Headline)`
+  padding-right: 32px;
+
+  margin-bottom: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 40px;
+  }
+`;
+
+const STopContainer = styled.div`
+  ${({ theme }) => theme.media.tablet} {
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    background-color: initial;
+    padding: initial;
+    border-radius: initial;
+    margin-bottom: initial;
+  }
+`;
+
+const SFormItemContainer = styled.div`
+  width: 100%;
+
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    /* width: 284px; */
+    width: 100%;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    /* width: 296px; */
+  }
+`;
+
+const SSeparator = styled.div`
+  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  margin-bottom: 16px;
+`;
+
+const SControlsDiv = styled.div`
+  /* position: fixed; */
+  margin-left: 16px;
+  width: calc(100% - 32px);
+
+  margin-top: 70%;
+
+  display: flex;
+  justify-content: space-between;
+
+
+  button {
+    width: 100%;
+    height: 56px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    position: static;
+    margin-top: 24px;
+
+    margin-left: initial;
+    width: 100%;
+
+    button {
+      width: 170px;
+      height: 48px;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-top: 70%;
+  }
+`;

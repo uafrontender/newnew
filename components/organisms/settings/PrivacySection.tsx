@@ -33,8 +33,6 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 }) => {
   const { t } = useTranslation('profile');
 
-  console.log(isAccountPrivate)
-
   return (
     <SWrapper
       onMouseEnter={() => handleSetActive()}

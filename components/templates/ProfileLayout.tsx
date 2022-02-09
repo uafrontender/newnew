@@ -207,6 +207,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           router.push(`/u/${user.username}/subscribe`);
         } else if (res.data?.status?.activeRenewsAt) {
           console.log('Subscribed! Redirect to chat will be here');
+          router.push(`/direct-messages?user=${user.uuid}`);
           // Testing
           // const unsubPayload = new newnewapi.UnsubscribeFromCreatorRequest({
           //   creatorUuid: user.uuid,

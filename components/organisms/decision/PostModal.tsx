@@ -53,6 +53,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     ? new URL(window.location.href).searchParams.get('suggestion')
     : undefined;
 
+  const sessionId = isBrowser()
+  ? new URL(window.location.href).searchParams.get('?session_id')
+  : undefined;
+
   const [open, setOpen] = useState(false);
 
   const modalContainerRef = useRef<HTMLDivElement>();
@@ -132,6 +136,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewMC
           post={postParsed as newnewapi.MultipleChoice}
+          sessionId={sessionId ?? undefined}
           handleGoBack={() => {
             window.history.back();
           }}
@@ -143,6 +148,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewAC
           post={postParsed as newnewapi.Auction}
           optionFromUrl={acSuggestionFromUrl}
+          sessionId={sessionId ?? undefined}
           handleGoBack={() => {
             window.history.back();
           }}
@@ -153,6 +159,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewCF
           post={postParsed as newnewapi.Crowdfunding}
+          sessionId={sessionId ?? undefined}
           handleGoBack={() => {
             window.history.back();
           }}

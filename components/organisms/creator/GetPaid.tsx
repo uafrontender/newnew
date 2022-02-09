@@ -1,38 +1,37 @@
-import React from 'react';
+import React, {
+  useEffect, useState,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { fetchSetStripeLinkCreator, getMyOnboardingState } from '../../../api/endpoints/user';
 
 import Headline from '../../atoms/Headline';
 import Navigation from '../../molecules/creator/Navigation';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
+import Lottie from '../../atoms/Lottie';
 
 import StripeLogo from '../../../public/images/svg/StripeLogo.svg';
 import StripeLogoS from '../../../public/images/svg/icons/filled/StripeLogoS.svg';
-import { fetchSetStripeLinkCreator, getMyOnboardingState } from '../../../api/endpoints/user';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export const GetPaid = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const user = useAppSelector((state) => state.user);
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleRedirectToStripesetup = async () => {
     try {
-      const resStatus = await getMyOnboardingState(new newnewapi.EmptyRequest({}))
-
-      console.log(resStatus)
-
       const payload = new newnewapi.SetupStripeCreatorAccountRequest({
-        refreshUrl: `${process.env.NEXT_PUBLIC_APP_URL}/creator/get-paid?setup=failure`,
-        returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/creator/get-paid?setup=success`,
+        refreshUrl: window.location.href,
+        returnUrl: window.location.href,
       });
-
-      console.log(payload)
 
       const res = await fetchSetStripeLinkCreator(payload);
 
@@ -49,6 +48,24 @@ export const GetPaid = () => {
 
   const handleRedirectToStripeUpdate = () => {};
 
+  useEffect(() => {
+    async function fetchOnboardingState() {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getMyOnboardingState(payload);
+
+        if (res.data) {
+          setOnboardingState(res.data);
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchOnboardingState();
+  }, []);
+
   return (
     <SContainer>
       {!isMobile && <Navigation />}
@@ -58,96 +75,108 @@ export const GetPaid = () => {
             {t('getPaid.title')}
           </STitle>
         </STitleBlock>
-        {/* @ts-ignore */}
-        {!user.userData?.options.isCreatorConnectedToStripe && (
-          <>
-            <SHeadline
-              variant={5}
-            >
-              <span>
-                {t('getPaid.title-set-up-stripe')}
-              </span>
-              <InlineSvg
-                svg={StripeLogo}
-                width="80px"
-              />
-            </SHeadline>
-            <SUl>
-              <li>
-                {t('getPaid.bullets.1')}
-              </li>
-              <li>
-                {t('getPaid.bullets.2')}
-              </li>
-              <li>
-                {t('getPaid.bullets.3')}
-              </li>
-            </SUl>
-            <SButton
-              view="primaryGrad"
-              onClick={() => handleRedirectToStripesetup()}
-            >
-              <InlineSvg
-                svg={StripeLogoS}
-                width="24px"
-                height="24px"
-              />
-              <span>
-                {t('getPaid.requestSetupLinkBtn')}
-              </span>
-            </SButton>
-          </>
-        )}
-        {/* @ts-ignore */}
-        {user.userData?.options.isCreatorConnectedToStripe && (
-          <>
-            <SHeadline
-              variant={5}
-            >
-              <InlineSvg
-                svg={StripeLogo}
-                width="80px"
-              />
-              <span>
-                {t('getPaid.title-stripe-active')}
-              </span>
-            </SHeadline>
-            <div
-              style={{
-                display: 'flex',
-                gap: '16px',
-                flexWrap: 'wrap',
+        {!isLoading ? (
+            <>
+            {!onboardingState?.isCreatorConnectedToStripe && (
+              <>
+                <SHeadline
+                  variant={5}
+                >
+                  <span>
+                    {t('getPaid.title-set-up-stripe')}
+                  </span>
+                  <InlineSvg
+                    svg={StripeLogo}
+                    width="80px"
+                  />
+                </SHeadline>
+                <SUl>
+                  <li>
+                    {t('getPaid.bullets.1')}
+                  </li>
+                  <li>
+                    {t('getPaid.bullets.2')}
+                  </li>
+                  <li>
+                    {t('getPaid.bullets.3')}
+                  </li>
+                </SUl>
+                <SButton
+                  view="primaryGrad"
+                  onClick={() => handleRedirectToStripesetup()}
+                >
+                  <InlineSvg
+                    svg={StripeLogoS}
+                    width="24px"
+                    height="24px"
+                  />
+                  <span>
+                    {t('getPaid.requestSetupLinkBtn')}
+                  </span>
+                </SButton>
+              </>
+            )}
+            {onboardingState?.isCreatorConnectedToStripe && (
+              <>
+                <SHeadline
+                  variant={5}
+                >
+                  <InlineSvg
+                    svg={StripeLogo}
+                    width="80px"
+                  />
+                  <span>
+                    {t('getPaid.title-stripe-active')}
+                  </span>
+                </SHeadline>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '16px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <SButton
+                    view="primaryGrad"
+                    onClick={() => handleRedirectToStripeAccount()}
+                  >
+                    <InlineSvg
+                      svg={StripeLogoS}
+                      width="24px"
+                      height="24px"
+                    />
+                    <span>
+                      {t('getPaid.getPaidBtn')}
+                    </span>
+                  </SButton>
+                  <SButton
+                    view="primaryGrad"
+                    onClick={() => handleRedirectToStripeUpdate()}
+                  >
+                    <InlineSvg
+                      svg={StripeLogoS}
+                      width="24px"
+                      height="24px"
+                    />
+                    <span>
+                      {t('getPaid.updateBtn')}
+                    </span>
+                  </SButton>
+                </div>
+              </>
+            )}
+            </>
+          ) : (
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
               }}
-            >
-              <SButton
-                view="primaryGrad"
-                onClick={() => handleRedirectToStripeAccount()}
-              >
-                <InlineSvg
-                  svg={StripeLogoS}
-                  width="24px"
-                  height="24px"
-                />
-                <span>
-                  {t('getPaid.getPaidBtn')}
-                </span>
-              </SButton>
-              <SButton
-                view="primaryGrad"
-                onClick={() => handleRedirectToStripeUpdate()}
-              >
-                <InlineSvg
-                  svg={StripeLogoS}
-                  width="24px"
-                  height="24px"
-                />
-                <span>
-                  {t('getPaid.updateBtn')}
-                </span>
-              </SButton>
-            </div>
-          </>
-        )}
+            />
+          )}
       </SContent>
     </SContainer>
   );

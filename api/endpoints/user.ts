@@ -159,3 +159,34 @@ export const getUserByUsername = (
   'post',
   payload,
 );
+
+// Creator tags
+export const getAvailableCreatorTags = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobuf<newnewapi.EmptyRequest, newnewapi.CreatorTags>(
+  newnewapi.EmptyRequest,
+  newnewapi.CreatorTags,
+  `${BASE_URL_USER}/get_available_creator_tags`,
+  'post',
+  payload,
+);
+
+export const setMyCreatorTags = (
+  payload: newnewapi.SetMyCreatorTagsRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.SetMyCreatorTagsRequest, newnewapi.EmptyResponse>(
+  newnewapi.SetMyCreatorTagsRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_USER}/set_my_creator_tags`,
+  'post',
+  payload,
+);
+
+export const getMyCreatorTags = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.CreatorTags>(
+  newnewapi.EmptyRequest,
+  newnewapi.CreatorTags,
+  `${BASE_URL_USER}/get_my_creator_tags`,
+  'post',
+  payload,
+);
