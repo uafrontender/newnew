@@ -7,6 +7,7 @@ export interface IUser {
   blockedUser?: boolean;
   subscriptionExpired?: boolean;
   messagingDisabled?: boolean;
+  accountDeleted?: boolean;
   avatar: string;
 }
 
