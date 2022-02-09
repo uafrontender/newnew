@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
@@ -8,21 +9,27 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/creation/TextArea';
 import InlineSVG from '../../atoms/InlineSVG';
-import BlockUserModal from '../../atoms/chat/BlockUserModal';
 import UserAvatar from '../UserAvatar';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import ChatEllipseMenu from './ChatEllipseMenu';
-import ChatEllipseModal from './ChatEllipseModal';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
 
 import { IUser, IMessage, IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
+import { SUserAlias } from '../../atoms/chat/styles';
 
-export const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => {
+const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
+const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
+const BlockedUser = dynamic(() => import('./BlockedUser'));
+const AccountDeleted = dynamic(() => import('./AccountDeleted'));
+const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
+const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
+const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
+
+const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => {
   const [message, setMessage] = useState('');
   const [localUserData, setUserData] = useState<IUser>({
     userName: '',
@@ -39,8 +46,8 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList
   }, [userData, messages]);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
@@ -82,8 +89,9 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList
 
       const content = (
         <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={`message-${item.id}`} mine={item.mine}>
-          {!nextSameUser && !item.mine && <SUserAvatar avatarUrl={localUserData?.avatar} />}
-          {!nextSameUser && item.mine && <SUserAvatar avatarUrl={user.userData?.avatarUrl} />}
+          {!nextSameUser && (
+            <SUserAvatar mine={item.mine} avatarUrl={!item.mine ? localUserData?.avatar : user.userData?.avatarUrl} />
+          )}
           <SMessageContent mine={item.mine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
             <SMessageText mine={item.mine} weight={600} variant={3}>
               {item.message}
@@ -132,145 +140,89 @@ export const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList
 
   return (
     <SContainer>
-      <STopPart>
-        {isMobileOrTablet && (
-          <SBackButton
-            clickable
-            svg={chevronLeftIcon}
-            fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
-            onClick={showChatList}
-          />
-        )}
-        <SUserData>
-          <SUserName>{localUserData?.userName}</SUserName>
-          <SUserAlias>@{localUserData?.userAlias}</SUserAlias>
-        </SUserData>
-        <SActionsDiv>
-          <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
-            <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
-          </SMoreButton>
-          {/* Ellipse menu */}
-          {!isMobile && (
-            <ChatEllipseMenu
-              isVisible={ellipseMenuOpen}
-              handleClose={handleCloseEllipseMenu}
-              userBlocked={localUserData?.blockedUser}
-              onUserBlock={onUserBlock}
+      {localUserData.userName && (
+        <STopPart>
+          {isMobileOrTablet && (
+            <SBackButton
+              clickable
+              svg={chevronLeftIcon}
+              fill={theme.colorsThemed.text.secondary}
+              width="24px"
+              height="24px"
+              onClick={showChatList}
             />
           )}
-          {isMobile && ellipseMenuOpen ? (
-            <ChatEllipseModal
-              isOpen={ellipseMenuOpen}
-              zIndex={11}
-              onClose={handleCloseEllipseMenu}
-              userBlocked={localUserData?.blockedUser}
-              onUserBlock={onUserBlock}
-            />
-          ) : null}
-        </SActionsDiv>
-      </STopPart>
+          <SUserData>
+            <SUserName>{localUserData?.userName}</SUserName>
+            <SUserAlias>@{localUserData?.userAlias}</SUserAlias>
+          </SUserData>
+          <SActionsDiv>
+            <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
+              <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
+            </SMoreButton>
+            {/* Ellipse menu */}
+            {!isMobile && (
+              <ChatEllipseMenu
+                isVisible={ellipseMenuOpen}
+                handleClose={handleCloseEllipseMenu}
+                userBlocked={localUserData?.blockedUser}
+                onUserBlock={onUserBlock}
+              />
+            )}
+            {isMobile && ellipseMenuOpen ? (
+              <ChatEllipseModal
+                isOpen={ellipseMenuOpen}
+                zIndex={11}
+                onClose={handleCloseEllipseMenu}
+                userBlocked={localUserData?.blockedUser}
+                onUserBlock={onUserBlock}
+              />
+            ) : null}
+          </SActionsDiv>
+        </STopPart>
+      )}
       <SCenterPart id="messagesScrollContainer" ref={scrollRef}>
-        {localUserData?.justSubscribed && (
-          <SWelcomeMessage>
-            <div>
-              <span>🎉</span>
-              <p>
-                {t('chat.welcome-message')} @{localUserData.userAlias}.
-              </p>
-            </div>
-          </SWelcomeMessage>
-        )}
+        {localUserData?.justSubscribed && <WelcomeMessage userAlias={localUserData.userAlias} />}
         {collection.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        {localUserData.blockedUser === true && (
-          <>
-            <SBottomAction>
-              <SBottomActionLeft>
-                <SBottomActionIcon>🤐</SBottomActionIcon>
-                <SBottomActionText>
-                  <SBottomActionTitle>{t('user-blocked.title')}</SBottomActionTitle>
-                  <SBottomActionMessage>{t('user-blocked.message')}</SBottomActionMessage>
-                </SBottomActionText>
-              </SBottomActionLeft>
-              <SBottomActionButton withDim withShadow withShrink view="primaryGrad" onClick={onUserBlock}>
-                {t('user-blocked.button-text')}
-              </SBottomActionButton>
-            </SBottomAction>
-          </>
+        {(localUserData.blockedUser === true || confirmBlockUser) && (
+          <BlockedUser
+            confirmBlockUser={confirmBlockUser}
+            isBlocked={localUserData.blockedUser}
+            userName={localUserData?.userName}
+            onUserBlock={onUserBlock}
+            closeModal={() => setConfirmBlockUser(false)}
+          />
         )}
-        <BlockUserModal
-          confirmBlockUser={confirmBlockUser}
-          onUserBlock={onUserBlock}
-          userName={localUserData?.userName}
-          closeModal={() => {
-            setConfirmBlockUser(false);
-          }}
-        />
-        {localUserData.subscriptionExpired && (
-          <SBottomAction>
-            <SBottomActionLeft>
-              <SBottomActionIcon>🤐</SBottomActionIcon>
-              <SBottomActionText>
-                <SBottomActionTitle>{t('subscription-expired.title')}</SBottomActionTitle>
-                <SBottomActionMessage>
-                  {t('subscription-expired.message-first-part')} {localUserData.userName}{' '}
-                  {t('subscription-expired.message-second-part')}
-                </SBottomActionMessage>
-              </SBottomActionText>
-            </SBottomActionLeft>
-            <SBottomActionButton
-              withDim
-              withShadow
-              withShrink
-              view="primaryGrad"
-              onClick={() => {
-                console.log('Renew subscription');
-              }}
-            >
-              {t('subscription-expired.button-text')}
-            </SBottomActionButton>
-          </SBottomAction>
-        )}
-        {localUserData.messagingDisabled && (
-          <SBottomAction>
-            <SBottomActionLeft>
-              <SBottomActionIcon>🤐</SBottomActionIcon>
-              <SBottomActionText>
-                <SBottomActionTitle>{t('messaging-disabled.title')}</SBottomActionTitle>
-                <SBottomActionMessage>{t('messaging-disabled.message')}</SBottomActionMessage>
-              </SBottomActionText>
-            </SBottomActionLeft>
-            <SBottomActionButton
-              withDim
-              withShadow
-              withShrink
-              view="primaryGrad"
-              onClick={() => {
-                console.log('Check user’s profile');
-              }}
-            >
-              {t('messaging-disabled.button-text')}
-            </SBottomActionButton>
-          </SBottomAction>
-        )}
-        {!localUserData.blockedUser && !localUserData.subscriptionExpired && !localUserData.messagingDisabled && (
-          <SBottomTextarea>
-            <STextArea>
-              <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
-            </STextArea>
-            <SButton withShadow view={message ? 'primaryGrad' : 'secondary'} onClick={handleSubmit} disabled={!message}>
-              <SInlineSVG
-                svg={sendIcon}
-                fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
-              />
-            </SButton>
-          </SBottomTextarea>
-        )}
+        {localUserData.subscriptionExpired && <SubscriptionExpired userName={localUserData.userName} />}
+        {localUserData.accountDeleted && <AccountDeleted />}
+        {localUserData.messagingDisabled && <MessagingDisabled />}
+
+        {!localUserData.blockedUser &&
+          !localUserData.subscriptionExpired &&
+          !localUserData.messagingDisabled &&
+          !localUserData.accountDeleted &&
+          localUserData.userName && (
+            <SBottomTextarea>
+              <STextArea>
+                <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
+              </STextArea>
+              <SButton
+                withShadow
+                view={message ? 'primaryGrad' : 'secondary'}
+                onClick={handleSubmit}
+                disabled={!message}
+              >
+                <SInlineSVG
+                  svg={sendIcon}
+                  fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
+                  width="24px"
+                  height="24px"
+                />
+              </SButton>
+            </SBottomTextarea>
+          )}
       </SBottomPart>
     </SContainer>
   );
@@ -307,23 +259,15 @@ const SUserName = styled.strong`
   padding-bottom: 4px;
 `;
 
-const SUserAlias = styled.span`
-  font-size: 12px;
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-`;
-
 const SActionsDiv = styled.div`
   position: relative;
 `;
 
 const SMoreButton = styled(Button)`
   background: none;
-
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-
   padding: 8px;
   margin-right: 18px;
-
   span {
     display: flex;
     flex-direction: column;
@@ -359,15 +303,33 @@ const STextArea = styled.div`
   flex: 1;
 `;
 
-const SUserAvatar = styled(UserAvatar)`
+interface ISUserAvatar {
+  mine?: boolean;
+}
+const SUserAvatar = styled(UserAvatar)<ISUserAvatar>`
   position: absolute;
-  left: 0;
   bottom: 0;
   width: 36px;
   height: 36px;
   min-width: 36px;
   min-height: 36px;
   padding: 0;
+  display: none;
+
+  ${(props) => {
+    if (props.mine) {
+      return css`
+        right: 0;
+      `;
+    }
+    return css`
+      left: 0;
+    `;
+  }}
+
+  ${(props) => props.theme.media.tablet} {
+    display: block;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -378,7 +340,6 @@ const SInlineSVG = styled(InlineSVG)`
 const SButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
-
   &:disabled {
     background: ${(props) =>
       props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
@@ -393,17 +354,32 @@ interface ISMessage {
 const SMessage = styled.div<ISMessage>`
   width: 100%;
   position: relative;
-  padding-left: ${(props) => {
+
+  ${(props) => {
     if (props.type !== 'info') {
-      return '44px';
+      if (props.mine) {
+        return css`
+          ${props.theme.media.tablet} {
+            padding-right: 44px;
+          }
+        `;
+      }
+      return css`
+        ${props.theme.media.tablet} {
+          padding-left: 44px;
+        }
+      `;
     }
-    return '0px';
-  }};
+    return css``;
+  }}
   display: flex;
   flex-direction: row;
   justify-content: ${(props) => {
     if (props.type === 'info') {
       return 'center';
+    }
+    if (props.mine) {
+      return 'flex-end';
     }
     return 'flex-start';
   }};
@@ -425,7 +401,6 @@ const SMessageContent = styled.div<ISMessageContent>`
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
     }
-
     if (props.theme.name === 'light') {
       return props.theme.colors.white;
     }
@@ -539,93 +514,6 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
-`;
-
-const SWelcomeMessage = styled.div`
-  position: absolute;
-  left: 0;
-  top: 48px;
-  right: 0;
-  padding: 0 20px;
-  font-size: 14px;
-  line-height: 20px;
-  display: flex;
-  text-align: center;
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  div {
-    max-width: 352px;
-    margin: 0 auto;
-  }
-  span {
-    font-size: 48px;
-  }
-  p {
-    margin: 12px 0 0;
-  }
-`;
-
-const SBottomAction = styled.div`
-  display: flex;
-  background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
-  border-radius: ${(props) => props.theme.borderRadius.medium};
-  padding: 24px;
-  width: 100%;
-  box-sizing: border-box;
-  align-items: center;
-  flex-wrap: wrap;
-  & + & {
-    margin-top: 20px;
-  }
-  ${(props) => props.theme.media.laptop} {
-    flex-wrap: nowrap;
-  }
-`;
-
-const SBottomActionLeft = styled.div`
-  display: flex;
-  margin-bottom: 24px;
-  align-items: center;
-  ${(props) => props.theme.media.tablet} {
-    margin-bottom: 0;
-  }
-`;
-
-const SBottomActionIcon = styled.span`
-  font-size: 48px;
-  line-height: 1;
-  margin-right: 24px;
-`;
-
-const SBottomActionText = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-weight: 600;
-  margin-right: 12px;
-`;
-
-const SBottomActionTitle = styled.strong`
-  font-size: 16px;
-  margin-bottom: 4px;
-  font-weight: 600;
-  color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
-`;
-
-const SBottomActionMessage = styled.span`
-  font-size: 14px;
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-`;
-
-const SBottomActionButton = styled(Button)`
-  padding: 12px 24px;
-  line-height: 24px;
-  margin-left: auto;
-  flex-shrink: 0;
-  width: 100%;
-  ${(props) => props.theme.media.tablet} {
-    width: auto;
-  }
 `;
 
 const SBackButton = styled(SInlineSVG)`
