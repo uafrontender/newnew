@@ -35,7 +35,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
 
         if (res.data?.status?.activeRenewsAt) {
           console.log('Subscribed! Redirecting to chat');
-          router.push(`/chat?user=${userId}`);
+          router.push(`/direct-messages?user=${userId}`);
         }
       } catch (err) {
         console.error(err);
@@ -58,7 +58,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
       setIsLoading(false);
 
       // router.push('/');
-      router.push(`/chat?user=${decoded.creatorUuid}`);
+      router.push(`/direct-messages?user=${decoded.creatorUuid}`);
     };
 
     if (socketConnection) {

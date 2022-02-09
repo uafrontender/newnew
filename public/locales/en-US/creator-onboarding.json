@@ -89,5 +89,63 @@
     "backButton": "Back",
     "submitDesktop": "Save and continue",
     "submitMobile": "Set up and continue"
+  },
+  "AboutSection": {
+    "meta": {
+      "title": "Tell us a little about yourself.",
+      "description": "This is the description that will show on your profile page."
+    },
+    "heading": "This what your fans see",
+    "backButton": "Close",
+    "submitMobile": "Save changes",
+    "submitDesktop": "Save changes",
+    "bio": {
+      "title": "Bio",
+      "placeholder": "Tell a few words about yourself...",
+      "errors": {
+        "generic": "Please check input",
+        "tooLong": "Bio is too long",
+        "tooShort": "Bio is too short",
+        "innappropriate": "Offensive words are forbidden"
+      }
+    },
+    "tags": {
+      "title": "What will you post about the most? Select at least three"
+    }
+  },
+  "StripeSection": {
+    "meta": {
+      "title": "Payments made easy with Stripe",
+      "description": "Connect a Stripe account to get paid on time."
+    },
+    "side": {
+      "heading": "Payments made easy with Stripe",
+      "subheading": "Connect a Stripe account to get paid on time."
+    },
+    "title-set-up-stripe": "Set payment system",
+    "title-stripe-active": "account is active",
+    "bullets": {
+      "1": "$2.00 USD NewNew withdrawal fee.",
+      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
+      "3": "Set up will take you to Stripe."
+    },
+    "requestSetupLinkBtn": "Connect with Stripe",
+    "stripeConnectedLinkBtn": "Stripe connected!",
+    "submitMobile": "Submit",
+    "submitDesktop": "Submit"
+  },
+  "SubrateSection": {
+    "meta": {
+      "title": "Grow your passive income.",
+      "description": "Enable subscriptions for your channel and get paid monthly."
+    },
+    "side": {
+      "heading": "Grow your passive income.",
+      "subheading": "Enable subscriptions for your channel and get paid monthly."
+    },
+    "heading": "Set your subscription rate",
+    "submitMobile": "Save changes",
+    "submitDesktop": "Save changes",
+    "backButton": "Close"
   }
 }

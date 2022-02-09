@@ -21,6 +21,8 @@ import PlaceBidForm from './PlaceAcBidForm';
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import SuggestionActionMobileModal from '../OptionActionMobileModal';
+import Text from '../../../atoms/Text';
+import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -115,6 +117,36 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
     option.id,
     postId,
   ]);
+
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href}&`,
+        cancelUrl: `${window.location.href}&`,
+        acBidRequest: {
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(supportBidAmount, 10) * 100,
+          }),
+          optionId: option.id,
+          postUuid: postId,
+        }
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data
+        || !res.data.sessionUrl
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [setPaymentModalOpen, setLoadingModalOpen, supportBidAmount, option.id, postId]);
 
   return (
     <SWrapper>
@@ -237,13 +269,22 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${supportBidAmount}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={() => {}}
         >
-          <PlaceBidForm
-            optionTitle={option.title}
-            amountRounded={supportBidAmount}
-            handlePlaceBid={handleSubmitSupportBid}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle
+              variant={3}
+            >
+              { t('AcPost.paymenModalHeader.subtitle') }
+            </SPaymentModalTitle>
+            <SPaymentModalOptionText>
+              { option.title }
+            </SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
       {/* Loading Modal */}
@@ -443,4 +484,20 @@ const SSuggestSupportMobileContainer = styled.div`
 
   padding: 16px;
 
+`;
+
+// Payment modal header
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

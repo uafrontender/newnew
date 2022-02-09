@@ -25,6 +25,7 @@ import PaymentModal from '../../checkout/PaymentModal';
 import PlaceMcBidForm from './PlaceMcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
+import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -133,6 +134,34 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     option.id,
     postId,
   ]);
+
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href}&`,
+        cancelUrl: `${window.location.href}&`,
+        mcVoteRequest: {
+          votesCount: parseInt(supportBidAmount, 10),
+          optionId: option.id,
+          postUuid: postId,
+        }
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data
+        || !res.data.sessionUrl
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [option.id, postId, supportBidAmount]);
 
   return (
     <motion.div
@@ -299,13 +328,22 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${supportBidAmount}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={() => {}}
         >
-          <PlaceMcBidForm
-            optionTitle={option.text}
-            amountRounded={supportBidAmount}
-            handlePlaceBid={handleSubmitSupportBid}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle
+              variant={3}
+            >
+              { t('McPost.paymenModalHeader.subtitle') }
+            </SPaymentModalTitle>
+            <SPaymentModalOptionText>
+              { option.text }
+            </SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
       {/* Loading Modal */}
@@ -550,4 +588,21 @@ const SSuggestSupportMobileContainer = styled.div`
 
   padding: 16px;
 
+`;
+
+
+// Payment modal header
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

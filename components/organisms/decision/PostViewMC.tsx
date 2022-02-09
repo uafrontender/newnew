@@ -20,7 +20,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import { fetchCurrentOptionsForMCPost } from '../../../api/endpoints/multiple_choice';
+import { fetchCurrentOptionsForMCPost, voteOnPost } from '../../../api/endpoints/multiple_choice';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import CommentsTab from '../../molecules/decision/CommentsTab';
@@ -28,9 +28,7 @@ import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab'
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-
-// Temp
-const MockVideo = '/video/mock/mock_video_1.mp4';
+import LoadingModal from '../../molecules/LoadingModal';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -38,11 +36,13 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 
 interface IPostViewMC {
   post: newnewapi.MultipleChoice;
+  sessionId?: string;
   handleGoBack: () => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   post,
+  sessionId,
   handleGoBack,
 }) => {
   const theme = useTheme();
@@ -63,6 +63,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   const [currentTab, setCurrentTab] = useState<
     'options' | 'comments'
   >('options');
+
+  // Vote from sessionId
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
@@ -258,8 +261,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         });
 
         const res = await markPost(markAsViewedPayload);
-
-        console.log(res);
       } catch (err) {
         console.error(err);
       }
@@ -280,6 +281,36 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    const makeVoteFromSessionId = async () => {
+      if (!sessionId) return;
+      try {
+        setLoadingModalOpen(true);
+        const payload = new newnewapi.FulfillPaymentPurposeRequest({
+          paymentSuccessUrl: `session_id=${sessionId}`,
+        });
+
+        const res = await voteOnPost(payload);
+
+        if (!res.data
+          || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        setLoadingModalOpen(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingModalOpen(false);
+      }
+    };
+
+    makeVoteFromSessionId();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -431,8 +462,17 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
             />
           )}
       </SActivitesContainer>
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
     </SWrapper>
   );
+};
+
+PostViewMC.defaultProps = {
+  sessionId: undefined,
 };
 
 export default PostViewMC;

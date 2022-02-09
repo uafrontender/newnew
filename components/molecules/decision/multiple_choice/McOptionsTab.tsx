@@ -25,6 +25,8 @@ import LoadingModal from '../../LoadingModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import Text from '../../../atoms/Text';
+import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -166,6 +168,38 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     handleAddOrUpdateOptionFromResponse,
   ]);
 
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href}&`,
+        cancelUrl: `${window.location.href}&`,
+        mcVoteRequest: {
+          votesCount: parseInt(newBidAmount, 10),
+          optionText: newOptionText,
+          postUuid: post.postUuid,
+        }
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data
+        || !res.data.sessionUrl
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [
+    newBidAmount,
+    newOptionText,
+    post.postUuid,
+  ]);
+
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
       handleLoadOptions(pagingToken);
@@ -297,13 +331,22 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${newBidAmount}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={() => {}}
         >
-          <PlaceMcBidForm
-            optionTitle={newOptionText}
-            amountRounded={newBidAmount}
-            handlePlaceBid={handleSubmitNewOption}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle
+              variant={3}
+            >
+              { t('McPost.paymenModalHeader.subtitle') }
+            </SPaymentModalTitle>
+            <SPaymentModalOptionText>
+              { newOptionText }
+            </SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
       {/* Loading Modal */}
@@ -441,4 +484,20 @@ const SAmountInput = styled.input`
   &:focus {
     outline: none;
   }
+`;
+
+// Payment modal header
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
