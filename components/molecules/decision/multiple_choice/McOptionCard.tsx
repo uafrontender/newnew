@@ -338,7 +338,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <SPaymentModalTitle
               variant={3}
             >
-              { t('paymenModalHeader.subtitle') }
+              { t('McPost.paymenModalHeader.subtitle') }
             </SPaymentModalTitle>
             <SPaymentModalOptionText>
               { option.text }

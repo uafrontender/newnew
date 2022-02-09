@@ -485,7 +485,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <SPaymentModalTitle
               variant={3}
             >
-              { t('paymenModalHeader.subtitle') }
+              { t('AcPost.paymenModalHeader.subtitle') }
             </SPaymentModalTitle>
             <SPaymentModalOptionText>
               { newBidText }

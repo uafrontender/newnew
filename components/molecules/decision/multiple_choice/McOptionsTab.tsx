@@ -341,7 +341,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             <SPaymentModalTitle
               variant={3}
             >
-              { t('paymenModalHeader.subtitle') }
+              { t('McPost.paymenModalHeader.subtitle') }
             </SPaymentModalTitle>
             <SPaymentModalOptionText>
               { newOptionText }

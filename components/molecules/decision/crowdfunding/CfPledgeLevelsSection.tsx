@@ -295,7 +295,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
               view="secondary"
               onClick={() => handleClosePledgeForm()}
             >
-              { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
+              { t('McPost.OptionsTab.OptionCard.cancelBtn') }
             </SCancelButton>
           </SNewPledgeForm>
         ) : null}
@@ -315,7 +315,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
             <SPaymentModalTitle
               variant={3}
             >
-              { t('paymenModalHeader.subtitle') }
+              { t('CfPost.paymenModalHeader.subtitle') }
             </SPaymentModalTitle>
             <SPaymentModalOptionText>
               { post.title }

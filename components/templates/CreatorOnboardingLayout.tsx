@@ -39,6 +39,16 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
+  const SideTextSwitch = () => {
+    if (router.pathname.includes('creator-onboarding-stripe')) {
+      return 'StripeSection'
+    }
+    if (router.pathname.includes('creator-onboarding-subrate')) {
+      return 'SubrateSection'
+    }
+    return 'DetailsSection';
+  }
+
   return (
     <ErrorBoundary>
       <SkeletonTheme
@@ -76,12 +86,12 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
               <SHeadline
                 variant={3}
               >
-                { t('DetailsSection.side.heading') }
+                { t(`${SideTextSwitch()}.side.heading`) }
               </SHeadline>
               <Text
                 variant={2}
               >
-                { t('DetailsSection.side.subheading') }
+                { t(`${SideTextSwitch()}.side.subheading`) }
               </Text>
             </SSideMessage>
           )}
