@@ -57,7 +57,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
+  const myBid = useMemo(() => {
+    if (!option.creator?.uuid || !user.userData?.userUuid) return false;
+    return option.creator?.uuid === user.userData?.userUuid;
+  }, [
     option.creator?.uuid,
     user.userData?.userUuid,
   ]);
@@ -86,10 +89,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    if (!user.loggedIn) {
-      router.push('/sign-up?reason=bid');
-      return;
-    }
+    // if (!user.loggedIn) {
+    //   router.push('/sign-up?reason=bid');
+    //   return;
+    // }
     setPaymentModalOpen(true);
   };
 
@@ -141,6 +144,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
         successUrl: `${window.location.href}&`,
         cancelUrl: `${window.location.href}&`,
+        ...(!user.loggedIn ? {
+          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        } : {}),
         mcVoteRequest: {
           votesCount: parseInt(supportBidAmount, 10),
           optionId: option.id,
@@ -161,7 +167,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       setLoadingModalOpen(false);
       console.error(err);
     }
-  }, [option.id, postId, supportBidAmount]);
+  }, [option.id, postId, supportBidAmount, user.loggedIn]);
 
   return (
     <motion.div
