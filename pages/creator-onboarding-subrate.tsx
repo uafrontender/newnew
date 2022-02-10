@@ -19,23 +19,95 @@ import OnboardingSectionStripe from '../components/molecules/creator-onboarding/
 import OnboardingSectionSubrate from '../components/molecules/creator-onboarding/OnboadringSectionSubrate';
 
 
+// Testing!
+export type TSubProduct = {
+  id: string;
+  monthlyRate: newnewapi.IMoneyAmount;
+}
+
+const mockProducts: TSubProduct[] = [
+  {
+    id: '1',
+    monthlyRate: {
+      usdCents: 200,
+    }
+  },
+  {
+    id: '2',
+    monthlyRate: {
+      usdCents: 500,
+    }
+  },
+  {
+    id: '3',
+    monthlyRate: {
+      usdCents: 1000,
+    }
+  },
+  {
+    id: '4',
+    monthlyRate: {
+      usdCents: 2000,
+    }
+  },
+  {
+    id: '5',
+    monthlyRate: {
+      usdCents: 3000,
+    }
+  },
+  {
+    id: '6',
+    monthlyRate: {
+      usdCents: 4000,
+    }
+  },
+  {
+    id: '7',
+    monthlyRate: {
+      usdCents: 5000,
+    }
+  },
+  {
+    id: '8',
+    monthlyRate: {
+      usdCents: 12000,
+    }
+  },
+];
+
 interface ICreatorOnboardingSubrate {}
 
 const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
   const { t } = useTranslation('creator-onboarding');
 
   const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [standardProducts, setStandardProducts] = useState<TSubProduct[]>([]);
+  const [currentProduct, setCurrentProduct] = useState<TSubProduct | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchOnboardingState() {
       try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
+        const getOnboardingStatePayload = new newnewapi.EmptyRequest({});
+        const onboardingStateRes = await getMyOnboardingState(getOnboardingStatePayload);
 
-        if (res.data) {
-          setOnboardingState(res.data);
+        if (onboardingStateRes.data) {
+          setOnboardingState(onboardingStateRes.data);
         }
+
+        const getStandardProductsPayload = new newnewapi.EmptyRequest({});
+        // const getStandardProductsRes = await getStandardSubscriptionProducts(getStandardProductsPayload);
+        // if (getStandardProductsRes.data) {
+        //   setStandardProducts(getStandardProductsRes.data);
+        // }
+        setStandardProducts(mockProducts);
+
+        const getCurrentProductPayload = new newnewapi.EmptyRequest({});
+        // const getCurrentProductRes = await getMySubscriptionProduct(getCurrentProductPayload);
+        // if (getCurrentProductRes.data) {
+          // setCurrentProduct(getCurrentProductRes.data);
+        // }
 
         setIsLoading(false);
       } catch (err) {
@@ -55,6 +127,8 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
       {!isLoading ? (
         <OnboardingSectionSubrate
           onboardingState={onboardingState!!}
+          standardProducts={standardProducts}
+          currentProduct={currentProduct}
         />
       ) : (
         <Lottie
