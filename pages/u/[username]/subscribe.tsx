@@ -22,6 +22,7 @@ import Headline from '../../../components/atoms/Headline';
 import dmsImage from '../../../public/images/subscription/dms.png';
 import votesImage from '../../../public/images/subscription/free-votes.png';
 import suggestionsImage from '../../../public/images/subscription/suggestions.png';
+import FaqSection from '../../../components/molecules/subscribe/FaqSection';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -166,6 +167,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                 </SBullet>
               </SBulletsSection>
             </STopSection>
+            <FaqSection />
           </main>
         </div>
       </SGeneral>
@@ -286,6 +288,9 @@ const STopSection = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 60px 60px !important;
+
+    margin-left: 12px;
+    margin-right: 12px;
 
     margin-bottom: 60px;
   }
