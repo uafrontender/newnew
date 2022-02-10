@@ -94,10 +94,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
-    if (!user.loggedIn) {
-      router.push('/sign-up?reason=bid');
-      return;
-    }
+    // if (!user.loggedIn) {
+    //   router.push('/sign-up?reason=bid');
+    //   return;
+    // }
     setPaymentModalOpen(true);
   };
 
@@ -197,6 +197,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
         successUrl: `${window.location.href}&`,
         cancelUrl: `${window.location.href}&`,
+        ...(!user.loggedIn ? {
+          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        } : {}),
         acBidRequest: {
           amount: new newnewapi.MoneyAmount({
             usdCents: parseInt(newBidAmount, 10) * 100,
@@ -220,6 +223,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       console.error(err);
     }
   }, [
+    user.loggedIn,
     newBidAmount,
     newBidText,
     postId,

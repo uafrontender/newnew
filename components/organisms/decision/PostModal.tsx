@@ -54,7 +54,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     : undefined;
 
   const sessionId = isBrowser()
-  ? new URL(window.location.href).searchParams.get('?session_id')
+  ? (new URL(window.location.href).searchParams.get('?session_id') || new URL(window.location.href).searchParams.get('session_id'))
   : undefined;
 
   const [open, setOpen] = useState(false);
