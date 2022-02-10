@@ -131,10 +131,10 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
 
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
-    if (!user.loggedIn) {
-      router.push('/sign-up?reason=make-pledge');
-      return;
-    }
+    // if (!user.loggedIn) {
+    //   router.push('/sign-up?reason=make-pledge');
+    //   return;
+    // }
     setPaymentModalOpen(true);
   };
 
@@ -187,6 +187,9 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
         successUrl: `${window.location.href}&`,
         cancelUrl: `${window.location.href}&`,
+        ...(!user.loggedIn ? {
+          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        } : {}),
         cfPledgeRequest: {
           amount: new newnewapi.MoneyAmount({
             usdCents: parseInt(pledgeAmount?.toString()!!, 10),
@@ -214,6 +217,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
       setLoadingModalOpen(false);
     }
   }, [
+    user.loggedIn,
     pledgeAmount,
     pledgeMessage,
     post.postUuid,

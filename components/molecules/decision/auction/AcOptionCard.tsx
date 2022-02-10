@@ -95,10 +95,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    if (!user.loggedIn) {
-      router.push('/sign-up?reason=bid');
-      return;
-    }
+    // if (!user.loggedIn) {
+    //   router.push('/sign-up?reason=bid');
+    //   return;
+    // }
     setPaymentModalOpen(true);
   };
 
@@ -152,6 +152,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
         successUrl: `${window.location.href}&`,
         cancelUrl: `${window.location.href}&`,
+        ...(!user.loggedIn ? {
+          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        } : {}),
         acBidRequest: {
           amount: new newnewapi.MoneyAmount({
             usdCents: parseInt(supportBidAmount, 10) * 100,
@@ -174,7 +177,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setLoadingModalOpen(false);
       console.error(err);
     }
-  }, [setPaymentModalOpen, setLoadingModalOpen, supportBidAmount, option.id, postId]);
+  }, [user.loggedIn, supportBidAmount, option.id, postId]);
 
   return (
     <motion.div
