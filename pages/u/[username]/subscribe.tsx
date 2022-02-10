@@ -1,25 +1,27 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useState } from 'react';
+import React, { useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import styled from 'styled-components';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 
+import { useAppSelector } from '../../../redux-store/store';
 import { getUserByUsername } from '../../../api/endpoints/user';
-
-import { NextPageWithLayout } from '../../_app';
-import HomeLayout from '../../../components/templates/HomeLayout';
-import Button from '../../../components/atoms/Button';
-import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
 import { subscribeToCreator } from '../../../api/endpoints/subscription';
-import Text from '../../../components/atoms/Text';
-import Headline from '../../../components/atoms/Headline';
-import ProfileBackground from '../../../components/molecules/profile/ProfileBackground';
-import InlineSvg from '../../../components/atoms/InlineSVG';
-import ProfileImage from '../../../components/molecules/profile/ProfileImage';
+
 import General from '../../../components/templates/General';
+import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
+import Text from '../../../components/atoms/Text';
+import Button from '../../../components/atoms/Button';
+import Headline from '../../../components/atoms/Headline';
+
+// Images
+import dmsImage from '../../../public/images/subscription/dms.png';
+import votesImage from '../../../public/images/subscription/free-votes.png';
+import suggestionsImage from '../../../public/images/subscription/suggestions.png';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -28,9 +30,21 @@ interface ISubscribeToUserPage {
 const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   user,
 }) => {
+  const router = useRouter();
   const { t } = useTranslation('subscribe-to-user');
+  const { userData, loggedIn } = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+  const handleOpenPaymentModal = () => {
+    if (!loggedIn) {
+      router.push(`/sign-up?reason=subscribe`);
+      return;
+    }
+    setIsPaymentModalOpen(true);
+  }
 
   const handlePayWithCard = async () => {
     try {
@@ -56,40 +70,102 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       <SGeneral>
         <div>
           <main>
-          <SProfileLayout>
-            <ProfileBackground
-              // Temp
-              pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
-            />
-            <ProfileImage
-              src={user.avatarUrl ?? ''}
-            />
-            <div
-              style={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <SUsername
-                variant={4}
-              >
-                {user.nickname}
-              </SUsername>
-              <Button
-                withShadow
-                view="primaryGrad"
-                style={{
-                  marginBottom: '16px',
-                }}
-                onClick={() => setIsPaymentModalOpen(true)}
-              >
-                {/* @ts-ignore */}
-                {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
-              </Button>
-              </div>
-            </SProfileLayout>
+          <STopSection>
+            <UserInfoSection>
+              <SHeadingSection>
+                  <SSHeadingSectionAvatar>
+                    <img
+                      alt={user.username}
+                      src={user.avatarUrl}
+                    />
+                  </SSHeadingSectionAvatar>
+                  <div>
+                    <Headline
+                      variant={4}
+                    >
+                      { t('TopSection.headline.line_1', { username: user.username }) }
+                    </Headline>
+                    <Headline
+                      variant={2}
+                    >
+                      { t('TopSection.headline.line_2') }
+                    </Headline>
+                  </div>
+                </SHeadingSection>
+                <SButtonsSection>
+                  <Button
+                    withShadow
+                    view="primaryGrad"
+                    style={{
+                      marginBottom: '16px',
+                    }}
+                    onClick={() => handleOpenPaymentModal()}
+                  >
+                    {/* @ts-ignore */}
+                    {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+                  </Button>
+                  <Button
+                    view="quaternary"
+                    style={{
+                      marginBottom: '16px',
+                    }}
+                    onClick={() => {}}
+                  >
+                    {t('learnMoreBtn')}
+                  </Button>
+                </SButtonsSection>
+              </UserInfoSection>
+              <SBulletsSection>
+                <SBullet>
+                  <SBulletImg
+                    alt=""
+                    src={dmsImage.src}
+                  />
+                  <SBulletTitle
+                    variant={2}
+                  >
+                    { t('TopSection.bullets.dms.title') }
+                  </SBulletTitle>
+                  <SBulletBody
+                    variant={3}
+                  >
+                    { t('TopSection.bullets.dms.body') }
+                  </SBulletBody>
+                </SBullet>
+                <SBullet>
+                  <SBulletImg
+                    alt=""
+                    src={votesImage.src}
+                  />
+                  <SBulletTitle
+                    variant={2}
+                  >
+                    { t('TopSection.bullets.freeVotes.title') }
+                  </SBulletTitle>
+                  <SBulletBody
+                    variant={3}
+                  >
+                    { t('TopSection.bullets.freeVotes.body') }
+                  </SBulletBody>
+                </SBullet>
+                <SBullet>
+                  <SBulletImg
+                    alt=""
+                    src={suggestionsImage.src}
+                  />
+                  <SBulletTitle
+                    variant={2}
+                  >
+                    { t('TopSection.bullets.suggestions.title') }
+                  </SBulletTitle>
+                  <SBulletBody
+                    variant={3}
+                  >
+                    { t('TopSection.bullets.suggestions.body') }
+                  </SBulletBody>
+                </SBullet>
+              </SBulletsSection>
+            </STopSection>
           </main>
         </div>
       </SGeneral>
@@ -116,15 +192,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
             </SAvatar>
             <SCreatorInfo>
               <SCreatorUsername>
-                {`@${user.username}`}
+                {isMobile ? (
+                  user.nickname
+                ) : (
+                  `@${user.username}`
+                )}
               </SCreatorUsername>
-              {' '}
-              <SSubscriberInfo>
-                {/* @ts-ignore */}
-                {user.numSubscribers ?? 20}
-                {' '}
-                { t('paymenModalHeader.numSubscribers') }
-              </SSubscriberInfo>
             </SCreatorInfo>
           </SPaymentModalCreatorInfo>
         </SPaymentModalHeader>
@@ -132,12 +205,6 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     </>
   );
 };
-
-// (SubscribeToUserPage as NextPageWithLayout).getLayout = (page: ReactElement) => (
-//   <HomeLayout>
-//     {page}
-//   </HomeLayout>
-// );
 
 export default SubscribeToUserPage;
 
@@ -202,103 +269,14 @@ const SGeneral = styled(General)`
   }
 `;
 
-
-const SUsername = styled(Headline)`
-  text-align: center;
-
-  margin-bottom: 12px;
-`;
-
-const SShareDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  gap: 12px;
-
-  margin-bottom: 16px;
-`;
-
-const SUsernameButtonText = styled(Text)`
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
-
-const SBioText = styled(Text)`
-  text-align: center;
-  overflow-wrap: break-word;
-
-  padding-left: 16px;
-  padding-right: 16px;
-  margin-bottom: 54px;
-
-  max-width: 480px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
-
-const SFavoritesButton = styled(Button)`
-  position: absolute;
-  top: 164px;
-  right: 4px;
-
-  background: none;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-    right: calc(4px + 56px);
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-  }
-`;
-
-const SMoreButton = styled(Button)`
-  position: absolute;
-  top: 164px;
-  left: 4px;
-
-  background: none;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    top: 204px;
-    left: initial;
-    right: 4px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    top: 244px;
-  }
-`;
-
-const SProfileLayout = styled.div`
+const STopSection = styled.div`
   position: relative;
   overflow: hidden;
 
   margin-top: -28px;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
+
+  padding: 24px 16px !important;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
@@ -306,28 +284,190 @@ const SProfileLayout = styled.div`
     margin-top: -8px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    padding: 60px 60px !important;
+
+    margin-bottom: 60px;
   }
 
   ${(props) => props.theme.media.laptop} {
+    display: flex;
+    align-items: center;
+
     margin-top: -16px;
+
+    padding: 82px 96px !important;
+
+    margin-bottom: 120px;
   }
 `;
 
+const UserInfoSection = styled.div`
+  ${(props) => props.theme.media.laptop} {
+    width: 50%;
+  }
+`;
+
+const SHeadingSection = styled.div`
+  margin-bottom: 24px;
+`;
+
+const SSHeadingSectionAvatar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  position: relative;
+
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+
+  margin-bottom: 24px;
+
+  img {
+    display: block;
+    width: 84px;
+    height: 84px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+
+    img {
+      display: block;
+      width: 72px;
+      height: 72px;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+
+    img {
+      display: block;
+      width: 84px;
+      height: 84px;
+    }
+  }
+`;
+
+const SButtonsSection = styled.div`
+  display: flex;
+  gap: 24px;
+`;
+
+const SBulletsSection = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    width: 50%;
+  }
+`;
+
+const SBullet = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: radial-gradient(100% 1411.13% at 0% 0%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%), radial-gradient(100% 1411.13% at 100% 100%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%), #1B1C27;
+
+  height: 128px;
+
+  border-radius: 24px;
+
+  margin-bottom: 24px !important;
+
+  margin-left: 48px !important;
+  padding-left: 64px !important;
+  padding-right: 16px !important;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: 140px;
+
+    border-radius: 24px;
+    margin-bottom: 24px !important;
+
+    margin-left: 70px !important;
+    padding-left: 102px !important;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+
+  }
+`;
+
+const SBulletImg = styled.img`
+  position: absolute;
+  left: -48px;
+  top: calc(50% - 48px);
+
+  width: 96px;
+  height: 96px;
 
 
+  ${({ theme }) => theme.media.tablet} {
+    left: -70px;
+    top: calc(50% - 70px);
+    width: 140px;
+    height: initial;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+
+  }
+`;
+
+const SBulletTitle = styled(Text)`
+  margin-bottom: 4px;
+`;
+
+const SBulletBody = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+// Payment modal header
 const SPaymentModalHeader = styled.div`
 
 `;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  margin-bottom: 6px;
+
+  text-align: center;
+  margin-bottom: 12px;
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+    margin-bottom: 6px;
+  }
 `;
 
 const SPaymentModalCreatorInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: initial;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
 `;
 
 const SAvatar = styled.div`
@@ -341,14 +481,26 @@ const SAvatar = styled.div`
   grid-area: avatar;
   justify-self: left;
 
-  width: 36px;
-  height: 36px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
 
   img {
     display: block;
+    width: 84px;
+    height: 84px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
     width: 36px;
     height: 36px;
+    border-radius: 50%;
+
+    img {
+      display: block;
+      width: 36px;
+      height: 36px;
+    }
   }
 `;
 
@@ -358,13 +510,6 @@ const SCreatorInfo = styled.div`
 
 const SCreatorUsername = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-`;
-
-const SSubscriberInfo = styled.span`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
