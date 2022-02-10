@@ -6,7 +6,8 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { fetchSetStripeLinkCreator, getMyOnboardingState } from '../../../api/endpoints/user';
+import { fetchSetStripeLinkCreator } from '../../../api/endpoints/payments';
+import { getMyOnboardingState } from '../../../api/endpoints/user';
 
 import Headline from '../../atoms/Headline';
 import Navigation from '../../molecules/creator/Navigation';

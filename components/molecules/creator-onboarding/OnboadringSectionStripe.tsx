@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import { fetchSetStripeLinkCreator } from '../../../api/endpoints/user';
+import { fetchSetStripeLinkCreator } from '../../../api/endpoints/payments';
 
 import Headline from '../../atoms/Headline';
 import Button from '../../atoms/Button';
@@ -126,8 +126,8 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
         onClick={() => handleSubmit()}
       >
         {isMobile ? (
-          t('AboutSection.submitMobile')
-        ) : t('AboutSection.submitDesktop') }
+          t('StripeSection.submitMobile')
+        ) : t('StripeSection.submitDesktop') }
       </Button>
     </SControlsDiv>
     </SContainer>
