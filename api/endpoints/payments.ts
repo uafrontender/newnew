@@ -3,6 +3,7 @@ import {
   BASE_URL,
   fetchProtobuf,
   cookiesInstance,
+  fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
 export const BASE_URL_PAYMENTS = `${BASE_URL}/payments`;
@@ -18,7 +19,7 @@ newnewapi.EmptyRequest, newnewapi.GetSupportedCreatorCountriesResponse>(
   payload,
 );
 
-// Payments
+// Payments for bids/pledges/votes
 export const createPaymentSession = (
   payload: newnewapi.CreatePaymentSessionRequest,
 ) => fetchProtobuf<newnewapi.CreatePaymentSessionRequest, newnewapi.CreatePaymentSessionResponse>(
@@ -31,4 +32,16 @@ export const createPaymentSession = (
   (cookiesInstance.get('accessToken') ? {
     'x-auth-token': cookiesInstance.get('accessToken'),
   } : {}),
+);
+
+// Set up Stripe creator account
+export const fetchSetStripeLinkCreator = (
+  payload: newnewapi.SetupStripeCreatorAccountRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.SetupStripeCreatorAccountRequest, newnewapi.SetupStripeCreatorAccountResponse>(
+  newnewapi.SetupStripeCreatorAccountRequest,
+  newnewapi.SetupStripeCreatorAccountResponse,
+  `${BASE_URL_PAYMENTS}/setup_stripe_creator_account`,
+  'post',
+  payload,
 );

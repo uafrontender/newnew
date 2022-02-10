@@ -27,6 +27,7 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import Text from '../../../atoms/Text';
 import { createPaymentSession } from '../../../../api/endpoints/payments';
+import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -71,10 +72,23 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
-  const handleTogglePaymentModalOpen = () => {
+  const handleTogglePaymentModalOpen = async () => {
     if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
-      router.push('/sign-up?reason=vote');
+      router.push('/sign-up?reason=subscribe-suggest-new-option');
+      return;
+    }
+    // Check if subscribed
+    const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+      creatorUuid: post.creator?.uuid,
+    });
+
+    const res = await getSubscriptionStatus(getStatusPayload);
+
+    console.log(res.data);
+
+    if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
+      router.push(`/u/${post.creator?.username}/subscribe`);
       return;
     }
     setPaymentModalOpen(true);
