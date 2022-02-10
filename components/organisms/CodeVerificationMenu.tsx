@@ -130,7 +130,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       setIsSigninWithEmailLoading(false);
       setIsSuccess(true);
 
-      router.push('/');
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setIsSigninWithEmailLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -154,7 +158,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: signupEmailInput,
-        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP,
+        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
       });
 
       const { data, error } = await sendVerificationEmail(payload);
