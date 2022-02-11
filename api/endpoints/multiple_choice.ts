@@ -9,9 +9,9 @@ import {
 export const BASE_URL_MULTICHOICE = `${BASE_URL}/multiple_choice`;
 
 export const fetchTopMultipleChoices = (
-  payload: newnewapi.PagedRequest,
-) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedMultipleChoicesResponse>(
-  newnewapi.PagedRequest,
+  payload: newnewapi.PagedMultipleChoicesRequest,
+) => fetchProtobuf<newnewapi.PagedMultipleChoicesRequest, newnewapi.PagedMultipleChoicesResponse>(
+  newnewapi.PagedMultipleChoicesRequest,
   newnewapi.PagedMultipleChoicesResponse,
   `${BASE_URL_MULTICHOICE}/get_top_multiple_choices`,
   'post',

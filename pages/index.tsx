@@ -127,7 +127,7 @@ const Home: NextPage<IHome> = ({
       try {
         setCollectionACInitialLoading(true);
 
-        const liveAuctionsPayload = new newnewapi.PagedRequest({});
+        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({});
 
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
@@ -151,7 +151,7 @@ const Home: NextPage<IHome> = ({
     async function fetchMultipleChoices() {
       try {
         setCollectionMCInitialLoading(true);
-        const multichoicePayload = new newnewapi.PagedRequest({});
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({});
 
         const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
 
@@ -175,7 +175,7 @@ const Home: NextPage<IHome> = ({
     async function fetchCrowdfundings() {
       try {
         setCollectionCFInitialLoading(true);
-        const cfPayload = new newnewapi.PagedRequest({});
+        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({});
 
         const resCF = await fetchTopCrowdfundings(cfPayload);
 
