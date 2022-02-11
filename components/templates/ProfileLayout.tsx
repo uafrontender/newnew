@@ -1,6 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React, {
-  ReactElement, useCallback, useEffect, useMemo, useState,
+  ReactElement, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -25,6 +25,8 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 import { getSubscriptionStatus } from '../../api/endpoints/subscription';
+import { FollowingsContext } from '../../contexts/followingContext';
+import { markUser } from '../../api/endpoints/user';
 
 type TPageType = 'creatorsDecisions'
   | 'activity'
@@ -56,14 +58,15 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   postsCachedActivityCount,
   children,
 }) => {
-  const { t } = useTranslation('profile');
-  const theme = useTheme();
-
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const currentUser = useAppSelector((state) => state.user);
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation('profile');
 
+  const currentUser = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
@@ -280,6 +283,33 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     );
   };
 
+  const handleToggleFollowingCreator = async () => {
+    try {
+      if (!currentUser.loggedIn) {
+        router.push('/sign-up?reason=follow-creator');
+      }
+
+      const payload = new newnewapi.MarkUserRequest({
+        userUuid: user.uuid,
+        markAs: followingsIds.includes(user.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+      });
+
+      console.log(payload)
+
+      const res = await markUser(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      if (followingsIds.includes(user.uuid as string)) {
+        removeId(user.uuid as string);
+      } else {
+        addId(user.uuid as string);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (currentUser.loggedIn
@@ -298,10 +328,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           />
           {/* Favorites and more options buttons */}
           <SFavoritesButton
-            view="transparent"
+            view={followingsIds.includes(user.uuid as string) ? 'primaryGrad' : 'transparent'}
             iconOnly
-            onClick={() => {
-            }}
+            onClick={() => handleToggleFollowingCreator()}
           >
             <InlineSvg
               svg={FavouritesIconFilled}
@@ -493,7 +522,7 @@ const SFavoritesButton = styled(Button)`
   top: 164px;
   right: 4px;
 
-  background: none;
+  /* background: none; */
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
