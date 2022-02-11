@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { getSubscriptions } from '../../contexts/subscriptionsContext';
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
 import SearchInput from '../atoms/chat/SearchInput';
@@ -24,6 +25,8 @@ export const Chat = () => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
+  const { mySubscribers, creatorsImSubscribedTo } = getSubscriptions();
+
   useEffect(() => {
     /* eslint-disable no-unused-expressions */
     isMobileOrTablet ? setChatListHidden(true) : setChatListHidden(undefined);
@@ -36,12 +39,18 @@ export const Chat = () => {
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [chatData]);
 
+  useEffect(() => {
+    console.log(mySubscribers, creatorsImSubscribedTo);
+  }, [mySubscribers, creatorsImSubscribedTo]);
+
   const showChatList = () => {
     setChatListHidden(false);
   };
 
   const passInputValue = (str: string) => {
-    console.log(str);
+    if (str) {
+      console.log(str);
+    }
   };
 
   return (

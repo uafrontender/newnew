@@ -32,11 +32,12 @@ import { cookiesInstance } from '../api/apiConfigs';
 
 import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
+import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode,
-}
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 interface IMyApp extends AppProps {
   Component: NextPageWithLayout;
@@ -44,11 +45,7 @@ interface IMyApp extends AppProps {
 }
 
 const MyApp = (props: IMyApp): ReactElement => {
-  const {
-    Component,
-    pageProps,
-    uaString,
-  } = props;
+  const { Component, pageProps, uaString } = props;
   const ua: UserAgent = parse(uaString || (isBrowser() ? window?.navigator?.userAgent : ''));
   const store = useStore();
   const currentResizeMode = store.getState()?.ui?.resizeMode;
@@ -84,30 +81,24 @@ const MyApp = (props: IMyApp): ReactElement => {
         <meta name="robots" content="noindex" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
       </Head>
-      <CookiesProvider
-        cookies={cookiesInstance}
-      >
+      <CookiesProvider cookies={cookiesInstance}>
         <SocketContextProvider>
           <ChannelsContextProvider>
-            <PersistGate
-              loading={null}
-              persistor={(store as EnhancedStoreWithPersistor).__persistor}
-            >
-              <ResizeMode>
-                <GlobalTheme>
-                  <div>
-                    <ToastContainer />
-                    {!pageProps.error ? (
-                      getLayout(<Component {...pageProps} />)
-                    ) : (
-                      <Error
-                        errorMsg={pageProps.error?.message}
-                        statusCode={pageProps.error?.statusCode ?? 500}
-                      />
-                    )}
-                  </div>
-                </GlobalTheme>
-              </ResizeMode>
+            <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
+              <SubscriptionsProvider>
+                <ResizeMode>
+                  <GlobalTheme>
+                    <div>
+                      <ToastContainer />
+                      {!pageProps.error ? (
+                        getLayout(<Component {...pageProps} />)
+                      ) : (
+                        <Error errorMsg={pageProps.error?.message} statusCode={pageProps.error?.statusCode ?? 500} />
+                      )}
+                    </div>
+                  </GlobalTheme>
+                </ResizeMode>
+              </SubscriptionsProvider>
             </PersistGate>
           </ChannelsContextProvider>
         </SocketContextProvider>
