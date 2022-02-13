@@ -11,14 +11,16 @@ const SubscriptionsContext = createContext({
   creatorsImSubscribedTo: [] as string[],
   addCreatorsImSubscribedTo: (creatorId: string) => {},
   removeCreatorsImSubscribedTo: (creatorId: string) => {},
-  isLoading: false,
+  isMySubscribersIsLoading: false,
+  isCreatorsImSubscribedToLoading: false,
 });
 
 export const SubscriptionsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   const [mySubscribers, setMySubscribers] = useState<newnewapi.IUser[]>([]);
   const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
+  const [isCreatorsImSubscribedToLoading, setCreatorsImSubscribedToLoading] = useState(false);
 
   const addSubscriber = (subscriber: newnewapi.IUser) => {
     setMySubscribers((curr) => [...curr, subscriber]);
@@ -44,7 +46,8 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       creatorsImSubscribedTo,
       addCreatorsImSubscribedTo,
       removeCreatorsImSubscribedTo,
-      isLoading,
+      isMySubscribersIsLoading,
+      isCreatorsImSubscribedToLoading,
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
     [
@@ -58,41 +61,38 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
   );
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchMySubscribers() {
       if (!user.loggedIn) return;
       try {
-        setIsLoading(true);
-
-        const payloadMySubscribers = new newnewapi.GetMySubscribersRequest({
+        setMySubscribersIsLoading(true);
+        const payload = new newnewapi.GetMySubscribersRequest({
           paging: null,
         });
-        const payloadcCreatorsImSubscribedTo = new newnewapi.EmptyRequest({});
-
-        const resMySubscribers = await getMySubscribers(payloadMySubscribers);
-        const resCreatorsImSubscribedTo = await getCreatorsImSubscribedTo(payloadcCreatorsImSubscribedTo);
-
-        if (!resMySubscribers.data || resMySubscribers.error) {
-          if (!resCreatorsImSubscribedTo.data || resCreatorsImSubscribedTo.error) {
-            throw new Error(
-              `${resMySubscribers.error?.message}
-              ${resCreatorsImSubscribedTo.error?.message}` ?? 'Request failed'
-            );
-          } else {
-            setCreatorsImSubscribedTo(resCreatorsImSubscribedTo.data?.creatorUuids as []);
-            throw new Error(resMySubscribers.error?.message ?? 'Request failed');
-          }
-        } else {
-          setMySubscribers(resMySubscribers.data?.subscribers as newnewapi.IUser[]);
-        }
-
-        setIsLoading(false);
+        const res = await getMySubscribers(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setMySubscribers(res.data.subscribers as newnewapi.IUser[]);
       } catch (err) {
         console.error(err);
-        setIsLoading(false);
+        setMySubscribersIsLoading(false);
       }
     }
 
-    fetchData();
+    async function fetchCreatorsImSubscribedTo() {
+      if (!user.loggedIn) return;
+      try {
+        setCreatorsImSubscribedToLoading(true);
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getCreatorsImSubscribedTo(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setCreatorsImSubscribedTo(res.data.creatorUuids as []);
+      } catch (err) {
+        console.error(err);
+        setCreatorsImSubscribedToLoading(false);
+      }
+    }
+
+    fetchMySubscribers();
+    fetchCreatorsImSubscribedTo();
   }, [user.loggedIn]);
 
   return <SubscriptionsContext.Provider value={contextValue}>{children}</SubscriptionsContext.Provider>;
