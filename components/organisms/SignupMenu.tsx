@@ -450,14 +450,14 @@ const SHeadline = styled(Headline)`
 `;
 
 const SSubheading = styled(Text)`
-  display: none;
+  display: none !important;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-style: normal;
 
   ${({ theme }) => theme.media.tablet} {
-    display: block;
+    display: block !important;
     margin-bottom: 24px;
 
     font-size: 16px;
@@ -523,7 +523,6 @@ const SLegalText = styled(Text)`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    text-align: left;
     font-size: 14px;
     line-height: 20px;
   }
