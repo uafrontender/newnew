@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -23,6 +24,7 @@ import dmsImage from '../../../public/images/subscription/dms.png';
 import votesImage from '../../../public/images/subscription/free-votes.png';
 import suggestionsImage from '../../../public/images/subscription/suggestions.png';
 import FaqSection from '../../../components/molecules/subscribe/FaqSection';
+import isBrowser from '../../../utils/isBrowser';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -32,10 +34,14 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   user,
 }) => {
   const router = useRouter();
+  const theme = useTheme();
   const { t } = useTranslation('subscribe-to-user');
   const { userData, loggedIn } = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const topSectionRef = useRef<HTMLDivElement>();
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
@@ -66,12 +72,76 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     }
   };
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      // @ts-ignore
+      const currScroll = e?.currentTarget?.scrollTop!!;
+      const targetScroll = topSectionRef.current?.scrollHeight;
+
+      if (currScroll >= targetScroll!!) {
+        setIsScrolledDown(true);
+      } else {
+        setIsScrolledDown(false);
+      }
+    }
+
+    if (isBrowser()) {
+      document?.getElementById('generalScrollContainer')?.addEventListener('scroll', handler);
+    }
+
+    return () => {
+      if (isBrowser()) {
+        document?.getElementById('generalScrollContainer')?.removeEventListener('scroll', handler);
+      }
+    }
+  }, [isMobile]);
+
   return (
     <>
       <SGeneral>
         <div>
           <main>
-          <STopSection>
+            <AnimatePresence>
+              {isScrolledDown && !isMobile && (
+                <SScrolledDownTopSection
+                  initial={{
+                    opacity: 0,
+                    y: -30
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -30
+                  }}
+                >
+                  <SUserInfoScrollDown>
+                    <SUserInfoScrollDownAvatar>
+                      <img
+                        alt={user.username}
+                        src={user.avatarUrl}
+                      />
+                    </SUserInfoScrollDownAvatar>
+                    <SUserInfoScrollDownNickname>
+                      { user.nickname }
+                    </SUserInfoScrollDownNickname>
+                  </SUserInfoScrollDown>
+                  <SSubscribeButtonScrollDown
+                    onClick={() => handleOpenPaymentModal()}
+                  >
+                    {/* @ts-ignore */}
+                    {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+                  </SSubscribeButtonScrollDown>
+                </SScrolledDownTopSection>
+              )}
+            </AnimatePresence>
+          <STopSection
+            ref={(el) => {
+              topSectionRef.current = el!!;
+            }}
+          >
             <UserInfoSection>
               <SHeadingSection>
                   <SSHeadingSectionAvatar>
@@ -81,22 +151,20 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     />
                   </SSHeadingSectionAvatar>
                   <div>
-                    <Headline
+                    <SHeadline
                       variant={4}
                     >
                       { t('TopSection.headline.line_1', { username: user.username }) }
-                    </Headline>
-                    <Headline
+                    </SHeadline>
+                    <SHeadline
                       variant={2}
                     >
                       { t('TopSection.headline.line_2') }
-                    </Headline>
+                    </SHeadline>
                   </div>
                 </SHeadingSection>
                 <SButtonsSection>
-                  <Button
-                    withShadow
-                    view="primaryGrad"
+                  <SSubscribeButtonDesktop
                     style={{
                       marginBottom: '16px',
                     }}
@@ -104,11 +172,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                   >
                     {/* @ts-ignore */}
                     {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
-                  </Button>
+                  </SSubscribeButtonDesktop>
                   <Button
                     view="quaternary"
                     style={{
                       marginBottom: '16px',
+                      color: theme.colors.dark,
                     }}
                     onClick={() => {}}
                   >
@@ -171,6 +240,16 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
           </main>
         </div>
       </SGeneral>
+      {isMobile && (
+        <SSubscribeButtonMobile
+          withShadow
+          view="primaryGrad"
+          onClick={() => handleOpenPaymentModal()}
+        >
+          {/* @ts-ignore */}
+          {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+        </SSubscribeButtonMobile>
+      )}
       <PaymentModal
         isOpen={isPaymentModalOpen}
         zIndex={10}
@@ -271,6 +350,74 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SScrolledDownTopSection = styled(motion.div)`
+  position: fixed;
+  top: 72px;
+  left: 0;
+
+  height: 72px;
+  width: 100%;
+
+  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0px 48px;
+
+  z-index: 100;
+
+  ${({ theme }) => theme.media.laptop} {
+    top: 80px;
+    padding: 0px 118px;
+  }
+`;
+
+const SUserInfoScrollDownAvatar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  position: relative;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+
+  img {
+    display: block;
+    width: 48px;
+    height: 48px;
+  }
+`;
+
+const SUserInfoScrollDownNickname = styled.div`
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colors.dark};
+`;
+
+const SUserInfoScrollDown = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+
+const SSubscribeButtonScrollDown = styled(Button)`
+  background: ${({ theme }) => theme.colors.dark};
+
+  height: 48px;
+
+  &:focus:enabled,
+  &:hover:enabled  {
+    background: ${({ theme }) => theme.colors.dark};
+  }
+`;
+
 const STopSection = styled.div`
   position: relative;
   overflow: hidden;
@@ -280,7 +427,8 @@ const STopSection = styled.div`
 
   padding: 24px 16px !important;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  color: ${({ theme }) => theme.colors.dark};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: -8px;
@@ -362,9 +510,37 @@ const SSHeadingSectionAvatar = styled.div`
   }
 `;
 
+const SSubscribeButtonDesktop = styled(Button)`
+  background: ${({ theme }) => theme.colors.dark};
+
+  &:focus:enabled,
+  &:hover:enabled  {
+    background: ${({ theme }) => theme.colors.dark};
+  }
+`;
+
+const SSubscribeButtonMobile = styled(Button)`
+  width: 100%;
+  position: fixed;
+
+  left: 16px;
+  bottom: 64px;
+
+  height: 56px;
+  width: calc(100% - 32px);
+`;
+
+const SHeadline = styled(Headline)`
+  color: ${({ theme }) => theme.colors.dark};
+`;
+
 const SButtonsSection = styled.div`
-  display: flex;
-  gap: 24px;
+  display: none;
+
+  ${(props) => props.theme.media.tablet} {
+    display: flex;
+    gap: 24px;
+  }
 `;
 
 const SBulletsSection = styled.div`
@@ -435,10 +611,11 @@ const SBulletImg = styled.img`
 
 const SBulletTitle = styled(Text)`
   margin-bottom: 4px;
+  color: #fff;
 `;
 
 const SBulletBody = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  color: #fff;
 `;
 
 // Payment modal header
