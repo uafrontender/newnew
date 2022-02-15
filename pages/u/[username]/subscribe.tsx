@@ -25,9 +25,7 @@ interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
 }
 
-const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
-  user,
-}) => {
+const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const { t } = useTranslation('subscribe-to-user');
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -56,38 +54,32 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       <SGeneral>
         <div>
           <main>
-          <SProfileLayout>
-            <ProfileBackground
-              // Temp
-              pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
-            />
-            <ProfileImage
-              src={user.avatarUrl ?? ''}
-            />
-            <div
-              style={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <SUsername
-                variant={4}
-              >
-                {user.nickname}
-              </SUsername>
-              <Button
-                withShadow
-                view="primaryGrad"
+            <SProfileLayout>
+              <ProfileBackground
+                // Temp
+                pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
+              />
+              <ProfileImage src={user.avatarUrl ?? ''} />
+              <div
                 style={{
-                  marginBottom: '16px',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                 }}
-                onClick={() => setIsPaymentModalOpen(true)}
               >
-                {/* @ts-ignore */}
-                {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
-              </Button>
+                <SUsername variant={4}>{user.nickname}</SUsername>
+                <Button
+                  withShadow
+                  view="primaryGrad"
+                  style={{
+                    marginBottom: '16px',
+                  }}
+                  onClick={() => setIsPaymentModalOpen(true)}
+                >
+                  {/* @ts-ignore */}
+                  {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+                </Button>
               </div>
             </SProfileLayout>
           </main>
@@ -102,28 +94,16 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         handlePayWithCardStripeRedirect={handlePayWithCard}
       >
         <SPaymentModalHeader>
-          <SPaymentModalTitle
-            variant={3}
-          >
-            { t('paymenModalHeader.subtitle') }
-          </SPaymentModalTitle>
+          <SPaymentModalTitle variant={3}>{t('paymenModalHeader.subtitle')}</SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>
-              <img
-                src={user.avatarUrl}
-                alt={user.username}
-              />
+              <img src={user.avatarUrl} alt={user.username} />
             </SAvatar>
             <SCreatorInfo>
-              <SCreatorUsername>
-                {`@${user.username}`}
-              </SCreatorUsername>
-              {' '}
+              <SCreatorUsername>{`@${user.username}`}</SCreatorUsername>{' '}
               <SSubscriberInfo>
                 {/* @ts-ignore */}
-                {user.numSubscribers ?? 20}
-                {' '}
-                { t('paymenModalHeader.numSubscribers') }
+                {user.numSubscribers ?? 20} {t('paymenModalHeader.numSubscribers')}
               </SSubscriberInfo>
             </SCreatorInfo>
           </SPaymentModalCreatorInfo>
@@ -143,10 +123,12 @@ export default SubscribeToUserPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'home', 'subscribe-to-user', 'payment-modal'],
-  );
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'home',
+    'subscribe-to-user',
+    'payment-modal',
+  ]);
 
   if (!username || Array.isArray(username)) {
     return {
@@ -201,7 +183,6 @@ const SGeneral = styled(General)`
     }
   }
 `;
-
 
 const SUsername = styled(Headline)`
   text-align: center;
@@ -313,11 +294,7 @@ const SProfileLayout = styled.div`
   }
 `;
 
-
-
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
@@ -352,9 +329,7 @@ const SAvatar = styled.div`
   }
 `;
 
-const SCreatorInfo = styled.div`
-
-`;
+const SCreatorInfo = styled.div``;
 
 const SCreatorUsername = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};

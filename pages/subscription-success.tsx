@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import Lottie from '../components/atoms/Lottie';
-
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 import { SocketContext } from '../contexts/socketContext';
 import { getSubscriptionStatus } from '../api/endpoints/subscription';
@@ -18,6 +17,8 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
   userId,
 }) => {
   const router = useRouter();
+  console.log(router.query.username);
+
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -35,6 +36,15 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
 
         if (res.data?.status?.activeRenewsAt) {
           console.log('Subscribed! Redirecting to chat');
+
+          // create chat room
+          // const payload = new newnewapi.CreateRoomRequest({ kind: 1, memberUuids: [userId] });
+          // await createRoom(payload);
+
+          // I think we should not check is room created or not at this point
+          // we can do this on chat page and if not try to create again
+          // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
           router.push(`/direct-messages?user=${userId}`);
         }
       } catch (err) {
@@ -56,8 +66,6 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
       console.log(decoded);
 
       setIsLoading(false);
-
-      // router.push('/');
       router.push(`/direct-messages?user=${decoded.creatorUuid}`);
     };
 

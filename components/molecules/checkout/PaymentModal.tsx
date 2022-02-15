@@ -45,52 +45,24 @@ const PaymentModal: React.FunctionComponent<IPaymentModal> = ({
   const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>('wallet');
 
   return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
+    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
-          {isMobile && (
-            <SGoBackButton
-              onClick={() => onClose()}
-            />
-          )}
+          {isMobile && <SGoBackButton onClick={() => onClose()} />}
           {!isMobile && (
-            <SCloseButton
-              onClick={() => onClose()}
-            >
-              <InlineSvg
-                svg={CancelIcon}
-                fill={theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
-              />
+            <SCloseButton onClick={() => onClose()}>
+              <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
             </SCloseButton>
           )}
-          <SHeaderContainer>
-            { children }
-          </SHeaderContainer>
-          <SPaymentMethodTitle
-            variant={3}
-          >
-            { t('paymentMethodTitle') }
-          </SPaymentMethodTitle>
+          <SHeaderContainer>{children}</SHeaderContainer>
+          <SPaymentMethodTitle variant={3}>{t('paymentMethodTitle')}</SPaymentMethodTitle>
           <SOptionsContainer>
-            <OptionWallet
-              selected={selectedOption === 'wallet'}
-              handleClick={() => setSelectedOption('wallet')}
-            />
-            <OptionCard
-              selected={selectedOption === 'card'}
-              handleClick={() => setSelectedOption('card')}
-            />
+            <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
+            <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
           </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
@@ -103,19 +75,17 @@ const PaymentModal: React.FunctionComponent<IPaymentModal> = ({
                 }
               }}
             >
-              { t('payButton') }
-              {amount && (
-                ` ${amount}`
-              )}
+              {t('payButton')}
+              {amount && ` ${amount}`}
             </SPayButton>
-            { showTocApply && (
+            {showTocApply && (
               <STocApply>
-                *
-                { ' ' }
+                *{' '}
                 <Link href="/terms-and-conditions">
-                  <a href="/terms-and-conditions" target="_blank">{t('tocApplyLink')}</a>
-                </Link>
-                { ' ' }
+                  <a href="/terms-and-conditions" target="_blank">
+                    {t('tocApplyLink')}
+                  </a>
+                </Link>{' '}
                 {t('tocApplyText')}
               </STocApply>
             )}
@@ -238,7 +208,6 @@ const STocApply = styled.div`
   font-size: 12px;
   line-height: 16px;
 
-
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   a {
@@ -246,11 +215,12 @@ const STocApply = styled.div`
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       outline: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-      transition: .2s ease;
+      transition: 0.2s ease;
     }
   }
 
@@ -260,6 +230,4 @@ const STocApply = styled.div`
   }
 `;
 
-const SOptionsContainer = styled.div`
-
-`;
+const SOptionsContainer = styled.div``;
