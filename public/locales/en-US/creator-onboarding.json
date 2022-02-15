@@ -146,7 +146,9 @@
     "heading": "Set your subscription rate",
     "selectInput": {
       "perMonth": "/month",
-      "select": "Select"
+      "select": "Select",
+      "featured": "Popular",
+      "noProduct": "No subscription"
     },
     "submitMobile": "Save changes",
     "submitDesktop": "Save changes",
