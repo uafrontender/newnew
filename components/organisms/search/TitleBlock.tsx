@@ -15,13 +15,15 @@ import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import closeCircleIcon from '../../../public/images/svg/icons/filled/CloseCircle.svg';
 
 interface ITitleBlock {
-  authenticated?: boolean;
+  category: string;
   disabled?: boolean;
+  authenticated?: boolean;
 }
 
 export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
-  authenticated,
+  category,
   disabled,
+  authenticated,
 }) => {
   const { t } = useTranslation('home');
   const router = useRouter();
@@ -29,7 +31,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   let { sort = '' } = router.query;
-  const category = router.query.category as string;
+  // const category = router.query.category as string;
 
   if (sort) {
     // @ts-ignore

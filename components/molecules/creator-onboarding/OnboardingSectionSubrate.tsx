@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -11,17 +11,32 @@ import Headline from '../../atoms/Headline';
 import Button from '../../atoms/Button';
 import GoBackButton from '../GoBackButton';
 
+// Temp!
+import { TSubProduct } from '../../../pages/creator-onboarding-subrate';
+import OnboardingSubproductSelect from './OnboardingSubproductsSelect';
+
 interface IOnboardingSectionSubrate {
   onboardingState: newnewapi.GetMyOnboardingStateResponse;
+  standardProducts: TSubProduct[];
+  currentProduct?: TSubProduct;
 }
 
 const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrate> = ({
   onboardingState,
+  standardProducts,
+  currentProduct,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  // Selected products
+  const [selectedProduct, setSelectedProduct] = useState(currentProduct ?? standardProducts[1]);
+
+  const handleSetSelectedProduct = (product: TSubProduct) => {
+    setSelectedProduct(product);
+  }
 
   const handleSubmit = () => {
     console.log(onboardingState);
@@ -42,6 +57,11 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
           {t('SubrateSection.heading')}
         </span>
       </SHeadline>
+      <OnboardingSubproductSelect
+        currentProduct={selectedProduct}
+        standardProducts={standardProducts}
+        handleSelectProduct={handleSetSelectedProduct}
+      />
       <SControlsDiv>
         {!isMobile && (
           <GoBackButton
@@ -65,6 +85,10 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
       </SControlsDiv>
     </SContainer>
   );
+};
+
+OnboardingSectionSubrate.defaultProps = {
+  currentProduct: undefined,
 };
 
 export default OnboardingSectionSubrate;
@@ -107,8 +131,9 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SControlsDiv = styled.div`
-  width: 100%;
-  margin-top: 80%;
+  position: fixed;
+  width: calc(100% - 32px);
+  bottom: 16px;
 
   display: flex;
   justify-content: space-between;

@@ -4,27 +4,31 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
-import Modal from '../Modal';
-
-import isBrowser from '../../../utils/isBrowser';
-import PostViewMC from './PostViewMC';
-import Headline from '../../atoms/Headline';
-import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import PostViewAC from './PostViewAC';
-import PostViewCF from './PostViewCF';
-import List from '../search/List';
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
-import { useAppDispatch } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+
+import Modal from '../Modal';
+import Headline from '../../atoms/Headline';
+import List from '../search/List';
+import PostViewMC from './PostViewMC';
+import PostViewAC from './PostViewAC';
+import PostViewCF from './PostViewCF';
+import PostModerationAC from './PostModerationAC';
+import PostModerationCF from './PostModerationCF';
+import PostModerationMC from './PostModerationMC';
+
+import isBrowser from '../../../utils/isBrowser';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
+import switchPostType, { TPostType } from '../../../utils/switchPostType';
 
 interface IPostModal {
   isOpen: boolean;
@@ -44,7 +48,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
+  const isMyPost = useMemo(() => (
+    user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid
+  ), [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]);
+
+  console.log(postParsed?.status)
 
   const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<
@@ -129,7 +139,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     postParsed,
   ]);
 
-  const renderPostview = (
+  const renderPostView = (
     postToRender: TPostType,
   ) => {
     if (postToRender === 'mc') {
@@ -160,6 +170,42 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewCF
           post={postParsed as newnewapi.Crowdfunding}
           sessionId={sessionId ?? undefined}
+          handleGoBack={() => {
+            window.history.back();
+          }}
+        />
+      );
+    }
+    return <div />;
+  };
+
+  const renderPostModeration = (
+    postToRender: TPostType,
+  ) => {
+    if (postToRender === 'mc') {
+      return (
+        <PostModerationMC
+          post={postParsed as newnewapi.MultipleChoice}
+          handleGoBack={() => {
+            window.history.back();
+          }}
+        />
+      );
+    }
+    if (postToRender === 'ac') {
+      return (
+        <PostModerationAC
+          post={postParsed as newnewapi.Auction}
+          handleGoBack={() => {
+            window.history.back();
+          }}
+        />
+      );
+    }
+    if (postToRender === 'cf') {
+      return (
+        <PostModerationCF
+          post={postParsed as newnewapi.Crowdfunding}
           handleGoBack={() => {
             window.history.back();
           }}
@@ -263,41 +309,46 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       {postParsed && typeOfPost ? (
         <SPostModalContainer
           id="post-modal-container"
+          isMyPost={isMyPost}
           onClick={(e) => e.stopPropagation()}
           ref={(el) => {
             modalContainerRef.current = el!!;
           }}
         >
-          {renderPostview(typeOfPost)}
-          <SRecommendationsSection>
-            <Headline
-              variant={4}
-            >
-              { t('RecommendationsSection.heading') }
-            </Headline>
-            {recommenedPosts && (
-              <List
-                category=""
-                loading={recommenedPostsLoading}
-                // loading
-                collection={recommenedPosts}
-                // collection={[]}
-                wrapperStyle={{
-                  left: '-16px',
-                }}
-                skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                skeletonsHighlightColor={theme.colorsThemed.background.secondary}
-                handlePostClicked={handleOpenRecommendedPost}
-              />
-            )}
-            <div
-              ref={loadingRef}
-              style={{
-                position: 'relative',
-                bottom: '10px',
-              }}
-            />
-          </SRecommendationsSection>
+          {isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)}
+          {
+            !isMyPost && (
+              <SRecommendationsSection>
+                <Headline
+                  variant={4}
+                >
+                  { t('RecommendationsSection.heading') }
+                </Headline>
+                {recommenedPosts && (
+                  <List
+                    category=""
+                    loading={recommenedPostsLoading}
+                    // loading
+                    collection={recommenedPosts}
+                    // collection={[]}
+                    wrapperStyle={{
+                      left: '-16px',
+                    }}
+                    skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                    skeletonsHighlightColor={theme.colorsThemed.background.secondary}
+                    handlePostClicked={handleOpenRecommendedPost}
+                  />
+                )}
+                <div
+                  ref={loadingRef}
+                  style={{
+                    position: 'relative',
+                    bottom: '10px',
+                  }}
+                />
+              </SRecommendationsSection>
+            )
+          }
         </SPostModalContainer>
       ) : null }
     </Modal>
@@ -312,7 +363,9 @@ PostModal.defaultProps = {
 
 export default PostModal;
 
-const SPostModalContainer = styled.div`
+const SPostModalContainer = styled.div<{
+  isMyPost: boolean;
+}>`
   position: absolute;
 
   overflow-y: auto;
@@ -336,6 +389,13 @@ const SPostModalContainer = styled.div`
     top: 32px;
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    ${({ isMyPost }) => (isMyPost ? (
+      css`
+        height: initial;
+        max-height: 100%;
+      `
+    ) : null)}
   }
 
 
