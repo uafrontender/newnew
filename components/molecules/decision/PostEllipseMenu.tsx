@@ -8,14 +8,18 @@ import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseMenu {
+  isFollowing: boolean;
   isVisible: boolean;
   handleFollowDecision: () => {};
+  handleToggleFollowingCreator: () => {};
   handleClose: () => void;
 }
 
 const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
   isVisible,
+  isFollowing,
   handleFollowDecision,
+  handleToggleFollowingCreator,
   handleClose,
 }) => {
   const { t } = useTranslation('decision');
@@ -36,7 +40,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
           exit={{ opacity: 0 }}
         >
           <SButton
-            onClick={() => {}}
+            onClick={() => handleToggleFollowingCreator()}
             style={{
               marginBottom: '16px',
             }}
@@ -44,7 +48,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
             <Text
               variant={3}
             >
-              { t('ellipse.follow-creator') }
+              { !isFollowing ? t('ellipse.follow-creator') : t('ellipse.unfollow-creator') }
             </Text>
           </SButton>
           <SButton
