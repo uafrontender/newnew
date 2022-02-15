@@ -21,6 +21,7 @@
   },
   "ellipse": {
     "follow-creator": "Follow creator",
+    "unfollow-creator": "Unfollow creator",
     "follow-decision": "Follow decision",
     "report": "Report"
   },

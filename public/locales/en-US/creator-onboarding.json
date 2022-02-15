@@ -144,6 +144,10 @@
       "subheading": "Enable subscriptions for your channel and get paid monthly."
     },
     "heading": "Set your subscription rate",
+    "selectInput": {
+      "perMonth": "/month",
+      "select": "Select"
+    },
     "submitMobile": "Save changes",
     "submitDesktop": "Save changes",
     "backButton": "Close"

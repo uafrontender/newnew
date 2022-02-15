@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -24,6 +24,8 @@ import PostShareModal from './PostShareModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 import { markPost } from '../../../api/endpoints/post';
+import { FollowingsContext } from '../../../contexts/followingContext';
+import { markUser } from '../../../api/endpoints/user';
 
 interface IPostTopInfo {
   postId: string;
@@ -58,6 +60,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
@@ -86,6 +90,33 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       console.error(err);
     }
   };
+
+  const handleToggleFollowingCreator = async () => {
+    try {
+      if (!user.loggedIn) {
+        router.push('/sign-up?reason=follow-creator');
+      }
+
+      const payload = new newnewapi.MarkUserRequest({
+        userUuid: creator.uuid,
+        markAs: followingsIds.includes(creator.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+      });
+
+      console.log(payload)
+
+      const res = await markUser(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      if (followingsIds.includes(creator.uuid as string)) {
+        removeId(creator.uuid as string);
+      } else {
+        addId(creator.uuid as string);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <SWrapper>
@@ -177,16 +208,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         {/* Ellipse menu */}
         {!isMobile && (
           <PostEllipseMenu
+            isFollowing={followingsIds.includes(creator.uuid as string)}
             isVisible={ellipseMenuOpen}
             handleFollowDecision={handleFollowDecision}
+            handleToggleFollowingCreator={handleToggleFollowingCreator}
             handleClose={handleCloseEllipseMenu}
           />
         )}
         {isMobile && ellipseMenuOpen ? (
           <PostEllipseModal
-            isOpen={ellipseMenuOpen}
+            isFollowing={followingsIds.includes(creator.uuid as string)}
             zIndex={11}
+            isOpen={ellipseMenuOpen}
             handleFollowDecision={handleFollowDecision}
+            handleToggleFollowingCreator={handleToggleFollowingCreator}
             onClose={handleCloseEllipseMenu}
           />
         ) : null}
