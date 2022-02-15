@@ -1,58 +1,53 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import React, {
   useEffect, useRef,
 } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { css } from 'styled-components';
-
-import { useAppSelector } from '../../../redux-store/store';
+import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Lottie from '../../atoms/Lottie';
 
 import checkBoxAnim from '../../../public/animations/checkbox.json';
 
-// Temp!
-import { TSubProduct } from '../../../pages/creator-onboarding-subrate';
 import Text from '../../atoms/Text';
 import { formatNumber } from '../../../utils/format';
 
 interface IOnboardingSubproductSelect {
-  standardProducts: TSubProduct[];
-  currentProduct: TSubProduct;
-  handleSelectProduct: (product: TSubProduct) => void;
+  standardProducts: newnewapi.ISubscriptionProduct[];
+  currentProduct: newnewapi.ISubscriptionProduct;
+  featuredProductsIds: string[];
+  handleSelectProduct: (product: newnewapi.ISubscriptionProduct) => void;
 }
 
 const OnboardingSubproductSelect: React.FunctionComponent<IOnboardingSubproductSelect> = ({
   standardProducts,
   currentProduct,
+  featuredProductsIds,
   handleSelectProduct,
-}) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
-  return (
-    <SContainer>
-      {isMobile ? (
-        standardProducts.map((p) => (
-          <ProductOptionMobile
-            key={p.id}
-            product={p}
-            selected={currentProduct.id === p.id}
-            handleClick={() => handleSelectProduct(p)}
-          />
-        ))
-      ) : (
-        standardProducts.map((p) => (
-          <ProductOptionDesktop
-            key={p.id}
-            product={p}
-            selected={currentProduct.id === p.id}
-            handleClick={() => handleSelectProduct(p)}
-          />
-        ))
-      )}
-    </SContainer>
-  );
-};
+}) => (
+  <SContainer>
+    <ProductOption
+      product={new newnewapi.SubscriptionProduct({
+        id: ''
+      })}
+      selected={currentProduct.id === ''}
+      featured={false}
+      handleClick={() => handleSelectProduct(new newnewapi.SubscriptionProduct({
+        id: ''
+      }))}
+    />
+    {standardProducts.map((p) => (
+      <ProductOption
+        key={p.id}
+        product={p}
+        selected={currentProduct.id === p.id}
+        featured={featuredProductsIds.includes(p.id as string)}
+        handleClick={() => handleSelectProduct(p)}
+      />
+    ))}
+  </SContainer>
+);
 
 export default OnboardingSubproductSelect;
 
@@ -70,12 +65,14 @@ const SContainer = styled.div`
 
 interface IProductOption {
   selected: boolean;
-  product: TSubProduct;
+  featured: boolean;
+  product: newnewapi.ISubscriptionProduct;
   handleClick: () => void;
 }
 
-const ProductOptionMobile: React.FunctionComponent<IProductOption> = ({
+const ProductOption: React.FunctionComponent<IProductOption> = ({
   selected,
+  featured,
   product,
   handleClick,
 }) => {
@@ -94,7 +91,7 @@ const ProductOptionMobile: React.FunctionComponent<IProductOption> = ({
   }, [ref, selected]);
 
   return (
-    <SProductOptionMobile
+    <SProductOption
       selected={selected ?? false}
       onClick={handleClick}
     >
@@ -111,24 +108,41 @@ const ProductOptionMobile: React.FunctionComponent<IProductOption> = ({
         />
       </SAnimation>
       <SLabelContent>
-        <Text
-          variant={2}
-        >
-          $
-          {formatNumber((product.monthlyRate.usdCents!! / 100) ?? 0, true)}
-        </Text>
-        <SPerMonth
-          variant={2}
-        >
-          { t('SubrateSection.selectInput.perMonth') }
-        </SPerMonth>
+        {
+          product.id !== '' ? (
+            <>
+              <Text
+                variant={2}
+              >
+                $
+                {formatNumber((product?.monthlyRate?.usdCents!! / 100) ?? 0, true)}
+              </Text>
+              <SPerMonth
+                variant={2}
+              >
+                { t('SubrateSection.selectInput.perMonth') }
+              </SPerMonth>
+              {featured && (
+                <SFeaturedLabel>
+                  { t('SubrateSection.selectInput.featured') }
+                </SFeaturedLabel>
+              )}
+            </>
+          ) : (
+            <Text
+              variant={2}
+            >
+              { t('SubrateSection.selectInput.noProduct') }
+            </Text>
+          )
+        }
       </SLabelContent>
-    </SProductOptionMobile>
+    </SProductOption>
   );
 };
 
 
-const SProductOptionMobile = styled.button<{
+const SProductOption = styled.button<{
   selected: boolean;
 }>`
   display: flex;
@@ -145,12 +159,16 @@ const SProductOptionMobile = styled.button<{
   background: ${({ selected, theme }) => (selected ?
     'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))' : theme.colorsThemed.background.tertiary)};;
 
-  padding: 16px 16px;
+  padding: 27px 16px;
   margin-top: 6px;
   margin-bottom: 6px;
 
   cursor: pointer;
   transition: .2s linear;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 45%;
+  }
 `;
 
 const SAnimation = styled.div`
@@ -158,6 +176,8 @@ const SAnimation = styled.div`
 `;
 
 const SLabelContent = styled.div`
+  position: relative;
+
   width: 100%;
   display: flex;
   align-items: flex-end;
@@ -171,60 +191,18 @@ const SPerMonth = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `
 
-const ProductOptionDesktop: React.FunctionComponent<IProductOption> = ({
-  selected,
-  product,
-  handleClick,
-}) => {
-  const { t } = useTranslation('creator-onboarding');
+const SFeaturedLabel = styled.div`
+  position: absolute;
+  top: calc(50% - 16px);
+  right: 0px;
 
-  return (
-    <SProductOptionDesktop
-      selected={selected ?? false}
-      onClick={handleClick}
-    >
-      <Text
-        variant={2}
-      >
-        $
-        {formatNumber((product.monthlyRate.usdCents!! / 100) ?? 0, true)}
-      </Text>
-      <SSelectLabel
-        variant={2}
-      >
-        { t('SubrateSection.selectInput.select') }
-      </SSelectLabel>
-    </SProductOptionDesktop>
-  );
-};
+  border-radius: 24px;
+  padding: 8px 16px;
 
-const SProductOptionDesktop = styled.button<{
-  selected: boolean;
-}>`
-  width: 104px;
-  height: 108px;
+  background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  border-style: solid;
-  border-width: 2px;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  border-color: transparent;
-
-  background: ${({ selected, theme }) => (selected ?
-    theme.gradients.blueDiagonal : theme.colorsThemed.background.tertiary)};;
-
-  padding: 32px 16px;
-
-  ${({ selected }) => (selected && css`
-    div {
-      color: #FFF !important;
-    }
-  `)}
-
-  cursor: pointer;
-  transition: .2s linear;
-`;
-
-const SSelectLabel = styled(Text)`
-  margin-top: 12px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  color: #FFF;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
 `;

@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,7 +12,7 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { getUserByUsername } from '../../../api/endpoints/user';
-import { subscribeToCreator } from '../../../api/endpoints/subscription';
+import { getSubscriptionStatus, subscribeToCreator } from '../../../api/endpoints/subscription';
 
 import General from '../../../components/templates/General';
 import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
@@ -25,6 +26,7 @@ import votesImage from '../../../public/images/subscription/free-votes.png';
 import suggestionsImage from '../../../public/images/subscription/suggestions.png';
 import FaqSection from '../../../components/molecules/subscribe/FaqSection';
 import isBrowser from '../../../utils/isBrowser';
+import { formatNumber } from '../../../utils/format';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -43,6 +45,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
+
+  const [subscriptionPrice, setSubscriptionPrice] = useState('');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const handleOpenPaymentModal = () => {
@@ -71,6 +75,28 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    async function fetchSubscriptionPrice() {
+      try {
+        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+          creatorUuid: user.uuid,
+        });
+
+        const res = await getSubscriptionStatus(getStatusPayload);
+
+        console.log(res.data?.status?.product);
+
+        if (res.data?.status?.product) {
+          setSubscriptionPrice(formatNumber((res.data?.status?.product.monthlyRate?.usdCents!! / 100) ?? 0, true))
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchSubscriptionPrice();
+  }, [user.uuid]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -131,8 +157,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                   <SSubscribeButtonScrollDown
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {/* @ts-ignore */}
-                    {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+                    {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
                   </SSubscribeButtonScrollDown>
                 </SScrolledDownTopSection>
               )}
@@ -170,8 +195,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     }}
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {/* @ts-ignore */}
-                    {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+                    {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
                   </SSubscribeButtonDesktop>
                   <Button
                     view="quaternary"
@@ -246,8 +270,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
           view="primaryGrad"
           onClick={() => handleOpenPaymentModal()}
         >
-          {/* @ts-ignore */}
-          {t('subscribeBtn', { amount: user.subscriptionPrice ?? 5 })}
+          {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
         </SSubscribeButtonMobile>
       )}
       <PaymentModal
