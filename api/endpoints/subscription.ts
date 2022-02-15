@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  fetchProtobuf,
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
@@ -57,6 +58,39 @@ newnewapi.EmptyRequest, newnewapi.GetCreatorsImSubscribedToResponse>(
   newnewapi.EmptyRequest,
   newnewapi.GetCreatorsImSubscribedToResponse,
   `${BASE_URL_SUBSCRIPTIONS}/get_creators_im_subscribed_to`,
+  'post',
+  payload,
+);
+
+// Setting subscription rates
+export const getStandardSubscriptionProducts = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobuf<newnewapi.EmptyRequest, newnewapi.StandardSubscriptionProducts>(
+  newnewapi.EmptyRequest,
+  newnewapi.StandardSubscriptionProducts,
+  `${BASE_URL_SUBSCRIPTIONS}/get_standard_subscription_products`,
+  'post',
+  payload,
+);
+
+export const getMySubscriptionProduct = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.EmptyRequest, newnewapi.GetMySubscriptionProductResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.GetMySubscriptionProductResponse,
+  `${BASE_URL_SUBSCRIPTIONS}/get_my_subscription_product`,
+  'post',
+  payload,
+);
+
+export const setMySubscriptionProduct = (
+  payload: newnewapi.SetMySubscriptionProductRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.SetMySubscriptionProductRequest, newnewapi.EmptyResponse>(
+  newnewapi.SetMySubscriptionProductRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_SUBSCRIPTIONS}/set_my_subscription_product`,
   'post',
   payload,
 );
