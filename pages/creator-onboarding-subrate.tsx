@@ -15,8 +15,7 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import { getMyOnboardingState } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import OnboardingSectionStripe from '../components/molecules/creator-onboarding/OnboadringSectionStripe';
-import OnboardingSectionSubrate from '../components/molecules/creator-onboarding/OnboadringSectionSubrate';
+import OnboardingSectionSubrate from '../components/molecules/creator-onboarding/OnboardingSectionSubrate';
 
 
 // Testing!
