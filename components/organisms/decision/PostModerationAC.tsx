@@ -14,15 +14,13 @@ import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoin
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
+import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
-import OptionTitle from '../../molecules/decision/auction/AcOptionTitle';
-import AcOptionTopInfo from '../../molecules/decision/auction/AcOptionTopInfo';
 import GoBackButton from '../../molecules/GoBackButton';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -37,17 +35,13 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
 };
 
-interface IPostViewAC {
+interface IPostModerationAC {
   post: newnewapi.Auction;
-  optionFromUrl?: newnewapi.Auction.Option;
-  sessionId?: string;
   handleGoBack: () => void;
 }
 
-const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
+const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   post,
-  optionFromUrl,
-  sessionId,
   handleGoBack,
 }) => {
   const theme = useTheme();
@@ -69,9 +63,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [currentTab, setCurrentTab] = useState<
     'bids' | 'comments'
   >('bids');
-
-  // Vote from sessionId
-  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Total amount
   const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
@@ -265,11 +256,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     optionToOpen: newnewapi.Auction.Option,
   ) => {
     setOverviewedOption(optionToOpen);
-    window.history.pushState(
-      optionToOpen.id,
-      'Post',
-      `${currLocation}&suggestion=${optionToOpen.id}`,
-    );
   };
 
   const handleCloseOptionBidHistory = () => {
@@ -328,43 +314,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
-
-  useEffect(() => {
-    const makeBidFromSessionId = async () => {
-      if (!sessionId) return;
-      try {
-        setLoadingModalOpen(true);
-        const payload = new newnewapi.FulfillPaymentPurposeRequest({
-          paymentSuccessUrl: `session_id=${sessionId}`,
-        });
-
-        const res = await placeBidOnAuction(payload);
-
-        if (!res.data
-          || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
-
-        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
-
-        setLoadingModalOpen(false);
-      } catch (err) {
-        console.error(err);
-        setLoadingModalOpen(false);
-      }
-    };
-
-    makeBidFromSessionId();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (optionFromUrl) {
-      setOverviewedOption(optionFromUrl);
-    }
-  }, [optionFromUrl]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -443,16 +392,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             onClick={handleGoBack}
           />
         )}
-        {overviewedOption && (
-          <GoBackButton
-            style={{
-              gridArea: 'closeBtnMobile',
-            }}
-            onClick={() => {
-              handleCloseOptionBidHistory();
-            }}
-          />
-        )}
         <PostTimer
           timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
           postType="ac"
@@ -471,7 +410,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         )}
       </SExpiresSection>
       <PostVideo
-        // NB! Will be changed for streaming format
         // NB! Will support responses, as well!
         postId={post.postUuid}
         announcement={post.announcement!!}
@@ -483,73 +421,45 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           gridArea: 'title',
         }}
       >
-        <PostTitle
-          shrink={overviewedOption !== undefined}
-        >
+        <PostTitle>
           { post.title }
         </PostTitle>
-        {overviewedOption && (
-          <OptionTitle
-            option={overviewedOption}
-          />
-        )}
       </div>
       <SActivitesContainer>
-        {!overviewedOption ? (
-          <PostTopInfo
-            postId={post.postUuid}
-            postType="ac"
-            amountInBids={totalAmount}
-            creator={post.creator!!}
-            startsAtSeconds={post.startsAt?.seconds as number}
-            handleFollowCreator={() => {}}
-            handleReportAnnouncement={() => {}}
-          />
-        ) : (
-          <AcOptionTopInfo
-            creator={overviewedOption?.creator!!}
-            option={overviewedOption}
-            postId={post.postUuid}
-            minAmount={post.minimalBid?.usdCents
-              ? (
-                parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
-              ) : 5}
-            amountInBids={overviewedOption?.totalAmount?.usdCents!!}
-            createdAtSeconds={overviewedOption?.createdAt?.seconds as number}
-            handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-          />
-        )}
-        {!overviewedOption ? (
-          <DecisionTabs
-            tabs={[
-              {
-                label: 'bids',
-                value: 'bids',
-                ...(
-                  numberOfOptions
-                    ? { amount: numberOfOptions.toString() } : {}
-                ),
-              },
-              {
-                label: 'comments',
-                value: 'comments',
-                ...(
-                  comments.length > 0
-                    ? { amount: comments.length.toString() } : {}
-                ),
-              },
-            ]}
-            activeTab={currentTab}
-            handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
-          />
-        ) : (
-          <SHistoryLabel>
-            { t('tabs.history') }
-          </SHistoryLabel>
-        )}
+        <PostTopInfo
+          postId={post.postUuid}
+          postType="ac"
+          amountInBids={totalAmount}
+          creator={post.creator!!}
+          startsAtSeconds={post.startsAt?.seconds as number}
+          handleFollowCreator={() => {}}
+          handleReportAnnouncement={() => {}}
+        />
+        <DecisionTabs
+          tabs={[
+            {
+              label: 'bids',
+              value: 'bids',
+              ...(
+                numberOfOptions
+                  ? { amount: numberOfOptions.toString() } : {}
+              ),
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+              ...(
+                comments.length > 0
+                  ? { amount: comments.length.toString() } : {}
+              ),
+            },
+          ]}
+          activeTab={currentTab}
+          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+        />
         {currentTab === 'bids'
           ? (
-            <AcOptionsTab
+            <AcOptionsTabModeration
               postId={post.postUuid}
               options={options}
               optionToAnimate={optionToAnimate}
@@ -571,21 +481,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             />
           )}
       </SActivitesContainer>
-      {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      {/* Overview Modal */}
     </SWrapper>
   );
 };
 
-PostViewAC.defaultProps = {
-  optionFromUrl: undefined,
-  sessionId: undefined,
+PostModerationAC.defaultProps = {
 };
 
-export default PostViewAC;
+export default PostModerationAC;
 
 const SWrapper = styled.div`
   display: grid;
