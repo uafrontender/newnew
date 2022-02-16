@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import moment from 'moment';
+import { useTranslation } from 'next-i18next';
 
 import UserAvatar from '../UserAvatar';
 import textTrim from '../../../utils/textTrim';
@@ -30,10 +31,133 @@ interface IFunctionProps {
 
 export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   const user = useAppSelector((state) => state.user);
+  const { t } = useTranslation('chat');
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('all');
+
+  const userTypes = useMemo(
+    () => [
+      {
+        id: 'all',
+        title: t('usertypes.all'),
+      },
+      {
+        id: 'subscribers',
+        title: t('usertypes.subscribers'),
+      },
+      {
+        id: 'report-subscribing',
+        title: t('usertypes.subscribing'),
+      },
+    ],
+    [t]
+  );
 
   const collection = useMemo(
     () => [
+      {
+        id: '0',
+        time: '30 min',
+        userData: {
+          userName: '🦄Unicornbabe',
+          userAlias: 'unicornbabe',
+          avatar: '/images/mock/test_user_1.jpg',
+        },
+        messages: [
+          {
+            id: '1',
+            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '2',
+            message: 'Hiii, Lance 😃',
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '3',
+            message: 'I don’t beleive...',
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '4',
+            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '5',
+            message: 'Hey, Annie 👋',
+            mine: false,
+            date: moment(),
+          },
+          {
+            id: '6',
+            message: 'Hey there, Ya, me too 😏',
+            mine: false,
+            date: moment().subtract(2, 'days'),
+          },
+          {
+            id: '7',
+            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
+            mine: false,
+            date: moment().subtract(2, 'days'),
+          },
+          {
+            id: '8',
+            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '9',
+            message: 'Hiii, Lance 😃',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '10',
+            message: 'I don’t beleive...',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '11',
+            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '12',
+            message: 'Hey, Annie 👋',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '13',
+            message: 'Hey there, Ya, me too 😏',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '14',
+            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+          {
+            id: '15',
+            message: '🦄Unicornbabe created the announcement.\nYou and 499 others joined it',
+            mine: false,
+            date: moment().subtract(3, 'days'),
+          },
+        ],
+        unread: false,
+        isAnnouncement: true,
+      },
       {
         id: '1',
         time: '30 min',
@@ -231,6 +355,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
         id: '2',
         time: '30 min',
         userData: {
+          uuid: '7375607e-3175-4789-a12a-2db3ec60cbf8',
           userName: 'Caramella🍬',
           userAlias: 'caramella',
           avatar: '/images/mock/test_user_2.jpg',
@@ -545,7 +670,11 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (collection && collection.length > 0) {
-      openChat({ userData: collection[0].userData, messages: collection[0].messages });
+      openChat({
+        userData: collection[0].userData,
+        messages: collection[0].messages,
+        isAnnouncement: collection[0].isAnnouncement,
+      });
       setActiveChatIndex(collection[0].id);
     }
   }, []);
@@ -593,9 +722,31 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
     },
     [collection.length, user.userData?.avatarUrl, openChat]
   );
+
+  const Tabs = useCallback(
+    () => (
+      <STabs>
+        {userTypes.map((item) => (
+          <STab active={activeTab === item.id} key={item.id} onClick={() => setActiveTab(item.id)}>
+            {item.title}
+          </STab>
+        ))}
+      </STabs>
+    ),
+    []
+  );
   return (
     <>
-      <SSectionContent>{collection.length > 0 ? collection.map(renderChatItem) : <EmptyInbox />}</SSectionContent>
+      <SSectionContent>
+        {collection.length > 0 ? (
+          <>
+            <Tabs />
+            {collection.map(renderChatItem)}
+          </>
+        ) : (
+          <EmptyInbox />
+        )}
+      </SSectionContent>
     </>
   );
 };
@@ -608,4 +759,48 @@ const SSectionContent = styled.div`
   position: relative;
   overflow-y: auto;
   flex-direction: column;
+`;
+
+const STabs = styled.div`
+  display: flex;
+  text-align: center;
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: stretch;
+  margin-bottom: 16px;
+  font-size: 14px;
+`;
+
+interface ISTab {
+  active: boolean;
+}
+const STab = styled.div<ISTab>`
+  width: calc(100% / 3);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  ${(props) => {
+    if (props.active) {
+      return css`
+        font-weight: bold;
+        position: relative;
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -4px;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: ${({ theme }) => theme.gradients.blueHorizontal};
+          border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
+          border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
+        }
+      `;
+    }
+    return css`
+      font-weight: normal;
+    `;
+  }}
 `;

@@ -12,7 +12,6 @@ import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
@@ -28,15 +27,19 @@ const AccountDeleted = dynamic(() => import('./AccountDeleted'));
 const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
+const ReportUserModal = dynamic(() => import('./ReportUserModal'));
+const BackButton = dynamic(() => import('../../atoms/BackButton'));
 
-const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => {
+const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnnouncement }) => {
   const [message, setMessage] = useState('');
   const [localUserData, setUserData] = useState<IUser>({
     userName: '',
     userAlias: '',
     avatar: '',
   });
+
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
+  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [collection, setCollection] = useState<IMessage[]>([]);
   useEffect(() => {
     if (userData && messages) {
@@ -59,6 +62,10 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
     } else {
       setUserData({ ...localUserData, blockedUser: false });
     }
+  };
+
+  const onUserReport = () => {
+    setConfirmReportUser(true);
   };
 
   const theme = useTheme();
@@ -142,19 +149,13 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
     <SContainer>
       {localUserData.userName && (
         <STopPart>
-          {isMobileOrTablet && (
-            <SBackButton
-              clickable
-              svg={chevronLeftIcon}
-              fill={theme.colorsThemed.text.secondary}
-              width="24px"
-              height="24px"
-              onClick={showChatList}
-            />
-          )}
+          {isMobileOrTablet && <BackButton fn={showChatList} />}
           <SUserData>
-            <SUserName>{localUserData?.userName}</SUserName>
-            <SUserAlias>@{localUserData?.userAlias}</SUserAlias>
+            <SUserName>
+              {localUserData?.userName}
+              {isAnnouncement && t('announcement.title')}
+            </SUserName>
+            <SUserAlias>{!isAnnouncement ? `@${localUserData?.userAlias}` : `500 members`}</SUserAlias>
           </SUserData>
           <SActionsDiv>
             <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
@@ -167,6 +168,8 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
                 handleClose={handleCloseEllipseMenu}
                 userBlocked={localUserData?.blockedUser}
                 onUserBlock={onUserBlock}
+                onUserReport={onUserReport}
+                isAnnouncement={isAnnouncement}
               />
             )}
             {isMobile && ellipseMenuOpen ? (
@@ -176,10 +179,20 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
                 onClose={handleCloseEllipseMenu}
                 userBlocked={localUserData?.blockedUser}
                 onUserBlock={onUserBlock}
+                onUserReport={onUserReport}
+                isAnnouncement={isAnnouncement}
               />
             ) : null}
           </SActionsDiv>
         </STopPart>
+      )}
+      {isAnnouncement && (
+        <SAnnouncementHeader>
+          <SAnnouncementText>
+            {t('announcement.top-message-start')} <SAnnouncementName>{localUserData.userName}</SAnnouncementName>{' '}
+            {t('announcement.top-message-end')}
+          </SAnnouncementText>
+        </SAnnouncementHeader>
       )}
       <SCenterPart id="messagesScrollContainer" ref={scrollRef}>
         {localUserData?.justSubscribed && <WelcomeMessage userAlias={localUserData.userAlias} />}
@@ -193,17 +206,21 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
             userName={localUserData?.userName}
             onUserBlock={onUserBlock}
             closeModal={() => setConfirmBlockUser(false)}
+            isAnnouncement={isAnnouncement}
           />
         )}
-        {localUserData.subscriptionExpired && <SubscriptionExpired userName={localUserData.userName} />}
+        {localUserData.subscriptionExpired && localUserData.uuid && <SubscriptionExpired user={localUserData} />}
         {localUserData.accountDeleted && <AccountDeleted />}
-        {localUserData.messagingDisabled && <MessagingDisabled />}
+        {localUserData.messagingDisabled && (
+          <MessagingDisabled userName={localUserData.userName} userAlias={localUserData.userAlias} />
+        )}
 
         {!localUserData.blockedUser &&
           !localUserData.subscriptionExpired &&
           !localUserData.messagingDisabled &&
           !localUserData.accountDeleted &&
-          localUserData.userName && (
+          localUserData.userName &&
+          !isAnnouncement && (
             <SBottomTextarea>
               <STextArea>
                 <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
@@ -223,6 +240,15 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList }) => 
               </SButton>
             </SBottomTextarea>
           )}
+
+        {confirmReportUser && (
+          <ReportUserModal
+            confirmReportUser={confirmReportUser}
+            userName={localUserData.userName}
+            closeModal={() => setConfirmReportUser(false)}
+            isAnnouncement={isAnnouncement}
+          />
+        )}
       </SBottomPart>
     </SContainer>
   );
@@ -516,6 +542,23 @@ const SMessageText = styled(Text)<ISMessageText>`
   }};
 `;
 
-const SBackButton = styled(SInlineSVG)`
-  margin-right: 20px;
+const SAnnouncementHeader = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+`;
+
+const SAnnouncementText = styled.div`
+  text-align: center;
+  font-size: 14px;
+  padding: 12px 24px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+`;
+
+const SAnnouncementName = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
