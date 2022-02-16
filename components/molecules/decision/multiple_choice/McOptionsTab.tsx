@@ -13,7 +13,7 @@ import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
+import { voteOnPost, voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import McOptionCard from './McOptionCard';
@@ -26,7 +26,7 @@ import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import Text from '../../../atoms/Text';
-import { createPaymentSession } from '../../../../api/endpoints/payments';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 
 interface IMcOptionsTab {
@@ -145,31 +145,78 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     setNewOptionText, validateTextViaAPIDebounced,
   ]);
 
-  const handleSubmitNewOption = useCallback(async () => {
+  const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.VoteOnPostRequest({
-        votesCount: parseInt(newBidAmount, 10),
-        optionText: newOptionText,
-        postUuid: post.postUuid,
-      });
+      // Check if user is logged in
+      if (!user.loggedIn) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+          successUrl: `${window.location.href}&`,
+          cancelUrl: `${window.location.href}&`,
+          ...(!user.loggedIn ? {
+            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+          } : {}),
+          mcVoteRequest: {
+            votesCount: parseInt(newBidAmount, 10),
+            optionText: newOptionText,
+            postUuid: post.postUuid,
+          }
+        });
 
-      const res = await voteOnPost(makeBidPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data
-        || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data
+          || !res.data.sessionUrl
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
 
-      const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makeBidPayload = new newnewapi.VoteOnPostRequest({
+          votesCount: parseInt(newBidAmount, 10),
+          optionText: newOptionText,
+          postUuid: post.postUuid,
+        });
 
-      setNewBidAmount('');
-      setNewOptionText('');
-      setSuggestNewMobileOpen(false);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await voteOnPostWithWallet(makeBidPayload);
+
+        if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+            successUrl: `${window.location.href}&`,
+            cancelUrl: `${window.location.href}&`,
+            mcVoteRequest: {
+              votesCount: parseInt(newBidAmount, 10),
+              optionText: newOptionText,
+              postUuid: post.postUuid,
+            }
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+
+          if (!resStripeRedirect.data
+            || !resStripeRedirect.data.sessionUrl
+            || resStripeRedirect.error
+          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data
+          || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setNewBidAmount('');
+        setNewOptionText('');
+        setSuggestNewMobileOpen(false);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -179,6 +226,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     newBidAmount,
     newOptionText,
     post.postUuid,
+    user.loggedIn,
     handleAddOrUpdateOptionFromResponse,
   ]);
 
@@ -349,7 +397,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={() => {}}
+          handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle

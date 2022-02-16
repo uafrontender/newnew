@@ -146,7 +146,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      // Check if user is logged and if the wallet balance is sufficient
+      // Check if user is logged in
       if (!user.loggedIn) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
           successUrl: `${window.location.href}&`,
