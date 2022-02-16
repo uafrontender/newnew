@@ -3,8 +3,6 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
@@ -15,17 +13,17 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
+import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import Text from '../../../atoms/Text';
-import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
-import PlaceMcBidForm from './PlaceMcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import { voteOnPost, voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;

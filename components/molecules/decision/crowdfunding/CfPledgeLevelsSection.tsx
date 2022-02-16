@@ -1,9 +1,6 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -12,24 +9,20 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { validateText } from '../../../../api/endpoints/infrastructure';
+import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
-import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
-import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
+import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
-import PlaceCfBidForm from './PlaceCfBidForm';
-import { doPledgeCrowdfunding, doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
-import { validateText } from '../../../../api/endpoints/infrastructure';
-import Text from '../../../atoms/Text';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
-import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
@@ -43,14 +36,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   post,
   handleAddPledgeFromResponse,
   handleSetHeightDelta,
-}, ref) => {
+}) => {
   const { t } = useTranslation('decision');
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
-  const { walletBalance } = useContext(WalletContext);
 
   const containerRef = useRef<HTMLDivElement>();
 

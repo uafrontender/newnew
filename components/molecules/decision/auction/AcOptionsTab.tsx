@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, {
@@ -7,7 +5,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -21,15 +18,15 @@ import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
 import AcOptionCard from './AcOptionCard';
 import OptionOverview from './AcOptionOverview';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
+import PaymentModal from '../../checkout/PaymentModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import Button from '../../../atoms/Button';
-import Text from '../../../atoms/Text';
 
 
 interface IAcOptionsTab {
@@ -62,7 +59,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleOpenOptionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);

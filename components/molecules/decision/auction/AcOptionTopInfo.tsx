@@ -1,30 +1,27 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import React, {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { placeBidOnAuction, placeBidWithWallet } from '../../../../api/endpoints/auction';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { WalletContext } from '../../../../contexts/walletContext';
+import { placeBidWithWallet } from '../../../../api/endpoints/auction';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import InlineSvg from '../../../atoms/InlineSVG';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
+import SuggestionActionMobileModal from '../OptionActionMobileModal';
 
 import ShareIconFilled from '../../../../public/images/svg/icons/filled/Share.svg';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import SuggestionActionMobileModal from '../OptionActionMobileModal';
-import Text from '../../../atoms/Text';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
-import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IAcOptionTopInfo {
   creator: newnewapi.IUser;
@@ -46,7 +43,6 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('decision');
   const createdAtParsed = new Date(createdAtSeconds * 1000);
   const user = useAppSelector((state) => state.user);
@@ -54,8 +50,6 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const { walletBalance } = useContext(WalletContext);
-
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');

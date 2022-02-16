@@ -3,8 +3,6 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -13,27 +11,26 @@ import React, {
   useCallback, useContext, useMemo, useState,
 } from 'react';
 import styled, { css } from 'styled-components';
-import { placeBidOnAuction, placeBidWithWallet } from '../../../../api/endpoints/auction';
 
 import { useAppSelector } from '../../../../redux-store/store';
-
-import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import Text from '../../../atoms/Text';
+import { WalletContext } from '../../../../contexts/walletContext';
+import { placeBidWithWallet } from '../../../../api/endpoints/auction';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
+import Lottie from '../../../atoms/Lottie';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
-import PlaceBidForm from './PlaceAcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import { formatNumber } from '../../../../utils/format';
 
-import Lottie from '../../../atoms/Lottie';
+import { formatNumber } from '../../../../utils/format';
 
 // NB! temp sample
 import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
 import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
-import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
