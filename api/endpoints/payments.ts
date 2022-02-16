@@ -1,8 +1,8 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
-  fetchProtobuf,
   cookiesInstance,
+  fetchProtobuf,
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
@@ -19,7 +19,7 @@ newnewapi.EmptyRequest, newnewapi.GetSupportedCreatorCountriesResponse>(
   payload,
 );
 
-// Payments for bids/pledges/votes
+// Payments for bids/pledges/votes via Stripe redirect
 export const createPaymentSession = (
   payload: newnewapi.CreatePaymentSessionRequest,
 ) => fetchProtobuf<newnewapi.CreatePaymentSessionRequest, newnewapi.CreatePaymentSessionResponse>(
@@ -44,4 +44,42 @@ newnewapi.SetupStripeCreatorAccountRequest, newnewapi.SetupStripeCreatorAccountR
   `${BASE_URL_PAYMENTS}/setup_stripe_creator_account`,
   'post',
   payload,
+);
+
+// Wallet
+export const getWalletBalance = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.EmptyRequest, newnewapi.GetWalletBalanceResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.GetWalletBalanceResponse,
+  `${BASE_URL_PAYMENTS}/get_wallet_balance`,
+  'post',
+  payload,
+);
+
+export const getTopUpWalletSessionUrl = (
+  payload: newnewapi.GetTopUpWalletSessionUrlRequest,
+) => fetchProtobufProtectedIntercepted<
+newnewapi.GetTopUpWalletSessionUrlRequest, newnewapi.GetTopUpWalletSessionUrlResponse>(
+  newnewapi.GetTopUpWalletSessionUrlRequest,
+  newnewapi.GetTopUpWalletSessionUrlResponse,
+  `${BASE_URL_PAYMENTS}/get_top_up_wallet_session_url`,
+  'post',
+  payload,
+);
+
+export const getTopUpWalletWithPaymentPurposeUrl = (
+  payload: newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest,
+) => fetchProtobuf<
+newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest, newnewapi.GetTopUpWalletWithPaymentPurposeUrlResponse>(
+  newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest,
+  newnewapi.GetTopUpWalletWithPaymentPurposeUrlResponse,
+  `${BASE_URL_PAYMENTS}/get_top_up_wallet_with_payment_purpose_url`,
+  'post',
+  payload,
+  // Optional authentication
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
 );

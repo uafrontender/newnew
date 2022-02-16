@@ -347,10 +347,7 @@ const MyProfileSettginsIndex: NextPage = () => {
             } : {}),
           }}
         />
-        <SettingsWallet
-          // Temp
-          balance={0}
-        />
+        <SettingsWallet />
         <SettingsAccordion
           sections={accordionSections}
         />
