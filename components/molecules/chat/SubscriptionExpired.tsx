@@ -24,7 +24,7 @@ interface ISubscriptionExpired {
 }
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
-  const { t } = useTranslation(['chat', 'subscribe-to-user']);
+  const { t } = useTranslation('chat');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -76,9 +76,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
         handlePayWithCardStripeRedirect={handlePayWithCard}
       >
         <div>
-          <SPaymentModalTitle variant={3}>
-            {t('paymenModalHeader.subtitle', { ns: 'subscribe-to-user' })}
-          </SPaymentModalTitle>
+          <SPaymentModalTitle variant={3}>{t('modal.renewSubcriptionsSubtitle')}</SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>
               <img src={user.avatar} alt={user.userName} />

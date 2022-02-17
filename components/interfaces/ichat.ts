@@ -24,5 +24,5 @@ export interface IChatData {
   userData: IUser | null;
   messages: IMessage[];
   isAnnouncement?: boolean;
-  showChatList?: () => void;
+  showChatList: { (): void } | null;
 }

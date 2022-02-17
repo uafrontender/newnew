@@ -674,6 +674,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
         userData: collection[0].userData,
         messages: collection[0].messages,
         isAnnouncement: collection[0].isAnnouncement,
+        showChatList: null,
       });
       setActiveChatIndex(collection[0].id);
     }
@@ -691,7 +692,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   const renderChatItem = useCallback(
     (item: IItem, index: number) => {
       const handleItemClick = () => {
-        openChat({ userData: item.userData, messages: item.messages });
+        openChat({ userData: item.userData, messages: item.messages, showChatList: null });
         setActiveChatIndex(item.id);
       };
 

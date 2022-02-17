@@ -10,13 +10,17 @@ import SearchInput from '../atoms/chat/SearchInput';
 import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
-
-const BackButton = dynamic(() => import('../atoms/BackButton'));
+import GoBackButton from '../molecules/GoBackButton';
 
 export const Chat = () => {
-  const [chatData, setChatData] = useState<IChatData>({ userData: null, messages: [], isAnnouncement: false });
+  const [chatData, setChatData] = useState<IChatData>({
+    userData: null,
+    messages: [],
+    isAnnouncement: false,
+    showChatList: null,
+  });
   const openChat = ({ userData, messages, isAnnouncement }: IChatData) => {
-    setChatData({ userData, messages, isAnnouncement });
+    setChatData({ userData, messages, isAnnouncement, showChatList });
   };
   const { t } = useTranslation('chat');
   const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
@@ -49,8 +53,8 @@ export const Chat = () => {
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
         <SToolbar isMobile={isMobileOrTablet}>
           {isMobileOrTablet && (
-            <BackButton
-              fn={() => {
+            <GoBackButton
+              onClick={() => {
                 setChatListHidden(true);
               }}
             />

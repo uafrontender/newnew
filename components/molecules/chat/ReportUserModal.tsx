@@ -6,7 +6,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
-import BackButton from '../../atoms/BackButton';
+import GoBackButton from '../GoBackButton';
 
 interface IReportUserModal {
   confirmReportUser: boolean;
@@ -72,7 +72,7 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, userNa
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SModalHeader>
-            {isMobile && <BackButton fn={closeModal} />}
+            {isMobile && <GoBackButton onClick={closeModal} />}
             <SModalTitle>
               {t('modal.report-user.title')} {userName}
             </SModalTitle>

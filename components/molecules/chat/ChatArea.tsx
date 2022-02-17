@@ -19,6 +19,7 @@ import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
 import { IUser, IMessage, IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUserAlias } from '../../atoms/chat/styles';
+import GoBackButton from '../GoBackButton';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -28,7 +29,6 @@ const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const ReportUserModal = dynamic(() => import('./ReportUserModal'));
-const BackButton = dynamic(() => import('../../atoms/BackButton'));
 
 const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnnouncement }) => {
   const [message, setMessage] = useState('');
@@ -145,11 +145,17 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
     });
   }, [collection.length]);
 
+  const clickHandler = () => {
+    if (showChatList) {
+      showChatList();
+    }
+  };
+
   return (
     <SContainer>
       {localUserData.userName && (
         <STopPart>
-          {isMobileOrTablet && <BackButton fn={showChatList} />}
+          {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
               {localUserData?.userName}

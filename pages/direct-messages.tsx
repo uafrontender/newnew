@@ -28,7 +28,7 @@ export const Chat = () => {
 export default Chat;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'chat']);
+  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'chat', 'payment-modal']);
 
   return {
     props: {
