@@ -66,12 +66,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
-    option.creator?.uuid,
-    user.userData?.userUuid,
-  ]);
-  const bgVariant = highest ? 'yellow' : (
-    myBid ? 'blue' : myVote ? 'green' : undefined);
+  const myBid = useMemo(
+    () => option.creator?.uuid === user.userData?.userUuid,
+    [option.creator?.uuid, user.userData?.userUuid]
+  );
+  const bgVariant = highest ? 'yellow' : myBid ? 'blue' : myVote ? 'green' : undefined;
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -205,24 +204,23 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
         successUrl: `${window.location.href}&`,
         cancelUrl: `${window.location.href}&`,
-        ...(!user.loggedIn ? {
-          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        } : {}),
+        ...(!user.loggedIn
+          ? {
+              nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+            }
+          : {}),
         acBidRequest: {
           amount: new newnewapi.MoneyAmount({
             usdCents: parseInt(supportBidAmount, 10) * 100,
           }),
           optionId: option.id,
           postUuid: postId,
-        }
+        },
       });
 
       const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data
-        || !res.data.sessionUrl
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || !res.data.sessionUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       window.location.href = res.data.sessionUrl;
     } catch (err) {
@@ -245,9 +243,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         display: 'flex',
         flexDirection: 'column',
         marginBottom: '16px',
-        ...(!isMobile && isSupportFormOpen ? {
-          gap: '16px',
-        } : {}),
+        ...(!isMobile && isSupportFormOpen
+          ? {
+              gap: '16px',
+            }
+          : {}),
       }}
     >
       <SContainer
@@ -280,19 +280,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             ) : null}
           </SLottieAnimationContainer>
           <SBidInfo>
-            {highest
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.highest')}</STag>
-              ) : null}
-            {myVote
-              && !myBid
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag>
-              ) : null}
-            {myBid
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag>
-              ) : null}
+            {highest ? <STag>{t('AcPost.OptionsTab.tags.highest')}</STag> : null}
+            {myVote && !myBid ? <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag> : null}
+            {myBid ? <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag> : null}
             {/* Comment out for now */}
             {/* {option.creator.isVIP
               ? (
@@ -314,20 +304,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 handleRedirectToUser();
               }}
             >
-              { option.creator?.uuid === user.userData?.userUuid
-                ? t('me') : option?.creator?.username }
+              {option.creator?.uuid === user.userData?.userUuid ? t('me') : option?.creator?.username}
             </SUsername>
-            <SBidTitle
-              variant={3}
-            >
-              { option.title }
-            </SBidTitle>
+            <SBidTitle variant={3}>{option.title}</SBidTitle>
           </SBidInfo>
           <SAmount>
-            {option.totalAmount?.usdCents
-              ? (
-                `$${formatNumber((option?.totalAmount?.usdCents / 100) ?? 0, true)}`
-              ) : '$0'}
+            {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
           </SAmount>
         </SBidDetails>
         {optionBeingSupported && !disabled ? (
@@ -337,12 +319,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             }}
           />
         ) : (
-          <SSupportButton
-            view="secondary"
-            disabled={disabled}
-            onClick={() => handleOpenSupportForm()}
-          >
-            { t('AcPost.OptionsTab.OptionCard.supportBtn') }
+          <SSupportButton view="secondary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
+            {t('AcPost.OptionsTab.OptionCard.supportBtn')}
           </SSupportButton>
         )}
       </SContainer>
@@ -355,61 +333,52 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           stiffness: 300,
         }}
       >
-      {!isMobile && isSupportFormOpen && (
-        <>
-          <BidAmountTextInput
-            value={supportBidAmount}
-            inputAlign="left"
-            horizontalPadding="20px"
-            onChange={(newValue: string) => setSupportBidAmount(newValue)}
-            minAmount={minAmount}
-          />
-          <Button
-            view="primaryGrad"
-            disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
-            onClick={() => handleTogglePaymentModalOpen()}
-          >
-            { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
-          </Button>
-          <SCancelButton
-            view="secondary"
-            onClick={() => handleCloseSupportForm()}
-          >
-            { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
-          </SCancelButton>
-        </>
-      )}
-      {isMobile ? (
-        <OptionActionMobileModal
-          isOpen={isSupportFormOpen}
-          onClose={() => handleCloseSupportForm()}
-          zIndex={12}
-        >
-          <SSuggestSupportMobileContainer>
-            <div>
-              { option.title }
-            </div>
+        {!isMobile && isSupportFormOpen && (
+          <>
             <BidAmountTextInput
               value={supportBidAmount}
               inputAlign="left"
-              horizontalPadding="16px"
+              horizontalPadding="20px"
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
             />
             <Button
               view="primaryGrad"
-              size="sm"
-              disabled={!supportBidAmount}
+              disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+              {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
             </Button>
-          </SSuggestSupportMobileContainer>
-        </OptionActionMobileModal>
-      ) : null}
+            <SCancelButton view="secondary" onClick={() => handleCloseSupportForm()}>
+              {t('AcPost.OptionsTab.OptionCard.cancelBtn')}
+            </SCancelButton>
+          </>
+        )}
+        {isMobile ? (
+          <OptionActionMobileModal isOpen={isSupportFormOpen} onClose={() => handleCloseSupportForm()} zIndex={12}>
+            <SSuggestSupportMobileContainer>
+              <div>{option.title}</div>
+              <BidAmountTextInput
+                value={supportBidAmount}
+                inputAlign="left"
+                horizontalPadding="16px"
+                onChange={(newValue: string) => setSupportBidAmount(newValue)}
+                minAmount={minAmount}
+              />
+              <Button
+                view="primaryGrad"
+                size="sm"
+                disabled={!supportBidAmount}
+                onClick={() => handleTogglePaymentModalOpen()}
+              >
+                {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
+              </Button>
+            </SSuggestSupportMobileContainer>
+          </OptionActionMobileModal>
+        ) : null}
       </SSupportBidForm>
       {/* Payment Modal */}
-      {paymentModalOpen ? (
+      {paymentModalOpen && (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
@@ -420,22 +389,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
-            <SPaymentModalTitle
-              variant={3}
-            >
-              { t('AcPost.paymenModalHeader.subtitle') }
-            </SPaymentModalTitle>
-            <SPaymentModalOptionText>
-              { option.title }
-            </SPaymentModalOptionText>
+            <SPaymentModalTitle variant={3}>{t('AcPost.paymenModalHeader.subtitle')}</SPaymentModalTitle>
+            <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
-      ) : null }
+      )}
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </motion.div>
   );
 };
@@ -473,8 +433,7 @@ const SBidDetails = styled.div<{
   display: grid;
   grid-template-areas:
     'info amount'
-    'doubleVote doubleVote'
-  ;
+    'doubleVote doubleVote';
   grid-template-columns: 7fr 1fr;
   gap: 16px;
 
@@ -484,12 +443,12 @@ const SBidDetails = styled.div<{
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  ${({ bgVariant }) => (
+  ${({ bgVariant }) =>
     bgVariant
       ? css`
-        background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
-      ` : null
-  )};
+          background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
+        `
+      : null};
 
   &:hover {
     cursor: pointer;
@@ -512,7 +471,6 @@ const SBidInfo = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-
 
   vertical-align: middle;
   line-height: 24px;
@@ -577,7 +535,6 @@ const SAmount = styled.div`
   align-self: center;
   justify-self: flex-end;
 
-
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -595,7 +552,8 @@ const SSupportButton = styled(Button)`
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-    &:hover:enabled, &:focus:enabled {
+    &:hover:enabled,
+    &:focus:enabled {
       background: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
@@ -627,7 +585,8 @@ const SCancelButton = styled(Button)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  &:hover:enabled, &:focus:enabled {
+  &:hover:enabled,
+  &:focus:enabled {
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -639,13 +598,10 @@ const SSuggestSupportMobileContainer = styled.div`
   gap: 24px;
 
   padding: 16px;
-
 `;
 
 // Payment modal header
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};

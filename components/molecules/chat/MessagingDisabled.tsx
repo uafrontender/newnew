@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import {
   SBottomAction,
   SBottomActionButton,
@@ -10,16 +11,24 @@ import {
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
 
-const MessagingDisabled: React.FC = () => {
+interface IMessagingDisabled {
+  userName: string;
+  userAlias: string;
+}
+
+const MessagingDisabled: React.FC<IMessagingDisabled> = ({ userName, userAlias }) => {
   const { t } = useTranslation('chat');
+  const router = useRouter();
 
   return (
     <SBottomAction>
       <SBottomActionLeft>
-        <SBottomActionIcon>🤐</SBottomActionIcon>
+        <SBottomActionIcon>🙊</SBottomActionIcon>
         <SBottomActionText>
           <SBottomActionTitle>{t('messaging-disabled.title')}</SBottomActionTitle>
-          <SBottomActionMessage>{t('messaging-disabled.message')}</SBottomActionMessage>
+          <SBottomActionMessage>
+            {userName} {t('messaging-disabled.message')}
+          </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
       <SBottomActionButton
@@ -28,7 +37,7 @@ const MessagingDisabled: React.FC = () => {
         withShrink
         view="primaryGrad"
         onClick={() => {
-          console.log('Check user’s profile');
+          router.push(`/u/${userAlias}`);
         }}
       >
         {t('messaging-disabled.button-text')}

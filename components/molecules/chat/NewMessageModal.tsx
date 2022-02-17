@@ -346,14 +346,14 @@ const SModal = styled.div`
   flex-direction: column;
   line-height: 24px;
   height: 100%;
-  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
   max-width: 100%;
   max-height: 100vh;
 
   ${(props) => props.theme.media.tablet} {
     max-width: 480px;
     max-height: 80vh;
-    background-color: ${(props) => props.theme.colorsThemed.background.secondary};
     border-radius: ${(props) => props.theme.borderRadius.medium};
     padding: 24px;
   }
