@@ -16,10 +16,18 @@ interface IBlockedUser {
   closeModal: () => void;
   confirmBlockUser: boolean;
   isBlocked?: boolean;
+  isAnnouncement?: boolean;
   userName: string;
 }
 
-const BlockedUser: React.FC<IBlockedUser> = ({ onUserBlock, isBlocked, confirmBlockUser, userName, closeModal }) => {
+const BlockedUser: React.FC<IBlockedUser> = ({
+  onUserBlock,
+  isBlocked,
+  confirmBlockUser,
+  userName,
+  closeModal,
+  isAnnouncement,
+}) => {
   const { t } = useTranslation('chat');
 
   return (
@@ -29,12 +37,16 @@ const BlockedUser: React.FC<IBlockedUser> = ({ onUserBlock, isBlocked, confirmBl
           <SBottomActionLeft>
             <SBottomActionIcon>🤐</SBottomActionIcon>
             <SBottomActionText>
-              <SBottomActionTitle>{t('user-blocked.title')}</SBottomActionTitle>
-              <SBottomActionMessage>{t('user-blocked.message')}</SBottomActionMessage>
+              <SBottomActionTitle>
+                {isAnnouncement ? t('group-blocked.title') : t('user-blocked.title')}
+              </SBottomActionTitle>
+              <SBottomActionMessage>
+                {isAnnouncement ? t('group-blocked.message') : t('user-blocked.message')}
+              </SBottomActionMessage>
             </SBottomActionText>
           </SBottomActionLeft>
           <SBottomActionButton withDim withShrink view="quaternary" onClick={onUserBlock}>
-            {t('user-blocked.button-text')}
+            {isAnnouncement ? t('group-blocked.button-text') : t('user-blocked.button-text')}
           </SBottomActionButton>
         </SBottomAction>
       )}
@@ -43,6 +55,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({ onUserBlock, isBlocked, confirmBl
         onUserBlock={onUserBlock}
         userName={userName}
         closeModal={closeModal}
+        isAnnouncement={isAnnouncement}
       />
     </>
   );
@@ -52,4 +65,5 @@ export default BlockedUser;
 
 BlockedUser.defaultProps = {
   isBlocked: false,
+  isAnnouncement: false,
 };
