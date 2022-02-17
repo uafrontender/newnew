@@ -34,7 +34,7 @@ export const Banner: React.FC<IBanner> = () => {
   };
 
   return (
-    <SContainer active={banner?.show} onClick={handleBannerClick}>
+    <SContainer id="header-banner" active={banner?.show} onClick={handleBannerClick}>
       <SText variant={3} weight={600}>
         {banner?.title}
       </SText>

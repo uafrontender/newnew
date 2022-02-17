@@ -27,6 +27,7 @@ import suggestionsImage from '../../../public/images/subscription/suggestions.pn
 import FaqSection from '../../../components/molecules/subscribe/FaqSection';
 import isBrowser from '../../../utils/isBrowser';
 import { formatNumber } from '../../../utils/format';
+import GoBackButton from '../../../components/molecules/GoBackButton';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -124,7 +125,13 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
 
   return (
     <>
-      <SGeneral>
+      <SGeneral
+        {...{
+          ...(isMobile ? {
+            specialStatusBarColor: theme.colorsThemed.accent.yellow,
+          } : {})
+        }}
+      >
         <div>
           <main>
             <AnimatePresence>
@@ -167,6 +174,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
               topSectionRef.current = el!!;
             }}
           >
+            {isMobile && (
+              <SBackButton
+                defer={500}
+                onClick={() => router.back()}
+              />
+            )}
             <UserInfoSection>
               <SHeadingSection>
                   <SSHeadingSectionAvatar>
@@ -201,6 +214,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     view="quaternary"
                     style={{
                       marginBottom: '16px',
+                      marginTop: '16px',
                       color: theme.colors.dark,
                     }}
                     onClick={() => {}}
@@ -216,7 +230,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     src={dmsImage.src}
                   />
                   <SBulletTitle
-                    variant={2}
+                    variant={5}
                   >
                     { t('TopSection.bullets.dms.title') }
                   </SBulletTitle>
@@ -232,7 +246,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     src={votesImage.src}
                   />
                   <SBulletTitle
-                    variant={2}
+                    variant={5}
                   >
                     { t('TopSection.bullets.freeVotes.title') }
                   </SBulletTitle>
@@ -248,7 +262,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     src={suggestionsImage.src}
                   />
                   <SBulletTitle
-                    variant={2}
+                    variant={5}
                   >
                     { t('TopSection.bullets.suggestions.title') }
                   </SBulletTitle>
@@ -265,18 +279,18 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         </div>
       </SGeneral>
       {isMobile && (
-        <SSubscribeButtonMobile
-          withShadow
-          view="primaryGrad"
-          onClick={() => handleOpenPaymentModal()}
-        >
-          {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
-        </SSubscribeButtonMobile>
+        <SSubscribeButtonMobileContainer>
+          <SSubscribeButtonMobile
+            onClick={() => handleOpenPaymentModal()}
+          >
+            {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
+          </SSubscribeButtonMobile>
+        </SSubscribeButtonMobileContainer>
       )}
       <PaymentModal
         isOpen={isPaymentModalOpen}
         zIndex={10}
-        // amount="$5"
+        amount={`$${subscriptionPrice}`}
         showTocApply
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayWithCard}
@@ -354,12 +368,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const SGeneral = styled(General)`
   position: relative;
 
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   header {
     z-index: 6;
   }
 
+  #header-banner {
+    display: none;
+  }
+
+  #bottom-nav-mobile {
+    display: none;
+  }
+
   @media (max-width: 768px) {
+    #top-nav-header {
+      display: none;
+    }
+
     main {
+      margin-top: -68px;
+
       div:first-child {
         padding-left: 0;
         padding-right: 0;
@@ -393,7 +429,37 @@ const SScrolledDownTopSection = styled(motion.div)`
 
   ${({ theme }) => theme.media.laptop} {
     top: 80px;
-    padding: 0px 118px;
+    padding: 0px calc(50% - 368px);
+  }
+`;
+
+const SBackButton = styled(GoBackButton)`
+  position: absolute;
+  top: 16px;
+  left: 18px;
+
+  width: fit-content;
+  height: fit-content;
+
+  padding: 0px;
+
+  path {
+    fill: ${({ theme }) => theme.colors.dark} !important;
+  }
+
+  &:active {
+    & div > svg {
+      path {
+        fill: ${({ theme }) => theme.colors.dark} !important;
+      }
+
+      transform: scale(0.8);
+      transition: .2s ease-in-out;
+    }
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    display: none;
   }
 `;
 
@@ -485,7 +551,18 @@ const UserInfoSection = styled.div`
 `;
 
 const SHeadingSection = styled.div`
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+
+  margin-bottom: 24px !important;
+
+  ${(props) => props.theme.media.tablet} {
+    display: initial;
+    text-align: initial;
+  }
 `;
 
 const SSHeadingSectionAvatar = styled.div`
@@ -536,21 +613,38 @@ const SSHeadingSectionAvatar = styled.div`
 const SSubscribeButtonDesktop = styled(Button)`
   background: ${({ theme }) => theme.colors.dark};
 
+  margin-top: 16px;
+
   &:focus:enabled,
   &:hover:enabled  {
     background: ${({ theme }) => theme.colors.dark};
   }
 `;
 
-const SSubscribeButtonMobile = styled(Button)`
+const SSubscribeButtonMobileContainer = styled.div`
   width: 100%;
   position: fixed;
+  left: 0px;
+  bottom: 0px;
 
-  left: 16px;
-  bottom: 64px;
+  padding: 0px 16px;
+  padding-top: 24px;
 
+  height: 104px;
+
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+`;
+
+const SSubscribeButtonMobile = styled(Button)`
   height: 56px;
-  width: calc(100% - 32px);
+  width: 100%;
+
+  background: ${({ theme }) => theme.colors.dark};
+
+  &:focus:enabled,
+  &:hover:enabled  {
+    background: ${({ theme }) => theme.colors.dark};
+  }
 `;
 
 const SHeadline = styled(Headline)`
@@ -569,8 +663,16 @@ const SButtonsSection = styled.div`
 const SBulletsSection = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 96px;
 
-  margin-top: 16px;
+  margin-top: 104px;
+
+
+  ${(props) => props.theme.media.tablet} {
+    margin-top: 16px;
+
+    gap: initial;
+  }
 
   ${(props) => props.theme.media.laptop} {
     width: 50%;
@@ -590,17 +692,18 @@ const SBullet = styled.div`
 
   border-radius: 24px;
 
-  margin-bottom: 24px !important;
-
-  margin-left: 48px !important;
-  padding-left: 64px !important;
+  padding-left: 16px !important;
   padding-right: 16px !important;
+
+  text-align: center;
 
   ${({ theme }) => theme.media.tablet} {
     height: 140px;
 
     border-radius: 24px;
     margin-bottom: 24px !important;
+
+    text-align: initial;
 
     margin-left: 70px !important;
     padding-left: 102px !important;
@@ -613,11 +716,11 @@ const SBullet = styled.div`
 
 const SBulletImg = styled.img`
   position: absolute;
-  left: -48px;
-  top: calc(50% - 48px);
+  left: calc(50% - 60px);
+  top: -76px;
 
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
 
 
   ${({ theme }) => theme.media.tablet} {
@@ -632,13 +735,14 @@ const SBulletImg = styled.img`
   }
 `;
 
-const SBulletTitle = styled(Text)`
+const SBulletTitle = styled(Headline)`
   margin-bottom: 4px;
   color: #fff;
 `;
 
 const SBulletBody = styled(Text)`
   color: #fff;
+  opacity: 0.6;
 `;
 
 // Payment modal header
