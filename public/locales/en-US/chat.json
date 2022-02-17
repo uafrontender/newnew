@@ -4,8 +4,11 @@
   },
   "ellipse": {
     "report-user": "Report user",
+    "report-group": "Report group",
     "block-user": "Block user",
     "unblock-user": "Unblock user",
+    "block-group": "Block group",
+    "unblock-group": "Unblock group",
     "view-profile": "View profile"
   },
   "chat": {
@@ -22,15 +25,19 @@
     "message": "Unblock the user, to continue conversation.",
     "button-text": "Unblock user"
   },
+  "group-blocked": {
+    "title": "Group blocked",
+    "message": "Unblock the group, to continue conversation.",
+    "button-text": "Unblock group"
+  },
   "subscription-expired": {
     "title": "Subscription expired",
-    "message-first-part": "To keep your communication with",
-    "message-second-part": "renew your subscription.",
+    "message": "Only subscribers can send messages. Renew subscription.",
     "button-text": "Renew subscription"
   },
   "messaging-disabled": {
     "title": "Messaging temporarily disabled",
-    "message": "Creator is not accepting messages at this moment. Stay tuned!",
+    "message": "is not accepting messages at this moment. Stay tuned!",
     "button-text": "Check user’s profile"
   },
   "account-deleted": {
@@ -49,6 +56,28 @@
       "button-cancel": "Cancel",
       "button-confirm": "Block user"
     },
+    "block-group": {
+      "title": "Block group",
+      "button-confirm": "Block group"
+    },
+    "report-user": {
+      "title": "Report",
+      "subtitle": "Help us understand the problem. Please select a reason.",
+      "options": {
+        "spam": "Suspicious or spam",
+        "abuse": "Abusive or harmful",
+        "suicide": "Expresses intentions of self-harm or suicide",
+        "hate-speech": "Hate speech",
+        "harrasment": "Harrasment or bullying"
+      },
+      "additional-info": {
+        "label": "Additional info (optional)",
+        "placeholder": "Tell us more about the problem"
+      },
+      "button-cancel": "Cancel",
+      "button-confirm": "Report user",
+      "button-confirm-group": "Report group"
+    },
     "delete-group": {
       "title": "Delete group",
       "message-first-part": "Do you really want to delete",
@@ -62,7 +91,8 @@
       "no-results-title": "No results",
       "no-results-text": "There were no results for",
       "no-results-search-text": "Try a new search."
-    }
+    },
+    "renewSubcriptionsSubtitle": "Renew subscription to"
   },
   "empty-inbox": {
     "title": "Your inbox is empty",
@@ -75,5 +105,23 @@
   },
   "default": {
     "search-placeholder": "Search"
+  },
+  "announcement": {
+    "title": "'s announcement",
+    "top-message-start": "Only",
+    "top-message-end": "can send messages",
+    "bottom-message-first-line": "created the announcement.",
+    "bottom-message-second-line-start": "You and",
+    "bottom-message-second-line-end": "others joined it"
+  },
+  "usertypes": {
+    "all": "All",
+    "subscribers": "Subscribers",
+    "subscribing": "Subscribing"
+  },
+  "dates": {
+    "now": "now",
+    "min": "min",
+    "today": "Today"
   }
 }

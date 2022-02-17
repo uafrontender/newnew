@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import dynamic from 'next/dynamic';
+import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -9,16 +10,19 @@ import SearchInput from '../atoms/chat/SearchInput';
 import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
-import InlineSVG from '../atoms/InlineSVG';
-import chevronLeftIcon from '../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import GoBackButton from '../molecules/GoBackButton';
 
 export const Chat = () => {
-  const [chatData, setChatData] = useState<IChatData>({ userData: null, messages: [] });
-  const openChat = ({ userData, messages }: IChatData) => {
-    setChatData({ userData, messages });
+  const [chatData, setChatData] = useState<IChatData>({
+    userData: null,
+    messages: [],
+    isAnnouncement: false,
+    showChatList: null,
+  });
+  const openChat = ({ userData, messages, isAnnouncement }: IChatData) => {
+    setChatData({ userData, messages, isAnnouncement, showChatList });
   };
   const { t } = useTranslation('chat');
-  const theme = useTheme();
   const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -49,12 +53,7 @@ export const Chat = () => {
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
         <SToolbar isMobile={isMobileOrTablet}>
           {isMobileOrTablet && (
-            <SBackButton
-              clickable
-              svg={chevronLeftIcon}
-              fill={theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
+            <GoBackButton
               onClick={() => {
                 setChatListHidden(true);
               }}
@@ -97,7 +96,7 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100%;
-  background: ${(props) => props.theme.colors.black};
+  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colors.black)};
   flex-shrink: 0;
   ${(props) => {
     if (props.hidden === false) {
@@ -109,7 +108,7 @@ const SSidebar = styled.div<ISSidebar>`
           bottom: 0;
           right: 0;
           position: fixed;
-          height: 100vh;
+          /* height: 100vh; */
           padding: 0 15px;
         }
       `;
@@ -159,13 +158,4 @@ const SContent = styled.div`
     margin-left: auto;
     border-radius: ${(props) => props.theme.borderRadius.large};
   }
-`;
-
-const SInlineSVG = styled(InlineSVG)`
-  min-width: 24px;
-  min-height: 24px;
-`;
-
-const SBackButton = styled(SInlineSVG)`
-  margin-right: 20px;
 `;
