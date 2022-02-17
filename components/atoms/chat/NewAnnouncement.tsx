@@ -47,6 +47,8 @@ const SText = styled.div`
 
 const STitle = styled.strong`
   color: #fff;
+  color: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
