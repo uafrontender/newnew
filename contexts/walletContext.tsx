@@ -48,8 +48,6 @@ const WalletContextProvider: React.FC = ({ children }) => {
 
         const res = await getWalletBalance(payload);
 
-        console.log(res);
-
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
         setWalletBalance((res.data.walletBalance as newnewapi.MoneyAmount) ?? undefined);

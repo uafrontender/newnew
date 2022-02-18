@@ -181,8 +181,6 @@ const MyProfileSettginsIndex: NextPage = () => {
 
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
-      console.log(data);
-
       dispatch(setUserData({
         options: {
           isActivityPrivate: data.me?.options?.isActivityPrivate,
