@@ -1,7 +1,9 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useContext, useEffect, useRef, useState, useMemo,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -11,23 +13,25 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { WalletContext } from '../../../contexts/walletContext';
 import { getUserByUsername } from '../../../api/endpoints/user';
 import { getSubscriptionStatus, subscribeToCreator } from '../../../api/endpoints/subscription';
 
 import General from '../../../components/templates/General';
-import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
 import Text from '../../../components/atoms/Text';
 import Button from '../../../components/atoms/Button';
 import Headline from '../../../components/atoms/Headline';
+import GoBackButton from '../../../components/molecules/GoBackButton';
+import FaqSection from '../../../components/molecules/subscribe/FaqSection';
+import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
 
 // Images
 import dmsImage from '../../../public/images/subscription/dms.png';
 import votesImage from '../../../public/images/subscription/free-votes.png';
 import suggestionsImage from '../../../public/images/subscription/suggestions.png';
-import FaqSection from '../../../components/molecules/subscribe/FaqSection';
+
 import isBrowser from '../../../utils/isBrowser';
 import { formatNumber } from '../../../utils/format';
-import GoBackButton from '../../../components/molecules/GoBackButton';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -39,16 +43,29 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('subscribe-to-user');
-  const { userData, loggedIn } = useAppSelector((state) => state.user);
+  const { loggedIn } = useAppSelector((state) => state.user);
+  const { banner } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const { walletBalance } = useContext(WalletContext);
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
-
-  const [subscriptionPrice, setSubscriptionPrice] = useState('');
+  const [subscriptionPrice, setSubscriptionPrice] = useState<number | undefined>(undefined);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+  const predefinedOption = useMemo(() => {
+    if (walletBalance && subscriptionPrice) {
+      return walletBalance.usdCents >= subscriptionPrice ? 'wallet' : 'card';
+    }
+    return undefined;
+  }, [walletBalance, subscriptionPrice]);
+
+  const subPriceFormatted = useMemo(() => (
+    subscriptionPrice ? formatNumber((subscriptionPrice!! / 100) ?? 0, true) : ''
+  ), [subscriptionPrice]);
 
   const handleOpenPaymentModal = () => {
     if (!loggedIn) {
@@ -58,7 +75,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     setIsPaymentModalOpen(true);
   }
 
-  const handlePayWithCard = async () => {
+  const handlePayRegistered = async () => {
     try {
       const payload = new newnewapi.SubscribeToCreatorRequest({
         creatorUuid: user.uuid,
@@ -89,7 +106,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         console.log(res.data?.status?.product);
 
         if (res.data?.status?.product) {
-          setSubscriptionPrice(formatNumber((res.data?.status?.product.monthlyRate?.usdCents!! / 100) ?? 0, true))
+          setSubscriptionPrice(res.data?.status?.product.monthlyRate?.usdCents!!)
         }
       } catch (err) {
         console.log(err);
@@ -133,7 +150,13 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         }}
       >
         <div>
-          <main>
+          <main
+            style={{
+              ...(isMobile && !banner.show ? {
+                marginTop: '-28px',
+              } : {})
+            }}
+          >
             <AnimatePresence>
               {isScrolledDown && !isMobile && (
                 <SScrolledDownTopSection
@@ -149,6 +172,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     opacity: 0,
                     y: -30
                   }}
+                  pushDown={banner.show}
                 >
                   <SUserInfoScrollDown>
                     <SUserInfoScrollDownAvatar>
@@ -164,7 +188,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                   <SSubscribeButtonScrollDown
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
+                    {t('subscribeBtn', { amount: subPriceFormatted })}
                   </SSubscribeButtonScrollDown>
                 </SScrolledDownTopSection>
               )}
@@ -208,7 +232,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                     }}
                     onClick={() => handleOpenPaymentModal()}
                   >
-                    {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
+                    {t('subscribeBtn', { amount: subPriceFormatted })}
                   </SSubscribeButtonDesktop>
                   <Button
                     view="quaternary"
@@ -283,17 +307,19 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
           <SSubscribeButtonMobile
             onClick={() => handleOpenPaymentModal()}
           >
-            {t('subscribeBtn', { amount: subscriptionPrice ?? '' })}
+            {t('subscribeBtn', { amount: subPriceFormatted })}
           </SSubscribeButtonMobile>
         </SSubscribeButtonMobileContainer>
       )}
       <PaymentModal
-        isOpen={isPaymentModalOpen}
         zIndex={10}
-        amount={`$${subscriptionPrice}`}
         showTocApply
+        predefinedOption={predefinedOption}
+        isOpen={isPaymentModalOpen}
+        amount={`$${subPriceFormatted}`}
         onClose={() => setIsPaymentModalOpen(false)}
-        handlePayWithCardStripeRedirect={handlePayWithCard}
+        handlePayWithCardStripeRedirect={handlePayRegistered}
+        handlePayWithWallet={handlePayRegistered}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle
@@ -380,10 +406,6 @@ const SGeneral = styled(General)`
     z-index: 6;
   }
 
-  #header-banner {
-    display: none;
-  }
-
   #bottom-nav-mobile {
     display: none;
   }
@@ -409,9 +431,11 @@ const SGeneral = styled(General)`
   }
 `;
 
-const SScrolledDownTopSection = styled(motion.div)`
+const SScrolledDownTopSection = styled(motion.div)<{
+  pushDown: boolean;
+}>`
   position: fixed;
-  top: 72px;
+  top: ${({ pushDown }) => (pushDown ? '112px' : '72px')};
   left: 0;
 
   height: 72px;
@@ -428,7 +452,7 @@ const SScrolledDownTopSection = styled(motion.div)`
   z-index: 100;
 
   ${({ theme }) => theme.media.laptop} {
-    top: 80px;
+    top: ${({ pushDown }) => (pushDown ? '120px' : '80px')};
     padding: 0px calc(50% - 368px);
   }
 `;
