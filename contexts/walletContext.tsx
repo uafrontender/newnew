@@ -72,8 +72,6 @@ const WalletContextProvider: React.FC = ({ children }) => {
 
       if (!decoded) return;
 
-      console.log(decoded);
-
       setWalletBalance((decoded.currentBalance as newnewapi.MoneyAmount) ?? undefined)
     };
 
