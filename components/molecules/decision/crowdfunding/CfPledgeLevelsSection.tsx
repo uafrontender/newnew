@@ -1,6 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback,
   useEffect,
@@ -11,23 +9,20 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { validateText } from '../../../../api/endpoints/infrastructure';
+import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
-import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
-import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
+import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
-import PlaceCfBidForm from './PlaceCfBidForm';
-import { doPledgeCrowdfunding } from '../../../../api/endpoints/crowdfunding';
-import { validateText } from '../../../../api/endpoints/infrastructure';
-import Text from '../../../atoms/Text';
-import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
@@ -41,9 +36,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   post,
   handleAddPledgeFromResponse,
   handleSetHeightDelta,
-}, ref) => {
+}) => {
   const { t } = useTranslation('decision');
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -139,36 +133,95 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
   };
 
   // Make a pledge and close all forms and modals
-  const handleMakePledge = useCallback(async () => {
+  const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makePledgePayload = new newnewapi.DoPledgeRequest({
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(pledgeAmount?.toString()!!, 10),
-        }),
-        postUuid: post.postUuid,
-        ...(pledgeMessage ? (
-          {
-            message: pledgeMessage,
+      // Check if user is logged in
+      if (!user.loggedIn) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+          successUrl: `${window.location.href}&`,
+          cancelUrl: `${window.location.href}&`,
+          ...(!user.loggedIn ? {
+            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+          } : {}),
+          cfPledgeRequest: {
+            amount: new newnewapi.MoneyAmount({
+              usdCents: parseInt(pledgeAmount?.toString()!!, 10),
+            }),
+            postUuid: post.postUuid,
+            ...(pledgeMessage ? (
+              {
+                message: pledgeMessage,
+              }
+            ) : {}),
           }
-        ) : {}),
-      });
+        });
 
-      const res = await doPledgeCrowdfunding(makePledgePayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data
-        || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data
+          || !res.data.sessionUrl
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
 
-      handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makePledgePayload = new newnewapi.DoPledgeRequest({
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(pledgeAmount?.toString()!!, 10),
+          }),
+          postUuid: post.postUuid,
+          ...(pledgeMessage ? (
+            {
+              message: pledgeMessage,
+            }
+          ) : {}),
+        });
 
-      setCustomPledgeAmount('');
-      setSelectedPledgeLevelIdx(-1);
-      setIsFormOpen(false);
-      setPledgeMessage('');
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await doPledgeWithWallet(makePledgePayload);
+
+        if (res.data && res.data.status === newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${window.location.href}&`,
+            cancelUrl: `${window.location.href}&`,
+            cfPledgeRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(pledgeAmount?.toString()!!, 10),
+              }),
+              postUuid: post.postUuid,
+              ...(pledgeMessage ? (
+                {
+                  message: pledgeMessage,
+                }
+              ) : {}),
+            }
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+
+          if (!resStripeRedirect.data
+            || !resStripeRedirect.data.sessionUrl
+            || resStripeRedirect.error
+          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data
+          || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
+
+        setCustomPledgeAmount('');
+        setSelectedPledgeLevelIdx(-1);
+        setIsFormOpen(false);
+        setPledgeMessage('');
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       console.error(err);
       setPaymentModalOpen(false);
@@ -178,6 +231,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     pledgeAmount,
     pledgeMessage,
     post.postUuid,
+    user.loggedIn,
     handleAddPledgeFromResponse,
   ]);
 
@@ -313,7 +367,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={() => {}}
+          handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle

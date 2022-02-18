@@ -51,3 +51,13 @@ export const doPledgeCrowdfunding = (
   'post',
   payload,
 );
+
+export const doPledgeWithWallet = (
+  payload: newnewapi.DoPledgeRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DoPledgeRequest, newnewapi.DoPledgeResponse>(
+  newnewapi.DoPledgeRequest,
+  newnewapi.DoPledgeResponse,
+  `${BASE_URL_CROWDFUNDING}/do_pledge_with_wallet`,
+  'post',
+  payload,
+);

@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import {
   BASE_URL,
+  cookiesInstance,
   fetchProtobuf,
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
@@ -29,15 +30,20 @@ newnewapi.UnsubscribeFromCreatorRequest, newnewapi.UnsubscribeFromCreatorRespons
   payload,
 );
 
+// NB! Will be with optional authentication
 export const getSubscriptionStatus = (
   payload: newnewapi.SubscriptionStatusRequest,
-) => fetchProtobufProtectedIntercepted<
+) => fetchProtobuf<
 newnewapi.SubscriptionStatusRequest, newnewapi.SubscriptionStatusResponse>(
   newnewapi.SubscriptionStatusRequest,
   newnewapi.SubscriptionStatusResponse,
   `${BASE_URL_SUBSCRIPTIONS}/get_subscription_status`,
   'post',
   payload,
+  // Optional authentication
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
 );
 
 export const getMySubscribers = (

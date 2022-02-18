@@ -181,8 +181,6 @@ const MyProfileSettginsIndex: NextPage = () => {
 
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
-      console.log(data);
-
       dispatch(setUserData({
         options: {
           isActivityPrivate: data.me?.options?.isActivityPrivate,
@@ -347,10 +345,7 @@ const MyProfileSettginsIndex: NextPage = () => {
             } : {}),
           }}
         />
-        <SettingsWallet
-          // Temp
-          balance={0}
-        />
+        <SettingsWallet />
         <SettingsAccordion
           sections={accordionSections}
         />

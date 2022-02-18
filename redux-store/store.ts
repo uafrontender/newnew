@@ -48,7 +48,6 @@ const userPersistConfig = {
   storage,
   whitelist: [
     'loggedIn',
-    'walletBalance',
     'userData',
   ],
 };
