@@ -3,8 +3,10 @@ import { newnewapi } from 'newnew-api';
 import React, {
   createContext, useState, useMemo, useEffect,
 } from 'react';
+
 import { getCreatorsIFollow } from '../api/endpoints/user';
-import { useAppSelector } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { logoutUserClearCookiesAndRedirect } from '../redux-store/slices/userStateSlice';
 
 export const FollowingsContext = createContext({
   followingsIds: [] as string[],
@@ -14,6 +16,7 @@ export const FollowingsContext = createContext({
 });
 
 const FollowingsContextProvider: React.FC = ({ children }) => {
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
   const [followingsIds, setFollowingsIds] = useState<string[]>([]);
@@ -45,8 +48,6 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
 
         const res = await getCreatorsIFollow(payload);
 
-        console.log(res)
-
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
         setFollowingsIds(res.data.userUuids);
@@ -55,10 +56,19 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
       } catch (err) {
         console.error(err);
         setIsLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+        }
       }
     }
 
     fetchIds();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
 
   return (

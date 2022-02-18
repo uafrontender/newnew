@@ -1,26 +1,50 @@
-import React from 'react';
+/* eslint-disable no-unsafe-optional-chaining */
+import React, { useContext, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
+import { WalletContext } from '../../../contexts/walletContext';
+
+import Text from '../../atoms/Text';
+import Button from '../../atoms/Button';
+import Lottie from '../../atoms/Lottie';
+import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
+import TopUpWalletModal from '../../molecules/settings/TopUpWalletModal';
 
 // Icons
 import WalletIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
-import Text from '../../atoms/Text';
-import Button from '../../atoms/Button';
-import Headline from '../../atoms/Headline';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import { formatNumber } from '../../../utils/format';
 
 interface ISettingsWallet {
-  balance: number;
 }
 
-const SettingsWallet: React.FunctionComponent<ISettingsWallet> = ({
-  balance,
-}) => {
+const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
   const theme = useTheme();
   const { t } = useTranslation('profile');
 
-  if (balance === 0) {
+  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+
+  const [isTopUpWalletModalOpen, setIsTopWalletModalOpen] = useState(false);
+
+  if (isBalanceLoading) {
+    return (
+      <SSettingsWalletContainer>
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      </SSettingsWalletContainer>
+    )
+  }
+
+  if (!walletBalance || walletBalance.usdCents === 0) {
     return (
       <SSettingsWalletContainer>
         <SIconConatainer>
@@ -50,16 +74,45 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = ({
         </SCaptionText>
         <Button
           view="primaryGrad"
+          onClick={() => setIsTopWalletModalOpen(true)}
         >
           { t('Settings.sections.Wallet.empty.topUpBtn') }
         </Button>
+        <TopUpWalletModal
+          zIndex={12}
+          isOpen={isTopUpWalletModalOpen}
+          onClose={() => setIsTopWalletModalOpen(false)}
+        />
       </SSettingsWalletContainer>
     );
   }
 
   return (
     <SSettingsWalletContainer>
-      I will be the wallet
+      <SText
+        variant={2}
+      >
+        { t('Settings.sections.Wallet.non-empty.balance') }
+      </SText>
+      <SActionDiv>
+        <Headline
+          variant={4}
+        >
+          $
+          { formatNumber((walletBalance?.usdCents / 100) ?? 0, true) }
+        </Headline>
+          <Button
+            view="primaryGrad"
+            onClick={() => setIsTopWalletModalOpen(true)}
+          >
+            { t('Settings.sections.Wallet.non-empty.topUpBtn') }
+          </Button>
+      </SActionDiv>
+      <TopUpWalletModal
+        zIndex={12}
+        isOpen={isTopUpWalletModalOpen}
+        onClose={() => setIsTopWalletModalOpen(false)}
+      />
     </SSettingsWalletContainer>
   );
 };
@@ -72,7 +125,7 @@ const SSettingsWalletContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
 
-  height: 260px;
+  max-height: 260px;
   padding: 16px;
 
   border-radius: ${({ theme }) => theme.borderRadius.large};
@@ -87,12 +140,12 @@ const SSettingsWalletContainer = styled.div`
   user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 296px;
+    max-height: 296px;
     padding: 24px;
   }
 
   ${({ theme }) => theme.media.desktop} {
-    height: 300px;
+    max-height: 300px;
   }
 `;
 
@@ -129,5 +182,24 @@ const SCaptionText = styled(Text)`
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 24px;
+  }
+`;
+
+const SText = styled(Text)`
+  text-align: left;
+  width: 100%;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SActionDiv = styled.div`
+  width: 100%;
+
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+
+  h4 {
+    line-height: 48px;
   }
 `;

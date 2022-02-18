@@ -33,6 +33,7 @@ import { cookiesInstance } from '../api/apiConfigs';
 import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
+import WalletContextProvider from '../contexts/walletContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -95,21 +96,23 @@ const MyApp = (props: IMyApp): ReactElement => {
               persistor={(store as EnhancedStoreWithPersistor).__persistor}
             >
               <FollowingsContextProvider>
-                <ResizeMode>
-                  <GlobalTheme>
-                    <div>
-                      <ToastContainer />
-                      {!pageProps.error ? (
-                        getLayout(<Component {...pageProps} />)
-                      ) : (
-                        <Error
-                          errorMsg={pageProps.error?.message}
-                          statusCode={pageProps.error?.statusCode ?? 500}
-                        />
-                      )}
-                    </div>
-                  </GlobalTheme>
-                </ResizeMode>
+                <WalletContextProvider>
+                  <ResizeMode>
+                    <GlobalTheme>
+                      <div>
+                        <ToastContainer />
+                        {!pageProps.error ? (
+                          getLayout(<Component {...pageProps} />)
+                        ) : (
+                          <Error
+                            errorMsg={pageProps.error?.message}
+                            statusCode={pageProps.error?.statusCode ?? 500}
+                          />
+                        )}
+                      </div>
+                    </GlobalTheme>
+                  </ResizeMode>
+                </WalletContextProvider>
               </FollowingsContextProvider>
             </PersistGate>
           </ChannelsContextProvider>

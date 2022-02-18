@@ -65,3 +65,13 @@ export const placeBidOnAuction = (
   'post',
   payload,
 );
+
+export const placeBidWithWallet = (
+  payload: newnewapi.PlaceBidRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.PlaceBidRequest, newnewapi.PlaceBidResponse>(
+  newnewapi.PlaceBidRequest,
+  newnewapi.PlaceBidResponse,
+  `${BASE_URL_AUCTION}/place_bid_with_wallet`,
+  'post',
+  payload,
+);

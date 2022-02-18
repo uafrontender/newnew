@@ -1,7 +1,8 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import React, { useState } from 'react';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 
@@ -22,6 +23,7 @@ interface IPaymentModal {
   zIndex: number;
   amount?: string;
   showTocApply?: boolean;
+  predefinedOption?: 'wallet' | 'card';
   onClose: () => void;
   handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
@@ -32,6 +34,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   zIndex,
   amount,
   showTocApply,
+  predefinedOption,
   onClose,
   handlePayWithWallet,
   handlePayWithCardStripeRedirect,
@@ -42,7 +45,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>('wallet');
+  const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(predefinedOption ?? 'wallet');
+
+  useEffect(() => {
+    if (predefinedOption) {
+      setSelectedOption(predefinedOption);
+    }
+  }, [predefinedOption]);
 
   return (
     <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
@@ -61,8 +70,18 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           <SHeaderContainer>{children}</SHeaderContainer>
           <SPaymentMethodTitle variant={3}>{t('paymentMethodTitle')}</SPaymentMethodTitle>
           <SOptionsContainer>
-            <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
-            <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+            {!predefinedOption ? (
+              <>
+                <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
+                <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+              </>
+            ) : (
+              selectedOption === 'card' ? (
+                <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+              ) : (
+                <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
+              )
+            )}
           </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
@@ -99,6 +118,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
 PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
+  predefinedOption: undefined,
   handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
@@ -133,12 +153,15 @@ const SContentContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
-    height: 480px;
+    height: fit-content;
+    min-height: 360px;
+    max-height: 480px;
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
+    padding-bottom: 116px;
   }
 `;
 
@@ -230,4 +253,5 @@ const STocApply = styled.div`
   }
 `;
 
-const SOptionsContainer = styled.div``;
+const SOptionsContainer = styled.div`
+`;
