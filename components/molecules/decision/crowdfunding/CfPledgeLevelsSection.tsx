@@ -138,7 +138,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     try {
       // Check if user is logged in
       if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
           successUrl: `${window.location.href}&`,
           cancelUrl: `${window.location.href}&`,
           ...(!user.loggedIn ? {
@@ -181,7 +181,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
         const res = await doPledgeWithWallet(makePledgePayload);
 
         if (res.data && res.data.status === newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
             successUrl: `${window.location.href}&`,
             cancelUrl: `${window.location.href}&`,
             cfPledgeRequest: {

@@ -95,7 +95,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     try {
       // Check if user is logged in
       if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
           successUrl: `${window.location.href}&`,
           cancelUrl: `${window.location.href}&`,
           ...(!user.loggedIn ? {
@@ -126,7 +126,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         const res = await voteOnPostWithWallet(makeBidPayload);
 
         if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
             successUrl: `${window.location.href}&`,
             cancelUrl: `${window.location.href}&`,
             mcVoteRequest: {

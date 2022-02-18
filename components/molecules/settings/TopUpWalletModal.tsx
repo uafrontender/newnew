@@ -34,11 +34,11 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(5);
 
   const handleSubmit = async () => {
     try {
-      const payload = new newnewapi.GetTopUpWalletSessionUrlRequest({
+      const payload = new newnewapi.TopUpWalletRequest({
         successUrl: `${window.location.href}`,
         cancelUrl: `${window.location.href}`,
         topUpAmount: {
@@ -132,7 +132,7 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
               </SCancelButton>
               <Button
                 view="primaryGrad"
-                disabled={amount <= 0}
+                disabled={amount <= 4}
                 onClick={() => handleSubmit()}
               >
                 { t('Settings.sections.Wallet.TopUpWalletModal.checkoutButtonDesktop') }
@@ -142,7 +142,7 @@ const TopUpWalletModal: React.FunctionComponent<ITopUpWalletModal> = ({
           {isMobile && (
             <SButtonCheckoutMobile
               view="primaryGrad"
-              disabled={amount <= 0}
+              disabled={amount <= 4}
               onClick={() => handleSubmit()}
             >
               { t('Settings.sections.Wallet.TopUpWalletModal.checkoutButtonMobile') }

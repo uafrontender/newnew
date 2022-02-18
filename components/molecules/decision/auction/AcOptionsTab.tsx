@@ -158,7 +158,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     try {
       // Check if user is logged and if the wallet balance is sufficient
       if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(newBidAmount, 10) * 100)) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
           successUrl: `${window.location.href}&`,
           cancelUrl: `${window.location.href}&`,
           ...(!user.loggedIn ? {
@@ -194,7 +194,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
         // Additional handler if balance turned out to be insufficient
         if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest({
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
             successUrl: `${window.location.href}&`,
             cancelUrl: `${window.location.href}&`,
             acBidRequest: {

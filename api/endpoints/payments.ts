@@ -59,23 +59,23 @@ newnewapi.EmptyRequest, newnewapi.GetWalletBalanceResponse>(
 );
 
 export const getTopUpWalletSessionUrl = (
-  payload: newnewapi.GetTopUpWalletSessionUrlRequest,
+  payload: newnewapi.TopUpWalletRequest,
 ) => fetchProtobufProtectedIntercepted<
-newnewapi.GetTopUpWalletSessionUrlRequest, newnewapi.GetTopUpWalletSessionUrlResponse>(
-  newnewapi.GetTopUpWalletSessionUrlRequest,
-  newnewapi.GetTopUpWalletSessionUrlResponse,
-  `${BASE_URL_PAYMENTS}/get_top_up_wallet_session_url`,
+newnewapi.TopUpWalletRequest, newnewapi.TopUpWalletResponse>(
+  newnewapi.TopUpWalletRequest,
+  newnewapi.TopUpWalletResponse,
+  `${BASE_URL_PAYMENTS}/top_up_wallet`,
   'post',
   payload,
 );
 
 export const getTopUpWalletWithPaymentPurposeUrl = (
-  payload: newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest,
+  payload: newnewapi.TopUpWalletWithPurposeRequest,
 ) => fetchProtobuf<
-newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest, newnewapi.GetTopUpWalletWithPaymentPurposeUrlResponse>(
-  newnewapi.GetTopUpWalletWithPaymentPurposeUrlRequest,
-  newnewapi.GetTopUpWalletWithPaymentPurposeUrlResponse,
-  `${BASE_URL_PAYMENTS}/get_top_up_wallet_with_payment_purpose_url`,
+newnewapi.TopUpWalletWithPurposeRequest, newnewapi.TopUpWalletWithPurposeResponse>(
+  newnewapi.TopUpWalletWithPurposeRequest,
+  newnewapi.TopUpWalletWithPurposeResponse,
+  `${BASE_URL_PAYMENTS}/top_up_wallet_with_purpose`,
   'post',
   payload,
   // Optional authentication
