@@ -22,6 +22,7 @@ export const Header: React.FC<IHeader> = (props) => {
   return (
     <SWrapper
       name="top-reload"
+      id="top-nav-header"
       visible={visible}
       withBanner={!!banner.show}
     >

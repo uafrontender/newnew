@@ -54,8 +54,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid
   ), [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]);
 
-  console.log(postParsed?.status)
-
   const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<
   newnewapi.Auction.Option | undefined>(undefined);

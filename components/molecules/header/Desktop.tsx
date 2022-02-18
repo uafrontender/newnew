@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -10,6 +10,7 @@ import SearchInput from '../../atoms/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { WalletContext } from '../../../contexts/walletContext';
 
 interface IDesktop {}
 
@@ -18,6 +19,8 @@ export const Desktop: React.FC<IDesktop> = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
+
+  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const handleCreateClick = () => {
     if (!user.userData?.options?.isCreator) {
@@ -81,7 +84,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
-                    value: user.walletBalance,
+                    value: !isBalanceLoading && walletBalance?.usdCents ? (parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined) : undefined,
                   }}
                 />
               </SItemWithMargin>

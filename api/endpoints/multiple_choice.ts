@@ -41,3 +41,13 @@ export const voteOnPost = (
   'post',
   payload,
 );
+
+export const voteOnPostWithWallet = (
+  payload: newnewapi.VoteOnPostRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.VoteOnPostRequest, newnewapi.VoteOnPostResponse>(
+  newnewapi.VoteOnPostRequest,
+  newnewapi.VoteOnPostResponse,
+  `${BASE_URL_MULTICHOICE}/vote_on_post_with_wallet`,
+  'post',
+  payload,
+);
