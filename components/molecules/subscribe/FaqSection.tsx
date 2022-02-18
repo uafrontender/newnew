@@ -59,6 +59,8 @@ const SContainer = styled.div`
     width: 736px;
     margin-left: auto !important;
     margin-right: auto !important;
+
+    padding: 0px 0px !important;
     margin-bottom: 120px;
   }
 `;

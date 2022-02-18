@@ -12,7 +12,6 @@ export type TUserData = Omit<
 export interface IUserStateInterface {
   loggedIn: boolean;
   signupEmailInput: string;
-  walletBalance: number;
   notificationsCount: number;
   directMessagesCount: number;
   userData?: TUserData;
@@ -21,7 +20,6 @@ export interface IUserStateInterface {
 const defaultUIState: IUserStateInterface = {
   loggedIn: false,
   signupEmailInput: '',
-  walletBalance: 120,
   notificationsCount: 150,
   directMessagesCount: 12,
 };

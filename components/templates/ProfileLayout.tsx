@@ -195,38 +195,24 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(async () => {
     try {
-      if (!currentUser.loggedIn) {
+      const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+        creatorUuid: user.uuid,
+      });
+
+      const res = await getSubscriptionStatus(getStatusPayload);
+
+      console.log(res.data);
+
+      if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
         router.push(`/u/${user.username}/subscribe`);
-      } else {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: user.uuid,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        console.log(res.data);
-
-        if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-          router.push(`/u/${user.username}/subscribe`);
-        } else if (res.data?.status?.activeRenewsAt) {
-          console.log('Subscribed! Redirect to chat will be here');
-          router.push(`/direct-messages?user=${user.uuid}`);
-          // Testing
-          // const unsubPayload = new newnewapi.UnsubscribeFromCreatorRequest({
-          //   creatorUuid: user.uuid,
-          // });
-          // const unsubRes = await unsubscribeFromCreator(unsubPayload);
-
-          // console.log(unsubRes);
-
-          // console.log('Unsubscribed!');
-        }
+      } else if (res.data?.status?.activeRenewsAt) {
+        console.log('Subscribed! Redirect to chat will be here');
+        router.push(`/direct-messages?user=${user.uuid}`);
       }
     } catch (err) {
       console.error(err);
     }
   }, [
-    currentUser.loggedIn,
     router,
     user,
   ]);

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -7,12 +9,12 @@ import Text from '../../atoms/Text';
 
 import checkBoxAnim from '../../../public/animations/checkbox.json';
 
-interface IOptionWallet {
+interface IOptionCard {
   selected?: boolean;
   handleClick: () => void;
 }
 
-const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
+const OptionCard: React.FunctionComponent<IOptionCard> = ({
   selected,
   handleClick,
 }) => {
@@ -31,7 +33,7 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
   }, [ref, selected]);
 
   return (
-    <SOptionWallet
+    <SOptionCard
       selected={selected ?? false}
       onClick={handleClick}
     >
@@ -53,23 +55,23 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
         >
           { t('options.card.name') }
         </Text>
-        <SFeesText
+        {/* <SFeesText
           variant={2}
         >
           { t('options.card.fees') }
-        </SFeesText>
+        </SFeesText> */}
       </SLabelContent>
-    </SOptionWallet>
+    </SOptionCard>
   );
 }
 
-OptionWallet.defaultProps = {
+OptionCard.defaultProps = {
   selected: undefined,
 };
 
-export default OptionWallet;
+export default OptionCard;
 
-const SOptionWallet = styled.button<{
+const SOptionCard = styled.button<{
   selected: boolean;
 }>`
   display: flex;
