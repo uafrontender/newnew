@@ -19,26 +19,23 @@ interface ITextArea {
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
-  const {
-    id = '',
-    maxlength,
-    value,
-    error,
-    onBlur = () => {},
-    onFocus = () => {},
-    onChange,
-    placeholder,
-  } = props;
+  const { id = '', maxlength, value, error, onBlur = () => {}, onFocus = () => {}, onChange, placeholder } = props;
 
-  const handleChange = useCallback((e) => {
-    onChange(id, e.target.value);
-  }, [id, onChange]);
+  const handleChange = useCallback(
+    (e) => {
+      onChange(id, e.target.value);
+    },
+    [id, onChange]
+  );
   const handleFocus = useCallback(() => {
     onFocus(id);
   }, [id, onFocus]);
-  const handleBlur = useCallback((e) => {
-    onBlur(id, e.target.value);
-  }, [id, onBlur]);
+  const handleBlur = useCallback(
+    (e) => {
+      onBlur(id, e.target.value);
+    },
+    [id, onBlur]
+  );
 
   return (
     <SWrapper>
@@ -52,22 +49,14 @@ export const TextArea: React.FC<ITextArea> = (props) => {
           maxLength={maxlength}
         />
       </SContent>
-      {
-        error ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={alertIcon}
-                width="16px"
-                height="16px"
-              />
-              {error}
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {error ? (
+        <AnimatedPresence animation="t-09">
+          <SErrorDiv>
+            <InlineSvg svg={alertIcon} width="16px" height="16px" />
+            {error}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
     </SWrapper>
   );
 };
@@ -91,7 +80,7 @@ interface ISContent {
 }
 
 const SContent = styled.div<ISContent>`
-  padding: 10.5px 18.5px 6.5px 18.5px;
+  padding: 10.5px 18.5px 10.5px 18.5px;
   position: relative;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
@@ -101,7 +90,8 @@ const SContent = styled.div<ISContent>`
   border-color: ${({ theme, error }) => {
     if (!error) {
       return 'transparent';
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 `;
 
