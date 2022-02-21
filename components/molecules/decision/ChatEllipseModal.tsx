@@ -5,35 +5,16 @@ import styled from 'styled-components';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
-import { useAppSelector } from '../../../redux-store/store';
 
 interface IChatEllipseModal {
   isOpen: boolean;
   zIndex: number;
   onClose: () => void;
-  userBlocked?: boolean;
-  onUserBlock: () => void;
   onUserReport: () => void;
-  isAnnouncement?: boolean;
 }
 
-const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
-  isOpen,
-  zIndex,
-  onClose,
-  userBlocked,
-  onUserBlock,
-  onUserReport,
-  isAnnouncement,
-}) => {
-  const { t } = useTranslation('chat');
-  const user = useAppSelector((state) => state.user);
-
-  const blockUserHandler = () => {
-    onUserBlock();
-    onClose();
-  };
-
+const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({ isOpen, zIndex, onClose, onUserReport }) => {
+  const { t } = useTranslation('decision');
   const reportUserHandler = () => {
     onUserReport();
     onClose();
@@ -47,24 +28,8 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
             e.stopPropagation();
           }}
         >
-          {user.userData?.options?.isCreator && !isAnnouncement && (
-            <>
-              <SButton onClick={() => {}}>
-                <Text variant={2}>{t('ellipse.view-profile')}</Text>
-              </SButton>
-              <SSeparator />
-            </>
-          )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
-          </SButton>
-          <SSeparator />
-          <SButton onClick={blockUserHandler}>
-            {!isAnnouncement ? (
-              <Text variant={2}>{userBlocked ? t('ellipse.unblock-user') : t('ellipse.block-user')}</Text>
-            ) : (
-              <Text variant={2}>{userBlocked ? t('ellipse.unblock-group') : t('ellipse.block-group')}</Text>
-            )}
+            <Text variant={2}>{t('comments.report')}</Text>
           </SButton>
         </SContentContainer>
         <Button
@@ -82,11 +47,6 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
 };
 
 export default ChatEllipseModal;
-
-ChatEllipseModal.defaultProps = {
-  userBlocked: false,
-  isAnnouncement: false,
-};
 
 const SWrapper = styled.div`
   width: 100%;
@@ -128,15 +88,4 @@ const SButton = styled.button`
   &:focus {
     outline: none;
   }
-`;
-
-const SSeparator = styled.div`
-  margin: 0 20px;
-  height: 1px;
-  overflow: hidden;
-  background: ${(props) =>
-    props.theme.name === 'light'
-      ? props.theme.colorsThemed.background.outlines1
-      : props.theme.colorsThemed.background.tertiary};
-  border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
 `;

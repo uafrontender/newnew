@@ -3,9 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -32,8 +30,8 @@ import switchPostType, { TPostType } from '../../../utils/switchPostType';
 
 interface IPostModal {
   isOpen: boolean;
-  post?: newnewapi.IPost,
-  manualCurrLocation?: string,
+  post?: newnewapi.IPost;
+  manualCurrLocation?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
 }
@@ -50,22 +48,21 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
-  const isMyPost = useMemo(() => (
-    user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid
-  ), [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]);
+  const isMyPost = useMemo(
+    () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
+    [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
+  );
 
-  console.log(postParsed?.status)
+  console.log(postParsed?.status);
 
   const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
-  const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<
-  newnewapi.Auction.Option | undefined>(undefined);
-  const acSuggestionIDFromUrl = isBrowser()
-    ? new URL(window.location.href).searchParams.get('suggestion')
-    : undefined;
+  const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
+  const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
 
   const sessionId = isBrowser()
-  ? (new URL(window.location.href).searchParams.get('?session_id') || new URL(window.location.href).searchParams.get('session_id'))
-  : undefined;
+    ? new URL(window.location.href).searchParams.get('?session_id') ||
+      new URL(window.location.href).searchParams.get('session_id')
+    : undefined;
 
   const [open, setOpen] = useState(false);
 
@@ -77,10 +74,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null | undefined>('');
   const [recommenedPostsLoading, setRecommenedPostsLoading] = useState(false);
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
 
   const handleCloseAndGoBack = () => {
     // window.history.back();
@@ -99,49 +93,43 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       top: 0,
       behavior: 'smooth',
     });
-    window.history.pushState(
-      newPostParsed.postUuid,
-      'Post',
-      `/?post=${newPostParsed.postUuid}`,
-    );
+    window.history.pushState(newPostParsed.postUuid, 'Post', `/?post=${newPostParsed.postUuid}`);
     setRecommenedPosts([]);
     setNextPageToken('');
   };
 
-  const loadRecommendedPosts = useCallback(async (
-    pageToken?: string,
-  ) => {
-    if (recommenedPostsLoading) return;
-    try {
-      setRecommenedPostsLoading(true);
+  const loadRecommendedPosts = useCallback(
+    async (pageToken?: string) => {
+      if (recommenedPostsLoading) return;
+      try {
+        setRecommenedPostsLoading(true);
 
-      const fetchRecommenedPostsPayload = new newnewapi.GetSimilarPostsRequest({
-        postUuid: postParsed?.postUuid,
-        ...(pageToken ? {
-          paging: {
-            pageToken,
-          },
-        } : {}),
-      });
-      const postsResponse = await fetchMoreLikePosts(fetchRecommenedPostsPayload);
+        const fetchRecommenedPostsPayload = new newnewapi.GetSimilarPostsRequest({
+          postUuid: postParsed?.postUuid,
+          ...(pageToken
+            ? {
+                paging: {
+                  pageToken,
+                },
+              }
+            : {}),
+        });
+        const postsResponse = await fetchMoreLikePosts(fetchRecommenedPostsPayload);
 
-      if (postsResponse.data && postsResponse.data.posts) {
-        setRecommenedPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
-        setNextPageToken(postsResponse.data.paging?.nextPageToken);
+        if (postsResponse.data && postsResponse.data.posts) {
+          setRecommenedPosts((curr) => [...curr, ...(postsResponse.data?.posts as newnewapi.Post[])]);
+          setNextPageToken(postsResponse.data.paging?.nextPageToken);
+        }
+        setRecommenedPostsLoading(false);
+      } catch (err) {
+        setRecommenedPostsLoading(false);
+        console.error(err);
       }
-      setRecommenedPostsLoading(false);
-    } catch (err) {
-      setRecommenedPostsLoading(false);
-      console.error(err);
-    }
-  }, [
-    setRecommenedPosts, recommenedPostsLoading,
-    postParsed,
-  ]);
+    },
+    [setRecommenedPosts, recommenedPostsLoading, postParsed]
+  );
 
-  const renderPostView = (
-    postToRender: TPostType,
-  ) => {
+  const renderPostView = (postToRender: TPostType) => {
     if (postToRender === 'mc') {
       return (
         <PostViewMC
@@ -179,9 +167,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
-  const renderPostModeration = (
-    postToRender: TPostType,
-  ) => {
+  const renderPostModeration = (postToRender: TPostType) => {
     if (postToRender === 'mc') {
       return (
         <PostModerationMC
@@ -228,7 +214,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       // eslint-disable-next-line no-useless-return
       return;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -253,7 +239,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     };
 
     fetchSuggestionFromUrl();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Close modal on back btn
@@ -263,17 +249,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
       const postId = new URL(window.location.href).searchParams.get('post');
 
-      if (innerHistoryStack.current
-        && innerHistoryStack.current[innerHistoryStack.current.length - 1]) {
+      if (innerHistoryStack.current && innerHistoryStack.current[innerHistoryStack.current.length - 1]) {
         handleOpenAnotherPost?.(innerHistoryStack.current[innerHistoryStack.current.length - 1]);
         modalContainerRef.current?.scrollTo({
           top: 0,
           behavior: 'smooth',
         });
-        innerHistoryStack.current = innerHistoryStack.current.slice(
-          0,
-          innerHistoryStack.current.length - 1,
-        );
+        innerHistoryStack.current = innerHistoryStack.current.slice(0, innerHistoryStack.current.length - 1);
         setRecommenedPosts([]);
         setNextPageToken('');
       }
@@ -297,15 +279,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         loadRecommendedPosts();
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, nextPageToken, recommenedPostsLoading]);
 
   return (
-    <Modal
-      show={open}
-      overlayDim
-      onClose={() => handleCloseAndGoBack()}
-    >
+    <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       {postParsed && typeOfPost ? (
         <SPostModalContainer
           id="post-modal-container"
@@ -316,41 +294,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           }}
         >
           {isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)}
-          {
-            !isMyPost && (
-              <SRecommendationsSection>
-                <Headline
-                  variant={4}
-                >
-                  { t('RecommendationsSection.heading') }
-                </Headline>
-                {recommenedPosts && (
-                  <List
-                    category=""
-                    loading={recommenedPostsLoading}
-                    // loading
-                    collection={recommenedPosts}
-                    // collection={[]}
-                    wrapperStyle={{
-                      left: '-16px',
-                    }}
-                    skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                    skeletonsHighlightColor={theme.colorsThemed.background.secondary}
-                    handlePostClicked={handleOpenRecommendedPost}
-                  />
-                )}
-                <div
-                  ref={loadingRef}
-                  style={{
-                    position: 'relative',
-                    bottom: '10px',
+          {!isMyPost && (
+            <SRecommendationsSection>
+              <Headline variant={4}>{t('RecommendationsSection.heading')}</Headline>
+              {recommenedPosts && (
+                <List
+                  category=""
+                  loading={recommenedPostsLoading}
+                  // loading
+                  collection={recommenedPosts}
+                  // collection={[]}
+                  wrapperStyle={{
+                    left: '-16px',
                   }}
+                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                  skeletonsHighlightColor={theme.colorsThemed.background.secondary}
+                  handlePostClicked={handleOpenRecommendedPost}
                 />
-              </SRecommendationsSection>
-            )
-          }
+              )}
+              <div
+                ref={loadingRef}
+                style={{
+                  position: 'relative',
+                  bottom: '10px',
+                }}
+              />
+            </SRecommendationsSection>
+          )}
         </SPostModalContainer>
-      ) : null }
+      ) : null}
     </Modal>
   );
 };
@@ -372,9 +344,8 @@ const SPostModalContainer = styled.div<{
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
-  width: 100%;
   height: 100%;
-
+  width: auto;
   padding: 16px;
 
   /* No select */
@@ -389,15 +360,16 @@ const SPostModalContainer = styled.div<{
     top: 32px;
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
+    width: 100%;
 
-    ${({ isMyPost }) => (isMyPost ? (
-      css`
-        height: initial;
-        max-height: 100%;
-      `
-    ) : null)}
+    ${({ isMyPost }) =>
+      isMyPost
+        ? css`
+            height: initial;
+            max-height: 100%;
+          `
+        : null}
   }
-
 
   ${({ theme }) => theme.media.laptop} {
     top: 32px;
