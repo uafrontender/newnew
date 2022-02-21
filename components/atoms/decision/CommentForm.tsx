@@ -21,7 +21,8 @@ const CommentForm: React.FC<ICommentForm> = ({ onBlur }) => {
     setCommentText(value);
   }, []);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
     console.log('submit');
   }, []);
 
