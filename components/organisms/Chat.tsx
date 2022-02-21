@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import ChatList from '../molecules/chat/ChatList';
