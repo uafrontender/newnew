@@ -109,5 +109,18 @@
   },
   "RecommendationsSection": {
     "heading": "More like this"
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Add a comment ...",
+    "bid": "bid",
+    "report": "Report",
+    "send-reply": "Reply",
+    "reply": "reply",
+    "replies": "replies",
+    "view-replies": "View",
+    "hide-replies": "Hide",
+    "view-more": "View more comments",
+    "comments": "Comments"
   }
 }
