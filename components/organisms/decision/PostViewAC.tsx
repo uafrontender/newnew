@@ -55,7 +55,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
   const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>('comments');
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>('bids');
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
