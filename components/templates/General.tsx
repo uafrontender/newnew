@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
@@ -25,12 +26,14 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 interface IGeneral {
   children: React.ReactNode;
   withChat?: boolean;
+  specialStatusBarColor?: string;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
   const {
     children,
     withChat,
+    specialStatusBarColor,
   } = props;
   const user = useAppSelector((state) => state.user);
   const {
@@ -123,7 +126,10 @@ export const General: React.FC<IGeneral> = (props) => {
           {...props}
         >
           <Head>
-            <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
+            <meta
+              name="theme-color"
+              content={specialStatusBarColor ? specialStatusBarColor : theme.colorsThemed.statusBar.background}
+            />
           </Head>
           <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
           <SContent>
@@ -167,6 +173,7 @@ export default General;
 
 General.defaultProps = {
   withChat: false,
+  specialStatusBarColor: undefined,
 };
 
 interface ISWrapper {

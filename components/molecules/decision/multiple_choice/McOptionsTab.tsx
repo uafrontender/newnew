@@ -1,8 +1,6 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -13,21 +11,21 @@ import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
 import { validateText } from '../../../../api/endpoints/infrastructure';
-
-import McOptionCard from './McOptionCard';
-import Button from '../../../atoms/Button';
-import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import PaymentModal from '../../checkout/PaymentModal';
-import PlaceMcBidForm from './PlaceMcBidForm';
-import LoadingModal from '../../LoadingModal';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
-import OptionActionMobileModal from '../OptionActionMobileModal';
-import Text from '../../../atoms/Text';
-import { createPaymentSession } from '../../../../api/endpoints/payments';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
+import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
+
+import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
+import McOptionCard from './McOptionCard';
+import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import PaymentModal from '../../checkout/PaymentModal';
+import LoadingModal from '../../LoadingModal';
+import OptionActionMobileModal from '../OptionActionMobileModal';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -145,31 +143,78 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     setNewOptionText, validateTextViaAPIDebounced,
   ]);
 
-  const handleSubmitNewOption = useCallback(async () => {
+  const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.VoteOnPostRequest({
-        votesCount: parseInt(newBidAmount, 10),
-        optionText: newOptionText,
-        postUuid: post.postUuid,
-      });
+      // Check if user is logged in
+      if (!user.loggedIn) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+          successUrl: `${window.location.href}&`,
+          cancelUrl: `${window.location.href}&`,
+          ...(!user.loggedIn ? {
+            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+          } : {}),
+          mcVoteRequest: {
+            votesCount: parseInt(newBidAmount, 10),
+            optionText: newOptionText,
+            postUuid: post.postUuid,
+          }
+        });
 
-      const res = await voteOnPost(makeBidPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data
-        || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data
+          || !res.data.sessionUrl
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
 
-      const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makeBidPayload = new newnewapi.VoteOnPostRequest({
+          votesCount: parseInt(newBidAmount, 10),
+          optionText: newOptionText,
+          postUuid: post.postUuid,
+        });
 
-      setNewBidAmount('');
-      setNewOptionText('');
-      setSuggestNewMobileOpen(false);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await voteOnPostWithWallet(makeBidPayload);
+
+        if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${window.location.href}&`,
+            cancelUrl: `${window.location.href}&`,
+            mcVoteRequest: {
+              votesCount: parseInt(newBidAmount, 10),
+              optionText: newOptionText,
+              postUuid: post.postUuid,
+            }
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+
+          if (!resStripeRedirect.data
+            || !resStripeRedirect.data.sessionUrl
+            || resStripeRedirect.error
+          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data
+          || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setNewBidAmount('');
+        setNewOptionText('');
+        setSuggestNewMobileOpen(false);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -179,6 +224,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     newBidAmount,
     newOptionText,
     post.postUuid,
+    user.loggedIn,
     handleAddOrUpdateOptionFromResponse,
   ]);
 
@@ -349,7 +395,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={() => {}}
+          handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle
@@ -452,51 +498,6 @@ const SActionSection = styled.div`
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     box-shadow: 0px -50px 18px 20px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 0.9)' : 'rgba(241, 243, 249, 0.9)')};
-  }
-`;
-
-const STextarea = styled.textarea`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 12.5px 20px;
-  resize: none;
-  width: 277px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border: transparent;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ::placeholder {
-    color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  }
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const SAmountInput = styled.input`
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 12.5px 5px;
-  width: 80px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  text-align: center;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border: transparent;
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ::placeholder {
-    color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  }
-
-  &:focus {
-    outline: none;
   }
 `;
 

@@ -95,6 +95,16 @@
           "balance": "Balance",
           "caption": "Use your NewNew wallet and make your bets with no fees.",
           "topUpBtn": "Top up my wallet"
+        },
+        "non-empty": {
+          "balance": "Balance",
+          "topUpBtn": "Top up"
+        },
+        "TopUpWalletModal": {
+          "heading": "Top up amount",
+          "checkoutButtonMobile": "Check out",
+          "checkoutButtonDesktop": "Check out",
+          "cancelButtonDesktop": "Cancel"
         }
       },
       "PersonalInformation": {

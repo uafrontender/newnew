@@ -3,8 +3,6 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
@@ -15,17 +13,17 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
+import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
+import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+
+import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import Text from '../../../atoms/Text';
-import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
-import PlaceMcBidForm from './PlaceMcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import { voteOnPost } from '../../../../api/endpoints/multiple_choice';
-import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -89,38 +87,81 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    // if (!user.loggedIn) {
-    //   router.push('/sign-up?reason=bid');
-    //   return;
-    // }
     setPaymentModalOpen(true);
   };
 
-  const handleSubmitSupportBid = useCallback(async () => {
+  const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.VoteOnPostRequest({
-        votesCount: parseInt(supportBidAmount, 10),
-        optionId: option.id,
-        postUuid: postId,
-      });
+      // Check if user is logged in
+      if (!user.loggedIn) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+          successUrl: `${window.location.href}&`,
+          cancelUrl: `${window.location.href}&`,
+          ...(!user.loggedIn ? {
+            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+          } : {}),
+          mcVoteRequest: {
+            votesCount: parseInt(supportBidAmount, 10),
+            optionId: option.id,
+            postUuid: postId,
+          }
+        });
 
-      const res = await voteOnPost(makeBidPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data
-        || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data
+          || !res.data.sessionUrl
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
 
-      const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makeBidPayload = new newnewapi.VoteOnPostRequest({
+          votesCount: parseInt(supportBidAmount, 10),
+          optionId: option.id,
+          postUuid: postId,
+        });
 
-      handleSetSupportedBid('');
-      setSupportBidAmount('');
-      setIsSupportFormOpen(false);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await voteOnPostWithWallet(makeBidPayload);
+
+        if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${window.location.href}&`,
+            cancelUrl: `${window.location.href}&`,
+            mcVoteRequest: {
+              votesCount: parseInt(supportBidAmount, 10),
+              optionId: option.id,
+              postUuid: postId,
+            }
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+
+          if (!resStripeRedirect.data
+            || !resStripeRedirect.data.sessionUrl
+            || resStripeRedirect.error
+          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data
+          || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        handleSetSupportedBid('');
+        setSupportBidAmount('');
+        setIsSupportFormOpen(false);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -136,6 +177,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     supportBidAmount,
     option.id,
     postId,
+    user.loggedIn,
   ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
@@ -338,7 +380,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={() => {}}
+          handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle
