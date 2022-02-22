@@ -1,13 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useContext, useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
+import { WalletContext } from '../../../contexts/walletContext';
+
+import Text from '../../atoms/Text';
 import Lottie from '../../atoms/Lottie';
 import InlineSvg from '../../atoms/InlineSVG';
 
 import checkBoxAnim from '../../../public/animations/checkbox.json';
 import NewnewLogoBlue from '../../../public/images/svg/auth/newnew-logo-blue.svg';
-import Text from '../../atoms/Text';
+
+import { formatNumber } from '../../../utils/format';
 
 interface IOptionWallet {
   selected?: boolean;
@@ -20,6 +26,8 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
 }) => {
   const { t } = useTranslation('payment-modal');
   const ref: any = useRef();
+
+  const { walletBalance } = useContext(WalletContext);
 
   useEffect(() => {
     ref.current.anim.stop();
@@ -70,13 +78,16 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
             variant={2}
           >
             { t('options.wallet.name') }
+            {walletBalance && (
+              ` ($${formatNumber((walletBalance.usdCents!! / 100) ?? 0, true)})`
+            )}
           </Text>
         </div>
-        <SFeesText
+        {/* <SFeesText
           variant={2}
         >
           { t('options.wallet.fees') }
-        </SFeesText>
+        </SFeesText> */}
       </SLabelContent>
     </SOptionWallet>
   );

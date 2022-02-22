@@ -9,9 +9,16 @@ interface IBlockUserModal {
   onUserBlock: () => void;
   userName: string;
   closeModal: () => void;
+  isAnnouncement?: boolean;
 }
 
-const BlockUserModal: React.FC<IBlockUserModal> = ({ confirmBlockUser, onUserBlock, userName, closeModal }) => {
+const BlockUserModal: React.FC<IBlockUserModal> = ({
+  confirmBlockUser,
+  onUserBlock,
+  userName,
+  closeModal,
+  isAnnouncement,
+}) => {
   const { t } = useTranslation('chat');
 
   const handleConfirmClick = () => {
@@ -21,13 +28,15 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({ confirmBlockUser, onUserBlo
     <Modal show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
+          <SModalTitle>{isAnnouncement ? t('modal.block-group.title') : t('modal.block-user.title')}</SModalTitle>
           <SModalMessage>
             {t('modal.block-user.message-first-part')} {userName} {t('modal.block-user.message-second-part')}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton>{t('modal.block-user.button-cancel')}</SCancelButton>
-            <SConfirmButton onClick={handleConfirmClick}>{t('modal.block-user.button-confirm')}</SConfirmButton>
+            <SConfirmButton onClick={handleConfirmClick}>
+              {isAnnouncement ? t('modal.block-group.button-confirm') : t('modal.block-user.button-confirm')}
+            </SConfirmButton>
           </SModalButtons>
         </SModal>
       </SContainer>
@@ -36,6 +45,10 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({ confirmBlockUser, onUserBlo
 };
 
 export default BlockUserModal;
+
+BlockUserModal.defaultProps = {
+  isAnnouncement: false,
+};
 
 const SContainer = styled.div`
   display: flex;
@@ -47,7 +60,8 @@ const SContainer = styled.div`
 const SModal = styled.div`
   max-width: 480px;
   width: 100%;
-  background-color: ${(props) => props.theme.colorsThemed.background.secondary};
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
     props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
@@ -78,11 +92,14 @@ const SCancelButton = styled(Button)`
   font-size: 14px;
   margin-right: auto;
   flex-shrink: 0;
-  background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+  color: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+  background: ${(props) => props.theme.colorsThemed.background.quaternary};
   &:hover {
     background: ${(props) =>
       props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+    color: ${(props) => props.theme.colors.white};
+    background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }
 `;
 

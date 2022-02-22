@@ -13,10 +13,19 @@ interface IChatEllipseMenu {
   isVisible: boolean;
   handleClose: () => void;
   onUserBlock: () => void;
+  onUserReport: () => void;
   userBlocked?: boolean;
+  isAnnouncement?: boolean;
 }
 
-const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, userBlocked, onUserBlock }) => {
+const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
+  isVisible,
+  handleClose,
+  userBlocked,
+  onUserBlock,
+  onUserReport,
+  isAnnouncement,
+}) => {
   const { t } = useTranslation('chat');
   const containerRef = useRef<HTMLDivElement>();
   const user = useAppSelector((state) => state.user);
@@ -26,6 +35,11 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, u
 
   const blockUserHandler = () => {
     onUserBlock();
+    handleClose();
+  };
+
+  const reportUserHandler = () => {
+    onUserReport();
     handleClose();
   };
 
@@ -40,16 +54,20 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, u
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {user.userData?.options?.isCreator && (
+          {user.userData?.options?.isCreator && !isAnnouncement && (
             <SButton onClick={() => {}}>
               <Text variant={2}>{t('ellipse.view-profile')}</Text>
             </SButton>
           )}
-          <SButton onClick={() => {}}>
-            <Text variant={2}>{t('ellipse.report-user')}</Text>
+          <SButton onClick={reportUserHandler}>
+            <Text variant={2}>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
-            <Text variant={2}>{userBlocked ? t('ellipse.unblock-user') : t('ellipse.block-user')}</Text>
+            {!isAnnouncement ? (
+              <Text variant={2}>{userBlocked ? t('ellipse.unblock-user') : t('ellipse.block-user')}</Text>
+            ) : (
+              <Text variant={2}>{userBlocked ? t('ellipse.unblock-group') : t('ellipse.block-group')}</Text>
+            )}
           </SButton>
         </SContainer>
       )}
@@ -59,6 +77,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, u
 
 ChatEllipseMenu.defaultProps = {
   userBlocked: false,
+  isAnnouncement: false,
 };
 
 export default ChatEllipseMenu;
@@ -73,10 +92,11 @@ const SContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  box-shadow: 0px 0px 35px 20px rgba(0, 0, 0, 0.25);
   padding: 8px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;

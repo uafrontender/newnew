@@ -33,6 +33,8 @@ import { cookiesInstance } from '../api/apiConfigs';
 import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
+import FollowingsContextProvider from '../contexts/followingContext';
+import WalletContextProvider from '../contexts/walletContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -85,20 +87,27 @@ const MyApp = (props: IMyApp): ReactElement => {
         <SocketContextProvider>
           <ChannelsContextProvider>
             <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
-              <SubscriptionsProvider>
-                <ResizeMode>
-                  <GlobalTheme>
-                    <div>
-                      <ToastContainer />
-                      {!pageProps.error ? (
-                        getLayout(<Component {...pageProps} />)
-                      ) : (
-                        <Error errorMsg={pageProps.error?.message} statusCode={pageProps.error?.statusCode ?? 500} />
-                      )}
-                    </div>
-                  </GlobalTheme>
-                </ResizeMode>
-              </SubscriptionsProvider>
+              <FollowingsContextProvider>
+                <WalletContextProvider>
+                  <SubscriptionsProvider>
+                    <ResizeMode>
+                      <GlobalTheme>
+                        <div>
+                          <ToastContainer />
+                          {!pageProps.error ? (
+                            getLayout(<Component {...pageProps} />)
+                          ) : (
+                            <Error
+                              errorMsg={pageProps.error?.message}
+                              statusCode={pageProps.error?.statusCode ?? 500}
+                            />
+                          )}
+                        </div>
+                      </GlobalTheme>
+                    </ResizeMode>
+                  </SubscriptionsProvider>
+                </WalletContextProvider>
+              </FollowingsContextProvider>
             </PersistGate>
           </ChannelsContextProvider>
         </SocketContextProvider>

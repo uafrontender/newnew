@@ -3,34 +3,32 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 
 import { useAppSelector } from '../../../../redux-store/store';
-
-import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import Text from '../../../atoms/Text';
+import { WalletContext } from '../../../../contexts/walletContext';
+import { placeBidWithWallet } from '../../../../api/endpoints/auction';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
+import Lottie from '../../../atoms/Lottie';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
-import PlaceBidForm from './PlaceAcBidForm';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import { formatNumber } from '../../../../utils/format';
 
-import Lottie from '../../../atoms/Lottie';
+import { formatNumber } from '../../../../utils/format';
 
 // NB! temp sample
 import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
 import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
-import { createPaymentSession } from '../../../../api/endpoints/payments';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -61,6 +59,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const { walletBalance } = useContext(WalletContext);
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
@@ -99,31 +99,81 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     setPaymentModalOpen(true);
   };
 
-  const handleSubmitSupportBid = useCallback(async () => {
+  const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.PlaceBidRequest({
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(supportBidAmount, 10) * 100,
-        }),
-        optionId: option.id,
-        postUuid: postId,
-      });
+      // Check if user is logged and if the wallet balance is sufficient
+      if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(supportBidAmount, 10) * 100)) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+          successUrl: `${window.location.href}&`,
+          cancelUrl: `${window.location.href}&`,
+          ...(!user.loggedIn
+            ? {
+                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+              }
+            : {}),
+          acBidRequest: {
+            amount: new newnewapi.MoneyAmount({
+              usdCents: parseInt(supportBidAmount, 10) * 100,
+            }),
+            optionId: option.id,
+            postUuid: postId,
+          },
+        });
 
-      const res = await placeBidOnAuction(makeBidPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makeBidPayload = new newnewapi.PlaceBidRequest({
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(supportBidAmount, 10) * 100,
+          }),
+          optionId: option.id,
+          postUuid: postId,
+        });
 
-      handleSetSupportedBid('');
-      setSupportBidAmount('');
-      setIsSupportFormOpen(false);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await placeBidWithWallet(makeBidPayload);
+
+        if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${window.location.href}&`,
+            cancelUrl: `${window.location.href}&`,
+            acBidRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(supportBidAmount, 10) * 100,
+              }),
+              optionId: option.id,
+              postUuid: postId,
+            },
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+            getTopUpWalletWithPaymentPurposeUrlPayload
+          );
+
+          if (!resStripeRedirect.data || !resStripeRedirect.data.sessionUrl || resStripeRedirect.error)
+            throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        handleSetSupportedBid('');
+        setSupportBidAmount('');
+        setIsSupportFormOpen(false);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -139,6 +189,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     supportBidAmount,
     option.id,
     postId,
+    user.loggedIn,
+    walletBalance,
   ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
@@ -321,7 +373,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         ) : null}
       </SSupportBidForm>
       {/* Payment Modal */}
-      {paymentModalOpen ? (
+      {paymentModalOpen && (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
@@ -329,14 +381,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={() => {}}
+          handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>{t('AcPost.paymenModalHeader.subtitle')}</SPaymentModalTitle>
             <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
-      ) : null}
+      )}
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </motion.div>

@@ -15,7 +15,12 @@ const NewMessageButton: React.FC<INewMessageButton> = ({ handleClick }) => {
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   return (
     <SButton onClick={handleClick} view={!isMobileOrTablet ? 'secondary' : 'transparent'}>
-      <SInlineSVG svg={NewMessageIcon} fill={theme.colors.white} width="24px" height="24px" />
+      <SInlineSVG
+        svg={NewMessageIcon}
+        fill={theme.name === 'light' ? theme.colorsThemed.text.primary : theme.colors.white}
+        width="24px"
+        height="24px"
+      />
     </SButton>
   );
 };

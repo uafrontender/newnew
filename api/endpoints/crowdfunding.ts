@@ -9,9 +9,9 @@ import {
 export const BASE_URL_CROWDFUNDING = `${BASE_URL}/crowdfunding`;
 
 export const fetchTopCrowdfundings = (
-  payload: newnewapi.PagedRequest,
-) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedCrowdfundingsResponse>(
-  newnewapi.PagedRequest,
+  payload: newnewapi.PagedCrowdfundingsRequest,
+) => fetchProtobuf<newnewapi.PagedCrowdfundingsRequest, newnewapi.PagedCrowdfundingsResponse>(
+  newnewapi.PagedCrowdfundingsRequest,
   newnewapi.PagedCrowdfundingsResponse,
   `${BASE_URL_CROWDFUNDING}/get_top_crowdfundings`,
   'post',
@@ -48,6 +48,16 @@ export const doPledgeCrowdfunding = (
   newnewapi.FulfillPaymentPurposeRequest,
   newnewapi.DoPledgeResponse,
   `${BASE_URL_CROWDFUNDING}/do_pledge`,
+  'post',
+  payload,
+);
+
+export const doPledgeWithWallet = (
+  payload: newnewapi.DoPledgeRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DoPledgeRequest, newnewapi.DoPledgeResponse>(
+  newnewapi.DoPledgeRequest,
+  newnewapi.DoPledgeResponse,
+  `${BASE_URL_CROWDFUNDING}/do_pledge_with_wallet`,
   'post',
   payload,
 );

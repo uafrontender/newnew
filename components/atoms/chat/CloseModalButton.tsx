@@ -8,7 +8,7 @@ import Button from '../Button';
 const CloseModalButton: React.FC<IButton> = ({ handleClick }) => {
   const theme = useTheme();
   return (
-    <SButton onClick={handleClick} view="secondary">
+    <SButton onClick={handleClick} view="modalSecondary">
       <SInlineSVG svg={closeIcon} fill={theme.colorsThemed.text.secondary} width="24px" height="24px" />
     </SButton>
   );

@@ -63,8 +63,6 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
 
       if (!decoded) return;
 
-      console.log(decoded);
-
       setIsLoading(false);
       router.push(`/direct-messages?user=${decoded.creatorUuid}`);
     };

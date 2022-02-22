@@ -9,9 +9,9 @@ import {
 export const BASE_URL_AUCTION = `${BASE_URL}/auction`;
 
 export const fetchLiveAuctions = (
-  payload: newnewapi.PagedRequest,
-) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedAuctionsResponse>(
-  newnewapi.PagedRequest,
+  payload: newnewapi.PagedAuctionsRequest,
+) => fetchProtobuf<newnewapi.PagedAuctionsRequest, newnewapi.PagedAuctionsResponse>(
+  newnewapi.PagedAuctionsRequest,
   newnewapi.PagedAuctionsResponse,
   `${BASE_URL_AUCTION}/get_top_auctions`,
   'post',
@@ -62,6 +62,16 @@ export const placeBidOnAuction = (
   newnewapi.FulfillPaymentPurposeRequest,
   newnewapi.PlaceBidResponse,
   `${BASE_URL_AUCTION}/place_bid`,
+  'post',
+  payload,
+);
+
+export const placeBidWithWallet = (
+  payload: newnewapi.PlaceBidRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.PlaceBidRequest, newnewapi.PlaceBidResponse>(
+  newnewapi.PlaceBidRequest,
+  newnewapi.PlaceBidResponse,
+  `${BASE_URL_AUCTION}/place_bid_with_wallet`,
   'post',
   payload,
 );

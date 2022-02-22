@@ -175,7 +175,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)) === -1;
+  const optionsAreValid = tab !== 'multiple-choice'
+    || multiplechoice.choices.findIndex((item) => validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)) !== -1;
   const disabled = !!titleError
     || !post.title
     || !post.announcementVideoUrl

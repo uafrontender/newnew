@@ -196,7 +196,7 @@ const SWrapper = styled.div`
 `;
 
 const SButton = styled(Button)`
-  padding: 12px 12px 11px 20px;
+  padding: 12px 16px;
   border-radius: 50px;
 
   ${(props) => props.theme.media.tablet} {
@@ -224,7 +224,6 @@ const SMenuButton = styled.div`
   width: 24px;
   height: 24px;
   display: flex;
-  margin-left: 8px;
   align-items: center;
   justify-content: center;
 `;

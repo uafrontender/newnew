@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, cookiesInstance, fetchProtobuf, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 export const BASE_URL_SUBSCRIPTIONS = `${BASE_URL}/subscription`;
 
@@ -21,13 +21,20 @@ export const unsubscribeFromCreator = (payload: newnewapi.UnsubscribeFromCreator
     payload
   );
 
+// NB! Will be with optional authentication
 export const getSubscriptionStatus = (payload: newnewapi.SubscriptionStatusRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.SubscriptionStatusRequest, newnewapi.SubscriptionStatusResponse>(
+  fetchProtobuf<newnewapi.SubscriptionStatusRequest, newnewapi.SubscriptionStatusResponse>(
     newnewapi.SubscriptionStatusRequest,
     newnewapi.SubscriptionStatusResponse,
     `${BASE_URL_SUBSCRIPTIONS}/get_subscription_status`,
     'post',
-    payload
+    payload,
+    // Optional authentication
+    cookiesInstance.get('accessToken')
+      ? {
+          'x-auth-token': cookiesInstance.get('accessToken'),
+        }
+      : {}
   );
 
 export const getMySubscribers = (payload: newnewapi.GetMySubscribersRequest) =>
@@ -44,6 +51,34 @@ export const getCreatorsImSubscribedTo = (payload: newnewapi.EmptyRequest) =>
     newnewapi.EmptyRequest,
     newnewapi.GetCreatorsImSubscribedToResponse,
     `${BASE_URL_SUBSCRIPTIONS}/get_creators_im_subscribed_to`,
+    'post',
+    payload
+  );
+
+// Setting subscription rates
+export const getStandardSubscriptionProducts = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.StandardSubscriptionProducts>(
+    newnewapi.EmptyRequest,
+    newnewapi.StandardSubscriptionProducts,
+    `${BASE_URL_SUBSCRIPTIONS}/get_standard_subscription_products`,
+    'post',
+    payload
+  );
+
+export const getMySubscriptionProduct = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetMySubscriptionProductResponse>(
+    newnewapi.EmptyRequest,
+    newnewapi.GetMySubscriptionProductResponse,
+    `${BASE_URL_SUBSCRIPTIONS}/get_my_subscription_product`,
+    'post',
+    payload
+  );
+
+export const setMySubscriptionProduct = (payload: newnewapi.SetMySubscriptionProductRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.SetMySubscriptionProductRequest, newnewapi.EmptyResponse>(
+    newnewapi.SetMySubscriptionProductRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_SUBSCRIPTIONS}/set_my_subscription_product`,
     'post',
     payload
   );

@@ -9,9 +9,9 @@ import {
 export const BASE_URL_MULTICHOICE = `${BASE_URL}/multiple_choice`;
 
 export const fetchTopMultipleChoices = (
-  payload: newnewapi.PagedRequest,
-) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedMultipleChoicesResponse>(
-  newnewapi.PagedRequest,
+  payload: newnewapi.PagedMultipleChoicesRequest,
+) => fetchProtobuf<newnewapi.PagedMultipleChoicesRequest, newnewapi.PagedMultipleChoicesResponse>(
+  newnewapi.PagedMultipleChoicesRequest,
   newnewapi.PagedMultipleChoicesResponse,
   `${BASE_URL_MULTICHOICE}/get_top_multiple_choices`,
   'post',
@@ -38,6 +38,16 @@ export const voteOnPost = (
   newnewapi.FulfillPaymentPurposeRequest,
   newnewapi.VoteOnPostResponse,
   `${BASE_URL_MULTICHOICE}/vote_on_post`,
+  'post',
+  payload,
+);
+
+export const voteOnPostWithWallet = (
+  payload: newnewapi.VoteOnPostRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.VoteOnPostRequest, newnewapi.VoteOnPostResponse>(
+  newnewapi.VoteOnPostRequest,
+  newnewapi.VoteOnPostResponse,
+  `${BASE_URL_MULTICHOICE}/vote_on_post_with_wallet`,
   'post',
   payload,
 );

@@ -35,8 +35,8 @@ import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import isBrowser from '../../../utils/isBrowser';
 import OnboardingCountrySelect from './OnboardingCountrySelect';
-import OnboardingSectionUsernameInput from './OnboardingSectionUsernameInput';
-import OnboardingSectionNicknameInput from './OnboardingSectionNicknameInput';
+import OnboardingSectionUsernameInput from './OnboardingUsernameInput';
+import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
 
 const maxDate = new Date();

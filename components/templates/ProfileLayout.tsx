@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -23,6 +23,8 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
 import { getSubscriptionStatus } from '../../api/endpoints/subscription';
+import { FollowingsContext } from '../../contexts/followingContext';
+import { markUser } from '../../api/endpoints/user';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -52,14 +54,15 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   postsCachedActivityCount,
   children,
 }) => {
-  const { t } = useTranslation('profile');
-  const theme = useTheme();
-
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const currentUser = useAppSelector((state) => state.user);
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation('profile');
 
+  const currentUser = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
@@ -175,35 +178,24 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(async () => {
     try {
-      if (!currentUser.loggedIn) {
+      const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+        creatorUuid: user.uuid,
+      });
+
+      const res = await getSubscriptionStatus(getStatusPayload);
+
+      console.log(res.data);
+
+      if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
         router.push(`/u/${user.username}/subscribe`);
-      } else {
-        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-          creatorUuid: user.uuid,
-        });
-
-        const res = await getSubscriptionStatus(getStatusPayload);
-
-        if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-          router.push(`/u/${user.username}/subscribe`);
-        } else if (res.data?.status?.activeRenewsAt) {
-          console.log('Subscribed! Redirect to chat will be here');
-          router.push(`/direct-messages?user=${user.uuid}`);
-          // Testing
-          // const unsubPayload = new newnewapi.UnsubscribeFromCreatorRequest({
-          //   creatorUuid: user.uuid,
-          // });
-          // const unsubRes = await unsubscribeFromCreator(unsubPayload);
-
-          // console.log(unsubRes);
-
-          // console.log('Unsubscribed!');
-        }
+      } else if (res.data?.status?.activeRenewsAt) {
+        console.log('Subscribed! Redirect to chat will be here');
+        router.push(`/direct-messages?user=${user.uuid}`);
       }
     } catch (err) {
       console.error(err);
     }
-  }, [currentUser.loggedIn, router, user]);
+  }, [router, user]);
 
   const renderChildren = () => {
     let postsForPage = {};
@@ -254,6 +246,35 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     });
   };
 
+  const handleToggleFollowingCreator = async () => {
+    try {
+      if (!currentUser.loggedIn) {
+        router.push('/sign-up?reason=follow-creator');
+      }
+
+      const payload = new newnewapi.MarkUserRequest({
+        userUuid: user.uuid,
+        markAs: followingsIds.includes(user.uuid as string)
+          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
+          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+      });
+
+      console.log(payload);
+
+      const res = await markUser(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      if (followingsIds.includes(user.uuid as string)) {
+        removeId(user.uuid as string);
+      } else {
+        addId(user.uuid as string);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (currentUser.loggedIn && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
@@ -270,7 +291,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
           />
           {/* Favorites and more options buttons */}
-          <SFavoritesButton view="transparent" iconOnly onClick={() => {}}>
+          <SFavoritesButton
+            view={followingsIds.includes(user.uuid as string) ? 'primaryGrad' : 'transparent'}
+            iconOnly
+            onClick={() => handleToggleFollowingCreator()}
+          >
             <InlineSvg
               svg={FavouritesIconFilled}
               fill={theme.colorsThemed.text.primary}
@@ -429,7 +454,7 @@ const SFavoritesButton = styled(Button)`
   top: 164px;
   right: 4px;
 
-  background: none;
+  /* background: none; */
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 

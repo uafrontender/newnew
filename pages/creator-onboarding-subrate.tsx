@@ -15,9 +15,8 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import { getMyOnboardingState } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import OnboardingSectionStripe from '../components/molecules/creator-onboarding/OnboadringSectionStripe';
-import OnboardingSectionSubrate from '../components/molecules/creator-onboarding/OnboadringSectionSubrate';
-
+import OnboardingSectionSubrate from '../components/molecules/creator-onboarding/OnboardingSectionSubrate';
+import { getMySubscriptionProduct, getStandardSubscriptionProducts } from '../api/endpoints/subscription';
 
 interface ICreatorOnboardingSubrate {}
 
@@ -25,16 +24,32 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
   const { t } = useTranslation('creator-onboarding');
 
   const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [standardProducts, setStandardProducts] = useState<newnewapi.ISubscriptionProduct[]>([]);
+  const [featuredProductsIds, setFeaturedProductsIds] = useState<string[]>([]);
+  const [currentProduct, setCurrentProduct] = useState<newnewapi.ISubscriptionProduct | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchOnboardingState() {
       try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
+        const getOnboardingStatePayload = new newnewapi.EmptyRequest({});
+        const onboardingStateRes = await getMyOnboardingState(getOnboardingStatePayload);
 
-        if (res.data) {
-          setOnboardingState(res.data);
+        if (onboardingStateRes.data) {
+          setOnboardingState(onboardingStateRes.data);
+        }
+
+        const getStandardProductsPayload = new newnewapi.EmptyRequest({});
+        const getStandardProductsRes = await getStandardSubscriptionProducts(getStandardProductsPayload);
+        if (getStandardProductsRes.data) {
+          setStandardProducts(getStandardProductsRes.data.products);
+          setFeaturedProductsIds(getStandardProductsRes.data.featuredProductIds);
+        }
+
+        const getCurrentProductPayload = new newnewapi.EmptyRequest({});
+        const getCurrentProductRes = await getMySubscriptionProduct(getCurrentProductPayload);
+        if (getCurrentProductRes.data) {
+          setCurrentProduct(getCurrentProductRes?.data?.myProduct ?? undefined);
         }
 
         setIsLoading(false);
@@ -55,6 +70,9 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
       {!isLoading ? (
         <OnboardingSectionSubrate
           onboardingState={onboardingState!!}
+          standardProducts={standardProducts}
+          featuredProductsIds={featuredProductsIds}
+          currentProduct={currentProduct}
         />
       ) : (
         <Lottie

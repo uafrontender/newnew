@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -6,26 +6,58 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-
-import Headline from '../../atoms/Headline';
 import Button from '../../atoms/Button';
 import GoBackButton from '../GoBackButton';
+import Headline from '../../atoms/Headline';
+import OnboardingSubproductSelect from './OnboardingSubproductsSelect';
+import LoadingModal from '../LoadingModal';
+import { setMySubscriptionProduct } from '../../../api/endpoints/subscription';
 
 interface IOnboardingSectionSubrate {
   onboardingState: newnewapi.GetMyOnboardingStateResponse;
+  standardProducts: newnewapi.ISubscriptionProduct[];
+  featuredProductsIds: string[];
+  currentProduct?: newnewapi.ISubscriptionProduct;
 }
 
 const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrate> = ({
   onboardingState,
+  standardProducts,
+  featuredProductsIds,
+  currentProduct,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const handleSubmit = () => {
-    console.log(onboardingState);
-    router.push('/creator/dashboard');
+  // Selected products
+  const [selectedProduct, setSelectedProduct] = useState(currentProduct ?? standardProducts[standardProducts.findIndex((p) => featuredProductsIds.includes(p.id as string))]);
+
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
+  const handleSetSelectedProduct = (product: newnewapi.ISubscriptionProduct) => {
+    setSelectedProduct(product);
+  }
+
+  const handleSubmit = async () => {
+    try {
+      console.log(onboardingState);
+      setLoadingModalOpen(true);
+
+      const payload = new newnewapi.SetMySubscriptionProductRequest({
+        productId: selectedProduct.id,
+      });
+
+      const res = await setMySubscriptionProduct(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      router.push('/creator/dashboard');
+    } catch (err) {
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
   };
 
   return (
@@ -42,6 +74,12 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
           {t('SubrateSection.heading')}
         </span>
       </SHeadline>
+      <OnboardingSubproductSelect
+        currentProduct={selectedProduct}
+        standardProducts={standardProducts}
+        featuredProductsIds={featuredProductsIds}
+        handleSelectProduct={handleSetSelectedProduct}
+      />
       <SControlsDiv>
         {!isMobile && (
           <GoBackButton
@@ -63,8 +101,17 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
           ) : t('AboutSection.submitDesktop') }
         </Button>
       </SControlsDiv>
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
     </SContainer>
   );
+};
+
+OnboardingSectionSubrate.defaultProps = {
+  currentProduct: undefined,
 };
 
 export default OnboardingSectionSubrate;
@@ -107,8 +154,9 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SControlsDiv = styled.div`
-  width: 100%;
-  margin-top: 80%;
+  position: fixed;
+  width: calc(100% - 32px);
+  bottom: 16px;
 
   display: flex;
   justify-content: space-between;
@@ -133,7 +181,7 @@ const SControlsDiv = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-top: 80%;
+    margin-top: 35%;
   }
 `;
 
