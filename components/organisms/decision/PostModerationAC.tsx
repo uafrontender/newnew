@@ -30,6 +30,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import LoadingModal from '../../molecules/LoadingModal';
+import isBrowser from '../../../utils/isBrowser';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -60,9 +61,42 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<
-    'bids' | 'comments'
-  >('bids');
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'bids'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#bids' || hash === '#comments')) {
+      return hash.substring(1) as 'bids' | 'comments';
+    }
+    return 'bids';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      console.log(hash)
+      if (!hash) {
+        setCurrentTab('bids');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'bids' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Total amount
   const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
@@ -455,7 +489,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             },
           ]}
           activeTab={currentTab}
-          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+          handleChangeTab={handleChangeTab}
         />
         {currentTab === 'bids'
           ? (

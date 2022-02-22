@@ -139,8 +139,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
       // Check if user is logged in
       if (!user.loggedIn) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href}&`,
-          cancelUrl: `${window.location.href}&`,
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -182,8 +182,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
 
         if (res.data && res.data.status === newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href}&`,
-            cancelUrl: `${window.location.href}&`,
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
             cfPledgeRequest: {
               amount: new newnewapi.MoneyAmount({
                 usdCents: parseInt(pledgeAmount?.toString()!!, 10),
@@ -239,8 +239,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href}&`,
-        cancelUrl: `${window.location.href}&`,
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
         ...(!user.loggedIn ? {
           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
         } : {}),

@@ -8,26 +8,31 @@ import React, {
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
+import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import DecisionTabs from '../../molecules/decision/PostTabs';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
+import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
 import GoBackButton from '../../molecules/GoBackButton';
+import LoadingModal from '../../molecules/LoadingModal';
 import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
-import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
-import LoadingModal from '../../molecules/LoadingModal';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -60,6 +65,44 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     removeChannel,
   } = useContext(ChannelsContext);
 
+  // Tabs
+  const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'backers'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#backers' || hash === '#comments')) {
+      return hash.substring(1) as 'backers' | 'comments';
+    }
+    return 'backers';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      console.log(hash)
+      if (!hash) {
+        setCurrentTab('backers');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'backers' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
+
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
@@ -76,6 +119,12 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
+
+  // Comments
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -413,20 +462,43 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           handleFollowCreator={() => {}}
           handleReportAnnouncement={() => {}}
         />
-        <CfPledgeLevelsSection
-          pledgeLevels={pledgeLevels}
-          post={post}
-          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-          handleSetHeightDelta={(newValue: number) => setHeightDelta(newValue)}
+        <DecisionTabs
+          tabs={[
+            {
+              label: 'backers',
+              value: 'backers',
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]}
+          activeTab={currentTab}
+          handleChangeTab={handleChangeTab}
         />
-        <CfPledgesSection
-          pledges={pledges}
-          pagingToken={pledgesNextPageToken}
-          pledgesLoading={pledgesLoading}
-          post={post}
-          heightDelta={heightDelta ?? 256}
-          handleLoadPledges={fetchPledgesForPost}
-        />
+        {currentTab === 'backers' ? (
+          <>
+            <CfPledgeLevelsSection
+              pledgeLevels={pledgeLevels}
+              post={post}
+              handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+              handleSetHeightDelta={(newValue: number) => setHeightDelta(newValue)}
+            />
+            <CfPledgesSection
+              pledges={pledges}
+              pagingToken={pledgesNextPageToken}
+              pledgesLoading={pledgesLoading}
+              post={post}
+              heightDelta={heightDelta ?? 256}
+              handleLoadPledges={fetchPledgesForPost}
+            />
+          </>
+        ) : (
+          <CommentsTab
+            comments={comments}
+          />
+        )
+      }
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal

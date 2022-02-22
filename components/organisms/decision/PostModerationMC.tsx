@@ -30,6 +30,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import LoadingModal from '../../molecules/LoadingModal';
 import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
+import isBrowser from '../../../utils/isBrowser';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -59,9 +60,42 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<
-    'options' | 'comments'
-  >('options');
+  const [currentTab, setCurrentTab] = useState<'options' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'options'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#options' || hash === '#comments')) {
+      return hash.substring(1) as 'options' | 'comments';
+    }
+    return 'options';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      console.log(hash)
+      if (!hash) {
+        setCurrentTab('options');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'options' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -409,7 +443,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
             },
           ]}
           activeTab={currentTab}
-          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+          handleChangeTab={handleChangeTab}
         />
         {currentTab === 'options'
           ? (

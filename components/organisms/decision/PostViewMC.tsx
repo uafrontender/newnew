@@ -8,27 +8,30 @@ import React, {
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { fetchCurrentOptionsForMCPost, voteOnPost } from '../../../api/endpoints/multiple_choice';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
+import DecisionTabs from '../../molecules/decision/PostTabs';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
 import GoBackButton from '../../molecules/GoBackButton';
+import LoadingModal from '../../molecules/LoadingModal';
 import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import DecisionTabs from '../../molecules/decision/PostTabs';
-import { fetchCurrentOptionsForMCPost, voteOnPost } from '../../../api/endpoints/multiple_choice';
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -60,9 +63,42 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<
-    'options' | 'comments'
-  >('options');
+  const [currentTab, setCurrentTab] = useState<'options' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'options'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#options' || hash === '#comments')) {
+      return hash.substring(1) as 'options' | 'comments';
+    }
+    return 'options';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      console.log(hash)
+      if (!hash) {
+        setCurrentTab('options');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'options' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -440,7 +476,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
             },
           ]}
           activeTab={currentTab}
-          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+          handleChangeTab={handleChangeTab}
         />
         {currentTab === 'options'
           ? (

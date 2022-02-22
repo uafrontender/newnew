@@ -5,12 +5,15 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
-import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
@@ -21,15 +24,16 @@ import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import OptionTitle from '../../molecules/decision/auction/AcOptionTitle';
 import AcOptionTopInfo from '../../molecules/decision/auction/AcOptionTopInfo';
+import LoadingModal from '../../molecules/LoadingModal';
 import GoBackButton from '../../molecules/GoBackButton';
 import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { ChannelsContext } from '../../../contexts/channelsContext';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -44,6 +48,7 @@ interface IPostViewAC {
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl, sessionId, handleGoBack }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
@@ -55,7 +60,42 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
   const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>('bids');
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'bids'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#bids' || hash === '#comments')) {
+      return hash.substring(1) as 'bids' | 'comments';
+    }
+    return 'bids';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      console.log(hash)
+      if (!hash) {
+        setCurrentTab('bids');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'bids' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -465,7 +505,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
               },
             ]}
             activeTab={currentTab}
-            handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+            handleChangeTab={handleChangeTab}
           />
         ) : (
           <SHistoryLabel>{t('tabs.history')}</SHistoryLabel>

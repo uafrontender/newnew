@@ -107,8 +107,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       // Check if user is logged and if the wallet balance is sufficient
       if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(supportBidAmount, 10) * 100)) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href}&`,
-          cancelUrl: `${window.location.href}&`,
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -142,8 +142,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
         if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href}&`,
-            cancelUrl: `${window.location.href}&`,
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
             acBidRequest: {
               amount: new newnewapi.MoneyAmount({
                 usdCents: parseInt(supportBidAmount, 10) * 100,
@@ -202,8 +202,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href}&`,
-        cancelUrl: `${window.location.href}&`,
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
         ...(!user.loggedIn
           ? {
               nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,

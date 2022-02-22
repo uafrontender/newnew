@@ -28,8 +28,9 @@
   "tabs": {
     "comments": "Comments",
     "bids": "Bids",
-    "history": "History",
-    "options": "Options"
+    "options": "Options",
+    "backers": "Backers",
+    "history": "History"
   },
   "AcPost": {
     "paymenModalHeader": {

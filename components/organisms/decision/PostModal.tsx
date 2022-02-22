@@ -75,13 +75,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const { ref: loadingRef, inView } = useInView();
 
   const handleCloseAndGoBack = () => {
-    // window.history.back();
     handleClose();
     window.history.replaceState('', '', currLocation);
-
-    // test
     innerHistoryStack.current = [];
   };
+
+  const handleGoBackInsidePost = () => {
+    if (innerHistoryStack.current.length !== 0) {
+      window.history.back();
+    } else {
+      handleClose();
+      window.history.replaceState('', '', '/');
+    }
+  }
 
   const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
     const newPostParsed = switchPostType(newPost)[0];
@@ -133,9 +139,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewMC
           post={postParsed as newnewapi.MultipleChoice}
           sessionId={sessionId ?? undefined}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -145,9 +149,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Auction}
           optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -156,9 +158,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewCF
           post={postParsed as newnewapi.Crowdfunding}
           sessionId={sessionId ?? undefined}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -170,9 +170,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationMC
           post={postParsed as newnewapi.MultipleChoice}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -180,9 +178,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationAC
           post={postParsed as newnewapi.Auction}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -190,9 +186,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationCF
           post={postParsed as newnewapi.Crowdfunding}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -201,8 +195,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useEffect(() => {
     if (isOpen && postParsed) {
+      const additionalHash = window?.location?.hash === '#comments' ? '#comments' : undefined;
       setOpen(true);
-      window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}`);
+      window.history.pushState(
+        postParsed.postUuid,
+        'Post',
+        `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
     }
 
     return () => {

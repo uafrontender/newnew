@@ -96,8 +96,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       // Check if user is logged in
       if (!user.loggedIn) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href}&`,
-          cancelUrl: `${window.location.href}&`,
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -127,8 +127,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href}&`,
-            cancelUrl: `${window.location.href}&`,
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
             mcVoteRequest: {
               votesCount: parseInt(supportBidAmount, 10),
               optionId: option.id,
@@ -184,8 +184,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href}&`,
-        cancelUrl: `${window.location.href}&`,
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
         ...(!user.loggedIn ? {
           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
         } : {}),

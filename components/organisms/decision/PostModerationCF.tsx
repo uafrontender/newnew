@@ -28,6 +28,9 @@ import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
 import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
 import LoadingModal from '../../molecules/LoadingModal';
+import isBrowser from '../../../utils/isBrowser';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import DecisionTabs from '../../molecules/decision/PostTabs';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -58,6 +61,44 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     removeChannel,
   } = useContext(ChannelsContext);
 
+  // Tabs
+  const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'backers'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#backers' || hash === '#comments')) {
+      return hash.substring(1) as 'backers' | 'comments';
+    }
+    return 'backers';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      console.log(hash)
+      if (!hash) {
+        setCurrentTab('backers');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'backers' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
+
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
@@ -74,6 +115,12 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
+
+  // Comments
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -383,14 +430,35 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           handleFollowCreator={() => {}}
           handleReportAnnouncement={() => {}}
         />
-        <CfPledgesSection
-          pledges={pledges}
-          pagingToken={pledgesNextPageToken}
-          pledgesLoading={pledgesLoading}
-          post={post}
-          heightDelta={heightDelta ?? 256}
-          handleLoadPledges={fetchPledgesForPost}
+        <DecisionTabs
+          tabs={[
+            {
+              label: 'backers',
+              value: 'backers',
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]}
+          activeTab={currentTab}
+          handleChangeTab={handleChangeTab}
         />
+        {currentTab === 'backers' ? (
+          <CfPledgesSection
+            pledges={pledges}
+            pagingToken={pledgesNextPageToken}
+            pledgesLoading={pledgesLoading}
+            post={post}
+            heightDelta={heightDelta ?? 256}
+            handleLoadPledges={fetchPledgesForPost}
+          />
+        ) : (
+          <CommentsTab
+            comments={comments}
+          />
+        )
+      }
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal
