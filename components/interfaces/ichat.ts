@@ -1,17 +1,18 @@
 import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 
-export interface IUser {
-  uuid?: string;
-  userName: string;
-  userAlias: string;
-  justSubscribed?: boolean;
-  blockedUser?: boolean;
-  isAnnouncement?: boolean;
-  subscriptionExpired?: boolean;
-  messagingDisabled?: boolean;
-  accountDeleted?: boolean;
-  avatar: string;
-}
+// export interface IUser {
+//   chatUser: newnewapi.IUser;
+//   // userName: string;
+//   // userAlias: string;
+//   justSubscribed?: boolean;
+//   blockedUser?: boolean;
+//   isAnnouncement?: boolean;
+//   subscriptionExpired?: boolean;
+//   messagingDisabled?: boolean;
+//   accountDeleted?: boolean;
+//   // avatar: string;
+// }
 
 export interface IMessage {
   id: string;
@@ -21,8 +22,13 @@ export interface IMessage {
 }
 
 export interface IChatData {
-  userData: IUser | null;
-  messages: IMessage[];
+  chatUser: newnewapi.IUser | null;
+  justSubscribed?: boolean;
+  blockedUser?: boolean;
   isAnnouncement?: boolean;
+  subscriptionExpired?: boolean;
+  messagingDisabled?: boolean;
+  accountDeleted?: boolean;
+
   showChatList: { (): void } | null;
 }

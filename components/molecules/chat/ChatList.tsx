@@ -1,13 +1,17 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import { getSubscriptions } from '../../../contexts/subscriptionsContext';
 
 import UserAvatar from '../UserAvatar';
 import textTrim from '../../../utils/textTrim';
 
-import { IChatData, IUser, IMessage } from '../../interfaces/ichat';
+import { IChatData, IMessage } from '../../interfaces/ichat';
 
 import { useAppSelector } from '../../../redux-store/store';
 import {
@@ -22,6 +26,8 @@ import {
   SChatSeparator,
   SUserAvatar,
 } from '../../atoms/chat/styles';
+import randomID from '../../../utils/randomIdGenerator';
+import { getMyRooms } from '../../../api/endpoints/chat';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
@@ -33,25 +39,96 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
   const user = useAppSelector((state) => state.user);
   const { t } = useTranslation('chat');
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string>('allUsers');
+
+  const [allUsers, setAllUsers] = useState<newnewapi.IUser[]>([]);
+
+  const [chatRoomsLoading, setChatRoomsLoading] = useState(false);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(null);
+  const [chatRoomsCreators, setChatRoomsCreators] = useState<newnewapi.IChatRoom[]>([]);
+  const [chatRoomsSubs, setChatRoomsSubs] = useState<newnewapi.IChatRoom[]>([]);
 
   const userTypes = useMemo(
     () => [
       {
-        id: 'all',
+        id: 'chatRooms',
         title: t('usertypes.all'),
       },
       {
-        id: 'subscribers',
+        id: 'chatRoomsSubs',
         title: t('usertypes.subscribers'),
       },
       {
-        id: 'report-subscribing',
+        id: 'chatRoomsCreators',
         title: t('usertypes.subscribing'),
       },
     ],
     [t]
   );
+
+  const { mySubscribers, creatorsImSubscribedTo } = getSubscriptions();
+
+  useEffect(() => {
+    async function fetchMyRooms() {
+      try {
+        const payload = new newnewapi.GetMyRoomsRequest({ paging: { limit: 20 }, roomKind: 1 });
+        const res = await getMyRooms(payload);
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setChatRooms(res.data.rooms);
+        setChatRoomsLoading(false);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (!chatRooms) {
+      setChatRoomsLoading(true);
+      fetchMyRooms();
+    } else {
+      // if (creatorsImSubscribedTo.length > 0 && chatRoomsCreators.length < 1) {
+      console.log(creatorsImSubscribedTo);
+
+      // chatRooms.forEach(chat =>{
+      //   if (chat.visavis){
+      //     console.log(chat.visavis?.uuid);
+
+      //     console.log(creatorsImSubscribedTo.find((cuser) => { cuser.uuid === chat.visavis?.uuid }));
+
+      //     if (creatorsImSubscribedTo.find((cuser) => { cuser.uuid === chat.visavis?.uuid })){
+      //       setChatRoomsCreators([...chatRoomsCreators, chat]);
+      //     }
+      //   }
+      // })
+      // }
+
+      // if(mySubscribers.length > 0 && chatRoomsSubs.length < 1){
+      //   chatRooms.forEach(chat =>{
+      //     if (chat.visavis){
+      //       if (mySubscribers.find((cuser) => { cuser.uuid === chat.visavis?.uuid })){
+      //         setChatRoomsSubs([...chatRoomsSubs, chat])
+      //       }
+      //     }
+      //   })
+      // }
+    }
+  }, [chatRooms, creatorsImSubscribedTo, mySubscribers, chatRoomsCreators.length]);
+
+  useEffect(() => {
+    console.log(chatRooms, chatRoomsCreators, chatRoomsSubs);
+  }, [chatRooms, chatRoomsCreators, chatRoomsSubs]);
+  // useEffect(() => {
+  //   setAllUsers([...creatorsImSubscribedTo, ...mySubscribers]);
+  // }, [creatorsImSubscribedTo,mySubscribers]);
+
+  // useEffect(() => {
+  //   if (allUsers.length > 0 && allUsers[0].uuid) {
+  //     openChat({
+  //       chatUser: allUsers[0],
+  //       showChatList: null,
+  //     });
+  //     setActiveChatIndex(allUsers[0].uuid);
+  //   }
+  // }, [allUsers]);
 
   const collection = useMemo(
     () => [
@@ -667,82 +744,72 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
     []
   );
 
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    if (collection && collection.length > 0) {
-      openChat({
-        userData: collection[0].userData,
-        messages: collection[0].messages,
-        isAnnouncement: collection[0].isAnnouncement,
-        showChatList: null,
-      });
-      setActiveChatIndex(collection[0].id);
-    }
-  }, []);
-
-  interface IItem {
-    id: string;
-    time: string;
-    userData: IUser;
-    messages: IMessage[];
-    unread: boolean;
-    unreadCount?: number;
-  }
+  // interface IItem {
+  //   id: string;
+  //   time: string;
+  //   userData: IUser;
+  //   messages: IMessage[];
+  //   unread: boolean;
+  //   unreadCount?: number;
+  // }
 
   const renderChatItem = useCallback(
-    (item: IItem, index: number) => {
+    (item: newnewapi.IUser, index: number) => {
       const handleItemClick = () => {
-        openChat({ userData: item.userData, messages: item.messages, showChatList: null });
-        setActiveChatIndex(item.id);
+        if (item.uuid) {
+          openChat({ chatUser: item, showChatList: null });
+          setActiveChatIndex(item.uuid);
+        }
       };
 
       return (
-        <SChatItemContainer key={`chat-item-${item.id}`}>
-          <SChatItem onClick={handleItemClick} className={activeChatIndex === item.id ? 'active' : ''}>
+        <SChatItemContainer key={randomID()}>
+          <SChatItem onClick={handleItemClick} className={activeChatIndex === item.uuid ? 'active' : ''}>
             <SUserAvatar>
-              <UserAvatar avatarUrl={item.userData.avatar} />
+              <UserAvatar avatarUrl={item.avatarUrl ? item.avatarUrl : ''} />
             </SUserAvatar>
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
-                {item.userData.userName}
+                {item.nickname}
               </SChatItemText>
-              <SChatItemLastMessage variant={3} weight={600}>
+              {/* <SChatItemLastMessage variant={3} weight={600}>
                 {textTrim(item.messages[0].message)}
-              </SChatItemLastMessage>
+              </SChatItemLastMessage> */}
             </SChatItemCenter>
-            <SChatItemRight>
+            {/* <SChatItemRight>
               <SChatItemTime variant={3} weight={600}>
                 {item.time}
               </SChatItemTime>
               {!!item.unread && <SChatItemIndicator counter={item.unreadCount} />}
-            </SChatItemRight>
+            </SChatItemRight> */}
           </SChatItem>
           {index !== collection.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
-    [collection.length, user.userData?.avatarUrl, openChat]
+    [collection.length, openChat, activeChatIndex]
   );
 
   const Tabs = useCallback(
     () => (
       <STabs>
         {userTypes.map((item) => (
-          <STab active={activeTab === item.id} key={item.id} onClick={() => setActiveTab(item.id)}>
+          <STab active={activeTab === item.id} key={randomID()} onClick={() => setActiveTab(item.id)}>
             {item.title}
           </STab>
         ))}
       </STabs>
     ),
-    []
+    [activeTab, userTypes]
   );
+  /* eslint-disable no-eval */
   return (
     <>
       <SSectionContent>
-        {collection.length > 0 ? (
+        {allUsers.length > 0 ? (
           <>
-            <Tabs />
-            {collection.map(renderChatItem)}
+            {creatorsImSubscribedTo.length > 0 && mySubscribers.length > 0 && <Tabs />}
+            {eval(activeTab).map(renderChatItem)}
           </>
         ) : (
           <EmptyInbox />

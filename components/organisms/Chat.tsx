@@ -3,9 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { newnewapi } from 'newnew-api';
-// import { getMyRooms } from '../../api/endpoints/chat';
-// import { getSubscriptions } from '../../contexts/subscriptionsContext';
+
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
 import SearchInput from '../atoms/chat/SearchInput';
@@ -16,28 +14,16 @@ import GoBackButton from '../molecules/GoBackButton';
 
 export const Chat = () => {
   const [chatData, setChatData] = useState<IChatData>({
-    userData: null,
-    messages: [],
-    isAnnouncement: false,
+    chatUser: null,
     showChatList: null,
   });
-  const openChat = ({ userData, messages, isAnnouncement }: IChatData) => {
-    setChatData({ userData, messages, isAnnouncement, showChatList });
+  const openChat = ({ chatUser }: IChatData) => {
+    setChatData({ chatUser, showChatList });
   };
   const { t } = useTranslation('chat');
   const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
-
-  const [allUsers, setAllUsers] = useState<newnewapi.IUser[]>([]);
-  // const [myCreators, setMyCreators] = useState<newnewapi.IUser[]>([]);
-  // const [mySubs, setMySubs] = useState<newnewapi.IUser[]>([]);
-
-  // const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[]>([]);
-
   const { resizeMode } = useAppSelector((state) => state.ui);
-  // const user = useAppSelector((state) => state.user);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-
-  // const { mySubscribers, creatorsImSubscribedTo } = getSubscriptions();
 
   useEffect(() => {
     /* eslint-disable no-unused-expressions */
@@ -51,71 +37,13 @@ export const Chat = () => {
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [chatData]);
 
-  // useEffect(() => {
-
-  //   async function fetchMyRooms() {
-  //     try {
-  //       const payload = new newnewapi.GetMyRoomsRequest();
-  //       const res = await getMyRooms(payload);
-  //       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-  //       setChatRooms(res.data.rooms);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   }
-  //   fetchMyRooms();
-
-  //   async function fetchUser(uuid:string) {
-  //     try {
-  //       const payload = new newnewapi.GetUserRequest({ uuid: uuid });
-  //       const res = await getUserByUsername(payload);
-
-  //       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-  //       return res.data as newnewapi.IUser;
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   }
-
-  //   if (creatorsImSubscribedTo.length > 0){
-  //     let arrCreators: newnewapi.IUser[] = [];
-  //     creatorsImSubscribedTo.forEach(async item => {
-  //       const u = await fetchUser(item);
-  //       u && arrCreators.push(u);
-  //     });
-  //     setMyCreators(arrCreators)
-  //     // console.log(arrCreators);
-  //     setAllUsers(oldArray => [...oldArray, ...arrCreators])
-  //   }
-
-  //   if (mySubscribers.length > 0){
-  //     let arrSubs: newnewapi.IUser[] = [];
-  //     mySubscribers.forEach(async item => {
-  //       if (item.uuid){
-  //         const u = await fetchUser(item.uuid);
-  //         u && arrSubs.push(u);
-  //       }
-  //     });
-  //     console.log(arrSubs);
-  //     setMySubs(arrSubs)
-  //     setAllUsers(oldArray => [...oldArray, ...arrSubs])
-  //   }
-  // }, [mySubscribers, creatorsImSubscribedTo]);
-
-  // useEffect(() => {
-  //   if (allUsers.length > 0){
-  //     // console.log(allUsers, mySubs, myCreators);
-  //   }
-  // }, [allUsers]);
-
   const showChatList = () => {
     setChatListHidden(false);
   };
 
   const passInputValue = (str: string) => {
     if (str) {
-      console.log(str);
+      // console.log(str);
     }
   };
 

@@ -8,9 +8,9 @@ const SubscriptionsContext = createContext({
   mySubscribers: [] as newnewapi.IUser[],
   addSubscriber: (subscriber: newnewapi.IUser) => {},
   removeSubscriber: (subscriber: newnewapi.IUser) => {},
-  creatorsImSubscribedTo: [] as string[],
-  addCreatorsImSubscribedTo: (creatorId: string) => {},
-  removeCreatorsImSubscribedTo: (creatorId: string) => {},
+  creatorsImSubscribedTo: [] as newnewapi.IUser[],
+  addCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
+  removeCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
   isMySubscribersIsLoading: false,
   isCreatorsImSubscribedToLoading: false,
 });
@@ -18,7 +18,7 @@ const SubscriptionsContext = createContext({
 export const SubscriptionsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
   const [mySubscribers, setMySubscribers] = useState<newnewapi.IUser[]>([]);
-  const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<string[]>([]);
+  const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<newnewapi.IUser[]>([]);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
   const [isCreatorsImSubscribedToLoading, setCreatorsImSubscribedToLoading] = useState(false);
 
@@ -30,12 +30,12 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
     setMySubscribers((curr) => curr.filter((i) => i.uuid !== subscriber.uuid));
   };
 
-  const addCreatorsImSubscribedTo = (creatorId: string) => {
-    setCreatorsImSubscribedTo((curr) => [...curr, creatorId]);
+  const addCreatorsImSubscribedTo = (creator: newnewapi.IUser) => {
+    setCreatorsImSubscribedTo((curr) => [...curr, creator]);
   };
 
-  const removeCreatorsImSubscribedTo = (creatorId: string) => {
-    setCreatorsImSubscribedTo((curr) => curr.filter((i) => i !== creatorId));
+  const removeCreatorsImSubscribedTo = (creator: newnewapi.IUser) => {
+    setCreatorsImSubscribedTo((curr) => curr.filter((i) => i.uuid !== creator.uuid));
   };
 
   const contextValue = useMemo(

@@ -4,6 +4,7 @@ import moment from 'moment';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
@@ -16,10 +17,12 @@ import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
 
-import { IUser, IMessage, IChatData } from '../../interfaces/ichat';
+import { IMessage, IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUserAlias } from '../../atoms/chat/styles';
 import GoBackButton from '../GoBackButton';
+import randomID from '../../../utils/randomIdGenerator';
+import { getMyRooms } from '../../../api/endpoints/chat';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -30,23 +33,60 @@ const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const ReportUserModal = dynamic(() => import('./ReportUserModal'));
 
-const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnnouncement }) => {
+const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
   const [message, setMessage] = useState('');
-  const [localUserData, setUserData] = useState<IUser>({
-    userName: '',
-    userAlias: '',
-    avatar: '',
+  const [localUserData, setLocalUserData] = useState({
+    justSubscribed: true,
+    blockedUser: false,
+    isAnnouncement: false,
+    subscriptionExpired: false,
+    messagingDisabled: false,
+    accountDeleted: false,
   });
 
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [collection, setCollection] = useState<IMessage[]>([]);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[]>([]);
+
+  const theme = useTheme();
+  const { t } = useTranslation('chat');
+  const scrollRef: any = useRef();
+
   useEffect(() => {
-    if (userData && messages) {
-      setUserData(userData);
-      setCollection(messages);
+    async function fetchMyRooms(name:string) {
+      try {
+        const payload = new newnewapi.GetMyRoomsRequest({ searchQuery: name });
+        const res = await getMyRooms(payload);
+        console.log(res);
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setChatRooms(res.data.rooms);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }, [userData, messages]);
+
+    if (chatUser) {
+      setLocalUserData((data) => ({ ...data, ...chatUser }));
+      setCollection([
+        {
+          id: randomID(),
+          message: '👋 Hey, thank you for subscribing to my channel, I look forward to talking to you.',
+          mine: false,
+          date: moment().subtract(3, 'days'),
+        },
+      ]);
+      if (chatUser.username) fetchMyRooms(chatUser.username);
+    }
+  }, [chatUser]);
+
+  useEffect(() => {
+    if (chatRooms.length > 0) {
+      console.log(chatRooms);
+    }
+  }, [chatRooms]);
+
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
@@ -58,19 +98,15 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
   const onUserBlock = () => {
     if (!localUserData.blockedUser) {
       /* eslint-disable no-unused-expressions */
-      !confirmBlockUser ? setConfirmBlockUser(true) : setUserData({ ...localUserData, blockedUser: true });
+      !confirmBlockUser ? setConfirmBlockUser(true) : setLocalUserData({ ...localUserData, blockedUser: true });
     } else {
-      setUserData({ ...localUserData, blockedUser: false });
+      setLocalUserData({ ...localUserData, blockedUser: false });
     }
   };
 
   const onUserReport = () => {
     setConfirmReportUser(true);
   };
-
-  const theme = useTheme();
-  const { t } = useTranslation('chat');
-  const scrollRef: any = useRef();
 
   const handleChange = useCallback((id, value) => {
     setMessage(value);
@@ -86,56 +122,57 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
     setMessage('');
     setCollection([newItem, ...collection]);
   }, [message, collection]);
-  const renderMessage = useCallback(
-    (item, index) => {
-      const prevElement = collection[index - 1];
-      const nextElement = collection[index + 1];
 
-      const prevSameUser = prevElement?.mine === item.mine;
-      const nextSameUser = prevElement?.mine === item.mine;
+  const renderMessage = useCallback((item, index) => {
+    const prevElement = collection[index - 1];
+    const nextElement = collection[index + 1];
 
-      const content = (
-        <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={`message-${item.id}`} mine={item.mine}>
-          {!nextSameUser && (
-            <SUserAvatar mine={item.mine} avatarUrl={!item.mine ? localUserData?.avatar : user.userData?.avatarUrl} />
-          )}
-          <SMessageContent mine={item.mine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
-            <SMessageText mine={item.mine} weight={600} variant={3}>
-              {item.message}
-            </SMessageText>
-          </SMessageContent>
-        </SMessage>
-      );
+    const prevSameUser = prevElement?.mine === item.mine;
+    const nextSameUser = prevElement?.mine === item.mine;
 
-      if (moment(item.date).format('DD.MM.YYYY') !== moment(nextElement?.date).format('DD.MM.YYYY')) {
-        let date = moment(item.date).format('MMM DD');
+    const content = (
+      <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={randomID()} mine={item.mine}>
+        {!nextSameUser && (
+          <SUserAvatar
+            mine={item.mine}
+            avatarUrl={!item.mine && chatUser && chatUser.avatarUrl ? chatUser.avatarUrl : user.userData?.avatarUrl}
+          />
+        )}
+        <SMessageContent mine={item.mine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+          <SMessageText mine={item.mine} weight={600} variant={3}>
+            {item.message}
+          </SMessageText>
+        </SMessageContent>
+      </SMessage>
+    );
 
-        if (date === moment().format('MMM DD')) {
-          date = t('chat.today');
-        }
+    if (moment(item.date).format('DD.MM.YYYY') !== moment(nextElement?.date).format('DD.MM.YYYY')) {
+      let date = moment(item.date).format('MMM DD');
 
-        return (
-          <>
-            {content}
-            <SMessage key={`message-date-${moment(item.date).format('DD.MM.YYYY')}`} type="info">
-              <SMessageContent
-                type="info"
-                prevSameUser={prevElement?.mine === item.mine}
-                nextSameUser={nextElement?.mine === item.mine}
-              >
-                <SMessageText type="info" weight={600} variant={3}>
-                  {date}
-                </SMessageText>
-              </SMessageContent>
-            </SMessage>
-          </>
-        );
+      if (date === moment().format('MMM DD')) {
+        date = t('chat.today');
       }
 
-      return content;
-    },
-    [collection, t, localUserData?.avatar, user.userData?.avatarUrl]
-  );
+      return (
+        <>
+          {content}
+          <SMessage key={randomID()} type="info">
+            <SMessageContent
+              type="info"
+              prevSameUser={prevElement?.mine === item.mine}
+              nextSameUser={nextElement?.mine === item.mine}
+            >
+              <SMessageText type="info" weight={600} variant={3}>
+                {date}
+              </SMessageText>
+            </SMessageContent>
+          </SMessage>
+        </>
+      );
+    }
+
+    return content;
+  }, [chatUser, collection, t, user.userData?.avatarUrl]);
 
   useEffect(() => {
     scroller.scrollTo('first-element', {
@@ -153,15 +190,15 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
 
   return (
     <SContainer>
-      {localUserData.userName && (
+      {chatUser && (
         <STopPart>
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {localUserData?.userName}
-              {isAnnouncement && t('announcement.title')}
+              {chatUser.nickname}
+              {localUserData.isAnnouncement && t('announcement.title')}
             </SUserName>
-            <SUserAlias>{!isAnnouncement ? `@${localUserData?.userAlias}` : `500 members`}</SUserAlias>
+            <SUserAlias>{!localUserData.isAnnouncement ? `@${chatUser.username}` : `500 members`}</SUserAlias>
           </SUserData>
           <SActionsDiv>
             <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
@@ -175,7 +212,7 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
                 userBlocked={localUserData?.blockedUser}
                 onUserBlock={onUserBlock}
                 onUserReport={onUserReport}
-                isAnnouncement={isAnnouncement}
+                isAnnouncement={localUserData.isAnnouncement}
               />
             )}
             {isMobile && ellipseMenuOpen ? (
@@ -186,47 +223,52 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
                 userBlocked={localUserData?.blockedUser}
                 onUserBlock={onUserBlock}
                 onUserReport={onUserReport}
-                isAnnouncement={isAnnouncement}
+                isAnnouncement={localUserData.isAnnouncement}
               />
             ) : null}
           </SActionsDiv>
         </STopPart>
       )}
-      {isAnnouncement && (
+      {localUserData.isAnnouncement && chatUser && (
         <SAnnouncementHeader>
           <SAnnouncementText>
-            {t('announcement.top-message-start')} <SAnnouncementName>{localUserData.userName}</SAnnouncementName>{' '}
+            {t('announcement.top-message-start')} <SAnnouncementName>{chatUser.username}</SAnnouncementName>{' '}
             {t('announcement.top-message-end')}
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}
       <SCenterPart id="messagesScrollContainer" ref={scrollRef}>
-        {localUserData?.justSubscribed && <WelcomeMessage userAlias={localUserData.userAlias} />}
+        {localUserData?.justSubscribed && chatUser && (
+          <WelcomeMessage userAlias={chatUser.username ? chatUser.username : ''} />
+        )}
         {collection.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        {(localUserData.blockedUser === true || confirmBlockUser) && (
+        {(localUserData.blockedUser === true || confirmBlockUser) && chatUser && (
           <BlockedUser
             confirmBlockUser={confirmBlockUser}
             isBlocked={localUserData.blockedUser}
-            userName={localUserData?.userName}
+            userName={chatUser.username ? chatUser.username : ''}
             onUserBlock={onUserBlock}
             closeModal={() => setConfirmBlockUser(false)}
-            isAnnouncement={isAnnouncement}
+            // isAnnouncement={isAnnouncement}
           />
         )}
-        {localUserData.subscriptionExpired && localUserData.uuid && <SubscriptionExpired user={localUserData} />}
+        {localUserData.subscriptionExpired && chatUser && chatUser.uuid && <SubscriptionExpired user={chatUser} />}
         {localUserData.accountDeleted && <AccountDeleted />}
-        {localUserData.messagingDisabled && (
-          <MessagingDisabled userName={localUserData.userName} userAlias={localUserData.userAlias} />
+        {localUserData.messagingDisabled && chatUser && (
+          <MessagingDisabled
+            userName={chatUser.username ? chatUser.username : ''}
+            userAlias={chatUser.nickname ? chatUser.nickname : ''}
+          />
         )}
 
         {!localUserData.blockedUser &&
           !localUserData.subscriptionExpired &&
           !localUserData.messagingDisabled &&
           !localUserData.accountDeleted &&
-          localUserData.userName &&
-          !isAnnouncement && (
+          !localUserData.isAnnouncement &&
+          chatUser && (
             <SBottomTextarea>
               <STextArea>
                 <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
@@ -250,9 +292,9 @@ const ChatArea: React.FC<IChatData> = ({ userData, messages, showChatList, isAnn
         {confirmReportUser && (
           <ReportUserModal
             confirmReportUser={confirmReportUser}
-            userName={localUserData.userName}
+            userName={chatUser && chatUser.username ? chatUser.username : ''}
             closeModal={() => setConfirmReportUser(false)}
-            isAnnouncement={isAnnouncement}
+            isAnnouncement={localUserData.isAnnouncement}
           />
         )}
       </SBottomPart>
