@@ -108,19 +108,29 @@
       },
       "loadMoreBtn": "Load more",
       "OptionCard": {
+        "noVotes": "no votes",
         "votes": "votes",
+        "others": "others",
+        "voters": "voters",
+        "voted": "voted",
         "supportBtn": "Vote",
         "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
         "doubleMyVoteButton": "Double my vote",
-        "placeABidBtn": "Vote",
+        "placeABidBtn": "Place a vote",
         "cancelBtn": "Cancel"
       },
       "BidCard": {
         "didABid": "bid"
       },
       "ActionSection": {
+        "votesAmount": {
+          "placeholder": {
+            "votes": "votes",
+            "vote": "vote"
+          }
+        },
         "suggestionPlaceholder": "Add a suggestion ...",
-        "placeABidBtn": "Place a bid"
+        "placeABidBtn": "Place a vote"
       }
     },
     "FloatingActionButton": {

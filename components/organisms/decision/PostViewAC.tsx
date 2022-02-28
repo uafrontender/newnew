@@ -22,10 +22,6 @@ import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import LoadingModal from '../../molecules/LoadingModal';
 import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';

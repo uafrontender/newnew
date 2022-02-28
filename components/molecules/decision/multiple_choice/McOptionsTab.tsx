@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -17,14 +17,16 @@ import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice'
 import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
+import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
 import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
+import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
 interface IMcOptionsTab {
@@ -51,11 +53,21 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
   // Infinite load
   const {
     ref: loadingRef,
     inView,
   } = useInView();
+
+  const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
+
+  const [heightDelta, setHeightDelta] = useState(post.isSuggestionsAllowed ? 56 : 0);
+  const actionSectionContainer = useRef<HTMLDivElement>();
+
+  const mainContainer = useRef<HTMLDivElement>();
 
   const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
@@ -267,21 +279,42 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entry) => {
+      const size = entry[0]?.borderBoxSize
+        ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
+      if (size) {
+        setHeightDelta(size);
+      }
+    });
+
+    resizeObserver.observe(actionSectionContainer.current!!);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <STabContainer
-        key="bids"
+        key="options"
+        ref={(el) => {
+          mainContainer.current = el!!;
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         <SBidsContainer
-          style={{
-            ...(optionBeingSupported ? {
-              overflowY: 'hidden',
-            } : {}),
+          ref={(el) => {
+            containerRef.current = el!!;
           }}
+          heightDelta={heightDelta}
         >
+          {!isMobile ? (
+            <>
+              <GradientMask positionTop active={showTopGradient} />
+              <GradientMask positionBottom={heightDelta} active={showBottomGradient} />
+            </>
+          ) : null}
           {options.map((option, i) => (
             <McOptionCard
               key={option.id.toString()}
@@ -305,34 +338,46 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 <SLoadMoreBtn
                   onClick={() => handleLoadOptions(pagingToken)}
                 >
-                  Load more
+                  { t('McPost.OptionsTab.loadMoreBtn') }
                 </SLoadMoreBtn>
               )
             ) : null
           )}
         </SBidsContainer>
         {post.isSuggestionsAllowed ? (
-          <SActionSection>
+          <SActionSection
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+          >
             <SuggestionTextArea
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
-              placeholder="Add a option ..."
+              placeholder={t('McPost.OptionsTab.ActionSection.suggestionPlaceholder')}
               onChange={handleUpdateNewOptionText}
             />
-            <BidAmountTextInput
+            <VotesAmountTextInput
               value={newBidAmount}
-              inputAlign="center"
+              inputAlign="left"
               disabled={optionBeingSupported !== ''}
+              placeholder={
+                newBidAmount && parseInt(newBidAmount, 10) > 1
+                ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
+                : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
+              }
               onChange={(newValue: string) => setNewBidAmount(newValue)}
+              bottomPlaceholder={
+                !newBidAmount || parseInt(newBidAmount, 10) === 1
+                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
+                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+              }
               minAmount={minAmount}
-              style={{
-                width: '60px',
-              }}
             />
             <Button
               view="primaryGrad"
               size="sm"
               disabled={!newOptionText
+                || !newBidAmount
                 || parseInt(newBidAmount, 10) < minAmount
                 || optionBeingSupported !== ''
                 || !newOptionTextValid}
@@ -341,8 +386,17 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              Place a bid
+              { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
             </Button>
+            {!isMobileOrTablet && (
+              <SBottomPlaceholder>
+                {
+                  !newBidAmount || parseInt(newBidAmount, 10) === 1
+                  ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
+                  : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                }
+              </SBottomPlaceholder>
+            )}
           </SActionSection>
         ) : null}
       </STabContainer>
@@ -361,10 +415,20 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               placeholder="Add a option ..."
               onChange={handleUpdateNewOptionText}
             />
-            <BidAmountTextInput
+            <VotesAmountTextInput
               value={newBidAmount}
               inputAlign="left"
               disabled={optionBeingSupported !== ''}
+              placeholder={
+                newBidAmount && parseInt(newBidAmount, 10) > 1
+                ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
+                : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
+              }
+              bottomPlaceholder={
+                !newBidAmount || parseInt(newBidAmount, 10) === 1
+                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
+                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+              }
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
             />
@@ -372,6 +436,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               view="primaryGrad"
               size="sm"
               disabled={!newOptionText
+                || !newBidAmount
                 || parseInt(newBidAmount, 10) < minAmount
                 || optionBeingSupported !== ''
                 || !newOptionTextValid}
@@ -380,7 +445,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              Place a bid
+              { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
             </Button>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
@@ -390,7 +455,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${newBidAmount}`}
+          amount={`$${parseInt(newBidAmount, 10) * 5}`}
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -434,20 +499,52 @@ export default McOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 112px);
+  height: calc(100% - 50px);
+
+  ${({ theme }) => theme.media.tablet} {
+    height: calc(100% - 56px);
+  }
 `;
 
-const SBidsContainer = styled.div`
+const SBidsContainer = styled.div<{
+  heightDelta: number;
+}>`
   width: 100%;
   height: 100%;
   overflow-y: auto;
 
   display: flex;
   flex-direction: column;
-  /* gap: 16px; */
+
+  padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 125px;
+    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 4px;
+      transition: .2s linear;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 4px;
+      transition: .2s linear;
+    }
+
+    &:hover {
+      &::-webkit-scrollbar-track {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+      }
+    }
   }
 `;
 
@@ -456,7 +553,8 @@ const SLoaderDiv = styled.div`
 `;
 
 const SLoadMoreBtn = styled(Button)`
-
+  width: 100%;
+  height: 56px;
 `;
 
 const SActionButton = styled(Button)`
@@ -486,17 +584,50 @@ const SActionSection = styled.div`
   ${({ theme }) => theme.media.tablet} {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 16px;
 
-    position: absolute;
-    min-height: 85px;
+    min-height: 50px;
     width: 100%;
     z-index: 5;
-    bottom: 0;
+
+    padding-top: 8px;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-    box-shadow: 0px -50px 18px 20px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 0.9)' : 'rgba(241, 243, 249, 0.9)')};
+
+    border-top: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+    textarea {
+      width: 100%;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-wrap: nowrap;
+    justify-content: initial;
+
+    textarea {
+      width: 277px;
+    }
+  }
+`;
+
+const SBottomPlaceholder = styled.div`
+  display: none;
+
+  ${({ theme }) => theme.media.laptop} {
+    display: block;
+
+    position: absolute;
+    bottom: -30px;
+
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    width: max-content;
   }
 `;
 

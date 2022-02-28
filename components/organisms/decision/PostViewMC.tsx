@@ -16,7 +16,6 @@ import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import { fetchCurrentOptionsForMCPost, voteOnPost } from '../../../api/endpoints/multiple_choice';
 
 import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import CommentsTab from '../../molecules/decision/CommentsTab';
@@ -24,10 +23,6 @@ import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
 import GoBackButton from '../../molecules/GoBackButton';
 import LoadingModal from '../../molecules/LoadingModal';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
@@ -147,7 +142,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         ))
       : [];
 
-    // const optionsByVipUsers = [];
+    const optionsByVipUsers = unsortedArr
+      .filter((o) => o.isCreatedBySubscriber)
+      .sort((a, b) => {
+        return (b.id as number) - (a.id as number);
+      })
 
     const workingArrSorted = unsortedArr.sort((a, b) => (
       (b?.voteCount as number) - (a?.voteCount as number)
@@ -159,7 +158,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         && highestOption.creator?.uuid === user.userData?.userUuid ? [highestOption] : []),
       ...optionsByUser,
       ...optionsSupportedByUser,
-      // ...optionsByVipUsers,
+      ...optionsByVipUsers,
       ...(
         highestOption
         && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),

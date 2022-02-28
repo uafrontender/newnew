@@ -17,6 +17,7 @@ import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../..
 import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -25,11 +26,10 @@ import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
+import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
 import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
-import GradientMask from '../../../atoms/GradientMask';
-import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 interface IAcOptionsTab {
   postId: string;
@@ -71,9 +71,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [heightDelta, setHeightDelta] = useState(56);
   const actionSectionContainer = useRef<HTMLDivElement>();
 
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
-
   const mainContainer = useRef<HTMLDivElement>();
+
+  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
@@ -88,10 +88,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
-    // if (!user.loggedIn) {
-    //   router.push('/sign-up?reason=bid');
-    //   return;
-    // }
     setPaymentModalOpen(true);
   };
 
