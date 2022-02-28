@@ -121,7 +121,7 @@ const SDate = styled.div`
 const SIcon = styled.span`
   position: absolute;
   right: calc(50% - 20px);
-  top: auto;
+  top: 36px;
   bottom: -5px;
   width: 40px;
   height: 40px;
