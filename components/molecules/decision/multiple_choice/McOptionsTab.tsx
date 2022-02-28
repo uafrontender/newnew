@@ -321,8 +321,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             />
             <BidAmountTextInput
               value={newBidAmount}
-              inputAlign="left"
-              horizontalPadding="16px"
+              inputAlign="center"
               disabled={optionBeingSupported !== ''}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
@@ -358,13 +357,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             <SuggestionTextArea
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
+              autofocus={suggestNewMobileOpen}
               placeholder="Add a option ..."
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
               inputAlign="left"
-              horizontalPadding="16px"
               disabled={optionBeingSupported !== ''}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}

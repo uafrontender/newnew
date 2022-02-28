@@ -8,6 +8,7 @@
     "days": "d",
     "hours": "h",
     "minutes": "m",
+    "seconds": "s",
     "ended_on": "ended on",
     "at_time": "at"
   },
@@ -23,6 +24,7 @@
     "follow-creator": "Follow creator",
     "unfollow-creator": "Unfollow creator",
     "follow-decision": "Follow decision",
+    "unfollow-decision": "Unfollow decision",
     "report": "Report"
   },
   "tabs": {
@@ -31,6 +33,21 @@
     "options": "Options",
     "backers": "Backers",
     "history": "History"
+  },
+  "PostScheduled": {
+    "PostScheduledSection": {
+      "title": "Coming soon",
+      "subtitle_1": "Decision is not active yet.",
+      "subtitle_2": "Follow to not miss the update.",
+      "timer": {
+        "days": "Days",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+      },
+      "followBtn": "Follow decision",
+      "unfollowBtn": "Unfollow decision"
+    }
   },
   "AcPost": {
     "paymenModalHeader": {
@@ -41,6 +58,10 @@
     },
     "OptionsTab": {
       "me": "me",
+      "NoOptions": {
+        "caption_1": "No active bids yet.",
+        "caption_2": "Be the first to make a bid!"
+      },
       "tags": {
         "my_vote": "My vote",
         "my_bid": "My bid",
@@ -51,7 +72,10 @@
       "OptionCard": {
         "by": "by",
         "bidders": "bidders",
+        "others": "others",
+        "bid": "bid",
         "supportBtn": "Support",
+        "raiseBidBtn": "Raise bid",
         "placeABidBtn": "Place a bid",
         "cancelBtn": "Cancel"
       },

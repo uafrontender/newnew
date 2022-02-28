@@ -272,7 +272,6 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           <BidAmountTextInput
             value={supportBidAmount}
             inputAlign="left"
-            horizontalPadding="20px"
             onChange={(newValue: string) => setSupportBidAmount(newValue)}
             minAmount={minAmount}
           />
@@ -303,8 +302,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             </div>
             <BidAmountTextInput
               value={supportBidAmount}
-              inputAlign="left"
-              horizontalPadding="16px"
+              inputAlign="center"
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
             />

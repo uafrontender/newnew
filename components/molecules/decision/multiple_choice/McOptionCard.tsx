@@ -323,7 +323,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <BidAmountTextInput
             value={supportBidAmount}
             inputAlign="left"
-            horizontalPadding="20px"
             onChange={(newValue: string) => setSupportBidAmount(newValue)}
             minAmount={minAmount}
           />
@@ -355,7 +354,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <BidAmountTextInput
               value={supportBidAmount}
               inputAlign="left"
-              horizontalPadding="16px"
+              autofocus={isSupportFormOpen}
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
             />

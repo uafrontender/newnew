@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import React, {
   useCallback, useContext, useMemo, useState,
 } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
@@ -32,6 +32,10 @@ import { formatNumber } from '../../../../utils/format';
 import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
 import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
 
+// Icons
+import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
+import CoinIcon from '../../../../public/images/decision/coin-mock.png';
+
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   shouldAnimate: boolean;
@@ -41,7 +45,6 @@ interface IAcOptionCard {
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
-  handleOpenOptionBidHistory: () => void;
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
@@ -53,24 +56,22 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   minAmount,
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
-  handleOpenOptionBidHistory,
 }) => {
-  const { t } = useTranslation('decision');
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { walletBalance } = useContext(WalletContext);
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
-  const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const myBid = useMemo(
+  const isSupportedByMe = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
+  const isMyBid = useMemo(
     () => option.creator?.uuid === user.userData?.userUuid,
     [option.creator?.uuid, user.userData?.userUuid]
   );
-  const bgVariant = highest ? 'yellow' : myBid ? 'blue' : myVote ? 'green' : undefined;
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -87,17 +88,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToUser = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    // if (!user.loggedIn) {
-    //   router.push('/sign-up?reason=bid');
-    //   return;
-    // }
     setPaymentModalOpen(true);
   };
 
@@ -233,12 +231,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   return (
     <motion.div
       key={index}
-      // layout="position"
-      // transition={{
-      //   type: 'spring',
-      //   damping: 20,
-      //   stiffness: 300,
-      // }}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -251,21 +243,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }}
     >
       <SContainer
-        // layout="position"
-        // transition={{
-        //   type: 'spring',
-        //   damping: 20,
-        //   stiffness: 300,
-        // }}
         isDisabled={disabled}
       >
-        <SBidDetails
-          bgVariant={bgVariant}
-          onClick={() => {
-            if (optionBeingSupported) return;
-            handleOpenOptionBidHistory();
-          }}
-        >
+        <SBidDetails>
           <SLottieAnimationContainer>
             {shouldAnimate ? (
               <Lottie
@@ -279,48 +259,91 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               />
             ) : null}
           </SLottieAnimationContainer>
-          <SBidInfo>
-            {highest ? <STag>{t('AcPost.OptionsTab.tags.highest')}</STag> : null}
-            {myVote && !myBid ? <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag> : null}
-            {myBid ? <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag> : null}
-            {/* Comment out for now */}
-            {/* {option.creator.isVIP
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.vip')}</STag>
-              ) : null} */}
-            <SAvatar
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
-              }}
-              src={option?.creator?.avatarUrl!! as string}
-              alt={option?.creator?.username!!}
-              draggable={false}
+          <SBidAmount>
+            <SCoinImg
+              src={CoinIcon.src}
             />
-            <SUsername
-              isColored={bgVariant !== undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
+            <div>
+              {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
+            </div>
+          </SBidAmount>
+          <SOptionInfo
+            variant={3}
+          >
+            {option.title}
+          </SOptionInfo>
+          <SBiddersInfo
+            variant={3}
+          >
+            <SSpanBiddersHighlighted
+              onClick={() => {
+                if (!isMyBid) {
+                  handleRedirectToOptionCreator()
+                }
+              }}
+              style={{
+                ...(!isMyBid && option.isCreatedBySubscriber ? {
+                  color: theme.colorsThemed.accent.yellow,
+                } : {}),
+                ...(!isMyBid ? {
+                  cursor: 'pointer',
+                } : {}),
               }}
             >
-              {option.creator?.uuid === user.userData?.userUuid ? t('me') : option?.creator?.username}
-            </SUsername>
-            <SBidTitle variant={3}>{option.title}</SBidTitle>
-          </SBidInfo>
-          <SAmount>
-            {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
-          </SAmount>
+              {isMyBid ? t('me') : (option.creator?.nickname ?? option.creator?.username)}
+            </SSpanBiddersHighlighted>
+            {isSupportedByMe && !isMyBid ? (
+              <SSpanBiddersHighlighted>
+                {`, ${t('me')}`}
+              </SSpanBiddersHighlighted>
+            ) : null}
+            {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+              <>
+                <SSpanBiddersRegular>
+                  {` & `}
+                </SSpanBiddersRegular>
+                <SSpanBiddersHighlighted>
+                  {formatNumber(
+                    option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
+                    true,
+                  )}
+                  { ' ' }
+                  {t('AcPost.OptionsTab.OptionCard.others')}
+                </SSpanBiddersHighlighted>
+              </>
+            ) : null}
+            {' '}
+            <SSpanBiddersRegular>
+              {t('AcPost.OptionsTab.OptionCard.bid')}
+            </SSpanBiddersRegular>
+          </SBiddersInfo>
         </SBidDetails>
         {optionBeingSupported && !disabled ? (
-          <div
-            style={{
-              minWidth: isMobileOrTablet ? '82px' : '92px',
-            }}
-          />
+          null
         ) : (
-          <SSupportButton view="secondary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
-            {t('AcPost.OptionsTab.OptionCard.supportBtn')}
+          <SSupportButton
+            view="quaternary"
+            disabled={disabled}
+            onClick={() => handleOpenSupportForm()}
+          >
+            {!isMobile ? (
+              <img
+                draggable={false}
+                src={SupportOptionIcon.src}
+                alt={t('AcPost.OptionsTab.OptionCard.supportBtn')}
+              />
+            ) : (
+              <>
+                <img
+                  draggable={false}
+                  src={SupportOptionIcon.src}
+                  alt={t('AcPost.OptionsTab.OptionCard.supportBtn')}
+                />
+                <div>
+                  {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
+                </div>
+              </>
+            )}
           </SSupportButton>
         )}
       </SContainer>
@@ -338,9 +361,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             <BidAmountTextInput
               value={supportBidAmount}
               inputAlign="left"
-              horizontalPadding="20px"
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
+              style={{
+                padding: '12.5px 16px',
+              }}
             />
             <Button
               view="primaryGrad"
@@ -361,7 +386,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               <BidAmountTextInput
                 value={supportBidAmount}
                 inputAlign="left"
-                horizontalPadding="16px"
+                autofocus={isSupportFormOpen}
                 onChange={(newValue: string) => setSupportBidAmount(newValue)}
                 minAmount={minAmount}
               />
@@ -413,7 +438,12 @@ const SContainer = styled(motion.div)<{
   flex-direction: column;
   gap: 12px;
 
-  width: calc(100% - 16px);
+  width: 100%;
+
+  padding: 16px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
 
@@ -422,38 +452,82 @@ const SContainer = styled(motion.div)<{
     flex-direction: row;
     justify-content: space-between;
     gap: 16px;
+
+    padding: initial;
+    background-color: initial;
+    border-radius: initial;
   }
 `;
 
-const SBidDetails = styled.div<{
-  bgVariant?: 'yellow' | 'green' | 'blue';
-}>`
+const SBidDetails = styled.div`
   position: relative;
 
   display: grid;
   grid-template-areas:
-    'info amount'
-    'doubleVote doubleVote';
+    'amount amount'
+    'optionInfo optionInfo'
+    'bidders bidders';
   grid-template-columns: 7fr 1fr;
-  gap: 16px;
 
   width: 100%;
 
-  padding: 14px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  ${({ theme }) => theme.media.tablet} {
+    grid-template-areas:
+    'amount bidders'
+    'optionInfo optionInfo';
+    grid-template-columns: 3fr 7fr;
 
-  ${({ bgVariant }) =>
-    bgVariant
-      ? css`
-          background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
-        `
-      : null};
 
-  &:hover {
-    cursor: pointer;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    padding: 14px;
   }
 `;
+
+const SBidAmount = styled.div`
+  grid-area: amount;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  margin-bottom: 6px;
+`;
+
+const SCoinImg = styled.img`
+  height: 24px;
+`;
+
+const SOptionInfo = styled(Text)`
+  grid-area: optionInfo;
+
+  margin-bottom: 8px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: initial;
+  }
+`;
+
+const SBiddersInfo = styled(Text)`
+  grid-area: bidders;
+
+  ${({ theme }) => theme.media.tablet} {
+    justify-self: flex-end;
+  }
+`;
+
+const SSpanBiddersHighlighted = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SSpanBiddersRegular = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+
 
 const SLottieAnimationContainer = styled.div`
   position: absolute;
@@ -463,86 +537,16 @@ const SLottieAnimationContainer = styled.div`
   z-index: 100;
 `;
 
-const SBidInfo = styled.div`
-  grid-area: info;
-
-  /* display: flex; */
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  vertical-align: middle;
-  line-height: 24px;
-`;
-
-const STag = styled.span`
-  background-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: 50px;
-  padding: 6px;
-
-  font-weight: bold;
-  font-size: 10px;
-  line-height: 12px;
-  color: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  margin-right: 8px;
-`;
-
-const SAvatar = styled.img`
-  position: relative;
-  top: 7.5px;
-
-  display: inline;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-
-  margin-right: 8px;
-
-  cursor: pointer;
-`;
-
-const SUsername = styled.div<{
-  isColored?: boolean;
-}>`
-  display: inline;
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme, isColored }) => (isColored ? 'rgba(255, 255, 255, 0.8)' : theme.colorsThemed.text.secondary)};
-  margin-right: 8px;
-
-  transition: 0.2s linear;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-  }
-`;
-
-const SBidTitle = styled(Text)`
-  display: inline;
-  line-break: loose;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-`;
-
-const SAmount = styled.div`
-  grid-area: amount;
-  align-self: center;
-  justify-self: flex-end;
-
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
 const SSupportButton = styled(Button)`
   width: 100%;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     width: auto;
@@ -551,6 +555,7 @@ const SSupportButton = styled(Button)`
     margin-right: 16px;
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
+    background: none;
 
     &:hover:enabled,
     &:focus:enabled {
@@ -581,7 +586,6 @@ const SCancelButton = styled(Button)`
   width: auto;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
