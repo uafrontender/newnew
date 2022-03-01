@@ -36,8 +36,9 @@ interface IMcOptionCard {
   creator: newnewapi.IUser,
   postId: string;
   index: number;
-  optionBeingSupported?: string;
   minAmount: number;
+  noAction: boolean;
+  optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
@@ -47,8 +48,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   creator,
   postId,
   index,
-  optionBeingSupported,
   minAmount,
+  noAction,
+  optionBeingSupported,
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -352,7 +354,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             }
           </SBiddersInfo>
         </SBidDetails>
-        {optionBeingSupported && !disabled ? (
+        {(optionBeingSupported && !disabled) || noAction ? (
           null
         ) : (
           <SSupportButton
@@ -448,7 +450,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              Place a bid
+              { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
             </Button>
           </SSuggestSupportMobileContainer>
         </OptionActionMobileModal>

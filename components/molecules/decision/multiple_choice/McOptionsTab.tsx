@@ -28,6 +28,7 @@ import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import McOptionCardDoubleVote from './McOptionCardDoubleVote';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -55,6 +56,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
+  const hasVotedOptionId = useMemo(() => {
+    const supportedOption = options.find((o) => o.isSupportedByMe);
+
+    if (supportedOption) return supportedOption.id;
+    return undefined;
+  }, [options]);
+
   // Infinite load
   const {
     ref: loadingRef,
@@ -64,7 +72,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
-  const [heightDelta, setHeightDelta] = useState(post.isSuggestionsAllowed ? 56 : 0);
+  const [heightDelta, setHeightDelta] = useState(post.isSuggestionsAllowed && !hasVotedOptionId ? 56 : 0);
   const actionSectionContainer = useRef<HTMLDivElement>();
 
   const mainContainer = useRef<HTMLDivElement>();
@@ -288,9 +296,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       }
     });
 
-    resizeObserver.observe(actionSectionContainer.current!!);
+    if (!hasVotedOptionId && post.isSuggestionsAllowed) {
+      resizeObserver.observe(actionSectionContainer.current!!);
+    } else {
+      setHeightDelta(0);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hasVotedOptionId, post.isSuggestionsAllowed]);
 
   return (
     <>
@@ -316,17 +328,32 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </>
           ) : null}
           {options.map((option, i) => (
-            <McOptionCard
-              key={option.id.toString()}
-              option={option as TMcOptionWithHighestField}
-              creator={option.creator ?? post.creator!!}
-              postId={post.postUuid}
-              index={i}
-              minAmount={minAmount}
-              optionBeingSupported={optionBeingSupported}
-              handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
-              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-            />
+            hasVotedOptionId === option.id ? (
+              <McOptionCardDoubleVote
+                key={option.id.toString()}
+                option={option as TMcOptionWithHighestField}
+                creator={option.creator ?? post.creator!!}
+                postId={post.postUuid}
+                index={i}
+                hasAlreadyVoted={hasVotedOptionId === option.id}
+                noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
+                handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+                handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
+              />
+            ) : (
+              <McOptionCard
+                key={option.id.toString()}
+                option={option as TMcOptionWithHighestField}
+                creator={option.creator ?? post.creator!!}
+                postId={post.postUuid}
+                index={i}
+                minAmount={minAmount}
+                optionBeingSupported={optionBeingSupported}
+                noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
+                handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+                handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
+              />
+            )
           ))}
           {!isMobile ? (
             <SLoaderDiv
@@ -344,7 +371,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             ) : null
           )}
         </SBidsContainer>
-        {post.isSuggestionsAllowed ? (
+        {post.isSuggestionsAllowed && !hasVotedOptionId ? (
           <SActionSection
             ref={(el) => {
               actionSectionContainer.current = el!!;
@@ -398,10 +425,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               </SBottomPlaceholder>
             )}
           </SActionSection>
-        ) : null}
+        ) : (
+          <div
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+            style={{
+              height: 0,
+            }}
+          />
+        )}
       </STabContainer>
       {/* Suggest new Modal */}
-      {isMobile ? (
+      {isMobile && !hasVotedOptionId ? (
         <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
           onClose={() => setSuggestNewMobileOpen(false)}
@@ -479,12 +515,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         zIndex={14}
       />
       {/* Mobile floating button */}
-      {isMobile && !suggestNewMobileOpen ? (
+      {isMobile && !suggestNewMobileOpen && !hasVotedOptionId ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}
         >
-          Suggest new
+          { t('McPost.FloatingActionButton.suggestNewBtn') }
         </SActionButton>
       ) : null}
     </>
@@ -503,6 +539,10 @@ const STabContainer = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     height: calc(100% - 56px);
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    padding-right: 16px;
   }
 `;
 
@@ -607,6 +647,8 @@ const SActionSection = styled.div`
   ${({ theme }) => theme.media.laptop} {
     flex-wrap: nowrap;
     justify-content: initial;
+
+    padding-right: 16px;
 
     textarea {
       width: 277px;
