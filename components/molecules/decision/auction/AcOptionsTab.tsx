@@ -644,6 +644,8 @@ const SPaymentModalOptionText = styled.div`
 
 // No options yet
 const SNoOptionsYet = styled.div`
+  position: absolute;
+
   display: flex;
   flex-direction: column;
   justify-content: center;

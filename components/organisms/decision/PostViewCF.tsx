@@ -3,9 +3,10 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useRef, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
@@ -33,6 +34,9 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
+import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
+import Button from '../../atoms/Button';
+import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -50,12 +54,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [heightDelta, setHeightDelta] = useState(256);
+  const [heightDelta, setHeightDelta] = useState( isMobile ? 0 : 256);
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -118,6 +123,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
+
+  // Mobile choose pledge modal
+  const [choosePledgeModalOpen, setChoosePledgeModalOpen] = useState(false);
 
   // Comments
   const [comments, setComments] = useState<any[]>([]);
@@ -458,20 +466,17 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         />
         {currentTab === 'backers' ? (
           <>
-            <CfPledgeLevelsSection
-              pledgeLevels={pledgeLevels}
+            <CfBackersStatsSection
               post={post}
-              handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-              handleSetHeightDelta={(newValue: number) => setHeightDelta(newValue)}
+              currentNumBackers={currentBackers}
             />
-            <CfPledgesSection
-              pledges={pledges}
-              pagingToken={pledgesNextPageToken}
-              pledgesLoading={pledgesLoading}
-              post={post}
-              heightDelta={heightDelta ?? 256}
-              handleLoadPledges={fetchPledgesForPost}
-            />
+            {!isMobile ? (
+              <CfPledgeLevelsSection
+                post={post}
+                pledgeLevels={pledgeLevels}
+                handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+              />
+            ) : null }
           </>
         ) : (
           <CommentsTab
@@ -486,6 +491,26 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Choose pledge mobile modal */}
+      {isMobile ? (
+        <CfPledgeLevelsModal
+          zIndex={11}
+          post={post}
+          pledgeLevels={pledgeLevels}
+          isOpen={choosePledgeModalOpen}
+          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+          onClose={() => setChoosePledgeModalOpen(false)}
+        />
+      ) : null}
+      {/* Mobile floating button */}
+      {isMobile && !choosePledgeModalOpen ? (
+        <SActionButton
+          view="primaryGrad"
+          onClick={() => setChoosePledgeModalOpen(true)}
+        >
+          { t('CfPost.FloatingActionButton.choosePledgeBtn') }
+        </SActionButton>
+      ) : null}
     </SWrapper>
   );
 };
@@ -547,13 +572,20 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
+const SActionButton = styled(Button)`
+  position: fixed;
+  z-index: 2;
+
+  width: calc(100% - 32px);
+  bottom: 16px;
+  left: 16px;
+`;
+
 const SActivitesContainer = styled.div`
   grid-area: activities;
 
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
-
-  align-self: bottom;
 
   height: 100%;
   width: 100%;

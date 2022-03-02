@@ -235,6 +235,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         workingArr[idx]
           .voteCount = (newOrUpdatedption.voteCount as number);
         workingArr[idx]
+          .supporterCount = (newOrUpdatedption.supporterCount as number);
+        workingArr[idx]
           .isSupportedByMe = true;
         workingArrUnsorted = workingArr;
       }

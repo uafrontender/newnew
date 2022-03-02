@@ -12,6 +12,7 @@ export type TPostStatusStringified =
   | 'cancelled'
   | 'processing';
 
+// TODO: Resolve stringification issue
 export default function switchPostStatus(
   postType: TPostType,
   status: newnewapi.Auction.Status | newnewapi.Crowdfunding.Status | newnewapi.MultipleChoice.Status,

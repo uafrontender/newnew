@@ -61,15 +61,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const isSupportedByMe = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const isMyBid = useMemo(
-    () => option.creator?.uuid === user.userData?.userUuid,
-    [option.creator?.uuid, user.userData?.userUuid]
-  );
   const isCreatorsBid = useMemo(() => {
     if (!option.creator) return true;
     return false;
   }, [option.creator]);
+  const supporterCountSubstracted = useMemo(() => {
+    if (isCreatorsBid) return option.supporterCount;
+    return  option.supporterCount - 1;
+  }, [option.supporterCount, isCreatorsBid]);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -265,31 +264,15 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           >
             {isCreatorsBid ? (
               <>
-                {isSupportedByMe && !isMyBid ? (
-                  <SSpanBiddersHighlighted>
-                    {`${t('me')}`}
-                  </SSpanBiddersHighlighted>
-                ) : null}
-                {/* {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? ( */}
-                {option.voteCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+                {supporterCountSubstracted > 0 ? (
                   <>
-                    <SSpanBiddersRegular>
-                      {option.isSupportedByMe || option.isCreatedBySubscriber ? ` & ` : ''}
-                    </SSpanBiddersRegular>
                     <SSpanBiddersHighlighted>
                       {formatNumber(
-                        // option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
-                        option.voteCount - (isSupportedByMe && !isMyBid ? 2 : 1),
+                        supporterCountSubstracted,
                         true,
                       )}
                       { ' ' }
-                      {
-                        option.isCreatedBySubscriber || option.isSupportedByMe ? (
-                          t('McPost.OptionsTab.OptionCard.others')
-                        ) : (
-                          t('McPost.OptionsTab.OptionCard.voters')
-                        )
-                      }
+                      { t('McPost.OptionsTab.OptionCard.voters') }
                     </SSpanBiddersHighlighted>
                     {' '}
                     <SSpanBiddersRegular>
@@ -302,53 +285,36 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               <>
                 <SSpanBiddersHighlighted
                   onClick={() => {
-                    if (!isMyBid) {
-                      handleRedirectToOptionCreator()
-                    }
+                    handleRedirectToOptionCreator()
                   }}
                   style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber ? {
-                      color: theme.colorsThemed.accent.yellow,
-                    } : {}),
-                    ...(!isMyBid ? {
-                      cursor: 'pointer',
-                    } : {}),
+                    color: theme.colorsThemed.accent.yellow,
+                    cursor: 'pointer',
                   }}
                 >
-                  {isMyBid ? t('me') : (option.creator?.nickname ?? option.creator?.username)}
+                  {t('McPost.OptionsTab.OptionCard.subscriber_suggestion',
+                    {
+                      nickname: option.creator?.nickname ?? option.creator?.username
+                    },
+                  )}
                 </SSpanBiddersHighlighted>
-                {isSupportedByMe && !isMyBid ? (
-                  <SSpanBiddersHighlighted>
-                    {`, ${t('me')}`}
-                  </SSpanBiddersHighlighted>
-                ) : null}
-                {/* {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? ( */}
-                {option.voteCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+                {supporterCountSubstracted > 0 ? (
                   <>
-                    <SSpanBiddersRegular>
-                      {` & `}
-                    </SSpanBiddersRegular>
+                    { ', ' }
                     <SSpanBiddersHighlighted>
                       {formatNumber(
-                        // option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
-                        option.voteCount - (isSupportedByMe && !isMyBid ? 2 : 1),
+                        supporterCountSubstracted,
                         true,
                       )}
                       { ' ' }
-                      {
-                        option.isCreatedBySubscriber || option.isSupportedByMe ? (
-                          t('McPost.OptionsTab.OptionCard.others')
-                        ) : (
-                          t('McPost.OptionsTab.OptionCard.voters')
-                        )
-                      }
+                      {t('McPost.OptionsTab.OptionCard.voters')}
                     </SSpanBiddersHighlighted>
+                    {' '}
+                    <SSpanBiddersRegular>
+                      {t('McPost.OptionsTab.OptionCard.voted')}
+                    </SSpanBiddersRegular>
                   </>
                 ) : null}
-                {' '}
-                <SSpanBiddersRegular>
-                  {t('McPost.OptionsTab.OptionCard.voted')}
-                </SSpanBiddersRegular>
               </>
             )
             }

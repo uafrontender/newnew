@@ -110,6 +110,8 @@
       "OptionCard": {
         "noVotes": "no votes",
         "votes": "votes",
+        "my_suggestion": "My suggestion",
+        "subscriber_suggestion": "{{ nickname }}'s suggestion",
         "others": "others",
         "voters": "voters",
         "voted": "voted",
@@ -138,8 +140,28 @@
     }
   },
   "CfPost": {
+    "BackersStatsSection": {
+      "of_backers": "of {{ targetBackers }} backers"
+    },
+    "BackersTab": {
+      "info": {
+        "title": "Back the decision",
+        "caption": "You won't get charged until a decision has been made."
+      },
+      "CustomPledge": {
+        "pledgeBtn": "Pledge",
+        "continue": "Continue",
+        "cancelBtn": "Cancel"
+      },
+      "free_sub": "FREE SUB",
+      "custom": "Custom",
+      "cancel": "Cancel"
+    },
     "paymenModalHeader": {
       "subtitle": "You pledge for"
+    },
+    "FloatingActionButton": {
+      "choosePledgeBtn": "Make pledge"
     }
   },
   "RecommendationsSection": {

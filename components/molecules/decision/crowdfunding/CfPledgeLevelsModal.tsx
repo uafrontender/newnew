@@ -1,11 +1,11 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
 import React, {
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
@@ -15,32 +15,35 @@ import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../..
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-import CfMakeCustomPledgeCard from './CfMakeCustomPledgeCard';
-import CfMakeStandardPledgeCard from './CfMakeStandardPledgeCard';
+import Modal from '../../../organisms/Modal';
 import LoadingModal from '../../LoadingModal';
+import InlineSvg from '../../../atoms/InlineSVG';
 import PaymentModal from '../../checkout/PaymentModal';
-import useScrollGradientsHorizontal from '../../../../utils/hooks/useScrollGradientsHorizontal';
-import GradientMaskHorizontal from '../../../atoms/GradientMaskHorizontal';
+import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
-interface ICfPledgeLevelsSection {
-  pledgeLevels: newnewapi.IMoneyAmount[];
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+
+interface ICfPledgeLevelsModal {
+  zIndex: number;
+  isOpen: boolean;
   post: newnewapi.Crowdfunding;
+  pledgeLevels: newnewapi.IMoneyAmount[];
+  onClose: () => void;
   handleAddPledgeFromResponse: (newPledge: newnewapi.Crowdfunding.Pledge) => void;
 }
 
-const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = ({
-  pledgeLevels,
+const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   post,
+  zIndex,
+  isOpen,
+  pledgeLevels,
+  onClose,
   handleAddPledgeFromResponse,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
-
-  const containerRef = useRef<HTMLDivElement>();
-
-  const buttonsContainerRef = useRef<HTMLDivElement>();
-  const { showLeftGradient, showRightGradient } = useScrollGradientsHorizontal(buttonsContainerRef);
 
   const [pledgeAmount, setPledgeAmount] = useState<number | undefined>(undefined);
 
@@ -147,6 +150,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
         setIsFormOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        onClose();
       }
     } catch (err) {
       console.error(err);
@@ -158,6 +162,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     post.postUuid,
     user.loggedIn,
     handleAddPledgeFromResponse,
+    onClose,
   ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
@@ -202,91 +207,104 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
 
   return (
     <>
-      <SSectionContainer
-        ref={(el) => {
-          // eslint-disable-next-line no-param-reassign
-          containerRef.current = el!!;
-        }}
+      <Modal
+        additionalZ={zIndex}
+        show={isOpen}
+        onClose={() => onClose()}
       >
-        <SInfoSubsection>
-          <STitle
-            variant={2}
-            weight={600}
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           >
-            { t('CfPost.BackersTab.info.title') }
-          </STitle>
-          <SCaption
-            variant={3}
+            {pledgeLevels.map((p, i, arr) => (
+              <>
+                <SItem
+                  key={i}
+                  onClick={() => {
+                    handleSetPledgeAmountAndOpenPaymentModal(p.usdCents!!);
+                  }}
+                >
+                  <SText>
+                    {`$${(p.usdCents!! / 100).toFixed(0)}`}
+                  </SText>
+                  {i === arr.length - 1 ? (
+                      <SAdditionalLabel>
+                        { t('CfPost.BackersTab.free_sub') }
+                      </SAdditionalLabel>
+                  ) : null}
+                </SItem>
+                <SSeparator />
+              </>
+            ))}
+            <SItem
+              onClick={() => {
+                handleOpenCustomPledgeForm();
+              }}
+            >
+              <SText>
+                { t('CfPost.BackersTab.custom') }
+              </SText>
+            </SItem>
+          </SContentContainer>
+          <Button
+            view="secondary"
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
+            }}
           >
+            { t('CfPost.BackersTab.cancel') }
+          </Button>
+        </SWrapper>
+      </Modal>
+      {/* Custom pledge modal */}
+      <OptionActionMobileModal
+        isOpen={isFormOpen}
+        onClose={() => handleCloseCustomPledgeForm()}
+        zIndex={12}
+      >
+        <SCustomPledgeMobileContainer>
+          <div
+            style={{
+              position: 'relative',
+            }}
+          >
+            { t('CfPost.BackersTab.CustomPledge.pledgeBtn') }
+            <SCloseButton onClick={() => handleCloseCustomPledgeForm()}>
+              <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+            </SCloseButton>
+          </div>
+          <BidAmountTextInput
+            value={customPledgeAmount}
+            inputAlign="center"
+            autofocus={isFormOpen}
+            minAmount={1}
+            style={{
+              textAlign: 'center',
+              paddingLeft: '12px',
+            }}
+            onChange={(newValue: string) => setCustomPledgeAmount(newValue)}
+          />
+          <Button
+            view="primaryGrad"
+            size="sm"
+            disabled={customPledgeAmount === ''}
+            onClick={() => handleCustomPledgePaymentModal()}
+          >
+            { t('CfPost.BackersTab.CustomPledge.continue') }
+          </Button>
+          <SCaption>
             { t('CfPost.BackersTab.info.caption') }
           </SCaption>
-        </SInfoSubsection>
-        {isFormOpen ? (
-          <SNewPledgeForm>
-            <BidAmountTextInput
-              value={customPledgeAmount}
-              minAmount={1}
-              inputAlign="left"
-              style={{
-                padding: '12.5px 16px',
-                width: '100%',
-              }}
-              onChange={(newValue: string) => setCustomPledgeAmount(newValue)}
-            />
-            <Button
-              size="sm"
-              view="primaryGrad"
-              disabled={customPledgeAmount === ''}
-              onClick={() => handleCustomPledgePaymentModal()}
-            >
-              { t('CfPost.BackersTab.CustomPledge.pledgeBtn') }
-            </Button>
-            <SCancelButton
-              view="secondary"
-              onClick={() => handleCloseCustomPledgeForm()}
-            >
-              { t('CfPost.BackersTab.CustomPledge.cancelBtn') }
-            </SCancelButton>
-          </SNewPledgeForm>
-        ) : (
-          <SButtonsContainer
-            ref={(el) => {
-              buttonsContainerRef.current = el!!;
-            }}
-            numItems={1 + pledgeLevels.length}
-          >
-            {pledgeLevels.map((pledgeLevel, i, arr) => (
-              <CfMakeStandardPledgeCard
-                amount={pledgeLevel}
-                grandsVipStatus={i === arr.length - 1}
-                handleOpenMakePledgeForm={() => {
-                  handleSetPledgeAmountAndOpenPaymentModal(pledgeLevel.usdCents!!);
-                }}
-              />
-            ))}
-            <CfMakeCustomPledgeCard
-              handleOpenMakePledgeForm={handleOpenCustomPledgeForm}
-            />
-            <GradientMaskHorizontal
-              height={`${buttonsContainerRef.current?.getBoundingClientRect().height}px`}
-              positionBottom="0px"
-              positionLeft="0px"
-              active={showLeftGradient}
-            />
-            <GradientMaskHorizontal
-              height={`${buttonsContainerRef.current?.getBoundingClientRect().height}px`}
-              positionBottom="0px"
-              positionRight="0px"
-              active={showRightGradient}
-            />
-          </SButtonsContainer>
-        )}
-      </SSectionContainer>
+        </SCustomPledgeMobileContainer>
+      </OptionActionMobileModal>
       {/* Payment Modal */}
       {paymentModalOpen ? (
         <PaymentModal
           isOpen={paymentModalOpen}
-          zIndex={12}
+          zIndex={14}
           amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
@@ -308,104 +326,104 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
       {/* Loading Modal */}
       <LoadingModal
         isOpen={loadingModalOpen}
-        zIndex={14}
+        zIndex={15}
       />
     </>
   );
 };
 
-export default CfPledgeLevelsSection;
+export default CfPledgeLevelsModal;
 
-const SSectionContainer = styled.div`
-  position: relative;
+const SWrapper = styled.div`
+  width: 100%;
+  height: 100%;
 
-  width: calc(100% - 16px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 16px;
+`;
+
+const SContentContainer = styled.div`
+  width: calc(100% - 32px);
+  height: fit-content;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px;
+  padding-bottom: 30px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
+    width: 480px;
+    height: 480px;
+    margin: auto;
   }
 `;
 
-const SInfoSubsection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+const SItem = styled.button`
+  position: relative;
 
-  width: 100%;
+  background: none;
+  border: transparent;
 
-  margin-bottom: 12px;
+  text-align: center;
+
+  height: 56px;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  cursor: pointer;
+  transition: 0.2s linear;
+
+  &:hover, &:focus {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  }
 `;
 
-const STitle = styled(Text)`
+const SText = styled(Text)`
 
 `;
 
 const SCaption = styled(Text)`
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 12px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  text-align: center;
 `;
 
-const SButtonsContainer = styled.div<{
-  numItems: number;
-}>`
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: row;
-  gap: 12px;
+const SAdditionalLabel = styled.div`
+  position: absolute;
+  top: calc(50% - 12px);
+  right: 8px;
 
-  width: 400px;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 24px;
+  color: #2C2C33;
+  text-align: center;
 
-  overflow-x: auto;
+  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
-  z-index: 10;
+  height: 24px;
+  padding-left: 8px;
+  padding-right: 8px;
 
-  @media (min-width: 800px) {
-    width: 480px;
-  }
-
-  @media (min-width: 860px) {
-    width: 540px;
-  }
-
-  @media (min-width: 960px) {
-    width: 600px;
-  }
-
-  @media (min-width: 960px) {
-    width: 650px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: 100%;
-  }
+  border-radius: 50px;
 `;
 
-// Custom pledge form
-const SNewPledgeForm = styled.div`
+const SSeparator = styled.div`
   width: 100%;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-
-  div:first-child {
-    width: 100%;
-  }
-`;
-
-const SCancelButton = styled(Button)`
-  width: auto;
-
-  padding: 0px 12px;
-  margin-right: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-  &:hover:enabled, &:focus:enabled {
-    background: none;
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-  }
+  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Payment modal header
@@ -422,4 +440,35 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+// Custom pledge form
+const SCustomPledgeMobileContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 16px;
+`;
+
+const SCloseButton = styled.button`
+  position: absolute;
+  top: 0;
+  right: 12px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: fit-content;
+  border: transparent;
+  background: transparent;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  cursor: pointer;
 `;

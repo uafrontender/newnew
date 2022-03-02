@@ -61,7 +61,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
   const user = useAppSelector((state) => state.user);
 
   const isSupportedByMe = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const isMyBid = useMemo(
+  const isSuggestedByMe = useMemo(
     () => option.creator?.uuid === user.userData?.userUuid,
     [option.creator?.uuid, user.userData?.userUuid]
   );
@@ -69,8 +69,11 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
     if (!option.creator) return true;
     return false;
   }, [option.creator]);
+  const supporterCountSubsctracted = useMemo(() => {
+    if (!isSupportedByMe) return option.supporterCount;
+    return  option.supporterCount - 1;
+  }, [option.supporterCount, isSupportedByMe]);
 
-  const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [doubleVoteAmount, setDoubleVoteAmount] = useState('');
 
   // Redirect to user's page
@@ -139,31 +142,21 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
           >
             {isCreatorsBid ? (
               <>
-                {isSupportedByMe && !isMyBid ? (
-                  <SSpanBiddersHighlightedDoubleVote>
-                    {`${t('me')}`}
-                  </SSpanBiddersHighlightedDoubleVote>
-                ) : null}
-                {/* {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? ( */}
-                {option.voteCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+                <SSpanBiddersHighlightedDoubleVote>
+                  {`${t('me')}`}
+                </SSpanBiddersHighlightedDoubleVote>
+                {supporterCountSubsctracted > 0 ? (
                   <>
                     <SSpanBiddersRegularDoubleVote>
                       {option.isSupportedByMe || option.isCreatedBySubscriber ? ` & ` : ''}
                     </SSpanBiddersRegularDoubleVote>
                     <SSpanBiddersHighlightedDoubleVote>
                       {formatNumber(
-                        // option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
-                        option.voteCount - (isSupportedByMe && !isMyBid ? 2 : 1),
+                        supporterCountSubsctracted,
                         true,
                       )}
                       { ' ' }
-                      {
-                        option.isCreatedBySubscriber || option.isSupportedByMe ? (
-                          t('McPost.OptionsTab.OptionCard.others')
-                        ) : (
-                          t('McPost.OptionsTab.OptionCard.voters')
-                        )
-                      }
+                      {t('McPost.OptionsTab.OptionCard.others')}
                     </SSpanBiddersHighlightedDoubleVote>
                     {' '}
                     <SSpanBiddersRegularDoubleVote>
@@ -176,36 +169,46 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
               <>
                 <SSpanBiddersHighlightedDoubleVote
                   onClick={() => {
-                    if (!isMyBid) {
+                    if (!isSuggestedByMe) {
                       handleRedirectToOptionCreator()
                     }
                   }}
                   style={{
-                    ...(!isMyBid && option.isCreatedBySubscriber ? {
+                    ...(!isSuggestedByMe && option.isCreatedBySubscriber ? {
                       color: theme.colorsThemed.accent.yellow,
                     } : {}),
-                    ...(!isMyBid ? {
+                    ...(!isSuggestedByMe ? {
                       cursor: 'pointer',
                     } : {}),
                   }}
                 >
-                  {isMyBid ? t('me') : (option.creator?.nickname ?? option.creator?.username)}
+                  {isSuggestedByMe
+                    ? t('McPost.OptionsTab.OptionCard.my_suggestion')
+                    : t(
+                      'McPost.OptionsTab.OptionCard.subscriber_suggestion',
+                      {
+                        nickname: option.creator?.nickname ?? option.creator?.username
+                      }
+                    )
+                  }
                 </SSpanBiddersHighlightedDoubleVote>
-                {isSupportedByMe && !isMyBid ? (
+                {isSupportedByMe && !isSuggestedByMe ? (
                   <SSpanBiddersHighlightedDoubleVote>
                     {`, ${t('me')}`}
                   </SSpanBiddersHighlightedDoubleVote>
                 ) : null}
-                {/* {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? ( */}
-                {option.voteCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+                {supporterCountSubsctracted > 0 ? (
                   <>
                     <SSpanBiddersRegularDoubleVote>
-                      {` & `}
+                      {isSupportedByMe && !isSuggestedByMe ? (
+                        ` & `
+                        ) : (
+                          `, `
+                      )}
                     </SSpanBiddersRegularDoubleVote>
                     <SSpanBiddersHighlightedDoubleVote>
                       {formatNumber(
-                        // option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
-                        option.voteCount - (isSupportedByMe && !isMyBid ? 2 : 1),
+                        option.supporterCount - (isSupportedByMe && !isSuggestedByMe ? 2 : 1),
                         true,
                       )}
                       { ' ' }

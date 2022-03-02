@@ -62,8 +62,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
 
-  console.log(postParsed)
-
   const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
   const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
@@ -148,6 +146,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postStatus === 'scheduled') {
       return (
         <PostViewScheduled
+          key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
           postType={typeOfPost!!}
@@ -159,6 +158,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'mc') {
       return (
         <PostViewMC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
@@ -168,6 +168,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'ac') {
       return (
         <PostViewAC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           optionFromUrl={acSuggestionFromUrl}
@@ -179,6 +180,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'cf') {
       return (
         <PostViewCF
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}

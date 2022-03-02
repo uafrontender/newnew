@@ -387,8 +387,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 value={supportBidAmount}
                 inputAlign="left"
                 autofocus={isSupportFormOpen}
-                onChange={(newValue: string) => setSupportBidAmount(newValue)}
                 minAmount={minAmount}
+                style={{
+                  textAlign: 'center',
+                  paddingLeft: '12px',
+                }}
+                onChange={(newValue: string) => setSupportBidAmount(newValue)}
               />
               <Button
                 view="primaryGrad"

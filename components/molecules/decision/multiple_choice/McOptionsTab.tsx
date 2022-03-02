@@ -103,8 +103,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
     const res = await getSubscriptionStatus(getStatusPayload);
 
-    console.log(res.data);
-
     if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
       router.push(`/u/${post.creator?.username}/subscribe`);
       return;
