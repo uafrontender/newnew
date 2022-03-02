@@ -1,28 +1,26 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
-import { scroller } from 'react-scroll';
+// import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
-import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/creation/TextArea';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
-
-import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
-
-import { IMessage, IChatData } from '../../interfaces/ichat';
+// import { SCROLL_TO_FIRST_MESSAGE } from '../../../constants/timings';
+import { IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUserAlias } from '../../atoms/chat/styles';
 import GoBackButton from '../GoBackButton';
 import randomID from '../../../utils/randomIdGenerator';
-import { getMyRooms } from '../../../api/endpoints/chat';
+import { sendMessage, getMessages } from '../../../api/endpoints/chat';
+
+import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -33,10 +31,11 @@ const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const ReportUserModal = dynamic(() => import('./ReportUserModal'));
 
-const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
-  const [message, setMessage] = useState('');
+const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
+  const [messageText, setMessageText] = useState<string>('');
+  const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [localUserData, setLocalUserData] = useState({
-    justSubscribed: true,
+    justSubscribed: false,
     blockedUser: false,
     isAnnouncement: false,
     subscriptionExpired: false,
@@ -46,46 +45,11 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
 
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [collection, setCollection] = useState<IMessage[]>([]);
-  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[]>([]);
+  const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
   const theme = useTheme();
   const { t } = useTranslation('chat');
   const scrollRef: any = useRef();
-
-  useEffect(() => {
-    async function fetchMyRooms(name:string) {
-      try {
-        const payload = new newnewapi.GetMyRoomsRequest({ searchQuery: name });
-        const res = await getMyRooms(payload);
-        console.log(res);
-
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setChatRooms(res.data.rooms);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (chatUser) {
-      setLocalUserData((data) => ({ ...data, ...chatUser }));
-      setCollection([
-        {
-          id: randomID(),
-          message: '👋 Hey, thank you for subscribing to my channel, I look forward to talking to you.',
-          mine: false,
-          date: moment().subtract(3, 'days'),
-        },
-      ]);
-      if (chatUser.username) fetchMyRooms(chatUser.username);
-    }
-  }, [chatUser]);
-
-  useEffect(() => {
-    if (chatRooms.length > 0) {
-      console.log(chatRooms);
-    }
-  }, [chatRooms]);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
@@ -95,6 +59,31 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+
+  useEffect(() => {
+    async function getChatMessages() {
+      try {
+        const payload = new newnewapi.GetMessagesRequest({
+          roomId: chatRoom?.id,
+        });
+        const res = await getMessages(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setMessages(res.data.messages);
+
+        if (res.data.messages.length > 0) setLocalUserData({ ...localUserData, justSubscribed: false });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (chatRoom) {
+      setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
+
+      if (!chatRoom.lastMessage) setLocalUserData({ ...localUserData, justSubscribed: true });
+      getChatMessages();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatRoom]);
+
   const onUserBlock = () => {
     if (!localUserData.blockedUser) {
       /* eslint-disable no-unused-expressions */
@@ -109,78 +98,113 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
   };
 
   const handleChange = useCallback((id, value) => {
-    setMessage(value);
+    setMessageText(value);
   }, []);
 
+  const submitMessage = useCallback(async () => {
+    console.log(chatRoom, messageText);
+
+    if (chatRoom && messageText.length > 0) {
+      try {
+        setSendingMessage(true);
+        const payload = new newnewapi.SendMessageRequest({
+          roomId: chatRoom.id,
+          content: {
+            text: messageText,
+          },
+        });
+        const res = await sendMessage(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+        setSendingMessage(false);
+      } catch (err) {
+        console.error(err);
+        setSendingMessage(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatRoom?.id, messageText]);
+
   const handleSubmit = useCallback(() => {
-    const newItem: IMessage = {
-      id: (collection.length + 1).toString(),
-      mine: true,
-      date: moment(),
-      message,
-    };
-    setMessage('');
-    setCollection([newItem, ...collection]);
-  }, [message, collection]);
+    if (!sendingMessage) submitMessage();
+    // setMessages({ ...messages, ...message });
 
-  const renderMessage = useCallback((item, index) => {
-    const prevElement = collection[index - 1];
-    const nextElement = collection[index + 1];
+    // setMessageText('');
+    // setCollection([newItem, ...collection]);
+    // }, [message, messages, sendingMessage, submitMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageText]);
 
-    const prevSameUser = prevElement?.mine === item.mine;
-    const nextSameUser = prevElement?.mine === item.mine;
+  const renderMessage = useCallback(
+    (item: newnewapi.IChatMessage, index) => {
+      const prevElement = messages[index - 1];
+      const nextElement = messages[index + 1];
 
-    const content = (
-      <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={randomID()} mine={item.mine}>
-        {!nextSameUser && (
-          <SUserAvatar
-            mine={item.mine}
-            avatarUrl={!item.mine && chatUser && chatUser.avatarUrl ? chatUser.avatarUrl : user.userData?.avatarUrl}
-          />
-        )}
-        <SMessageContent mine={item.mine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
-          <SMessageText mine={item.mine} weight={600} variant={3}>
-            {item.message}
-          </SMessageText>
-        </SMessageContent>
-      </SMessage>
-    );
+      const isMine = item.sender?.uuid === user.userData?.userUuid;
 
-    if (moment(item.date).format('DD.MM.YYYY') !== moment(nextElement?.date).format('DD.MM.YYYY')) {
-      let date = moment(item.date).format('MMM DD');
+      const prevSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
+      const nextSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
 
-      if (date === moment().format('MMM DD')) {
-        date = t('chat.today');
+      const content = (
+        <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={randomID()} mine={isMine}>
+          {!nextSameUser && (
+            <SUserAvatar
+              mine={isMine}
+              avatarUrl={
+                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
+                  ? chatRoom.visavis?.avatarUrl
+                  : user.userData?.avatarUrl
+              }
+            />
+          )}
+          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+            <SMessageText mine={isMine} weight={600} variant={3}>
+              {item.content?.text}
+            </SMessageText>
+          </SMessageContent>
+        </SMessage>
+      );
+
+      if (
+        moment(item.createdAt?.nanos).format('DD.MM.YYYY') !==
+        moment(nextElement?.createdAt?.nanos).format('DD.MM.YYYY')
+      ) {
+        let date = moment(item.createdAt?.nanos).format('MMM DD');
+
+        if (date === moment().format('MMM DD')) {
+          date = t('chat.today');
+        }
+
+        return (
+          <>
+            {content}
+            <SMessage key={randomID()} type="info">
+              <SMessageContent
+                type="info"
+                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
+                nextSameUser={nextElement?.sender?.uuid === item.sender?.uuid}
+              >
+                <SMessageText type="info" weight={600} variant={3}>
+                  {date}
+                </SMessageText>
+              </SMessageContent>
+            </SMessage>
+          </>
+        );
       }
 
-      return (
-        <>
-          {content}
-          <SMessage key={randomID()} type="info">
-            <SMessageContent
-              type="info"
-              prevSameUser={prevElement?.mine === item.mine}
-              nextSameUser={nextElement?.mine === item.mine}
-            >
-              <SMessageText type="info" weight={600} variant={3}>
-                {date}
-              </SMessageText>
-            </SMessageContent>
-          </SMessage>
-        </>
-      );
-    }
+      return content;
+    },
+    [chatRoom, t, user.userData?.avatarUrl, user.userData?.userUuid, messages]
+  );
 
-    return content;
-  }, [chatUser, collection, t, user.userData?.avatarUrl]);
-
-  useEffect(() => {
-    scroller.scrollTo('first-element', {
-      smooth: 'easeInOutQuart',
-      duration: SCROLL_TO_FIRST_MESSAGE,
-      containerId: 'messagesScrollContainer',
-    });
-  }, [collection.length]);
+  // useEffect(() => {
+  //   scroller.scrollTo('first-element', {
+  //     smooth: 'easeInOutQuart',
+  //     duration: SCROLL_TO_FIRST_MESSAGE,
+  //     containerId: 'messagesScrollContainer',
+  //   });
+  // }, [collection.length]);
 
   const clickHandler = () => {
     if (showChatList) {
@@ -190,15 +214,15 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
 
   return (
     <SContainer>
-      {chatUser && (
+      {chatRoom && (
         <STopPart>
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {chatUser.nickname}
+              {chatRoom.visavis?.nickname}
               {localUserData.isAnnouncement && t('announcement.title')}
             </SUserName>
-            <SUserAlias>{!localUserData.isAnnouncement ? `@${chatUser.username}` : `500 members`}</SUserAlias>
+            <SUserAlias>{!localUserData.isAnnouncement ? `@${chatRoom.visavis?.username}` : `500 members`}</SUserAlias>
           </SUserData>
           <SActionsDiv>
             <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
@@ -229,37 +253,39 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
           </SActionsDiv>
         </STopPart>
       )}
-      {localUserData.isAnnouncement && chatUser && (
+      {localUserData.isAnnouncement && chatRoom && (
         <SAnnouncementHeader>
           <SAnnouncementText>
-            {t('announcement.top-message-start')} <SAnnouncementName>{chatUser.username}</SAnnouncementName>{' '}
+            {t('announcement.top-message-start')} <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
             {t('announcement.top-message-end')}
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}
       <SCenterPart id="messagesScrollContainer" ref={scrollRef}>
-        {localUserData?.justSubscribed && chatUser && (
-          <WelcomeMessage userAlias={chatUser.username ? chatUser.username : ''} />
+        {localUserData?.justSubscribed && chatRoom && (
+          <WelcomeMessage userAlias={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''} />
         )}
-        {collection.map(renderMessage)}
+        {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        {(localUserData.blockedUser === true || confirmBlockUser) && chatUser && (
+        {(localUserData.blockedUser === true || confirmBlockUser) && chatRoom && (
           <BlockedUser
             confirmBlockUser={confirmBlockUser}
             isBlocked={localUserData.blockedUser}
-            userName={chatUser.username ? chatUser.username : ''}
+            userName={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''}
             onUserBlock={onUserBlock}
             closeModal={() => setConfirmBlockUser(false)}
             // isAnnouncement={isAnnouncement}
           />
         )}
-        {localUserData.subscriptionExpired && chatUser && chatUser.uuid && <SubscriptionExpired user={chatUser} />}
+        {localUserData.subscriptionExpired && chatRoom && chatRoom.visavis?.uuid && (
+          <SubscriptionExpired user={chatRoom.visavis} />
+        )}
         {localUserData.accountDeleted && <AccountDeleted />}
-        {localUserData.messagingDisabled && chatUser && (
+        {localUserData.messagingDisabled && chatRoom && (
           <MessagingDisabled
-            userName={chatUser.username ? chatUser.username : ''}
-            userAlias={chatUser.nickname ? chatUser.nickname : ''}
+            userName={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''}
+            userAlias={chatRoom.visavis?.nickname ? chatRoom.visavis?.nickname : ''}
           />
         )}
 
@@ -268,20 +294,25 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
           !localUserData.messagingDisabled &&
           !localUserData.accountDeleted &&
           !localUserData.isAnnouncement &&
-          chatUser && (
+          chatRoom && (
             <SBottomTextarea>
               <STextArea>
-                <TextArea maxlength={500} value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
+                <TextArea
+                  maxlength={500}
+                  value={messageText}
+                  onChange={handleChange}
+                  placeholder={t('chat.placeholder')}
+                />
               </STextArea>
               <SButton
                 withShadow
-                view={message ? 'primaryGrad' : 'secondary'}
+                view={messageText ? 'primaryGrad' : 'secondary'}
                 onClick={handleSubmit}
-                disabled={!message}
+                disabled={!messageText}
               >
                 <SInlineSVG
                   svg={sendIcon}
-                  fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
+                  fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
                   width="24px"
                   height="24px"
                 />
@@ -292,7 +323,7 @@ const ChatArea: React.FC<IChatData> = ({ chatUser, showChatList }) => {
         {confirmReportUser && (
           <ReportUserModal
             confirmReportUser={confirmReportUser}
-            userName={chatUser && chatUser.username ? chatUser.username : ''}
+            userName={chatRoom && chatRoom.visavis?.username ? chatRoom.visavis?.username : ''}
             closeModal={() => setConfirmReportUser(false)}
             isAnnouncement={localUserData.isAnnouncement}
           />
@@ -389,17 +420,7 @@ const SUserAvatar = styled(UserAvatar)<ISUserAvatar>`
   min-height: 36px;
   padding: 0;
   display: none;
-
-  ${(props) => {
-    if (props.mine) {
-      return css`
-        right: 0;
-      `;
-    }
-    return css`
-      left: 0;
-    `;
-  }}
+  left: 0;
 
   ${(props) => props.theme.media.tablet} {
     display: block;
@@ -434,17 +455,20 @@ const SMessage = styled.div<ISMessage>`
       if (props.mine) {
         return css`
           ${props.theme.media.tablet} {
-            padding-right: 44px;
+            padding-left: 44px;
+            justify-content: flex-start;
           }
         `;
       }
       return css`
         ${props.theme.media.tablet} {
-          padding-left: 44px;
+          justify-content: flex-end;
         }
       `;
     }
-    return css``;
+    return css`
+      justify-content: center;
+    `;
   }}
   display: flex;
   flex-direction: row;

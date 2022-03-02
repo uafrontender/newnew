@@ -18,7 +18,8 @@
     "no-messages-first-line": "No messages here yet...",
     "no-messages-second-line": "Send a message to start conversation.",
     "select-chat": "Select a chat to start messaging",
-    "typing": "Typing..."
+    "typing": "Typing...",
+    "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you."
   },
   "user-blocked": {
     "title": "User blocked",

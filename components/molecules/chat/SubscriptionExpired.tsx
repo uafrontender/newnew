@@ -41,7 +41,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
-      window.location.href = url;
+      if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
     }
@@ -77,11 +77,11 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
         <div>
           <SPaymentModalTitle variant={3}>{t('modal.renewSubcriptionsSubtitle')}</SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
-            {user.avatarUrl &&
-            <SAvatar>
-              <img src={user.avatarUrl} alt={user.nickname ? user.nickname : `@${user.username}`} />
-            </SAvatar>
-            }
+            {user.avatarUrl && (
+              <SAvatar>
+                <img src={user.avatarUrl} alt={user.nickname ? user.nickname : `@${user.username}`} />
+              </SAvatar>
+            )}
             <div>
               <SCreatorUsername>{isMobile ? user.nickname : `@${user.username}`}</SCreatorUsername>
             </div>

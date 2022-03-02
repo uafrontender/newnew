@@ -85,7 +85,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
-      window.location.href = url;
+      if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
     }

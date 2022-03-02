@@ -14,11 +14,11 @@ import GoBackButton from '../molecules/GoBackButton';
 
 export const Chat = () => {
   const [chatData, setChatData] = useState<IChatData>({
-    chatUser: null,
+    chatRoom: null,
     showChatList: null,
   });
-  const openChat = ({ chatUser }: IChatData) => {
-    setChatData({ chatUser, showChatList });
+  const openChat = ({ chatRoom }: IChatData) => {
+    setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('chat');
   const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
