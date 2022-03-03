@@ -1,21 +1,20 @@
+import React from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import React from 'react';
-import styled, { css } from 'styled-components';
-import Button from '../../../atoms/Button';
+import styled from 'styled-components';
+
+import Headline from '../../../atoms/Headline';
+
+import CoinIcon from '../../../../public/images/decision/coin-mock.png';
 
 interface ICfMakeStandardPledgeCard {
   amount: newnewapi.IMoneyAmount;
-  disabled?: boolean;
-  isHighest?: boolean;
   grandsVipStatus?: boolean;
   handleOpenMakePledgeForm: () => void;
 }
 
 const CfMakeStandardPledgeCard: React.FunctionComponent<ICfMakeStandardPledgeCard> = ({
   amount,
-  disabled,
-  isHighest,
   grandsVipStatus,
   handleOpenMakePledgeForm,
 }) => {
@@ -23,68 +22,59 @@ const CfMakeStandardPledgeCard: React.FunctionComponent<ICfMakeStandardPledgeCar
 
   return (
     <SStandardPledgeCard
-      disabled={disabled}
+      onClick={() => handleOpenMakePledgeForm()}
     >
+      {grandsVipStatus ? (
+        <SAdditionalLabel>
+          { t('CfPost.BackersTab.free_sub') }
+        </SAdditionalLabel>
+      ) : (
+        <SCoinImg
+          src={CoinIcon.src}
+        />
+      )}
       <SCardInfo>
-        {isHighest ? (
-          <SAdditionalLabel>
-            { t('Highest') }
-          </SAdditionalLabel>
-        ) : null}
-        {grandsVipStatus ? (
-          <SAdditionalLabel>
-            { t('+ VIP Sub') }
-          </SAdditionalLabel>
-        ) : null}
-        <SCardAmount>
+        <SCardAmount
+          variant={6}
+        >
           {`$${(amount!!.usdCents!! / 100).toFixed(0)}`}
         </SCardAmount>
       </SCardInfo>
-      <SMakePledgeButton
-        view="secondary"
-        disabled={disabled}
-        onClick={() => handleOpenMakePledgeForm()}
-      >
-        { t('Pledge') }
-      </SMakePledgeButton>
     </SStandardPledgeCard>
   );
 };
 
 CfMakeStandardPledgeCard.defaultProps = {
-  disabled: undefined,
-  isHighest: undefined,
   grandsVipStatus: undefined,
 };
 
 export default CfMakeStandardPledgeCard;
 
-const SStandardPledgeCard = styled.div<{
-  disabled?: boolean;
-  isHighest?: boolean;
-  grandsVipStatus?: boolean;
-}>`
+const SStandardPledgeCard = styled.button`
   display: flex;
-  gap: 8px;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
 
-  background-color: transparent;
+  cursor: pointer;
+  transition: 0.2s linear;
 
+  border: transparent;
 
-  ${({ disabled }) => (disabled
-    ? (
-      css`
-        opacity: 0.5;
-      `
-    ) : null)}
+  height: 108px;
+  width: 96px;
 
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: stretch;
-    height: 108px;
-    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-    padding: 8px;
+  margin: 0px 6px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  padding: 8px;
+
+  &:hover, &:active {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }
 `;
 
@@ -103,19 +93,21 @@ const SCardInfo = styled.div`
 
 const SAdditionalLabel = styled.div`
   font-weight: bold;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  opacity: 0.6;
-
+  font-size: 10px;
+  line-height: 24px;
+  color: #2C2C33;
   text-align: center;
 
-  ${({ theme }) => theme.media.tablet} {
+  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
-  }
+  height: 24px;
+  padding-left: 8px;
+  padding-right: 8px;
+
+  border-radius: 50px;
 `;
 
-const SCardAmount = styled.div`
+const SCardAmount = styled(Headline)`
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -131,25 +123,6 @@ const SCardAmount = styled.div`
   }
 `;
 
-const SMakePledgeButton = styled(Button)<{
-  highlighted?: boolean;
-}>`
-  width: auto;
-  background: ${({ highlighted, theme }) => (highlighted ? theme.colorsThemed.background.primary : theme.colorsThemed.background.secondary)};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: auto;
-    min-height: 40px;
-
-    padding: 8px 16px;
-
-    font-weight: 600;
-    font-size: 14px;
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover:enabled, &:focus:enabled {
-      background: ${({ highlighted, theme }) => (highlighted ? theme.colorsThemed.background.primary : 'transparent')};
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
+const SCoinImg = styled.img`
+  height: 24px;
 `;

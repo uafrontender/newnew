@@ -6,7 +6,7 @@
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -20,18 +20,25 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
+
+import { formatNumber } from '../../../../utils/format';
+
+// Icons
+import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
+import McSymbolIcon from '../../../../public/images/decision/mc-option-mock.png';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser,
   postId: string;
   index: number;
-  optionBeingSupported?: string;
   minAmount: number;
+  noAction: boolean;
+  optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
@@ -41,29 +48,27 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   creator,
   postId,
   index,
-  optionBeingSupported,
   minAmount,
+  noAction,
+  optionBeingSupported,
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
 }) => {
-  const { t } = useTranslation('decision');
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
-  const highest = useMemo(() => option.isHighest, [option.isHighest]);
-  const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const myBid = useMemo(() => {
-    if (!option.creator?.uuid || !user.userData?.userUuid) return false;
-    return option.creator?.uuid === user.userData?.userUuid;
-  }, [
-    option.creator?.uuid,
-    user.userData?.userUuid,
-  ]);
-  const bgVariant = highest ? 'yellow' : (
-    myBid ? 'blue' : myVote ? 'green' : undefined);
+  const isCreatorsBid = useMemo(() => {
+    if (!option.creator) return true;
+    return false;
+  }, [option.creator]);
+  const supporterCountSubstracted = useMemo(() => {
+    if (isCreatorsBid) return option.supporterCount;
+    return  option.supporterCount - 1;
+  }, [option.supporterCount, isCreatorsBid]);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -80,7 +85,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToUser = () => router.push(`/u/${creator?.username}`);
+  const handleRedirectToOptionCreator = () => router.push(`/u/${creator?.username}`);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -96,8 +101,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       // Check if user is logged in
       if (!user.loggedIn) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href}&`,
-          cancelUrl: `${window.location.href}&`,
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -127,8 +132,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
         if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href}&`,
-            cancelUrl: `${window.location.href}&`,
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
             mcVoteRequest: {
               votesCount: parseInt(supportBidAmount, 10),
               optionId: option.id,
@@ -184,8 +189,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href}&`,
-        cancelUrl: `${window.location.href}&`,
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
         ...(!user.loggedIn ? {
           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
         } : {}),
@@ -236,82 +241,111 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }}
         isDisabled={disabled}
       >
-        <SBidDetails
-          bgVariant={bgVariant}
-        >
-          <SBidInfo>
-            {option.isSupportedByMe
-              && creator?.uuid !== user.userData?.userUuid
-              ? (
-                <STag>{t('McPost.OptionsTab.tags.my_vote')}</STag>
-              ) : null}
-            {creator?.uuid === user.userData?.userUuid
-              ? (
-                <STag>{t('McPost.OptionsTab.tags.my_bid')}</STag>
-              ) : null}
-            {option.isHighest
-              ? (
-                <STag>{t('McPost.OptionsTab.tags.highest')}</STag>
-              ) : null}
-            {/* Comment out for now */}
-            {/* {creator.isVIP
-              ? (
-                <STag>{t('McPost.OptionsTab.tags.vip')}</STag>
-              ) : null} */}
-            <SAvatar
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
-              }}
-              src={creator?.avatarUrl!! as string}
-              alt={option?.creator?.username!!}
-              draggable={false}
+        <SBidDetails>
+          <SBidAmount>
+            <SOptionSymbolImg
+              src={McSymbolIcon.src}
             />
-            <SUsername
-              isColored={bgVariant !== undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
-              }}
-            >
-              { creator?.uuid === user.userData?.userUuid
-                ? t('McPost.OptionsTab.me') : creator?.username }
-            </SUsername>
-            <SBidTitle
-              variant={3}
-            >
-              { option.text }
-            </SBidTitle>
-          </SBidInfo>
-          <SAmount>
-            {option.voteCount}
-            { ' ' }
-            { t('McPost.OptionsTab.OptionCard.votes') }
-          </SAmount>
-          {myVote || myBid ? (
-            <SDoubleMyVote>
-              <SDoubleMyVoteCaption>
-                { t('McPost.OptionsTab.OptionCard.doubleMyVoteCaption') }
-              </SDoubleMyVoteCaption>
-              <SDoubleMyVoteButton>
-              { t('McPost.OptionsTab.OptionCard.doubleMyVoteButton') }
-              </SDoubleMyVoteButton>
-            </SDoubleMyVote>
-          ) : null}
+            <div>
+              {
+                option.voteCount && option.voteCount > 0
+                ? `${formatNumber(option?.voteCount, true)}`
+                : t('McPost.OptionsTab.OptionCard.noVotes')
+              }
+            </div>
+          </SBidAmount>
+          <SOptionInfo
+            variant={3}
+          >
+            {option.text}
+          </SOptionInfo>
+          <SBiddersInfo
+            variant={3}
+          >
+            {isCreatorsBid ? (
+              <>
+                {supporterCountSubstracted > 0 ? (
+                  <>
+                    <SSpanBiddersHighlighted>
+                      {formatNumber(
+                        supporterCountSubstracted,
+                        true,
+                      )}
+                      { ' ' }
+                      { t('McPost.OptionsTab.OptionCard.voters') }
+                    </SSpanBiddersHighlighted>
+                    {' '}
+                    <SSpanBiddersRegular>
+                      {t('McPost.OptionsTab.OptionCard.voted')}
+                    </SSpanBiddersRegular>
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <SSpanBiddersHighlighted
+                  onClick={() => {
+                    handleRedirectToOptionCreator()
+                  }}
+                  style={{
+                    color: theme.colorsThemed.accent.yellow,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t('McPost.OptionsTab.OptionCard.subscriber_suggestion',
+                    {
+                      nickname: option.creator?.nickname ?? option.creator?.username
+                    },
+                  )}
+                </SSpanBiddersHighlighted>
+                {supporterCountSubstracted > 0 ? (
+                  <>
+                    { ', ' }
+                    <SSpanBiddersHighlighted>
+                      {formatNumber(
+                        supporterCountSubstracted,
+                        true,
+                      )}
+                      { ' ' }
+                      {t('McPost.OptionsTab.OptionCard.voters')}
+                    </SSpanBiddersHighlighted>
+                    {' '}
+                    <SSpanBiddersRegular>
+                      {t('McPost.OptionsTab.OptionCard.voted')}
+                    </SSpanBiddersRegular>
+                  </>
+                ) : null}
+              </>
+            )
+            }
+          </SBiddersInfo>
         </SBidDetails>
-        {(myBid || myVote) ? null : optionBeingSupported && !disabled ? (
-          <div
-            style={{
-              minWidth: isMobileOrTablet ? '82px' : '92px',
-            }}
-          />
+        {(optionBeingSupported && !disabled) || noAction ? (
+          null
         ) : (
           <SSupportButton
-            view="secondary"
+            view="quaternary"
             disabled={disabled}
             onClick={() => handleOpenSupportForm()}
           >
-            { t('McPost.OptionsTab.OptionCard.supportBtn') }
+            {!isMobile ? (
+              <img
+                draggable={false}
+                src={SupportOptionIcon.src}
+                alt={t('McPost.OptionsTab.OptionCard.supportBtn')}
+              />
+            ) : (
+              <>
+                <img
+                  draggable={false}
+                  src={SupportOptionIcon.src}
+                  alt={t('McPost.OptionsTab.OptionCard.supportBtn')}
+                />
+                <div>
+                  { t('McPost.OptionsTab.OptionCard.supportBtn') }
+                </div>
+              </>
+            )}
           </SSupportButton>
         )}
       </SContainer>
@@ -320,12 +354,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       >
       {!isMobile && isSupportFormOpen && (
         <>
-          <BidAmountTextInput
-            value={supportBidAmount}
+          <VotesAmountTextInput
             inputAlign="left"
-            horizontalPadding="20px"
-            onChange={(newValue: string) => setSupportBidAmount(newValue)}
             minAmount={minAmount}
+            value={supportBidAmount}
+            widthHardCoded="100%"
+            placeholder={
+              supportBidAmount && parseInt(supportBidAmount, 10) > 1
+              ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
+              : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
+            }
+            onChange={(newValue: string) => setSupportBidAmount(newValue)}
           />
           <Button
             view="primaryGrad"
@@ -340,6 +379,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           >
             { t('McPost.OptionsTab.OptionCard.cancelBtn') }
           </SCancelButton>
+          <SBottomPlaceholder>
+            {
+              !supportBidAmount || parseInt(supportBidAmount, 10) === 1
+              ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
+              : `${supportBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(supportBidAmount, 10) * 5}`
+            }
+          </SBottomPlaceholder>
         </>
       )}
       {isMobile ? (
@@ -352,12 +398,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <div>
               { option.text }
             </div>
-            <BidAmountTextInput
-              value={supportBidAmount}
+            <VotesAmountTextInput
               inputAlign="left"
-              horizontalPadding="16px"
-              onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
+              value={supportBidAmount}
+              autofocus={isSupportFormOpen}
+              placeholder={
+                supportBidAmount && parseInt(supportBidAmount, 10) > 1
+                ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
+                : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
+              }
+              onChange={(newValue: string) => setSupportBidAmount(newValue)}
             />
             <Button
               view="primaryGrad"
@@ -365,7 +416,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              Place a bid
+              { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
             </Button>
           </SSuggestSupportMobileContainer>
         </OptionActionMobileModal>
@@ -374,10 +425,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       {/* Payment Modal */}
       {paymentModalOpen ? (
         <PaymentModal
-          isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${supportBidAmount}`}
           showTocApply
+          isOpen={paymentModalOpen}
+          amount={`$${parseInt(supportBidAmount, 10) * 5}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}
@@ -416,7 +467,12 @@ const SContainer = styled(motion.div)<{
   flex-direction: column;
   gap: 12px;
 
-  width: calc(100% - 16px);
+  width: 100%;
+
+  padding: 16px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
 
@@ -425,163 +481,91 @@ const SContainer = styled(motion.div)<{
     flex-direction: row;
     justify-content: space-between;
     gap: 16px;
+
+    padding: initial;
+    background-color: initial;
+    border-radius: initial;
   }
 `;
 
-const SBidDetails = styled.div<{
-  bgVariant?: 'yellow' | 'green' | 'blue';
-}>`
+const SBidDetails = styled.div`
   position: relative;
 
   display: grid;
   grid-template-areas:
-    'info amount'
-    'doubleVote doubleVote'
-  ;
-  grid-template-columns: 7fr 2fr;
-  gap: 16px;
+    'amount amount'
+    'optionInfo optionInfo'
+    'bidders bidders';
+  grid-template-columns: 7fr 1fr;
 
   width: 100%;
 
-  padding: 14px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  ${({ theme }) => theme.media.tablet} {
+    grid-template-areas:
+    'amount bidders'
+    'optionInfo optionInfo';
+    grid-template-columns: 3fr 7fr;
 
-  ${({ bgVariant }) => (
-    bgVariant
-      ? css`
-        background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
-      ` : null
-  )};
 
-  &:hover {
-    cursor: pointer;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    padding: 14px;
   }
 `;
 
-const SBidInfo = styled.div`
-  grid-area: info;
-
-  /* display: flex; */
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-
-
-  vertical-align: middle;
-  line-height: 24px;
-`;
-
-const STag = styled.span`
-  background-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: 50px;
-  padding: 6px;
-
-  font-weight: bold;
-  font-size: 10px;
-  line-height: 12px;
-  color: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  margin-right: 8px;
-`;
-
-const SAvatar = styled.img`
-  position: relative;
-  top: 7.5px;
-
-  display: inline;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-
-  margin-right: 8px;
-
-  cursor: pointer;
-`;
-
-const SUsername = styled.div<{
-  isColored?: boolean;
-}>`
-  display: inline;
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme, isColored }) => (isColored ? 'rgba(255, 255, 255, 0.8)' : theme.colorsThemed.text.secondary)};
-  margin-right: 8px;
-
-  transition: 0.2s linear;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-  }
-`;
-
-const SBidTitle = styled(Text)`
-  display: inline;
-  line-break: loose;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-`;
-
-const SAmount = styled.div`
+const SBidAmount = styled.div`
   grid-area: amount;
-  align-self: center;
-  justify-self: flex-end;
 
-
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
-const SDoubleMyVote = styled.div`
-  grid-area: doubleVote;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-
-  padding: 12px 16px;
+  justify-content: flex-start;
   gap: 8px;
 
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
+  margin-bottom: 6px;
+`;
+
+const SOptionSymbolImg = styled.img`
+  height: 24px;
+`;
+
+const SOptionInfo = styled(Text)`
+  grid-area: optionInfo;
+
+  margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
-    flex-wrap: nowrap;
+    margin-bottom: initial;
   }
 `;
 
-const SDoubleMyVoteCaption = styled.div`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-
-  color: #FFFFFF;
-`;
-
-const SDoubleMyVoteButton = styled(Button)`
-  background: #FFFFFF;
-  color: #2C2C33;
-  width: 100%;
-  height: 48px;
-
-  &:focus:enabled,
-  &:hover:enabled  {
-    background: #FFFFFF;
-  }
+const SBiddersInfo = styled(Text)`
+  grid-area: bidders;
 
   ${({ theme }) => theme.media.tablet} {
-    flex-wrap: fit-content;
+    justify-self: flex-end;
   }
+`;
+
+const SSpanBiddersHighlighted = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SSpanBiddersRegular = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SSupportButton = styled(Button)`
   width: 100%;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     width: auto;
@@ -590,8 +574,10 @@ const SSupportButton = styled(Button)`
     margin-right: 16px;
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
+    background: none;
 
-    &:hover:enabled, &:focus:enabled {
+    &:hover:enabled,
+    &:focus:enabled {
       background: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
@@ -600,14 +586,15 @@ const SSupportButton = styled(Button)`
 
 const SSupportBidForm = styled(motion.div)`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
 
   width: 100%;
 
-  div {
+  div:first-child {
     display: flex;
-    width: 100%;
+    max-width: 100%;
     flex-grow: 1;
     input {
       width: 100%;
@@ -619,14 +606,23 @@ const SCancelButton = styled(Button)`
   width: auto;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  &:hover:enabled, &:focus:enabled {
+  &:hover:enabled,
+  &:focus:enabled {
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
+`;
+
+const SBottomPlaceholder = styled.div`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  width: 100%;
 `;
 
 const SSuggestSupportMobileContainer = styled.div`
@@ -635,14 +631,10 @@ const SSuggestSupportMobileContainer = styled.div`
   gap: 24px;
 
   padding: 16px;
-
 `;
-
 
 // Payment modal header
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};

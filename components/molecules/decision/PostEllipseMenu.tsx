@@ -8,8 +8,9 @@ import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseMenu {
-  isFollowing: boolean;
   isVisible: boolean;
+  isFollowing: boolean;
+  isFollowingDecision: boolean;
   handleFollowDecision: () => {};
   handleToggleFollowingCreator: () => {};
   handleClose: () => void;
@@ -18,6 +19,7 @@ interface IPostEllipseMenu {
 const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
   isVisible,
   isFollowing,
+  isFollowingDecision,
   handleFollowDecision,
   handleToggleFollowingCreator,
   handleClose,
@@ -57,7 +59,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
             <Text
               variant={3}
             >
-              { t('ellipse.follow-decision') }
+              { !isFollowingDecision ? t('ellipse.follow-decision') : t('ellipse.unfollow-decision') }
             </Text>
           </SButton>
           <SSeparator />

@@ -3,31 +3,40 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useRef, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
+import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import DecisionTabs from '../../molecules/decision/PostTabs';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
+import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
 import GoBackButton from '../../molecules/GoBackButton';
+import LoadingModal from '../../molecules/LoadingModal';
 import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
-import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
-import LoadingModal from '../../molecules/LoadingModal';
+import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
+import Button from '../../atoms/Button';
+import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -45,12 +54,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   handleGoBack,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [heightDelta, setHeightDelta] = useState(256);
+  const [heightDelta, setHeightDelta] = useState( isMobile ? 0 : 256);
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -59,6 +69,43 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
+
+  // Tabs
+  const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'backers'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#backers' || hash === '#comments')) {
+      return hash.substring(1) as 'backers' | 'comments';
+    }
+    return 'backers';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      if (!hash) {
+        setCurrentTab('backers');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'backers' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -76,6 +123,15 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
+
+  // Mobile choose pledge modal
+  const [choosePledgeModalOpen, setChoosePledgeModalOpen] = useState(false);
+
+  // Comments
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -363,7 +419,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     <SWrapper>
       <SExpiresSection>
         {isMobile && (
-          <GoBackButton
+          <SGoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
@@ -374,18 +430,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
           postType="cf"
         />
-        {!isMobile && (
-          <SGoBackButtonDesktop
-            onClick={handleGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SGoBackButtonDesktop>
-        )}
       </SExpiresSection>
       <PostVideo
         postId={post.postUuid}
@@ -393,46 +437,80 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <div
-        style={{
-          gridArea: 'title',
-        }}
-      >
-        <PostTitle>
-          { post.title }
-        </PostTitle>
-      </div>
+      <PostTopInfo
+        postType="cf"
+        postId={post.postUuid}
+        title={post.title}
+        currentBackers={currentBackers}
+        targetBackers={post.targetBackerCount}
+        creator={post.creator!!}
+        startsAtSeconds={post.startsAt?.seconds as number}
+        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleFollowCreator={() => {}}
+        handleReportAnnouncement={() => {}}
+      />
       <SActivitesContainer>
-        <PostTopInfo
-          postId={post.postUuid}
-          postType="cf"
-          currentBackers={currentBackers}
-          targetBackers={post.targetBackerCount}
-          creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
-          handleFollowCreator={() => {}}
-          handleReportAnnouncement={() => {}}
+        <DecisionTabs
+          tabs={[
+            {
+              label: 'backers',
+              value: 'backers',
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]}
+          activeTab={currentTab}
+          handleChangeTab={handleChangeTab}
         />
-        <CfPledgeLevelsSection
-          pledgeLevels={pledgeLevels}
-          post={post}
-          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-          handleSetHeightDelta={(newValue: number) => setHeightDelta(newValue)}
-        />
-        <CfPledgesSection
-          pledges={pledges}
-          pagingToken={pledgesNextPageToken}
-          pledgesLoading={pledgesLoading}
-          post={post}
-          heightDelta={heightDelta ?? 256}
-          handleLoadPledges={fetchPledgesForPost}
-        />
+        {currentTab === 'backers' ? (
+          <>
+            <CfBackersStatsSection
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            {!isMobile ? (
+              <CfPledgeLevelsSection
+                post={post}
+                pledgeLevels={pledgeLevels}
+                handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+              />
+            ) : null }
+          </>
+        ) : (
+          <CommentsTab
+            comments={comments}
+            handleGoBack={() => handleChangeTab('backers')}
+          />
+        )
+      }
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Choose pledge mobile modal */}
+      {isMobile ? (
+        <CfPledgeLevelsModal
+          zIndex={11}
+          post={post}
+          pledgeLevels={pledgeLevels}
+          isOpen={choosePledgeModalOpen}
+          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+          onClose={() => setChoosePledgeModalOpen(false)}
+        />
+      ) : null}
+      {/* Mobile floating button */}
+      {isMobile && !choosePledgeModalOpen ? (
+        <SActionButton
+          view="primaryGrad"
+          onClick={() => setChoosePledgeModalOpen(true)}
+        >
+          { t('CfPost.FloatingActionButton.choosePledgeBtn') }
+        </SActionButton>
+      ) : null}
     </SWrapper>
   );
 };
@@ -444,25 +522,17 @@ PostViewCF.defaultProps = {
 export default PostViewCF;
 
 const SWrapper = styled.div`
-  display: grid;
-
-  grid-template-areas:
-    'expires'
-    'video'
-    'title'
-    'activities'
-  ;
+  width: 100%;
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
-      'video activities'
-    ;
+      'video activities';
     grid-template-columns: 284px 1fr;
-    /* grid-template-rows: 46px 64px 40px calc(506px - 46px); */
     grid-template-rows: 46px min-content 1fr;
     grid-column-gap: 16px;
 
@@ -473,14 +543,7 @@ const SWrapper = styled.div`
     grid-template-areas:
       'video expires'
       'video title'
-      'video activities'
-    ;
-
-    /* grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px); */
-    /* grid-template-rows: 1fr max-content; */
-
-    // NB! 1fr results in unstable width
-    /* grid-template-columns: 410px 1fr; */
+      'video activities';
     grid-template-columns: 410px 538px;
   }
 `;
@@ -488,45 +551,44 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   grid-area: expires;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: 'closeBtnMobile timer closeBtnDesktop';
-
-  width: 100%;
-
-  margin-bottom: 6px;
-`;
-
-const SGoBackButtonDesktop = styled.button`
-  grid-area: closeBtnDesktop;
+  position: relative;
 
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: center;
 
   width: 100%;
-  border: transparent;
-  background: transparent;
-  padding: 24px;
+  margin-bottom: 6px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
+  padding-left: 24px;
 
-  cursor: pointer;
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: initial;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  position: absolute;
+  left: 0;
+  top: 4px;
+`;
+
+const SActionButton = styled(Button)`
+  position: fixed;
+  z-index: 2;
+
+  width: calc(100% - 32px);
+  bottom: 16px;
+  left: 16px;
 `;
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
 
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
 
-  align-self: bottom;
-
   height: 100%;
+  width: 100%;
 
   min-height: calc(728px - 46px - 64px - 40px - 72px);
 
@@ -536,6 +598,6 @@ const SActivitesContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px);
+    max-height: calc(728px - 46px - 64px - 72px);
   }
 `;

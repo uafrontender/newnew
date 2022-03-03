@@ -20,9 +20,13 @@ const MoreCommentsModal = dynamic(() => import('./MoreCommentsModal'));
 
 interface ICommentsTab {
   comments: newnewapi.Auction.Option[];
+  handleGoBack: () => void,
 }
 
-const CommentsTab: React.FunctionComponent<ICommentsTab> = ({ comments }) => {
+const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
+  comments,
+  handleGoBack,
+}) => {
   const scrollRef: any = useRef();
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
   const { t } = useTranslation('decision');
@@ -331,8 +335,8 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({ comments }) => {
                   {t('comments.view-more')}
                 </SButton>
                 <MoreCommentsModal
-                  confirmMoreComments={confirmMoreComments}
-                  closeMoreCommentsModal={() => setConfirmMoreComments(false)}
+                  confirmMoreComments={isMobile}
+                  closeMoreCommentsModal={() => handleGoBack()}
                   comments={collection.slice(3)}
                 />
               </>
@@ -352,7 +356,12 @@ const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
   padding-right: 20px;
-  height: calc(100% - 112px);
+  height: calc(100% - 50px);
+  align-self: flex-end;
+
+  ${({ theme }) => theme.media.tablet} {
+    height: calc(100% - 56px);
+  }
 `;
 
 const SActionSection = styled.div`
