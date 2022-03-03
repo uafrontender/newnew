@@ -281,7 +281,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   }, [inView, pagingToken, optionsLoading]);
 
   useEffect(() => {
-    if (optionBeingSupported && containerRef.current) {
+    if (optionBeingSupported && containerRef.current && !isMobile) {
       let optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
       optIdx += 2;
       const childDiv = containerRef.current.children[optIdx];
@@ -295,7 +295,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         top: scrollBy,
       });
     }
-  }, [options, optionBeingSupported]);
+  }, [options, optionBeingSupported, isMobile]);
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
@@ -440,6 +440,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               value={newBidAmount}
               inputAlign="left"
               disabled={optionBeingSupported !== ''}
+              style={{
+                textAlign: 'center',
+                paddingLeft: '12px',
+              }}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
             />
