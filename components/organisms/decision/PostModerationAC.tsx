@@ -31,6 +31,8 @@ import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -39,11 +41,15 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 interface IPostModerationAC {
   post: newnewapi.Auction;
   handleGoBack: () => void;
+  postStatus: TPostStatusStringified;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   post,
   handleGoBack,
+  postStatus,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -73,7 +79,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -158,7 +168,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         })
       : [];
 
-    // const optionsByVipUsers = [];
+    const optionsByVipUsers = unsortedArr
+      .filter((o) => o.isCreatedBySubscriber)
+      .sort((a, b) => {
+        return (b.id as number) - (a.id as number);
+      });
 
     const workingArrSorted = unsortedArr.sort((a, b) => {
       // Sort the rest by newest first
@@ -172,7 +186,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           || highestOption.isSupportedByMe) ? [highestOption] : []),
       ...optionsByUser,
       ...optionsSupportedByUser,
-      // ...optionsByVipUsers,
+      ...optionsByVipUsers,
       ...(
         highestOption
         && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),
@@ -437,16 +451,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <PostTopInfo
+      <PostTopInfoModeration
         postType="ac"
-        postId={post.postUuid}
         title={post.title}
+        postId={post.postUuid}
         amountInBids={totalAmount}
-        creator={post.creator!!}
-        startsAtSeconds={post.startsAt?.seconds as number}
-        isFollowingDecisionInitial={false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
+        handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer>
         <DecisionTabs
@@ -454,18 +464,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             {
               label: 'bids',
               value: 'bids',
-              ...(
-                numberOfOptions
-                  ? { amount: numberOfOptions.toString() } : {}
-              ),
             },
             {
               label: 'comments',
               value: 'comments',
-              ...(
-                comments.length > 0
-                  ? { amount: comments.length.toString() } : {}
-              ),
             },
           ]}
           activeTab={currentTab}

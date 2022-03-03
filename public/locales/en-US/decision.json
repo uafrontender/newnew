@@ -25,7 +25,15 @@
     "unfollow-creator": "Unfollow creator",
     "follow-decision": "Follow decision",
     "unfollow-decision": "Unfollow decision",
-    "report": "Report"
+    "report": "Report",
+    "deleteDecision": "Delete decision",
+    "cancel": "Cancel"
+  },
+  "DeletePostModal": {
+    "title": "Delete decision",
+    "body": "Are you sure you want to permanently delete this decision? You can't undo the action.",
+    "cancelBtn": "Cancel",
+    "confirmBtn": "Delete permenently"
   },
   "tabs": {
     "comments": "Comments",
@@ -165,8 +173,12 @@
     }
   },
   "AcPostModeration": {
-    "noBids": {
-
+    "OptionsTab": {
+      "me": "me",
+      "NoOptions": {
+        "caption_1": "No active bids yet.",
+        "caption_2": "Share the decision to get as many as possible!"
+      }
     }
   },
   "McPostModeration": {

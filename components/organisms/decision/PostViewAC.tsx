@@ -38,10 +38,16 @@ interface IPostViewAC {
   optionFromUrl?: newnewapi.Auction.Option;
   sessionId?: string;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
-  post, optionFromUrl, sessionId, postStatus, handleGoBack,
+  post,
+  optionFromUrl,
+  sessionId,
+  postStatus,
+  handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -67,7 +73,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -158,7 +168,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         .filter((o) => o.isCreatedBySubscriber)
         .sort((a, b) => {
           return (b.id as number) - (a.id as number);
-        })
+        });
 
       const workingArrSorted = unsortedArr.sort((a, b) => {
         // Sort the rest by newest first
@@ -377,6 +387,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
         setNumberOfOptions(decoded.post?.auction?.optionCount!!);
+        handleUpdatePostStatus(decodedParsed.status);
       }
     };
 
@@ -425,8 +436,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <DecisionTabs

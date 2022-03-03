@@ -75,3 +75,13 @@ export const placeBidWithWallet = (
   'post',
   payload,
 );
+
+export const selectWinningOption = (
+  payload: newnewapi.SelectWinningOptionRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.SelectWinningOptionRequest, newnewapi.Auction>(
+  newnewapi.SelectWinningOptionRequest,
+  newnewapi.Auction,
+  `${BASE_URL_AUCTION}/select_winning_option`,
+  'post',
+  payload,
+);

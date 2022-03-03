@@ -36,12 +36,14 @@ interface IPostViewMC {
   post: newnewapi.MultipleChoice;
   sessionId?: string;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   post,
   sessionId,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -70,7 +72,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -380,6 +386,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
         setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
+        handleUpdatePostStatus(decodedParsed.status);
       }
     };
 
@@ -433,8 +440,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <DecisionTabs

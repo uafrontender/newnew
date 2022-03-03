@@ -46,12 +46,14 @@ interface IPostViewCF {
   post: newnewapi.Crowdfunding;
   sessionId?: string;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   post,
   sessionId,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -83,7 +85,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -393,6 +399,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
+        handleUpdatePostStatus(decodedParsed.status);
       }
     };
 
@@ -441,13 +448,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         postType="cf"
         postId={post.postUuid}
         title={post.title}
-        currentBackers={currentBackers}
-        targetBackers={post.targetBackerCount}
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <DecisionTabs

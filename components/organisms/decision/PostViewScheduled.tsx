@@ -1,31 +1,34 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import React, {
-  useCallback, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { markPost } from '../../../api/endpoints/post';
 
-import PostVideo from '../../molecules/decision/PostVideo';
 import GoBackButton from '../../molecules/GoBackButton';
+import PostVideo from '../../molecules/decision/PostVideo';
+import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import { TPostType } from '../../../utils/switchPostType';
-import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import switchPostType, { TPostType } from '../../../utils/switchPostType';
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
   postType: TPostType;
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
@@ -33,6 +36,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   postType,
   postStatus,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -41,6 +45,10 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
 
   const [isFollowing, setIsFollowing] = useState(post.isFavoritedByMe ?? false);
 
@@ -65,6 +73,30 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const socketHandlerPostData = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostUpdated.decode(arr);
+
+      if (!decoded) return;
+      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
+      if (decodedParsed.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decodedParsed.status);
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection.on('PostUpdated', socketHandlerPostData);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('PostUpdated', socketHandlerPostData);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, post, user.userData?.userUuid]);
 
   return (
     <SWrapper>
@@ -91,8 +123,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
         creator={post.creator!!}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
         startsAtSeconds={post.startsAt?.seconds as number}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <PostScheduledSection

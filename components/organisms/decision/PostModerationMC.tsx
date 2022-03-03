@@ -39,11 +39,13 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostModerationMC {
   post: newnewapi.MultipleChoice;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   post,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -72,7 +74,11 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -346,6 +352,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
         setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
+        handleUpdatePostStatus(decodedParsed.status);
       }
     };
 
@@ -399,8 +406,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <DecisionTabs

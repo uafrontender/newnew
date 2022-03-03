@@ -39,11 +39,13 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 interface IPostModerationCF {
   post: newnewapi.Crowdfunding;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   post,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -74,7 +76,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -353,6 +359,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
+        handleUpdatePostStatus(decodedParsed.status);
       }
     };
 
@@ -401,13 +408,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         postType="cf"
         postId={post.postUuid}
         title={post.title}
-        currentBackers={currentBackers}
-        targetBackers={post.targetBackerCount}
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <DecisionTabs

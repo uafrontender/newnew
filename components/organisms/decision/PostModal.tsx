@@ -14,15 +14,16 @@ import { fetchAcOptionById } from '../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import Headline from '../../atoms/Headline';
 import List from '../search/List';
-import PostViewMC from './PostViewMC';
+import Headline from '../../atoms/Headline';
+import InlineSvg from '../../atoms/InlineSVG';
 import PostViewAC from './PostViewAC';
+import PostViewMC from './PostViewMC';
 import PostViewCF from './PostViewCF';
 import PostModerationAC from './PostModerationAC';
-import PostModerationCF from './PostModerationCF';
 import PostModerationMC from './PostModerationMC';
-import InlineSvg from '../../atoms/InlineSVG';
+import PostModerationCF from './PostModerationCF';
+import PostViewScheduled from './PostViewScheduled';
 
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
@@ -30,8 +31,8 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import isBrowser from '../../../utils/isBrowser';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import switchPostStatus from '../../../utils/switchPostStatus';
-import PostViewScheduled from './PostViewScheduled';
+import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatusString from '../../../utils/switchPostStatusString';
 
 interface IPostModal {
   isOpen: boolean;
@@ -56,7 +57,26 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
-  const postStatus = (typeOfPost && postParsed?.status) ? switchPostStatus(typeOfPost, postParsed?.status) : 'processing'
+  const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
+    if (typeOfPost && postParsed?.status) {
+      if (typeof postParsed.status === 'string') {
+        return switchPostStatusString(typeOfPost, postParsed?.status);
+      }
+      return switchPostStatus(typeOfPost, postParsed?.status);
+    }
+    return 'processing'
+  });
+
+  const handleUpdatePostStatus = useCallback((newStatus: number | string) => {
+    let status;
+    if (typeof newStatus === 'number') {
+      status = switchPostStatus(typeOfPost!!, newStatus);
+    } else {
+      status = switchPostStatusString(typeOfPost!!, newStatus);
+    }
+    setPostStatus(status);
+  }, [typeOfPost]);
+
   const isMyPost = useMemo(
     () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
@@ -151,6 +171,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           postType={typeOfPost!!}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -162,6 +183,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.MultipleChoice}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -174,6 +196,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -184,6 +207,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Crowdfunding}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -194,15 +218,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'mc') {
       return (
         <PostModerationMC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
     if (postToRender === 'ac') {
       return (
         <PostModerationAC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
+          postStatus={postStatus}
+          handleUpdatePostStatus={handleUpdatePostStatus}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -210,8 +239,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'cf') {
       return (
         <PostModerationCF
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -302,6 +333,22 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, nextPageToken, recommenedPostsLoading]);
+
+  useEffect(() => {
+    setPostStatus(() => {
+      if (typeOfPost && postParsed?.status) {
+        if (typeof postParsed.status === 'string') {
+          return switchPostStatusString(typeOfPost, postParsed?.status);
+        }
+        return switchPostStatus(typeOfPost, postParsed?.status);
+      }
+      return 'processing'
+    });
+  }, [postParsed, typeOfPost]);
+
+  useEffect(() => {
+    console.log(postStatus)
+  }, [postStatus]);
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>

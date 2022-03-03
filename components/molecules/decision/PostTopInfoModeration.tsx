@@ -6,68 +6,52 @@ import React, { useContext, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { cancelMyPost } from '../../../api/endpoints/post';
 
 import { TPostType } from '../../../utils/switchPostType';
 
 import Button from '../../atoms/Button';
+import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
+import PostShareMenu from './PostShareMenu';
+import PostShareModal from './PostShareModal';
+import PostConfirmDeleteModal from './PostConfirmDeleteModal';
+import PostEllipseMenuModeration from './PostEllipseMenuModeration';
+import PostEllipseModalModeration from './PostEllipseModalModeration';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 import { formatNumber } from '../../../utils/format';
-import PostTitle from './PostTitle';
-import PostShareMenu from './PostShareMenu';
-import PostShareModal from './PostShareModal';
-import PostEllipseMenu from './PostEllipseMenu';
-import PostEllipseModal from './PostEllipseModal';
-import { markPost } from '../../../api/endpoints/post';
-import { FollowingsContext } from '../../../contexts/followingContext';
-import { markUser } from '../../../api/endpoints/user';
-import Headline from '../../atoms/Headline';
 
-interface IPostTopInfo {
-  postId: string;
+interface IPostTopInfoModeration {
   title: string;
-  creator: newnewapi.IUser;
-  isFollowingDecisionInitial: boolean;
-  postType?: TPostType;
-  startsAtSeconds: number;
-  amountInBids?: number;
+  postId: string;
   totalVotes?: number;
+  postType?: TPostType;
+  amountInBids?: number;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
-const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
-  postId,
+const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = ({
   title,
-  creator,
+  postId,
   postType,
-  startsAtSeconds,
-  isFollowingDecisionInitial,
-  amountInBids,
   totalVotes,
+  amountInBids,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('decision');
-  const startingDateParsed = new Date(startsAtSeconds * 1000);
-  const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
-
-  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial)
-
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+  const [deletePostOpen, setDeletePostOpen] = useState(false);
 
-  const handleRedirectToUser = () => {
-    router.push(`/u/${creator.username}`);
-  };
 
   const handleOpenShareMenu = () => setShareMenuOpen(true);
   const handleCloseShareMenu = () => setShareMenuOpen(false);
@@ -75,50 +59,26 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
-  const handleFollowDecision = async () => {
+  const handleOpenDeletePostModal = () => setDeletePostOpen(true);
+  const handleCloseDeletePostModal = () => setDeletePostOpen(false);
+
+  const handleDeletePost = async () => {
     try {
-      if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-decision');
-      }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+      const payload = new newnewapi.CancelMyPostRequest({
         postUuid: postId,
       });
 
-      const res = await markPost(markAsViewedPayload);
+      const res = await cancelMyPost(payload);
 
       if (!res.error) {
-        setIsFollowingDecision(!isFollowingDecision);
+        console.log('Post deleted/cancelled');
+        handleUpdatePostStatus('CANCELLED');
+        handleCloseDeletePostModal();
       }
     } catch (err) {
       console.error(err);
     }
   };
-
-  const handleToggleFollowingCreator = async () => {
-    try {
-      if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-creator');
-      }
-
-      const payload = new newnewapi.MarkUserRequest({
-        userUuid: creator.uuid,
-        markAs: followingsIds.includes(creator.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-      });
-
-      const res = await markUser(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (followingsIds.includes(creator.uuid as string)) {
-        removeId(creator.uuid as string);
-      } else {
-        addId(creator.uuid as string);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   return (
     <SContainer>
@@ -142,19 +102,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             { t('McPost.PostTopInfo.votes') }
           </SBidsAmount>
         ) : null}
-        <CreatorCard
-          onClick={() => handleRedirectToUser()}
-        >
-          <SAvatarArea>
-            <img
-              src={creator.avatarUrl!! as string}
-              alt={creator.username!!}
-            />
-          </SAvatarArea>
-          <SUsername>
-            { creator.nickname ?? `@${creator.username}` }
-          </SUsername>
-        </CreatorCard>
         <SActionsDiv>
           <SShareButton
             view="transparent"
@@ -201,24 +148,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
           {/* Ellipse menu */}
           {!isMobile && (
-            <PostEllipseMenu
-              isFollowing={followingsIds.includes(creator.uuid as string)}
-              isFollowingDecision={isFollowingDecision}
+            <PostEllipseMenuModeration
               isVisible={ellipseMenuOpen}
-              handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
               handleClose={handleCloseEllipseMenu}
+              handleOpenDeletePostModal={handleOpenDeletePostModal}
             />
           )}
           {isMobile && ellipseMenuOpen ? (
-            <PostEllipseModal
-              isFollowing={followingsIds.includes(creator.uuid as string)}
-              isFollowingDecision={isFollowingDecision}
+            <PostEllipseModalModeration
               zIndex={11}
               isOpen={ellipseMenuOpen}
-              handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
               onClose={handleCloseEllipseMenu}
+              handleOpenDeletePostModal={handleOpenDeletePostModal}
             />
           ) : null}
         </SActionsDiv>
@@ -228,17 +169,23 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {title}
         </SPostTitle>
       </SWrapper>
+      {/* Confirm delete post */}
+      <PostConfirmDeleteModal
+        isVisible={deletePostOpen}
+        closeModal={handleCloseDeletePostModal}
+        handleConfirmDelete={handleDeletePost}
+      />
     </SContainer>
   );
 };
 
-PostTopInfo.defaultProps = {
+PostTopInfoModeration.defaultProps = {
   postType: undefined,
   amountInBids: undefined,
   totalVotes: undefined,
 };
 
-export default PostTopInfo;
+export default PostTopInfoModeration;
 
 const SContainer = styled.div`
   grid-area: title;
@@ -251,8 +198,7 @@ const SWrapper = styled.div`
 
   grid-template-areas:
     'title title title'
-    'userCard userCard actions'
-    'stats stats stats';
+    'stats stats actions'
   ;
 
   height: fit-content;
@@ -263,7 +209,7 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
     grid-template-areas:
-      'userCard stats actions'
+      'stats stats actions'
       'title title title'
     ;
     grid-template-rows: 40px;
@@ -276,62 +222,6 @@ const SWrapper = styled.div`
 
 const SPostTitle = styled(Headline)`
   grid-area: title;
-`;
-
-// Creator card
-const CreatorCard = styled.div`
-  grid-area: userCard;
-
-  display: grid;
-  align-items: center;
-  grid-template-areas:
-    'avatar username'
-  ;
-  grid-template-columns: 36px 1fr;
-
-  height: 36px;
-
-  cursor: pointer;
-
-  & > div:nth-child(2) {
-    transition: .2s linear;
-  }
-
-  &:hover {
-    & > div:nth-child(2) {
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
-`;
-
-const SAvatarArea = styled.div`
-  grid-area: avatar;
-
-  align-self: center;
-
-  overflow: hidden;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    display: block;
-    width: 24px;
-    height: 24px;
-  }
-`;
-
-const SUsername = styled.div`
-  grid-area: username;
-
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;
 
 // Action buttons
@@ -372,8 +262,8 @@ const SMoreButton = styled(Button)`
 // Auction
 const SBidsAmount = styled.div`
   grid-area: stats;
-
-  margin-bottom: 12px;
+  justify-self: flex-start !important;
+  align-self: center;
 
   font-weight: 600;
   font-size: 14px;

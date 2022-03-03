@@ -3,44 +3,36 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, {
-  useMemo,
-} from 'react';
-import styled, { css } from 'styled-components';
+import React from 'react';
+import styled, { useTheme } from 'styled-components';
 
-import { useAppSelector } from '../../../../../redux-store/store';
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostViewAC';
 
 import Text from '../../../../atoms/Text';
+import Button from '../../../../atoms/Button';
 
 import { formatNumber } from '../../../../../utils/format';
+
+// Icons
+import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
+import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
+import InlineSvg from '../../../../atoms/InlineSVG';
 
 interface IAcOptionCardModeration {
   option: TAcOptionWithHighestField;
   index: number;
-  handleOpenOptionBidHistory: () => void;
 }
 
 const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> = ({
   option,
   index,
-  handleOpenOptionBidHistory,
 }) => {
+  const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
-  const user = useAppSelector((state) => state.user);
-
-  const highest = useMemo(() => option.isHighest, [option.isHighest]);
-  const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
-    option.creator?.uuid,
-    user.userData?.userUuid,
-  ]);
-  const bgVariant = highest ? 'yellow' : (
-    myBid ? 'blue' : myVote ? 'green' : undefined);
 
   // Redirect to user's page
-  const handleRedirectToUser = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
 
   return (
     <motion.div
@@ -52,63 +44,70 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
       }}
     >
       <SContainer>
-        <SBidDetails
-          bgVariant={bgVariant}
-          onClick={() => {
-            handleOpenOptionBidHistory();
-          }}
-        >
-          <SBidInfo>
-            {highest
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.highest')}</STag>
-              ) : null}
-            {myVote
-              && !myBid
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag>
-              ) : null}
-            {myBid
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag>
-              ) : null}
-            {/* Comment out for now */}
-            {/* {option.creator.isVIP
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.vip')}</STag>
-              ) : null} */}
-            <SAvatar
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
-              }}
-              src={option?.creator?.avatarUrl!! as string}
-              alt={option?.creator?.username!!}
-              draggable={false}
+      <SBidDetails>
+          <SBidAmount>
+            <SCoinImg
+              src={CoinIcon.src}
             />
-            <SUsername
-              isColored={bgVariant !== undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
+            <div>
+              {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
+            </div>
+          </SBidAmount>
+          <SOptionInfo
+            variant={3}
+          >
+            {option.title}
+          </SOptionInfo>
+          <SBiddersInfo
+            variant={3}
+          >
+            <SSpanBiddersHighlighted
+              className="spanHighlighted"
+              onClick={() => handleRedirectToOptionCreator()}
+              style={{
+                ...(option.isCreatedBySubscriber ? {
+                  color: theme.colorsThemed.accent.yellow,
+                  cursor: 'pointer',
+                } : {}),
               }}
             >
-              { option.creator?.uuid === user.userData?.userUuid
-                ? t('me') : option?.creator?.username }
-            </SUsername>
-            <SBidTitle
-              variant={3}
+              {option.creator?.nickname ?? option.creator?.username}
+            </SSpanBiddersHighlighted>
+            {option.supporterCount > 1 ? (
+              <>
+                <SSpanBiddersRegular
+                  className="spanRegular"
+                >
+                  {` & `}
+                </SSpanBiddersRegular>
+                <SSpanBiddersHighlighted
+                  className="spanHighlighted"
+                >
+                  {formatNumber(
+                    option.supporterCount - 1,
+                    true,
+                  )}
+                  { ' ' }
+                  {t('AcPost.OptionsTab.OptionCard.others')}
+                </SSpanBiddersHighlighted>
+              </>
+            ) : null}
+            {' '}
+            <SSpanBiddersRegular
+              className="spanRegular"
             >
-              { option.title }
-            </SBidTitle>
-          </SBidInfo>
-          <SAmount>
-            {option.totalAmount?.usdCents
-              ? (
-                `$${formatNumber((option?.totalAmount?.usdCents / 100) ?? 0, true)}`
-              ) : '$0'}
-          </SAmount>
+              {t('AcPost.OptionsTab.OptionCard.bid')}
+            </SSpanBiddersRegular>
+          </SBiddersInfo>
         </SBidDetails>
+        <SSupportButton>
+          <InlineSvg
+            svg={MoreIconFilled}
+            fill={theme.colorsThemed.text.secondary}
+            width="20px"
+            height="20px"
+          />
+        </SSupportButton>
       </SContainer>
     </motion.div>
   );
@@ -119,128 +118,123 @@ AcOptionCardModeration.defaultProps = {
 
 export default AcOptionCardModeration;
 
+
 const SContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: 12px;
 
-  width: calc(100% - 16px);
+  width: 100%;
+
+  padding: 16px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ${({ theme }) => theme.media.tablet} {
     /* width: 80%; */
     flex-direction: row;
     justify-content: space-between;
     gap: 16px;
+
+    padding: initial;
+    background-color: initial;
+    border-radius: initial;
   }
 `;
 
-const SBidDetails = styled.div<{
-  bgVariant?: 'yellow' | 'green' | 'blue';
-}>`
+const SBidDetails = styled.div`
   position: relative;
 
   display: grid;
   grid-template-areas:
-    'info amount'
-    'doubleVote doubleVote'
-  ;
+    'amount amount'
+    'optionInfo optionInfo'
+    'bidders bidders';
   grid-template-columns: 7fr 1fr;
-  gap: 16px;
 
   width: 100%;
 
-  padding: 14px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  ${({ theme }) => theme.media.tablet} {
+    grid-template-areas:
+    'amount bidders'
+    'optionInfo optionInfo';
+    grid-template-columns: 3fr 7fr;
 
-  ${({ bgVariant }) => (
-    bgVariant
-      ? css`
-        background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
-      ` : null
-  )};
 
-  &:hover {
-    cursor: pointer;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    padding: 14px;
   }
 `;
 
-const SBidInfo = styled.div`
-  grid-area: info;
+const SBidAmount = styled.div`
+  grid-area: amount;
 
-  /* display: flex; */
-  justify-content: flex-start;
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: 8px;
 
-
-  vertical-align: middle;
-  line-height: 24px;
+  margin-bottom: 6px;
 `;
 
-const STag = styled.span`
-  background-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: 50px;
-  padding: 6px;
-
-  font-weight: bold;
-  font-size: 10px;
-  line-height: 12px;
-  color: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  margin-right: 8px;
-`;
-
-const SAvatar = styled.img`
-  position: relative;
-  top: 7.5px;
-
-  display: inline;
-  width: 24px;
+const SCoinImg = styled.img`
   height: 24px;
-  border-radius: 50%;
-
-  margin-right: 8px;
-
-  cursor: pointer;
 `;
 
-const SUsername = styled.div<{
-  isColored?: boolean;
-}>`
-  display: inline;
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme, isColored }) => (isColored ? 'rgba(255, 255, 255, 0.8)' : theme.colorsThemed.text.secondary)};
-  margin-right: 8px;
+const SOptionInfo = styled(Text)`
+  grid-area: optionInfo;
 
-  transition: 0.2s linear;
-  cursor: pointer;
+  margin-bottom: 8px;
 
-  &:hover {
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: initial;
   }
 `;
 
-const SBidTitle = styled(Text)`
-  display: inline;
-  line-break: loose;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
+const SBiddersInfo = styled(Text)`
+  grid-area: bidders;
+
+  ${({ theme }) => theme.media.tablet} {
+    justify-self: flex-end;
+  }
 `;
 
-const SAmount = styled.div`
-  grid-area: amount;
-  align-self: center;
-  justify-self: flex-end;
+const SSpanBiddersHighlighted = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
 
+const SSpanBiddersRegular = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
 
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
+const SSupportButton = styled(Button)`
+  width: 100%;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    width: auto;
+
+    padding: 0px 12px;
+    margin-right: 16px;
+
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+    background: none;
+
+    &:hover:enabled,
+    &:focus:enabled {
+      background: none;
+      color: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
 `;

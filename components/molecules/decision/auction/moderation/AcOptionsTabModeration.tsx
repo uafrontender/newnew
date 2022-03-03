@@ -11,23 +11,19 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { debounce } from 'lodash';
 
-import { placeBidOnAuction } from '../../../../../api/endpoints/auction';
 import { useAppSelector } from '../../../../../redux-store/store';
 
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostViewAC';
 
-import AcOptionCard from '../AcOptionCard';
-import OptionOverview from '../AcOptionOverview';
-import SuggestionTextArea from '../../../../atoms/decision/SuggestionTextArea';
-import BidAmountTextInput from '../../../../atoms/decision/BidAmountTextInput';
-import PaymentModal from '../../../checkout/PaymentModal';
-import LoadingModal from '../../../LoadingModal';
-import OptionActionMobileModal from '../../OptionActionMobileModal';
-import Button from '../../../../atoms/Button';
 import Text from '../../../../atoms/Text';
+import Button from '../../../../atoms/Button';
+import GradientMask from '../../../../atoms/GradientMask';
 import AcOptionCardModeration from './AcOptionCardModeration';
+
+import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
+
+import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
 
 interface IAcOptionsTabModeration {
   postId: string;
@@ -69,10 +65,8 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
     inView,
   } = useInView();
 
-  const [shadowTop, setShadowTop] = useState(false);
-  const [shadowBottom, setShadowBottom] = useState(!isMobile);
-  const heightDelta = 56;
   const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
   const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
@@ -86,83 +80,6 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
 
-  useEffect(() => {
-    if (optionBeingSupported && containerRef.current) {
-      let optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
-      optIdx += 2;
-      const childDiv = containerRef.current.children[optIdx];
-
-      const childRect = childDiv.getBoundingClientRect();
-      const parentRect = containerRef.current.getBoundingClientRect();
-
-      const scrollBy = childRect.top - parentRect.top;
-
-      containerRef.current.scrollBy({
-        top: scrollBy,
-      });
-    }
-  }, [options, optionBeingSupported]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolledToTop = (containerRef.current?.scrollTop ?? 0) < 10;
-      const isScrolledToBottom = (
-        (containerRef.current?.scrollTop ?? 0) + (containerRef.current?.clientHeight ?? 0))
-        >= (containerRef.current?.scrollHeight ?? 0);
-
-      if (!isScrolledToTop) {
-        setShadowTop(true);
-      } else {
-        setShadowTop(false);
-      }
-
-      if (!isScrolledToBottom) {
-        setShadowBottom(true);
-      } else {
-        setShadowBottom(false);
-      }
-    };
-
-    containerRef.current?.addEventListener('scroll', handleScroll);
-
-    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
-  }, [overviewedOption]);
-
-  useEffect(() => {
-    if (overviewedOption) {
-      overviewedRefId.current = overviewedOption.id.toString();
-
-      if (isMobile) {
-        document.getElementById('post-modal-container')
-          ?.scrollTo({
-            top: window.innerHeight,
-            behavior: 'smooth',
-          });
-      }
-    } else if (!overviewedOption && overviewedRefId.current) {
-      let optIdx = options.findIndex((o) => o.id.toString() === overviewedRefId.current);
-      optIdx += 2;
-      const childDiv = containerRef.current!!.children[optIdx];
-
-      if (childDiv) {
-        if (isMobile) {
-          childDiv.scrollIntoView();
-        } else {
-          const childRect = childDiv.getBoundingClientRect();
-          const parentRect = containerRef.current!!.getBoundingClientRect();
-          const scrollBy = childRect.top - parentRect.top;
-
-          containerRef.current!!.scrollBy({
-            top: scrollBy,
-          });
-        }
-      }
-
-      overviewedRefId.current = '';
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overviewedOption, options]);
-
   return (
     <>
       <STabContainer
@@ -174,29 +91,42 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
+        {options.length === 0 && !optionsLoading ? (
+          <SNoOptionsYet>
+            <SNoOptionsImgContainer>
+              <img
+                src={NoContentYetImg.src}
+                alt='No content yet'
+              />
+            </SNoOptionsImgContainer>
+            <SNoOptionsCaption
+              variant={3}
+            >
+              { t('AcPostModeration.OptionsTab.NoOptions.caption_1') }
+            </SNoOptionsCaption>
+            <SNoOptionsCaption
+              variant={3}
+            >
+              { t('AcPostModeration.OptionsTab.NoOptions.caption_2') }
+            </SNoOptionsCaption>
+          </SNoOptionsYet>
+        ) : null}
         <SBidsContainer
           ref={(el) => {
             containerRef.current = el!!;
           }}
-          heightDelta={heightDelta}
         >
-          <SShadowTop
-            style={{
-              opacity: shadowTop && !optionBeingSupported ? 1 : 0,
-            }}
-          />
-          <SShadowBottom
-            heightDelta={heightDelta}
-            style={{
-              opacity: shadowBottom && !optionBeingSupported ? 1 : 0,
-            }}
-          />
+          {!isMobile ? (
+            <>
+              <GradientMask positionTop active={showTopGradient} />
+              <GradientMask positionBottom={0} active={showBottomGradient} />
+            </>
+          ) : null}
           {options.map((option, i) => (
             <AcOptionCardModeration
               key={option.id.toString()}
               option={option as TAcOptionWithHighestField}
               index={i}
-              handleOpenOptionBidHistory={() => handleOpenOptionBidHistory(option)}
             />
           ))}
           {!isMobile ? (
@@ -234,9 +164,7 @@ const STabContainer = styled(motion.div)`
   height: calc(100% - 112px);
 `;
 
-const SBidsContainer = styled.div<{
-  heightDelta: number;
-}>`
+const SBidsContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -247,7 +175,7 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    height: 100%;
     &::-webkit-scrollbar {
       width: 4px;
     }
@@ -362,18 +290,37 @@ const SActionSection = styled.div`
   }
 `;
 
-// Payment modal header
-const SPaymentModalHeader = styled.div`
 
-`;
+// No options yet
+const SNoOptionsYet = styled.div`
+  position: absolute;
 
-const SPaymentModalTitle = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  margin-bottom: 6px;
-`;
-
-const SPaymentModalOptionText = styled.div`
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+
+  width: 100%;
+  min-height: 400px;
+`;
+
+const SNoOptionsImgContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  margin-bottom: 16px;
+`;
+
+const SNoOptionsCaption = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
