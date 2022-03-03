@@ -8,6 +8,7 @@
     "days": "d",
     "hours": "h",
     "minutes": "m",
+    "seconds": "s",
     "ended_on": "ended on",
     "at_time": "at"
   },
@@ -23,13 +24,30 @@
     "follow-creator": "Follow creator",
     "unfollow-creator": "Unfollow creator",
     "follow-decision": "Follow decision",
+    "unfollow-decision": "Unfollow decision",
     "report": "Report"
   },
   "tabs": {
     "comments": "Comments",
     "bids": "Bids",
-    "history": "History",
-    "options": "Options"
+    "options": "Options",
+    "backers": "Backers",
+    "history": "History"
+  },
+  "PostScheduled": {
+    "PostScheduledSection": {
+      "title": "Coming soon",
+      "subtitle_1": "Decision is not active yet.",
+      "subtitle_2": "Follow to not miss the update.",
+      "timer": {
+        "days": "Days",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+      },
+      "followBtn": "Follow decision",
+      "unfollowBtn": "Unfollow decision"
+    }
   },
   "AcPost": {
     "paymenModalHeader": {
@@ -40,6 +58,10 @@
     },
     "OptionsTab": {
       "me": "me",
+      "NoOptions": {
+        "caption_1": "No active bids yet.",
+        "caption_2": "Be the first to make a bid!"
+      },
       "tags": {
         "my_vote": "My vote",
         "my_bid": "My bid",
@@ -50,7 +72,10 @@
       "OptionCard": {
         "by": "by",
         "bidders": "bidders",
+        "others": "others",
+        "bid": "bid",
         "supportBtn": "Support",
+        "raiseBidBtn": "Raise bid",
         "placeABidBtn": "Place a bid",
         "cancelBtn": "Cancel"
       },
@@ -83,19 +108,31 @@
       },
       "loadMoreBtn": "Load more",
       "OptionCard": {
+        "noVotes": "no votes",
         "votes": "votes",
+        "my_suggestion": "My suggestion",
+        "subscriber_suggestion": "{{ nickname }}'s suggestion",
+        "others": "others",
+        "voters": "voters",
+        "voted": "voted",
         "supportBtn": "Vote",
         "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
         "doubleMyVoteButton": "Double my vote",
-        "placeABidBtn": "Vote",
+        "placeABidBtn": "Place a vote",
         "cancelBtn": "Cancel"
       },
       "BidCard": {
         "didABid": "bid"
       },
       "ActionSection": {
+        "votesAmount": {
+          "placeholder": {
+            "votes": "votes",
+            "vote": "vote"
+          }
+        },
         "suggestionPlaceholder": "Add a suggestion ...",
-        "placeABidBtn": "Place a bid"
+        "placeABidBtn": "Place a vote"
       }
     },
     "FloatingActionButton": {
@@ -103,8 +140,28 @@
     }
   },
   "CfPost": {
+    "BackersStatsSection": {
+      "of_backers": "of {{ targetBackers }} backers"
+    },
+    "BackersTab": {
+      "info": {
+        "title": "Back the decision",
+        "caption": "You won't get charged until a decision has been made."
+      },
+      "CustomPledge": {
+        "pledgeBtn": "Pledge",
+        "continue": "Continue",
+        "cancelBtn": "Cancel"
+      },
+      "free_sub": "FREE SUB",
+      "custom": "Custom",
+      "cancel": "Cancel"
+    },
     "paymenModalHeader": {
       "subtitle": "You pledge for"
+    },
+    "FloatingActionButton": {
+      "choosePledgeBtn": "Make pledge"
     }
   },
   "RecommendationsSection": {

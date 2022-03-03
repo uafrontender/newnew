@@ -8,28 +8,25 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
-import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
+import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 
 import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
-import OptionTitle from '../../molecules/decision/auction/AcOptionTitle';
-import AcOptionTopInfo from '../../molecules/decision/auction/AcOptionTopInfo';
-import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import LoadingModal from '../../molecules/LoadingModal';
+import GoBackButton from '../../molecules/GoBackButton';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
+import switchPostType from '../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -37,12 +34,15 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 
 interface IPostViewAC {
   post: newnewapi.Auction;
+  postStatus: TPostStatusStringified;
   optionFromUrl?: newnewapi.Auction.Option;
   sessionId?: string;
   handleGoBack: () => void;
 }
 
-const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl, sessionId, handleGoBack }) => {
+const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
+  post, optionFromUrl, sessionId, postStatus, handleGoBack,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -55,7 +55,41 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
   const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>('bids');
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'bids'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#bids' || hash === '#comments')) {
+      return hash.substring(1) as 'bids' | 'comments';
+    }
+    return 'bids';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      if (!hash) {
+        setCurrentTab('bids');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'bids' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -73,8 +107,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
   // Animating options
   const [optionToAnimate, setOptionToAnimate] = useState('');
 
-  // Option overview
-  const [overviewedOption, setOverviewedOption] = useState<newnewapi.Auction.Option | undefined>(undefined);
   const currLocation = `/?post=${post.postUuid}`;
 
   // Comments
@@ -122,7 +154,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
             })
         : [];
 
-      // const optionsByVipUsers = [];
+      const optionsByVipUsers = unsortedArr
+        .filter((o) => o.isCreatedBySubscriber)
+        .sort((a, b) => {
+          return (b.id as number) - (a.id as number);
+        })
 
       const workingArrSorted = unsortedArr.sort((a, b) => {
         // Sort the rest by newest first
@@ -135,7 +171,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
           : []),
         ...optionsByUser,
         ...optionsSupportedByUser,
-        // ...optionsByVipUsers,
+        ...optionsByVipUsers,
         ...(highestOption && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),
         ...workingArrSorted,
       ];
@@ -238,17 +274,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
     },
     [setOptions, sortOptions]
   );
-
-  const handleOpenOptionBidHistory = (optionToOpen: newnewapi.Auction.Option) => {
-    setOverviewedOption(optionToOpen);
-    window.history.pushState(optionToOpen.id, 'Post', `${currLocation}&suggestion=${optionToOpen.id}`);
-  };
-
-  const handleCloseOptionBidHistory = () => {
-    setOverviewedOption(undefined);
-    window.history.replaceState('', '', currLocation);
-  };
-
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
@@ -322,12 +347,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
   }, []);
 
   useEffect(() => {
-    if (optionFromUrl) {
-      setOverviewedOption(optionFromUrl);
-    }
-  }, [optionFromUrl]);
-
-  useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
@@ -345,15 +364,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
           }
 
           return sortOptions(workingArrUnsorted);
-        });
-
-        setOverviewedOption((curr) => {
-          if (curr === undefined) return curr;
-          const workingObj = { ...curr };
-          if (workingObj.totalAmount) {
-            workingObj.totalAmount.usdCents = decoded.option?.totalAmount?.usdCents!!;
-          }
-          return workingObj as newnewapi.Auction.Option;
         });
       }
     };
@@ -387,89 +397,52 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
   return (
     <SWrapper>
       <SExpiresSection>
-        {isMobile && !overviewedOption && (
-          <GoBackButton
+        {isMobile && (
+          <SGoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
             onClick={handleGoBack}
           />
         )}
-        {overviewedOption && (
-          <GoBackButton
-            style={{
-              gridArea: 'closeBtnMobile',
-            }}
-            onClick={() => {
-              handleCloseOptionBidHistory();
-            }}
-          />
-        )}
-        <PostTimer timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()} postType="ac" />
-        {!isMobile && (
-          <SGoBackButtonDesktop onClick={handleGoBack}>
-            <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
-          </SGoBackButtonDesktop>
-        )}
+        <PostTimer
+          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+          postType="ac"
+        />
       </SExpiresSection>
       <PostVideo
-        // NB! Will be changed for streaming format
-        // NB! Will support responses, as well!
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={post.response ?? undefined}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <div
-        style={{
-          gridArea: 'title',
-        }}
-      >
-        <PostTitle shrink={overviewedOption !== undefined}>{post.title}</PostTitle>
-        {overviewedOption && <OptionTitle option={overviewedOption} />}
-      </div>
+      <PostTopInfo
+        postType="ac"
+        postId={post.postUuid}
+        title={post.title}
+        amountInBids={totalAmount}
+        creator={post.creator!!}
+        startsAtSeconds={post.startsAt?.seconds as number}
+        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleFollowCreator={() => {}}
+        handleReportAnnouncement={() => {}}
+      />
       <SActivitesContainer>
-        {!overviewedOption ? (
-          <PostTopInfo
-            postId={post.postUuid}
-            postType="ac"
-            amountInBids={totalAmount}
-            creator={post.creator!!}
-            startsAtSeconds={post.startsAt?.seconds as number}
-            handleFollowCreator={() => {}}
-            handleReportAnnouncement={() => {}}
-          />
-        ) : (
-          <AcOptionTopInfo
-            creator={overviewedOption?.creator!!}
-            option={overviewedOption}
-            postId={post.postUuid}
-            minAmount={post.minimalBid?.usdCents ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10) : 5}
-            amountInBids={overviewedOption?.totalAmount?.usdCents!!}
-            createdAtSeconds={overviewedOption?.createdAt?.seconds as number}
-            handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-          />
-        )}
-        {!overviewedOption ? (
-          <DecisionTabs
-            tabs={[
-              {
-                label: 'bids',
-                value: 'bids',
-                ...(numberOfOptions ? { amount: numberOfOptions.toString() } : {}),
-              },
-              {
-                label: 'comments',
-                value: 'comments',
-                ...(comments.length > 0 ? { amount: comments.length.toString() } : {}),
-              },
-            ]}
-            activeTab={currentTab}
-            handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
-          />
-        ) : (
-          <SHistoryLabel>{t('tabs.history')}</SHistoryLabel>
-        )}
+        <DecisionTabs
+          tabs={[
+            {
+              label: 'bids',
+              value: 'bids',
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]}
+          activeTab={currentTab}
+          handleChangeTab={handleChangeTab}
+        />
         {currentTab === 'bids' ? (
           <AcOptionsTab
             postId={post.postUuid}
@@ -479,13 +452,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({ post, optionFromUrl,
             pagingToken={optionsNextPageToken}
             minAmount={post.minimalBid?.usdCents ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10) : 5}
             handleLoadBids={fetchBids}
-            overviewedOption={overviewedOption}
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-            handleOpenOptionBidHistory={handleOpenOptionBidHistory}
-            handleCloseOptionBidHistory={handleCloseOptionBidHistory}
           />
         ) : (
-          <CommentsTab comments={comments} />
+          <CommentsTab
+            comments={comments}
+            handleGoBack={() => handleChangeTab('bids')}
+          />
         )}
       </SActivitesContainer>
       {/* Loading Modal */}
@@ -502,23 +475,17 @@ PostViewAC.defaultProps = {
 export default PostViewAC;
 
 const SWrapper = styled.div`
-  display: grid;
-
-  grid-template-areas:
-    'expires'
-    'video'
-    'title'
-    'activities';
+  width: 100%;
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    /* grid-template-rows: 46px 64px 40px calc(506px - 46px); */
     grid-template-rows: 46px min-content 1fr;
     grid-column-gap: 16px;
 
@@ -530,12 +497,6 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
-
-    /* grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px); */
-    /* grid-template-rows: 1fr max-content; */
-
-    // NB! 1fr results in unstable width
-    /* grid-template-columns: 410px 1fr; */
     grid-template-columns: 410px 538px;
   }
 `;
@@ -543,34 +504,25 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   grid-area: expires;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: 'closeBtnMobile timer closeBtnDesktop';
-
-  width: 100%;
-
-  margin-bottom: 6px;
-`;
-
-const SGoBackButtonDesktop = styled.button`
-  grid-area: closeBtnDesktop;
+  position: relative;
 
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: center;
 
   width: 100%;
-  border: transparent;
-  background: transparent;
-  padding: 24px;
+  margin-bottom: 6px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
+  padding-left: 24px;
 
-  cursor: pointer;
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: initial;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  position: absolute;
+  left: 0;
+  top: 4px;
 `;
 
 const SActivitesContainer = styled.div`
@@ -582,6 +534,7 @@ const SActivitesContainer = styled.div`
   align-self: bottom;
 
   height: 100%;
+  width: 100%;
 
   min-height: calc(728px - 46px - 64px - 40px - 72px);
 
@@ -591,14 +544,6 @@ const SActivitesContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px);
+    max-height: calc(728px - 46px - 64px - 72px);
   }
-`;
-
-const SHistoryLabel = styled.div`
-  height: 32px;
-  margin-bottom: 16px;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
 `;

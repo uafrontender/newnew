@@ -25,8 +25,11 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({ confirmMoreComments, 
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SModalHeader>
-            <GoBackButton onClick={closeMoreCommentsModal} />
-            <SModalTitle>{t('comments.comments')}</SModalTitle>
+            <GoBackButton
+              onClick={closeMoreCommentsModal}
+            >
+              <SModalTitle>{t('comments.comments')}</SModalTitle>
+            </GoBackButton>
           </SModalHeader>
           <SWrapper ref={scrollRef}>
             <SActionSection>
@@ -93,6 +96,7 @@ const SModalTitle = styled.strong`
   font-size: 14px;
   margin: 0;
   font-weight: 600;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
   ${(props) => props.theme.media.tablet} {
     font-size: 20px;
     margin-bottom: 16px;

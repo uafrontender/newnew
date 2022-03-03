@@ -4,10 +4,11 @@ import styled from 'styled-components';
 interface IGradientMask {
   active: boolean;
   positionTop?: boolean;
+  positionBottom?: number;
 }
 
-const GradientMask: React.FC<IGradientMask> = ({ active, positionTop }) => (
-  <SGradientMask active={active} positionTop={positionTop} />
+const GradientMask: React.FC<IGradientMask> = ({ active, positionTop, positionBottom, }) => (
+  <SGradientMask active={active} positionTop={positionTop} positionBottom={positionBottom} />
 );
 
 export default GradientMask;
@@ -17,7 +18,7 @@ const SGradientMask = styled.div<IGradientMask>`
     if (props.positionTop) {
       return 'top: 0';
     }
-    return 'bottom: 0';
+    return `bottom: ${props.positionBottom ?? 0}px`;
   }};
   left: 0;
   right: 0;
@@ -44,4 +45,5 @@ const SGradientMask = styled.div<IGradientMask>`
 
 GradientMask.defaultProps = {
   positionTop: false,
+  positionBottom: undefined,
 };

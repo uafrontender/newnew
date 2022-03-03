@@ -1,31 +1,41 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-interface IBidAmountTextInput {
+import { useAppSelector } from '../../../redux-store/store';
+
+interface IVotesAmountTextInput {
   value: string;
   minAmount: number;
   disabled?: boolean;
   autofocus?: boolean;
-  onChange: (newValue: string) => void;
   inputAlign: 'left' | 'center';
   bottomPlaceholder?: string;
-  style?: React.CSSProperties;
+  placeholder: string;
+  widthHardCoded?: string;
+  onChange: (newValue: string) => void;
 }
 
-const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
+const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
   value,
   minAmount,
   disabled,
   autofocus,
   inputAlign,
-  onChange,
   bottomPlaceholder,
-  style,
+  placeholder,
+  widthHardCoded,
+  onChange,
 }) => {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+
   const inputRef = useRef<HTMLInputElement>();
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value.slice(1);
+    const newValue = e.target.value;
     if (/[^0-9]/.test(newValue)) return;
+
+    if (newValue.length > 8) return;
 
     // @ts-ignore
     onChange(newValue ? (newValue as number) : '');
@@ -41,14 +51,31 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        value={`$${value}`}
+        value={value}
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode="numeric"
-        placeholder={minAmount.toString()}
+        placeholder={`${minAmount.toString()} ${placeholder}`}
         onChange={handleOnChange}
-        style={style ?? {}}
+        style={{
+          ...(!isMobile ? {
+            width: `calc(86px + ${Math.floor(value.length / 1.4)}em)`,
+          } : {}),
+          ...(widthHardCoded ? {
+            width: widthHardCoded,
+          } : {}),
+        }}
       />
+      <SPseudoPlaceholder
+        onClick={() => {
+          inputRef.current?.focus();
+        }}
+        style={{
+          left: `calc(${Math.floor(value.length / 2)}em + 1.2em + ${isMobile ? '8px' : '16px'})`
+        }}
+      >
+        { value ? placeholder : '' }
+      </SPseudoPlaceholder>
       {bottomPlaceholder && (
         <SBottomPlaceholder>
           { bottomPlaceholder }
@@ -58,20 +85,22 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
   );
 };
 
-BidAmountTextInput.defaultProps = {
+VotesAmountTextInput.defaultProps = {
   disabled: undefined,
   autofocus: undefined,
+  widthHardCoded: undefined,
   bottomPlaceholder: undefined,
-  style: {},
 };
 
-export default BidAmountTextInput;
+export default VotesAmountTextInput;
 
 const SWrapper = styled.div`
   position: relative;
 
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 12px;
 
   ${({ theme }) => theme.media.tablet} {
     display: block;
@@ -88,7 +117,8 @@ const SInput = styled.input<{
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   text-align: left;
 
-  padding-left: calc(50% - .2em);
+  padding: 12.5px 16px;
+  padding-right: 4em;
   width: 100%;
 
   background-color: transparent;
@@ -109,8 +139,9 @@ const SInput = styled.input<{
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
-    padding: 12.5px 2px;
     min-width: 80px;
+
+    padding-right: 0px;
 
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     text-align: ${({ align }) => align};
@@ -119,6 +150,41 @@ const SInput = styled.input<{
   }
 `;
 
-const SBottomPlaceholder = styled.div`
+const SPseudoPlaceholder = styled.div`
+  position: absolute;
+  top: 12.5px;
 
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 40px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  ${({ theme }) => theme.media.tablet} {
+    top: 14px;
+
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+
+    padding: 0px;
+  }
+`;
+
+const SBottomPlaceholder = styled.div`
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+    left: calc(100% + 12px);
+    top: calc(50% - 8px);
+
+    width: max-content;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    display: none;
+  }
 `;
