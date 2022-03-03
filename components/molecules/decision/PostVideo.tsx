@@ -19,6 +19,7 @@ const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
 interface IPostVideo {
   postId: string;
   announcement: newnewapi.IVideoUrls;
+  response?: newnewapi.IVideoUrls;
   isMuted: boolean;
   handleToggleMuted: () => void;
 }
@@ -26,6 +27,8 @@ interface IPostVideo {
 const PostVideo: React.FunctionComponent<IPostVideo> = ({
   postId,
   announcement,
+  // eslint-disable-next-line no-unused-vars
+  response,
   isMuted,
   handleToggleMuted,
 }) => {
@@ -63,6 +66,10 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       </SSoundButton>
     </SVideoWrapper>
   );
+};
+
+PostVideo.defaultProps = {
+  response: undefined,
 };
 
 export default PostVideo;

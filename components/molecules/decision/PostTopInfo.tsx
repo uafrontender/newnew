@@ -19,6 +19,7 @@ import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 import { formatNumber } from '../../../utils/format';
+import PostTitle from './PostTitle';
 import PostShareMenu from './PostShareMenu';
 import PostShareModal from './PostShareModal';
 import PostEllipseMenu from './PostEllipseMenu';
@@ -26,11 +27,14 @@ import PostEllipseModal from './PostEllipseModal';
 import { markPost } from '../../../api/endpoints/post';
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
+import Headline from '../../atoms/Headline';
 
 interface IPostTopInfo {
   postId: string;
+  title: string;
   creator: newnewapi.IUser;
-  postType: TPostType;
+  isFollowingDecisionInitial: boolean;
+  postType?: TPostType;
   startsAtSeconds: number;
   amountInBids?: number;
   totalVotes?: number;
@@ -42,9 +46,11 @@ interface IPostTopInfo {
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postId,
+  title,
   creator,
   postType,
   startsAtSeconds,
+  isFollowingDecisionInitial,
   amountInBids,
   totalVotes,
   currentBackers,
@@ -61,6 +67,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+
+  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial)
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -86,6 +94,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       });
 
       const res = await markPost(markAsViewedPayload);
+
+      if (!res.error) {
+        setIsFollowingDecision(!isFollowingDecision);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -102,8 +114,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         markAs: followingsIds.includes(creator.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
       });
 
-      console.log(payload)
-
       const res = await markUser(payload);
 
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
@@ -119,118 +129,119 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   }
 
   return (
-    <SWrapper>
-      {postType === 'ac' && amountInBids && (
-        <SBidsAmount>
-          <span>
-            $
-            {formatNumber((amountInBids / 100) ?? 0, true)}
-          </span>
-          {' '}
-          { t('AcPost.PostTopInfo.in_bids') }
-        </SBidsAmount>
-      )}
-      {postType === 'mc' && totalVotes && (
-        <SBidsAmount>
-          <span>
-            {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
-          </span>
-          {' '}
-          { t('McPost.PostTopInfo.votes') }
-        </SBidsAmount>
-      )}
-      <CreatorCard
-        onClick={() => handleRedirectToUser()}
-      >
-        <SAvatarArea>
-          <img
-            src={creator.avatarUrl!! as string}
-            alt={creator.username!!}
-          />
-        </SAvatarArea>
-        <SUsername>
-          @
-          { creator.username }
-        </SUsername>
-        <SStartsAt>
-          { startingDateParsed.getDate() }
-          {' '}
-          { startingDateParsed.toLocaleString('default', { month: 'short' }) }
-          {' '}
-          { startingDateParsed.getFullYear() }
-          {' '}
-        </SStartsAt>
-      </CreatorCard>
-      <SActionsDiv>
-        <SShareButton
-          view="transparent"
-          iconOnly
-          withDim
-          withShrink
-          style={{
-            padding: '8px',
-          }}
-          onClick={() => handleOpenShareMenu()}
-        >
-          <InlineSvg
-            svg={ShareIconFilled}
-            fill={theme.colorsThemed.text.secondary}
-            width="20px"
-            height="20px"
-          />
-        </SShareButton>
-        <SMoreButton
-          view="transparent"
-          iconOnly
-          onClick={() => handleOpenEllipseMenu()}
-        >
-          <InlineSvg
-            svg={MoreIconFilled}
-            fill={theme.colorsThemed.text.secondary}
-            width="20px"
-            height="20px"
-          />
-        </SMoreButton>
-        {/* Share menu */}
-        {!isMobile && (
-          <PostShareMenu
-            isVisible={shareMenuOpen}
-            handleClose={handleCloseShareMenu}
-          />
-        )}
-        {isMobile && shareMenuOpen ? (
-          <PostShareModal
-            isOpen={shareMenuOpen}
-            zIndex={11}
-            onClose={handleCloseShareMenu}
-          />
+    <SContainer>
+      <SWrapper>
+        {postType === 'ac' && amountInBids ? (
+          <SBidsAmount>
+            <span>
+              $
+              {formatNumber((amountInBids / 100) ?? 0, true)}
+            </span>
+            {' '}
+            { t('AcPost.PostTopInfo.in_bids') }
+          </SBidsAmount>
         ) : null}
-        {/* Ellipse menu */}
-        {!isMobile && (
-          <PostEllipseMenu
-            isFollowing={followingsIds.includes(creator.uuid as string)}
-            isVisible={ellipseMenuOpen}
-            handleFollowDecision={handleFollowDecision}
-            handleToggleFollowingCreator={handleToggleFollowingCreator}
-            handleClose={handleCloseEllipseMenu}
-          />
-        )}
-        {isMobile && ellipseMenuOpen ? (
-          <PostEllipseModal
-            isFollowing={followingsIds.includes(creator.uuid as string)}
-            zIndex={11}
-            isOpen={ellipseMenuOpen}
-            handleFollowDecision={handleFollowDecision}
-            handleToggleFollowingCreator={handleToggleFollowingCreator}
-            onClose={handleCloseEllipseMenu}
-          />
+        {postType === 'mc' && totalVotes ? (
+          <SBidsAmount>
+            <span>
+              {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
+            </span>
+            {' '}
+            { t('McPost.PostTopInfo.votes') }
+          </SBidsAmount>
         ) : null}
-      </SActionsDiv>
-    </SWrapper>
+        <CreatorCard
+          onClick={() => handleRedirectToUser()}
+        >
+          <SAvatarArea>
+            <img
+              src={creator.avatarUrl!! as string}
+              alt={creator.username!!}
+            />
+          </SAvatarArea>
+          <SUsername>
+            { creator.nickname ?? `@${creator.username}` }
+          </SUsername>
+        </CreatorCard>
+        <SActionsDiv>
+          <SShareButton
+            view="transparent"
+            iconOnly
+            withDim
+            withShrink
+            style={{
+              padding: '8px',
+            }}
+            onClick={() => handleOpenShareMenu()}
+          >
+            <InlineSvg
+              svg={ShareIconFilled}
+              fill={theme.colorsThemed.text.secondary}
+              width="20px"
+              height="20px"
+            />
+          </SShareButton>
+          <SMoreButton
+            view="transparent"
+            iconOnly
+            onClick={() => handleOpenEllipseMenu()}
+          >
+            <InlineSvg
+              svg={MoreIconFilled}
+              fill={theme.colorsThemed.text.secondary}
+              width="20px"
+              height="20px"
+            />
+          </SMoreButton>
+          {/* Share menu */}
+          {!isMobile && (
+            <PostShareMenu
+              isVisible={shareMenuOpen}
+              handleClose={handleCloseShareMenu}
+            />
+          )}
+          {isMobile && shareMenuOpen ? (
+            <PostShareModal
+              isOpen={shareMenuOpen}
+              zIndex={11}
+              onClose={handleCloseShareMenu}
+            />
+          ) : null}
+          {/* Ellipse menu */}
+          {!isMobile && (
+            <PostEllipseMenu
+              isFollowing={followingsIds.includes(creator.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              isVisible={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleClose={handleCloseEllipseMenu}
+            />
+          )}
+          {isMobile && ellipseMenuOpen ? (
+            <PostEllipseModal
+              isFollowing={followingsIds.includes(creator.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              zIndex={11}
+              isOpen={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              onClose={handleCloseEllipseMenu}
+            />
+          ) : null}
+        </SActionsDiv>
+        <SPostTitle
+          variant={5}
+        >
+          {title}
+        </SPostTitle>
+      </SWrapper>
+    </SContainer>
   );
 };
 
 PostTopInfo.defaultProps = {
+  postType: undefined,
   amountInBids: undefined,
   totalVotes: undefined,
   currentBackers: undefined,
@@ -239,27 +250,42 @@ PostTopInfo.defaultProps = {
 
 export default PostTopInfo;
 
+const SContainer = styled.div`
+  grid-area: title;
+
+  margin-bottom: 24px;
+`;
+
 const SWrapper = styled.div`
   display: grid;
 
   grid-template-areas:
-    'stats stats stats'
+    'title title title'
     'userCard userCard actions'
+    'stats stats stats';
   ;
 
   height: fit-content;
 
-  margin-bottom: 24px;
+  margin-top: 24px;
+  margin-bottom: 12px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
     grid-template-areas:
       'userCard stats actions'
+      'title title title'
     ;
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
+
+    margin-top: initial;
   }
+`;
+
+const SPostTitle = styled(Headline)`
+  grid-area: title;
 `;
 
 // Creator card
@@ -267,11 +293,11 @@ const CreatorCard = styled.div`
   grid-area: userCard;
 
   display: grid;
+  align-items: center;
   grid-template-areas:
     'avatar username'
-    'avatar startsAt'
   ;
-  grid-template-columns: 44px 1fr;
+  grid-template-columns: 36px 1fr;
 
   height: 36px;
 
@@ -295,8 +321,8 @@ const SAvatarArea = styled.div`
 
   overflow: hidden;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
 
   display: flex;
   justify-content: center;
@@ -304,8 +330,8 @@ const SAvatarArea = styled.div`
 
   img {
     display: block;
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
   }
 `;
 
@@ -316,15 +342,6 @@ const SUsername = styled.div`
   font-size: 14px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SStartsAt = styled.div`
-  grid-area: startsAt;
-
-  font-weight: bold;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 // Action buttons
@@ -353,7 +370,6 @@ const SMoreButton = styled(Button)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   padding: 8px;
-  margin-right: 18px;
 
   span {
     display: flex;

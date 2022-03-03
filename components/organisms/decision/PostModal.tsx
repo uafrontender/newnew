@@ -7,7 +7,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
 import styled, { css, useTheme } from 'styled-components';
 
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
@@ -23,10 +22,16 @@ import PostViewCF from './PostViewCF';
 import PostModerationAC from './PostModerationAC';
 import PostModerationCF from './PostModerationCF';
 import PostModerationMC from './PostModerationMC';
+import InlineSvg from '../../atoms/InlineSVG';
+
+
+import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 import isBrowser from '../../../utils/isBrowser';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
+import switchPostStatus from '../../../utils/switchPostStatus';
+import PostViewScheduled from './PostViewScheduled';
 
 interface IPostModal {
   isOpen: boolean;
@@ -47,7 +52,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
+  const postStatus = (typeOfPost && postParsed?.status) ? switchPostStatus(typeOfPost, postParsed?.status) : 'processing'
   const isMyPost = useMemo(
     () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
@@ -75,13 +84,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const { ref: loadingRef, inView } = useInView();
 
   const handleCloseAndGoBack = () => {
-    // window.history.back();
     handleClose();
     window.history.replaceState('', '', currLocation);
-
-    // test
     innerHistoryStack.current = [];
   };
+
+  const handleGoBackInsidePost = () => {
+    if (innerHistoryStack.current.length !== 0) {
+      window.history.back();
+    } else {
+      handleClose();
+      window.history.replaceState('', '', currLocation);
+    }
+  }
 
   const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
     const newPostParsed = switchPostType(newPost)[0];
@@ -128,37 +143,47 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const renderPostView = (postToRender: TPostType) => {
+    if (postStatus === 'scheduled') {
+      return (
+        <PostViewScheduled
+          key={postParsed?.postUuid}
+          post={postParsed!!}
+          postStatus={postStatus}
+          postType={typeOfPost!!}
+          handleGoBack={handleGoBackInsidePost}
+        />
+      );
+    }
+
     if (postToRender === 'mc') {
       return (
         <PostViewMC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
           sessionId={sessionId ?? undefined}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
     if (postToRender === 'ac') {
       return (
         <PostViewAC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
+          postStatus={postStatus}
           optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
     if (postToRender === 'cf') {
       return (
         <PostViewCF
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
           sessionId={sessionId ?? undefined}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -170,9 +195,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationMC
           post={postParsed as newnewapi.MultipleChoice}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -180,9 +203,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationAC
           post={postParsed as newnewapi.Auction}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -190,9 +211,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationCF
           post={postParsed as newnewapi.Crowdfunding}
-          handleGoBack={() => {
-            window.history.back();
-          }}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -201,8 +220,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useEffect(() => {
     if (isOpen && postParsed) {
+      const additionalHash = window?.location?.hash === '#comments' ? '#comments' : undefined;
       setOpen(true);
-      window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}`);
+      window.history.pushState(
+        postParsed.postUuid,
+        'Post',
+        `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
     }
 
     return () => {
@@ -282,6 +305,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+      {!isMobile && (
+        <SGoBackButtonDesktop onClick={handleCloseAndGoBack}>
+          <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+        </SGoBackButtonDesktop>
+      )}
       {postParsed && typeOfPost ? (
         <SPostModalContainer
           id="post-modal-container"
@@ -337,13 +365,15 @@ const SPostModalContainer = styled.div<{
   isMyPost: boolean;
 }>`
   position: absolute;
+  top: 0;
+  left: 0;
 
   overflow-y: auto;
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
-  height: 100%;
-  width: auto;
+  height: 100vh;
+  width: 100vw;
   padding: 16px;
 
   /* No select */
@@ -355,10 +385,11 @@ const SPostModalContainer = styled.div<{
   user-select: none;
 
   ${({ theme }) => theme.media.tablet} {
-    top: 32px;
+    top: 64px;
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
+    height: calc(100% - 64px);
 
     ${({ isMyPost }) =>
       isMyPost
@@ -373,13 +404,44 @@ const SPostModalContainer = styled.div<{
     top: 32px;
     left: calc(50% - 496px);
     width: 992px;
+    height: calc(100% - 32px);
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
+
+    ${({ isMyPost }) =>
+      isMyPost
+        ? css`
+            height: initial;
+            max-height: 100%;
+          `
+        : null}
   }
 `;
 
 const SRecommendationsSection = styled.div`
   min-height: 600px;
+`;
+
+const SGoBackButtonDesktop = styled.button`
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  border: transparent;
+  background: transparent;
+  padding: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  cursor: pointer;
 `;
