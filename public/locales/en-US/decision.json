@@ -164,6 +164,17 @@
       "choosePledgeBtn": "Make pledge"
     }
   },
+  "AcPostModeration": {
+    "noBids": {
+
+    }
+  },
+  "McPostModeration": {
+
+  },
+  "CfPostModeration": {
+
+  },
   "RecommendationsSection": {
     "heading": "More like this"
   },
