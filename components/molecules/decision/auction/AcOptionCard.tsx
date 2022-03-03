@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import React, {
   useCallback, useContext, useMemo, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
@@ -244,8 +244,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     >
       <SContainer
         isDisabled={disabled}
+        isBlue={isSupportedByMe || isMyBid}
       >
-        <SBidDetails>
+        <SBidDetails
+          isBlue={isSupportedByMe || isMyBid}
+        >
           <SLottieAnimationContainer>
             {shouldAnimate ? (
               <Lottie
@@ -276,6 +279,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             variant={3}
           >
             <SSpanBiddersHighlighted
+              className="spanHighlighted"
               onClick={() => {
                 if (!isMyBid) {
                   handleRedirectToOptionCreator()
@@ -293,16 +297,22 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               {isMyBid ? t('me') : (option.creator?.nickname ?? option.creator?.username)}
             </SSpanBiddersHighlighted>
             {isSupportedByMe && !isMyBid ? (
-              <SSpanBiddersHighlighted>
+              <SSpanBiddersHighlighted
+                className="spanHighlighted"
+              >
                 {`, ${t('me')}`}
               </SSpanBiddersHighlighted>
             ) : null}
             {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
               <>
-                <SSpanBiddersRegular>
+                <SSpanBiddersRegular
+                  className="spanRegular"
+                >
                   {` & `}
                 </SSpanBiddersRegular>
-                <SSpanBiddersHighlighted>
+                <SSpanBiddersHighlighted
+                  className="spanHighlighted"
+                >
                   {formatNumber(
                     option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
                     true,
@@ -313,7 +323,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               </>
             ) : null}
             {' '}
-            <SSpanBiddersRegular>
+            <SSpanBiddersRegular
+              className="spanRegular"
+            >
               {t('AcPost.OptionsTab.OptionCard.bid')}
             </SSpanBiddersRegular>
           </SBiddersInfo>
@@ -437,6 +449,7 @@ export default AcOptionCard;
 
 const SContainer = styled(motion.div)<{
   isDisabled: boolean;
+  isBlue: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -446,7 +459,7 @@ const SContainer = styled(motion.div)<{
 
   padding: 16px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme, isBlue }) => (isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
@@ -463,7 +476,9 @@ const SContainer = styled(motion.div)<{
   }
 `;
 
-const SBidDetails = styled.div`
+const SBidDetails = styled.div<{
+  isBlue: boolean;
+}>`
   position: relative;
 
   display: grid;
@@ -475,6 +490,18 @@ const SBidDetails = styled.div`
 
   width: 100%;
 
+  ${({ isBlue }) => (isBlue ? (
+    css`
+      .spanRegular {
+        color: #FFFFFF;
+        opacity: 0.6;
+      }
+      .spanHighlighted {
+        color: #FFFFFF;
+      }
+    `
+  ) : null)}
+
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
     'amount bidders'
@@ -483,7 +510,7 @@ const SBidDetails = styled.div`
 
 
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+    background-color: ${({ theme, isBlue }) => (isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 14px;

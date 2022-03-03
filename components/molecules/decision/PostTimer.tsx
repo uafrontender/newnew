@@ -1,8 +1,8 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
 import { useTranslation } from 'next-i18next';
-import React, { useEffect, useRef, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import { TPostType } from '../../../utils/switchPostType';
@@ -16,7 +16,6 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   timestampSeconds,
   postType,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('decision');
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -25,6 +24,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(secondsToDHMS(parsed));
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
+
+  const shouldTurnRed = useMemo(() => !hasEnded && seconds <= 60 * 60, [hasEnded, seconds]);
 
   useEffect(() => {
     if (isBrowser()) {
@@ -41,17 +42,15 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 
   return (
     <SWrapper
-      style={{
-        ...(!hasEnded && seconds <= 60 * 60 ? {
-          color: theme.colorsThemed.accent.error,
-        } : {}),
-      }}
+      shouldTurnRed={shouldTurnRed}
     >
       {!hasEnded ? (
         <>
           {parsedSeconds.days !== '00' && (
             <>
-              <STimerItem>
+              <STimerItem
+                className="timerItem"
+              >
                 <div>
                   {parsedSeconds.days}
                 </div>
@@ -64,7 +63,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               </div>
             </>
           )}
-          <STimerItem>
+          <STimerItem
+            className="timerItem"
+          >
             <div>
               {parsedSeconds.hours}
             </div>
@@ -75,7 +76,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           <div>
             :
           </div>
-          <STimerItem>
+            <STimerItem
+              className="timerItem"
+            >
             <div>
               {parsedSeconds.minutes}
             </div>
@@ -88,7 +91,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               <div>
                 :
               </div>
-              <STimerItem>
+              <STimerItem
+                className="timerItem"
+              >
                 <div>
                   {parsedSeconds.seconds}
                 </div>
@@ -124,7 +129,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 
 export default PostTimer;
 
-const SWrapper = styled.div`
+const SWrapper = styled.div<{
+  shouldTurnRed: boolean;
+}>`
   grid-area: timer;
   width: fit-content;
   justify-self: center;
@@ -142,6 +149,15 @@ const SWrapper = styled.div`
 
   position: relative;
   top: -4px;
+
+  ${({ shouldTurnRed }) => (shouldTurnRed ? (
+    css`
+      .timerItem {
+        background-color: ${({ theme }) => theme.colorsThemed.accent.pink} !important;
+        color: #FFFFFF;
+      }
+    `
+  ) : null)};
 
   ${({ theme }) => theme.media.tablet} {
     position: initial;
