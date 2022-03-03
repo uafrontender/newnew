@@ -39,7 +39,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
 
       const res = await subscribeToCreator(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data?.checkoutUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
       window.location.href = url;

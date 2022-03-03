@@ -1,103 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { css } from 'styled-components';
-import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import styled from 'styled-components';
 
 interface ICfMakeCustomPledgeCard {
-  disabled?: boolean;
-  isSelected?: boolean;
-  customAmount: string;
-  handleSetCustomAmount: (newValue: string) => void;
   handleOpenMakePledgeForm: () => void;
 }
 
 const CfMakeCustomPledgeCard: React.FunctionComponent<ICfMakeCustomPledgeCard> = ({
-  disabled,
-  isSelected,
-  customAmount,
-  handleSetCustomAmount,
   handleOpenMakePledgeForm,
 }) => {
   const { t } = useTranslation('decision');
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    if (disabled || !isSelected) {
-      handleSetCustomAmount('');
-      setIsActive(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
 
   return (
     <SStandardPledgeCard
-      disabled={disabled}
+      onClick={() => handleOpenMakePledgeForm()}
     >
       <SCardInfo>
-        {isActive ? (
-          <BidAmountTextInput
-            value={customAmount.toString()}
-            minAmount={1}
-            inputAlign="center"
-            style={{
-              minWidth: '12px',
-              maxWidth: '48px',
-            }}
-            onChange={handleSetCustomAmount}
-          />
-        ) : (
-          <SCardAmount>
-            { t('Custom') }
-          </SCardAmount>
-        )}
+        <SCardAmount>
+          { t('CfPost.BackersTab.custom') }
+        </SCardAmount>
       </SCardInfo>
-      <SMakePledgeButton
-        view="secondary"
-        disabled={disabled}
-        onClick={() => {
-          handleOpenMakePledgeForm();
-          setIsActive(true);
-        }}
-      >
-        { t('Pledge') }
-      </SMakePledgeButton>
     </SStandardPledgeCard>
   );
 };
 
-CfMakeCustomPledgeCard.defaultProps = {
-  disabled: undefined,
-  isSelected: undefined,
-};
-
 export default CfMakeCustomPledgeCard;
 
-const SStandardPledgeCard = styled.div<{
-  disabled?: boolean;
-  isHighest?: boolean;
-  grandsVipStatus?: boolean;
-}>`
+const SStandardPledgeCard = styled.button`
   display: flex;
-  gap: 8px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
 
-  background-color: transparent;
+  cursor: pointer;
+  transition: 0.2s linear;
 
-  ${({ disabled }) => (disabled
-    ? (
-      css`
-        opacity: 0.5;
-      `
-    ) : null)}
+  border: transparent;
 
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: stretch;
-    height: 108px;
-    background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-    padding: 8px;
+  height: 108px;
+  width: 96px;
+
+  margin: 0px 6px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  padding: 8px;
+
+  &:hover, &:active {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }
 `;
 
@@ -127,28 +78,5 @@ const SCardAmount = styled.div`
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
-  }
-`;
-
-const SMakePledgeButton = styled(Button)<{
-  highlighted?: boolean;
-}>`
-  width: auto;
-  background: ${({ highlighted, theme }) => (highlighted ? theme.colorsThemed.background.primary : theme.colorsThemed.background.secondary)};
-
-  ${({ theme }) => theme.media.tablet} {
-    width: auto;
-    min-height: 40px;
-
-    padding: 8px 16px;
-
-    font-weight: 600;
-    font-size: 14px;
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
-    &:hover:enabled, &:focus:enabled {
-      background: ${({ highlighted, theme }) => (highlighted ? theme.colorsThemed.background.primary : 'transparent')};
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
   }
 `;

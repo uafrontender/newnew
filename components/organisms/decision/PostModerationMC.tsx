@@ -30,6 +30,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import LoadingModal from '../../molecules/LoadingModal';
 import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
+import isBrowser from '../../../utils/isBrowser';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -59,9 +60,41 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<
-    'options' | 'comments'
-  >('options');
+  const [currentTab, setCurrentTab] = useState<'options' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'options'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#options' || hash === '#comments')) {
+      return hash.substring(1) as 'options' | 'comments';
+    }
+    return 'options';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      if (!hash) {
+        setCurrentTab('options');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'options' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -340,7 +373,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     <SWrapper>
       <SExpiresSection>
         {isMobile && (
-          <GoBackButton
+          <SGoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
@@ -351,18 +384,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
           postType="mc"
         />
-        {!isMobile && (
-          <SGoBackButtonDesktop
-            onClick={handleGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SGoBackButtonDesktop>
-        )}
       </SExpiresSection>
       <PostVideo
         postId={post.postUuid}
@@ -370,46 +391,31 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <div
-        style={{
-          gridArea: 'title',
-        }}
-      >
-        <PostTitle>
-          { post.title }
-        </PostTitle>
-      </div>
+      <PostTopInfo
+        postType="mc"
+        postId={post.postUuid}
+        title={post.title}
+        totalVotes={totalVotes}
+        creator={post.creator!!}
+        startsAtSeconds={post.startsAt?.seconds as number}
+        isFollowingDecisionInitial={false}
+        handleFollowCreator={() => {}}
+        handleReportAnnouncement={() => {}}
+      />
       <SActivitesContainer>
-        <PostTopInfo
-          postId={post.postUuid}
-          postType="mc"
-          totalVotes={totalVotes}
-          creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
-          handleFollowCreator={() => {}}
-          handleReportAnnouncement={() => {}}
-        />
         <DecisionTabs
           tabs={[
             {
               label: 'options',
               value: 'options',
-              ...(
-                numberOfOptions
-                  ? { amount: numberOfOptions.toString() } : {}
-              ),
             },
             {
               label: 'comments',
               value: 'comments',
-              ...(
-                comments.length > 0
-                  ? { amount: comments.length.toString() } : {}
-              ),
             },
           ]}
           activeTab={currentTab}
-          handleChangeTab={(tab: string) => setCurrentTab(tab as typeof currentTab)}
+          handleChangeTab={handleChangeTab}
         />
         {currentTab === 'options'
           ? (
@@ -428,6 +434,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           ) : (
             <CommentsTab
               comments={comments}
+              handleGoBack={() => handleChangeTab('options')}
             />
           )}
       </SActivitesContainer>
@@ -446,25 +453,17 @@ PostModerationMC.defaultProps = {
 export default PostModerationMC;
 
 const SWrapper = styled.div`
-  display: grid;
-
-  grid-template-areas:
-    'expires'
-    'video'
-    'title'
-    'activities'
-  ;
+  width: 100%;
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
-      'video activities'
-    ;
+      'video activities';
     grid-template-columns: 284px 1fr;
-    /* grid-template-rows: 46px 64px 40px calc(506px - 46px); */
     grid-template-rows: 46px min-content 1fr;
     grid-column-gap: 16px;
 
@@ -475,14 +474,7 @@ const SWrapper = styled.div`
     grid-template-areas:
       'video expires'
       'video title'
-      'video activities'
-    ;
-
-    /* grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px); */
-    /* grid-template-rows: 1fr max-content; */
-
-    // NB! 1fr results in unstable width
-    /* grid-template-columns: 410px 1fr; */
+      'video activities';
     grid-template-columns: 410px 538px;
   }
 `;
@@ -490,34 +482,25 @@ const SWrapper = styled.div`
 const SExpiresSection = styled.div`
   grid-area: expires;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: 'closeBtnMobile timer closeBtnDesktop';
-
-  width: 100%;
-
-  margin-bottom: 6px;
-`;
-
-const SGoBackButtonDesktop = styled.button`
-  grid-area: closeBtnDesktop;
+  position: relative;
 
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: center;
 
   width: 100%;
-  border: transparent;
-  background: transparent;
-  padding: 24px;
+  margin-bottom: 6px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
+  padding-left: 24px;
 
-  cursor: pointer;
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: initial;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  position: absolute;
+  left: 0;
+  top: 4px;
 `;
 
 const SActivitesContainer = styled.div`
@@ -529,6 +512,7 @@ const SActivitesContainer = styled.div`
   align-self: bottom;
 
   height: 100%;
+  width: 100%;
 
   min-height: calc(728px - 46px - 64px - 40px - 72px);
 
@@ -538,6 +522,6 @@ const SActivitesContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px);
+    max-height: calc(728px - 46px - 64px - 72px);
   }
 `;
