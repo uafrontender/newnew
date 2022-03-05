@@ -31,6 +31,8 @@ import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import LoadingModal from '../../molecules/LoadingModal';
 import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
 import isBrowser from '../../../utils/isBrowser';
+import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -38,12 +40,14 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 
 interface IPostModerationMC {
   post: newnewapi.MultipleChoice;
+  postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   post,
+  postStatus,
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
@@ -102,7 +106,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     }
   }, []);
 
-  // Vote from sessionId
+  // Respone upload
+  const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<newnewapi.IVideoUrls | undefined>(undefined);
+
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Total votes
@@ -226,23 +232,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     post,
   ]);
 
-  const handleAddOrUpdateOptionFromResponse = useCallback((
-    newOrUpdatedption: newnewapi.MultipleChoice.Option,
+  const handleRemoveOption = useCallback((
+    optionToRemove: newnewapi.MultipleChoice.Option,
   ) => {
     setOptions((curr) => {
       const workingArr = [...curr];
-      let workingArrUnsorted;
-      const idx = workingArr.findIndex((op) => op.id === newOrUpdatedption.id);
-      if (idx === -1) {
-        workingArrUnsorted = [...workingArr, newOrUpdatedption as TMcOptionWithHighestField];
-      } else {
-        workingArr[idx]
-          .voteCount = (newOrUpdatedption.voteCount as number);
-        workingArr[idx]
-          .isSupportedByMe = true;
-        workingArrUnsorted = workingArr;
-      }
-
+      const workingArrUnsorted = [...workingArr.filter((o) => o.id !== optionToRemove.id)];
       return sortOptions(workingArrUnsorted);
     });
   }, [
@@ -262,6 +257,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
       setTotalVotes(res.data.multipleChoice!!.totalVotes as number);
       setNumberOfOptions(res.data.multipleChoice!!.optionCount as number);
+      handleUpdatePostStatus(res.data.multipleChoice!!.status!!);
     } catch (err) {
       console.error(err);
     }
@@ -352,19 +348,33 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
         setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
-        handleUpdatePostStatus(decodedParsed.status);
+      }
+    };
+
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      console.log(decoded)
+
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.multipleChoice!!);
       }
     };
 
     if (socketConnection) {
       socketConnection.on('McOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('McOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -392,11 +402,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           postType="mc"
         />
       </SExpiresSection>
-      <PostVideo
+      <PostVideoModeration
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={(post.response || responseFreshlyUploaded) ?? undefined}
+        postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
+        handleUpdateResponseVideo={(newValue) => setResponseFreshlyUploaded(newValue)}
       />
       <PostTopInfo
         postType="mc"
@@ -434,7 +447,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
                   parseInt((post.votePrice?.usdCents / 100).toFixed(0), 10)
                 ) : 1}
               handleLoadOptions={fetchOptions}
-              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
+              handleRemoveOption={handleRemoveOption}
             />
           ) : (
             <CommentsTab

@@ -75,24 +75,31 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   };
 
   useEffect(() => {
-    const socketHandlerPostData = (data: any) => {
+    const socketHandlerPostStatus = (data: any) => {
       const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostUpdated.decode(arr);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      console.log(decoded)
 
       if (!decoded) return;
-      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === post.postUuid) {
-        handleUpdatePostStatus(decodedParsed.status);
+      if (decoded.postUuid === post.postUuid) {
+        if (decoded.auction) {
+          handleUpdatePostStatus(decoded.auction!!);
+        } else if (decoded.multipleChoice) {
+          handleUpdatePostStatus(decoded.multipleChoice!!);
+        } else {
+          handleUpdatePostStatus(decoded.crowdfunding!!);
+        }
       }
     };
 
     if (socketConnection) {
-      socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

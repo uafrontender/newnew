@@ -31,6 +31,10 @@ import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import DecisionTabs from '../../molecules/decision/PostTabs';
+import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -38,12 +42,14 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 
 interface IPostModerationCF {
   post: newnewapi.Crowdfunding;
+  postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   post,
+  postStatus,
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
@@ -126,6 +132,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [loadingCommentsError, setLoadingCommentsError] = useState('');
+
+  // Respone upload
+  const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<newnewapi.IVideoUrls | undefined>(undefined);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -269,6 +278,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
+      handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
     } catch (err) {
       console.error(err);
     }
@@ -359,19 +369,32 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
-        handleUpdatePostStatus(decodedParsed.status);
+      }
+    };
+
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      console.log(decoded)
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.crowdfunding!!);
       }
     };
 
     if (socketConnection) {
       socketConnection.on('CfPledgeCreated', socketHandlerPledgeCreated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('CfPledgeCreated', socketHandlerPledgeCreated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -381,6 +404,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     setPledges,
     sortPleges,
   ]);
+
+  console.log(post)
+  console.log(postStatus)
 
   return (
     <SWrapper>
@@ -398,19 +424,20 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           postType="cf"
         />
       </SExpiresSection>
-      <PostVideo
+      <PostVideoModeration
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={(post.response || responseFreshlyUploaded) ?? undefined}
+        postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
+        handleUpdateResponseVideo={(newValue) => setResponseFreshlyUploaded(newValue)}
       />
-      <PostTopInfo
+      <PostTopInfoModeration
         postType="cf"
-        postId={post.postUuid}
         title={post.title}
-        creator={post.creator!!}
-        startsAtSeconds={post.startsAt?.seconds as number}
-        isFollowingDecisionInitial={false}
+        postId={post.postUuid}
+        handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer>
         <DecisionTabs
@@ -428,13 +455,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'backers' ? (
-          <CfPledgesSection
-            pledges={pledges}
-            pagingToken={pledgesNextPageToken}
-            pledgesLoading={pledgesLoading}
+          <CfBackersStatsSection
             post={post}
-            heightDelta={heightDelta ?? 256}
-            handleLoadPledges={fetchPledgesForPost}
+            currentNumBackers={currentBackers}
           />
         ) : (
           <CommentsTab

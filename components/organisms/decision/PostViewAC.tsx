@@ -254,6 +254,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
+      handleUpdatePostStatus(res.data.auction!!.status!!);
     } catch (err) {
       console.error(err);
     }
@@ -387,19 +388,32 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
         setNumberOfOptions(decoded.post?.auction?.optionCount!!);
-        handleUpdatePostStatus(decodedParsed.status);
+      }
+    };
+
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      console.log(decoded)
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.auction!!);
       }
     };
 
     if (socketConnection) {
       socketConnection.on('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

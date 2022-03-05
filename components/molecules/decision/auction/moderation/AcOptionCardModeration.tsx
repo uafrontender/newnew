@@ -1,50 +1,207 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
+import { useAppSelector } from '../../../../../redux-store/store';
+import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostViewAC';
 
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
+import InlineSvg from '../../../../atoms/InlineSVG';
+import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 
 import { formatNumber } from '../../../../../utils/format';
 
 // Icons
+import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
-import InlineSvg from '../../../../atoms/InlineSVG';
+import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 
 interface IAcOptionCardModeration {
-  option: TAcOptionWithHighestField;
   index: number;
+  option: TAcOptionWithHighestField;
+  postStatus: TPostStatusStringified;
+  handleConfirmWinningOption: () => void;
 }
 
 const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> = ({
-  option,
   index,
+  option,
+  postStatus,
+  handleConfirmWinningOption,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPickOptionModalOpen, setIsPickOptionModalOpen] = useState(false);
 
   // Redirect to user's page
   const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
 
   return (
-    <motion.div
-      key={index}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        marginBottom: '16px',
-      }}
-    >
-      <SContainer>
-      <SBidDetails>
+    <>
+      <motion.div
+        key={index}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          marginBottom: '16px',
+        }}
+      >
+        <SContainer>
+        <SBidDetails>
+            <SBidAmount>
+              <SCoinImg
+                src={CoinIcon.src}
+              />
+              <div>
+                {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
+              </div>
+            </SBidAmount>
+            <SOptionInfo
+              variant={3}
+            >
+              {option.title}
+            </SOptionInfo>
+            <SBiddersInfo
+              variant={3}
+            >
+              <SSpanBiddersHighlighted
+                className="spanHighlighted"
+                onClick={() => handleRedirectToOptionCreator()}
+                style={{
+                  ...(option.isCreatedBySubscriber ? {
+                    color: theme.colorsThemed.accent.yellow,
+                    cursor: 'pointer',
+                  } : {}),
+                }}
+              >
+                {option.creator?.nickname ?? option.creator?.username}
+              </SSpanBiddersHighlighted>
+              {option.supporterCount > 1 ? (
+                <>
+                  <SSpanBiddersRegular
+                    className="spanRegular"
+                  >
+                    {` & `}
+                  </SSpanBiddersRegular>
+                  <SSpanBiddersHighlighted
+                    className="spanHighlighted"
+                  >
+                    {formatNumber(
+                      option.supporterCount - 1,
+                      true,
+                    )}
+                    { ' ' }
+                    {t('AcPost.OptionsTab.OptionCard.others')}
+                  </SSpanBiddersHighlighted>
+                </>
+              ) : null}
+              {' '}
+              <SSpanBiddersRegular
+                className="spanRegular"
+              >
+                {t('AcPost.OptionsTab.OptionCard.bid')}
+              </SSpanBiddersRegular>
+            </SBiddersInfo>
+          </SBidDetails>
+          {postStatus === 'wating_for_decision' ? (
+            !isMobile ? (
+              <SSelectOptionWidget>
+                <SPickOptionButton
+                  onClick={() => setIsPickOptionModalOpen(true)}
+                >
+                  {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
+                </SPickOptionButton>
+                <SDropdownButton
+                  onClick={() => setIsEllipseMenuOpen(true)}
+                >
+                  <InlineSvg
+                    svg={ChevronDown}
+                    fill={theme.colorsThemed.text.primary}
+                    width="20px"
+                    height="20px"
+                  />
+                </SDropdownButton>
+              </SSelectOptionWidget>
+            ) : (
+              <>
+                <SPickOptionButtonMobile
+                  onClick={() => setIsPickOptionModalOpen(true)}
+                >
+                  {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
+                </SPickOptionButtonMobile>
+                <SEllipseButton
+                  onClick={() => setIsEllipseMenuOpen(true)}
+                >
+                  <InlineSvg
+                    svg={MoreIconFilled}
+                    fill={theme.colorsThemed.text.secondary}
+                    width="20px"
+                    height="20px"
+                  />
+                </SEllipseButton>
+              </>
+            )
+          ) : (
+            !isMobile ? (
+
+              <SEllipseButton
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width="20px"
+                  height="20px"
+                />
+              </SEllipseButton>
+            ) : (
+              <SEllipseButtonMobile
+                onClick={() => setIsEllipseMenuOpen(true)}
+              >
+                { t('AcPost.OptionsTab.OptionCard.moreBtn') }
+              </SEllipseButtonMobile>
+            )
+          )}
+          {!isMobile && (
+            <AcOptionCardModerationEllipseMenu
+              isVisible={isEllipseMenuOpen}
+              handleClose={() => setIsEllipseMenuOpen(false)}
+              handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+              handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+              handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+            />
+          )}
+        </SContainer>
+      </motion.div>
+      {/* Modals */}
+      <AcPickWinningOptionModal
+        isVisible={isPickOptionModalOpen}
+        closeModal={() => setIsPickOptionModalOpen(false)}
+        handleConfirm={() => {
+          setIsPickOptionModalOpen(false);
+          handleConfirmWinningOption();
+        }}
+      >
+        <SBidDetailsModal>
           <SBidAmount>
             <SCoinImg
               src={CoinIcon.src}
@@ -99,17 +256,9 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               {t('AcPost.OptionsTab.OptionCard.bid')}
             </SSpanBiddersRegular>
           </SBiddersInfo>
-        </SBidDetails>
-        <SSupportButton>
-          <InlineSvg
-            svg={MoreIconFilled}
-            fill={theme.colorsThemed.text.secondary}
-            width="20px"
-            height="20px"
-          />
-        </SSupportButton>
-      </SContainer>
-    </motion.div>
+        </SBidDetailsModal>
+      </AcPickWinningOptionModal>
+    </>
   );
 };
 
@@ -120,6 +269,8 @@ export default AcOptionCardModeration;
 
 
 const SContainer = styled(motion.div)`
+  position: relative;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -132,9 +283,9 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ${({ theme }) => theme.media.tablet} {
-    /* width: 80%; */
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     gap: 16px;
 
     padding: initial;
@@ -160,8 +311,6 @@ const SBidDetails = styled.div`
     'amount bidders'
     'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
-
-
 
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -211,8 +360,24 @@ const SSpanBiddersRegular = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
-const SSupportButton = styled(Button)`
-  width: 100%;
+const SEllipseButton = styled(Button)`
+  position: absolute;
+  right: 0px;
+  top: 12px;
+
+  padding: 0px 12px;
+  margin-right: 16px;
+
+  width: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  background: none;
+
+  &:hover:enabled,
+  &:focus:enabled {
+    background: none;
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
 
   span {
     display: flex;
@@ -223,18 +388,133 @@ const SSupportButton = styled(Button)`
   }
 
   ${({ theme }) => theme.media.tablet} {
+    position: initial;
+
     width: auto;
+  }
+`;
 
-    padding: 0px 12px;
-    margin-right: 16px;
+// Select Option
+const SSelectOptionWidget = styled.div`
+  display: flex;
+  flex-shrink: 0;
 
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-    background: none;
+  border-radius: 12px;
+  overflow: hidden;
 
-    &:hover:enabled,
-    &:focus:enabled {
-      background: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
+  height: 40px;
+`;
+
+const SPickOptionButton = styled.button`
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  padding: 0px 16px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+
+  border: transparent;
+
+  cursor: pointer;
+  transition: 0.2s linear;
+
+  &:focus, &:hover {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+`;
+
+const SDropdownButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+
+  border: transparent;
+
+  padding: 0px 8px;
+
+  cursor: pointer;
+  transition: 0.2s linear;
+
+  &:focus, &:hover {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+`;
+
+const SPickOptionButtonMobile = styled.button`
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  padding: 16px 16px;
+  height: 56px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+
+  border-radius: 16px;
+  border: transparent;
+
+  cursor: pointer;
+  transition: 0.2s linear;
+
+  &:focus, &:hover {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+`;
+
+const SEllipseButtonMobile = styled.button`
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+  padding: 16px 16px;
+  height: 56px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+
+  border-radius: 16px;
+  border: transparent;
+
+  cursor: pointer;
+  transition: 0.2s linear;
+
+  &:focus, &:hover {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+`;
+
+// Modal
+
+const SBidDetailsModal = styled.div`
+  position: relative;
+
+  display: grid;
+  grid-template-areas:
+    'amount amount'
+    'optionInfo optionInfo'
+    'bidders bidders';
+  grid-template-columns: 7fr 1fr;
+
+  width: 100%;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  padding: 14px;
+
+  ${({ theme }) => theme.media.tablet} {
+    grid-template-areas:
+    'amount bidders'
+    'optionInfo optionInfo';
+    grid-template-columns: 3fr 7fr;
   }
 `;

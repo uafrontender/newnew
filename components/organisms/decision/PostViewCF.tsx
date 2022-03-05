@@ -281,6 +281,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
+      handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
     } catch (err) {
       console.error(err);
     }
@@ -399,19 +400,32 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
-        handleUpdatePostStatus(decodedParsed.status);
+      }
+    };
+
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      console.log(decoded)
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.crowdfunding!!);
       }
     };
 
     if (socketConnection) {
       socketConnection.on('CfPledgeCreated', socketHandlerPledgeCreated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('CfPledgeCreated', socketHandlerPledgeCreated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

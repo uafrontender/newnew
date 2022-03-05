@@ -24,35 +24,31 @@ import AcOptionCardModeration from './AcOptionCardModeration';
 import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 
 import NoContentYetImg from '../../../../../public/images/decision/no-content-yet-mock.png';
+import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
+import { selectWinningOption } from '../../../../../api/endpoints/auction';
 
 interface IAcOptionsTabModeration {
   postId: string;
+  postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
-  optionToAnimate?: string;
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
   handleLoadBids: (token?: string) => void;
-  overviewedOption?: newnewapi.Auction.Option;
-  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
-  handleCloseOptionBidHistory: () => void;
-  handleOpenOptionBidHistory: (
-    optionToOpen: newnewapi.Auction.Option
-  ) => void;
+  handleRemoveOption: (optionToRemove: newnewapi.Auction.Option) => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> = ({
   postId,
+  postStatus,
   options,
-  optionToAnimate,
   optionsLoading,
   pagingToken,
   minAmount,
   handleLoadBids,
-  overviewedOption,
-  handleAddOrUpdateOptionFromResponse,
-  handleCloseOptionBidHistory,
-  handleOpenOptionBidHistory,
+  handleRemoveOption,
+  handleUpdatePostStatus,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -72,6 +68,26 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
 
   const mainContainer = useRef<HTMLDivElement>();
   const overviewedRefId = useRef('');
+
+  const handleConfirmWinningOption = async (winningOption: newnewapi.Auction.Option) => {
+    try {
+      const payload = new newnewapi.SelectWinningOptionRequest({
+        postUuid: postId,
+        winningOptionId: winningOption.id,
+      });
+
+      const res = await selectWinningOption(payload);
+
+      console.log(res.data);
+
+      if (res.data) {
+        handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
+        // handleUpdateWinningOption(winningOption);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -124,9 +140,11 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
           ) : null}
           {options.map((option, i) => (
             <AcOptionCardModeration
-              key={option.id.toString()}
-              option={option as TAcOptionWithHighestField}
               index={i}
+              key={option.id.toString()}
+              postStatus={postStatus}
+              option={option as TAcOptionWithHighestField}
+              handleConfirmWinningOption={() => handleConfirmWinningOption(option)}
             />
           ))}
           {!isMobile ? (
@@ -151,10 +169,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
   );
 };
 
-AcOptionsTabModeration.defaultProps = {
-  overviewedOption: undefined,
-  optionToAnimate: undefined,
-};
+AcOptionsTabModeration.defaultProps = {};
 
 export default AcOptionsTabModeration;
 

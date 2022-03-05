@@ -1,11 +1,12 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
@@ -33,6 +34,9 @@ import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
+import Button from '../../atoms/Button';
+import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -58,6 +62,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const showWinnerOption = useMemo(() => (
+    postStatus === 'wating_for_decision'
+  ), [postStatus]);
+
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
@@ -67,12 +75,45 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>(() => {
+  const tabs = useMemo(() => {
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) {
+      return [
+        {
+          label: 'winner',
+          value: 'winner',
+        },
+        {
+          label: 'bids',
+          value: 'bids',
+        },
+        {
+          label: 'comments',
+          value: 'comments',
+        },
+      ];
+    }
+    return [
+      {
+        label: 'bids',
+        value: 'bids',
+      },
+      {
+        label: 'comments',
+        value: 'comments',
+      },
+    ];
+  }, [postStatus]);
+
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
       return 'bids'
     }
     const { hash } = window.location;
-    if (hash && (hash === '#bids' || hash === '#comments')) {
+    if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
       return hash.substring(1) as 'bids' | 'comments';
     }
     return 'bids';
@@ -85,7 +126,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-  }
+  };
+
+  // Respone upload
+  const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<newnewapi.IVideoUrls | undefined>(undefined);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -95,7 +139,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'bids' || parsedHash === 'comments') {
+      if (parsedHash === 'bids' || parsedHash === 'comments' || parsedHash === 'winner') {
         setCurrentTab(parsedHash);
       }
     }
@@ -264,51 +308,25 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
 
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
+      handleUpdatePostStatus(res.data.auction!!.status!!);
     } catch (err) {
       console.error(err);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAddOrUpdateOptionFromResponse = useCallback((
-    newOption: newnewapi.Auction.Option,
+  const handleRemoveOption = useCallback((
+    optionToRemove: newnewapi.Auction.Option,
   ) => {
     setOptions((curr) => {
       const workingArr = [...curr];
-      let workingArrUnsorted;
-      const idx = workingArr.findIndex((op) => op.id === newOption?.id);
-      if (idx === -1) {
-        workingArrUnsorted = [...workingArr, newOption as TAcOptionWithHighestField];
-      } else {
-        workingArr[idx]
-          .supporterCount = (newOption?.supporterCount as number);
-        workingArr[idx]
-          .totalAmount = (newOption?.totalAmount as newnewapi.IMoneyAmount);
-        workingArrUnsorted = workingArr;
-      }
-
+      const workingArrUnsorted = [...workingArr.filter((o) => o.id !== optionToRemove.id)];
       return sortOptions(workingArrUnsorted);
     });
-    setOptionToAnimate(newOption.id.toString());
-
-    setTimeout(() => {
-      setOptionToAnimate('');
-    }, 3000);
   }, [
     setOptions,
     sortOptions,
   ]);
-
-  const handleOpenOptionBidHistory = (
-    optionToOpen: newnewapi.Auction.Option,
-  ) => {
-    setOverviewedOption(optionToOpen);
-  };
-
-  const handleCloseOptionBidHistory = () => {
-    setOverviewedOption(undefined);
-    window.history.replaceState('', '', currLocation);
-  };
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -408,15 +426,30 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       }
     };
 
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      console.log(decoded)
+
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.auction!!);
+      }
+    };
+
     if (socketConnection) {
       socketConnection.on('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -427,6 +460,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     setOptions,
     sortOptions,
   ]);
+
+  console.log(postStatus)
 
   return (
     <SWrapper>
@@ -444,32 +479,28 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           postType="ac"
         />
       </SExpiresSection>
-      <PostVideo
-        // NB! Will support responses, as well!
+      <PostVideoModeration
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={(post.response || responseFreshlyUploaded) ?? undefined}
+        postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
+        handleUpdateResponseVideo={(newValue) => setResponseFreshlyUploaded(newValue)}
       />
       <PostTopInfoModeration
         postType="ac"
+        postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
         amountInBids={totalAmount}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
-      <SActivitesContainer>
+      <SActivitesContainer
+        showWinnerOption={showWinnerOption}
+      >
         <DecisionTabs
-          tabs={[
-            {
-              label: 'bids',
-              value: 'bids',
-            },
-            {
-              label: 'comments',
-              value: 'comments',
-            },
-          ]}
+          tabs={tabs}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />
@@ -477,8 +508,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           ? (
             <AcOptionsTabModeration
               postId={post.postUuid}
+              postStatus={postStatus}
               options={options}
-              optionToAnimate={optionToAnimate}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
               minAmount={post.minimalBid?.usdCents
@@ -486,18 +517,40 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
                   parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
                 ) : 5}
               handleLoadBids={fetchBids}
-              overviewedOption={overviewedOption}
-              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-              handleOpenOptionBidHistory={handleOpenOptionBidHistory}
-              handleCloseOptionBidHistory={handleCloseOptionBidHistory}
+              handleRemoveOption={handleRemoveOption}
+              handleUpdatePostStatus={handleUpdatePostStatus}
             />
           ) : (
-            <CommentsTab
-              comments={comments}
-              handleGoBack={() => handleChangeTab('bids')}
-            />
+            currentTab === 'comments'
+            ? (
+              <CommentsTab
+                comments={comments}
+                handleGoBack={() => handleChangeTab('bids')}
+              />
+            ) : (
+              <AcWinnerTabModeration
+                option={new newnewapi.Auction.Option({
+                  id: 123,
+                  title: 'Some title',
+                  supporterCount: 2,
+                  totalAmount: {
+                    usdCents: 100000,
+                  },
+                  creator: {
+                    username: 'user123',
+                  }
+                })}
+              />
+            )
           )}
       </SActivitesContainer>
+      {isMobile && postStatus === 'waiting_for_response' ? (
+        <SUploadResponseButton
+          view="primaryGrad"
+        >
+          { t('AcPostModeration.floatingUploadResponseBtn') }
+        </SUploadResponseButton>
+      ) : null}
       {/* Overview Modal */}
     </SWrapper>
   );
@@ -524,6 +577,8 @@ const SWrapper = styled.div`
     grid-column-gap: 16px;
 
     align-items: flex-start;
+
+    padding-bottom: 24px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -532,6 +587,8 @@ const SWrapper = styled.div`
       'video title'
       'video activities';
     grid-template-columns: 410px 538px;
+
+    padding-bottom: initial;
   }
 `;
 
@@ -559,7 +616,9 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  showWinnerOption: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -579,5 +638,23 @@ const SActivitesContainer = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
+
+    ${({ showWinnerOption }) => (
+      showWinnerOption
+      ? css`
+        max-height: calc(728px - 46px - 64px - 72px - 130px);
+      `
+      : null
+    )}
   }
+`;
+
+const SUploadResponseButton = styled(Button)`
+  position: fixed;
+  bottom: 16px;
+
+  width: calc(100% - 32px);
+  height: 56px;
+
+  z-index: 10;
 `;

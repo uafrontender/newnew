@@ -219,6 +219,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationMC
           key={postParsed?.postUuid}
+          postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -240,6 +241,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostModerationCF
           key={postParsed?.postUuid}
+          postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -349,6 +351,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   useEffect(() => {
     console.log(postStatus)
   }, [postStatus]);
+
+  console.log(post)
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
