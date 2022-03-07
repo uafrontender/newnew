@@ -15,15 +15,15 @@ import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
+import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 
 import { formatNumber } from '../../../../../utils/format';
 
 // Icons
-import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
-import AcPickWinningOptionModal from './AcPickWinningOptionModal';
+import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -162,7 +162,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             )
           ) : (
             !isMobile ? (
-
               <SEllipseButton
                 onClick={() => setIsEllipseMenuOpen(true)}
               >

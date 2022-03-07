@@ -62,7 +62,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const showWinnerOption = useMemo(() => (
+  const showSelectWinnerOption = useMemo(() => (
     postStatus === 'wating_for_decision'
   ), [postStatus]);
 
@@ -497,7 +497,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer
-        showWinnerOption={showWinnerOption}
+        showSelectWinnerOption={showSelectWinnerOption}
       >
         <DecisionTabs
           tabs={tabs}
@@ -617,7 +617,7 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SActivitesContainer = styled.div<{
-  showWinnerOption: boolean;
+  showSelectWinnerOption: boolean;
 }>`
   grid-area: activities;
 
@@ -639,8 +639,8 @@ const SActivitesContainer = styled.div<{
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
 
-    ${({ showWinnerOption }) => (
-      showWinnerOption
+    ${({ showSelectWinnerOption }) => (
+      showSelectWinnerOption
       ? css`
         max-height: calc(728px - 46px - 64px - 72px - 130px);
       `

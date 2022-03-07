@@ -67,11 +67,11 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
         <SBidsContainer>
           {options.map((option, i) => (
             <McOptionCardModeration
+              index={i}
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
-              index={i}
-              minAmount={minAmount}
+              postId={post.postUuid}
             />
           ))}
           {!isMobile ? (

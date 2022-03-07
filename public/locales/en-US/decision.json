@@ -372,7 +372,15 @@
     "floatingUploadResponseBtn": "Respond now with a video"
   },
   "McPostModeration": {
-
+    "OptionsTab": {
+      "OptionCard": {
+        "ellipse": {
+          "report": "Report option",
+          "block": "Block user",
+          "remove": "Remove option"
+        }
+      }
+    }
   },
   "CfPostModeration": {
 
