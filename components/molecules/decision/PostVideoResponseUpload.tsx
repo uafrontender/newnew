@@ -20,6 +20,7 @@ import { loadVideo } from '../../../utils/loadVideo';
 import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import Headline from '../../atoms/Headline';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -109,15 +110,23 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           multiple={false}
           onChange={handleFileChange}
         />
-        <SPlaceholder weight={600} variant={2}>
-          {t('PostVideo.UploadResponseForm.fileUpload.description')}
-        </SPlaceholder>
+        <SHeadline
+          variant={6}
+        >
+          {t('PostVideo.UploadResponseForm.fileUpload.title_1')}
+            <br />
+          {t('PostVideo.UploadResponseForm.fileUpload.title_2')}
+        </SHeadline>
         <SButton
+          id="upload-response-btn"
           view="primaryGrad"
           onClick={handleButtonClick}
         >
           {t('PostVideo.UploadResponseForm.fileUpload.button')}
         </SButton>
+        <SPlaceholder weight={600} variant={2}>
+          {t('PostVideo.UploadResponseForm.fileUpload.description')}
+        </SPlaceholder>
       </SDropBox>
     );
 
@@ -255,10 +264,12 @@ PostVideoResponseUpload.defaultProps = {
 
 const SWrapper = styled.div`
   width: 100%;
+  height: 100%;
 `;
 
 const SDropBox = styled.label`
   width: 100%;
+  height: 100%;
   cursor: copy;
   display: flex;
   padding: 16px;
@@ -273,6 +284,12 @@ const SDropBox = styled.label`
   }
 `;
 
+const SHeadline = styled(Headline)`
+  text-align: center;
+
+  margin-bottom: 12px;
+`;
+
 const SPlaceholder = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   margin-bottom: 12px;
@@ -280,6 +297,8 @@ const SPlaceholder = styled(Caption)`
 
 const SButton = styled(Button)`
   cursor: copy;
+
+  margin-bottom: 16px;
 `;
 
 const SFileBox = styled.div`

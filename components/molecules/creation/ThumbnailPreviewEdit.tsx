@@ -81,9 +81,11 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     const percentage = ((time - videoThumbs.current.startTime) * 100) / 3;
     const position = (percentage * 70) / 100;
 
-    progressIndicatorRef.current.style.transition = 'all ease 0.5s';
-    progressIndicatorRef.current.style.left = `calc(50% - 38px + ${position}px)`;
-    progressIndicatorRef.current.style.transform = 'translateX(-50%)';
+    if (progressIndicatorRef.current) {
+      progressIndicatorRef.current.style.transition = 'all ease 0.5s';
+      progressIndicatorRef.current.style.left = `calc(50% - 38px + ${position}px)`;
+      progressIndicatorRef.current.style.transform = 'translateX(-50%)';
+    }
   }, []);
 
   const getTime = useCallback((position) => {

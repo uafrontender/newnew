@@ -4,6 +4,7 @@
     "mc": "Multiple Choice",
     "cf": "Crowdfunding"
   },
+  "loadMoreBtn": "Load more",
   "expires": {
     "days": "d",
     "hours": "h",
@@ -45,6 +46,8 @@
         "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
       },
       "fileUpload": {
+        "title_1": "Your voters are waiting!",
+        "title_2": "Respond now with a video.",
         "description": "Max size of the video 100 MB",
         "button": "Select file"
       },
@@ -177,7 +180,9 @@
           "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
         },
         "full": {
-          "title": "Video preview"
+          "title": "Preview",
+          "cancelBtn": "Cancel",
+          "publishBtn": "Publish"
         },
         "loading":  {
           "title": "Just a minute",
@@ -235,7 +240,6 @@
         "highest": "Highest",
         "vip": "VIP"
       },
-      "loadMoreBtn": "Load more",
       "OptionCard": {
         "by": "by",
         "bidders": "bidders",
@@ -274,7 +278,6 @@
         "highest": "Highest",
         "vip": "VIP"
       },
-      "loadMoreBtn": "Load more",
       "OptionCard": {
         "noVotes": "no votes",
         "votes": "votes",
@@ -380,10 +383,24 @@
           "remove": "Remove option"
         }
       }
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "voters_told_you": "voters told you to",
+        "voter_told_you": "voter told you to",
+        "you_made": "You made",
+        "created_by": "The option was created by"
+      }
     }
   },
   "CfPostModeration": {
-
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "backers_told_you": "backers told you to",
+        "backer_told_you": "backer told you to",
+        "you_made": "You made"
+      }
+    }
   },
   "RecommendationsSection": {
     "heading": "More like this"

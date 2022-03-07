@@ -377,7 +377,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                   view="secondary"
                   onClick={() => handleLoadBids(pagingToken)}
                 >
-                  { t('AcPost.OptionsTab.loadMoreBtn') }
+                  { t('loadMoreBtn') }
                 </SLoadMoreBtn>
               )
             ) : null

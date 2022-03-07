@@ -69,12 +69,10 @@ interface IStyledModalOverlay {
   customBackdropFilterValue?: number;
 }
 
-// const StyledModalOverlay = styled.div<IStyledModalOverlay>`
 const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
   left: 0;
   width: 100vw;
   bottom: 0;
-  /* height: ${(props) => (props.show ? '100%' : 0)}; */
   z-index: ${({ additionalZ }) => additionalZ ?? 10};
   overflow: hidden;
   position: fixed;
@@ -82,7 +80,7 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
     customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)'};
   -webkit-backdrop-filter: ${({ customBackdropFilterValue }) =>
     customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)'};
-  /* transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`}; */
+
   // To avoid overlapping dim color with this bg color
   background-color: ${({ theme, overlayDim }) =>
     overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT};

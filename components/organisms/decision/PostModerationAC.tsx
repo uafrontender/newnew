@@ -531,7 +531,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
               <AcWinnerTabModeration
                 option={new newnewapi.Auction.Option({
                   id: 123,
-                  title: 'Some title',
+                  title: 'Some really really long long long long title',
                   supporterCount: 2,
                   totalAmount: {
                     usdCents: 100000,
@@ -544,14 +544,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             )
           )}
       </SActivitesContainer>
-      {isMobile && postStatus === 'waiting_for_response' ? (
-        <SUploadResponseButton
-          view="primaryGrad"
-        >
-          { t('AcPostModeration.floatingUploadResponseBtn') }
-        </SUploadResponseButton>
-      ) : null}
-      {/* Overview Modal */}
     </SWrapper>
   );
 };
@@ -647,14 +639,4 @@ const SActivitesContainer = styled.div<{
       : null
     )}
   }
-`;
-
-const SUploadResponseButton = styled(Button)`
-  position: fixed;
-  bottom: 16px;
-
-  width: calc(100% - 32px);
-  height: 56px;
-
-  z-index: 10;
 `;

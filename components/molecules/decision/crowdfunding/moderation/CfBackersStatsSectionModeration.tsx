@@ -6,19 +6,19 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../../redux-store/store';
 
-import Text from '../../../atoms/Text';
-import Headline from '../../../atoms/Headline';
+import Text from '../../../../atoms/Text';
+import Headline from '../../../../atoms/Headline';
 
-import { formatNumber } from '../../../../utils/format';
+import { formatNumber } from '../../../../../utils/format';
 
-interface ICfBackersStatsSection {
+interface ICfBackersStatsSectionModeration {
   post: newnewapi.Crowdfunding;
   currentNumBackers: number;
 }
 
-const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> = ({
+const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSectionModeration> = ({
   post,
   currentNumBackers,
 }) => {
@@ -94,7 +94,7 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> = (
   );
 };
 
-export default CfBackersStatsSection;
+export default CfBackersStatsSectionModeration;
 
 const SSectionContainer = styled(motion.div)`
   position: relative;

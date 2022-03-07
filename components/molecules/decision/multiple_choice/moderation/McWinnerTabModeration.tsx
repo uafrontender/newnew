@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -7,24 +7,30 @@ import { motion } from 'framer-motion';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
-import isBrowser from '../../../../../utils/isBrowser';
-
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
-import { formatNumber } from '../../../../../utils/format';
 import Headline from '../../../../atoms/Headline';
 import Text from '../../../../atoms/Text';
 
-interface IAcWinnerTabModeration {
-  option: newnewapi.Auction.Option;
+import isBrowser from '../../../../../utils/isBrowser';
+import { formatNumber } from '../../../../../utils/format';
+
+import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
+
+interface MAcWinnerTabModeration {
+  option: newnewapi.MultipleChoice.Option;
 }
 
-const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = ({
+const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> = ({
   option,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const isCreatorsBid = useMemo(() => {
+    if (!option.creator) return true;
+    return false;
+  }, [option.creator]);
 
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
@@ -100,27 +106,27 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
               {' '}
               <SSpanThin>
                 {option.supporterCount > 1
-                  ? t('AcPostModeration.WinnerTab.WinnerOptionCard.bidders_told_you')
-                  : t('AcPostModeration.WinnerTab.WinnerOptionCard.bidder_told_you')
+                  ? t('McPostModeration.WinnerTab.WinnerOptionCard.voters_told_you')
+                  : t('McPostModeration.WinnerTab.WinnerOptionCard.voter_told_you')
                 }
               </SSpanThin>
             </SNumBidders>
             <SHeadline
               variant={4}
             >
-              { option.title }
+              { option.text }
             </SHeadline>
             <SYouMade
               variant={3}
             >
-              { t('AcPostModeration.WinnerTab.WinnerOptionCard.you_made') }
+              { t('McPostModeration.WinnerTab.WinnerOptionCard.you_made') }
             </SYouMade>
             <SHeadline
               variant={4}
             >
               $
               {formatNumber(
-                option.totalAmount!!.usdCents!! / 100,
+                option.voteCount * 5,
                 true,
               )}
             </SHeadline>
@@ -128,16 +134,21 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
               variant={3}
             >
               <SSpanThin>
-                { t('AcPostModeration.WinnerTab.WinnerOptionCard.created_by') }
+                { t('McPostModeration.WinnerTab.WinnerOptionCard.created_by') }
               </SSpanThin>
               {' '}
               <SSpanBold
-                onClick={() => handleRedirectToUser()}
+                onClick={() => {
+                  if (isCreatorsBid) return;
+                  handleRedirectToUser();
+                }}
                 style={{
-                  cursor: 'pointer',
+                  ...(!isCreatorsBid ? {
+                    cursor: 'pointer',
+                  } : {}),
                 }}
               >
-                {option.creator?.nickname ?? option.creator?.username}
+                {isCreatorsBid ? t('McPost.OptionsTab.me') : (option.creator?.nickname ?? option.creator?.username)}
               </SSpanBold>
             </SOptionCreator>
           </SOptionDetails>
@@ -170,9 +181,9 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
   );
 };
 
-AcWinnerTabModeration.defaultProps = {};
+McWinnerTabModeration.defaultProps = {};
 
-export default AcWinnerTabModeration;
+export default McWinnerTabModeration;
 
 const STabContainer = styled(motion.div)`
   width: 100%;

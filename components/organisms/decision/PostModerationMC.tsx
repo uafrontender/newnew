@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -33,6 +34,7 @@ import McOptionsTabModeration from '../../molecules/decision/multiple_choice/mod
 import isBrowser from '../../../utils/isBrowser';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -66,12 +68,45 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'options' | 'comments'>(() => {
+  const tabs = useMemo(() => {
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) {
+      return [
+        {
+          label: 'winner',
+          value: 'winner',
+        },
+        {
+          label: 'options',
+          value: 'options',
+        },
+        {
+          label: 'comments',
+          value: 'comments',
+        },
+      ];
+    }
+    return [
+      {
+        label: 'options',
+        value: 'options',
+      },
+      {
+        label: 'comments',
+        value: 'comments',
+      },
+    ];
+  }, [postStatus]);
+
+  const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
       return 'options'
     }
     const { hash } = window.location;
-    if (hash && (hash === '#options' || hash === '#comments')) {
+    if (hash && (hash === '#options' || hash === '#comments'|| hash === '#winner')) {
       return hash.substring(1) as 'options' | 'comments';
     }
     return 'options';
@@ -94,7 +129,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'options' || parsedHash === 'comments') {
+      if (parsedHash === 'options' || parsedHash === 'comments' || parsedHash === 'winner') {
         setCurrentTab(parsedHash);
       }
     }
@@ -422,16 +457,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       />
       <SActivitesContainer>
         <DecisionTabs
-          tabs={[
-            {
-              label: 'options',
-              value: 'options',
-            },
-            {
-              label: 'comments',
-              value: 'comments',
-            },
-          ]}
+          tabs={tabs}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />
@@ -450,10 +476,25 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
               handleRemoveOption={handleRemoveOption}
             />
           ) : (
-            <CommentsTab
-              comments={comments}
-              handleGoBack={() => handleChangeTab('options')}
-            />
+            currentTab === 'comments'
+            ? (
+              <CommentsTab
+                comments={comments}
+                handleGoBack={() => handleChangeTab('options')}
+              />
+            ) : (
+              <McWinnerTabModeration
+                option={new newnewapi.MultipleChoice.Option({
+                  id: 123,
+                  text: 'Some really really long long long long text',
+                  supporterCount: 2,
+                  voteCount: 1000,
+                  creator: {
+                    username: 'user123',
+                  }
+                })}
+              />
+            )
           )}
       </SActivitesContainer>
       {/* Loading Modal */}

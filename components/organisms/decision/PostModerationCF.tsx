@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useRef, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -35,6 +36,8 @@ import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBacke
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import CfBackersStatsSectionModeration from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration';
+import CfCrowdfundingSuccessModeration from '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -115,6 +118,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
 
   // Current backers
   const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
+  const crowdfundingSuccess = useMemo(() => {
+    return currentBackers >= post.targetBackerCount
+  }, [post, currentBackers]);
 
   // Pledge levels
   const [pledgeLevels, setPledgeLevels] = useState<newnewapi.IMoneyAmount[]>([]);
@@ -455,10 +461,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'backers' ? (
-          <CfBackersStatsSection
-            post={post}
-            currentNumBackers={currentBackers}
-          />
+          !crowdfundingSuccess ? (
+            <CfBackersStatsSectionModeration
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+          ) : (
+            <CfCrowdfundingSuccessModeration
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+          )
         ) : (
           <CommentsTab
             comments={comments}

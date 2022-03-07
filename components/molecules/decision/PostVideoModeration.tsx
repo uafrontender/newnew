@@ -1,10 +1,11 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
@@ -47,7 +48,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   handleToggleMuted,
   handleUpdateResponseVideo,
 }) => {
+  const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const socketConnection = useContext(SocketContext);
@@ -259,33 +262,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   console.log(response);
 
   return (
-    <SVideoWrapper>
-      {openedTab === 'announcement' ? (
-        <>
-          <PostBitmovinPlayer
-            id={postId}
-            resources={announcement}
-            muted={isMuted}
-          />
-          <SSoundButton
-            iconOnly
-            view="transparent"
-            onClick={() => handleToggleMuted()}
-          >
-            <InlineSvg
-              svg={isMuted ? VolumeOff : VolumeOn}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-              fill="#FFFFFF"
-            />
-          </SSoundButton>
-        </>
-      ) : (
-        response ? (
+    <>
+      <SVideoWrapper>
+        {openedTab === 'announcement' ? (
           <>
             <PostBitmovinPlayer
               id={postId}
-              resources={response}
+              resources={announcement}
               muted={isMuted}
             />
             <SSoundButton
@@ -302,34 +285,66 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             </SSoundButton>
           </>
         ) : (
-          <PostVideoResponseUpload
-            id="video"
-            eta={responseFileUploadETA}
-            error={responseFileUploadError}
-            loading={responseFileUploadLoading}
-            progress={responseFileUploadProgress}
-            value={videoProcessing?.targetUrls!!}
-            onChange={handleItemChange}
-            thumbnails={{}}
+          response ? (
+            <>
+              <PostBitmovinPlayer
+                id={postId}
+                resources={response}
+                muted={isMuted}
+              />
+              <SSoundButton
+                iconOnly
+                view="transparent"
+                onClick={() => handleToggleMuted()}
+              >
+                <InlineSvg
+                  svg={isMuted ? VolumeOff : VolumeOn}
+                  width={isMobileOrTablet ? '20px' : '24px'}
+                  height={isMobileOrTablet ? '20px' : '24px'}
+                  fill="#FFFFFF"
+                />
+              </SSoundButton>
+            </>
+          ) : (
+            <PostVideoResponseUpload
+              id="video"
+              eta={responseFileUploadETA}
+              error={responseFileUploadError}
+              loading={responseFileUploadLoading}
+              progress={responseFileUploadProgress}
+              value={videoProcessing?.targetUrls!!}
+              onChange={handleItemChange}
+              thumbnails={{}}
+            />
+          )
+        )}
+        {response || postStatus === 'waiting_for_response' ? (
+          <ToggleVideoWidget
+            currentTab={openedTab}
+            responseUploaded={response !== undefined}
+            handleChangeTab={(newValue) => setOpenedTab(newValue)}
           />
-        )
-      )}
-      {response || postStatus === 'waiting_for_response' ? (
-        <ToggleVideoWidget
-          currentTab={openedTab}
-          responseUploaded={response !== undefined}
-          handleChangeTab={(newValue) => setOpenedTab(newValue)}
-        />
+        ) : null}
+        {uploadedResponseVideoUrl && !responseFileUploadLoading && (
+          <PostVideoResponsePreviewModal
+            value={videoProcessing.targetUrls!!}
+            open={uploadedResponseVideoUrl !== ''}
+            handleClose={() => handleVideoDelete()}
+            handleConfirm={() => handleUploadVideo()}
+          />
+        )}
+      </SVideoWrapper>
+      {isMobile && postStatus === 'waiting_for_response' && !responseFileUploadLoading ? (
+        <SUploadResponseButton
+          view="primaryGrad"
+          onClick={() => {
+            document.getElementById('upload-response-btn')?.click();
+          }}
+        >
+          { t('AcPostModeration.floatingUploadResponseBtn') }
+        </SUploadResponseButton>
       ) : null}
-      {uploadedResponseVideoUrl && !responseFileUploadLoading && (
-        <PostVideoResponsePreviewModal
-          value={videoProcessing.targetUrls!!}
-          open={uploadedResponseVideoUrl !== ''}
-          handleClose={() => handleVideoDelete()}
-          handleConfirm={() => handleUploadVideo()}
-        />
-      )}
-    </SVideoWrapper>
+    </>
   );
 };
 
@@ -405,4 +420,14 @@ const SSoundButton = styled(Button)`
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
+`;
+
+const SUploadResponseButton = styled(Button)`
+  position: fixed;
+  bottom: 16px;
+
+  width: calc(100% - 32px);
+  height: 56px;
+
+  z-index: 10;
 `;

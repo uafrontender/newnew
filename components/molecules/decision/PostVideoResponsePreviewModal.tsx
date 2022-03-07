@@ -9,7 +9,6 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 
-import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import chevronLeft from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -44,6 +43,7 @@ export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewMo
   return (
     <Modal
       show={open}
+      additionalZ={15}
       onClose={handleClose}
     >
       <SMobileContainer onClick={preventCLick}>
@@ -52,14 +52,6 @@ export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewMo
             <SModalTopLineTitleTablet variant={6}>
               {t('PostVideo.UploadResponseForm.video.full.title')}
             </SModalTopLineTitleTablet>
-            <InlineSVG
-              clickable
-              svg={closeIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-              onClick={handleConfirm}
-            />
           </SModalTopLine>
         )}
         <SModalVideoWrapper>
@@ -72,12 +64,28 @@ export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewMo
             />
           )}
         </SModalVideoWrapper>
+        <SControlsContainer>
+          {!isMobile && (
+            <SCancelButton
+              view="secondary"
+              onClick={handleClose}
+            >
+              {t('PostVideo.UploadResponseForm.video.full.cancelBtn')}
+            </SCancelButton>
+          )}
+          <SPublishButton
+            view="primaryGrad"
+            onClick={handleConfirm}
+          >
+            {t('PostVideo.UploadResponseForm.video.full.publishBtn')}
+          </SPublishButton>
+        </SControlsContainer>
         {isMobile && (
           <SModalCloseIcon>
             <Button
               iconOnly
               view="transparent"
-              onClick={handleConfirm}
+              onClick={handleClose}
             >
               <InlineSVG
                 svg={chevronLeft}
@@ -164,5 +172,40 @@ const SModalTopLine = styled.div`
 `;
 
 const SModalTopLineTitleTablet = styled(Headline)`
+  width: 100%;
+
+  text-align: center;
   color: ${(props) => props.theme.colorsThemed.text.primary};
+`;
+
+const SControlsContainer = styled.div`
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+
+  width: calc(100% - 32px);
+
+  display: flex;
+
+  @media (min-width: 425px) {
+    position: initial;
+
+    width: 100%;
+
+    justify-content: space-between;
+  }
+`;
+
+const SCancelButton = styled(Button)`
+
+`;
+
+const SPublishButton = styled(Button)`
+  width: 100%;
+  height: 56px;
+
+  @media (min-width: 425px) {
+    width: initial;
+    height: initial;
+  }
 `;

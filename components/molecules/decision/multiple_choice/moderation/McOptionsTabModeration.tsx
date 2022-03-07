@@ -84,7 +84,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 <SLoadMoreBtn
                   onClick={() => handleLoadOptions(pagingToken)}
                 >
-                  Load more
+                  { t('loadMoreBtn') }
                 </SLoadMoreBtn>
               )
             ) : null
