@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -24,6 +25,8 @@ export const Chat = () => {
   const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
     /* eslint-disable no-unused-expressions */
@@ -37,14 +40,23 @@ export const Chat = () => {
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [chatData]);
 
+  useEffect(() => {
+    if (newMessage) {
+      setNewMessage(null);
+    }
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [newMessage]);
+
   const showChatList = () => {
     setChatListHidden(false);
   };
 
   const passInputValue = (str: string) => {
-    if (str) {
-      // console.log(str);
-    }
+    setSearchText(str);
+  };
+
+  const gotNewMessage = (msg: newnewapi.IChatMessage | null | undefined) => {
+    setNewMessage(msg);
   };
 
   return (
@@ -65,10 +77,10 @@ export const Chat = () => {
           />
           <NewMessage />
         </SToolbar>
-        <ChatList openChat={openChat} />
+        <ChatList searchText={searchText} openChat={openChat} gotNewMessage={gotNewMessage} />
       </SSidebar>
       <SContent>
-        <ChatArea {...chatData} showChatList={showChatList} />
+        <ChatArea {...chatData} showChatList={showChatList} newMessage={newMessage} />
       </SContent>
     </SContainer>
   );

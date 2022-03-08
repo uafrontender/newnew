@@ -289,7 +289,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
                   <NewAnnouncement handleClick={createNewAnnouncement} />
                   {usersSortedList.length > 0 &&
                     usersSortedList.map((section: IUsersSorted) => (
-                      <SSection>
+                      <SSection key={randomID()}>
                         <SLetter>{section.letter}</SLetter>
                         {section.users.map(renderChatItem)}
                       </SSection>

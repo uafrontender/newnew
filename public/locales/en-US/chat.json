@@ -102,7 +102,9 @@
   "new-announcement": {
     "title": "New announcement",
     "text": "Only you can send messages to the group.",
-    "created": "You created the announcement"
+    "created": "You created the announcement",
+    "member": "member",
+    "members": "members"
   },
   "default": {
     "search-placeholder": "Search"

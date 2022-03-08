@@ -3,6 +3,7 @@ import { createContext, useContext, useMemo, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { getMySubscribers, getCreatorsImSubscribedTo } from '../api/endpoints/subscription';
 import { useAppSelector } from '../redux-store/store';
+import { SocketContext } from './socketContext';
 
 const SubscriptionsContext = createContext({
   mySubscribers: [] as newnewapi.IUser[],
@@ -13,6 +14,7 @@ const SubscriptionsContext = createContext({
   removeCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
   isMySubscribersIsLoading: false,
   isCreatorsImSubscribedToLoading: false,
+  newSubscriber: {} as newnewapi.ICreatorSubscriptionChanged,
 });
 
 export const SubscriptionsProvider: React.FC = ({ children }) => {
@@ -21,6 +23,10 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
   const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<newnewapi.IUser[]>([]);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
   const [isCreatorsImSubscribedToLoading, setCreatorsImSubscribedToLoading] = useState(false);
+
+  const [newSubscriber, setNewSubscriber] = useState<newnewapi.ICreatorSubscriptionChanged>({});
+
+  const socketConnection = useContext(SocketContext);
 
   const addSubscriber = (subscriber: newnewapi.IUser) => {
     setMySubscribers((curr) => [...curr, subscriber]);
@@ -48,6 +54,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       removeCreatorsImSubscribedTo,
       isMySubscribersIsLoading,
       isCreatorsImSubscribedToLoading,
+      newSubscriber,
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
     [
@@ -57,6 +64,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       creatorsImSubscribedTo,
       addCreatorsImSubscribedTo,
       removeCreatorsImSubscribedTo,
+      newSubscriber,
     ]
   );
 
@@ -94,6 +102,21 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
     fetchMySubscribers();
     fetchCreatorsImSubscribedTo();
   }, [user.loggedIn]);
+
+  useEffect(() => {
+    const handlerSubscriptionUpdated = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.CreatorSubscriptionChanged.decode(arr);
+
+      if (!decoded) return;
+
+      setNewSubscriber(decoded);
+    };
+
+    if (socketConnection) {
+      socketConnection.on('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
+    }
+  }, [socketConnection]);
 
   return <SubscriptionsContext.Provider value={contextValue}>{children}</SubscriptionsContext.Provider>;
 };

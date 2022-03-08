@@ -30,16 +30,9 @@ interface IGeneral {
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const {
-    children,
-    withChat,
-    specialStatusBarColor,
-  } = props;
+  const { children, withChat, specialStatusBarColor } = props;
   const user = useAppSelector((state) => state.user);
-  const {
-    banner,
-    resizeMode,
-  } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
   const wrapperRef: any = useRef();
@@ -119,12 +112,7 @@ export const General: React.FC<IGeneral> = (props) => {
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <SWrapper
-          id="generalScrollContainer"
-          ref={wrapperRef}
-          withBanner={!!banner?.show}
-          {...props}
-        >
+        <SWrapper id="generalScrollContainer" ref={wrapperRef} withBanner={!!banner?.show} {...props}>
           <Head>
             <meta
               name="theme-color"
@@ -135,31 +123,22 @@ export const General: React.FC<IGeneral> = (props) => {
           <SContent>
             <Container noMaxContent>
               <Row>
-                <Col>
-                  {children}
-                </Col>
+                <Col>{children}</Col>
               </Row>
             </Container>
           </SContent>
           <Footer />
-          <BottomNavigation
-            visible={isMobile && scrollDirection !== 'down'}
-            collection={bottomNavigation}
-          />
+          <BottomNavigation visible={isMobile && scrollDirection !== 'down'} collection={bottomNavigation} />
           <SortingContainer
             id="sorting-container"
             withCookie={cookies.accepted !== 'true'}
             bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
           />
-          <CookieContainer
-            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-          >
+          <CookieContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
             <Cookie />
           </CookieContainer>
           {withChat && isMobile && (
-            <ChatContainer
-              bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-            >
+            <ChatContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
               <FloatingMessages withCounter />
             </ChatContainer>
           )}
@@ -250,7 +229,8 @@ interface ISortingContainer {
 
 const SortingContainer = styled.div<ISortingContainer>`
   left: 50%;
-  bottom: ${(props) => (props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`)}px;
+  bottom: ${(props) =>
+    props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`}px;
   z-index: 10;
   position: fixed;
   transform: translateX(-50%);

@@ -73,20 +73,34 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
               const workingObj = { ...curr };
               const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
               if (shouldSubscribe && socketConnection && socketConnection.connected) {
-                const subscribeMsg = new newnewapi.SubscribeToChannels({
-                  channels: [
-                    {
-                      postUpdates: {
-                        postUuid: val,
+                let subscribeMsg;
+                if (val.startsWith('chat_')) {
+                  const chatId = parseInt(val.split('_')[1]);
+                  subscribeMsg = new newnewapi.SubscribeToChannels({
+                    channels: [
+                      {
+                        chatRoomUpdates: {
+                          chatRoomId: chatId,
+                        },
                       },
-                    },
-                  ],
-                });
+                    ],
+                  });
+                } else {
+                  subscribeMsg = new newnewapi.SubscribeToChannels({
+                    channels: [
+                      {
+                        postUpdates: {
+                          postUuid: val,
+                        },
+                      },
+                    ],
+                  });
+                }
                 const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-
                 socketConnection.emit('SubscribeToChannels', subscribeMsgEncoded);
               }
               workingObj[val] = shouldSubscribe ? 1 : workingObj[val] + 1;
+
               return workingObj;
             });
           });
@@ -98,14 +112,22 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     const shouldUnsubArray: newnewapi.IChannel[] = [];
-
     for (let i = 0; i < Object.values(channelsWithSubs).length; i++) {
       if (Object.values(channelsWithSubs)[i] < 1) {
-        shouldUnsubArray.push({
-          postUpdates: {
-            postUuid: Object.keys(channelsWithSubs)[i]!!,
-          },
-        } as newnewapi.IChannel);
+        if (Object.keys(channelsWithSubs)[i].startsWith('chat_')) {
+          const chatId = parseInt(Object.keys(channelsWithSubs)[i].split('_')[1]);
+          shouldUnsubArray.push({
+            chatRoomUpdates: {
+              chatRoomId: chatId,
+            },
+          } as newnewapi.IChannel);
+        } else {
+          shouldUnsubArray.push({
+            postUpdates: {
+              postUuid: Object.keys(channelsWithSubs)[i]!!,
+            },
+          } as newnewapi.IChannel);
+        }
       }
     }
     if (shouldUnsubArray.length > 0) {

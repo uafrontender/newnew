@@ -21,11 +21,11 @@ export const deleteMyRoom = (payload: newnewapi.DeleteMyRoomRequest) =>
     payload
   );
 
-export const getMessageCount = (payload: newnewapi.GetMessageCountRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.GetMessageCountRequest, newnewapi.GetMessageCountResponse>(
-    newnewapi.GetMessageCountRequest,
-    newnewapi.GetMessageCountResponse,
-    `${BASE_URL_CHAT}/get_message_count`,
+export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.MarkRoomAsReadRequest, newnewapi.EmptyResponse>(
+    newnewapi.MarkRoomAsReadRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_CHAT}/mark_room_as_read`,
     'post',
     payload
   );

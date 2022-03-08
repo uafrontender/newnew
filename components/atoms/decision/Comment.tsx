@@ -110,7 +110,7 @@ const Comment: React.FC<IComment> = ({ lastChild, comment }) => {
       </SCommentContent>
       <ReportUserModal
         confirmReportUser={confirmReportUser}
-        userName="acascs"
+        user={comment.user}
         closeModal={() => setConfirmReportUser(false)}
       />
     </SComment>
