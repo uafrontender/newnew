@@ -35,6 +35,7 @@ import isBrowser from '../../../utils/isBrowser';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -446,14 +447,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         handleToggleMuted={() => handleToggleMutedMode()}
         handleUpdateResponseVideo={(newValue) => setResponseFreshlyUploaded(newValue)}
       />
-      <PostTopInfo
+      <PostTopInfoModeration
         postType="mc"
-        postId={post.postUuid}
         title={post.title}
+        postId={post.postUuid}
         totalVotes={totalVotes}
-        creator={post.creator!!}
-        startsAtSeconds={post.startsAt?.seconds as number}
-        isFollowingDecisionInitial={false}
+        handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer>
         <DecisionTabs
