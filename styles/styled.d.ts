@@ -190,6 +190,8 @@ declare module 'styled-components' {
       creationSubmit: string,
       listTop: string,
       listBottom: string,
+      listLeft: string,
+      listRight: string,
       decisionOption: {
         yellow: string,
         blue: string,

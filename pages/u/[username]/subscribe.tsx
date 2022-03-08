@@ -82,7 +82,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
       const res = await subscribeToCreator(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data?.checkoutUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
       if (url) window.location.href = url;

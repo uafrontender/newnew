@@ -350,6 +350,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     const res = await fetchPostByUUID(getPostPayload);
 
+    // NB! Need to tackle toJSON() method
+
     if (res.data && !res.error) {
       return {
         props: {

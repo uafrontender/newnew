@@ -17,17 +17,19 @@ import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../..
 import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import AcOptionCard from './AcOptionCard';
-import OptionOverview from './AcOptionOverview';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
+import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
+import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
 
 interface IAcOptionsTab {
   postId: string;
@@ -37,12 +39,7 @@ interface IAcOptionsTab {
   pagingToken: string | undefined | null;
   minAmount: number;
   handleLoadBids: (token?: string) => void;
-  overviewedOption?: newnewapi.Auction.Option;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
-  handleCloseOptionBidHistory: () => void;
-  handleOpenOptionBidHistory: (
-    optionToOpen: newnewapi.Auction.Option
-  ) => void;
 }
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
@@ -53,10 +50,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   pagingToken,
   minAmount,
   handleLoadBids,
-  overviewedOption,
   handleAddOrUpdateOptionFromResponse,
-  handleCloseOptionBidHistory,
-  handleOpenOptionBidHistory,
 }) => {
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
@@ -71,16 +65,15 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     inView,
   } = useInView();
 
-  const [shadowTop, setShadowTop] = useState(false);
-  const [shadowBottom, setShadowBottom] = useState(!isMobile);
-  const [heightDelta, setHeightDelta] = useState(56);
   const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
+
+  const [heightDelta, setHeightDelta] = useState(56);
   const actionSectionContainer = useRef<HTMLDivElement>();
 
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
-
   const mainContainer = useRef<HTMLDivElement>();
-  const overviewedRefId = useRef('');
+
+  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
@@ -95,10 +88,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
-    // if (!user.loggedIn) {
-    //   router.push('/sign-up?reason=bid');
-    //   return;
-    // }
     setPaymentModalOpen(true);
   };
 
@@ -159,8 +148,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       // Check if user is logged and if the wallet balance is sufficient
       if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(newBidAmount, 10) * 100)) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href}&`,
-          cancelUrl: `${window.location.href}&`,
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -195,8 +184,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         // Additional handler if balance turned out to be insufficient
         if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href}&`,
-            cancelUrl: `${window.location.href}&`,
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
             acBidRequest: {
               amount: new newnewapi.MoneyAmount({
                 usdCents: parseInt(newBidAmount, 10) * 100,
@@ -250,8 +239,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href}&`,
-        cancelUrl: `${window.location.href}&`,
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
         ...(!user.loggedIn ? {
           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
         } : {}),
@@ -292,7 +281,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   }, [inView, pagingToken, optionsLoading]);
 
   useEffect(() => {
-    if (optionBeingSupported && containerRef.current) {
+    if (optionBeingSupported && containerRef.current && !isMobile) {
       let optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
       optIdx += 2;
       const childDiv = containerRef.current.children[optIdx];
@@ -306,32 +295,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         top: scrollBy,
       });
     }
-  }, [options, optionBeingSupported]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolledToTop = (containerRef.current?.scrollTop ?? 0) < 10;
-      const isScrolledToBottom = (
-        (containerRef.current?.scrollTop ?? 0) + (containerRef.current?.clientHeight ?? 0))
-        >= (containerRef.current?.scrollHeight ?? 0);
-
-      if (!isScrolledToTop) {
-        setShadowTop(true);
-      } else {
-        setShadowTop(false);
-      }
-
-      if (!isScrolledToBottom) {
-        setShadowBottom(true);
-      } else {
-        setShadowBottom(false);
-      }
-    };
-
-    containerRef.current?.addEventListener('scroll', handleScroll);
-
-    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
-  }, [overviewedOption]);
+  }, [options, optionBeingSupported, isMobile]);
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
@@ -346,41 +310,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (overviewedOption) {
-      overviewedRefId.current = overviewedOption.id.toString();
-
-      if (isMobile) {
-        document.getElementById('post-modal-container')
-          ?.scrollTo({
-            top: window.innerHeight,
-            behavior: 'smooth',
-          });
-      }
-    } else if (!overviewedOption && overviewedRefId.current) {
-      let optIdx = options.findIndex((o) => o.id.toString() === overviewedRefId.current);
-      optIdx += 2;
-      const childDiv = containerRef.current!!.children[optIdx];
-
-      if (childDiv) {
-        if (isMobile) {
-          childDiv.scrollIntoView();
-        } else {
-          const childRect = childDiv.getBoundingClientRect();
-          const parentRect = containerRef.current!!.getBoundingClientRect();
-          const scrollBy = childRect.top - parentRect.top;
-
-          containerRef.current!!.scrollBy({
-            top: scrollBy,
-          });
-        }
-      }
-
-      overviewedRefId.current = '';
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overviewedOption, options]);
-
   return (
     <>
       <STabContainer
@@ -392,64 +321,68 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {
-          !overviewedOption ? (
-            <SBidsContainer
-              ref={(el) => {
-                containerRef.current = el!!;
-              }}
-              heightDelta={heightDelta}
+        {options.length === 0 && !optionsLoading ? (
+          <SNoOptionsYet>
+            <SNoOptionsImgContainer>
+              <img
+                src={NoContentYetImg.src}
+                alt='No content yet'
+              />
+            </SNoOptionsImgContainer>
+            <SNoOptionsCaption
+              variant={3}
             >
-              <SShadowTop
-                style={{
-                  opacity: shadowTop && !optionBeingSupported ? 1 : 0,
-                }}
-              />
-              <SShadowBottom
-                heightDelta={heightDelta}
-                style={{
-                  opacity: shadowBottom && !optionBeingSupported ? 1 : 0,
-                }}
-              />
-              {options.map((option, i) => (
-                <AcOptionCard
-                  key={option.id.toString()}
-                  option={option as TAcOptionWithHighestField}
-                  shouldAnimate={optionToAnimate === option.id.toString()}
-                  postId={postId}
-                  index={i}
-                  minAmount={minAmount}
-                  optionBeingSupported={optionBeingSupported}
-                  handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
-                  handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-                  handleOpenOptionBidHistory={() => handleOpenOptionBidHistory(option)}
-                />
-              ))}
-              {!isMobile ? (
-                <SLoaderDiv
-                  ref={loadingRef}
-                />
-              ) : (
-                pagingToken ? (
-                  (
-                    <SLoadMoreBtn
-                      view="secondary"
-                      onClick={() => handleLoadBids(pagingToken)}
-                    >
-                      { t('AcPost.OptionsTab.loadMoreBtn') }
-                    </SLoadMoreBtn>
-                  )
-                ) : null
-              )}
-            </SBidsContainer>
-          ) : (
-            <OptionOverview
-              postUuid={postId}
-              overviewedOption={overviewedOption}
-              handleCloseOptionBidHistory={handleCloseOptionBidHistory}
+              { t('AcPost.OptionsTab.NoOptions.caption_1') }
+            </SNoOptionsCaption>
+            <SNoOptionsCaption
+              variant={3}
+            >
+              { t('AcPost.OptionsTab.NoOptions.caption_2') }
+            </SNoOptionsCaption>
+          </SNoOptionsYet>
+        ) : null}
+        <SBidsContainer
+          ref={(el) => {
+            containerRef.current = el!!;
+          }}
+          heightDelta={heightDelta}
+        >
+          {!isMobile ? (
+            <>
+              <GradientMask positionTop active={showTopGradient} />
+              <GradientMask positionBottom={heightDelta} active={showBottomGradient} />
+            </>
+          ) : null}
+          {options.map((option, i) => (
+            <AcOptionCard
+              key={option.id.toString()}
+              option={option as TAcOptionWithHighestField}
+              shouldAnimate={optionToAnimate === option.id.toString()}
+              postId={postId}
+              index={i}
+              minAmount={minAmount}
+              optionBeingSupported={optionBeingSupported}
+              handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             />
-          )
-          }
+          ))}
+          {!isMobile ? (
+            <SLoaderDiv
+              ref={loadingRef}
+            />
+          ) : (
+            pagingToken ? (
+              (
+                <SLoadMoreBtn
+                  view="secondary"
+                  onClick={() => handleLoadBids(pagingToken)}
+                >
+                  { t('AcPost.OptionsTab.loadMoreBtn') }
+                </SLoadMoreBtn>
+              )
+            ) : null
+          )}
+        </SBidsContainer>
         <SActionSection
           ref={(el) => {
             actionSectionContainer.current = el!!;
@@ -457,15 +390,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         >
           <SuggestionTextArea
             value={newBidText}
-            disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
+            disabled={optionBeingSupported !== ''}
             placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
             onChange={handleUpdateNewOptionText}
           />
           <BidAmountTextInput
             value={newBidAmount}
-            inputAlign="left"
-            horizontalPadding="16px"
-            disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
+            inputAlign="center"
+            disabled={optionBeingSupported !== ''}
             onChange={(newValue: string) => setNewBidAmount(newValue)}
             minAmount={minAmount}
             style={{
@@ -476,9 +408,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             view="primaryGrad"
             size="sm"
             disabled={!newBidText
+              || !newBidAmount
               || parseInt(newBidAmount, 10) < minAmount
               || optionBeingSupported !== ''
-              || overviewedOption !== undefined
               || !newBidTextValid}
             style={{
               ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
@@ -499,15 +431,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           <SSuggestNewContainer>
             <SuggestionTextArea
               value={newBidText}
-              disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
+              disabled={optionBeingSupported !== ''}
+              autofocus={suggestNewMobileOpen}
               placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
               inputAlign="left"
-              horizontalPadding="16px"
-              disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
+              disabled={optionBeingSupported !== ''}
+              style={{
+                textAlign: 'center',
+                paddingLeft: '12px',
+              }}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
             />
@@ -515,9 +451,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               view="primaryGrad"
               size="sm"
               disabled={!newBidText
+                || !newBidAmount
                 || parseInt(newBidAmount, 10) < minAmount
                 || optionBeingSupported !== ''
-                || overviewedOption !== undefined
                 || !newBidTextValid}
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
@@ -571,7 +507,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 };
 
 AcOptionsTab.defaultProps = {
-  overviewedOption: undefined,
   optionToAnimate: undefined,
 };
 
@@ -580,7 +515,11 @@ export default AcOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 112px);
+  height: calc(100% - 50px);
+
+  ${({ theme }) => theme.media.tablet} {
+    height: calc(100% - 56px);
+  }
 `;
 
 const SBidsContainer = styled.div<{
@@ -625,47 +564,12 @@ const SBidsContainer = styled.div<{
   }
 `;
 
-const SShadowTop = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0;
-
-  width: calc(100% - 18px);
-  height: 0px;
-
-  z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
-  ;
-  clip-path: inset(0px 0px -100px 0px);
-
-  transition: linear .2s;
-`;
-
-const SShadowBottom = styled.div<{
-  heightDelta: number;
-}>`
-  position: absolute;
-  bottom: ${({ heightDelta }) => heightDelta}px;
-  left: 0;
-
-  width: calc(100% - 18px);
-  height: 0px;
-
-  z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
-  ;
-  clip-path: inset(-100px 0px 0px 0px);
-  transition: linear .2s;
-`;
-
 const SLoaderDiv = styled.div`
   height: 10px;
 `;
 
 const SLoadMoreBtn = styled(Button)`
-  width: calc(100% - 16px);
+  width: 100%;
   height: 56px;
 `;
 
@@ -697,17 +601,32 @@ const SActionSection = styled.div`
     display: flex;
     flex-direction: row;
     align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 16px;
 
-    position: absolute;
     min-height: 50px;
     width: 100%;
     z-index: 5;
-    bottom: 0;
 
     padding-top: 8px;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+    border-top: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+    textarea {
+      width: 100%;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-wrap: nowrap;
+    justify-content: initial;
+
+    textarea {
+      width: 277px;
+    }
   }
 `;
 
@@ -725,4 +644,38 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+// No options yet
+const SNoOptionsYet = styled.div`
+  position: absolute;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 400px;
+`;
+
+const SNoOptionsImgContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  margin-bottom: 16px;
+`;
+
+const SNoOptionsCaption = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;

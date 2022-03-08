@@ -1,10 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface ISuggestionTextArea {
   value: string;
   placeholder: string;
   disabled?: boolean;
+  autofocus?: boolean;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
@@ -12,9 +13,20 @@ const SuggestionTextArea:React.FunctionComponent<ISuggestionTextArea> = ({
   value,
   placeholder,
   disabled,
+  autofocus,
   onChange,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>();
+
+  useEffect(() => {
+    if (!value && textareaRef?.current) {
+      textareaRef.current.style.height = '';
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (autofocus) textareaRef.current?.focus();
+  }, [autofocus]);
 
   return (
     <STextarea
@@ -38,6 +50,7 @@ const SuggestionTextArea:React.FunctionComponent<ISuggestionTextArea> = ({
 
 SuggestionTextArea.defaultProps = {
   disabled: undefined,
+  autofocus: undefined,
 };
 
 export default SuggestionTextArea;
@@ -52,7 +65,7 @@ const STextarea = styled.textarea`
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border: transparent;
+  border: 1.5px solid transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   ::placeholder {
@@ -61,5 +74,6 @@ const STextarea = styled.textarea`
 
   &:focus {
     outline: none;
+    border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
   }
 `;
