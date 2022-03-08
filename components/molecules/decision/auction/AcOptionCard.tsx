@@ -7,15 +7,8 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-<<<<<<< HEAD
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
-=======
-import React, {
-  useCallback, useContext, useMemo, useState,
-} from 'react';
 import styled, { css, useTheme } from 'styled-components';
->>>>>>> development
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
@@ -110,21 +103,13 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       // Check if user is logged and if the wallet balance is sufficient
       if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(supportBidAmount, 10) * 100)) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-<<<<<<< HEAD
-          successUrl: `${window.location.href}&`,
-          cancelUrl: `${window.location.href}&`,
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
           ...(!user.loggedIn
             ? {
                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
               }
             : {}),
-=======
-          successUrl: `${window.location.href.split('#')[0]}&`,
-          cancelUrl: `${window.location.href.split('#')[0]}&`,
-          ...(!user.loggedIn ? {
-            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-          } : {}),
->>>>>>> development
           acBidRequest: {
             amount: new newnewapi.MoneyAmount({
               usdCents: parseInt(supportBidAmount, 10) * 100,
@@ -252,13 +237,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           : {}),
       }}
     >
-      <SContainer
-        isDisabled={disabled}
-        isBlue={isSupportedByMe || isMyBid}
-      >
-        <SBidDetails
-          isBlue={isSupportedByMe || isMyBid}
-        >
+      <SContainer isDisabled={disabled} isBlue={isSupportedByMe || isMyBid}>
+        <SBidDetails isBlue={isSupportedByMe || isMyBid}>
           <SLottieAnimationContainer>
             {shouldAnimate ? (
               <Lottie
@@ -273,97 +253,58 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             ) : null}
           </SLottieAnimationContainer>
           <SBidAmount>
-            <SCoinImg
-              src={CoinIcon.src}
-            />
+            <SCoinImg src={CoinIcon.src} />
             <div>
               {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
             </div>
           </SBidAmount>
-          <SOptionInfo
-            variant={3}
-          >
-            {option.title}
-          </SOptionInfo>
-          <SBiddersInfo
-            variant={3}
-          >
+          <SOptionInfo variant={3}>{option.title}</SOptionInfo>
+          <SBiddersInfo variant={3}>
             <SSpanBiddersHighlighted
               className="spanHighlighted"
               onClick={() => {
                 if (!isMyBid) {
-                  handleRedirectToOptionCreator()
+                  handleRedirectToOptionCreator();
                 }
               }}
               style={{
-                ...(!isMyBid && option.isCreatedBySubscriber ? {
-                  color: theme.colorsThemed.accent.yellow,
-                } : {}),
-                ...(!isMyBid ? {
-                  cursor: 'pointer',
-                } : {}),
+                ...(!isMyBid && option.isCreatedBySubscriber
+                  ? {
+                      color: theme.colorsThemed.accent.yellow,
+                    }
+                  : {}),
+                ...(!isMyBid
+                  ? {
+                      cursor: 'pointer',
+                    }
+                  : {}),
               }}
             >
-              {isMyBid ? t('me') : (option.creator?.nickname ?? option.creator?.username)}
+              {isMyBid ? t('me') : option.creator?.nickname ?? option.creator?.username}
             </SSpanBiddersHighlighted>
             {isSupportedByMe && !isMyBid ? (
-              <SSpanBiddersHighlighted
-                className="spanHighlighted"
-              >
-                {`, ${t('me')}`}
-              </SSpanBiddersHighlighted>
+              <SSpanBiddersHighlighted className="spanHighlighted">{`, ${t('me')}`}</SSpanBiddersHighlighted>
             ) : null}
             {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
               <>
-                <SSpanBiddersRegular
-                  className="spanRegular"
-                >
-                  {` & `}
-                </SSpanBiddersRegular>
-                <SSpanBiddersHighlighted
-                  className="spanHighlighted"
-                >
-                  {formatNumber(
-                    option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1),
-                    true,
-                  )}
-                  { ' ' }
+                <SSpanBiddersRegular className="spanRegular">{` & `}</SSpanBiddersRegular>
+                <SSpanBiddersHighlighted className="spanHighlighted">
+                  {formatNumber(option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1), true)}{' '}
                   {t('AcPost.OptionsTab.OptionCard.others')}
                 </SSpanBiddersHighlighted>
               </>
-            ) : null}
-            {' '}
-            <SSpanBiddersRegular
-              className="spanRegular"
-            >
-              {t('AcPost.OptionsTab.OptionCard.bid')}
-            </SSpanBiddersRegular>
+            ) : null}{' '}
+            <SSpanBiddersRegular className="spanRegular">{t('AcPost.OptionsTab.OptionCard.bid')}</SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {optionBeingSupported && !disabled ? (
-          null
-        ) : (
-          <SSupportButton
-            view="quaternary"
-            disabled={disabled}
-            onClick={() => handleOpenSupportForm()}
-          >
+        {optionBeingSupported && !disabled ? null : (
+          <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
             {!isMobile ? (
-              <img
-                draggable={false}
-                src={SupportOptionIcon.src}
-                alt={t('AcPost.OptionsTab.OptionCard.supportBtn')}
-              />
+              <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
             ) : (
               <>
-                <img
-                  draggable={false}
-                  src={SupportOptionIcon.src}
-                  alt={t('AcPost.OptionsTab.OptionCard.supportBtn')}
-                />
-                <div>
-                  {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
-                </div>
+                <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
+                <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
               </>
             )}
           </SSupportButton>
@@ -469,7 +410,8 @@ const SContainer = styled(motion.div)<{
 
   padding: 16px;
 
-  background-color: ${({ theme, isBlue }) => (isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  background-color: ${({ theme, isBlue }) =>
+    isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
@@ -500,27 +442,27 @@ const SBidDetails = styled.div<{
 
   width: 100%;
 
-  ${({ isBlue }) => (isBlue ? (
-    css`
-      .spanRegular {
-        color: #FFFFFF;
-        opacity: 0.6;
-      }
-      .spanHighlighted {
-        color: #FFFFFF;
-      }
-    `
-  ) : null)}
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          .spanRegular {
+            color: #ffffff;
+            opacity: 0.6;
+          }
+          .spanHighlighted {
+            color: #ffffff;
+          }
+        `
+      : null}
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'amount bidders'
-    'optionInfo optionInfo';
+      'amount bidders'
+      'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
-
-
-    background-color: ${({ theme, isBlue }) => (isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+    background-color: ${({ theme, isBlue }) =>
+      isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 14px;
@@ -567,8 +509,6 @@ const SSpanBiddersHighlighted = styled.span`
 const SSpanBiddersRegular = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
-
-
 
 const SLottieAnimationContainer = styled.div`
   position: absolute;
