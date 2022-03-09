@@ -7,7 +7,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { toNumber } from 'lodash';
 
-import { getBlockedUsers } from '../../../contexts/blockedUsersContext';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/chat/TextArea';
@@ -23,7 +23,7 @@ import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { markUser } from '../../../api/endpoints/user';
-import { getSubscriptions } from '../../../contexts/subscriptionsContext';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -45,8 +45,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const { usersIBlocked, usersBlockedMe, unblockUser } = getBlockedUsers();
-  const { mySubscribers } = getSubscriptions();
+  const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
+  const { mySubscribers } = useGetSubscriptions();
 
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
@@ -156,7 +156,12 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
 
   useEffect(() => {
     if (newMessage) {
-      setMessages((curr) => [newMessage, ...curr]);
+      setMessages((curr) => {
+        if (curr[0].id !== newMessage.id) {
+          return [newMessage, ...curr];
+        }
+        return curr;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessage]);
@@ -231,10 +236,11 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <>
+        <React.Fragment
+          key={item.id ? item.id.toString() : randomID()}
+        >
           <SMessage
             id={item.id ? item.id.toString() : randomID()}
-            key={randomID()}
             mine={isMine}
             prevSameUser={prevSameUser}
           >
@@ -255,7 +261,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
             </SMessageContent>
           </SMessage>
           {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
-        </>
+        </React.Fragment>
       );
 
       if (

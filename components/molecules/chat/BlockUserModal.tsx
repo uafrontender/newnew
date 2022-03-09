@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { markUser } from '../../../api/endpoints/user';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
-import { getBlockedUsers } from '../../../contexts/blockedUsersContext';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 interface IBlockUserModal {
   user: newnewapi.IUser;
@@ -24,7 +24,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
 }) => {
   const { t } = useTranslation('chat');
 
-  const { blockUser } = getBlockedUsers();
+  const { blockUser } = useGetBlockedUsers();
 
   async function blockUserRequest() {
     try {

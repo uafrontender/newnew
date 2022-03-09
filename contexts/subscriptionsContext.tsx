@@ -1,5 +1,11 @@
-import React, { useEffect } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, {
+  useEffect,
+  createContext,
+  useContext,
+  useMemo,
+  useState
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { getMySubscribers, getCreatorsImSubscribedTo } from '../api/endpoints/subscription';
 import { useAppSelector } from '../redux-store/store';
@@ -55,8 +61,8 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       isMySubscribersIsLoading,
       isCreatorsImSubscribedToLoading,
       newSubscriber,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       mySubscribers,
       addSubscriber,
@@ -121,8 +127,8 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
   return <SubscriptionsContext.Provider value={contextValue}>{children}</SubscriptionsContext.Provider>;
 };
 
-export function getSubscriptions() {
+export function useGetSubscriptions() {
   const context = useContext(SubscriptionsContext);
-  if (!context) throw new Error('getSubscriptions must be used inside a `SubscriptionsProvider`');
+  if (!context) throw new Error('useGetSubscriptions must be used inside a `SubscriptionsProvider`');
   return context;
 }

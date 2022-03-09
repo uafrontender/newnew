@@ -28,7 +28,7 @@ import randomID from '../../../utils/randomIdGenerator';
 import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import { getSubscriptions } from '../../../contexts/subscriptionsContext';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import InlineSVG from '../../atoms/InlineSVG';
@@ -50,7 +50,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const { newSubscriber } = getSubscriptions();
+  const { newSubscriber } = useGetSubscriptions();
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('chatRooms');
 
@@ -122,14 +122,18 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
     if (!chatRooms && !loadingRooms) {
       fetchMyRooms();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  // Cleanup
+  useEffect(() => () => {
     if (chatRooms) {
       chatRooms.forEach((chat) => {
         if (chat.id) removeChannel(`chat_${chat.id.toString()}`);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatRooms]);
 
   useEffect(() => {
     if (searchText) {
@@ -205,7 +209,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRooms, socketConnection]);
+  }, [chatRooms, socketConnection, addChannel]);
 
   useEffect(() => {
     const socketHandlerMessageCreated = (data: any) => {
@@ -364,7 +368,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
               </SChatItemCenter>
               <SChatItemRight>
                 <SChatItemTime variant={3} weight={600}>
-                  {chat.updatedAt && moment(chat.updatedAt?.nanos).fromNow()}
+                  {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
                 </SChatItemTime>
                 {unreadChatRooms.find((i) => toNumber(chat.id) === i.id) && (
                   <SUnreadCount>{unreadChatRooms.find((i) => toNumber(chat.id) === i.id)?.count}</SUnreadCount>

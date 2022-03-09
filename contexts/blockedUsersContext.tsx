@@ -1,5 +1,11 @@
-import React, { useEffect } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, {
+  createContext,
+  useEffect,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { GetMyBlockedUsers } from '../api/endpoints/user';
@@ -33,8 +39,8 @@ export const BlockedUsersProvider: React.FC = ({ children }) => {
       usersBlockedLoading,
       blockUser,
       unblockUser,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [usersBlockedMe, usersIBlocked, blockUser, unblockUser]
   );
 
@@ -59,8 +65,8 @@ export const BlockedUsersProvider: React.FC = ({ children }) => {
   return <BlockedUsersContext.Provider value={contextValue}>{children}</BlockedUsersContext.Provider>;
 };
 
-export function getBlockedUsers() {
+export function useGetBlockedUsers() {
   const context = useContext(BlockedUsersContext);
-  if (!context) throw new Error('getBlockedUsers must be used inside a `BlockedUsersProvider`');
+  if (!context) throw new Error('useGetBlockedUsers must be used inside a `BlockedUsersProvider`');
   return context;
 }

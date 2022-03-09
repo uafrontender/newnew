@@ -59,8 +59,8 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
       channelsWithSubs,
       addChannel,
       removeChannel,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [channelsWithSubs]
   );
 
@@ -75,7 +75,7 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
               if (shouldSubscribe && socketConnection && socketConnection.connected) {
                 let subscribeMsg;
                 if (val.startsWith('chat_')) {
-                  const chatId = parseInt(val.split('_')[1]);
+                  const chatId = parseInt(val.split('_')[1], 10);
                   subscribeMsg = new newnewapi.SubscribeToChannels({
                     channels: [
                       {
@@ -115,7 +115,7 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
     for (let i = 0; i < Object.values(channelsWithSubs).length; i++) {
       if (Object.values(channelsWithSubs)[i] < 1) {
         if (Object.keys(channelsWithSubs)[i].startsWith('chat_')) {
-          const chatId = parseInt(Object.keys(channelsWithSubs)[i].split('_')[1]);
+          const chatId = parseInt(Object.keys(channelsWithSubs)[i].split('_')[1], 10);
           shouldUnsubArray.push({
             chatRoomUpdates: {
               chatRoomId: chatId,
