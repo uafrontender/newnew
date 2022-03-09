@@ -37,6 +37,8 @@ import switchPostType from '../../../utils/switchPostType';
 import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
 import Button from '../../atoms/Button';
 import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -44,6 +46,7 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 
 interface IPostViewCF {
   post: newnewapi.Crowdfunding;
+  postStatus: TPostStatusStringified;
   sessionId?: string;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -51,6 +54,7 @@ interface IPostViewCF {
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   post,
+  postStatus,
   sessionId,
   handleGoBack,
   handleUpdatePostStatus,
@@ -288,6 +292,74 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Render functions
+  const renderBackersSection = useCallback(() => {
+    switch(postStatus) {
+      case 'voting': {
+        return (
+          <>
+          <CfBackersStatsSection
+            post={post}
+            currentNumBackers={currentBackers}
+          />
+          {!isMobile ? (
+            <CfPledgeLevelsSection
+              post={post}
+              pledgeLevels={pledgeLevels}
+              handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+            />
+          ) : null }
+        </>
+        );
+      }
+      case 'waiting_for_response': {
+        return (
+          <>
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            <SNotifyMeSection>
+              notify me
+            </SNotifyMeSection>
+          </>
+        );
+      }
+      case 'succeeded': {
+        return (
+          <>
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            <SSeeMoreSection>
+              see more
+            </SSeeMoreSection>
+          </>
+        );
+      }
+      default: {
+        // return null;
+        <>
+        <CfCrowdfundingSuccess
+          post={post}
+          currentNumBackers={currentBackers}
+        />
+
+      </>
+      }
+    }
+
+    return null;
+  }, [
+    currentBackers,
+    handleAddPledgeFromResponse,
+    isMobile,
+    pledgeLevels,
+    post,
+    postStatus,
+  ]);
+
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
@@ -482,19 +554,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'backers' ? (
-          <>
-            <CfBackersStatsSection
-              post={post}
-              currentNumBackers={currentBackers}
-            />
-            {!isMobile ? (
-              <CfPledgeLevelsSection
-                post={post}
-                pledgeLevels={pledgeLevels}
-                handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-              />
-            ) : null }
-          </>
+          renderBackersSection()
         ) : (
           <CommentsTab
             comments={comments}
@@ -617,4 +677,14 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
   }
+`;
+
+// Notify me
+const SNotifyMeSection = styled.div`
+
+`;
+
+// See more
+const SSeeMoreSection = styled.div`
+
 `;

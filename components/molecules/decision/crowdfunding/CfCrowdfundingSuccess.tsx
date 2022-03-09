@@ -1,67 +1,36 @@
-import React, {
-  useMemo,
-} from 'react';
-import styled, { useTheme } from 'styled-components';
+import React from 'react';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
-import { useAppSelector } from '../../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 
-import Text from '../../../../atoms/Text';
-import Headline from '../../../../atoms/Headline';
+import Text from '../../../atoms/Text';
+import Headline from '../../../atoms/Headline';
 
-import { formatNumber } from '../../../../../utils/format';
+import { formatNumber } from '../../../../utils/format';
 
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import WinnerIcon from '../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 
-interface ICfCrowdfundingSuccessModeration {
+interface ICfCrowdfundingSuccess {
   post: newnewapi.Crowdfunding;
   currentNumBackers: number;
 }
 
-const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSuccessModeration> = ({
+const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> = ({
   post,
   currentNumBackers,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
-
-  const percentage = (currentNumBackers / post.targetBackerCount) * 100;
-  const size = useMemo(() => (
-    isTablet ? 180 : 240
-  ), [isTablet]);
-  const radius = (size - 12) / 2;
 
   return (
     <SSectionContainer>
       {!isMobile ? (
         <>
           <SProgressRingContainer>
-            {isTablet ? (
-              <SProgressRingSvg
-                width={size}
-                height={size}
-              >
-                <SBgRingCircle
-                  stroke={theme.colorsThemed.accent.green}
-                  strokeWidth="12px"
-                  strokeLinecap="round"
-                  fill="transparent"
-                  style={{
-                    transform: `rotate(${90 - (percentage !== 0 ? 4 : 0)}deg) scale(-1, 1)`,
-                    transformOrigin: 'center',
-                  }}
-                  r={radius}
-                  cx={size / 2}
-                  cy={size / 2}
-                />
-              </SProgressRingSvg>
-
-            ) : null}
             <STrophyImg
               src={WinnerIcon.src}
             />
@@ -131,12 +100,11 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
   );
 };
 
-export default CfCrowdfundingSuccessModeration;
+export default CfCrowdfundingSuccess;
 
 const SSectionContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-
 `;
 
 const SProgressRingContainer = styled.div`
@@ -153,17 +121,6 @@ const SProgressRingContainer = styled.div`
     height: 240px;
   }
 `;
-
-const SProgressRingSvg = styled.svg`
-  position: absolute;
-  top: 0;
-  left: 0;
-`;
-
-const SBgRingCircle = styled.circle`
-
-`;
-
 
 const STrophyImg = styled.img`
   position: absolute;
@@ -206,14 +163,15 @@ const SCaptionSection = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding-left: 55%;
 
-    margin-top: 80px;
-    margin-bottom: 114px;
+    padding-top: 80px;
+    margin-bottom: 80px;
 
     text-align: left;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-top: 124px;
+    padding-top: 124px;
+    margin-bottom: 60px;
   }
 `;
 

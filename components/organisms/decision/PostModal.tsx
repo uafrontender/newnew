@@ -205,6 +205,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewCF
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
+          postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
