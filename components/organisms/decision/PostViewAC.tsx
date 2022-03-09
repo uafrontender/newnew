@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
@@ -27,6 +28,7 @@ import GoBackButton from '../../molecules/GoBackButton';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -56,18 +58,55 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const showSelectingWinnerOption = useMemo(() => (
+    postStatus === 'wating_for_decision'
+  ), [postStatus]);
+
   // Socket
   const socketConnection = useContext(SocketContext);
   const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>(() => {
+  const tabs = useMemo(() => {
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) {
+      return [
+        {
+          label: 'winner',
+          value: 'winner',
+        },
+        {
+          label: 'bids',
+          value: 'bids',
+        },
+        {
+          label: 'comments',
+          value: 'comments',
+        },
+      ];
+    }
+    return [
+      {
+        label: 'bids',
+        value: 'bids',
+      },
+      {
+        label: 'comments',
+        value: 'comments',
+      },
+    ];
+  }, [postStatus]);
+
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
       return 'bids'
     }
     const { hash } = window.location;
-    if (hash && (hash === '#bids' || hash === '#comments')) {
-      return hash.substring(1) as 'bids' | 'comments';
+    if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
+      return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
     return 'bids';
   });
@@ -89,7 +128,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'bids' || parsedHash === 'comments') {
+      if (parsedHash === 'bids' || parsedHash === 'comments' || parsedHash === 'winner') {
         setCurrentTab(parsedHash);
       }
     }
@@ -445,30 +484,25 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       <PostTopInfo
         postType="ac"
         postId={post.postUuid}
+        postStatus={postStatus}
         title={post.title}
         amountInBids={totalAmount}
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
       />
-      <SActivitesContainer>
+      <SActivitesContainer
+        showSelectingWinnerOption={showSelectingWinnerOption}
+      >
         <DecisionTabs
-          tabs={[
-            {
-              label: 'bids',
-              value: 'bids',
-            },
-            {
-              label: 'comments',
-              value: 'comments',
-            },
-          ]}
+          tabs={tabs}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'bids' ? (
           <AcOptionsTab
             postId={post.postUuid}
+            postStatus={postStatus}
             options={options}
             optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
@@ -478,10 +512,27 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
         ) : (
-          <CommentsTab
-            comments={comments}
-            handleGoBack={() => handleChangeTab('bids')}
-          />
+          currentTab === 'comments'
+          ? (
+            <CommentsTab
+              comments={comments}
+              handleGoBack={() => handleChangeTab('bids')}
+            />
+          ) : (
+            <AcWinnerTab
+              option={new newnewapi.Auction.Option({
+                id: 123,
+                title: 'Some really really long long long long title',
+                supporterCount: 2,
+                totalAmount: {
+                  usdCents: 100000,
+                },
+                creator: {
+                  username: 'user123',
+                }
+              })}
+            />
+          )
         )}
       </SActivitesContainer>
       {/* Loading Modal */}
@@ -548,7 +599,9 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  showSelectingWinnerOption: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -568,5 +621,13 @@ const SActivitesContainer = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
+
+    ${({ showSelectingWinnerOption }) => (
+      showSelectingWinnerOption
+      ? css`
+        max-height: calc(728px - 46px - 64px - 72px - 130px);
+      `
+      : null
+    )}
   }
 `;

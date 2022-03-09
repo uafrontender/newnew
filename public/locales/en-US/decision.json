@@ -226,6 +226,10 @@
       "subtitle": "You bid on"
     },
     "PostTopInfo": {
+      "SelectWinner": {
+        "title": "Time's up!",
+        "body": "Auction ended. Now it's time for the creator to choose a winner. Stay tuned!"
+      },
       "in_bids": "in bids"
     },
     "OptionsTab": {
@@ -257,6 +261,16 @@
       "ActionSection": {
         "suggestionPlaceholder": "Add a suggestion ...",
         "placeABidBtn": "Place a bid"
+      }
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "bidders_bid_amount": "bidders bid",
+        "bidder_bid_amount": "bidder bid",
+        "on": "on",
+        "suggested_by_me": "my",
+        "suggested_by_user": "{{username}}'s",
+        "bid_to": "bid to"
       }
     },
     "FloatingActionButton": {

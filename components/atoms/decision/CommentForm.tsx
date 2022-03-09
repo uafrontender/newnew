@@ -80,8 +80,7 @@ const SButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
   &:disabled {
-    background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+    background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
 `;
 
@@ -94,8 +93,7 @@ const SCommentsForm = styled.form`
   background: ${({ theme }) => theme.colorsThemed.background.primary};
 
   ${(props) => props.theme.media.tablet} {
-    background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+    background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
 `;
 

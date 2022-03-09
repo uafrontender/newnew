@@ -2,8 +2,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useContext, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useContext, useMemo, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -19,7 +19,6 @@ import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 import { formatNumber } from '../../../utils/format';
-import PostTitle from './PostTitle';
 import PostShareMenu from './PostShareMenu';
 import PostShareModal from './PostShareModal';
 import PostEllipseMenu from './PostEllipseMenu';
@@ -28,9 +27,14 @@ import { markPost } from '../../../api/endpoints/post';
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
 import Headline from '../../atoms/Headline';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+
+import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import Text from '../../atoms/Text';
 
 interface IPostTopInfo {
   postId: string;
+  postStatus: TPostStatusStringified;
   title: string;
   creator: newnewapi.IUser;
   isFollowingDecisionInitial: boolean;
@@ -42,6 +46,7 @@ interface IPostTopInfo {
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postId,
+  postStatus,
   title,
   creator,
   postType,
@@ -57,6 +62,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const showSelectingWinnerOption = useMemo(() => (
+    postType === 'ac' && postStatus === 'wating_for_decision'
+  ), [postType, postStatus]);
 
   const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
 
@@ -122,7 +131,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   return (
     <SContainer>
-      <SWrapper>
+      <SWrapper
+        showSelectingWinnerOption={showSelectingWinnerOption}
+      >
         {postType === 'ac' && amountInBids ? (
           <SBidsAmount>
             <span>
@@ -227,6 +238,23 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
         >
           {title}
         </SPostTitle>
+        {showSelectingWinnerOption ? (
+          <SSelectingWinnerOption>
+            <SHeadline
+              variant={4}
+            >
+              { t('AcPost.PostTopInfo.SelectWinner.title') }
+            </SHeadline>
+            <SText
+              variant={3}
+            >
+              { t('AcPost.PostTopInfo.SelectWinner.body') }
+            </SText>
+            <STrophyImg
+              src={AcSelectWinnerIcon.src}
+            />
+          </SSelectingWinnerOption>
+        ) : null}
       </SWrapper>
     </SContainer>
   );
@@ -246,7 +274,9 @@ const SContainer = styled.div`
   margin-bottom: 24px;
 `;
 
-const SWrapper = styled.div`
+const SWrapper = styled.div<{
+  showSelectingWinnerOption: boolean;
+}>`
   display: grid;
 
   grid-template-areas:
@@ -262,10 +292,22 @@ const SWrapper = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
-    grid-template-areas:
-      'userCard stats actions'
-      'title title title'
-    ;
+    ${({ showSelectingWinnerOption }) => (
+      showSelectingWinnerOption
+      ? css`
+        grid-template-areas:
+          'userCard stats actions'
+          'title title title'
+          'selectWinner selectWinner selectWinner'
+        ;
+      `
+      : css`
+        grid-template-areas:
+          'userCard stats actions'
+          'title title title'
+        ;
+      `
+    )}
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
@@ -391,4 +433,56 @@ const SBidsAmount = styled.div`
     margin-bottom: initial;
     justify-self: flex-end;
   }
+`;
+
+
+// Winner option
+const SSelectingWinnerOption = styled.div`
+  position: fixed;
+  bottom: 16px;
+  left: 16;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  z-index: 20;
+
+  height: 130px;
+  width: calc(100% - 48px);
+
+  padding: 24px 16px;
+  padding-right: 134px;
+
+  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  border-radius: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    grid-area: selectWinner;
+
+    position: relative;
+
+    width: auto;
+
+    margin-top: 32px;
+
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    width: calc(100% - 16px);
+  }
+`;
+
+const STrophyImg = styled.img`
+  position: absolute;
+  right: -16px;
+  top: 8px;
+`;
+
+const SHeadline = styled(Headline)`
+  color: #FFFFFF;
+`;
+
+const SText = styled(Text)`
+  color:#FFFFFF;
 `;

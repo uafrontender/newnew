@@ -27,6 +27,7 @@ import LoadingModal from '../../molecules/LoadingModal';
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -35,12 +36,14 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostViewMC {
   post: newnewapi.MultipleChoice;
   sessionId?: string;
+  postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   post,
+  postStatus,
   sessionId,
   handleGoBack,
   handleUpdatePostStatus,
@@ -449,6 +452,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       <PostTopInfo
         postType="mc"
         postId={post.postUuid}
+        postStatus={postStatus}
         title={post.title}
         totalVotes={totalVotes}
         creator={post.creator!!}

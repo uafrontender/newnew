@@ -533,6 +533,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       <PostTopInfo
         postType="cf"
         postId={post.postUuid}
+        postStatus={postStatus}
         title={post.title}
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}

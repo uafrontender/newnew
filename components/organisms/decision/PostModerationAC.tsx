@@ -114,7 +114,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     }
     const { hash } = window.location;
     if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
-      return hash.substring(1) as 'bids' | 'comments';
+      console.log('from hash')
+      console.log(hash)
+      return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
     return 'bids';
   });

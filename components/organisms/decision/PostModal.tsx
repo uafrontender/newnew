@@ -181,6 +181,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewMC
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
+          postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
@@ -254,7 +255,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useEffect(() => {
     if (isOpen && postParsed) {
-      const additionalHash = window?.location?.hash === '#comments' ? '#comments' : undefined;
+      let additionalHash;
+      if (window?.location?.hash === '#comments') {
+        additionalHash = '#comments';
+      } else if (window?.location?.hash === '#winner') {
+        additionalHash = '#winner';
+      }
       setOpen(true);
       window.history.pushState(
         postParsed.postUuid,
