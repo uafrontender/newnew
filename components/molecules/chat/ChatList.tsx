@@ -126,14 +126,16 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
   }, []);
 
   // Cleanup
-  useEffect(() => () => {
-    if (chatRooms) {
-      chatRooms.forEach((chat) => {
-        if (chat.id) removeChannel(`chat_${chat.id.toString()}`);
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRooms]);
+  useEffect(
+    () => () => {
+      if (chatRooms) {
+        chatRooms.forEach((chat) => {
+          if (chat.id) removeChannel(`chat_${chat.id.toString()}`);
+        });
+      }
+    },
+    [chatRooms, removeChannel]
+  );
 
   useEffect(() => {
     if (searchText) {
@@ -164,6 +166,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         let unreadCount = chatRoomsUnreadCount;
         let unreadCreatorsCount = chatRoomsCreatorsUnreadCount;
         let unreadSubsCount = chatRoomsSubsUnreadCount;
+        console.log(chatRooms);
 
         chatRooms.forEach((chat, index) => {
           if (chat.unreadMessageCount) {

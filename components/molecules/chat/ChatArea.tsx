@@ -23,7 +23,6 @@ import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { markUser } from '../../../api/endpoints/user';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -46,8 +45,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
-  const { mySubscribers } = useGetSubscriptions();
-
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
@@ -236,14 +233,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <React.Fragment
-          key={item.id ? item.id.toString() : randomID()}
-        >
-          <SMessage
-            id={item.id ? item.id.toString() : randomID()}
-            mine={isMine}
-            prevSameUser={prevSameUser}
-          >
+        <React.Fragment key={item.id ? item.id.toString() : randomID()}>
+          <SMessage id={item.id ? item.id.toString() : randomID()} mine={isMine} prevSameUser={prevSameUser}>
             {!nextSameUser && (
               <SUserAvatar
                 mine={isMine}
@@ -340,10 +331,10 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
               {isAnnouncement && t('announcement.title')}
             </SUserName>
             <SUserAlias>
-              {!isMyAnnouncement
+              {!isAnnouncement
                 ? `@${chatRoom.visavis?.username}`
-                : `${mySubscribers.length} ${
-                    mySubscribers.length > 1 ? t('new-announcement.members') : t('new-announcement.member')
+                : `${chatRoom.memberCount && chatRoom.memberCount > 0 ? chatRoom.memberCount : 0} ${
+                    chatRoom.memberCount!! > 1 ? t('new-announcement.members') : t('new-announcement.member')
                   }`}
             </SUserAlias>
           </SUserData>

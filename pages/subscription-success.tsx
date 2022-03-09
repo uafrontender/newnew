@@ -13,12 +13,9 @@ interface ISubscriptionSuccessPage {
   userId: string;
 }
 
-const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
-  userId,
-}) => {
+const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId }) => {
   const router = useRouter();
   console.log(router.query.username);
-
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -45,7 +42,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-          router.push(`/direct-messages?user=${userId}`);
+          router.push(`/direct-messages`);
         }
       } catch (err) {
         console.error(err);
@@ -53,7 +50,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
     }
 
     checkSubscriptionStatus();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -76,7 +73,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
         socketConnection.off('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   return (
@@ -113,9 +110,7 @@ export default SubscriptionSuccessPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { userId } = context.query;
 
-  if (!userId
-    || Array.isArray(userId)
-  ) {
+  if (!userId || Array.isArray(userId)) {
     return {
       redirect: {
         destination: '/',
