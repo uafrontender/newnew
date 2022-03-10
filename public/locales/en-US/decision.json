@@ -52,6 +52,21 @@
     "body": "Let's start again and share more.",
     "ctaButton": "Make a new one"
   },
+  "PostSuccessModeration": {
+    "title": "You're done!",
+    "body": "Share it with the world!",
+    "ctaButton": "Share it now"
+  },
+  "PostWaitingForResponse": {
+    "title": "Time for response",
+    "body": "Don't miss the update. Stay tuned!",
+    "ctaButton": "Notify me"
+  },
+  "PostSuccess": {
+    "title": "This decision is finished!",
+    "body": "Checkout more like it.",
+    "ctaButton": "See more"
+  },
   "ellipse": {
     "follow-creator": "Follow creator",
     "unfollow-creator": "Unfollow creator",
@@ -68,14 +83,6 @@
       "back_to_original": "Back to original"
     },
     "UploadResponseForm": {
-      "meta": {
-        "title-auction": "Creation | Auction",
-        "title-multiple-choice": "Creation | Multiple Choice",
-        "title-crowdfunding": "Creation | Crowdfunding"
-      },
-      "input": {
-        "placeholder": "Title - ex. Where should I get my first tattoo \uD83D\uDE4A"
-      },
       "fileUpload": {
         "title_1": "Your voters are waiting!",
         "title_2": "Respond now with a video.",
@@ -103,96 +110,6 @@
           "description": "Are you sure you want to permanently delete this file? You can’t undo the action."
         }
       },
-      "card": {
-        "left": "{{time}} left"
-      },
-      "button": {
-        "retry": "Retry",
-        "cancel": "Cancel",
-        "submit": "Publish",
-        "preview": "Preview post",
-        "schedule": "Schedule",
-        "delete": "Delete permanently",
-        "card": {
-          "ac": "Place a bid",
-          "mc": "Place a bid",
-          "cf": "Place a bid"
-        }
-      },
-      "field": {
-        "minimalBid": {
-          "title": "Minimum bid",
-          "value": "${{value}}",
-          "label": "$",
-          "placeholder": "1",
-          "description": "Starting bid is ${{value}}"
-        },
-        "targetBackerCount": {
-          "title": "Minimum backers",
-          "value": "{{value}}",
-          "label": "",
-          "placeholder": "10",
-          "description": "No less than {{value}}"
-        },
-        "expiresAt": {
-          "title": "Expire after",
-          "value": "{{value}}",
-          "description": "{{value}}",
-          "options": {
-            "1-hour": "1 hour",
-            "6-hours": "6 hours",
-            "12-hours": "12 hours",
-            "1-day": "1 day",
-            "3-days": "3 days",
-            "5-days": "5 days",
-            "7-days": "7 days"
-          }
-        },
-        "startsAt": {
-          "title": "Start date",
-          "value": "{{value}}",
-          "description": "{{value}}",
-          "modal": {
-            "title": "Start date",
-            "type": {
-              "schedule": "Schedule",
-              "right-away": "Right away"
-            },
-            "hours-format": {
-              "pm": "PM",
-              "am": "AM"
-            },
-            "days": {
-              "sunday": "S",
-              "monday": "M",
-              "tuesday": "T",
-              "wednesday": "W",
-              "thursday": "T",
-              "friday": "F",
-              "saturday": "S"
-            }
-          },
-          "tablet": {
-            "title": "Start date",
-            "type": {
-              "schedule": "Schedule publishing",
-              "right-away": "Right away after I publish my decision"
-            }
-          }
-        },
-        "comments": {
-          "title": "Commenting turned on"
-        },
-        "allowSuggestions": {
-          "title": "Allow suggestions from VIP subscribers"
-        },
-        "choices": {
-          "add": "Add another option",
-          "option": {
-            "label": "Option {{value}}"
-          }
-        }
-      },
       "video": {
         "error": {
           "minLength": "Video duration too small, choose from 10 seconds",
@@ -201,15 +118,8 @@
           "title": "Ooops...",
           "description": "There was an error and your file could not be uploaded. Would you like to try again."
         },
-        "setThumbnail": "Set thumbnail",
         "deleteFile": "Delete file",
         "previewFull": "Preview",
-        "thumbnail": {
-          "info": "Learn more",
-          "title": "Set thumbnail preview",
-          "submit": "Save changes",
-          "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
-        },
         "full": {
           "title": "Preview",
           "cancelBtn": "Cancel",
@@ -373,6 +283,12 @@
       "free_sub": "FREE SUB",
       "custom": "Custom",
       "cancel": "Cancel"
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "backers_founed": "backers successfully funded",
+        "backer_founded": "backer successfully funded"
+      }
     },
     "paymenModalHeader": {
       "subtitle": "You pledge for"

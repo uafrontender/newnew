@@ -3,7 +3,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -63,14 +63,51 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   } = useContext(ChannelsContext);
 
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'options' | 'comments'>(() => {
+  const tabs = useMemo(() => {
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) {
+      return [
+        {
+          label: 'winner',
+          value: 'winner',
+        },
+        {
+          label: 'options',
+          value: 'options',
+        },
+        {
+          label: 'comments',
+          value: 'comments',
+        },
+      ];
+    }
+    return [
+      {
+        label: 'options',
+        value: 'options',
+      },
+      {
+        label: 'comments',
+        value: 'comments',
+      },
+    ];
+  }, [postStatus]);
+  const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
       return 'options'
     }
     const { hash } = window.location;
-    if (hash && (hash === '#options' || hash === '#comments')) {
-      return hash.substring(1) as 'options' | 'comments';
+    if (hash && (hash === '#options' || hash === '#comments' || hash === '#winner')) {
+      return hash.substring(1) as 'options' | 'comments' | 'winner';
     }
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) return 'winner';
     return 'options';
   });
 
@@ -91,7 +128,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'options' || parsedHash === 'comments') {
+      if (parsedHash === 'options' || parsedHash === 'comments' || parsedHash === 'winner') {
         setCurrentTab(parsedHash);
       }
     }
@@ -477,16 +514,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       />
       <SActivitesContainer>
         <DecisionTabs
-          tabs={[
-            {
-              label: 'options',
-              value: 'options',
-            },
-            {
-              label: 'comments',
-              value: 'comments',
-            },
-          ]}
+          tabs={tabs}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />

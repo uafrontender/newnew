@@ -10,6 +10,7 @@ import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
@@ -367,6 +368,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+      <Head>
+        <title>{ postParsed?.title }</title>
+      </Head>
       {!isMobile && (
         <SGoBackButtonDesktop onClick={handleCloseAndGoBack}>
           <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />

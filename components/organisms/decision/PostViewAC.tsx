@@ -108,6 +108,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
       return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) return 'winner';
     return 'bids';
   });
 

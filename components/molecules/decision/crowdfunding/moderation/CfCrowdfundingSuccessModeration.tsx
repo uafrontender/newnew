@@ -115,8 +115,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
           >
             $
             {formatNumber(
-              100000 / 100,
-              // post.totalAmount!!.usdCents!! / 100,
+              post.totalAmount?.usdCents ? (post.totalAmount.usdCents!! / 100) : 100,
               true,
             )}
           </SHeadline>

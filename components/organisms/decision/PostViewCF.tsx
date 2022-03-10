@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
@@ -39,6 +40,8 @@ import Button from '../../atoms/Button';
 import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
+import PostSuccessBox from '../../molecules/decision/PostSuccessBox';
+import PostWaitingForResponseBox from '../../molecules/decision/PostWaitingForResponseBox';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -60,6 +63,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
@@ -292,6 +296,26 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleFollowDecision = useCallback(async () => {
+    try {
+      if (!user.loggedIn) {
+        router.push('/sign-up?reason=follow-decision');
+      }
+      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+        postUuid: post.postUuid,
+      });
+
+      console.log(markAsViewedPayload)
+
+      const res = await markPost(markAsViewedPayload);
+
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [post.postUuid, router, user.loggedIn]);
+
   // Render functions
   const renderBackersSection = useCallback(() => {
     switch(postStatus) {
@@ -319,9 +343,17 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
               post={post}
               currentNumBackers={currentBackers}
             />
-            <SNotifyMeSection>
-              notify me
-            </SNotifyMeSection>
+            <PostWaitingForResponseBox
+              title={t('PostWaitingForResponse.title')}
+              body={t('PostWaitingForResponse.body')}
+              buttonCaption={t('PostWaitingForResponse.ctaButton')}
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                handleFollowDecision();
+              }}
+            />
           </>
         );
       }
@@ -332,32 +364,43 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
               post={post}
               currentNumBackers={currentBackers}
             />
-            <SSeeMoreSection>
-              see more
-            </SSeeMoreSection>
+            <PostSuccessBox
+              title={t('PostSuccess.title')}
+              body={t('PostSuccess.body')}
+              buttonCaption={t('PostSuccess.ctaButton')}
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                document.getElementById('post-modal-container')?.scrollTo({
+                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  behavior: 'smooth',
+                })
+              }}
+            />
           </>
         );
       }
       default: {
-        // return null;
         <>
-        <CfCrowdfundingSuccess
-          post={post}
-          currentNumBackers={currentBackers}
-        />
-
-      </>
+          <CfCrowdfundingSuccess
+            post={post}
+            currentNumBackers={currentBackers}
+          />
+        </>
       }
     }
 
     return null;
   }, [
-    currentBackers,
-    handleAddPledgeFromResponse,
-    isMobile,
-    pledgeLevels,
+    t,
     post,
+    isMobile,
     postStatus,
+    pledgeLevels,
+    currentBackers,
+    handleFollowDecision,
+    handleAddPledgeFromResponse,
   ]);
 
   // Increment channel subs after mounting
@@ -581,7 +624,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         />
       ) : null}
       {/* Mobile floating button */}
-      {isMobile && !choosePledgeModalOpen ? (
+      {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setChoosePledgeModalOpen(true)}
@@ -678,14 +721,4 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
   }
-`;
-
-// Notify me
-const SNotifyMeSection = styled.div`
-
-`;
-
-// See more
-const SSeeMoreSection = styled.div`
-
 `;

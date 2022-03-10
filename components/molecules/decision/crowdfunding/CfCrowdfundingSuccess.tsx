@@ -64,8 +64,8 @@ const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> = (
             {' '}
             <SSpanThin>
               {currentNumBackers > 1
-                ? t('CfPostModeration.WinnerTab.WinnerOptionCard.backers_told_you')
-                : t('CfPostModeration.WinnerTab.WinnerOptionCard.backer_told_you')
+                ? t('CfPost.WinnerTab.WinnerOptionCard.backers_founded')
+                : t('CfPost.WinnerTab.WinnerOptionCard.backer_founded')
               }
             </SSpanThin>
           </SNumBidders>
@@ -73,21 +73,6 @@ const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> = (
             variant={4}
           >
             { post.title }
-          </SHeadline>
-          <SYouMade
-            variant={3}
-          >
-            { t('CfPostModeration.WinnerTab.WinnerOptionCard.you_made') }
-          </SYouMade>
-          <SHeadline
-            variant={4}
-          >
-            $
-            {formatNumber(
-              100000 / 100,
-              // post.totalAmount!!.usdCents!! / 100,
-              true,
-            )}
           </SHeadline>
         </SOptionDetails>
         {isMobile && (
@@ -176,7 +161,7 @@ const SCaptionSection = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-
+  color: #FFFFFF;
 `;
 
 const SHeadlineNumBackers = styled(Headline)`
@@ -231,18 +216,18 @@ const SOptionDetails = styled.div`
 `;
 
 const SNumBidders = styled(Text)`
-
-`;
-
-const SYouMade = styled(Text)`
+  color: #FFFFFF;
 
 `;
 
 const SSpanBold = styled.span`
+  color: #FFFFFF;
 
 `;
 
 const SSpanThin = styled.span`
+  color: #FFFFFF;
+
   opacity: 0.8;
 `;
 
