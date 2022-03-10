@@ -5,6 +5,7 @@
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -15,10 +16,12 @@ import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
+import AcConfirmDeleteOption from './AcConfirmDeleteOption';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 
 import { formatNumber } from '../../../../../utils/format';
+import { deleteAcOption } from '../../../../../api/endpoints/auction';
 
 // Icons
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
@@ -54,6 +57,25 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
 
   // Redirect to user's page
   const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
+
+  const handleConfirmDelete = async () => {
+    try {
+      const payload = new newnewapi.DeleteAcOptionRequest({
+        optionId: option.id,
+      });
+
+      const res = await deleteAcOption(payload);
+
+      console.log(res);
+
+
+      if (!res.error) {
+        console.log('deleted');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <>
@@ -192,6 +214,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         </SContainer>
       </motion.div>
       {/* Modals */}
+      {/* Pick winning option */}
       <AcPickWinningOptionModal
         isVisible={isPickOptionModalOpen}
         closeModal={() => setIsPickOptionModalOpen(false)}
@@ -257,6 +280,12 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
           </SBiddersInfo>
         </SBidDetailsModal>
       </AcPickWinningOptionModal>
+      {/* Delete option */}
+      <AcConfirmDeleteOption
+        isVisible={isDeleteModalOpen}
+        closeModal={() => setIsDeleteModalOpen(false)}
+        handleConfirmDelete={handleConfirmDelete}
+      />
     </>
   );
 };

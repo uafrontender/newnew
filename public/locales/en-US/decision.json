@@ -386,6 +386,12 @@
         "created_by": "The bid was created by"
       }
     },
+    "DeleteOptionModal": {
+      "title": "Delete option",
+      "body": "Are you sure you want to permanently delete this option? You can't undo the action.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Delete permenently"
+    },
     "floatingUploadResponseBtn": "Respond now with a video"
   },
   "McPostModeration": {
@@ -405,6 +411,12 @@
         "you_made": "You made",
         "created_by": "The option was created by"
       }
+    },
+    "DeleteOptionModal": {
+      "title": "Delete option",
+      "body": "Are you sure you want to permanently delete this option? You can't undo the action.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Delete permenently"
     }
   },
   "CfPostModeration": {

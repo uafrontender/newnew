@@ -51,3 +51,13 @@ export const voteOnPostWithWallet = (
   'post',
   payload,
 );
+
+export const deleteMcOption = (
+  payload: newnewapi.DeleteMcOptionRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DeleteMcOptionRequest, newnewapi.EmptyResponse>(
+  newnewapi.DeleteMcOptionRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_MULTICHOICE}/delete_mc_option`,
+  'post',
+  payload,
+);

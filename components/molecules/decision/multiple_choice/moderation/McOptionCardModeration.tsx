@@ -27,6 +27,8 @@ import McSymbolIcon from '../../../../../public/images/decision/mc-option-mock.p
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMenu';
+import McConfirmDeleteOption from './McConfirmDeleteOption';
+import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -65,6 +67,24 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
 
   // Redirect to user's page
   const handleRedirectToOptionCreator = () => router.push(`/u/${creator?.username}`);
+
+  const handleConfirmDelete = async () => {
+    try {
+      const payload = new newnewapi.DeleteMcOptionRequest({
+        optionId: option.id,
+      });
+
+      const res = await deleteMcOption(payload);
+
+      console.log(res);
+
+      if (!res.error) {
+        console.log('deleted');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <>
@@ -201,6 +221,12 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         </SContainer>
       </motion.div>
       {/* Modals */}
+      {/* Delete option */}
+      <McConfirmDeleteOption
+        isVisible={isDeleteModalOpen}
+        closeModal={() => setIsDeleteModalOpen(false)}
+        handleConfirmDelete={handleConfirmDelete}
+      />
     </>
   );
 };

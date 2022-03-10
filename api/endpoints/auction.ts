@@ -85,3 +85,13 @@ export const selectWinningOption = (
   'post',
   payload,
 );
+
+export const deleteAcOption = (
+  payload: newnewapi.DeleteAcOptionRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DeleteAcOptionRequest, newnewapi.EmptyResponse>(
+  newnewapi.DeleteAcOptionRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_AUCTION}/delete_ac_option`,
+  'post',
+  payload,
+);

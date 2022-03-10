@@ -418,6 +418,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       }
     };
 
+    const socketHandlerOptionDeleted = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.AcOptionDeleted.decode(arr);
+
+      console.log(decoded);
+      // if (decoded.optionId && decoded.postUuid === post.postUuid) {
+      if (decoded.optionId) {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          return workingArr.filter((o) => o.id !== decoded.optionId);
+        });
+      }
+    };
+
     const socketHandlerPostData = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostUpdated.decode(arr);
@@ -444,6 +458,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
     if (socketConnection) {
       socketConnection.on('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
       socketConnection.on('PostUpdated', socketHandlerPostData);
       socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
@@ -451,6 +466,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
         socketConnection.off('PostUpdated', socketHandlerPostData);
         socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }

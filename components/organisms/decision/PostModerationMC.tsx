@@ -374,6 +374,20 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       }
     };
 
+    const socketHandlerOptionDeleted = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.McOptionDeleted.decode(arr);
+
+      console.log(decoded);
+      // if (decoded.optionId && decoded.postUuid === post.postUuid) {
+      if (decoded.optionId) {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          return workingArr.filter((o) => o.id !== decoded.optionId);
+        });
+      }
+    };
+
     const socketHandlerPostData = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostUpdated.decode(arr);
@@ -402,6 +416,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
     if (socketConnection) {
       socketConnection.on('McOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on('McOptionDeleted', socketHandlerOptionDeleted);
       socketConnection.on('PostUpdated', socketHandlerPostData);
       socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
@@ -409,6 +424,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('McOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off('McOptionDeleted', socketHandlerOptionDeleted);
         socketConnection.off('PostUpdated', socketHandlerPostData);
         socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
