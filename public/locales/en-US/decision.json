@@ -21,6 +21,37 @@
     "tiktok": "TikTok",
     "copy": "Copy Link"
   },
+  "PostFailedBoxModeration": {
+    "title": "Decision failed",
+    "body": "Let's start again and share more.",
+    "ctaButton": "Make a new one"
+  },
+  "PostDeletedByMe": {
+    "title": "Decision deleted",
+    "body": {
+      "by_creator": "You deleted this decision"
+    },
+    "ctaButton": "Make a new one"
+  },
+  "PostDeleted": {
+    "title": "Decision deleted",
+    "body": {
+      "by_creator": "Creator deleted this decision"
+    },
+    "ctaButton": "See others"
+  },
+  "PostFailed": {
+    "title": "Decision failed",
+    "body": {
+      "not_reached_goal": "Decision hasn't reached its goal"
+    },
+    "ctaButton": "See others"
+  },
+  "PostFailedBox": {
+    "title": "Decision failed",
+    "body": "Let's start again and share more.",
+    "ctaButton": "Make a new one"
+  },
   "ellipse": {
     "follow-creator": "Follow creator",
     "unfollow-creator": "Unfollow creator",

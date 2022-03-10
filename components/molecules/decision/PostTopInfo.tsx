@@ -31,6 +31,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import Text from '../../atoms/Text';
+import PostFailedBox from './PostFailedBox';
 
 interface IPostTopInfo {
   postId: string;
@@ -256,6 +257,19 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           </SSelectingWinnerOption>
         ) : null}
       </SWrapper>
+      {postStatus === 'failed' && (
+        <PostFailedBox
+          title={t('PostFailed.title')}
+          body={t('PostFailed.body.not_reached_goal')}
+          buttonCaption={t('PostFailed.ctaButton')}
+          handleButtonClick={() => {
+            document.getElementById('post-modal-container')?.scrollTo({
+              top: document.getElementById('recommendations-section-heading')?.offsetTop,
+              behavior: 'smooth',
+            })
+          }}
+        />
+      )}
     </SContainer>
   );
 };

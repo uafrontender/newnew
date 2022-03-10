@@ -1,13 +1,15 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import styled, { css, useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
@@ -33,6 +35,7 @@ import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
+import PostFailedBox from '../../molecules/decision/PostFailedBox';
 
 interface IPostModal {
   isOpen: boolean;
@@ -50,6 +53,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   handleOpenAnotherPost,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -377,10 +381,40 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             modalContainerRef.current = el!!;
           }}
         >
-          {isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)}
+          {postStatus !== 'cancelled' ? (
+            isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)
+          ) : isMyPost ? (
+              <PostFailedBox
+                title={t('PostDeletedByMe.title')}
+                body={t('PostDeletedByMe.body.by_creator')}
+                buttonCaption={t('PostDeletedByMe.ctaButton')}
+                handleButtonClick={() => {
+                  router.push('/creation');
+                }}
+              />
+          ) : (
+            <PostFailedBox
+              title={t('PostDeleted.title')}
+              body={t('PostDeleted.body.by_creator')}
+              buttonCaption={t('PostDeleted.ctaButton')}
+              style={{
+                marginBottom: '24px',
+              }}
+              handleButtonClick={() => {
+                document.getElementById('post-modal-container')?.scrollTo({
+                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  behavior: 'smooth',
+                })
+              }}
+            />
+          )}
           {!isMyPost && (
-            <SRecommendationsSection>
-              <Headline variant={4}>{t('RecommendationsSection.heading')}</Headline>
+            <SRecommendationsSection
+              id="recommendations-section-heading"
+            >
+              <Headline variant={4}>
+                {t('RecommendationsSection.heading')}
+              </Headline>
               {recommenedPosts && (
                 <List
                   category=""

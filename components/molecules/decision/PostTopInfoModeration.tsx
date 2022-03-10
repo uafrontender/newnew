@@ -5,6 +5,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -29,6 +30,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import Text from '../../atoms/Text';
+import PostFailedBox from './PostFailedBox';
 
 interface IPostTopInfoModeration {
   title: string;
@@ -50,6 +52,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -198,6 +201,16 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
           </SSelectWinnerOption>
         ) : null}
       </SWrapper>
+      {postStatus === 'failed' && (
+        <PostFailedBox
+          title={t('PostFailedBoxModeration.title')}
+          body={t('PostFailedBoxModeration.body')}
+          buttonCaption={t('PostFailedBoxModeration.ctaButton')}
+          handleButtonClick={() => {
+            router.push('/creation');
+          }}
+        />
+      )}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
         isVisible={deletePostOpen}
