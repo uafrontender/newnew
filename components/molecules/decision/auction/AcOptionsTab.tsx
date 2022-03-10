@@ -3,7 +3,7 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
@@ -17,6 +17,7 @@ import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../..
 import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import Text from '../../../atoms/Text';
@@ -30,7 +31,8 @@ import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
 import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
-import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IAcOptionsTab {
   postId: string;
@@ -55,6 +57,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -344,6 +347,13 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             >
               { t('AcPost.OptionsTab.NoOptions.caption_2') }
             </SNoOptionsCaption>
+            {!isMobile && (
+              <SMakeBidArrowSvg
+                svg={MakeFirstBidArrow}
+                fill={theme.colorsThemed.background.quinary}
+                width="36px"
+              />
+            )}
           </SNoOptionsYet>
         ) : null}
         <SBidsContainer
@@ -686,4 +696,11 @@ const SNoOptionsImgContainer = styled.div`
 
 const SNoOptionsCaption = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SMakeBidArrowSvg = styled(InlineSvg)`
+  position: absolute;
+  left: 26%;
+  bottom: -58px;
+
 `;
