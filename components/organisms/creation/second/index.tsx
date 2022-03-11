@@ -1,11 +1,4 @@
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-} from 'react';
+import React, { useRef, useMemo, useState, useEffect, useContext, useCallback } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
@@ -31,6 +24,7 @@ import DraggableMobileOptions from '../DraggableMobileOptions';
 import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
+import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -71,8 +65,7 @@ const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
 
-interface ICreationSecondStepContent {
-}
+interface ICreationSecondStepContent {}
 
 type CardType = 'ac' | 'mc' | 'cf';
 
@@ -83,119 +76,112 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
   const router = useRouter();
   const dispatch = useAppDispatch();
   const playerRef: any = useRef(null);
-  const {
-    post,
-    auction,
-    fileUpload,
-    crowdfunding,
-    multiplechoice,
-    videoProcessing,
-  } = useAppSelector((state) => state.creation);
+  const { post, auction, fileUpload, crowdfunding, multiplechoice, videoProcessing } = useAppSelector(
+    (state) => state.creation
+  );
   const user = useAppSelector((state) => state.user);
+  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
   const {
-    resizeMode,
-    overlay,
-  } = useAppSelector((state) => state.ui);
-  const { query: { tab } } = router;
-  const tabs: Tab[] = useMemo(() => [
-    {
-      nameToken: 'auction',
-      url: '/creation/auction',
-    },
-    {
-      nameToken: 'multiple-choice',
-      url: '/creation/multiple-choice',
-    },
-    {
-      nameToken: 'crowdfunding',
-      url: '/creation/crowdfunding',
-    },
-  ], []);
-  const typesOfPost: any = useMemo(() => ({
-    auction: 'ac',
-    'multiple-choice': 'mc',
-    crowdfunding: 'cf',
-  }), []);
+    query: { tab },
+  } = router;
+  const { mySubscribers } = useGetSubscriptions();
+  const tabs: Tab[] = useMemo(
+    () => [
+      {
+        nameToken: 'auction',
+        url: '/creation/auction',
+      },
+      {
+        nameToken: 'multiple-choice',
+        url: '/creation/multiple-choice',
+      },
+      {
+        nameToken: 'crowdfunding',
+        url: '/creation/crowdfunding',
+      },
+    ],
+    []
+  );
+  const typesOfPost: any = useMemo(
+    () => ({
+      auction: 'ac',
+      'multiple-choice': 'mc',
+      crowdfunding: 'cf',
+    }),
+    []
+  );
   const typeOfPost: CardType = typesOfPost[tab as string];
   const [titleError, setTitleError] = useState('');
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const {
-    addChannel,
-    removeChannel,
-  } = useContext(ChannelsContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const validateTextAPI = useCallback(async (
-    text: string,
-    kind: newnewapi.ValidateTextRequest.Kind,
-  ) => {
-    if (!text) {
-      return '';
-    }
-
-    try {
-      const payload = new newnewapi.ValidateTextRequest({
-        kind,
-        text,
-      });
-
-      const res = await validateText(payload);
-
-      if (!res?.data?.status) throw new Error('An error occured');
-
-      if (res?.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-        return tCommon('error.text.badWords');
+  const validateTextAPI = useCallback(
+    async (text: string, kind: newnewapi.ValidateTextRequest.Kind) => {
+      if (!text) {
+        return '';
       }
 
-      return '';
-    } catch (err) {
-      return '';
-    }
-  }, [tCommon]);
-  const validateT = useCallback(async (
-    text: string,
-    min: number,
-    max: number,
-    type: newnewapi.ValidateTextRequest.Kind,
-  ) => {
-    let error = minLength(tCommon, text, min);
+      try {
+        const payload = new newnewapi.ValidateTextRequest({
+          kind,
+          text,
+        });
 
-    if (!error) {
-      error = maxLength(tCommon, text, max);
-    }
+        const res = await validateText(payload);
 
-    if (!error) {
-      error = await validateTextAPI(text, type);
-    }
+        if (!res?.data?.status) throw new Error('An error occured');
 
-    return error;
-  }, [tCommon, validateTextAPI]);
+        if (res?.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          return tCommon('error.text.badWords');
+        }
+
+        return '';
+      } catch (err) {
+        return '';
+      }
+    },
+    [tCommon]
+  );
+  const validateT = useCallback(
+    async (text: string, min: number, max: number, type: newnewapi.ValidateTextRequest.Kind) => {
+      let error = minLength(tCommon, text, min);
+
+      if (!error) {
+        error = maxLength(tCommon, text, max);
+        console.log(error);
+      }
+
+      if (!error) {
+        error = await validateTextAPI(text, type);
+      }
+
+      return error;
+    },
+    [tCommon, validateTextAPI]
+  );
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const optionsAreValid = tab !== 'multiple-choice'
-    || multiplechoice.choices.findIndex((item) => validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)) !== -1;
-  const disabled = !!titleError
-    || !post.title
-    || !post.announcementVideoUrl
-    || fileUpload.progress !== 100
-    || !optionsAreValid;
+  const optionsAreValid =
+    tab !== 'multiple-choice' ||
+    multiplechoice.choices.findIndex((item) =>
+      validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)
+    ) !== -1;
+  const disabled =
+    !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
 
   const validateTitleDebounced = useDebounce(post.title, 500);
   const formatStartsAt = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
 
-    return moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
+    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
   }, [post.startsAt]);
   const formatExpiresAt = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-    const dateValue = moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
+    const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
 
     if (post.expiresAt === '1-hour') {
       dateValue.add(1, 'h');
@@ -258,167 +244,172 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
       toast.error(error?.message);
     }
   }, [dispatch, post?.announcementVideoUrl, removeChannel, videoProcessing?.taskUuid]);
-  const handleVideoUpload = useCallback(async (value) => {
-    try {
-      dispatch(setCreationFileUploadETA(100));
-      dispatch(setCreationFileUploadProgress(1));
-      dispatch(setCreationFileUploadLoading(true));
-      dispatch(setCreationFileUploadError(false));
+  const handleVideoUpload = useCallback(
+    async (value) => {
+      try {
+        dispatch(setCreationFileUploadETA(100));
+        dispatch(setCreationFileUploadProgress(1));
+        dispatch(setCreationFileUploadLoading(true));
+        dispatch(setCreationFileUploadError(false));
 
-      const payload = new newnewapi.GetVideoUploadUrlRequest({
-        filename: value.name,
-      });
+        const payload = new newnewapi.GetVideoUploadUrlRequest({
+          filename: value.name,
+        });
 
-      const res = await getVideoUploadUrl(payload);
+        const res = await getVideoUploadUrl(payload);
 
-      if (!res.data || res.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
-      }
+        if (!res.data || res.error) {
+          throw new Error(res.error?.message ?? 'An error occurred');
+        }
 
-      const uploadResponse = await fetch(
-        res.data.uploadUrl,
-        {
+        const uploadResponse = await fetch(res.data.uploadUrl, {
           method: 'PUT',
           body: value,
           headers: {
             'Content-Type': value.type,
           },
-        },
-      );
+        });
 
-      if (!uploadResponse.ok) {
-        throw new Error('Upload failed');
-      }
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
 
-      dispatch(setCreationFileUploadProgress(5));
-      dispatch(setCreationFileUploadETA(90));
+        dispatch(setCreationFileUploadProgress(5));
+        dispatch(setCreationFileUploadETA(90));
 
-      const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
-        publicUrl: res.data.publicUrl,
-      });
+        const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
+          publicUrl: res.data.publicUrl,
+        });
 
-      const resProcessing = await startVideoProcessing(payloadProcessing);
+        const resProcessing = await startVideoProcessing(payloadProcessing);
 
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
-      }
+        if (!resProcessing.data || resProcessing.error) {
+          throw new Error(resProcessing.error?.message ?? 'An error occurred');
+        }
 
-      addChannel(
-        resProcessing.data.taskUuid,
-        {
+        addChannel(resProcessing.data.taskUuid, {
           processingProgress: {
             taskUuid: resProcessing.data.taskUuid,
           },
-        },
-      );
+        });
 
-      dispatch(setCreationVideoProcessing({
-        taskUuid: resProcessing.data.taskUuid,
-        targetUrls: {
-          thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-          hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-          dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-          originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
-          thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-        },
-      }));
-      dispatch(setCreationFileUploadProgress(10));
-      dispatch(setCreationFileUploadETA(80));
-      dispatch(setCreationVideo(res.data.publicUrl ?? ''));
-    } catch (error: any) {
-      dispatch(setCreationFileUploadError(true));
-      dispatch(setCreationFileUploadLoading(false));
-      toast.error(error?.message);
-    }
-  }, [addChannel, dispatch]);
+        dispatch(
+          setCreationVideoProcessing({
+            taskUuid: resProcessing.data.taskUuid,
+            targetUrls: {
+              thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+              hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+              dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
+              originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
+              thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+            },
+          })
+        );
+        dispatch(setCreationFileUploadProgress(10));
+        dispatch(setCreationFileUploadETA(80));
+        dispatch(setCreationVideo(res.data.publicUrl ?? ''));
+      } catch (error: any) {
+        dispatch(setCreationFileUploadError(true));
+        dispatch(setCreationFileUploadLoading(false));
+        toast.error(error?.message);
+      }
+    },
+    [addChannel, dispatch]
+  );
   const handleItemFocus = useCallback((key: string) => {
     if (key === 'title') {
       setTitleError('');
     }
   }, []);
-  const handleItemBlur = useCallback(async (key: string, value: string) => {
-    if (key === 'title') {
-      setTitleError(await validateT(
-        value,
-        CREATION_TITLE_MIN,
-        CREATION_TITLE_MAX,
-        newnewapi.ValidateTextRequest.Kind.POST_TITLE,
-      ));
-    }
-  }, [validateT]);
-  const handleItemChange = useCallback(async (key: string, value: any) => {
-    if (key === 'title') {
-      dispatch(setCreationTitle(value));
-    } else if (key === 'minimalBid') {
-      dispatch(setCreationMinBid(value));
-    } else if (key === 'comments') {
-      dispatch(setCreationComments(value));
-    } else if (key === 'allowSuggestions') {
-      dispatch(setCreationAllowSuggestions(value));
-    } else if (key === 'expiresAt') {
-      dispatch(setCreationExpireDate(value));
-    } else if (key === 'startsAt') {
-      dispatch(setCreationStartDate(value));
-    } else if (key === 'targetBackerCount') {
-      dispatch(setCreationTargetBackerCount(value));
-    } else if (key === 'choices') {
-      dispatch(setCreationChoices(value));
-    } else if (key === 'video') {
-      if (value) {
-        await handleVideoUpload(value);
-      } else {
-        await handleVideoDelete();
+  const handleItemBlur = useCallback(
+    async (key: string, value: string) => {
+      if (key === 'title') {
+        setTitleError(
+          await validateT(value, CREATION_TITLE_MIN, CREATION_TITLE_MAX, newnewapi.ValidateTextRequest.Kind.POST_TITLE)
+        );
       }
-    } else if (key === 'thumbnailParameters') {
-      dispatch(setCreationVideoThumbnails(value));
-    }
-  }, [dispatch, handleVideoUpload, handleVideoDelete]);
-  const expireOptions = useMemo(() => [
-    {
-      id: '1-hour',
-      title: t('secondStep.field.expiresAt.options.1-hour'),
     },
-    {
-      id: '6-hours',
-      title: t('secondStep.field.expiresAt.options.6-hours'),
+    [validateT]
+  );
+  const handleItemChange = useCallback(
+    async (key: string, value: any) => {
+      if (key === 'title') {
+        dispatch(setCreationTitle(value));
+      } else if (key === 'minimalBid') {
+        dispatch(setCreationMinBid(value));
+      } else if (key === 'comments') {
+        dispatch(setCreationComments(value));
+      } else if (key === 'allowSuggestions') {
+        dispatch(setCreationAllowSuggestions(value));
+      } else if (key === 'expiresAt') {
+        dispatch(setCreationExpireDate(value));
+      } else if (key === 'startsAt') {
+        dispatch(setCreationStartDate(value));
+      } else if (key === 'targetBackerCount') {
+        dispatch(setCreationTargetBackerCount(value));
+      } else if (key === 'choices') {
+        dispatch(setCreationChoices(value));
+      } else if (key === 'video') {
+        if (value) {
+          await handleVideoUpload(value);
+        } else {
+          await handleVideoDelete();
+        }
+      } else if (key === 'thumbnailParameters') {
+        dispatch(setCreationVideoThumbnails(value));
+      }
     },
-    {
-      id: '12-hours',
-      title: t('secondStep.field.expiresAt.options.12-hours'),
-    },
-    {
-      id: '1-day',
-      title: t('secondStep.field.expiresAt.options.1-day'),
-    },
-    {
-      id: '3-days',
-      title: t('secondStep.field.expiresAt.options.3-days'),
-    },
-    {
-      id: '5-days',
-      title: t('secondStep.field.expiresAt.options.5-days'),
-    },
-    {
-      id: '7-days',
-      title: t('secondStep.field.expiresAt.options.7-days'),
-    },
-  ], [t]);
-
-  const getDecisionPart = useCallback(() => (
-    <>
-      <SItemWrapper>
-        <TextArea
-          id="title"
-          value={post?.title}
-          error={titleError}
-          onBlur={handleItemBlur}
-          onFocus={handleItemFocus}
-          onChange={handleItemChange}
-          placeholder={t('secondStep.input.placeholder')}
-        />
-      </SItemWrapper>
+    [dispatch, handleVideoUpload, handleVideoDelete]
+  );
+  const expireOptions = useMemo(
+    () => [
       {
-        tab === 'multiple-choice' && (
+        id: '1-hour',
+        title: t('secondStep.field.expiresAt.options.1-hour'),
+      },
+      {
+        id: '6-hours',
+        title: t('secondStep.field.expiresAt.options.6-hours'),
+      },
+      {
+        id: '12-hours',
+        title: t('secondStep.field.expiresAt.options.12-hours'),
+      },
+      {
+        id: '1-day',
+        title: t('secondStep.field.expiresAt.options.1-day'),
+      },
+      {
+        id: '3-days',
+        title: t('secondStep.field.expiresAt.options.3-days'),
+      },
+      {
+        id: '5-days',
+        title: t('secondStep.field.expiresAt.options.5-days'),
+      },
+      {
+        id: '7-days',
+        title: t('secondStep.field.expiresAt.options.7-days'),
+      },
+    ],
+    [t]
+  );
+
+  const getDecisionPart = useCallback(
+    () => (
+      <>
+        <SItemWrapper>
+          <TextArea
+            id="title"
+            value={post?.title}
+            error={titleError}
+            onBlur={handleItemBlur}
+            onFocus={handleItemFocus}
+            onChange={handleItemChange}
+            placeholder={t('secondStep.input.placeholder')}
+          />
+        </SItemWrapper>
+        {tab === 'multiple-choice' && (
           <>
             <SSeparator margin="16px 0" />
             <DraggableMobileOptions
@@ -428,14 +419,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
               onChange={handleItemChange}
               validation={validateT}
             />
-            {isMobile && (
-              <SSeparator margin="16px 0" />
-            )}
+            {isMobile && <SSeparator margin="16px 0" />}
           </>
-        )
-      }
-      {
-        tab === 'auction' && !isMobile && (
+        )}
+        {tab === 'auction' && !isMobile && (
           <>
             <SSeparator margin="16px 0" />
             <SItemWrapper>
@@ -453,10 +440,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
               />
             </SItemWrapper>
           </>
-        )
-      }
-      {
-        tab === 'crowdfunding' && !isMobile && (
+        )}
+        {tab === 'crowdfunding' && !isMobile && (
           <>
             <SSeparator margin="16px 0" />
             <SItemWrapper>
@@ -468,36 +453,38 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 formattedDescription={crowdfunding.targetBackerCount}
                 inputProps={{
                   min: 1,
+                  max: 999999,
                   type: 'number',
                   pattern: '[0-9]*',
                 }}
               />
             </SItemWrapper>
           </>
-        )
-      }
-    </>
-  ), [
-    t,
-    tab,
-    isMobile,
-    titleError,
-    post?.title,
-    auction?.minimalBid,
-    crowdfunding?.targetBackerCount,
-    validateT,
-    handleItemBlur,
-    handleItemFocus,
-    handleItemChange,
-    multiplechoice.choices,
-  ]);
-  const getAdvancedPart = useCallback(() => (
-    <>
-      {isMobile ? (
-        <>
-          <SListWrapper>
-            {
-              tab === 'auction' && (
+        )}
+      </>
+    ),
+    [
+      t,
+      tab,
+      isMobile,
+      titleError,
+      post?.title,
+      auction?.minimalBid,
+      crowdfunding?.targetBackerCount,
+      validateT,
+      handleItemBlur,
+      handleItemFocus,
+      handleItemChange,
+      multiplechoice.choices,
+    ]
+  );
+  const getAdvancedPart = useCallback(
+    () => (
+      <>
+        {isMobile ? (
+          <>
+            <SListWrapper>
+              {tab === 'auction' && (
                 <SFieldWrapper>
                   <MobileFieldBlock
                     id="minimalBid"
@@ -512,10 +499,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                     }}
                   />
                 </SFieldWrapper>
-              )
-            }
-            {
-              tab === 'crowdfunding' && (
+              )}
+              {tab === 'crowdfunding' && (
                 <SFieldWrapper>
                   <MobileFieldBlock
                     id="targetBackerCount"
@@ -530,122 +515,117 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                     }}
                   />
                 </SFieldWrapper>
-              )
-            }
-            <SFieldWrapper>
-              <MobileFieldBlock
+              )}
+              <SFieldWrapper>
+                <MobileFieldBlock
+                  id="expiresAt"
+                  type="select"
+                  value={post.expiresAt}
+                  options={expireOptions}
+                  onChange={handleItemChange}
+                  formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
+                  formattedDescription={formatExpiresAt().format('DD MMM [at] hh:mm A')}
+                />
+              </SFieldWrapper>
+              <SFieldWrapper>
+                <MobileFieldBlock
+                  id="startsAt"
+                  type="date"
+                  value={post.startsAt}
+                  onChange={handleItemChange}
+                  formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
+                  formattedDescription={formatStartsAt().format('DD MMM [at] hh:mm A')}
+                />
+              </SFieldWrapper>
+            </SListWrapper>
+            <SSeparator />
+          </>
+        ) : (
+          <>
+            <SItemWrapper>
+              <TabletFieldBlock
                 id="expiresAt"
                 type="select"
                 value={post.expiresAt}
                 options={expireOptions}
+                maxItems={5}
                 onChange={handleItemChange}
                 formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-                formattedDescription={formatExpiresAt()
-                  .format('DD MMM [at] hh:mm A')}
+                formattedDescription={formatExpiresAt().format('DD MMM [at] hh:mm A')}
               />
-            </SFieldWrapper>
-            <SFieldWrapper>
-              <MobileFieldBlock
-                id="startsAt"
-                type="date"
-                value={post.startsAt}
-                onChange={handleItemChange}
-                formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
-                formattedDescription={formatStartsAt()
-                  .format('DD MMM [at] hh:mm A')}
-              />
-            </SFieldWrapper>
-          </SListWrapper>
-          <SSeparator />
-        </>
-      ) : (
-        <>
-          <SItemWrapper>
-            <TabletFieldBlock
-              id="expiresAt"
-              type="select"
-              value={post.expiresAt}
-              options={expireOptions}
-              maxItems={5}
+            </SItemWrapper>
+            <SSeparator margin="16px 0" />
+            <STabletBlockTitle variant={1} weight={700}>
+              {t('secondStep.field.startsAt.tablet.title')}
+            </STabletBlockTitle>
+            <TabletStartDate id="startsAt" value={post.startsAt} onChange={handleItemChange} />
+            <SSeparator margin="16px 0" />
+          </>
+        )}
+        {tab === 'multiple-choice' && mySubscribers.length > 0 && (
+          <SMobileFieldWrapper>
+            <MobileField
+              id="allowSuggestions"
+              type="toggle"
+              value={multiplechoice.options.allowSuggestions}
               onChange={handleItemChange}
-              formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-              formattedDescription={formatExpiresAt()
-                .format('DD MMM [at] hh:mm A')}
             />
-          </SItemWrapper>
-          <SSeparator margin="16px 0" />
-          <STabletBlockTitle variant={1} weight={700}>
-            {t('secondStep.field.startsAt.tablet.title')}
-          </STabletBlockTitle>
-          <TabletStartDate
-            id="startsAt"
-            value={post.startsAt}
-            onChange={handleItemChange}
-          />
-          <SSeparator margin="16px 0" />
-        </>
-      )}
-      {tab === 'multiple-choice' && (
-        <SMobileFieldWrapper>
-          <MobileField
-            id="allowSuggestions"
-            type="toggle"
-            value={multiplechoice.options.allowSuggestions}
-            onChange={handleItemChange}
-          />
-        </SMobileFieldWrapper>
-      )}
-      <MobileField
-        id="comments"
-        type="toggle"
-        value={post.options.commentsEnabled}
-        onChange={handleItemChange}
-      />
-    </>
-  ), [
-    t,
-    tab,
-    isMobile,
-    post.startsAt,
-    post.expiresAt,
-    post.options.commentsEnabled,
-    auction.minimalBid,
-    crowdfunding.targetBackerCount,
-    multiplechoice.options.allowSuggestions,
-    expireOptions,
-    formatStartsAt,
-    formatExpiresAt,
-    handleItemChange,
-  ]);
-  const handlerSocketUpdated = useCallback((data: any) => {
-    const arr = new Uint8Array(data);
-    const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+          </SMobileFieldWrapper>
+        )}
+        <MobileField id="comments" type="toggle" value={post.options.commentsEnabled} onChange={handleItemChange} />
+      </>
+    ),
+    [
+      t,
+      tab,
+      isMobile,
+      post.startsAt,
+      post.expiresAt,
+      post.options.commentsEnabled,
+      auction.minimalBid,
+      mySubscribers.length,
+      crowdfunding.targetBackerCount,
+      multiplechoice.options.allowSuggestions,
+      expireOptions,
+      formatStartsAt,
+      formatExpiresAt,
+      handleItemChange,
+    ]
+  );
+  const handlerSocketUpdated = useCallback(
+    (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-    if (!decoded) return;
+      if (!decoded) return;
 
-    if (decoded.taskUuid === videoProcessing?.taskUuid) {
-      dispatch(setCreationFileUploadETA(decoded.estimatedTimeLeft?.seconds));
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        dispatch(setCreationFileUploadETA(decoded.estimatedTimeLeft?.seconds));
 
-      if (decoded.fractionCompleted > fileUpload.progress) {
-        dispatch(setCreationFileUploadProgress(decoded.fractionCompleted));
+        if (decoded.fractionCompleted > fileUpload.progress) {
+          dispatch(setCreationFileUploadProgress(decoded.fractionCompleted));
+        }
+
+        if (decoded.fractionCompleted === 100) {
+          removeChannel(videoProcessing?.taskUuid);
+          dispatch(setCreationFileUploadLoading(false));
+        }
       }
-
-      if (decoded.fractionCompleted === 100) {
-        removeChannel(videoProcessing?.taskUuid);
-        dispatch(setCreationFileUploadLoading(false));
-      }
-    }
-  }, [videoProcessing, fileUpload, dispatch, removeChannel]);
+    },
+    [videoProcessing, fileUpload, dispatch, removeChannel]
+  );
 
   useEffect(() => {
     const func = async () => {
       if (validateTitleDebounced) {
-        setTitleError(await validateT(
-          validateTitleDebounced,
-          CREATION_TITLE_MIN,
-          CREATION_TITLE_MAX,
-          newnewapi.ValidateTextRequest.Kind.POST_TITLE,
-        ));
+        setTitleError(
+          await validateT(
+            validateTitleDebounced,
+            CREATION_TITLE_MIN,
+            CREATION_TITLE_MAX,
+            newnewapi.ValidateTextRequest.Kind.POST_TITLE
+          )
+        );
       }
     };
     func();
@@ -676,13 +656,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     <>
       <div>
         <STabsWrapper>
-          <Tabs
-            t={t}
-            tabs={tabs}
-            draggable={false}
-            activeTabIndex={activeTabIndex}
-            withTabIndicator={isDesktop}
-          />
+          <Tabs t={t} tabs={tabs} draggable={false} activeTabIndex={activeTabIndex} withTabIndicator={isDesktop} />
           {isMobile && (
             <SCloseIconWrapper>
               <InlineSVG
@@ -712,7 +686,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 thumbnails={post.thumbnailParameters}
               />
             </SItemWrapper>
-            {isMobile ? getDecisionPart() : (
+            {isMobile ? (
+              getDecisionPart()
+            ) : (
               <SItemWrapper>
                 <TabletFieldWrapper>
                   <STabletBlockTitle variant={1} weight={700}>
@@ -731,7 +707,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 </TabletFieldWrapper>
               </SItemWrapper>
             )}
-            {isMobile ? getAdvancedPart() : (
+            {isMobile ? (
+              getAdvancedPart()
+            ) : (
               <SItemWrapper>
                 <TabletFieldWrapper>
                   <STabletBlockTitle variant={1} weight={700}>
@@ -744,11 +722,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
             {isMobile ? (
               <SButtonWrapper>
                 <SButtonContent>
-                  <SButton
-                    view="primaryGrad"
-                    onClick={handleSubmit}
-                    disabled={disabled}
-                  >
+                  <SButton view="primaryGrad" onClick={handleSubmit} disabled={disabled}>
                     {t('secondStep.button.preview')}
                   </SButton>
                 </SButtonContent>
@@ -757,19 +731,12 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
               <SItemWrapper>
                 <STabletButtonsWrapper>
                   <div>
-                    <SButton
-                      view="secondary"
-                      onClick={handleCloseClick}
-                    >
+                    <SButton view="secondary" onClick={handleCloseClick}>
                       {t('secondStep.button.cancel')}
                     </SButton>
                   </div>
                   <div>
-                    <SButton
-                      view="primaryGrad"
-                      onClick={handleSubmit}
-                      disabled={disabled}
-                    >
+                    <SButton view="primaryGrad" onClick={handleSubmit} disabled={disabled}>
                       {t('secondStep.button.preview')}
                     </SButton>
                   </div>
@@ -798,23 +765,16 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                       />
                     </SFloatingSubSectionPlayer>
                     <SFloatingSubSectionUser>
-                      <SUserAvatar
-                        avatarUrl={user.userData?.avatarUrl}
-                      />
+                      <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                       <SUserTitle variant={3} weight={600}>
                         {post?.title}
                       </SUserTitle>
                     </SFloatingSubSectionUser>
                     <SBottomEnd>
-                      <SButtonUser
-                        view="primary"
-                      >
-                        {t(`secondStep.button.card.${typeOfPost}`)}
-                      </SButtonUser>
+                      <SButtonUser view="primary">{t(`secondStep.button.card.${typeOfPost}`)}</SButtonUser>
                       <SCaption variant={2} weight={700}>
                         {t('secondStep.card.left', {
-                          time: formatExpiresAt()
-                            .fromNow(true),
+                          time: formatExpiresAt().fromNow(true),
                         })}
                       </SCaption>
                     </SBottomEnd>
@@ -933,9 +893,11 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 `;
 
 const TabletFieldWrapper = styled.div`
-  border: 1px solid ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+  border: 1px solid
+    ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
   padding: 23px;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
   border-radius: 16px;
 `;
 

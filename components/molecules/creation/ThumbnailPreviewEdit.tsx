@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { PlayerEvent } from 'bitmovin-player';
@@ -35,13 +30,7 @@ interface IThumbnailPreviewEdit {
 }
 
 export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => {
-  const {
-    open,
-    value,
-    thumbnails,
-    handleClose,
-    handleSubmit,
-  } = props;
+  const { open, value, thumbnails, handleClose, handleSubmit } = props;
   const theme = useTheme();
   const { t } = useTranslation('creation');
   const videoThumbs: any = useRef({ ...thumbnails });
@@ -62,19 +51,16 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
   const onSubmit = useCallback(() => {
     handleSubmit(videoThumbs.current);
   }, [handleSubmit]);
-  const renderChunks = useCallback((chunk, index) => (
-    <SProgressSeparator
-      key={`chunk-${index}`}
-      height={index % 5 === 0 ? '16px' : '6px'}
-    />
-  ), []);
+  const renderChunks = useCallback(
+    (chunk, index) => <SProgressSeparator key={`chunk-${index}`} height={index % 5 === 0 ? '16px' : '6px'} />,
+    []
+  );
   const setDuration = useCallback((duration) => {
     const percentage = (3 * 100) / duration;
     const durationCount = 100 / percentage;
     const separatorsCount = +(durationCount * 8).toFixed(0);
 
-    setChunks(Array(separatorsCount)
-      .fill('_'));
+    setChunks(Array(separatorsCount).fill('_'));
     setVideoDuration(duration);
   }, []);
   const setCurrentTime = useCallback((time) => {
@@ -110,11 +96,8 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     return `${minutes}:${seconds}`;
   }, []);
   const handleVideoSelectDrag = useCallback(() => {
-    const {
-      left,
-      width,
-    } = progressRef.current.getBoundingClientRect();
-    const initialPoint = (window.innerWidth / 2) - 36;
+    const { left, width } = progressRef.current.getBoundingClientRect();
+    const initialPoint = window.innerWidth / 2 - 36;
     const percentage = ((initialPoint - left) * 100) / width;
     const startTime = +((videoDuration * percentage) / 100).toFixed(0);
     const endTime = startTime + 3;
@@ -126,10 +109,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     endTimeRef.current.innerHTML = getTime('end');
     startTimeRef.current.innerHTML = getTime('start');
 
-    playerRef.current.off(
-      PlayerEvent.TimeChanged,
-      playerRef.current.handleTimeChange,
-    );
+    playerRef.current.off(PlayerEvent.TimeChanged, playerRef.current.handleTimeChange);
     const handleTimeChange = () => {
       if (setCurrentTime) {
         setCurrentTime(playerRef.current.getCurrentTime());
@@ -149,7 +129,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     playerRef.current.play();
   }, [getTime, videoDuration, setCurrentTime]);
   const getInitialXPosition = useCallback(() => {
-    const generalWidth = (chunks.length * 7) - 5;
+    const generalWidth = chunks.length * 7 - 5;
     const startPointPercentage = (videoThumbs.current.startTime * 100) / videoDuration;
     const startPoint = (generalWidth * startPointPercentage) / 100;
 
@@ -165,10 +145,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
   const initialX = getInitialXPosition();
 
   return (
-    <Modal
-      show={open}
-      onClose={handleClose}
-    >
+    <Modal show={open} onClose={handleClose}>
       <SContainer onClick={preventCLick}>
         <SModalTopContent>
           <SModalTopLine>
@@ -187,9 +164,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 {t('secondStep.video.thumbnail.title')}
               </SModalTopLineTitle>
             ) : (
-              <SModalTopLineTitleTablet variant={6}>
-                {t('secondStep.video.thumbnail.title')}
-              </SModalTopLineTitleTablet>
+              <SModalTopLineTitleTablet variant={6}>{t('secondStep.video.thumbnail.title')}</SModalTopLineTitleTablet>
             )}
             {!isMobile && (
               <InlineSVG
@@ -217,18 +192,10 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
             )}
           </SPlayerWrapper>
           <STimeWrapper>
-            <STimeStart
-              variant={2}
-              weight={600}
-              innerRef={startTimeRef}
-            >
+            <STimeStart variant={2} weight={600} innerRef={startTimeRef}>
               {getTime('start')}
             </STimeStart>
-            <STimeEnd
-              weight={600}
-              variant={2}
-              innerRef={endTimeRef}
-            >
+            <STimeEnd weight={600} variant={2} innerRef={endTimeRef}>
               {getTime('end')}
             </STimeEnd>
           </STimeWrapper>
@@ -251,7 +218,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 dragElastic={0}
                 dragMomentum={false}
                 dragConstraints={{
-                  left: -(((chunks.length - 9) * 7) - 5),
+                  left: -((chunks.length - 9) * 7 - 5),
                   right: 0,
                 }}
               >
@@ -261,33 +228,22 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
           </SSelectLine>
           {!isMobile && (
             <SDescription>
-              <SText>
-                {t('secondStep.video.thumbnail.description')}
-              </SText>
+              <SText>{t('secondStep.video.thumbnail.description')}</SText>
             </SDescription>
           )}
         </SModalTopContent>
         {isMobile ? (
           <SModalButtonContainer>
-            <Button
-              view="primaryGrad"
-              onClick={onSubmit}
-            >
+            <Button view="primaryGrad" onClick={onSubmit}>
               {t('secondStep.video.thumbnail.submit')}
             </Button>
           </SModalButtonContainer>
         ) : (
           <SButtonsWrapper>
-            <Button
-              view="secondary"
-              onClick={handleClose}
-            >
+            <Button view="secondary" onClick={handleClose}>
               {t('secondStep.button.cancel')}
             </Button>
-            <Button
-              view="primaryGrad"
-              onClick={onSubmit}
-            >
+            <Button view="primaryGrad" onClick={onSubmit}>
               {t('secondStep.video.thumbnail.submit')}
             </Button>
           </SButtonsWrapper>
@@ -342,10 +298,12 @@ const SModalTopLine = styled.div`
 `;
 
 const SModalTopLineTitleTablet = styled(Headline)`
+  margin: 0 auto;
   color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
 const SModalTopLineTitle = styled(Text)`
+  margin: 0 auto;
   color: ${(props) => props.theme.colorsThemed.text.primary};
   margin-left: 8px;
 `;
@@ -445,15 +403,16 @@ const SInvisibleWrapper = styled.div<ISInvisibleWrapper>`
   align-items: center;
   pointer-events: none;
 
-  ${(props) => (props.position === 'left'
-    ? css`
-      left: 0;
-      justify-content: flex-end;
-    `
-    : css`
-      right: 0;
-      justify-content: flex-start;
-    `)};
+  ${(props) =>
+    props.position === 'left'
+      ? css`
+          left: 0;
+          justify-content: flex-end;
+        `
+      : css`
+          right: 0;
+          justify-content: flex-start;
+        `};
 `;
 
 const SProgressLine = styled(motion.div)`
@@ -476,7 +435,8 @@ const SProgressSeparator = styled.div<ISProgressSeparator>`
   width: 2px;
   height: ${(props) => props.height};
   overflow: hidden;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.accent.blue : props.theme.colors.white)};
+  background: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colorsThemed.accent.blue : props.theme.colors.white};
   border-radius: 2px;
   pointer-events: none;
 `;

@@ -158,14 +158,14 @@
       "previewFull": "Preview",
       "thumbnail": {
         "info": "Learn more",
-        "title": "Set thumbnail preview",
+        "title": "Set preview",
         "submit": "Save changes",
         "description": "Select a 3 sec snippet as decision cover. A good preview draws viewer's attention."
       },
       "full": {
         "title": "Video preview"
       },
-      "loading":  {
+      "loading": {
         "title": "Just a minute",
         "description": "Your file is uploading. Just give us a second to finish your upload.",
         "process": "{{progress}}% • {{time}} left"
@@ -225,7 +225,8 @@
       "facebook": "Facebook",
       "instagram": "Instagram",
       "tiktok": "TikTok",
-      "copy": "Copy Link"
+      "copy": "Copy Link",
+      "copied": "Link Copied!"
     }
   }
 }
