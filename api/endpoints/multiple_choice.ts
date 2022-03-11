@@ -32,6 +32,20 @@ export const fetchCurrentOptionsForMCPost = (
   } : {}),
 );
 
+export const getMcOption = (
+  payload: newnewapi.GetMcOptionRequest,
+) => fetchProtobuf<newnewapi.GetMcOptionRequest, newnewapi.GetMcOptionResponse>(
+  newnewapi.GetMcOptionRequest,
+  newnewapi.GetMcOptionResponse,
+  `${BASE_URL_MULTICHOICE}/get_mc_option`,
+  'post',
+  payload,
+  // Optional authentication to get individualized list of options
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
+);
+
 export const voteOnPost = (
   payload: newnewapi.FulfillPaymentPurposeRequest,
 ) => fetchProtobufProtectedIntercepted<newnewapi.FulfillPaymentPurposeRequest, newnewapi.VoteOnPostResponse>(
@@ -48,6 +62,16 @@ export const voteOnPostWithWallet = (
   newnewapi.VoteOnPostRequest,
   newnewapi.VoteOnPostResponse,
   `${BASE_URL_MULTICHOICE}/vote_on_post_with_wallet`,
+  'post',
+  payload,
+);
+
+export const deleteMcOption = (
+  payload: newnewapi.DeleteMcOptionRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DeleteMcOptionRequest, newnewapi.EmptyResponse>(
+  newnewapi.DeleteMcOptionRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_MULTICHOICE}/delete_mc_option`,
   'post',
   payload,
 );

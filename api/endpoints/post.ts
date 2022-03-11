@@ -27,6 +27,26 @@ export const markPost = (
   payload,
 );
 
+export const cancelMyPost = (
+  payload: newnewapi.CancelMyPostRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.CancelMyPostRequest, newnewapi.EmptyResponse>(
+  newnewapi.CancelMyPostRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_POST}/cancel_my_post`,
+  'post',
+  payload,
+);
+
+export const uploadPostResponse = (
+  payload: newnewapi.UploadPostResponseRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.UploadPostResponseRequest, newnewapi.Post>(
+  newnewapi.UploadPostResponseRequest,
+  newnewapi.Post,
+  `${BASE_URL_POST}/upload_post_response`,
+  'post',
+  payload,
+);
+
 export const fetchPostByUUID = (
   payload: newnewapi.GetPostRequest,
 ) => fetchProtobuf<newnewapi.GetPostRequest, newnewapi.Post>(

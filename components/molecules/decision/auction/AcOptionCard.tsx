@@ -37,6 +37,7 @@ import CoinIcon from '../../../../public/images/decision/coin-mock.png';
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   shouldAnimate: boolean;
+  votingAllowed: boolean;
   postId: string;
   index: number;
   optionBeingSupported?: string;
@@ -48,6 +49,7 @@ interface IAcOptionCard {
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
   shouldAnimate,
+  votingAllowed,
   postId,
   index,
   optionBeingSupported,
@@ -252,13 +254,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               />
             ) : null}
           </SLottieAnimationContainer>
-          <SBidAmount>
+          <SBidAmount isWhite={isSupportedByMe || isMyBid}>
             <SCoinImg src={CoinIcon.src} />
             <div>
               {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
             </div>
           </SBidAmount>
-          <SOptionInfo variant={3}>{option.title}</SOptionInfo>
+          <SOptionInfo isWhite={isSupportedByMe || isMyBid} variant={3}>
+            {option.title}
+          </SOptionInfo>
           <SBiddersInfo variant={3}>
             <SSpanBiddersHighlighted
               className="spanHighlighted"
@@ -297,7 +301,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             <SSpanBiddersRegular className="spanRegular">{t('AcPost.OptionsTab.OptionCard.bid')}</SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {optionBeingSupported && !disabled ? null : (
+        {(optionBeingSupported && !disabled) || !votingAllowed ? null : (
           <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
             {!isMobile ? (
               <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
@@ -469,7 +473,9 @@ const SBidDetails = styled.div<{
   }
 `;
 
-const SBidAmount = styled.div`
+const SBidAmount = styled.div<{
+  isWhite: boolean;
+}>`
   grid-area: amount;
 
   display: flex;
@@ -478,16 +484,32 @@ const SBidAmount = styled.div`
   gap: 8px;
 
   margin-bottom: 6px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
 `;
 
 const SCoinImg = styled.img`
   height: 24px;
 `;
 
-const SOptionInfo = styled(Text)`
+const SOptionInfo = styled(Text)<{
+  isWhite: boolean;
+}>`
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;

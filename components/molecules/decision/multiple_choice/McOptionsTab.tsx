@@ -363,7 +363,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 <SLoadMoreBtn
                   onClick={() => handleLoadOptions(pagingToken)}
                 >
-                  { t('McPost.OptionsTab.loadMoreBtn') }
+                  { t('loadMoreBtn') }
                 </SLoadMoreBtn>
               )
             ) : null
