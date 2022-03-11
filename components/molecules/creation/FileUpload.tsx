@@ -1,8 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
@@ -41,16 +37,7 @@ interface IFileUpload {
 }
 
 export const FileUpload: React.FC<IFileUpload> = (props) => {
-  const {
-    id,
-    eta,
-    value,
-    error,
-    loading,
-    progress,
-    onChange,
-    thumbnails,
-  } = props;
+  const { id, eta, value, error, loading, progress, onChange, thumbnails } = props;
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -96,28 +83,34 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
     setLocalFile(null);
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
-  const handlePreviewEditSubmit = useCallback((params) => {
-    handleCloseThumbnailEditClick();
-    onChange('thumbnailParameters', params);
-  }, [handleCloseThumbnailEditClick, onChange]);
-  const handleFileChange = useCallback(async (e) => {
-    const file = e.target?.files[0];
+  const handlePreviewEditSubmit = useCallback(
+    (params) => {
+      handleCloseThumbnailEditClick();
+      onChange('thumbnailParameters', params);
+    },
+    [handleCloseThumbnailEditClick, onChange]
+  );
+  const handleFileChange = useCallback(
+    async (e) => {
+      const file = e.target?.files[0];
 
-    if (file.size > MAX_VIDEO_SIZE) {
-      toast.error(t('secondStep.video.error.maxSize'));
-    } else {
-      const media: any = await loadVideo(file);
-
-      if (media.duration < MIN_VIDEO_DURATION) {
-        toast.error(t('secondStep.video.error.minLength'));
-      } else if (media.duration > MAX_VIDEO_DURATION) {
-        toast.error(t('secondStep.video.error.maxLength'));
+      if (file.size > MAX_VIDEO_SIZE) {
+        toast.error(t('secondStep.video.error.maxSize'));
       } else {
-        setLocalFile(file);
-        onChange(id, file);
+        const media: any = await loadVideo(file);
+
+        if (media.duration < MIN_VIDEO_DURATION) {
+          toast.error(t('secondStep.video.error.minLength'));
+        } else if (media.duration > MAX_VIDEO_DURATION) {
+          toast.error(t('secondStep.video.error.maxLength'));
+        } else {
+          setLocalFile(file);
+          onChange(id, file);
+        }
       }
-    }
-  }, [id, onChange, t]);
+    },
+    [id, onChange, t]
+  );
   const handleRetryVideoUpload = useCallback(() => {
     onChange(id, localFile);
   }, [id, localFile, onChange]);
@@ -128,9 +121,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
 
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox
-        htmlFor="file"
-      >
+      <SDropBox htmlFor="file">
         <input
           id="file"
           ref={inputRef}
@@ -143,10 +134,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
         <SPlaceholder weight={600} variant={2}>
           {t('secondStep.fileUpload.description')}
         </SPlaceholder>
-        <SButton
-          view="primaryGrad"
-          onClick={handleButtonClick}
-        >
+        <SButton view="primaryGrad" onClick={handleButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
       </SDropBox>
@@ -185,11 +173,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
       content = (
         <SErrorBox>
           <SErrorTitleWrapper>
-            <SInlineSVG
-              svg={errorIcon}
-              width="16px"
-              height="16px"
-            />
+            <SInlineSVG svg={errorIcon} width="16px" height="16px" />
             <SErrorTitle variant={3} weight={600}>
               {t('secondStep.video.error.title')}
             </SErrorTitle>
@@ -198,17 +182,10 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
             {t('secondStep.video.error.description')}
           </SLoadingDescription>
           <SErrorBottomBlock>
-            <SLoadingBottomBlockButton
-              view="secondary"
-              onClick={handleCancelVideoUpload}
-            >
+            <SLoadingBottomBlockButton view="secondary" onClick={handleCancelVideoUpload}>
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
-            <Button
-              view="primaryGrad"
-              onClick={handleRetryVideoUpload}
-              disabled={!localFile}
-            >
+            <Button view="primaryGrad" onClick={handleRetryVideoUpload} disabled={!localFile}>
               {t('secondStep.button.retry')}
             </Button>
           </SErrorBottomBlock>
@@ -237,18 +214,14 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
           </SPlayerWrapper>
           <SButtonsContainer>
             <SButtonsContainerLeft>
-              <SVideoButton onClick={handleEditThumb}>
-                {t('secondStep.video.setThumbnail')}
-              </SVideoButton>
+              <SVideoButton onClick={handleEditThumb}>{t('secondStep.video.setThumbnail')}</SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
                 {t('secondStep.video.deleteFile')}
               </SVideoButton>
             </SButtonsContainerLeft>
             {!isDesktop && (
               <div>
-                <SVideoButton onClick={handleFullPreview}>
-                  {t('secondStep.video.previewFull')}
-                </SVideoButton>
+                <SVideoButton onClick={handleFullPreview}>{t('secondStep.video.previewFull')}</SVideoButton>
               </div>
             )}
           </SButtonsContainer>
@@ -278,16 +251,8 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
 
   return (
     <SWrapper>
-      <DeleteVideo
-        open={showVideoDelete}
-        handleClose={handleCloseDeleteVideoClick}
-        handleSubmit={handleDeleteVideo}
-      />
-      <FullPreview
-        open={showFullPreview}
-        value={value}
-        handleClose={handleCloseFullPreviewClick}
-      />
+      <DeleteVideo open={showVideoDelete} handleClose={handleCloseDeleteVideoClick} handleSubmit={handleDeleteVideo} />
+      <FullPreview open={showFullPreview} value={value} handleClose={handleCloseFullPreviewClick} />
       <ThumbnailPreviewEdit
         open={showThumbnailEdit}
         value={value}
@@ -345,10 +310,12 @@ const SFileBox = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 176px;
-    border: 1px solid ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+    border: 1px solid
+      ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
     padding: 23px;
     overflow: hidden;
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
   }
 `;
@@ -434,11 +401,13 @@ const SLoadingBottomBlock = styled.div`
 
 const SLoadingBottomBlockButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  padding: 0;
+  padding: 0 10px;
+  margin-right: -10px;
 
   &:focus:enabled,
   &:hover:enabled {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
   }
 `;
 

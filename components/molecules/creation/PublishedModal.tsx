@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
@@ -37,16 +37,12 @@ interface IPublishedModal {
 }
 
 export const PublishedModal: React.FC<IPublishedModal> = (props) => {
-  const {
-    open,
-    handleClose,
-  } = props;
+  const { open, handleClose } = props;
   const { t } = useTranslation('creation');
   const user = useAppSelector((state) => state.user);
-  const {
-    post,
-    videoProcessing,
-  } = useAppSelector((state) => state.creation);
+  const { post, videoProcessing, postData } = useAppSelector((state) => state.creation);
+
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
   const preventCLick = (e: any) => {
     e.preventDefault();
@@ -55,86 +51,120 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const formatStartsAt = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
 
-    return moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
+    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
   }, [post.startsAt]);
-  const socialButtons = useMemo(() => [
-    {
-      key: 'twitter',
+  const socialButtons = useMemo(
+    () => [
+      // {
+      //   key: 'twitter',
+      // },
+      // {
+      //   key: 'facebook',
+      // },
+      // {
+      //   key: 'instagram',
+      // },
+      // {
+      //   key: 'tiktok',
+      // },
+      {
+        key: 'copy',
+      },
+    ],
+    []
+  );
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  interface IItemButtonAttrs extends NamedNodeMap {
+    type?: {
+      value: string;
+    };
+  }
+
+  const socialBtnClickHandler = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const attr: IItemButtonAttrs = (e.target as HTMLDivElement).attributes;
+      const val = attr.type?.value;
+      if (val === 'copy' && postData) {
+        let url;
+        if (window) {
+          url = `${window.location.origin}/?post=`;
+          if (url) {
+            if (postData.auction) {
+              url += postData.auction.postUuid;
+            }
+            if (postData.crowdfunding) {
+              url += postData.crowdfunding.postUuid;
+            }
+            if (postData.multipleChoice) {
+              url += postData.multipleChoice.postUuid;
+            }
+
+            copyPostUrlToClipboard(url)
+              .then(() => {
+                setIsCopiedUrl(true);
+                setTimeout(() => {
+                  setIsCopiedUrl(false);
+                }, 1500);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+        }
+      }
     },
-    {
-      key: 'facebook',
-    },
-    {
-      key: 'instagram',
-    },
-    {
-      key: 'tiktok',
-    },
-    {
-      key: 'copy',
-    },
-  ], []);
+    [postData]
+  );
+
   const renderItem = (item: any) => (
     <SItem key={item.key}>
-      <SItemButton type={item.key}>
-        <InlineSVG
-          svg={SOCIAL_ICONS[item.key] as string}
-          width="50%"
-          height="50%"
-        />
+      <SItemButton type={item.key} onClick={socialBtnClickHandler}>
+        <InlineSVG svg={SOCIAL_ICONS[item.key] as string} width="25px" height="25px" />
       </SItemButton>
       <SItemTitle variant={3} weight={600}>
-        {t(`published.socials.${item.key}`)}
+        {item.key === 'copy' && isCopiedUrl ? t(`published.socials.copied`) : t(`published.socials.${item.key}`)}
       </SItemTitle>
     </SItem>
   );
 
   return (
-    <Modal
-      show={open}
-      onClose={handleClose}
-    >
+    <Modal show={open} onClose={handleClose}>
       <SMobileContainer onClick={preventCLick}>
         <SContent>
           <SPlayerWrapper>
-            {
-              open && (
-                <BitmovinPlayer
-                  id="published-modal"
-                  muted={false}
-                  resources={videoProcessing?.targetUrls}
-                  thumbnails={post.thumbnailParameters}
-                  borderRadius="16px"
-                />
-              )
-            }
+            {open && (
+              <BitmovinPlayer
+                id="published-modal"
+                muted={false}
+                resources={videoProcessing?.targetUrls}
+                thumbnails={post.thumbnailParameters}
+                borderRadius="16px"
+              />
+            )}
           </SPlayerWrapper>
           <SUserBlock>
-            <SUserAvatar
-              avatarUrl={user.userData?.avatarUrl}
-            />
+            <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
             <SUserTitle variant={3} weight={600}>
               {post?.title}
             </SUserTitle>
           </SUserBlock>
           <SSubTitle variant={2} weight={500}>
             {t(`published.texts.desktop.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {
-              value: formatStartsAt()
-                .format('DD MMM [at] hh:mm A'),
+              value: formatStartsAt().format('DD MMM [at] hh:mm A'),
             })}
           </SSubTitle>
-          <STitle variant={6}>
-            {t('published.texts.title')}
-          </STitle>
-          <SSocials>
-            {socialButtons.map(renderItem)}
-          </SSocials>
+          <STitle variant={6}>{t('published.texts.title')}</STitle>
+          <SSocials>{socialButtons.map(renderItem)}</SSocials>
           <SButtonWrapper onClick={handleClose}>
-            <SButtonTitle>
-              {t('published.button.submit')}
-            </SButtonTitle>
+            <SButtonTitle>{t('published.button.submit')}</SButtonTitle>
           </SButtonWrapper>
         </SContent>
       </SMobileContainer>
@@ -183,10 +213,11 @@ const SSubTitle = styled(Text)`
 `;
 
 const SSocials = styled.div`
-  gap: 24px;
+  /* gap: 24px; */
+  width: 100%;
   display: flex;
   margin-top: 16px;
-  align-items: center;
+  /* align-items: center; */
   flex-direction: row;
   justify-content: center;
 `;
@@ -202,7 +233,8 @@ interface ISItemButton {
 }
 
 const SItemButton = styled.div<ISItemButton>`
-  width: 48px;
+  cursor: pointer;
+  width: 224px;
   height: 48px;
   display: flex;
   overflow: hidden;
