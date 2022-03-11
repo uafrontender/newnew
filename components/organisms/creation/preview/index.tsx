@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useMemo,
-  useState,
-  useCallback,
-} from 'react';
+import React, { useRef, useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import _compact from 'lodash/compact';
@@ -38,8 +33,7 @@ const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
 
-interface IPreviewContent {
-}
+interface IPreviewContent {}
 
 export const PreviewContent: React.FC<IPreviewContent> = () => {
   const { t: tCommon } = useTranslation();
@@ -50,72 +44,69 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const playerRef: any = useRef(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const {
-    post,
-    auction,
-    crowdfunding,
-    multiplechoice,
-    videoProcessing,
-  } = useAppSelector((state) => state.creation);
-  const validateText = useCallback((text: string, min: number, max: number) => {
-    let error = minLength(tCommon, text, min);
+  const { post, auction, crowdfunding, multiplechoice, videoProcessing } = useAppSelector((state) => state.creation);
+  const validateText = useCallback(
+    (text: string, min: number, max: number) => {
+      let error = minLength(tCommon, text, min);
 
-    if (!error) {
-      error = maxLength(tCommon, text, max);
-    }
+      if (!error) {
+        error = maxLength(tCommon, text, max);
+      }
 
-    return error;
-  }, [tCommon]);
+      return error;
+    },
+    [tCommon]
+  );
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const { query: { tab } } = router;
+  const {
+    query: { tab },
+  } = router;
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const titleIsValid = !validateText(post.title, CREATION_TITLE_MIN, CREATION_TITLE_MAX);
-  const optionsAreValid = tab !== 'multiple-choice' || multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) === -1;
-  const disabled = loading
-    || !titleIsValid
-    || !post.title
-    || !post.announcementVideoUrl
-    || !optionsAreValid;
+  const optionsAreValid =
+    tab !== 'multiple-choice' ||
+    multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) ===
+      -1;
+  const disabled = loading || !titleIsValid || !post.title || !post.announcementVideoUrl || !optionsAreValid;
 
   const formatStartsAt: () => any = useCallback(() => {
     const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
 
-    return moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
+    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
   }, [post.startsAt]);
-  const formatExpiresAt: (inSeconds?: boolean) => any = useCallback((inSeconds = false) => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-    const dateValue = moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
-    let seconds = 0;
+  const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
+    (inSeconds = false) => {
+      const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+      const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+      let seconds = 0;
 
-    if (post.expiresAt === '1-hour') {
-      dateValue.add(1, 'h');
-      seconds = 3600;
-    } else if (post.expiresAt === '6-hours') {
-      seconds = 21600;
-      dateValue.add(6, 'h');
-    } else if (post.expiresAt === '12-hours') {
-      seconds = 43200;
-      dateValue.add(12, 'h');
-    } else if (post.expiresAt === '1-day') {
-      seconds = 86400;
-      dateValue.add(1, 'd');
-    } else if (post.expiresAt === '3-days') {
-      seconds = 259200;
-      dateValue.add(3, 'd');
-    } else if (post.expiresAt === '5-days') {
-      seconds = 432000;
-      dateValue.add(5, 'd');
-    } else if (post.expiresAt === '7-days') {
-      seconds = 604800;
-      dateValue.add(7, 'd');
-    }
+      if (post.expiresAt === '1-hour') {
+        dateValue.add(1, 'h');
+        seconds = 3600;
+      } else if (post.expiresAt === '6-hours') {
+        seconds = 21600;
+        dateValue.add(6, 'h');
+      } else if (post.expiresAt === '12-hours') {
+        seconds = 43200;
+        dateValue.add(12, 'h');
+      } else if (post.expiresAt === '1-day') {
+        seconds = 86400;
+        dateValue.add(1, 'd');
+      } else if (post.expiresAt === '3-days') {
+        seconds = 259200;
+        dateValue.add(3, 'd');
+      } else if (post.expiresAt === '5-days') {
+        seconds = 432000;
+        dateValue.add(5, 'd');
+      } else if (post.expiresAt === '7-days') {
+        seconds = 604800;
+        dateValue.add(7, 'd');
+      }
 
-    return inSeconds ? seconds : dateValue;
-  }, [post.expiresAt, post.startsAt]);
+      return inSeconds ? seconds : dateValue;
+    },
+    [post.expiresAt, post.startsAt]
+  );
   const handleClose = useCallback(() => {
     router.back();
   }, [router]);
@@ -131,10 +122,12 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         post: {
           title: post.title,
           settings: post.options,
-          startsAt: post.startsAt.type === 'right-away' ? null : {
-            seconds: formatStartsAt()
-              .unix(),
-          },
+          startsAt:
+            post.startsAt.type === 'right-away'
+              ? null
+              : {
+                  seconds: formatStartsAt().unix(),
+                },
           expiresAfter: {
             seconds: formatExpiresAt(true),
           },
@@ -169,10 +162,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
       const payload = new newnewapi.CreatePostRequest(body);
 
-      const {
-        data,
-        error,
-      } = await createPost(payload);
+      const { data, error } = await createPost(payload);
 
       if (!data || error) {
         throw new Error(error?.message ?? 'Request failed');
@@ -191,55 +181,50 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       toast.error(err);
       setLoading(false);
     }
-  }, [
-    tab,
-    post,
-    router,
-    auction,
-    isMobile,
-    dispatch,
-    crowdfunding,
-    multiplechoice,
-    formatStartsAt,
-    formatExpiresAt,
-  ]);
-  const settings: any = useMemo(() => _compact([
-    tab === 'auction' && {
-      key: 'minimalBid',
-      value: t('preview.values.minimalBid', { value: auction.minimalBid }),
-    },
-    tab === 'crowdfunding' && {
-      key: 'targetBackerCount',
-      value: crowdfunding.targetBackerCount,
-    },
-    {
-      key: 'startsAt',
-      value: formatStartsAt()
-        .format('DD MMM [at] hh:mm A'),
-    },
-    {
-      key: 'expiresAt',
-      value: formatExpiresAt(false)
-        .format('DD MMM [at] hh:mm A'),
-    },
-    {
-      key: 'comments',
-      value: t(`preview.values.${post.options.commentsEnabled ? 'comments-allowed' : 'comments-forbidden'}`),
-    },
-    tab === 'multiple-choice' && {
-      key: 'allowSuggestions',
-      value: t(`preview.values.${multiplechoice.options.allowSuggestions ? 'allowSuggestions-allowed' : 'allowSuggestions-forbidden'}`),
-    },
-  ]), [
-    t,
-    tab,
-    formatStartsAt,
-    post.options.commentsEnabled,
-    auction.minimalBid,
-    crowdfunding.targetBackerCount,
-    multiplechoice?.options?.allowSuggestions,
-    formatExpiresAt,
-  ]);
+  }, [tab, post, router, auction, isMobile, dispatch, crowdfunding, multiplechoice, formatStartsAt, formatExpiresAt]);
+  const settings: any = useMemo(
+    () =>
+      _compact([
+        tab === 'auction' && {
+          key: 'minimalBid',
+          value: t('preview.values.minimalBid', { value: auction.minimalBid }),
+        },
+        tab === 'crowdfunding' && {
+          key: 'targetBackerCount',
+          value: crowdfunding.targetBackerCount,
+        },
+        {
+          key: 'startsAt',
+          value: formatStartsAt().format('DD MMM [at] hh:mm A'),
+        },
+        {
+          key: 'expiresAt',
+          value: formatExpiresAt(false).format('DD MMM [at] hh:mm A'),
+        },
+        {
+          key: 'comments',
+          value: t(`preview.values.${post.options.commentsEnabled ? 'comments-allowed' : 'comments-forbidden'}`),
+        },
+        tab === 'multiple-choice' && {
+          key: 'allowSuggestions',
+          value: t(
+            `preview.values.${
+              multiplechoice.options.allowSuggestions ? 'allowSuggestions-allowed' : 'allowSuggestions-forbidden'
+            }`
+          ),
+        },
+      ]),
+    [
+      t,
+      tab,
+      formatStartsAt,
+      post.options.commentsEnabled,
+      auction.minimalBid,
+      crowdfunding.targetBackerCount,
+      multiplechoice?.options?.allowSuggestions,
+      formatExpiresAt,
+    ]
+  );
   const handleGoBack = useCallback(() => {
     router.back();
   }, [router]);
@@ -254,13 +239,8 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       </SItemValue>
     </SItem>
   );
-  const renderChoice = (item: any, index: number) => (
+  const renderChoice = (item: any) => (
     <SChoiceItem key={item.id}>
-      <SChoiceItemValue>
-        <Text variant={2} weight={600}>
-          {index + 1}
-        </Text>
-      </SChoiceItemValue>
       <SChoiceItemTitle variant={2} weight={500}>
         {item.text}
       </SChoiceItemTitle>
@@ -284,30 +264,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               {post.title}
             </SHeadlineMobile>
           </STopLine>
-          {tab === 'multiple-choice' && (
-            <SChoices>
-              {multiplechoice.choices.map(renderChoice)}
-            </SChoices>
-          )}
-          <SSettings>
-            {settings.map(renderSetting)}
-          </SSettings>
+          {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
+          <SSettings>{settings.map(renderSetting)}</SSettings>
           <SPlayerWrapper>
-            <BitmovinPlayer
-              id="preview-mobile"
-              muted={false}
-              resources={videoProcessing?.targetUrls}
-            />
+            <BitmovinPlayer id="preview-mobile" muted={false} resources={videoProcessing?.targetUrls} />
           </SPlayerWrapper>
         </SContent>
         <SButtonWrapper>
           <SButtonContent>
-            <SButton
-              view="primaryGrad"
-              loading={loading}
-              onClick={handleSubmit}
-              disabled={disabled}
-            >
+            <SButton view="primaryGrad" loading={loading} onClick={handleSubmit} disabled={disabled}>
               {t('preview.button.submit')}
             </SButton>
           </SButtonContent>
@@ -318,10 +283,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   return (
     <>
-      <PublishedModal
-        open={showModal}
-        handleClose={handleCloseModal}
-      />
+      <PublishedModal open={showModal} handleClose={handleCloseModal} />
       <SHeadLine variant={3} weight={600}>
         {t('preview.title')}
       </SHeadLine>
@@ -339,31 +301,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
-          <SHeadline variant={5}>
-            {post.title}
-          </SHeadline>
-          {tab === 'multiple-choice' && (
-            <SChoices>
-              {multiplechoice.choices.map(renderChoice)}
-            </SChoices>
-          )}
-          <SSettings>
-            {settings.map(renderSetting)}
-          </SSettings>
+          <SHeadline variant={5}>{post.title}</SHeadline>
+          {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
+          <SSettings>{settings.map(renderSetting)}</SSettings>
           <SButtonsWrapper>
-            <Button
-              view="secondary"
-              onClick={handleClose}
-              disabled={loading}
-            >
+            <Button view="secondary" onClick={handleClose} disabled={loading}>
               {t('preview.button.edit')}
             </Button>
-            <Button
-              view="primaryGrad"
-              loading={loading}
-              onClick={handleSubmit}
-              disabled={disabled}
-            >
+            <Button view="primaryGrad" loading={loading} onClick={handleSubmit} disabled={disabled}>
               {t('preview.button.submit')}
             </Button>
           </SButtonsWrapper>
@@ -512,19 +457,6 @@ const SChoiceItem = styled.div`
 
 const SChoiceItemTitle = styled(Text)`
   margin-left: 12px;
-`;
-
-const SChoiceItemValue = styled.div`
-  width: 28px;
-  height: 28px;
-  display: flex;
-  overflow: hidden;
-  min-width: 28px;
-  min-height: 28px;
-  background: ${(props) => props.theme.colorsThemed.background.outlines1};
-  align-items: center;
-  border-radius: 14px;
-  justify-content: center;
 `;
 
 const SPlayerWrapper = styled.div`

@@ -10,19 +10,16 @@ interface IList {
 export const List: React.FC<IList> = (props) => {
   const { collection } = props;
 
-  const renderItem = useCallback((item) => (
-    <SItemWrapper key={`creation-item-${item.key}`}>
-      <ListItem
-        item={item}
-      />
-    </SItemWrapper>
-  ), []);
-
-  return (
-    <SList>
-      {collection?.map(renderItem)}
-    </SList>
+  const renderItem = useCallback(
+    (item) => (
+      <SItemWrapper key={`creation-item-${item.key}`}>
+        <ListItem item={item} />
+      </SItemWrapper>
+    ),
+    []
   );
+
+  return <SList>{collection?.map(renderItem)}</SList>;
 };
 
 export default List;
