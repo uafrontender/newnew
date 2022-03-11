@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import isBrowser from '../../utils/isBrowser';
 import { setOverlay } from '../../redux-store/slices/uiStateSlice';
@@ -31,18 +32,28 @@ const Modal: React.FC<IModal> = (props) => {
     }
   }, [show]);
 
+  if (!show) return null;
+
   if (isBrowser()) {
     return ReactDOM.createPortal(
-      <StyledModalOverlay
-        show={show}
-        onClick={onClose}
-        overlayDim={overlayDim ?? false}
-        additionalZ={additionalZ ?? undefined}
-        customBackdropFilterValue={customBackdropFilterValue ?? undefined}
-        transitionSpeed={transitionSpeed ?? 0.5}
-      >
-        {children}
-      </StyledModalOverlay>,
+      <AnimatePresence>
+          <StyledModalOverlay
+            key="modal-overlay"
+            initial={{ height: 0 }}
+            animate={{ height: '100%' }}
+            exit={{ height: 0 }}
+            transition={{ type: 'tween', duration: transitionSpeed ?? 0.5, delay: 0 }}
+
+            show={show}
+            onClick={onClose}
+            overlayDim={overlayDim ?? false}
+            additionalZ={additionalZ ?? undefined}
+            customBackdropFilterValue={customBackdropFilterValue ?? undefined}
+            transitionSpeed={transitionSpeed ?? 0.5}
+          >
+            {children}
+          </StyledModalOverlay>
+      </AnimatePresence>,
       document.getElementById('modal-root') as HTMLElement
     );
   }
@@ -58,11 +69,10 @@ interface IStyledModalOverlay {
   customBackdropFilterValue?: number;
 }
 
-const StyledModalOverlay = styled.div<IStyledModalOverlay>`
+const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
   left: 0;
   width: 100vw;
   bottom: 0;
-  height: ${(props) => (props.show ? '100%' : 0)};
   z-index: ${({ additionalZ }) => additionalZ ?? 10};
   overflow: hidden;
   position: fixed;
@@ -70,7 +80,7 @@ const StyledModalOverlay = styled.div<IStyledModalOverlay>`
     customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)'};
   -webkit-backdrop-filter: ${({ customBackdropFilterValue }) =>
     customBackdropFilterValue ? `blur(${customBackdropFilterValue}px)` : 'blur(16px)'};
-  transition: ${({ transitionSpeed }) => `height ease ${transitionSpeed ?? 0.5}s`};
+
   // To avoid overlapping dim color with this bg color
   background-color: ${({ theme, overlayDim }) =>
     overlayDim ? 'transparent' : theme.colorsThemed.background.backgroundT};
