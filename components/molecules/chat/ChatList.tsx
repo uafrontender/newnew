@@ -134,7 +134,8 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         });
       }
     },
-    [chatRooms, removeChannel]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chatRooms]
   );
 
   useEffect(() => {

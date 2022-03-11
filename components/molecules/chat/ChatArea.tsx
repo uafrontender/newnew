@@ -154,7 +154,10 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
   useEffect(() => {
     if (newMessage) {
       setMessages((curr) => {
-        if (curr[0].id !== newMessage.id) {
+        if (curr.length === 0) {
+          return [newMessage, ...curr];
+        }
+        if (curr[0]?.id !== newMessage.id) {
           return [newMessage, ...curr];
         }
         return curr;
