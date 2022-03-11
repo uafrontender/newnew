@@ -63,7 +63,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
     response || postStatus === 'waiting_for_response' ? 'response' : 'announcement'
   );
-  console.log(openedTab)
 
   // File upload
   const [uploadedResponseVideoUrl, setUploadedResponseVideoUrl] = useState('');

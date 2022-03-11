@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -17,13 +18,7 @@ const ToggleVideoWidget:React.FunctionComponent<IToggleVideoWidget> = ({
 
   return (
     <SToggleVideoWidget>
-      {currentTab === 'response' && responseUploaded ? (
-        <SBackToOriginalBtn
-          onClick={() => handleChangeTab('announcement')}
-        >
-          { t('PostVideo.tabs.back_to_original') }
-        </SBackToOriginalBtn>
-      ) : (
+      {!responseUploaded ? (
         <SWrapper>
           <STabBtn
             active={currentTab === 'announcement'}
@@ -38,6 +33,20 @@ const ToggleVideoWidget:React.FunctionComponent<IToggleVideoWidget> = ({
             { t('PostVideo.tabs.response') }
           </STabBtn>
         </SWrapper>
+      ) : (
+        currentTab === 'response' ? (
+          <SBackToOriginalBtn
+            onClick={() => handleChangeTab('announcement')}
+          >
+            { t('PostVideo.tabs.back_to_original') }
+          </SBackToOriginalBtn>
+        ) : (
+          <SBackToOriginalBtn
+            onClick={() => handleChangeTab('response')}
+          >
+            { t('PostVideo.tabs.back_to_response') }
+          </SBackToOriginalBtn>
+        )
       )}
     </SToggleVideoWidget>
   );
@@ -54,6 +63,10 @@ const SToggleVideoWidget = styled.div`
 
   overflow: hidden;
   border-radius: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    bottom: 24px;
+  }
 `;
 
 const SWrapper = styled.div`
@@ -91,5 +104,22 @@ const STabBtn = styled.button<{
 
 const SBackToOriginalBtn = styled.button`
 
+  background: rgba(11, 10, 19, 0.2);
+  border: transparent;
+  border-radius: 16px;
 
+  padding: 12px 24px;
+
+  width: 100%;
+
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+
+  cursor: pointer;
+
+  &:active, &:focus {
+    outline: none;
+  }
 `;

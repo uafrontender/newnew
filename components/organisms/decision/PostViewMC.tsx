@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
@@ -13,7 +14,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import { fetchCurrentOptionsForMCPost, voteOnPost } from '../../../api/endpoints/multiple_choice';
+import { fetchCurrentOptionsForMCPost, getMcOption, voteOnPost } from '../../../api/endpoints/multiple_choice';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
@@ -28,6 +29,9 @@ import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import McWinnerTab from '../../molecules/decision/multiple_choice/McWinnerTab';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -61,6 +65,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
+
+  // Response viewed
+  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
 
   // Tabs
   const tabs = useMemo(() => {
@@ -152,6 +159,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+  // Winning option
+  const [winningOption, setWinningOption] = useState<newnewapi.MultipleChoice.Option | undefined>();
 
   // Comments
   const [comments, setComments] = useState<any[]>([]);
@@ -366,6 +376,30 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   }, [post.postUuid]);
 
   useEffect(() => {
+    async function fetchAndSetWinningOption(id: number) {
+      try {
+        const payload = new newnewapi.GetMcOptionRequest({
+          optionId: id,
+        });
+
+        const res = await getMcOption(payload);
+
+        console.log(res);
+
+        if (res.data?.option) {
+          setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (post.winningOptionId) {
+      fetchAndSetWinningOption(post.winningOptionId as number);
+    }
+  }, [post.winningOptionId]);
+
+  useEffect(() => {
     const makeVoteFromSessionId = async () => {
       if (!sessionId) return;
       try {
@@ -499,6 +533,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       <PostVideo
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={post.response ?? undefined}
+        responseViewed={responseViewed}
+        handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
@@ -533,10 +570,30 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
               handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             />
           ) : (
-            <CommentsTab
+            currentTab === 'comments'
+            ? ( <CommentsTab
               comments={comments}
               handleGoBack={() => handleChangeTab('options')}
             />
+          ) : winningOption ? (
+            <McWinnerTab
+              postId={post.postUuid}
+              option={winningOption}
+              postStatus={postStatus}
+            />
+          ) : (
+              <SAnimationContainer>
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
+              </SAnimationContainer>
+            )
           )}
       </SActivitesContainer>
       {/* Loading Modal */}
@@ -626,4 +683,13 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
   }
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

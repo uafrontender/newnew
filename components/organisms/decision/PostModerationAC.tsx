@@ -11,7 +11,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
-import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import { fetchAcOptionById, fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
@@ -37,6 +37,8 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
 import Button from '../../atoms/Button';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -160,6 +162,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+  // Winning option
+  const [winningOption, setWinningOption] = useState<newnewapi.Auction.Option | undefined>();
 
   // Animating options
   const [optionToAnimate, setOptionToAnimate] = useState('');
@@ -381,6 +386,30 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   }, [post.postUuid]);
 
   useEffect(() => {
+    async function fetchAndSetWinningOption(id: number) {
+      try {
+        const payload = new newnewapi.GetAcOptionRequest({
+          optionId: id,
+        });
+
+        const res = await fetchAcOptionById(payload);
+
+        console.log(res);
+
+        if (res.data?.option) {
+          setWinningOption(res.data.option as newnewapi.Auction.Option);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (post.winningOptionId) {
+      fetchAndSetWinningOption(post.winningOptionId as number);
+    }
+  }, [post.winningOptionId]);
+
+  useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
@@ -543,20 +572,22 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
                 comments={comments}
                 handleGoBack={() => handleChangeTab('bids')}
               />
-            ) : (
+            ) : winningOption ? (
               <AcWinnerTabModeration
-                option={new newnewapi.Auction.Option({
-                  id: 123,
-                  title: 'Some really really long long long long title',
-                  supporterCount: 2,
-                  totalAmount: {
-                    usdCents: 100000,
-                  },
-                  creator: {
-                    username: 'user123',
-                  }
-                })}
+                option={winningOption}
               />
+            ) : (
+              <SAnimationContainer>
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
+              </SAnimationContainer>
             )
           )}
       </SActivitesContainer>
@@ -655,4 +686,13 @@ const SActivitesContainer = styled.div<{
       : null
     )}
   }
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

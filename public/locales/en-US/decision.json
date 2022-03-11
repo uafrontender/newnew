@@ -80,7 +80,8 @@
     "tabs": {
       "announcement": "Decision",
       "response": "Response",
-      "back_to_original": "Back to original"
+      "back_to_original": "Back to original",
+      "back_to_response": "Watch response"
     },
     "UploadResponseForm": {
       "fileUpload": {
@@ -88,6 +89,10 @@
         "title_2": "Respond now with a video.",
         "description": "Max size of the video 100 MB",
         "button": "Select file"
+      },
+      "button": {
+        "retry": "Retry",
+        "cancel": "Cancel"
       },
       "block": {
         "title": {

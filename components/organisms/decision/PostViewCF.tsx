@@ -80,6 +80,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     removeChannel,
   } = useContext(ChannelsContext);
 
+  // Response viewed
+  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
+
   // Tabs
   const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
     if (!isBrowser()) {
@@ -570,6 +573,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       <PostVideo
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={post.response ?? undefined}
+        responseViewed={responseViewed}
+        handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />

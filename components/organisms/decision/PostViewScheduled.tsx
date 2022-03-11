@@ -121,12 +121,15 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
         postId={post.postUuid}
         announcement={post.announcement!!}
         response={post.response ?? undefined}
+        responseViewed={false}
+        handleSetResponseViewed={() => {}}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
         title={post.title}
         postId={post.postUuid}
+        postStatus={postStatus}
         creator={post.creator!!}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
         startsAtSeconds={post.startsAt?.seconds as number}

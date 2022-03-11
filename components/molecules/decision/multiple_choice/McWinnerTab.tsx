@@ -18,13 +18,13 @@ import PostWaitingForResponseBox from '../PostWaitingForResponseBox';
 import { markPost } from '../../../../api/endpoints/post';
 import PostSuccessBox from '../PostSuccessBox';
 
-interface IAcWinnerTab {
+interface IMcWinnerTab {
   postId: string;
-  option: newnewapi.Auction.Option;
+  option: newnewapi.MultipleChoice.Option;
   postStatus: TPostStatusStringified;
 }
 
-const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
+const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
   postId,
   option,
   postStatus,
@@ -36,8 +36,8 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const isMySuggestion = useMemo(() => (
-    option.creator?.uuid === user.userData?.userUuid
-  ), [option.creator?.uuid, user.userData?.userUuid]);
+    user.loggedIn && option.creator?.uuid === user.userData?.userUuid
+  ), [user.loggedIn, option.creator?.uuid, user.userData?.userUuid]);
 
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
@@ -133,17 +133,22 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
               {' '}
               <SSpanThin>
                 {option.supporterCount > 1
-                  ? t('AcPost.WinnerTab.WinnerOptionCard.bidders_bid_amount')
-                  : t('AcPost.WinnerTab.WinnerOptionCard.bidder_bid_amount')
+                  ? t('McPost.WinnerTab.WinnerOptionCard.voters_told_you')
+                  : t('McPost.WinnerTab.WinnerOptionCard.voter_told_you')
                 }
               </SSpanThin>
             </SNumBidders>
             <SHeadline
               variant={4}
             >
+              { option.text }
+            </SHeadline>
+            <SHeadline
+              variant={4}
+            >
               $
               {formatNumber(
-                option.totalAmount!!.usdCents!! / 100,
+                option.voteCount * 5,
                 true,
               )}
             </SHeadline>
@@ -151,7 +156,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
               variant={3}
             >
               <SSpanThin>
-                { t('AcPost.WinnerTab.WinnerOptionCard.on') }
+                { t('McPost.WinnerTab.WinnerOptionCard.created_by') }
               </SSpanThin>
               {' '}
               <SSpanBold
@@ -160,27 +165,14 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
                   handleRedirectToUser();
                 }}
                 style={{
-                  cursor: !isMySuggestion ? 'pointer' : 'default',
+                  ...(!isMySuggestion ? {
+                    cursor: 'pointer',
+                  } : {}),
                 }}
               >
-                {isMySuggestion
-                  ? t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_me')
-                  : t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_user', {
-                    username: (option.creator?.nickname ?? option.creator?.username),
-                  })
-                }
+                {isMySuggestion ? t('McPost.OptionsTab.me') : (option.creator?.nickname ?? option.creator?.username)}
               </SSpanBold>
-              {' '}
-              <SSpanThin>
-                { t('AcPost.WinnerTab.WinnerOptionCard.bid_to') }
-              </SSpanThin>
-              {' '}
             </SOptionCreator>
-            <SHeadline
-              variant={4}
-            >
-              { option.title }
-            </SHeadline>
           </SOptionDetails>
           <STrophyImg
             src={WinnerIcon.src}
@@ -240,9 +232,9 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
   );
 };
 
-AcWinnerTab.defaultProps = {};
+McWinnerTab.defaultProps = {};
 
-export default AcWinnerTab;
+export default McWinnerTab;
 
 const STabContainer = styled(motion.div)`
   width: 100%;

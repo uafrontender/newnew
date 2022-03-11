@@ -13,7 +13,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import { fetchAcOptionById, fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
@@ -29,6 +29,9 @@ import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -65,6 +68,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
   const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
+
+  // Response viewed
+  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
 
   // Tabs
   const tabs = useMemo(() => {
@@ -157,6 +163,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+  // Winning option
+  const [winningOption, setWinningOption] = useState<newnewapi.Auction.Option | undefined>();
 
   // Animating options
   const [optionToAnimate, setOptionToAnimate] = useState('');
@@ -373,6 +382,30 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   }, [post.postUuid]);
 
   useEffect(() => {
+    async function fetchAndSetWinningOption(id: number) {
+      try {
+        const payload = new newnewapi.GetAcOptionRequest({
+          optionId: id,
+        });
+
+        const res = await fetchAcOptionById(payload);
+
+        console.log(res);
+
+        if (res.data?.option) {
+          setWinningOption(res.data.option as newnewapi.Auction.Option);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (post.winningOptionId) {
+      fetchAndSetWinningOption(post.winningOptionId as number);
+    }
+  }, [post.winningOptionId]);
+
+  useEffect(() => {
     const makeBidFromSessionId = async () => {
       if (!sessionId) return;
       try {
@@ -499,6 +532,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         postId={post.postUuid}
         announcement={post.announcement!!}
         response={post.response ?? undefined}
+        responseViewed={responseViewed}
+        handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
@@ -539,20 +574,24 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
               comments={comments}
               handleGoBack={() => handleChangeTab('bids')}
             />
-          ) : (
+          ) : winningOption ? (
             <AcWinnerTab
-              option={new newnewapi.Auction.Option({
-                id: 123,
-                title: 'Some really really long long long long title',
-                supporterCount: 2,
-                totalAmount: {
-                  usdCents: 100000,
-                },
-                creator: {
-                  username: 'user123',
-                }
-              })}
+              postId={post.postUuid}
+              option={winningOption}
+              postStatus={postStatus}
             />
+          ) : (
+            <SAnimationContainer>
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
+            </SAnimationContainer>
           )
         )}
       </SActivitesContainer>
@@ -651,4 +690,13 @@ const SActivitesContainer = styled.div<{
       : null
     )}
   }
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

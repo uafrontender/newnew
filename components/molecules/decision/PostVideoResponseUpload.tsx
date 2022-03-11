@@ -265,6 +265,11 @@ PostVideoResponseUpload.defaultProps = {
 const SWrapper = styled.div`
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: ${(props) => props.theme.colorsThemed.background.tertiary};
 `;
 
 const SDropBox = styled.label`
@@ -362,6 +367,9 @@ const SLoadingBox = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.secondary};
   border-radius: 16px;
   flex-direction: column;
+
+  margin-left: 16px;
+  margin-right: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;

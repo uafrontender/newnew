@@ -21,7 +21,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import { fetchCurrentOptionsForMCPost, voteOnPost } from '../../../api/endpoints/multiple_choice';
+import { fetchCurrentOptionsForMCPost, getMcOption, voteOnPost } from '../../../api/endpoints/multiple_choice';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import CommentsTab from '../../molecules/decision/CommentsTab';
@@ -36,6 +36,8 @@ import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -156,6 +158,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+  // Winning option
+  const [winningOption, setWinningOption] = useState<newnewapi.MultipleChoice.Option | undefined>();
 
   // Comments
   const [comments, setComments] = useState<any[]>([]);
@@ -353,6 +358,30 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   }, [post.postUuid]);
 
   useEffect(() => {
+    async function fetchAndSetWinningOption(id: number) {
+      try {
+        const payload = new newnewapi.GetMcOptionRequest({
+          optionId: id,
+        });
+
+        const res = await getMcOption(payload);
+
+        console.log(res);
+
+        if (res.data?.option) {
+          setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (post.winningOptionId) {
+      fetchAndSetWinningOption(post.winningOptionId as number);
+    }
+  }, [post.winningOptionId]);
+
+  useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.McOptionCreatedOrUpdated.decode(arr);
@@ -497,18 +526,22 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
                 comments={comments}
                 handleGoBack={() => handleChangeTab('options')}
               />
-            ) : (
+            ) : winningOption ? (
               <McWinnerTabModeration
-                option={new newnewapi.MultipleChoice.Option({
-                  id: 123,
-                  text: 'Some really really long long long long text',
-                  supporterCount: 2,
-                  voteCount: 1000,
-                  creator: {
-                    username: 'user123',
-                  }
-                })}
+                option={winningOption}
               />
+            ) : (
+              <SAnimationContainer>
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
+              </SAnimationContainer>
             )
           )}
       </SActivitesContainer>
@@ -598,4 +631,13 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
   }
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
