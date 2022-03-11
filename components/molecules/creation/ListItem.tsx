@@ -21,7 +21,7 @@ const IMAGES: any = {
 
 interface IListItem {
   item: {
-    key: string,
+    key: string;
   };
 }
 
@@ -89,8 +89,15 @@ const SWrapper = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
+    img {
+      transition: all ease 0.5s;
+      filter: grayscale(1);
+    }
     :hover {
       transform: translateY(-12px);
+      img {
+        filter: grayscale(0);
+      }
     }
   }
 `;
