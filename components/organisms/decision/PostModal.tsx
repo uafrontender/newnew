@@ -1,28 +1,32 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-lonely-if */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import styled, { css, useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import Headline from '../../atoms/Headline';
 import List from '../search/List';
-import PostViewMC from './PostViewMC';
+import Headline from '../../atoms/Headline';
+import InlineSvg from '../../atoms/InlineSVG';
 import PostViewAC from './PostViewAC';
+import PostViewMC from './PostViewMC';
 import PostViewCF from './PostViewCF';
 import PostModerationAC from './PostModerationAC';
-import PostModerationCF from './PostModerationCF';
 import PostModerationMC from './PostModerationMC';
-import InlineSvg from '../../atoms/InlineSVG';
+import PostModerationCF from './PostModerationCF';
+import PostViewScheduled from './PostViewScheduled';
 
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
@@ -30,8 +34,9 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import isBrowser from '../../../utils/isBrowser';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import switchPostStatus from '../../../utils/switchPostStatus';
-import PostViewScheduled from './PostViewScheduled';
+import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatusString from '../../../utils/switchPostStatusString';
+import PostFailedBox from '../../molecules/decision/PostFailedBox';
 
 interface IPostModal {
   isOpen: boolean;
@@ -49,6 +54,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   handleOpenAnotherPost,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -56,7 +62,26 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
-  const postStatus = (typeOfPost && postParsed?.status) ? switchPostStatus(typeOfPost, postParsed?.status) : 'processing'
+  const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
+    if (typeOfPost && postParsed?.status) {
+      if (typeof postParsed.status === 'string') {
+        return switchPostStatusString(typeOfPost, postParsed?.status);
+      }
+      return switchPostStatus(typeOfPost, postParsed?.status);
+    }
+    return 'processing'
+  });
+
+  const handleUpdatePostStatus = useCallback((newStatus: number | string) => {
+    let status;
+    if (typeof newStatus === 'number') {
+      status = switchPostStatus(typeOfPost!!, newStatus);
+    } else {
+      status = switchPostStatusString(typeOfPost!!, newStatus);
+    }
+    setPostStatus(status);
+  }, [typeOfPost]);
+
   const isMyPost = useMemo(
     () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
@@ -151,6 +176,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           postType={typeOfPost!!}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -160,8 +186,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewMC
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
+          postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -174,6 +202,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -182,8 +211,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostViewCF
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
+          postStatus={postStatus}
           sessionId={sessionId ?? undefined}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -194,15 +225,21 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'mc') {
       return (
         <PostModerationMC
+          key={postParsed?.postUuid}
+          postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
     if (postToRender === 'ac') {
       return (
         <PostModerationAC
+          key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
+          postStatus={postStatus}
+          handleUpdatePostStatus={handleUpdatePostStatus}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -210,8 +247,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (postToRender === 'cf') {
       return (
         <PostModerationCF
+          key={postParsed?.postUuid}
+          postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -220,7 +260,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useEffect(() => {
     if (isOpen && postParsed) {
-      const additionalHash = window?.location?.hash === '#comments' ? '#comments' : undefined;
+      let additionalHash;
+      if (window?.location?.hash === '#comments') {
+        additionalHash = '#comments';
+      } else if (window?.location?.hash === '#winner') {
+        additionalHash = '#winner';
+      }
       setOpen(true);
       window.history.pushState(
         postParsed.postUuid,
@@ -303,8 +348,29 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, nextPageToken, recommenedPostsLoading]);
 
+  useEffect(() => {
+    setPostStatus(() => {
+      if (typeOfPost && postParsed?.status) {
+        if (typeof postParsed.status === 'string') {
+          return switchPostStatusString(typeOfPost, postParsed?.status);
+        }
+        return switchPostStatus(typeOfPost, postParsed?.status);
+      }
+      return 'processing'
+    });
+  }, [postParsed, typeOfPost]);
+
+  useEffect(() => {
+    console.log(postStatus)
+  }, [postStatus]);
+
+  console.log(post)
+
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+      <Head>
+        <title>{ postParsed?.title }</title>
+      </Head>
       {!isMobile && (
         <SGoBackButtonDesktop onClick={handleCloseAndGoBack}>
           <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
@@ -319,10 +385,40 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             modalContainerRef.current = el!!;
           }}
         >
-          {isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)}
+          {postStatus !== 'cancelled' ? (
+            isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)
+          ) : isMyPost ? (
+              <PostFailedBox
+                title={t('PostDeletedByMe.title')}
+                body={t('PostDeletedByMe.body.by_creator')}
+                buttonCaption={t('PostDeletedByMe.ctaButton')}
+                handleButtonClick={() => {
+                  router.push('/creation');
+                }}
+              />
+          ) : (
+            <PostFailedBox
+              title={t('PostDeleted.title')}
+              body={t('PostDeleted.body.by_creator')}
+              buttonCaption={t('PostDeleted.ctaButton')}
+              style={{
+                marginBottom: '24px',
+              }}
+              handleButtonClick={() => {
+                document.getElementById('post-modal-container')?.scrollTo({
+                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  behavior: 'smooth',
+                })
+              }}
+            />
+          )}
           {!isMyPost && (
-            <SRecommendationsSection>
-              <Headline variant={4}>{t('RecommendationsSection.heading')}</Headline>
+            <SRecommendationsSection
+              id="recommendations-section-heading"
+            >
+              <Headline variant={4}>
+                {t('RecommendationsSection.heading')}
+              </Headline>
               {recommenedPosts && (
                 <List
                   category=""

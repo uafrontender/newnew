@@ -80,7 +80,7 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
             <SLoadMoreBtn
               onClick={() => handleLoadPledges(pagingToken)}
             >
-              Load more
+              { t('loadMoreBtn') }
             </SLoadMoreBtn>
           )
         ) : null

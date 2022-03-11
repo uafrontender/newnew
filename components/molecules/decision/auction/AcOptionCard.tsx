@@ -39,6 +39,7 @@ import CoinIcon from '../../../../public/images/decision/coin-mock.png';
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   shouldAnimate: boolean;
+  votingAllowed: boolean;
   postId: string;
   index: number;
   optionBeingSupported?: string;
@@ -50,6 +51,7 @@ interface IAcOptionCard {
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
   shouldAnimate,
+  votingAllowed,
   postId,
   index,
   optionBeingSupported,
@@ -262,7 +264,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               />
             ) : null}
           </SLottieAnimationContainer>
-          <SBidAmount>
+          <SBidAmount
+            isWhite={isSupportedByMe || isMyBid}
+          >
             <SCoinImg
               src={CoinIcon.src}
             />
@@ -271,6 +275,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </div>
           </SBidAmount>
           <SOptionInfo
+            isWhite={isSupportedByMe || isMyBid}
             variant={3}
           >
             {option.title}
@@ -330,7 +335,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {optionBeingSupported && !disabled ? (
+        {(optionBeingSupported && !disabled) || !votingAllowed ? (
           null
         ) : (
           <SSupportButton
@@ -517,7 +522,9 @@ const SBidDetails = styled.div<{
   }
 `;
 
-const SBidAmount = styled.div`
+const SBidAmount = styled.div<{
+  isWhite: boolean;
+}>`
   grid-area: amount;
 
   display: flex;
@@ -526,16 +533,26 @@ const SBidAmount = styled.div`
   gap: 8px;
 
   margin-bottom: 6px;
+
+  ${({ isWhite }) => (isWhite ? css`
+    color: #FFFFFF;
+  ` : null)};
 `;
 
 const SCoinImg = styled.img`
   height: 24px;
 `;
 
-const SOptionInfo = styled(Text)`
+const SOptionInfo = styled(Text)<{
+  isWhite: boolean;
+}>`
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  ${({ isWhite }) => (isWhite ? css`
+    color: #FFFFFF;
+  ` : null)};
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;

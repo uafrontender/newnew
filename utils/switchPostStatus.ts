@@ -1,4 +1,5 @@
 import { newnewapi } from "newnew-api";
+
 import { TPostType } from "./switchPostType";
 
 export type TPostStatusStringified =
@@ -17,7 +18,6 @@ export default function switchPostStatus(
   postType: TPostType,
   status: newnewapi.Auction.Status | newnewapi.Crowdfunding.Status | newnewapi.MultipleChoice.Status,
 ): TPostStatusStringified {
-  console.log(typeof status)
 
   if (postType === 'ac') {
     switch (status as newnewapi.Auction.Status) {
