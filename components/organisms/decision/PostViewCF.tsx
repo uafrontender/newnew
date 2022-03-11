@@ -309,8 +309,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         postUuid: post.postUuid,
       });
 
-      console.log(markAsViewedPayload)
-
       const res = await markPost(markAsViewedPayload);
 
       console.log(res);
@@ -524,8 +522,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     const socketHandlerPostStatus = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      console.log(decoded)
 
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {

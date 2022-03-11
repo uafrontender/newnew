@@ -66,9 +66,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
 
       const res = await deleteAcOption(payload);
 
-      console.log(res);
-
-
       if (!res.error) {
         console.log('deleted');
       }

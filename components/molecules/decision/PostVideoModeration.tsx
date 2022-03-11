@@ -204,8 +204,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
       const res = await uploadPostResponse(payload);
 
-      console.log(res);
-
       if (res.data) {
         // @ts-ignore
         let responseObj;
@@ -257,8 +255,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
-
-  console.log(response);
 
   return (
     <>

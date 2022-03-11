@@ -382,8 +382,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-      console.log(decoded)
-
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {
         handleUpdatePostStatus(decoded.crowdfunding!!);
@@ -410,9 +408,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     setPledges,
     sortPleges,
   ]);
-
-  console.log(post)
-  console.log(postStatus)
 
   return (
     <SWrapper>

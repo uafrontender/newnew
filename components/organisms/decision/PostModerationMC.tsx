@@ -366,8 +366,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
         const res = await getMcOption(payload);
 
-        console.log(res);
-
         if (res.data?.option) {
           setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
         }
@@ -407,8 +405,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.McOptionDeleted.decode(arr);
 
-      console.log(decoded);
-      // if (decoded.optionId && decoded.postUuid === post.postUuid) {
       if (decoded.optionId) {
         setOptions((curr) => {
           const workingArr = [...curr];
@@ -433,9 +429,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     const socketHandlerPostStatus = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      console.log(decoded)
-
 
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {

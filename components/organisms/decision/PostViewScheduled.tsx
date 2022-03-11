@@ -79,8 +79,6 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-      console.log(decoded)
-
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {
         if (decoded.auction) {

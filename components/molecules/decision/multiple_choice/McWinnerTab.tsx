@@ -51,14 +51,12 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
       if (!user.loggedIn) {
         router.push('/sign-up?reason=follow-decision');
       }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+      const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
         postUuid: postId,
       });
 
-      console.log(markAsViewedPayload)
-
-      const res = await markPost(markAsViewedPayload);
+      const res = await markPost(markAsFavoritePayload);
 
       console.log(res);
     } catch (err) {

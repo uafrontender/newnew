@@ -78,8 +78,6 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
 
       const res = await selectWinningOption(payload);
 
-      console.log(res.data);
-
       if (res.data) {
         handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
         // handleUpdateWinningOption(winningOption);

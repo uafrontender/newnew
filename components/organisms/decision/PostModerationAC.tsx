@@ -394,8 +394,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
 
         const res = await fetchAcOptionById(payload);
 
-        console.log(res);
-
         if (res.data?.option) {
           setWinningOption(res.data.option as newnewapi.Auction.Option);
         }
@@ -446,8 +444,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
-      console.log(decoded);
-      // if (decoded.optionId && decoded.postUuid === post.postUuid) {
       if (decoded.optionId) {
         setOptions((curr) => {
           const workingArr = [...curr];
@@ -472,9 +468,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     const socketHandlerPostStatus = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      console.log(decoded)
-
 
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {
@@ -505,8 +498,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     setOptions,
     sortOptions,
   ]);
-
-  console.log(postStatus)
 
   return (
     <SWrapper>
