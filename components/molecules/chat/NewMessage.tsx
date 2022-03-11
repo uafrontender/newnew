@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import NewMessageButton from '../../atoms/chat/NewMessageButton';
+import { IChatData } from '../../interfaces/ichat';
 import NewMessageModal from './NewMessageModal';
 
-const NewMessage: React.FC = () => {
+interface IFunctionProps {
+  openChat: (arg: IChatData) => void;
+}
+
+const NewMessage: React.FC<IFunctionProps> = ({ openChat }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const openModal = () => {
@@ -15,7 +20,7 @@ const NewMessage: React.FC = () => {
   return (
     <>
       <NewMessageButton handleClick={openModal} />
-      <NewMessageModal showModal={showModal} closeModal={closeModal} />
+      <NewMessageModal openChat={openChat} showModal={showModal} closeModal={closeModal} />
     </>
   );
 };

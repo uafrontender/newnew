@@ -44,6 +44,7 @@ interface IFunctionProps {
 interface IUnreadChatRoom {
   id: number;
   count: number;
+  text: string;
 }
 
 export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, searchText }) => {
@@ -111,8 +112,6 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         const res = await getMyRooms(payload);
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
         setChatRooms(res.data.rooms);
-        console.log(res.data.rooms);
-
         setLoadingRooms(false);
       } catch (err) {
         console.error(err);
@@ -167,7 +166,6 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         let unreadCount = chatRoomsUnreadCount;
         let unreadCreatorsCount = chatRoomsCreatorsUnreadCount;
         let unreadSubsCount = chatRoomsSubsUnreadCount;
-        console.log(chatRooms);
 
         chatRooms.forEach((chat, index) => {
           if (chat.unreadMessageCount) {
@@ -176,6 +174,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
               unreadChats.push({
                 id: toNumber(chat.id),
                 count: chat.unreadMessageCount,
+                text: chat.lastMessage?.content?.text ? chat.lastMessage?.content?.text : '',
               });
             } else {
               markChatAsRead(toNumber(chat.id));
@@ -236,8 +235,9 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
 
             if (isUnreadMessages > -1) {
               unreadTemp[isUnreadMessages].count += 1;
+              unreadTemp[isUnreadMessages].text = decoded.newMessage?.content?.text!!;
             } else {
-              unreadTemp.push({ id: toNumber(decoded.roomId), count: 1 });
+              unreadTemp.push({ id: toNumber(decoded.roomId), count: 1, text: decoded.newMessage?.content?.text!! });
             }
 
             setChatRoomsUnreadCount((prevQty) => prevQty + 1);
@@ -350,6 +350,22 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         )}`;
       }
 
+      const isUnread = unreadChatRooms.find((i) => toNumber(chat.id) === i.id);
+
+      let lastMsg = chat.lastMessage?.content?.text;
+
+      if (isUnread) {
+        lastMsg = isUnread.text;
+      } else {
+        if (chat.myRole === 2 && !lastMsg) {
+          if (chat.kind === 4) {
+            lastMsg = textTrim(t('new-announcement.created'));
+          } else {
+            lastMsg = textTrim(t('chat.no-messages-first-line'));
+          }
+        }
+      }
+
       return (
         !emptyMassUpdateFromCreator && (
           <SChatItemContainer key={randomID()}>
@@ -360,23 +376,14 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
                   {chatName}
                 </SChatItemText>
                 <SChatItemLastMessage variant={3} weight={600}>
-                  {
-                    // eslint-disable-next-line no-nested-ternary
-                    !chat.lastMessage?.content?.text
-                      ? chat.kind === 4 && chat.myRole === 2
-                        ? textTrim(t('new-announcement.created'))
-                        : textTrim(t('chat.default-first-message'))
-                      : textTrim(chat.lastMessage.content?.text)
-                  }
+                  {lastMsg}
                 </SChatItemLastMessage>
               </SChatItemCenter>
               <SChatItemRight>
                 <SChatItemTime variant={3} weight={600}>
                   {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
                 </SChatItemTime>
-                {unreadChatRooms.find((i) => toNumber(chat.id) === i.id) && (
-                  <SUnreadCount>{unreadChatRooms.find((i) => toNumber(chat.id) === i.id)?.count}</SUnreadCount>
-                )}
+                {isUnread && <SUnreadCount>{isUnread.count}</SUnreadCount>}
               </SChatItemRight>
             </SChatItem>
             <SChatSeparator />

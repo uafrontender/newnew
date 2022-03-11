@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import randomID from '../../../utils/randomIdGenerator';
 import Modal from '../../organisms/Modal';
@@ -21,7 +22,10 @@ import clearNameFromEmoji from '../../../utils/clearNameFromEmoji';
 import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG from '../../atoms/InlineSVG';
 
+import { getMyRooms } from '../../../api/endpoints/chat';
+
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import { IChatData } from '../../interfaces/ichat';
 
 const CloseModalButton = dynamic(() => import('../../atoms/chat/CloseModalButton'));
 const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
@@ -30,147 +34,82 @@ const NewAnnouncement = dynamic(() => import('../../atoms/chat/NewAnnouncement')
 interface INewMessageModal {
   showModal: boolean;
   closeModal: () => void;
+  openChat: (arg: IChatData) => void;
 }
 
-interface IUserData {
-  userName: string;
+interface IChatRoomUserNameWithoutEmoji extends newnewapi.IChatRoom {
   userNameWithoutEmoji?: string;
-  userAlias: string;
-  avatar: string;
 }
 
-interface IUser {
-  id: string;
-  userData: IUserData;
-}
-
-interface IUsersSorted {
+interface IChatroomsSorted {
   letter: string;
-  users: IUser[];
+  chats: IChatRoomUserNameWithoutEmoji[];
 }
 
-const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) => {
+const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, closeModal }) => {
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const scrollRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [usersSortedList, setuUsersSortedList] = useState<IUsersSorted[]>([]);
+  const [chatroomsSortedList, setChatroomsSortedList] = useState<IChatroomsSorted[]>([]);
   const [searchValue, setSearchValue] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
+  const [filteredChatrooms, setFilteredChatrooms] = useState<IChatRoomUserNameWithoutEmoji[]>([]);
+
+  const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
+  const [chatRooms, setChatRooms] = useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
+  const [myAnnouncement, setMyAnnouncement] = useState<newnewapi.IChatRoom | null>(null);
 
   const passInputValue = (str: string) => {
     setSearchValue(str);
   };
 
-  const collection: Array<IUser> = useMemo(
-    () => [
-      {
-        id: randomID(),
-        userData: {
-          userName: '🦄Unicornbabe',
-          userAlias: 'unicornbabe',
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: 'Caramella🍬',
-          userAlias: 'caramella',
-          avatar: '/images/mock/test_user_2.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: '👧Girly',
-          userAlias: 'girly',
-          avatar: '/images/mock/test_user_3.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: '🪆Dolly🪆',
-          userAlias: 'dolly',
-          avatar: '/images/mock/test_user_4.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: 'Cuttie🍰Pie',
-          userAlias: 'cuttiepie',
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: 'AcidBunny111🐰',
-          userAlias: 'rogerlawrence',
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: 'Alpha13🐺🌕',
-          userAlias: 'jacobbishop',
-          avatar: '/images/mock/test_user_2.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: 'BeardedGenius95',
-          userAlias: 'alexpeterson',
-          avatar: '/images/mock/test_user_3.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: '☠CaptainBlack☠️',
-          userAlias: 'marshallmclaughlin',
-          avatar: '/images/mock/test_user_4.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: 'CaptainCyborg👾',
-          userAlias: 'codybrewer',
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-      },
-      {
-        id: randomID(),
-        userData: {
-          userName: '✨Cinderella✨',
-          userAlias: 'cindycraw',
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    async function fetchMyRooms() {
+      try {
+        setLoadingRooms(true);
+        const payload = new newnewapi.GetMyRoomsRequest({ paging: { limit: 50 } });
+        const res = await getMyRooms(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        const arr = [] as IChatRoomUserNameWithoutEmoji[];
+        res.data.rooms.forEach((chat) => {
+          if (chat.kind === 4) {
+            if (chat.myRole === 2) {
+              setMyAnnouncement(chat);
+            }
+          } else {
+            arr.push(chat);
+          }
+        });
+        setChatRooms(arr);
+        setLoadingRooms(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingRooms(false);
+      }
+    }
+    if (!chatRooms && !loadingRooms) {
+      fetchMyRooms();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    if (collection) {
-      const obj = collection.reduce((acc: { [key: string]: any }, c) => {
-        const letter = clearNameFromEmoji(c.userData.userName)[0].toLowerCase();
-        acc[letter] = (acc[letter] || []).concat(c);
+    if (chatRooms) {
+      const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
+        if (c.visavis) {
+          const letter = clearNameFromEmoji(c.visavis?.username!!)[0].toLowerCase();
+          acc[letter] = (acc[letter] || []).concat(c);
+        }
         return acc;
       }, {});
 
       // `map` over the object entries to return an array of objects
       const arr = Object.entries(obj)
         /* eslint-disable arrow-body-style */
-        .map(([letter, users]) => {
-          return { letter, users };
+        .map(([letter, chats]) => {
+          return { letter, chats };
         })
         .sort((a, b) => {
           if (a.letter < b.letter) {
@@ -182,67 +121,73 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
           return 0;
         });
 
-      setuUsersSortedList(arr);
+      setChatroomsSortedList(arr);
     }
-  }, [collection]);
+  }, [chatRooms]);
 
   useEffect(() => {
-    if (searchValue.length > 0) {
-      const arr: IUser[] = [];
+    if (searchValue.length > 0 && chatRooms) {
+      const arr: IChatRoomUserNameWithoutEmoji[] = [];
 
-      collection.forEach((user: IUser) => {
-        if (!user.userData.userNameWithoutEmoji) {
+      chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
+        if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          user.userData.userNameWithoutEmoji = clearNameFromEmoji(user.userData.userName).toLowerCase();
-        }
-        if (user.userData.userNameWithoutEmoji.startsWith(searchValue)) {
-          arr.push(user);
+          if (chat.visavis) chat.userNameWithoutEmoji = clearNameFromEmoji(chat.visavis.username!!).toLowerCase();
+        } else {
+          // eslint-disable-next-line no-lonely-if
+          if (chat.userNameWithoutEmoji.startsWith(searchValue)) arr.push(chat);
         }
       });
 
       arr.sort((a, b) => {
-        if (a.userData.userNameWithoutEmoji && b.userData.userNameWithoutEmoji) {
-          if (a.userData.userNameWithoutEmoji < b.userData.userNameWithoutEmoji) {
+        if (a.userNameWithoutEmoji && b.userNameWithoutEmoji) {
+          if (a.userNameWithoutEmoji < b.userNameWithoutEmoji) {
             return -1;
           }
-          if (a.userData.userNameWithoutEmoji > b.userData.userNameWithoutEmoji) {
+          if (a.userNameWithoutEmoji > b.userNameWithoutEmoji) {
             return 1;
           }
         }
         return 0;
       });
-      setFilteredUsers(arr);
+      setFilteredChatrooms(arr);
     } else {
-      setFilteredUsers([]);
+      setFilteredChatrooms([]);
     }
-  }, [searchValue, collection]);
+  }, [searchValue, chatRooms]);
 
   const createNewAnnouncement = () => {
-    console.log('New Announcement');
+    if (myAnnouncement) openChat({ chatRoom: myAnnouncement, showChatList: null });
+    closeModal();
   };
 
   const renderChatItem = useCallback(
-    (item: IUser, index: number) => {
-      const handleItemClick = () => {};
+    (chat: IChatRoomUserNameWithoutEmoji, index: number) => {
+      const handleItemClick = () => {
+        openChat({ chatRoom: chat, showChatList: null });
+        closeModal();
+      };
 
       return (
-        <SChatItemContainer key={item.id}>
+        <SChatItemContainer key={randomID()}>
           <SChatItemM onClick={handleItemClick}>
-            <SUserAvatar>
-              <UserAvatar avatarUrl={item.userData.avatar} />
-            </SUserAvatar>
+            {chat.visavis?.avatarUrl && (
+              <SUserAvatar>
+                <UserAvatar avatarUrl={chat.visavis?.avatarUrl} />
+              </SUserAvatar>
+            )}
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
-                {item.userData.userName}
+                {chat.visavis?.nickname}
               </SChatItemText>
-              <SUserAlias>@{item.userData.userAlias}</SUserAlias>
+              <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
-          {index !== collection.length - 1 && <SChatSeparator />}
+          {index !== chatRooms!!.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
-    [collection.length]
+    [chatRooms, closeModal, openChat]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
@@ -277,8 +222,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
             {
               /* eslint-disable no-nested-ternary */
               searchValue.length > 0 ? (
-                filteredUsers.length > 0 ? (
-                  <SSectionContent ref={scrollRef}>{filteredUsers.map(renderChatItem)}</SSectionContent>
+                filteredChatrooms.length > 0 ? (
+                  <SSectionContent ref={scrollRef}>{filteredChatrooms.map(renderChatItem)}</SSectionContent>
                 ) : (
                   <>
                     <NoResults text={searchValue} />
@@ -287,11 +232,11 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
               ) : (
                 <SSectionContent ref={scrollRef}>
                   <NewAnnouncement handleClick={createNewAnnouncement} />
-                  {usersSortedList.length > 0 &&
-                    usersSortedList.map((section: IUsersSorted) => (
+                  {chatroomsSortedList.length > 0 &&
+                    chatroomsSortedList.map((section: IChatroomsSorted) => (
                       <SSection key={randomID()}>
                         <SLetter>{section.letter}</SLetter>
-                        {section.users.map(renderChatItem)}
+                        {section.chats.map(renderChatItem)}
                       </SSection>
                     ))}
                 </SSectionContent>

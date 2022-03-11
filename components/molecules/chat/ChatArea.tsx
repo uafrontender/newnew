@@ -31,6 +31,7 @@ const AccountDeleted = dynamic(() => import('./AccountDeleted'));
 const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
+const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const ReportUserModal = dynamic(() => import('./ReportUserModal'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) => {
@@ -257,7 +258,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
           {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
         </React.Fragment>
       );
-
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
@@ -265,7 +265,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
           moment(toNumber(nextElement?.createdAt?.seconds)).format('DD.MM.YYYY')
       ) {
         let date = moment(toNumber(item.createdAt?.seconds)).format('MMM DD');
-
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -383,9 +382,14 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
         </SAnnouncementHeader>
       )}
       <SCenterPart id="messagesScrollContainer">
-        {localUserData?.justSubscribed && chatRoom && !isMyAnnouncement && (
-          <WelcomeMessage userAlias={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''} />
-        )}
+        {localUserData?.justSubscribed &&
+          chatRoom &&
+          !isMyAnnouncement &&
+          (chatRoom.myRole === 1 ? (
+            <WelcomeMessage userAlias={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''} />
+          ) : (
+            <NoMessagesYet />
+          ))}
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>

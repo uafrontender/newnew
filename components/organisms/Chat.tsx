@@ -75,7 +75,7 @@ export const Chat = () => {
             style={{ marginRight: '16px', fontSize: '16px' }}
             passInputValue={passInputValue}
           />
-          <NewMessage />
+          <NewMessage openChat={openChat} />
         </SToolbar>
         <ChatList searchText={searchText} openChat={openChat} gotNewMessage={gotNewMessage} />
       </SSidebar>
