@@ -23,23 +23,12 @@ interface IOptionItem {
   };
   index: number;
   withDelete: boolean;
-  validation: (
-    value: string,
-    min: number,
-    max: number,
-    kind: newnewapi.ValidateTextRequest.Kind,
-  ) => Promise<string>;
+  validation: (value: string, min: number, max: number, kind: newnewapi.ValidateTextRequest.Kind) => Promise<string>;
   handleChange: (index: number, item: object | null) => void;
 }
 
 export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
-  const {
-    item,
-    index,
-    withDelete,
-    validation,
-    handleChange,
-  } = props;
+  const { item, index, withDelete, validation, handleChange } = props;
   const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -56,12 +45,19 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
     });
   };
   const handleInputBlur = async (e: any) => {
-    setError(await validation(
-      e.target.value,
-      CREATION_OPTION_MIN,
-      CREATION_OPTION_MAX,
-      newnewapi.ValidateTextRequest.Kind.POST_OPTION,
-    ));
+    if (e.target.value.length < 1 && index > 1) {
+      handleChange(index, null);
+      return;
+    }
+
+    setError(
+      await validation(
+        e.target.value,
+        CREATION_OPTION_MIN,
+        CREATION_OPTION_MAX,
+        newnewapi.ValidateTextRequest.Kind.POST_OPTION
+      )
+    );
   };
   const handleInputFocus = () => {
     setError('');
@@ -82,12 +78,14 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   useEffect(() => {
     const func = async () => {
       if (validateTitleDebounced) {
-        setError(await validation(
-          validateTitleDebounced,
-          CREATION_OPTION_MIN,
-          CREATION_OPTION_MAX,
-          newnewapi.ValidateTextRequest.Kind.POST_OPTION,
-        ));
+        setError(
+          await validation(
+            validateTitleDebounced,
+            CREATION_OPTION_MIN,
+            CREATION_OPTION_MAX,
+            newnewapi.ValidateTextRequest.Kind.POST_OPTION
+          )
+        );
       }
     };
 
@@ -95,18 +93,9 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   }, [validation, validateTitleDebounced]);
 
   return (
-    <SWrapper
-      error={!!error}
-      style={{ y }}
-      value={item}
-      dragListener={false}
-      dragControls={dragControls}
-    >
+    <SWrapper error={!!error} style={{ y }} value={item} dragListener={false} dragControls={dragControls}>
       <STextAreaWrapper>
-        <SLeftPart
-          error={!!error}
-          isDragging={isDragging}
-        >
+        <SLeftPart error={!!error} isDragging={isDragging}>
           <STextArea
             value={item.text}
             onBlur={handleInputBlur}
@@ -115,49 +104,53 @@ export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
             placeholder={t('secondStep.field.choices.option.label', { value: index + 1 })}
           />
           {withDelete && (
-            <InlineSVG
+            <SDeleteIcon
               clickable
               svg={trashIcon}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width="23px"
+              height="23px"
               onClick={handleDelete}
             />
           )}
         </SLeftPart>
-        {
-          error ? (
-            <AnimatedPresence
-              animation="t-09"
-            >
-              <SErrorDiv>
-                <InlineSVG
-                  svg={alertIcon}
-                  width="16px"
-                  height="16px"
-                />
-                {error}
-              </SErrorDiv>
-            </AnimatedPresence>
-          ) : null
-        }
+        {error ? (
+          <AnimatedPresence animation="t-09">
+            <SErrorDiv>
+              <InlineSVG svg={alertIcon} width="16px" height="16px" />
+              {error}
+            </SErrorDiv>
+          </AnimatedPresence>
+        ) : null}
       </STextAreaWrapper>
-      <SRightPart
-        onPointerUp={handlePointerUp}
-        onPointerDown={handlePointerDown}
-      >
-        <InlineSVG
-          svg={changeOrderIcon}
-          fill={theme.colorsThemed.text.primary}
-          width="24px"
-          height="24px"
-        />
+      <SRightPart onPointerUp={handlePointerUp} onPointerDown={handlePointerDown}>
+        <InlineSVG svg={changeOrderIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
       </SRightPart>
     </SWrapper>
   );
 };
 
 export default DraggableOptionItem;
+
+const SRightPart = styled.div`
+  cursor: grab;
+  display: flex;
+  margin-left: 4px;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: -10px;
+  ${({ theme }) => theme.media.laptop} {
+    display: none;
+    right: 0;
+  }
+`;
+
+const SDeleteIcon = styled(InlineSVG)`
+  ${({ theme }) => theme.media.laptop} {
+    display: none;
+  }
+`;
 
 interface ISWrapper {
   error: boolean;
@@ -170,8 +163,25 @@ const SWrapper = styled(Reorder.Item)<ISWrapper>`
   align-items: center;
   touch-action: pan-x;
   justify-content: flex-start;
+  position: relative;
+  padding-right: 20px;
+  ${({ theme }) => theme.media.laptop} {
+    margin-right: -23px;
+    padding-right: 23px;
+  }
 
-  ${(props) => props.error && css`margin-bottom: 32px`}
+  ${(props) =>
+    props.error &&
+    css`
+      margin-bottom: 32px;
+    `}
+
+  &:hover {
+    ${SDeleteIcon},
+    ${SRightPart} {
+      display: block;
+    }
+  }
 `;
 
 const STextAreaWrapper = styled.div`
@@ -185,17 +195,18 @@ interface ISLeftPart {
 }
 
 const SLeftPart = styled.div<ISLeftPart>`
-  border: 1.5px solid ${(props) => {
-    if (props.isDragging) {
-      return props.theme.colorsThemed.background.outlines2;
-    }
+  border: 1.5px solid
+    ${(props) => {
+      if (props.isDragging) {
+        return props.theme.colorsThemed.background.outlines2;
+      }
 
-    if (props.error) {
-      return props.theme.colorsThemed.accent.error;
-    }
+      if (props.error) {
+        return props.theme.colorsThemed.accent.error;
+      }
 
-    return props.theme.colorsThemed.background.tertiary;
-  }};
+      return props.theme.colorsThemed.background.tertiary;
+    }};
   display: flex;
   padding: 10.5px 20px;
   overflow: hidden;
@@ -204,6 +215,8 @@ const SLeftPart = styled.div<ISLeftPart>`
   align-items: center;
   border-radius: 16px;
   flex-direction: row;
+  &:hover {
+  }
 `;
 
 const STextArea = styled(TextArea)`
@@ -226,14 +239,6 @@ const STextArea = styled(TextArea)`
     font-size: 16px;
     line-height: 24px;
   }
-`;
-
-const SRightPart = styled.div`
-  cursor: grab;
-  display: flex;
-  margin-left: 4px;
-  align-items: center;
-  justify-content: center;
 `;
 
 const SErrorDiv = styled.div`

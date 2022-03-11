@@ -9,29 +9,28 @@ import Headline from '../../../atoms/Headline';
 export const CreationFirstStepContent = () => {
   const { t } = useTranslation('creation');
 
-  const collection = useMemo(() => [
-    {
-      key: 'auction',
-    },
-    {
-      key: 'multiple-choice',
-    },
-    {
-      key: 'crowdfunding',
-    },
-  ], []);
+  const collection = useMemo(
+    () => [
+      {
+        key: 'auction',
+      },
+      {
+        key: 'multiple-choice',
+      },
+      {
+        key: 'crowdfunding',
+      },
+    ],
+    []
+  );
 
   return (
     <SContent>
-      <STitle variant={4}>
-        {t('first-step-title')}
-      </STitle>
+      <STitle variant={4}>{t('first-step-title')}</STitle>
       <SSubTitle variant={2} weight={600}>
         {t('first-step-sub-title')}
       </SSubTitle>
-      <List
-        collection={collection}
-      />
+      <List collection={collection} />
     </SContent>
   );
 };
@@ -56,6 +55,7 @@ const STitle = styled(Headline)`
   padding: 0 35px;
   margin-top: 20px;
   text-align: center;
+  font-weight: 600;
 
   ${(props) => props.theme.media.tablet} {
     margin-top: unset;
