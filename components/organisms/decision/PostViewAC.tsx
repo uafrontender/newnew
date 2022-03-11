@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
@@ -12,7 +13,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import { fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import { fetchAcOptionById, fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
@@ -27,6 +28,10 @@ import GoBackButton from '../../molecules/GoBackButton';
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -38,10 +43,16 @@ interface IPostViewAC {
   optionFromUrl?: newnewapi.Auction.Option;
   sessionId?: string;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
-  post, optionFromUrl, sessionId, postStatus, handleGoBack,
+  post,
+  optionFromUrl,
+  sessionId,
+  postStatus,
+  handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -50,24 +61,73 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const showSelectingWinnerOption = useMemo(() => (
+    postStatus === 'wating_for_decision'
+  ), [postStatus]);
+
   // Socket
   const socketConnection = useContext(SocketContext);
   const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
 
+  // Response viewed
+  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
+
   // Tabs
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments'>(() => {
+  const tabs = useMemo(() => {
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) {
+      return [
+        {
+          label: 'winner',
+          value: 'winner',
+        },
+        {
+          label: 'bids',
+          value: 'bids',
+        },
+        {
+          label: 'comments',
+          value: 'comments',
+        },
+      ];
+    }
+    return [
+      {
+        label: 'bids',
+        value: 'bids',
+      },
+      {
+        label: 'comments',
+        value: 'comments',
+      },
+    ];
+  }, [postStatus]);
+
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
       return 'bids'
     }
     const { hash } = window.location;
-    if (hash && (hash === '#bids' || hash === '#comments')) {
-      return hash.substring(1) as 'bids' | 'comments';
+    if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
+      return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
+    // NB! Will a check for winner option here
+    if (
+      postStatus === 'waiting_for_response'
+      || postStatus === 'succeeded'
+    ) return 'winner';
     return 'bids';
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -79,7 +139,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'bids' || parsedHash === 'comments') {
+      if (parsedHash === 'bids' || parsedHash === 'comments' || parsedHash === 'winner') {
         setCurrentTab(parsedHash);
       }
     }
@@ -103,6 +163,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+  // Winning option
+  const [winningOption, setWinningOption] = useState<newnewapi.Auction.Option | undefined>();
 
   // Animating options
   const [optionToAnimate, setOptionToAnimate] = useState('');
@@ -158,7 +221,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         .filter((o) => o.isCreatedBySubscriber)
         .sort((a, b) => {
           return (b.id as number) - (a.id as number);
-        })
+        });
 
       const workingArrSorted = unsortedArr.sort((a, b) => {
         // Sort the rest by newest first
@@ -244,6 +307,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
+      handleUpdatePostStatus(res.data.auction!!.status!!);
     } catch (err) {
       console.error(err);
     }
@@ -318,6 +382,28 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   }, [post.postUuid]);
 
   useEffect(() => {
+    async function fetchAndSetWinningOption(id: number) {
+      try {
+        const payload = new newnewapi.GetAcOptionRequest({
+          optionId: id,
+        });
+
+        const res = await fetchAcOptionById(payload);
+
+        if (res.data?.option) {
+          setWinningOption(res.data.option as newnewapi.Auction.Option);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (post.winningOptionId) {
+      fetchAndSetWinningOption(post.winningOptionId as number);
+    }
+  }, [post.winningOptionId]);
+
+  useEffect(() => {
     const makeBidFromSessionId = async () => {
       if (!sessionId) return;
       try {
@@ -368,6 +454,18 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       }
     };
 
+    const socketHandlerOptionDeleted = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.AcOptionDeleted.decode(arr);
+
+      if (decoded.optionId) {
+        setOptions((curr) => {
+          const workingArr = [...curr];
+          return workingArr.filter((o) => o.id !== decoded.optionId);
+        });
+      }
+    };
+
     const socketHandlerPostData = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostUpdated.decode(arr);
@@ -380,15 +478,29 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       }
     };
 
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.auction!!);
+      }
+    };
+
     if (socketConnection) {
       socketConnection.on('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -414,38 +526,33 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         postId={post.postUuid}
         announcement={post.announcement!!}
         response={post.response ?? undefined}
+        responseViewed={responseViewed}
+        handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
         postType="ac"
         postId={post.postUuid}
+        postStatus={postStatus}
         title={post.title}
         amountInBids={totalAmount}
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
-      <SActivitesContainer>
+      <SActivitesContainer
+        showSelectingWinnerOption={showSelectingWinnerOption}
+      >
         <DecisionTabs
-          tabs={[
-            {
-              label: 'bids',
-              value: 'bids',
-            },
-            {
-              label: 'comments',
-              value: 'comments',
-            },
-          ]}
+          tabs={tabs}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'bids' ? (
           <AcOptionsTab
             postId={post.postUuid}
+            postStatus={postStatus}
             options={options}
             optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
@@ -455,10 +562,31 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
         ) : (
-          <CommentsTab
-            comments={comments}
-            handleGoBack={() => handleChangeTab('bids')}
-          />
+          currentTab === 'comments'
+          ? (
+            <CommentsTab
+              comments={comments}
+              handleGoBack={() => handleChangeTab('bids')}
+            />
+          ) : winningOption ? (
+            <AcWinnerTab
+              postId={post.postUuid}
+              option={winningOption}
+              postStatus={postStatus}
+            />
+          ) : (
+            <SAnimationContainer>
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
+            </SAnimationContainer>
+          )
         )}
       </SActivitesContainer>
       {/* Loading Modal */}
@@ -525,7 +653,9 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  showSelectingWinnerOption: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -545,5 +675,22 @@ const SActivitesContainer = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px - 72px);
+
+    ${({ showSelectingWinnerOption }) => (
+      showSelectingWinnerOption
+      ? css`
+        max-height: calc(728px - 46px - 64px - 72px - 130px);
+      `
+      : null
+    )}
   }
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

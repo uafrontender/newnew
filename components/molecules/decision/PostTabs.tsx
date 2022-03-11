@@ -24,6 +24,14 @@ interface IDecisionTabs {
   handleChangeTab: (val: string) => void;
 }
 
+const Icons = {
+  bids: BackersIcon,
+  options: BackersIcon,
+  backers: BackersIcon,
+  winner: BackersIcon,
+  comments: CommentsIcon,
+};
+
 const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
   tabs,
   activeTab,
@@ -78,7 +86,8 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
             activeTab={tab.value === activeTab}
           >
             <InlineSvg
-              svg={i === 0 ? BackersIcon : CommentsIcon}
+              // @ts-ignore
+              svg={Icons[tab.value]}
               fill={tab.value === activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary}
               width="24px"
               height="24px"

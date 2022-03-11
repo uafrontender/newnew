@@ -32,6 +32,7 @@ type TPageType = 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
   | 'subscriptions'
+  | 'myposts'
   | 'favorites';
 
 interface IMyProfileLayout {
@@ -56,6 +57,10 @@ interface IMyProfileLayout {
   postsCachedFavoritesFilter?: newnewapi.Post.Filter;
   postsCachedFavoritesPageToken?: string | null | undefined;
   postsCachedFavoritesCount?: number;
+  postsCachedMyPosts?: newnewapi.Post[];
+  postsCachedMyPostsFilter?: newnewapi.Post.Filter;
+  postsCachedMyPostsCount?: number;
+  postsCachedMyPostsPageToken?: string | null | undefined;
 }
 
 const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
@@ -75,11 +80,15 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   postsCachedFavorites,
   postsCachedFavoritesFilter,
   postsCachedFavoritesCount,
+  postsCachedMyPosts,
+  postsCachedMyPostsFilter,
+  postsCachedMyPostsCount,
   postsCachedActivelyBiddingPageToken,
   postsCachedMyPurchasesPageToken,
   postsCachedViewHistoryPageToken,
   postsCachedSubscriptionsPageToken,
   postsCachedFavoritesPageToken,
+  postsCachedMyPostsPageToken,
   children,
 }) => {
   const { t } = useTranslation('profile');
@@ -105,6 +114,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       {
         nameToken: 'subscriptions',
         url: '/profile/subscriptions',
+      },
+      {
+        nameToken: 'myposts',
+        url: '/profile/my-posts',
       },
       {
         nameToken: 'favorites',
@@ -193,6 +206,21 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     setFavoritesCount,
   ] = useState(postsCachedFavoritesCount);
 
+  const [
+    postsMyPosts, setPostsMyPosts,
+  ] = useState(postsCachedMyPosts ?? []);
+  const [
+    postsMyPostsFilter, setPostsMyPostsFilter,
+  ] = useState(postsCachedMyPostsFilter ?? newnewapi.Post.Filter.ALL);
+  const [
+    myPostsPageToken,
+    setMyPostsPageToken,
+  ] = useState(postsCachedMyPostsPageToken);
+  const [
+    postsMyPostsCount,
+    setMyPostsCount,
+  ] = useState(postsCachedMyPostsCount);
+
   // UpdateCachedPosts
   const handleSetPostsActivelyBiddingOn: React
     .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
@@ -218,6 +246,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       setPostsFavorites, [setPostsFavorites],
     );
 
+  const handleSetPostsMyPosts: React
+    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+      setPostsMyPosts, [setPostsMyPosts],
+    );
+
   const handleUpdateFilter = useCallback((
     value: newnewapi.Post.Filter,
   ) => {
@@ -240,6 +273,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       }
       case 'favorites': {
         setPostsFavoritesFilter(value);
+        break;
+      }
+      case 'myposts': {
+        setPostsMyPostsFilter(value);
         break;
       }
       default: {
@@ -272,6 +309,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         setFavoritesPageToken(value);
         break;
       }
+      case 'myposts': {
+        setMyPostsPageToken(value);
+        break;
+      }
       default: {
         break;
       }
@@ -300,6 +341,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       }
       case 'favorites': {
         setFavoritesCount(value);
+        break;
+      }
+      case 'myposts': {
+        setMyPostsCount(value);
         break;
       }
       default: {
@@ -354,6 +399,14 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         pageToken = favoritesPageToken;
         totalCount = postsFavoritesCount;
         handleSetPosts = handleSetPostsFavorites;
+        break;
+      }
+      case 'myposts': {
+        postsForPage = postsMyPosts;
+        postsForPageFilter = postsMyPostsFilter;
+        pageToken = myPostsPageToken;
+        totalCount = postsMyPostsCount;
+        handleSetPosts = handleSetPostsMyPosts;
         break;
       }
       default: {
@@ -636,6 +689,10 @@ MyProfileLayout.defaultProps = {
   postsCachedViewHistoryPageToken: undefined,
   postsCachedSubscriptionsPageToken: undefined,
   postsCachedFavoritesPageToken: undefined,
+  postsCachedMyPosts: undefined,
+  postsCachedMyPostsFilter: undefined,
+  postsCachedMyPostsCount: undefined,
+  postsCachedMyPostsPageToken: undefined,
 };
 
 export default MyProfileLayout;

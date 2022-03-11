@@ -25,7 +25,7 @@ interface IMcOptionsTabModeration {
   pagingToken: string | undefined | null;
   minAmount: number;
   handleLoadOptions: (token?: string) => void;
-  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
+  handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
 
 const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> = ({
@@ -35,7 +35,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
   pagingToken,
   minAmount,
   handleLoadOptions,
-  handleAddOrUpdateOptionFromResponse,
+  handleRemoveOption,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -67,11 +67,11 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
         <SBidsContainer>
           {options.map((option, i) => (
             <McOptionCardModeration
+              index={i}
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
-              index={i}
-              minAmount={minAmount}
+              postId={post.postUuid}
             />
           ))}
           {!isMobile ? (
@@ -84,7 +84,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 <SLoadMoreBtn
                   onClick={() => handleLoadOptions(pagingToken)}
                 >
-                  Load more
+                  { t('loadMoreBtn') }
                 </SLoadMoreBtn>
               )
             ) : null
