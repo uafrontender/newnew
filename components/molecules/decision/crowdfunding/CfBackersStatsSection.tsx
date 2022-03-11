@@ -5,10 +5,13 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
+
 import { useAppSelector } from '../../../../redux-store/store';
-import { formatNumber } from '../../../../utils/format';
-import Headline from '../../../atoms/Headline';
+
 import Text from '../../../atoms/Text';
+import Headline from '../../../atoms/Headline';
+
+import { formatNumber } from '../../../../utils/format';
 
 interface ICfBackersStatsSection {
   post: newnewapi.Crowdfunding;

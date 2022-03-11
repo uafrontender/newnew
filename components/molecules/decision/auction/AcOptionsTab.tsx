@@ -3,7 +3,7 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
@@ -17,6 +17,7 @@ import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../..
 import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import Text from '../../../atoms/Text';
@@ -30,9 +31,12 @@ import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
 import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
+import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IAcOptionsTab {
   postId: string;
+  postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   optionToAnimate?: string;
   optionsLoading: boolean;
@@ -44,6 +48,7 @@ interface IAcOptionsTab {
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
+  postStatus,
   options,
   optionToAnimate,
   optionsLoading,
@@ -52,6 +57,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -306,7 +312,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       }
     });
 
-    resizeObserver.observe(actionSectionContainer.current!!);
+    if (actionSectionContainer.current) {
+      resizeObserver.observe(actionSectionContainer.current!!);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -339,6 +347,13 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             >
               { t('AcPost.OptionsTab.NoOptions.caption_2') }
             </SNoOptionsCaption>
+            {!isMobile && (
+              <SMakeBidArrowSvg
+                svg={MakeFirstBidArrow}
+                fill={theme.colorsThemed.background.quinary}
+                width="36px"
+              />
+            )}
           </SNoOptionsYet>
         ) : null}
         <SBidsContainer
@@ -361,6 +376,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               postId={postId}
               index={i}
               minAmount={minAmount}
+              votingAllowed={postStatus === 'voting'}
               optionBeingSupported={optionBeingSupported}
               handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
               handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
@@ -377,52 +393,54 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                   view="secondary"
                   onClick={() => handleLoadBids(pagingToken)}
                 >
-                  { t('AcPost.OptionsTab.loadMoreBtn') }
+                  { t('loadMoreBtn') }
                 </SLoadMoreBtn>
               )
             ) : null
           )}
         </SBidsContainer>
-        <SActionSection
-          ref={(el) => {
-            actionSectionContainer.current = el!!;
-          }}
-        >
-          <SuggestionTextArea
-            value={newBidText}
-            disabled={optionBeingSupported !== ''}
-            placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
-            onChange={handleUpdateNewOptionText}
-          />
-          <BidAmountTextInput
-            value={newBidAmount}
-            inputAlign="center"
-            disabled={optionBeingSupported !== ''}
-            onChange={(newValue: string) => setNewBidAmount(newValue)}
-            minAmount={minAmount}
-            style={{
-              width: '60px',
+        {postStatus === 'voting' && (
+          <SActionSection
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
             }}
-          />
-          <Button
-            view="primaryGrad"
-            size="sm"
-            disabled={!newBidText
-              || !newBidAmount
-              || parseInt(newBidAmount, 10) < minAmount
-              || optionBeingSupported !== ''
-              || !newBidTextValid}
-            style={{
-              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-            }}
-            onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
-          </Button>
-        </SActionSection>
+            <SuggestionTextArea
+              value={newBidText}
+              disabled={optionBeingSupported !== ''}
+              placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
+              onChange={handleUpdateNewOptionText}
+            />
+            <BidAmountTextInput
+              value={newBidAmount}
+              inputAlign="center"
+              disabled={optionBeingSupported !== ''}
+              onChange={(newValue: string) => setNewBidAmount(newValue)}
+              minAmount={minAmount}
+              style={{
+                width: '60px',
+              }}
+            />
+            <Button
+              view="primaryGrad"
+              size="sm"
+              disabled={!newBidText
+                || !newBidAmount
+                || parseInt(newBidAmount, 10) < minAmount
+                || optionBeingSupported !== ''
+                || !newBidTextValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClick={() => handleTogglePaymentModalOpen()}
+            >
+              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+            </Button>
+          </SActionSection>
+        )}
       </STabContainer>
       {/* Suggest new Modal */}
-      {isMobile ? (
+      {isMobile && postStatus === 'voting' ? (
         <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
           onClose={() => setSuggestNewMobileOpen(false)}
@@ -494,7 +512,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         zIndex={14}
       />
       {/* Mobile floating button */}
-      {isMobile && !suggestNewMobileOpen ? (
+      {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}
@@ -678,4 +696,11 @@ const SNoOptionsImgContainer = styled.div`
 
 const SNoOptionsCaption = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SMakeBidArrowSvg = styled(InlineSvg)`
+  position: absolute;
+  left: 26%;
+  bottom: -58px;
+
 `;

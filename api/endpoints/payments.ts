@@ -25,7 +25,7 @@ export const createPaymentSession = (
 ) => fetchProtobuf<newnewapi.CreatePaymentSessionRequest, newnewapi.CreatePaymentSessionResponse>(
   newnewapi.CreatePaymentSessionRequest,
   newnewapi.CreatePaymentSessionResponse,
-  `${BASE_URL_PAYMENTS}/get_payment_session`,
+  `${BASE_URL_PAYMENTS}/create_payment_session`,
   'post',
   payload,
   // Optional authentication

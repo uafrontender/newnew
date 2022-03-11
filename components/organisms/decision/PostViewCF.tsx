@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import { SocketContext } from '../../../contexts/socketContext';
@@ -37,6 +38,10 @@ import switchPostType from '../../../utils/switchPostType';
 import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
 import Button from '../../atoms/Button';
 import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
+import PostSuccessBox from '../../molecules/decision/PostSuccessBox';
+import PostWaitingForResponseBox from '../../molecules/decision/PostWaitingForResponseBox';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -44,16 +49,21 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 
 interface IPostViewCF {
   post: newnewapi.Crowdfunding;
+  postStatus: TPostStatusStringified;
   sessionId?: string;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   post,
+  postStatus,
   sessionId,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
@@ -70,6 +80,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     removeChannel,
   } = useContext(ChannelsContext);
 
+  // Response viewed
+  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
+
   // Tabs
   const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
     if (!isBrowser()) {
@@ -83,7 +96,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   });
 
   const handleChangeTab = (tab: string) => {
-    window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
@@ -275,11 +292,117 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
+      handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
     } catch (err) {
       console.error(err);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleFollowDecision = useCallback(async () => {
+    try {
+      if (!user.loggedIn) {
+        router.push('/sign-up?reason=follow-decision');
+      }
+      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+        postUuid: post.postUuid,
+      });
+
+      const res = await markPost(markAsViewedPayload);
+
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [post.postUuid, router, user.loggedIn]);
+
+  // Render functions
+  const renderBackersSection = useCallback(() => {
+    switch(postStatus) {
+      case 'voting': {
+        return (
+          <>
+          <CfBackersStatsSection
+            post={post}
+            currentNumBackers={currentBackers}
+          />
+          {!isMobile ? (
+            <CfPledgeLevelsSection
+              post={post}
+              pledgeLevels={pledgeLevels}
+              handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+            />
+          ) : null }
+        </>
+        );
+      }
+      case 'waiting_for_response': {
+        return (
+          <>
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            <PostWaitingForResponseBox
+              title={t('PostWaitingForResponse.title')}
+              body={t('PostWaitingForResponse.body')}
+              buttonCaption={t('PostWaitingForResponse.ctaButton')}
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                handleFollowDecision();
+              }}
+            />
+          </>
+        );
+      }
+      case 'succeeded': {
+        return (
+          <>
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            <PostSuccessBox
+              title={t('PostSuccess.title')}
+              body={t('PostSuccess.body')}
+              buttonCaption={t('PostSuccess.ctaButton')}
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                document.getElementById('post-modal-container')?.scrollTo({
+                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  behavior: 'smooth',
+                })
+              }}
+            />
+          </>
+        );
+      }
+      default: {
+        <>
+          <CfCrowdfundingSuccess
+            post={post}
+            currentNumBackers={currentBackers}
+          />
+        </>
+      }
+    }
+
+    return null;
+  }, [
+    t,
+    post,
+    isMobile,
+    postStatus,
+    pledgeLevels,
+    currentBackers,
+    handleFollowDecision,
+    handleAddPledgeFromResponse,
+  ]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -396,15 +519,27 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       }
     };
 
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.crowdfunding!!);
+      }
+    };
+
     if (socketConnection) {
       socketConnection.on('CfPledgeCreated', socketHandlerPledgeCreated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('CfPledgeCreated', socketHandlerPledgeCreated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -434,20 +569,20 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       <PostVideo
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={post.response ?? undefined}
+        responseViewed={responseViewed}
+        handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
         postType="cf"
         postId={post.postUuid}
+        postStatus={postStatus}
         title={post.title}
-        currentBackers={currentBackers}
-        targetBackers={post.targetBackerCount}
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        handleFollowCreator={() => {}}
-        handleReportAnnouncement={() => {}}
       />
       <SActivitesContainer>
         <DecisionTabs
@@ -465,19 +600,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'backers' ? (
-          <>
-            <CfBackersStatsSection
-              post={post}
-              currentNumBackers={currentBackers}
-            />
-            {!isMobile ? (
-              <CfPledgeLevelsSection
-                post={post}
-                pledgeLevels={pledgeLevels}
-                handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-              />
-            ) : null }
-          </>
+          renderBackersSection()
         ) : (
           <CommentsTab
             comments={comments}
@@ -503,7 +626,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         />
       ) : null}
       {/* Mobile floating button */}
-      {isMobile && !choosePledgeModalOpen ? (
+      {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setChoosePledgeModalOpen(true)}
