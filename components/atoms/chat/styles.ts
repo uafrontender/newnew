@@ -94,6 +94,8 @@ export const SChatItemCenter = styled.div`
   display: flex;
   padding: 2px 12px;
   flex-direction: column;
+  max-width: 60%;
+  overflow: hidden;
 `;
 
 export const SChatItemText = styled(Text)`

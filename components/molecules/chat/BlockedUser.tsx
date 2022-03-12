@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 import {
   SBottomAction,
   SBottomActionButton,
@@ -17,14 +18,14 @@ interface IBlockedUser {
   confirmBlockUser: boolean;
   isBlocked?: boolean;
   isAnnouncement?: boolean;
-  userName: string;
+  user: newnewapi.IUser;
 }
 
 const BlockedUser: React.FC<IBlockedUser> = ({
   onUserBlock,
   isBlocked,
   confirmBlockUser,
-  userName,
+  user,
   closeModal,
   isAnnouncement,
 }) => {
@@ -53,7 +54,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({
       <BlockUserModal
         confirmBlockUser={confirmBlockUser}
         onUserBlock={onUserBlock}
-        userName={userName}
+        user={user}
         closeModal={closeModal}
         isAnnouncement={isAnnouncement}
       />

@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
 import Lottie from '../components/atoms/Lottie';
-
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 import { SocketContext } from '../contexts/socketContext';
 import { getSubscriptionStatus } from '../api/endpoints/subscription';
@@ -14,10 +13,9 @@ interface ISubscriptionSuccessPage {
   userId: string;
 }
 
-const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
-  userId,
-}) => {
+const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId }) => {
   const router = useRouter();
+  console.log(router.query.username);
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -35,7 +33,16 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
 
         if (res.data?.status?.activeRenewsAt) {
           console.log('Subscribed! Redirecting to chat');
-          router.push(`/direct-messages?user=${userId}`);
+
+          // create chat room
+          // const payload = new newnewapi.CreateRoomRequest({ kind: 1, memberUuids: [userId] });
+          // await createRoom(payload);
+
+          // I think we should not check is room created or not at this point
+          // we can do this on chat page and if not try to create again
+          // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+          router.push(`/direct-messages`);
         }
       } catch (err) {
         console.error(err);
@@ -43,7 +50,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
     }
 
     checkSubscriptionStatus();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -54,8 +61,6 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
       if (!decoded) return;
 
       setIsLoading(false);
-
-      // router.push('/');
       router.push(`/direct-messages?user=${decoded.creatorUuid}`);
     };
 
@@ -68,7 +73,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
         socketConnection.off('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   return (
@@ -105,9 +110,7 @@ export default SubscriptionSuccessPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { userId } = context.query;
 
-  if (!userId
-    || Array.isArray(userId)
-  ) {
+  if (!userId || Array.isArray(userId)) {
     return {
       redirect: {
         destination: '/',
