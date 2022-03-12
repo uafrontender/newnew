@@ -13,14 +13,13 @@ import {
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
 import Text from '../../atoms/Text';
-import { IUser } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { subscribeToCreator } from '../../../api/endpoints/subscription';
 
 const PaymentModal = dynamic(() => import('../checkout/PaymentModal'));
 
 interface ISubscriptionExpired {
-  user: IUser;
+  user: newnewapi.IUser;
 }
 
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
@@ -42,7 +41,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
       if (!res.data?.checkoutUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
-      window.location.href = url;
+      if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
     }
@@ -78,11 +77,13 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
         <div>
           <SPaymentModalTitle variant={3}>{t('modal.renewSubcriptionsSubtitle')}</SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
-            <SAvatar>
-              <img src={user.avatar} alt={user.userName} />
-            </SAvatar>
+            {user.avatarUrl && (
+              <SAvatar>
+                <img src={user.avatarUrl} alt={user.nickname ? user.nickname : `@${user.username}`} />
+              </SAvatar>
+            )}
             <div>
-              <SCreatorUsername>{isMobile ? user.userAlias : `@${user.userName}`}</SCreatorUsername>
+              <SCreatorUsername>{isMobile ? user.nickname : `@${user.username}`}</SCreatorUsername>
             </div>
           </SPaymentModalCreatorInfo>
         </div>

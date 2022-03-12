@@ -2,20 +2,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
-import { useAppSelector } from '../../../redux-store/store';
-
 interface IChatEllipseMenu {
+  user: newnewapi.IUser;
   isVisible: boolean;
   handleClose: () => void;
   onUserBlock: () => void;
   onUserReport: () => void;
   userBlocked?: boolean;
   isAnnouncement?: boolean;
+  myRole: newnewapi.ChatRoom.MyRole;
 }
 
 const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
@@ -25,10 +27,12 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   onUserBlock,
   onUserReport,
   isAnnouncement,
+  user,
+  myRole,
 }) => {
   const { t } = useTranslation('chat');
   const containerRef = useRef<HTMLDivElement>();
-  const user = useAppSelector((state) => state.user);
+  const router = useRouter();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -43,6 +47,10 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
     handleClose();
   };
 
+  const viewUserProfile = () => {
+    router.push(`/u/${user.username}`);
+  };
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -54,8 +62,8 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {user.userData?.options?.isCreator && !isAnnouncement && (
-            <SButton onClick={() => {}}>
+          {myRole === 2 && !isAnnouncement && (
+            <SButton onClick={viewUserProfile}>
               <Text variant={2}>{t('ellipse.view-profile')}</Text>
             </SButton>
           )}

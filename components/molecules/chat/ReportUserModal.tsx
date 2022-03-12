@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
@@ -10,12 +11,12 @@ import GoBackButton from '../GoBackButton';
 
 interface IReportUserModal {
   confirmReportUser: boolean;
-  userName: string;
+  user: newnewapi.IUser | null;
   isAnnouncement?: boolean;
   closeModal: () => void;
 }
 
-const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, userName, closeModal, isAnnouncement }) => {
+const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, closeModal, isAnnouncement }) => {
   const { t } = useTranslation('chat');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -55,7 +56,9 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, userNa
 
   const submitReport = () => {
     /* eslint-disable no-unused-expressions */
-    !disabled && console.log('1');
+    if (user && !disabled) {
+      console.log(user);
+    }
   };
 
   const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -74,7 +77,7 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, userNa
           <SModalHeader>
             {isMobile && <GoBackButton onClick={closeModal} />}
             <SModalTitle>
-              {t('modal.report-user.title')} {userName}
+              {t('modal.report-user.title')} {user ? user.nickname : ''}
             </SModalTitle>
           </SModalHeader>
           <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>

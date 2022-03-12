@@ -1,13 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+import { markUser } from '../../../api/endpoints/user';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
+import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 interface IBlockUserModal {
+  user: newnewapi.IUser;
   confirmBlockUser: boolean;
   onUserBlock: () => void;
-  userName: string;
   closeModal: () => void;
   isAnnouncement?: boolean;
 }
@@ -15,14 +18,30 @@ interface IBlockUserModal {
 const BlockUserModal: React.FC<IBlockUserModal> = ({
   confirmBlockUser,
   onUserBlock,
-  userName,
+  user,
   closeModal,
   isAnnouncement,
 }) => {
   const { t } = useTranslation('chat');
 
+  const { blockUser } = useGetBlockedUsers();
+
+  async function blockUserRequest() {
+    try {
+      const payload = new newnewapi.MarkUserRequest({
+        markAs: 3,
+        userUuid: user.uuid,
+      });
+      const res = await markUser(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      blockUser(user.uuid!!);
+      onUserBlock();
+    } catch (err) {
+      console.error(err);
+    }
+  }
   const handleConfirmClick = () => {
-    onUserBlock();
+    blockUserRequest();
   };
   return (
     <Modal show={confirmBlockUser} onClose={closeModal}>
@@ -30,7 +49,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
         <SModal>
           <SModalTitle>{isAnnouncement ? t('modal.block-group.title') : t('modal.block-user.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {userName} {t('modal.block-user.message-second-part')}
+            {t('modal.block-user.message-first-part')} {user.nickname} {t('modal.block-user.message-second-part')}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton>{t('modal.block-user.button-cancel')}</SCancelButton>

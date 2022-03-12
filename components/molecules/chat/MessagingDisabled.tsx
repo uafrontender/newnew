@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 import {
   SBottomAction,
   SBottomActionButton,
@@ -12,11 +13,10 @@ import {
 } from '../../atoms/chat/styles';
 
 interface IMessagingDisabled {
-  userName: string;
-  userAlias: string;
+  user: newnewapi.IUser;
 }
 
-const MessagingDisabled: React.FC<IMessagingDisabled> = ({ userName, userAlias }) => {
+const MessagingDisabled: React.FC<IMessagingDisabled> = ({ user }) => {
   const { t } = useTranslation('chat');
   const router = useRouter();
 
@@ -27,7 +27,7 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = ({ userName, userAlias }
         <SBottomActionText>
           <SBottomActionTitle>{t('messaging-disabled.title')}</SBottomActionTitle>
           <SBottomActionMessage>
-            {userName} {t('messaging-disabled.message')}
+            {user.nickname ? user.nickname : user.username} {t('messaging-disabled.message')}
           </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
@@ -37,7 +37,7 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = ({ userName, userAlias }
         withShrink
         view="primaryGrad"
         onClick={() => {
-          router.push(`/u/${userAlias}`);
+          router.push(`/u/${user.username}`);
         }}
       >
         {t('messaging-disabled.button-text')}
