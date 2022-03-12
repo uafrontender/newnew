@@ -75,12 +75,10 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
                 <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
               </>
+            ) : selectedOption === 'card' ? (
+              <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
             ) : (
-              selectedOption === 'card' ? (
-                <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
-              ) : (
-                <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
-              )
+              <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
             )}
           </SOptionsContainer>
           <SPayButtonDiv>
@@ -253,5 +251,4 @@ const STocApply = styled.div`
   }
 `;
 
-const SOptionsContainer = styled.div`
-`;
+const SOptionsContainer = styled.div``;

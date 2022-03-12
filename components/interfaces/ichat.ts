@@ -1,28 +1,15 @@
-import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 
-export interface IUser {
-  uuid?: string;
-  userName: string;
-  userAlias: string;
+export interface IChatData {
+  chatRoom: newnewapi.IChatRoom | null;
   justSubscribed?: boolean;
   blockedUser?: boolean;
   isAnnouncement?: boolean;
   subscriptionExpired?: boolean;
   messagingDisabled?: boolean;
   accountDeleted?: boolean;
-  avatar: string;
-}
 
-export interface IMessage {
-  id: string;
-  message: string;
-  mine: boolean;
-  date: moment.Moment;
-}
-
-export interface IChatData {
-  userData: IUser | null;
-  messages: IMessage[];
-  isAnnouncement?: boolean;
+  isNewMessage?: boolean;
   showChatList: { (): void } | null;
+  newMessage?: newnewapi.IChatMessage | null | undefined;
 }

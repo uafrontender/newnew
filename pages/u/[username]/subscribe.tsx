@@ -1,9 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useContext, useEffect, useRef, useState, useMemo,
-} from 'react';
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -37,9 +35,7 @@ interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;
 }
 
-const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
-  user,
-}) => {
+const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('subscribe-to-user');
@@ -63,9 +59,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
     return undefined;
   }, [walletBalance, subscriptionPrice]);
 
-  const subPriceFormatted = useMemo(() => (
-    subscriptionPrice ? formatNumber((subscriptionPrice!! / 100) ?? 0, true) : ''
-  ), [subscriptionPrice]);
+  const subPriceFormatted = useMemo(
+    () => (subscriptionPrice ? formatNumber(subscriptionPrice!! / 100 ?? 0, true) : ''),
+    [subscriptionPrice]
+  );
 
   const handleOpenPaymentModal = () => {
     if (!loggedIn) {
@@ -73,7 +70,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       return;
     }
     setIsPaymentModalOpen(true);
-  }
+  };
 
   const handlePayRegistered = async () => {
     try {
@@ -88,7 +85,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       if (!res.data?.checkoutUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
-      window.location.href = url;
+      if (url) window.location.href = url;
     } catch (err) {
       console.error(err);
     }
@@ -106,7 +103,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         console.log(res.data?.status?.product);
 
         if (res.data?.status?.product) {
-          setSubscriptionPrice(res.data?.status?.product.monthlyRate?.usdCents!!)
+          setSubscriptionPrice(res.data?.status?.product.monthlyRate?.usdCents!!);
         }
       } catch (err) {
         console.log(err);
@@ -127,7 +124,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       } else {
         setIsScrolledDown(false);
       }
-    }
+    };
 
     if (isBrowser()) {
       document?.getElementById('generalScrollContainer')?.addEventListener('scroll', handler);
@@ -137,24 +134,28 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       if (isBrowser()) {
         document?.getElementById('generalScrollContainer')?.removeEventListener('scroll', handler);
       }
-    }
+    };
   }, [isMobile]);
 
   return (
     <>
       <SGeneral
         {...{
-          ...(isMobile ? {
-            specialStatusBarColor: theme.colorsThemed.accent.yellow,
-          } : {})
+          ...(isMobile
+            ? {
+                specialStatusBarColor: theme.colorsThemed.accent.yellow,
+              }
+            : {}),
         }}
       >
         <div>
           <main
             style={{
-              ...(isMobile && !banner.show ? {
-                marginTop: '-28px',
-              } : {})
+              ...(isMobile && !banner.show
+                ? {
+                    marginTop: '-28px',
+                  }
+                : {}),
             }}
           >
             <AnimatePresence>
@@ -162,67 +163,44 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
                 <SScrolledDownTopSection
                   initial={{
                     opacity: 0,
-                    y: -30
+                    y: -30,
                   }}
                   animate={{
                     opacity: 1,
-                    y: 0
+                    y: 0,
                   }}
                   exit={{
                     opacity: 0,
-                    y: -30
+                    y: -30,
                   }}
                   pushDown={banner.show}
                 >
                   <SUserInfoScrollDown>
                     <SUserInfoScrollDownAvatar>
-                      <img
-                        alt={user.username}
-                        src={user.avatarUrl}
-                      />
+                      <img alt={user.username} src={user.avatarUrl} />
                     </SUserInfoScrollDownAvatar>
-                    <SUserInfoScrollDownNickname>
-                      { user.nickname }
-                    </SUserInfoScrollDownNickname>
+                    <SUserInfoScrollDownNickname>{user.nickname}</SUserInfoScrollDownNickname>
                   </SUserInfoScrollDown>
-                  <SSubscribeButtonScrollDown
-                    onClick={() => handleOpenPaymentModal()}
-                  >
+                  <SSubscribeButtonScrollDown onClick={() => handleOpenPaymentModal()}>
                     {t('subscribeBtn', { amount: subPriceFormatted })}
                   </SSubscribeButtonScrollDown>
                 </SScrolledDownTopSection>
               )}
             </AnimatePresence>
-          <STopSection
-            ref={(el) => {
-              topSectionRef.current = el!!;
-            }}
-          >
-            {isMobile && (
-              <SBackButton
-                defer={500}
-                onClick={() => router.back()}
-              />
-            )}
-            <UserInfoSection>
-              <SHeadingSection>
+            <STopSection
+              ref={(el) => {
+                topSectionRef.current = el!!;
+              }}
+            >
+              {isMobile && <SBackButton defer={500} onClick={() => router.back()} />}
+              <UserInfoSection>
+                <SHeadingSection>
                   <SSHeadingSectionAvatar>
-                    <img
-                      alt={user.username}
-                      src={user.avatarUrl}
-                    />
+                    <img alt={user.username} src={user.avatarUrl} />
                   </SSHeadingSectionAvatar>
                   <div>
-                    <SHeadline
-                      variant={4}
-                    >
-                      { t('TopSection.headline.line_1', { username: user.username }) }
-                    </SHeadline>
-                    <SHeadline
-                      variant={2}
-                    >
-                      { t('TopSection.headline.line_2') }
-                    </SHeadline>
+                    <SHeadline variant={4}>{t('TopSection.headline.line_1', { username: user.username })}</SHeadline>
+                    <SHeadline variant={2}>{t('TopSection.headline.line_2')}</SHeadline>
                   </div>
                 </SHeadingSection>
                 <SButtonsSection>
@@ -249,52 +227,19 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
               </UserInfoSection>
               <SBulletsSection>
                 <SBullet>
-                  <SBulletImg
-                    alt=""
-                    src={dmsImage.src}
-                  />
-                  <SBulletTitle
-                    variant={5}
-                  >
-                    { t('TopSection.bullets.dms.title') }
-                  </SBulletTitle>
-                  <SBulletBody
-                    variant={3}
-                  >
-                    { t('TopSection.bullets.dms.body') }
-                  </SBulletBody>
+                  <SBulletImg alt="" src={dmsImage.src} />
+                  <SBulletTitle variant={5}>{t('TopSection.bullets.dms.title')}</SBulletTitle>
+                  <SBulletBody variant={3}>{t('TopSection.bullets.dms.body')}</SBulletBody>
                 </SBullet>
                 <SBullet>
-                  <SBulletImg
-                    alt=""
-                    src={votesImage.src}
-                  />
-                  <SBulletTitle
-                    variant={5}
-                  >
-                    { t('TopSection.bullets.freeVotes.title') }
-                  </SBulletTitle>
-                  <SBulletBody
-                    variant={3}
-                  >
-                    { t('TopSection.bullets.freeVotes.body') }
-                  </SBulletBody>
+                  <SBulletImg alt="" src={votesImage.src} />
+                  <SBulletTitle variant={5}>{t('TopSection.bullets.freeVotes.title')}</SBulletTitle>
+                  <SBulletBody variant={3}>{t('TopSection.bullets.freeVotes.body')}</SBulletBody>
                 </SBullet>
                 <SBullet>
-                  <SBulletImg
-                    alt=""
-                    src={suggestionsImage.src}
-                  />
-                  <SBulletTitle
-                    variant={5}
-                  >
-                    { t('TopSection.bullets.suggestions.title') }
-                  </SBulletTitle>
-                  <SBulletBody
-                    variant={3}
-                  >
-                    { t('TopSection.bullets.suggestions.body') }
-                  </SBulletBody>
+                  <SBulletImg alt="" src={suggestionsImage.src} />
+                  <SBulletTitle variant={5}>{t('TopSection.bullets.suggestions.title')}</SBulletTitle>
+                  <SBulletBody variant={3}>{t('TopSection.bullets.suggestions.body')}</SBulletBody>
                 </SBullet>
               </SBulletsSection>
             </STopSection>
@@ -304,9 +249,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
       </SGeneral>
       {isMobile && (
         <SSubscribeButtonMobileContainer>
-          <SSubscribeButtonMobile
-            onClick={() => handleOpenPaymentModal()}
-          >
+          <SSubscribeButtonMobile onClick={() => handleOpenPaymentModal()}>
             {t('subscribeBtn', { amount: subPriceFormatted })}
           </SSubscribeButtonMobile>
         </SSubscribeButtonMobileContainer>
@@ -322,26 +265,13 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({
         handlePayWithWallet={handlePayRegistered}
       >
         <SPaymentModalHeader>
-          <SPaymentModalTitle
-            variant={3}
-          >
-            { t('paymenModalHeader.subtitle') }
-          </SPaymentModalTitle>
+          <SPaymentModalTitle variant={3}>{t('paymenModalHeader.subtitle')}</SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>
-              <img
-                src={user.avatarUrl}
-                alt={user.username}
-              />
+              <img src={user.avatarUrl} alt={user.username} />
             </SAvatar>
             <SCreatorInfo>
-              <SCreatorUsername>
-                {isMobile ? (
-                  user.nickname
-                ) : (
-                  `@${user.username}`
-                )}
-              </SCreatorUsername>
+              <SCreatorUsername>{isMobile ? user.nickname : `@${user.username}`}</SCreatorUsername>
             </SCreatorInfo>
           </SPaymentModalCreatorInfo>
         </SPaymentModalHeader>
@@ -354,10 +284,12 @@ export default SubscribeToUserPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'home', 'subscribe-to-user', 'payment-modal'],
-  );
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'home',
+    'subscribe-to-user',
+    'payment-modal',
+  ]);
 
   if (!username || Array.isArray(username)) {
     return {
@@ -431,9 +363,7 @@ const SGeneral = styled(General)`
   }
 `;
 
-const SScrolledDownTopSection = styled(motion.div)<{
-  pushDown: boolean;
-}>`
+const SScrolledDownTopSection = styled(motion.div)<{ pushDown: boolean }>`
   position: fixed;
   top: ${({ pushDown }) => (pushDown ? '112px' : '72px')};
   left: 0;
@@ -478,7 +408,7 @@ const SBackButton = styled(GoBackButton)`
       }
 
       transform: scale(0.8);
-      transition: .2s ease-in-out;
+      transition: 0.2s ease-in-out;
     }
   }
 
@@ -519,14 +449,13 @@ const SUserInfoScrollDown = styled.div`
   gap: 8px;
 `;
 
-
 const SSubscribeButtonScrollDown = styled(Button)`
   background: ${({ theme }) => theme.colors.dark};
 
   height: 48px;
 
   &:focus:enabled,
-  &:hover:enabled  {
+  &:hover:enabled {
     background: ${({ theme }) => theme.colors.dark};
   }
 `;
@@ -640,7 +569,7 @@ const SSubscribeButtonDesktop = styled(Button)`
   margin-top: 16px;
 
   &:focus:enabled,
-  &:hover:enabled  {
+  &:hover:enabled {
     background: ${({ theme }) => theme.colors.dark};
   }
 `;
@@ -666,7 +595,7 @@ const SSubscribeButtonMobile = styled(Button)`
   background: ${({ theme }) => theme.colors.dark};
 
   &:focus:enabled,
-  &:hover:enabled  {
+  &:hover:enabled {
     background: ${({ theme }) => theme.colors.dark};
   }
 `;
@@ -691,7 +620,6 @@ const SBulletsSection = styled.div`
 
   margin-top: 104px;
 
-
   ${(props) => props.theme.media.tablet} {
     margin-top: 16px;
 
@@ -710,7 +638,8 @@ const SBullet = styled.div`
   flex-direction: column;
   justify-content: center;
 
-  background: radial-gradient(100% 1411.13% at 0% 0%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%), radial-gradient(100% 1411.13% at 100% 100%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%), #1B1C27;
+  background: radial-gradient(100% 1411.13% at 0% 0%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%),
+    radial-gradient(100% 1411.13% at 100% 100%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%), #1b1c27;
 
   height: 128px;
 
@@ -734,7 +663,6 @@ const SBullet = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-
   }
 `;
 
@@ -746,7 +674,6 @@ const SBulletImg = styled.img`
   width: 120px;
   height: 120px;
 
-
   ${({ theme }) => theme.media.tablet} {
     left: -70px;
     top: calc(50% - 70px);
@@ -755,7 +682,6 @@ const SBulletImg = styled.img`
   }
 
   ${({ theme }) => theme.media.laptop} {
-
   }
 `;
 
@@ -770,9 +696,7 @@ const SBulletBody = styled(Text)`
 `;
 
 // Payment modal header
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
@@ -794,7 +718,6 @@ const SPaymentModalCreatorInfo = styled.div`
   justify-content: center;
   flex-direction: column;
   text-align: center;
-
 
   ${({ theme }) => theme.media.tablet} {
     text-align: initial;
@@ -837,9 +760,7 @@ const SAvatar = styled.div`
   }
 `;
 
-const SCreatorInfo = styled.div`
-
-`;
+const SCreatorInfo = styled.div``;
 
 const SCreatorUsername = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
