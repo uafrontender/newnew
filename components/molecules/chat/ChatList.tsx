@@ -1,15 +1,18 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import dynamic from 'next/dynamic';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import { toNumber } from 'lodash';
 
 import UserAvatar from '../UserAvatar';
 import textTrim from '../../../utils/textTrim';
 
-import { IChatData, IUser, IMessage } from '../../interfaces/ichat';
+import { IChatData } from '../../interfaces/ichat';
 
-import { useAppSelector } from '../../../redux-store/store';
 import {
   SChatItemContainer,
   SChatItem,
@@ -18,731 +21,422 @@ import {
   SChatItemLastMessage,
   SChatItemRight,
   SChatItemTime,
-  SChatItemIndicator,
   SChatSeparator,
   SUserAvatar,
 } from '../../atoms/chat/styles';
+import randomID from '../../../utils/randomIdGenerator';
+import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { useAppSelector } from '../../../redux-store/store';
+import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
+import InlineSVG from '../../atoms/InlineSVG';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
+  gotNewMessage: (newMessage: newnewapi.IChatMessage | null | undefined) => void;
+  searchText: string;
 }
 
-export const ChatList: React.FC<IFunctionProps> = ({ openChat }) => {
-  const user = useAppSelector((state) => state.user);
-  const { t } = useTranslation('chat');
-  const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('all');
+interface IUnreadChatRoom {
+  id: number;
+  count: number;
+  text: string;
+}
 
-  const userTypes = useMemo(
+export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, searchText }) => {
+  const { t } = useTranslation('chat');
+  const theme = useTheme();
+  const user = useAppSelector((state) => state.user);
+  const { newSubscriber } = useGetSubscriptions();
+  const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('chatRooms');
+
+  const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(null);
+  const [parsingRooms, setParsingRooms] = useState<boolean | null>(null);
+  const [chatRoomsCreators, setChatRoomsCreators] = useState<newnewapi.IChatRoom[]>([]);
+  const [chatRoomsSubs, setChatRoomsSubs] = useState<newnewapi.IChatRoom[]>([]);
+
+  const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
+
+  const [unreadChatRooms, setUnreadChatRooms] = useState<IUnreadChatRoom[]>([]);
+  const [chatRoomsUnreadCount, setChatRoomsUnreadCount] = useState<number>(0);
+  const [chatRoomsCreatorsUnreadCount, setChatRoomsCreatorsUnreadCount] = useState<number>(0);
+  const [chatRoomsSubsUnreadCount, setChatRoomsSubsUnreadCount] = useState<number>(0);
+
+  const [newSubscriberLocal, setNewSubscriberLocal] = useState<newnewapi.ICreatorSubscriptionChanged>({});
+
+  const tabTypes = useMemo(
     () => [
       {
-        id: 'all',
+        id: 'chatRooms',
         title: t('usertypes.all'),
       },
       {
-        id: 'subscribers',
+        id: 'chatRoomsSubs',
         title: t('usertypes.subscribers'),
       },
       {
-        id: 'report-subscribing',
+        id: 'chatRoomsCreators',
         title: t('usertypes.subscribing'),
       },
     ],
     [t]
   );
 
-  const collection = useMemo(
-    () => [
-      {
-        id: '0',
-        time: '30 min',
-        userData: {
-          userName: '🦄Unicornbabe',
-          userAlias: 'unicornbabe',
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-        messages: [
-          {
-            id: '1',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '2',
-            message: 'Hiii, Lance 😃',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '3',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '4',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '5',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '6',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '7',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '8',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '9',
-            message: 'Hiii, Lance 😃',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '10',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '11',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '12',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '13',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '14',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '15',
-            message: '🦄Unicornbabe created the announcement.\nYou and 499 others joined it',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-        ],
-        unread: false,
-        isAnnouncement: true,
-      },
-      {
-        id: '1',
-        time: '30 min',
-        userData: {
-          userName: '🦄Unicornbabe',
-          userAlias: 'unicornbabe',
-          blockedUser: true,
-          avatar: '/images/mock/test_user_1.jpg',
-        },
-        messages: [
-          {
-            id: '1',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '2',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '3',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '4',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '5',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '6',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '7',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '8',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '9',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '10',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '11',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '12',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '13',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '14',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-        ],
-        unread: false,
-      },
-      {
-        id: '6',
-        time: '30 min',
-        userData: {
-          userName: '🦄Unicornbabe1',
-          userAlias: 'unicornbabe1',
-          avatar: '/images/mock/test_user_3.jpg',
-        },
-        messages: [
-          {
-            id: '1',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '2',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '3',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '4',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '5',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '6',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '7',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '8',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '9',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '10',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '11',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '12',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '13',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '14',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-        ],
-        unread: false,
-      },
-      {
-        id: '2',
-        time: '30 min',
-        userData: {
-          uuid: '7375607e-3175-4789-a12a-2db3ec60cbf8',
-          userName: 'Caramella🍬',
-          userAlias: 'caramella',
-          avatar: '/images/mock/test_user_2.jpg',
-          subscriptionExpired: true,
-        },
-        messages: [
-          {
-            id: '1',
-            message: 'Deal 🤝',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '2',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '3',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '4',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '5',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '6',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '7',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '8',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '9',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '10',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '11',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '12',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '13',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '14',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-        ],
-        unread: true,
-        unreadCount: 10,
-      },
-      {
-        id: '3',
-        time: '50 min',
-        userData: {
-          userName: 'Girly👧',
-          userAlias: 'girly',
-          justSubscribed: true,
-          avatar: '/images/mock/test_user_3.jpg',
-        },
-        messages: [
-          {
-            id: '1',
-            message: '👋 Hey, thank you for subscribing to my channel, I look forward to talking to you',
-            mine: false,
-            date: moment(),
-          },
-        ],
-        unread: false,
-      },
-      {
-        id: '4',
-        time: '30 min',
-        userData: {
-          userName: 'Dolly🪆',
-          userAlias: 'dolly',
-          avatar: '/images/mock/test_user_4.jpg',
-          messagingDisabled: true,
-        },
-        messages: [
-          {
-            id: '1',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '2',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '3',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '4',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '5',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '6',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '7',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '8',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '9',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '10',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '11',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '12',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '13',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '14',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-        ],
-        unread: false,
-      },
-      {
-        id: '5',
-        time: '2 min',
-        userData: {
-          userName: 'Cuttie🍰Pie',
-          userAlias: 'cuttiepie',
-          avatar: '/images/mock/test_user_1.jpg',
-          accountDeleted: true,
-        },
-        messages: [
-          {
-            id: '1',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '2',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment(),
-          },
-          {
-            id: '3',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '4',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '5',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment(),
-          },
-          {
-            id: '6',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '7',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(2, 'days'),
-          },
-          {
-            id: '8',
-            message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '9',
-            message: 'Hiii, Lance 😃',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '10',
-            message: 'I don’t beleive...',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '11',
-            message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '12',
-            message: 'Hey, Annie 👋',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '13',
-            message: 'Hey there, Ya, me too 😏',
-            mine: false,
-            date: moment().subtract(3, 'days'),
-          },
-          {
-            id: '14',
-            message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-            mine: true,
-            date: moment().subtract(3, 'days'),
-          },
-        ],
-        unread: false,
-      },
-    ],
-    []
-  );
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    if (collection && collection.length > 0) {
-      openChat({
-        userData: collection[0].userData,
-        messages: collection[0].messages,
-        isAnnouncement: collection[0].isAnnouncement,
-        showChatList: null,
+  async function markChatAsRead(id: number) {
+    try {
+      const payload = new newnewapi.MarkRoomAsReadRequest({
+        roomId: id,
       });
-      setActiveChatIndex(collection[0].id);
+      const res = await markRoomAsRead(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+    } catch (err) {
+      console.error(err);
     }
-  }, []);
-
-  interface IItem {
-    id: string;
-    time: string;
-    userData: IUser;
-    messages: IMessage[];
-    unread: boolean;
-    unreadCount?: number;
   }
 
+  useEffect(() => {
+    async function fetchMyRooms() {
+      try {
+        setLoadingRooms(true);
+        const payload = new newnewapi.GetMyRoomsRequest({ paging: { limit: 20 } });
+        const res = await getMyRooms(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setChatRooms(res.data.rooms);
+        setLoadingRooms(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingRooms(false);
+      }
+    }
+    if (!chatRooms && !loadingRooms) {
+      fetchMyRooms();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Cleanup
+  useEffect(
+    () => () => {
+      if (chatRooms) {
+        chatRooms.forEach((chat) => {
+          if (chat.id) removeChannel(`chat_${chat.id.toString()}`);
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chatRooms]
+  );
+
+  useEffect(() => {
+    if (searchText) {
+      if (chatRooms) {
+        setSearchedRooms(null);
+        const arr = [] as newnewapi.IChatRoom[];
+        chatRooms.forEach((chat) => {
+          if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
+            arr.push(chat);
+          }
+        });
+        setSearchedRooms(arr);
+      }
+    } else {
+      setSearchedRooms(null);
+    }
+  }, [searchText, chatRooms, searchedRooms]);
+
+  useEffect(() => {
+    if (chatRooms && parsingRooms === null && socketConnection) {
+      if (chatRooms[0]) {
+        setActiveChatIndex(chatRooms[0].id!!.toString());
+
+        setParsingRooms(true);
+        const subsArr: newnewapi.IChatRoom[] = [];
+        const creatorsArr: newnewapi.IChatRoom[] = [];
+        const unreadChats: IUnreadChatRoom[] = [];
+        let unreadCount = chatRoomsUnreadCount;
+        let unreadCreatorsCount = chatRoomsCreatorsUnreadCount;
+        let unreadSubsCount = chatRoomsSubsUnreadCount;
+
+        chatRooms.forEach((chat, index) => {
+          if (chat.unreadMessageCount) {
+            if (index !== 0) {
+              unreadCount += chat.unreadMessageCount;
+              unreadChats.push({
+                id: toNumber(chat.id),
+                count: chat.unreadMessageCount,
+                text: chat.lastMessage?.content?.text ? chat.lastMessage?.content?.text : '',
+              });
+            } else {
+              markChatAsRead(toNumber(chat.id));
+            }
+          }
+          if (chat.id) {
+            addChannel(`chat_${chat.id.toString()}`, {
+              chatRoomUpdates: {
+                chatRoomId: chat.id,
+              },
+            });
+          }
+
+          // I am a creator
+          if (chat.myRole === 2) {
+            subsArr.push(chat);
+            if (index !== 0 && !!chat.unreadMessageCount) unreadSubsCount += chat.unreadMessageCount;
+          }
+          // I am a subscriber
+          if (chat.myRole === 1) {
+            if (index !== 0 && !!chat.unreadMessageCount) unreadCreatorsCount += chat.unreadMessageCount;
+            creatorsArr.push(chat);
+          }
+        });
+
+        openChat({ chatRoom: chatRooms[0], showChatList: null });
+        setChatRoomsUnreadCount(unreadCount);
+        setChatRoomsCreatorsUnreadCount(unreadCreatorsCount);
+        setChatRoomsSubsUnreadCount(unreadSubsCount);
+
+        setUnreadChatRooms(unreadChats);
+        setChatRoomsSubs(subsArr);
+        setChatRoomsCreators(creatorsArr);
+        setParsingRooms(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatRooms, socketConnection, addChannel]);
+
+  useEffect(() => {
+    const socketHandlerMessageCreated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      if (decoded) {
+        const senderId = decoded.newMessage?.sender?.uuid;
+        const roomId = decoded.newMessage?.roomId!!.toString();
+        if (roomId === activeChatIndex) {
+          gotNewMessage(decoded.newMessage);
+        } else {
+          /*
+           * update counts of unread messages in not opened rooms
+           * and update count of unread messages in tabs headers
+           */
+          /* eslint-disable no-lonely-if */
+          if (senderId !== user.userData?.userUuid) {
+            const unreadTemp = [...unreadChatRooms];
+            const isUnreadMessages = unreadTemp.findIndex((item) => item.id === toNumber(decoded.roomId));
+
+            if (isUnreadMessages > -1) {
+              unreadTemp[isUnreadMessages].count += 1;
+              unreadTemp[isUnreadMessages].text = decoded.newMessage?.content?.text!!;
+            } else {
+              unreadTemp.push({ id: toNumber(decoded.roomId), count: 1, text: decoded.newMessage?.content?.text!! });
+            }
+
+            setChatRoomsUnreadCount((prevQty) => prevQty + 1);
+            setUnreadChatRooms([...unreadTemp]);
+
+            const isMessageFromCreator = chatRoomsCreators.findIndex((item) => item.id === toNumber(decoded.roomId));
+
+            if (isMessageFromCreator > -1) {
+              setChatRoomsCreatorsUnreadCount((prevQty) => prevQty + 1);
+            } else {
+              setChatRoomsSubsUnreadCount((prevQty) => prevQty + 1);
+            }
+          }
+        }
+      }
+    };
+    if (socketConnection && activeChatIndex) {
+      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, activeChatIndex, unreadChatRooms]);
+
+  // observe messages from new subscribers
+  useEffect(() => {
+    if (newSubscriber !== newSubscriberLocal && socketConnection) {
+      setNewSubscriberLocal(newSubscriber);
+      if (newSubscriber.status?.oneToOneChatRoomId)
+        addChannel(`chat_${newSubscriber.status?.oneToOneChatRoomId.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: newSubscriber.status?.oneToOneChatRoomId,
+          },
+        });
+      if (newSubscriber.status?.massUpdateChatRoomId)
+        addChannel(`chat_${newSubscriber.status?.massUpdateChatRoomId.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: newSubscriber.status?.massUpdateChatRoomId,
+          },
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newSubscriber]);
+
+  const isActiveChat = useCallback(
+    (chat: newnewapi.IChatRoom) => activeChatIndex === chat.id!!.toString(),
+    [activeChatIndex]
+  );
+
   const renderChatItem = useCallback(
-    (item: IItem, index: number) => {
-      const handleItemClick = () => {
-        openChat({ userData: item.userData, messages: item.messages, showChatList: null });
-        setActiveChatIndex(item.id);
+    (chat: newnewapi.IChatRoom) => {
+      const handleItemClick = async () => {
+        if (searchedRooms) setSearchedRooms(null);
+        setActiveChatIndex(chat.id!!.toString());
+        openChat({ chatRoom: chat, showChatList: null });
+        const unreadChat = unreadChatRooms.find((i) => toNumber(chat.id) === i.id);
+        if (unreadChat) {
+          await markChatAsRead(toNumber(chat.id));
+
+          setUnreadChatRooms(unreadChatRooms.filter((item) => item.id !== chat.id));
+          setChatRoomsUnreadCount((val) => val - unreadChat.count);
+
+          switch (chat.myRole) {
+            // I am a creator
+            case 2: {
+              return setChatRoomsSubsUnreadCount((val) => val - unreadChat.count);
+            }
+            // I am a subscriber
+            default: {
+              return setChatRoomsCreatorsUnreadCount((val) => val - unreadChat.count);
+            }
+          }
+        }
+        return null;
       };
 
-      return (
-        <SChatItemContainer key={`chat-item-${item.id}`}>
-          <SChatItem onClick={handleItemClick} className={activeChatIndex === item.id ? 'active' : ''}>
+      const emptyMassUpdateFromCreator = chat.kind === 4 && chat.myRole === 1 && !chat.lastMessage;
+      let avatar = (
+        <SUserAvatar>
+          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''} />
+        </SUserAvatar>
+      );
+      let chatName = chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username;
+
+      if (chat.kind === 4 && chat.myRole === 2) {
+        avatar = (
+          <SMyAvatar>
             <SUserAvatar>
-              <UserAvatar avatarUrl={item.userData.avatar} />
+              <UserAvatar avatarUrl={user.userData?.avatarUrl!!} />
             </SUserAvatar>
-            <SChatItemCenter>
-              <SChatItemText variant={3} weight={600}>
-                {item.userData.userName}
-              </SChatItemText>
-              <SChatItemLastMessage variant={3} weight={600}>
-                {textTrim(item.messages[0].message)}
-              </SChatItemLastMessage>
-            </SChatItemCenter>
-            <SChatItemRight>
-              <SChatItemTime variant={3} weight={600}>
-                {item.time}
-              </SChatItemTime>
-              {!!item.unread && <SChatItemIndicator counter={item.unreadCount} />}
-            </SChatItemRight>
-          </SChatItem>
-          {index !== collection.length - 1 && <SChatSeparator />}
-        </SChatItemContainer>
+            <SInlineSVG
+              svg={megaphone}
+              fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
+              width="26px"
+              height="26px"
+            />
+          </SMyAvatar>
+        );
+        chatName = `${user.userData?.nickname ? user.userData?.nickname : user.userData?.username} ${t(
+          'announcement.title'
+        )}`;
+      }
+      if (chat.kind === 4 && chat.myRole === 1) {
+        chatName = `${chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username} ${t(
+          'announcement.title'
+        )}`;
+      }
+
+      const isUnread = unreadChatRooms.find((i) => toNumber(chat.id) === i.id);
+
+      let lastMsg = chat.lastMessage?.content?.text;
+
+      if (isUnread) {
+        lastMsg = isUnread.text;
+      } else {
+        if (chat.myRole === 2 && !lastMsg) {
+          if (chat.kind === 4) {
+            lastMsg = textTrim(t('new-announcement.created'));
+          } else {
+            lastMsg = textTrim(t('chat.no-messages-first-line'));
+          }
+        }
+      }
+
+      return (
+        !emptyMassUpdateFromCreator && (
+          <SChatItemContainer key={randomID()}>
+            <SChatItem onClick={handleItemClick} className={isActiveChat(chat) ? 'active' : ''}>
+              {avatar}
+              <SChatItemCenter>
+                <SChatItemText variant={3} weight={600}>
+                  {chatName}
+                </SChatItemText>
+                <SChatItemLastMessage variant={3} weight={600}>
+                  {lastMsg}
+                </SChatItemLastMessage>
+              </SChatItemCenter>
+              <SChatItemRight>
+                <SChatItemTime variant={3} weight={600}>
+                  {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
+                </SChatItemTime>
+                {isUnread && <SUnreadCount>{isUnread.count}</SUnreadCount>}
+              </SChatItemRight>
+            </SChatItem>
+            <SChatSeparator />
+          </SChatItemContainer>
+        )
       );
     },
-    [collection.length, user.userData?.avatarUrl, openChat]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      activeChatIndex,
+      chatRoomsUnreadCount,
+      chatRoomsCreatorsUnreadCount,
+      chatRoomsSubsUnreadCount,
+      unreadChatRooms,
+      searchedRooms,
+    ]
+  );
+
+  const unreadCountTab = useCallback(
+    (e) => {
+      switch (e) {
+        case 'chatRooms':
+          return chatRoomsUnreadCount !== 0 && chatRoomsUnreadCount;
+        case 'chatRoomsSubs':
+          return chatRoomsSubsUnreadCount !== 0 && chatRoomsSubsUnreadCount;
+        // chatRoomsCreators
+        default:
+          return chatRoomsCreatorsUnreadCount !== 0 && chatRoomsCreatorsUnreadCount;
+      }
+    },
+    [chatRoomsUnreadCount, chatRoomsCreatorsUnreadCount, chatRoomsSubsUnreadCount]
   );
 
   const Tabs = useCallback(
     () => (
       <STabs>
-        {userTypes.map((item) => (
-          <STab active={activeTab === item.id} key={item.id} onClick={() => setActiveTab(item.id)}>
-            {item.title}
+        {tabTypes.map((item) => (
+          <STab active={activeTab === item.id} key={randomID()} onClick={() => setActiveTab(item.id)}>
+            {item.title} {unreadCountTab(item.id) && <SUnreadCount>{unreadCountTab(item.id)}</SUnreadCount>}
           </STab>
         ))}
       </STabs>
     ),
-    []
+    [activeTab, tabTypes, unreadCountTab]
   );
+  /* eslint-disable no-eval */
   return (
     <>
       <SSectionContent>
-        {collection.length > 0 ? (
+        {chatRooms && chatRooms.length > 0 ? (
           <>
-            <Tabs />
-            {collection.map(renderChatItem)}
+            {chatRoomsCreators.length > 0 && chatRoomsSubs.length > 0 && !searchedRooms && <Tabs />}
+            {!searchedRooms ? eval(activeTab).map(renderChatItem) : searchedRooms.map(renderChatItem)}
           </>
         ) : (
           <EmptyInbox />
@@ -770,6 +464,19 @@ const STabs = styled.div`
   justify-content: stretch;
   margin-bottom: 16px;
   font-size: 14px;
+`;
+
+const SUnreadCount = styled.span`
+  background: ${({ theme }) => theme.colorsThemed.accent.pink};
+  border-radius: 50%;
+  color: ${({ theme }) => theme.colors.white};
+  padding: 0 6px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: 700;
+  font-size: 10px;
+  margin-left: 6px;
 `;
 
 interface ISTab {
@@ -804,4 +511,24 @@ const STab = styled.div<ISTab>`
       font-weight: normal;
     `;
   }}
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  min-width: 24px;
+  min-height: 24px;
+  margin-right: 14px;
+`;
+
+const SMyAvatar = styled.div`
+  position: relative;
+  height: 48px;
+  ${SInlineSVG} {
+    margin-right: 0;
+    position: absolute;
+    left: calc(50% - 13px);
+    top: calc(50% - 13px);
+  }
+  ${SUserAvatar} {
+    opacity: ${(props) => (props.theme.name === 'light' ? '1' : '0.5')};
+  }
 `;

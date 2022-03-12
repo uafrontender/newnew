@@ -1,7 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, {
-  ReactElement, useCallback, useContext, useEffect, useMemo, useState,
-} from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -28,9 +26,7 @@ import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
 
-type TPageType = 'creatorsDecisions'
-  | 'activity'
-  | 'activityHidden';
+type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
 interface IProfileLayout {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -66,11 +62,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
-  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
-    // if (true) {
+      // if (true) {
       return [
         {
           nameToken: 'userInitial',
@@ -86,111 +82,98 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   }, [user]);
 
   // Posts
-  const [
-    creatorsDecisions, setCreatorsDecisions,
-  ] = useState(postsCachedCreatorDecisions ?? []);
-  const [
-    creatorsDecisionsFilter, setCreatorsDecisionsFilter,
-  ] = useState(postsCachedCreatorDecisionsFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    creatorsDecisionsToken,
-    setCreatorsDecisionsPageToken,
-  ] = useState(postsCachedCreatorDecisionsPageToken);
-  const [
-    creatorsDecisionsCount,
-    setCreatorsDecisionsCount,
-  ] = useState(postsCachedCreatorDecisionsCount);
+  const [creatorsDecisions, setCreatorsDecisions] = useState(postsCachedCreatorDecisions ?? []);
+  const [creatorsDecisionsFilter, setCreatorsDecisionsFilter] = useState(
+    postsCachedCreatorDecisionsFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [creatorsDecisionsToken, setCreatorsDecisionsPageToken] = useState(postsCachedCreatorDecisionsPageToken);
+  const [creatorsDecisionsCount, setCreatorsDecisionsCount] = useState(postsCachedCreatorDecisionsCount);
 
-  const [
-    activityDecisions, setActivityDecisions,
-  ] = useState(postsCachedActivity ?? []);
-  const [
-    activityDecisionsFilter, setActivityDecisionsFilter,
-  ] = useState(postsCachedActivityFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    activityDecisionsToken,
-    setActivityDecisionsPageToken,
-  ] = useState(postsCachedActivityPageToken);
-  const [
-    activityDecisionsCount,
-    setActivityDecisionsCount,
-  ] = useState(postsCachedActivityCount);
+  const [activityDecisions, setActivityDecisions] = useState(postsCachedActivity ?? []);
+  const [activityDecisionsFilter, setActivityDecisionsFilter] = useState(
+    postsCachedActivityFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [activityDecisionsToken, setActivityDecisionsPageToken] = useState(postsCachedActivityPageToken);
+  const [activityDecisionsCount, setActivityDecisionsCount] = useState(postsCachedActivityCount);
 
-  const handleSetPostsCreatorsDecisions: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setCreatorsDecisions, [setCreatorsDecisions],
-    );
+  const handleSetPostsCreatorsDecisions: React.Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+    setCreatorsDecisions,
+    [setCreatorsDecisions]
+  );
 
-  const handleSetActivityDecisions: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setActivityDecisions, [setActivityDecisions],
-    );
+  const handleSetActivityDecisions: React.Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
+    setActivityDecisions,
+    [setActivityDecisions]
+  );
 
-  const handleUpdateFilter = useCallback((
-    value: newnewapi.Post.Filter,
-  ) => {
-    switch (renderedPage) {
-      case 'activity': {
-        setActivityDecisionsFilter(value);
-        break;
+  const handleUpdateFilter = useCallback(
+    (value: newnewapi.Post.Filter) => {
+      switch (renderedPage) {
+        case 'activity': {
+          setActivityDecisionsFilter(value);
+          break;
+        }
+        case 'activityHidden': {
+          setActivityDecisionsFilter(value);
+          break;
+        }
+        case 'creatorsDecisions': {
+          setCreatorsDecisionsFilter(value);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      case 'activityHidden': {
-        setActivityDecisionsFilter(value);
-        break;
-      }
-      case 'creatorsDecisions': {
-        setCreatorsDecisionsFilter(value);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [renderedPage]);
+    },
+    [renderedPage]
+  );
 
-  const handleUpdatePageToken = useCallback((
-    value: string | null | undefined,
-  ) => {
-    switch (renderedPage) {
-      case 'activity': {
-        setActivityDecisionsPageToken(value);
-        break;
+  const handleUpdatePageToken = useCallback(
+    (value: string | null | undefined) => {
+      switch (renderedPage) {
+        case 'activity': {
+          setActivityDecisionsPageToken(value);
+          break;
+        }
+        case 'activityHidden': {
+          setActivityDecisionsPageToken(value);
+          break;
+        }
+        case 'creatorsDecisions': {
+          setCreatorsDecisionsPageToken(value);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      case 'activityHidden': {
-        setActivityDecisionsPageToken(value);
-        break;
-      }
-      case 'creatorsDecisions': {
-        setCreatorsDecisionsPageToken(value);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [renderedPage]);
+    },
+    [renderedPage]
+  );
 
-  const handleUpdateCount = useCallback((
-    value: number,
-  ) => {
-    switch (renderedPage) {
-      case 'activity': {
-        setActivityDecisionsCount(value);
-        break;
+  const handleUpdateCount = useCallback(
+    (value: number) => {
+      switch (renderedPage) {
+        case 'activity': {
+          setActivityDecisionsCount(value);
+          break;
+        }
+        case 'activityHidden': {
+          setActivityDecisionsCount(value);
+          break;
+        }
+        case 'creatorsDecisions': {
+          setCreatorsDecisionsCount(value);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      case 'activityHidden': {
-        setActivityDecisionsCount(value);
-        break;
-      }
-      case 'creatorsDecisions': {
-        setCreatorsDecisionsCount(value);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [renderedPage]);
+    },
+    [renderedPage]
+  );
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
   const handleClickSendMessage = useCallback(async () => {
@@ -212,10 +195,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [
-    router,
-    user,
-  ]);
+  }, [router, user]);
 
   const renderChildren = () => {
     let postsForPage = {};
@@ -254,19 +234,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       }
     }
 
-    return React.cloneElement(
-      children as ReactElement,
-      {
-        ...(postsForPage ? { posts: postsForPage } : {}),
-        ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
-        pageToken,
-        totalCount,
-        handleSetPosts,
-        handleUpdatePageToken,
-        handleUpdateCount,
-        handleUpdateFilter,
-      },
-    );
+    return React.cloneElement(children as ReactElement, {
+      ...(postsForPage ? { posts: postsForPage } : {}),
+      ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
+      pageToken,
+      totalCount,
+      handleSetPosts,
+      handleUpdatePageToken,
+      handleUpdateCount,
+      handleUpdateFilter,
+    });
   };
 
   const handleToggleFollowingCreator = async () => {
@@ -277,10 +254,12 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
       const payload = new newnewapi.MarkUserRequest({
         userUuid: user.uuid,
-        markAs: followingsIds.includes(user.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+        markAs: followingsIds.includes(user.uuid as string)
+          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
+          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
       });
 
-      console.log(payload)
+      console.log(payload);
 
       const res = await markUser(payload);
 
@@ -294,12 +273,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
-    if (currentUser.loggedIn
-      && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
+    if (currentUser.loggedIn && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
       router.push('/profile');
     }
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
@@ -326,12 +304,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             />
             {t('ProfileLayout.buttons.favorites')}
           </SFavoritesButton>
-          <SMoreButton
-            view="transparent"
-            iconOnly
-            onClick={() => {
-            }}
-          >
+          <SMoreButton view="transparent" iconOnly onClick={() => {}}>
             <InlineSvg
               svg={MoreIconFilled}
               fill={theme.colorsThemed.text.primary}
@@ -340,9 +313,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             />
             {t('ProfileLayout.buttons.more')}
           </SMoreButton>
-          <ProfileImage
-            src={user.avatarUrl ?? ''}
-          />
+          <ProfileImage src={user.avatarUrl ?? ''} />
           <div
             style={{
               position: 'relative',
@@ -351,11 +322,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               alignItems: 'center',
             }}
           >
-            <SUsername
-              variant={4}
-            >
-              {user.nickname}
-            </SUsername>
+            <SUsername variant={4}>{user.nickname}</SUsername>
             <SShareDiv>
               <Button
                 view="tertiary"
@@ -366,12 +333,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   paddingLeft: '16px',
                   paddingRight: '16px',
                 }}
-                onClick={() => {
-                }}
+                onClick={() => {}}
               >
                 <SUsernameButtonText>
-                  @
-                  {/* Temp! */}
+                  @{/* Temp! */}
                   {user.username && user.username.length > 12
                     ? `${user.username.substring(0, 6)}...${user.username.substring(user.username.length - 3)}`
                     : user.username}
@@ -383,49 +348,30 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 style={{
                   padding: '8px',
                 }}
-                onClick={() => {
-                }}
+                onClick={() => {}}
               >
-                <InlineSvg
-                  svg={ShareIconFilled}
-                  fill={theme.colorsThemed.text.primary}
-                  width="20px"
-                  height="20px"
-                />
+                <InlineSvg svg={ShareIconFilled} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
               </Button>
             </SShareDiv>
-            {user.options?.isCreator
-              ? (
-                <Button
-                  withShadow
-                  view="primaryGrad"
-                  style={{
-                    marginBottom: '16px',
-                  }}
-                  onClick={handleClickSendMessage}
-                >
-                  {t('ProfileLayout.buttons.sendMessage')}
-                </Button>
-              ) : null}
-            {user.bio ? (
-              <SBioText
-                variant={3}
+            {user.options?.isCreator ? (
+              <Button
+                withShadow
+                view="primaryGrad"
+                style={{
+                  marginBottom: '16px',
+                }}
+                onClick={handleClickSendMessage}
               >
-                {user.bio}
-              </SBioText>
+                {t('ProfileLayout.buttons.sendMessage')}
+              </Button>
             ) : null}
+            {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0
-            ? (
-              <ProfileTabs
-                pageType="othersProfile"
-                tabs={tabs}
-              />
-            ) : null}
+          {tabs.length > 0 ? <ProfileTabs pageType="othersProfile" tabs={tabs} /> : null}
         </SProfileLayout>
-        { renderChildren() }
+        {renderChildren()}
       </SGeneral>
     </ErrorBoundary>
   );

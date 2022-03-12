@@ -223,7 +223,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
 
         if (resCreatorOnRisePayload) {
           // TODO: change logic and layout here, because we have multiple creators on the rise
-          console.log(resCreatorOnRisePayload.data?.posts);
+          // console.log(resCreatorOnRisePayload.data?.posts);
           setCollectionCreator(() => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]);
           setCollectionCreatorInitialLoading(false);
         } else {
