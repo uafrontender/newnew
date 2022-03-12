@@ -111,27 +111,6 @@ const MyApp = (props: IMyApp): ReactElement => {
                   </WalletContextProvider>
                 </FollowingsContextProvider>
               </BlockedUsersProvider>
-              <FollowingsContextProvider>
-                <WalletContextProvider>
-                  <SubscriptionsProvider>
-                    <ResizeMode>
-                      <GlobalTheme>
-                        <div>
-                          <ToastContainer />
-                          {!pageProps.error ? (
-                            getLayout(<Component {...pageProps} />)
-                          ) : (
-                            <Error
-                              errorMsg={pageProps.error?.message}
-                              statusCode={pageProps.error?.statusCode ?? 500}
-                            />
-                          )}
-                        </div>
-                      </GlobalTheme>
-                    </ResizeMode>
-                  </SubscriptionsProvider>
-                </WalletContextProvider>
-              </FollowingsContextProvider>
             </PersistGate>
           </ChannelsContextProvider>
         </SocketContextProvider>
