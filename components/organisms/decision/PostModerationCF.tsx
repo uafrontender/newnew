@@ -469,7 +469,8 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           )
         ) : (
           <CommentsTab
-            comments={comments}
+            canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
+            commentsRoomId={post.commentsRoomId as number}
             handleGoBack={() => handleChangeTab('backers')}
           />
         )

@@ -1,302 +1,299 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
+} from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
+import { useInView } from 'react-intersection-observer';
+
 import GradientMask from '../../atoms/GradientMask';
-import useScrollGradients from '../../../utils/hooks/useScrollGradients';
-import randomID from '../../../utils/randomIdGenerator';
 import Comment from '../../atoms/decision/Comment';
 import CommentForm from '../../atoms/decision/CommentForm';
+
 import { useAppSelector } from '../../../redux-store/store';
-import Button from '../../atoms/Button';
+import { TCommentWithReplies } from '../../interfaces/tcomment';
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
+import useScrollGradients from '../../../utils/hooks/useScrollGradients';
+import { deleteMessage, getMessages, sendMessage } from '../../../api/endpoints/chat';
 
 const MoreCommentsModal = dynamic(() => import('./MoreCommentsModal'));
 
 interface ICommentsTab {
-  comments: newnewapi.Auction.Option[];
-  handleGoBack: () => void,
+  commentsRoomId: number;
+  canDeleteComments?: boolean;
+  handleGoBack: () => void;
 }
 
 const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
-  comments,
+  canDeleteComments,
+  commentsRoomId,
   handleGoBack,
 }) => {
-  const scrollRef: any = useRef();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
   const { t } = useTranslation('decision');
-
-  const [confirmMoreComments, setConfirmMoreComments] = useState(false);
-
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const collection = useMemo(
-    () => [
-      {
-        id: 1,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
-        },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [
-          {
-            id: 2,
-            parent_id: 1,
-            created_at: moment().subtract(2.7, 'days'),
-            user: {
-              uuid: randomID(),
-              nickname: 'Nickname',
-              avatarUrl: '/images/mock/test_user_1.jpg',
-            },
-            bid: '$10',
-            message:
-              'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-            replies: [
-              {
-                id: 4,
-                parent_id: 2,
-                created_at: moment().subtract(2.7, 'days'),
-                user: {
-                  uuid: randomID(),
-                  nickname: 'Nickname',
-                  avatarUrl: '/images/mock/test_user_1.jpg',
-                },
-                bid: '$10',
-                message:
-                  'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                replies: [
-                  {
-                    id: 6,
-                    parent_id: 4,
-                    created_at: moment().subtract(2.7, 'days'),
-                    user: {
-                      uuid: randomID(),
-                      nickname: 'Nickname',
-                      avatarUrl: '/images/mock/test_user_1.jpg',
-                    },
-                    bid: '$10',
-                    message:
-                      'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                    replies: [],
-                  },
-                  {
-                    id: 7,
-                    parent_id: 4,
-                    created_at: moment().subtract(3, 'days'),
-                    user: {
-                      uuid: randomID(),
-                      nickname: 'Nickname',
-                      avatarUrl: '/images/mock/test_user_1.jpg',
-                    },
-                    bid: '$10',
-                    message:
-                      'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                    replies: [],
-                  },
-                ],
+  // Socket
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
+
+  // Scrolling gradients
+  const scrollRef: any = useRef();
+  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
+
+  // Infinite load
+  const {
+    ref: loadingRef,
+    inView,
+  } = useInView();
+
+  // Comments
+  const [comments, setComments] = useState<TCommentWithReplies[]>([]);
+  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [loadingCommentsError, setLoadingCommentsError] = useState('');
+
+  const processComments = (
+    commentsRaw: Array<newnewapi.ChatMessage | TCommentWithReplies>,
+  ): TCommentWithReplies[] => {
+    let lastParentId;
+    let lastParentIdx;
+    const goalArr: TCommentWithReplies[] = [];
+
+    const workingArr = [...commentsRaw];
+
+    workingArr.forEach((rawItem, i) => {
+      const workingItem = {...rawItem};
+
+      if (!rawItem.parentId || rawItem.parentId === 0) {
+        lastParentId = undefined;
+        lastParentIdx = undefined;
+
+        workingItem.parentId = undefined;
+        goalArr.push(workingItem as TCommentWithReplies);
+      } else {
+        lastParentId = workingItem.parentId;
+        lastParentIdx = goalArr.findIndex((o) => o.id === workingItem.parentId);
+
+        if (!goalArr[lastParentIdx].replies) {
+          goalArr[lastParentIdx].replies = []
+        }
+
+        // @ts-ignore
+        const workingSubarr = [...goalArr[lastParentIdx].replies];
+
+        goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
+      }
+    });
+
+    return goalArr;
+  };
+
+  const fetchComments = useCallback(
+    async (pageToken?: string) => {
+      if (commentsLoading) return;
+      try {
+        setCommentsLoading(true);
+        setLoadingCommentsError('');
+
+        const getCommentsPayload = new newnewapi.GetMessagesRequest({
+          roomId: commentsRoomId,
+          ...(pageToken
+            ? {
+              paging: {
+                pageToken,
               },
-              {
-                id: 8,
-                parent_id: 1,
-                created_at: moment().subtract(2.7, 'days'),
-                user: {
-                  uuid: randomID(),
-                  nickname: 'Nickname',
-                  avatarUrl: '/images/mock/test_user_1.jpg',
-                },
-                bid: '$10',
-                message:
-                  'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                replies: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 3,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
+            }
+            : {}),
+        });
+
+        const res = await getMessages(getCommentsPayload);
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data && res.data.messages) {
+          // console.log(res.data.messages)
+
+          setComments((curr) => {
+            const workingArr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
+
+            return processComments(workingArr);
+          });
+
+          setCommentsNextPageToken(res.data.paging?.nextPageToken);
+        }
+
+        setCommentsLoading(false);
+      } catch (err) {
+        setCommentsLoading(false);
+        setLoadingCommentsError((err as Error).message);
+        console.error(err);
+      }
+    },
+    [commentsLoading, commentsRoomId]
+  );
+
+  const handleAddComment = useCallback(async (content: string, parentMsgId?: number) => {
+    try {
+      const payload = new newnewapi.SendMessageRequest({
+        roomId: commentsRoomId,
+        content: {
+          text: content,
         },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [],
-      },
-      {
-        id: 5,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
+        ...(parentMsgId ? {
+          parentMessageId: parentMsgId,
+        } : {}),
+      });
+
+      const res = await sendMessage(payload);
+
+      if (res.data?.message) {
+        setComments((curr) => {
+          const workingArr = [...curr];
+
+          if (res.data?.message?.parentId && res.data?.message?.parentId !== 0) {
+            const parentMsgIdx = workingArr.findIndex((msg) => msg.id === res.data?.message?.parentId);
+
+            if (parentMsgIdx === -1 || !workingArr[parentMsgIdx]) return workingArr;
+
+            if (workingArr[parentMsgIdx].replies && Array.isArray(workingArr[parentMsgIdx].replies)) {
+              workingArr[parentMsgIdx].replies!!.push(res.data.message as newnewapi.ChatMessage);
+              return workingArr;
+            }
+
+            workingArr[parentMsgIdx].replies = [(res.data.message as newnewapi.ChatMessage)];
+            return workingArr;
+          }
+          return [res.data?.message, ...curr] as TCommentWithReplies[];
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [commentsRoomId]);
+
+  const deleteCommentIterativelyById = useCallback((comment: TCommentWithReplies) => {
+    setComments((curr) => {
+      const workingArr = [...curr];
+
+      if (!comment.parentId || comment.parentId === 0) {
+        return workingArr.filter((c) => c.id !== comment.id)
+      }
+
+      const parentIdx = workingArr.findIndex((c) => c.id === comment.parentId);
+
+      if (!parentIdx || parentIdx === -1) return workingArr;
+
+      workingArr[parentIdx].replies = workingArr[parentIdx].replies?.filter((c) => c.id !== comment.id);
+
+      return workingArr;
+    });
+  }, [setComments]);
+
+  const handleDeleteComment = useCallback(async (comment: TCommentWithReplies) => {
+    try {
+      const payload = new newnewapi.DeleteMessageRequest({
+        messageId: comment.id,
+      });
+
+      const res = await deleteMessage(payload);
+
+      if (!res.error) {
+        deleteCommentIterativelyById(comment);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [deleteCommentIterativelyById]);
+
+  useEffect(() => {
+    fetchComments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (inView && !commentsLoading && commentsNextPageToken) {
+      console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
+      fetchComments(commentsNextPageToken);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, commentsNextPageToken, commentsLoading]);
+
+  useEffect(() => {
+    if (commentsRoomId && socketConnection) {
+      addChannel(`comments_${commentsRoomId.toString()}`, {
+        chatRoomUpdates: {
+          chatRoomId: commentsRoomId,
         },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [],
-      },
-      {
-        id: 13,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
-        },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [],
-      },
-      {
-        id: 15,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
-        },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [],
-      },
-      {
-        id: 23,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
-        },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [],
-      },
-      {
-        id: 25,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
-        },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [],
-      },
-      {
-        id: 41,
-        parent_id: -1,
-        created_at: moment().subtract(3, 'days'),
-        user: {
-          uuid: randomID(),
-          nickname: 'Nickname',
-          avatarUrl: '/images/mock/test_user_1.jpg',
-        },
-        bid: '$10',
-        message:
-          'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-        replies: [
-          {
-            id: 42,
-            parent_id: 41,
-            created_at: moment().subtract(2.7, 'days'),
-            user: {
-              uuid: randomID(),
-              nickname: 'Nickname',
-              avatarUrl: '/images/mock/test_user_1.jpg',
-            },
-            bid: '$10',
-            message:
-              'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-            replies: [
-              {
-                id: 44,
-                parent_id: 42,
-                created_at: moment().subtract(2.7, 'days'),
-                user: {
-                  uuid: randomID(),
-                  nickname: 'Nickname',
-                  avatarUrl: '/images/mock/test_user_1.jpg',
-                },
-                bid: '$10',
-                message:
-                  'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                replies: [
-                  {
-                    id: 46,
-                    parent_id: 44,
-                    created_at: moment().subtract(2.7, 'days'),
-                    user: {
-                      uuid: randomID(),
-                      nickname: 'Nickname',
-                      avatarUrl: '/images/mock/test_user_1.jpg',
-                    },
-                    bid: '$10',
-                    message:
-                      'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                    replies: [],
-                  },
-                  {
-                    id: 47,
-                    parent_id: 44,
-                    created_at: moment().subtract(3, 'days'),
-                    user: {
-                      uuid: randomID(),
-                      nickname: 'Nickname',
-                      avatarUrl: '/images/mock/test_user_1.jpg',
-                    },
-                    bid: '$10',
-                    message:
-                      'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                    replies: [],
-                  },
-                ],
-              },
-              {
-                id: 48,
-                parent_id: 41,
-                created_at: moment().subtract(2.7, 'days'),
-                user: {
-                  uuid: randomID(),
-                  nickname: 'Nickname',
-                  avatarUrl: '/images/mock/test_user_1.jpg',
-                },
-                bid: '$10',
-                message:
-                  'When your mother asks, ‘Do you want a piece of advice?’ it is a mere formality. It doesn’t matter if you answer yes or no. You’re going to get it anyway.',
-                replies: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
+
+  useEffect(() => {
+    const socketHandlerMessageCreated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      if (decoded.newMessage!!.sender?.uuid!! !== user.userData?.userUuid) {
+        console.log('Adding comment from socket');
+
+        setComments((curr) => {
+          const workingArr = [...curr];
+
+          if (decoded.newMessage?.parentId && decoded.newMessage !== 0) {
+            console.log('Searching for parent comment')
+
+            const parentMsgIdx = workingArr.findIndex((msg) => msg.id === decoded.newMessage?.parentId);
+
+            if (parentMsgIdx === -1 || !workingArr[parentMsgIdx]) return workingArr;
+
+            if (!workingArr[parentMsgIdx].replies) {
+              workingArr[parentMsgIdx].replies = [];
+            }
+
+            // @ts-ignore
+            const workingSubarr = [...workingArr[parentMsgIdx].replies];
+
+            workingArr[parentMsgIdx].replies = [(decoded.newMessage as newnewapi.ChatMessage), ...workingSubarr];
+
+            return workingArr;
+          }
+          console.log('Adding comment directly');
+
+          return [decoded.newMessage, ...workingArr] as TCommentWithReplies[];
+        })
+      }
+    };
+
+    if (socketConnection) {
+      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, user.userData?.userUuid, setComments]);
+
+  // Cleanup
+  useEffect(
+    () => () => {
+      if (commentsRoomId) {
+        if (commentsRoomId) removeChannel(`comments_${commentsRoomId.toString()}`);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -310,34 +307,38 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         ref={scrollRef}
       >
         <SActionSection>
-          <CommentForm />
+          <CommentForm
+            onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+          />
           <SCommentsWrapper>
-            {collection.map((item, index) => {
-              if (!isMobile || index < 3)
-                return (
-                  <Comment
-                    key={randomID()}
-                    lastChild={index === collection.length - 1 || (isMobile && index === 2)}
-                    comment={item}
-                  />
-                );
-              return null;
+            {!isMobile && comments && comments.map((item, index) => {
+              return (
+                <Comment
+                  key={(item.id).toString()}
+                  canDeleteComment={canDeleteComments}
+                  lastChild={index === comments.length - 1 || (isMobile && index === 2)}
+                  comment={item}
+                  handleAddComment={(newMsg: string) => handleAddComment(newMsg, item.id as number)}
+                  handleDeleteComment={handleDeleteComment}
+                />
+              );
             })}
-            {isMobile && collection.length > 3 && (
+            {!isMobile && (
+              <SLoaderDiv
+                ref={loadingRef}
+              />
+            )}
+            {isMobile && comments && (
               <>
-                <SButton
-                  size="lg"
-                  view="modalSecondary"
-                  onClick={() => {
-                    setConfirmMoreComments(true);
-                  }}
-                >
-                  {t('comments.view-more')}
-                </SButton>
                 <MoreCommentsModal
-                  confirmMoreComments={isMobile}
+                  isVisible={isMobile}
+                  comments={comments}
+                  commentsLoading={commentsLoading}
+                  commentsNextPageToken={commentsNextPageToken}
+                  handleAddComment={handleAddComment}
+                  handleFetchComments={fetchComments}
+                  handleDeleteComment={handleDeleteComment}
                   closeMoreCommentsModal={() => handleGoBack()}
-                  comments={collection.slice(3)}
                 />
               </>
             )}
@@ -348,6 +349,10 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       </STabContainer>
     </>
   );
+};
+
+CommentsTab.defaultProps = {
+  canDeleteComments: false,
 };
 
 export default CommentsTab;
@@ -379,8 +384,9 @@ const SActionSection = styled.div`
 const SCommentsWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
 `;
 
-const SButton = styled(Button)`
-  margin-top: 20px;
+const SLoaderDiv = styled.div`
+  height: 10px;
 `;

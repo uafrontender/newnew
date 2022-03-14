@@ -516,7 +516,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
             currentTab === 'comments'
             ? (
               <CommentsTab
-                comments={comments}
+                canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
+                commentsRoomId={post.commentsRoomId as number}
                 handleGoBack={() => handleChangeTab('options')}
               />
             ) : winningOption ? (

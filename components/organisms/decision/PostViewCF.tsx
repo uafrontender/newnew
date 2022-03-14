@@ -603,7 +603,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           renderBackersSection()
         ) : (
           <CommentsTab
-            comments={comments}
+            commentsRoomId={post.commentsRoomId as number}
             handleGoBack={() => handleChangeTab('backers')}
           />
         )
