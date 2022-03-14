@@ -1,27 +1,62 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
+
 import preventParentClick from '../../../utils/preventParentClick';
+import useScrollGradients from '../../../utils/hooks/useScrollGradients';
+
+
 import Modal from '../../organisms/Modal';
 import GoBackButton from '../GoBackButton';
-import useScrollGradients from '../../../utils/hooks/useScrollGradients';
-import randomID from '../../../utils/randomIdGenerator';
-import GradientMask from '../../atoms/GradientMask';
 import Comment from '../../atoms/decision/Comment';
+import GradientMask from '../../atoms/GradientMask';
+import { TCommentWithReplies } from '../../interfaces/tcomment';
+import CommentForm from '../../atoms/decision/CommentForm';
 
 interface IMoreCommentsModal {
-  confirmMoreComments: boolean;
+  isVisible: boolean;
   comments: any[];
+  commentsLoading: boolean;
+  commentsNextPageToken: string | undefined | null;
+  canDeleteComment?: boolean;
+  handleFetchComments: (token?: string) => void;
+  handleAddComment: (newMsg: string, parentId?: number) => void;
+  handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
   closeMoreCommentsModal: () => void;
 }
 
-const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({ confirmMoreComments, comments, closeMoreCommentsModal }) => {
+const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
+  comments,
+  isVisible,
+  commentsLoading,
+  commentsNextPageToken,
+  canDeleteComment,
+  handleAddComment,
+  handleDeleteComment,
+  handleFetchComments,
+  closeMoreCommentsModal,
+}) => {
   const scrollRef: any = useRef();
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
   const { t } = useTranslation('decision');
 
+  // Infinite load
+  const {
+    ref: loadingRef,
+    inView,
+  } = useInView();
+
+  useEffect(() => {
+    if (inView && !commentsLoading && commentsNextPageToken) {
+      console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
+      handleFetchComments(commentsNextPageToken);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, commentsNextPageToken, commentsLoading]);
+
   return (
-    <Modal show={confirmMoreComments} onClose={closeMoreCommentsModal}>
+    <Modal show={isVisible} onClose={closeMoreCommentsModal}>
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SModalHeader>
@@ -34,10 +69,24 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({ confirmMoreComments, 
           <SWrapper ref={scrollRef}>
             <SActionSection>
               <SCommentsWrapper>
-                {comments.map((item, index) => (
-                  <Comment key={randomID()} lastChild={index === comments.length - 1} comment={item} />
+                {comments && comments.map((item, index) => (
+                  <Comment
+                    key={(item.id).toString()}
+                    canDeleteComment={canDeleteComment}
+                    lastChild={index === comments.length - 1} comment={item}
+                    handleAddComment={(newMsg: string) => handleAddComment(newMsg, item.id as number)}
+                    handleDeleteComment={() => handleDeleteComment(item)}
+                  />
                 ))}
+                <SLoaderDiv
+                  ref={loadingRef}
+                />
               </SCommentsWrapper>
+              <SCommentFormWrapper>
+                <CommentForm
+                  onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+                />
+              </SCommentFormWrapper>
             </SActionSection>
             <GradientMask positionTop active={showTopGradient} />
             <GradientMask active={showBottomGradient} />
@@ -47,6 +96,10 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({ confirmMoreComments, 
     </Modal>
   );
 };
+
+MoreCommentsModal.defaultProps = {
+  canDeleteComment: false,
+}
 
 export default MoreCommentsModal;
 
@@ -120,4 +173,32 @@ const SActionSection = styled.div`
 const SCommentsWrapper = styled.div`
   display: flex;
   flex-direction: column;
+
+  padding-bottom: 96px;
+`;
+
+const SLoaderDiv = styled.div`
+  height: 10px;
+`;
+
+const SCommentFormWrapper = styled.div`
+  position: fixed;
+  left: 0;
+  bottom: 0;
+
+  padding-top: 16px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+
+  & > form {
+    position: static;
+
+    width: calc(100% - 32px);
+  }
 `;

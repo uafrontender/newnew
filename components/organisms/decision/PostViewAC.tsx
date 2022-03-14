@@ -31,6 +31,8 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import { getMessages, sendMessage } from '../../../api/endpoints/chat';
+import { TCommentWithReplies } from '../../interfaces/tcomment';
 
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
@@ -171,12 +173,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionToAnimate, setOptionToAnimate] = useState('');
 
   const currLocation = `/?post=${post.postUuid}`;
-
-  // Comments
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -373,7 +369,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   }, [post, user.loggedIn, user.userData?.userUuid]);
 
   useEffect(() => {
-    setComments([]);
     setOptions([]);
     setOptionsNextPageToken('');
     fetchBids();
@@ -565,7 +560,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           currentTab === 'comments'
           ? (
             <CommentsTab
-              comments={comments}
+              commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('bids')}
             />
           ) : winningOption ? (
