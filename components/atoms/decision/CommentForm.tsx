@@ -7,10 +7,14 @@ import InlineSVG from '../InlineSVG';
 import TextArea from '../creation/TextArea';
 
 interface ICommentForm {
+  onSubmit: (text: string) => void;
   onBlur?: () => void;
 }
 
-const CommentForm: React.FC<ICommentForm> = ({ onBlur }) => {
+const CommentForm: React.FC<ICommentForm> = ({
+  onSubmit,
+  onBlur,
+}) => {
   const { t } = useTranslation('decision');
   const theme = useTheme();
 
@@ -21,10 +25,13 @@ const CommentForm: React.FC<ICommentForm> = ({ onBlur }) => {
     setCommentText(value);
   }, []);
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     console.log('submit');
-  }, []);
+
+    await onSubmit(commentText);
+    setCommentText('');
+  }, [commentText, onSubmit]);
 
   const handleBlur = useCallback(() => {
     setFocusedInput(false);
@@ -79,6 +86,9 @@ const SInlineSVG = styled(InlineSVG)`
 const SButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
+
+  height: 52.5px;
+
   &:disabled {
     background: ${({ theme }) => theme.colorsThemed.background.secondary};
   }
