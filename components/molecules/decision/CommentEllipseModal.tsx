@@ -6,17 +6,32 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
-interface IChatEllipseModal {
+interface ICommentEllipseModal {
   isOpen: boolean;
   zIndex: number;
+  canDeleteComment: boolean;
   onClose: () => void;
+  onDeleteComment: () => void;
   onUserReport: () => void;
 }
 
-const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({ isOpen, zIndex, onClose, onUserReport }) => {
+const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
+  isOpen,
+  zIndex,
+  canDeleteComment,
+  onClose,
+  onDeleteComment,
+  onUserReport,
+}) => {
   const { t } = useTranslation('decision');
+
   const reportUserHandler = () => {
     onUserReport();
+    onClose();
+  };
+
+  const deleteCommentHandler = () => {
+    onDeleteComment();
     onClose();
   };
 
@@ -28,6 +43,11 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({ isOpen, 
             e.stopPropagation();
           }}
         >
+          {canDeleteComment && (
+            <SButton onClick={deleteCommentHandler}>
+              <Text variant={2}>{t('comments.delete')}</Text>
+            </SButton>
+          )}
           <SButton onClick={reportUserHandler}>
             <Text variant={2}>{t('comments.report')}</Text>
           </SButton>
@@ -46,7 +66,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({ isOpen, 
   );
 };
 
-export default ChatEllipseModal;
+export default CommentEllipseModal;
 
 const SWrapper = styled.div`
   width: 100%;

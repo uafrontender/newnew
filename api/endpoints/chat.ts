@@ -56,3 +56,12 @@ export const sendMessage = (payload: newnewapi.SendMessageRequest) =>
     'post',
     payload
   );
+
+export const deleteMessage = (payload: newnewapi.DeleteMessageRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.DeleteMessageRequest, newnewapi.EmptyResponse>(
+    newnewapi.DeleteMessageRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_CHAT}/delete_message`,
+    'post',
+    payload
+  );

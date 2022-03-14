@@ -566,7 +566,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           ) : (
             currentTab === 'comments'
             ? ( <CommentsTab
-              comments={comments}
+              commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('options')}
             />
           ) : winningOption ? (

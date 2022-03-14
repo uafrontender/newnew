@@ -560,7 +560,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             currentTab === 'comments'
             ? (
               <CommentsTab
-                comments={comments}
+                canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
+                commentsRoomId={post.commentsRoomId as number}
                 handleGoBack={() => handleChangeTab('bids')}
               />
             ) : winningOption ? (
