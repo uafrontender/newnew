@@ -144,6 +144,12 @@
     "cancelBtn": "Cancel",
     "confirmBtn": "Delete permenently"
   },
+  "DeleteCommentModal": {
+    "title": "Delete comment",
+    "body": "Are you sure you want to permanently delete this comment? You can't undo the action.",
+    "cancelBtn": "Cancel",
+    "confirmBtn": "Delete permenently"
+  },
   "tabs": {
     "comments": "Comments",
     "bids": "Bids",

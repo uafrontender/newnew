@@ -7,13 +7,21 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
-interface IChatEllipseMenu {
+interface ICommentEllipseMenu {
   isVisible: boolean;
+  canDeleteComment: boolean;
   handleClose: () => void;
+  onDeleteComment: () => void;
   onUserReport: () => void;
 }
 
-const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, onUserReport }) => {
+const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
+  isVisible,
+  canDeleteComment,
+  handleClose,
+  onDeleteComment,
+  onUserReport,
+}) => {
   const { t } = useTranslation('decision');
   const containerRef = useRef<HTMLDivElement>();
 
@@ -22,6 +30,11 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, o
 
   const reportUserHandler = () => {
     onUserReport();
+    handleClose();
+  };
+
+  const deleteCommentHandler = () => {
+    onDeleteComment();
     handleClose();
   };
 
@@ -36,6 +49,11 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, o
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          {canDeleteComment && (
+            <SButton onClick={deleteCommentHandler}>
+              <Text variant={2}>{t('comments.delete')}</Text>
+            </SButton>
+          )}
           <SButton onClick={reportUserHandler}>
             <Text variant={2}>{t('comments.report')}</Text>
           </SButton>
@@ -45,7 +63,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({ isVisible, handleClose, o
   );
 };
 
-export default ChatEllipseMenu;
+export default CommentEllipseMenu;
 
 const SContainer = styled(motion.div)`
   position: absolute;

@@ -1,36 +1,39 @@
-import React, { useRef, useState } from 'react';
+/* eslint-disable no-unsafe-optional-chaining */
+import React, { useMemo, useRef, useState } from 'react';
 import moment from 'moment';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+
 import Button from '../Button';
-import randomID from '../../../utils/randomIdGenerator';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
+import { TCommentWithReplies } from '../../interfaces/tcomment';
 
-const ChatEllipseMenu = dynamic(() => import('../../molecules/decision/ChatEllipseMenu'));
-const ChatEllipseModal = dynamic(() => import('../../molecules/decision/ChatEllipseModal'));
+const CommentEllipseMenu = dynamic(() => import('../../molecules/decision/CommentEllipseMenu'));
+const CommentEllipseModal = dynamic(() => import('../../molecules/decision/CommentEllipseModal'));
 const ReportUserModal = dynamic(() => import('../../molecules/chat/ReportUserModal'));
+const DeleteCommentModal = dynamic(() => import('../../molecules/decision/DeleteCommentModal'));
 
 interface IComment {
   lastChild?: boolean;
-  comment: {
-    id: number;
-    parent_id: number;
-    user: newnewapi.IUser;
-    message: string;
-    bid: string;
-    created_at: moment.Moment;
-    replies: any[];
-  };
+  comment: TCommentWithReplies;
+  canDeleteComment?: boolean;
+  handleAddComment: (newMsg: string) => void;
+  handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
 }
 
-const Comment: React.FC<IComment> = ({ lastChild, comment }) => {
+const Comment: React.FC<IComment> = ({
+  comment,
+  lastChild,
+  canDeleteComment,
+  handleAddComment,
+  handleDeleteComment,
+}) => {
   const { t } = useTranslation('decision');
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -38,82 +41,125 @@ const Comment: React.FC<IComment> = ({ lastChild, comment }) => {
 
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [reply, setReply] = useState(false);
-  const [replies, setReplice] = useState(false);
+  const [confirmDeleteComment, setConfirmDeleteComment] = useState<boolean>(false);
+
+  const [isReplyFormOpen, setIsReplyFormOpen] = useState(false);
+
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
+  const replies = useMemo(() => (
+    comment.replies ?? []
+  ), [comment.replies]);
+
   const formRef: any = useRef();
   useOnClickOutside(formRef, () => {
-    setReply(false);
+    setIsReplyFormOpen(false);
   });
 
   const onUserReport = () => {
     setConfirmReportUser(true);
   };
 
-  const replyHandler = () => {
-    setReply(!reply);
-  };
+  const onDeleteComment = () => {
+    setConfirmDeleteComment(true);
+  }
 
-  const repliesHandler = () => {
-    setReplice(!replies);
+  const replyHandler = () => {
+    setIsReplyFormOpen(!isReplyFormOpen);
   };
 
   return (
-    <SComment key={randomID()}>
-      <SUserAvatar avatarUrl={comment.user.avatarUrl ? comment.user.avatarUrl : ''} />
-      <SCommentContent ref={formRef}>
-        <SCommentHeader>
-          <SNickname>{comment.user.nickname}</SNickname>
-          <SBid>
-            {' '}
-            bid <span>{comment.bid}</span>
-          </SBid>
-          <SDate> &bull; {moment(comment.created_at).format('MMM DD')}</SDate>
-          <SActionsDiv>
-            <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
-              <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
-            </SMoreButton>
-            {/* Ellipse menu */}
-            {!isMobile && (
-              <ChatEllipseMenu
-                isVisible={ellipseMenuOpen}
-                handleClose={handleCloseEllipseMenu}
-                onUserReport={onUserReport}
+    <>
+      <SComment
+        key={(comment.id).toString()}
+      >
+        <SUserAvatar avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''} />
+        <SCommentContent ref={formRef}>
+          <SCommentHeader>
+            <SNickname>{comment.sender?.nickname}</SNickname>
+            <SBid>
+              {' '}
+            </SBid>
+            <SDate> &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')}</SDate>
+            <SActionsDiv>
+              <SMoreButton
+                view="transparent"
+                iconOnly
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenEllipseMenu();
+                }}
+              >
+                <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
+              </SMoreButton>
+              {/* Ellipse menu */}
+              {!isMobile && (
+                <CommentEllipseMenu
+                  isVisible={ellipseMenuOpen}
+                  canDeleteComment={canDeleteComment ?? false}
+                  handleClose={handleCloseEllipseMenu}
+                  onDeleteComment={onDeleteComment}
+                  onUserReport={onUserReport}
+                />
+              )}
+            </SActionsDiv>
+          </SCommentHeader>
+          <SText>{comment.content?.text}</SText>
+          {!comment.parentId && (
+            !isReplyFormOpen ? (
+              <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
+            ) : (
+              <CommentForm
+                onSubmit={(newMsg: string) => handleAddComment(newMsg)}
               />
-            )}
-            {isMobile && ellipseMenuOpen ? (
-              <ChatEllipseModal
-                isOpen={ellipseMenuOpen}
-                zIndex={11}
-                onClose={handleCloseEllipseMenu}
-                onUserReport={onUserReport}
-              />
-            ) : null}
-          </SActionsDiv>
-        </SCommentHeader>
-        <SText>{comment.message}</SText>
-        {!reply ? (
-          <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
-        ) : (
-          <CommentForm onBlur={replyHandler} />
-        )}
-        {comment.replies.length > 0 && (
-          <SReply onClick={repliesHandler}>
-            {replies ? t('comments.hide-replies') : t('comments.view-replies')} {comment.replies.length}{' '}
-            {comment.replies.length > 1 ? t('comments.replies') : t('comments.reply')}
-          </SReply>
-        )}
-        {replies && comment.replies.map((item) => <Comment key={randomID()} comment={item} />)}
-        {!lastChild && <SSeparator />}
-      </SCommentContent>
-      <ReportUserModal
-        confirmReportUser={confirmReportUser}
-        user={comment.user}
-        closeModal={() => setConfirmReportUser(false)}
-      />
-    </SComment>
+            )
+          )}
+          {!comment.parentId && replies && replies.length > 0 && (
+            <SReply
+              onClick={replyHandler}
+            >
+              {isReplyFormOpen ? t('comments.hide-replies') : t('comments.view-replies')} {replies.length}{' '}
+              {replies.length > 1 ? t('comments.replies') : t('comments.reply')}
+            </SReply>
+          )}
+          {isReplyFormOpen && replies && replies.map((item) => (
+            <Comment
+              key={(item.id).toString()}
+              canDeleteComment={canDeleteComment}
+              comment={item}
+              handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
+              handleDeleteComment={() => handleDeleteComment(item as TCommentWithReplies)}
+            />
+            )
+          )}
+          {!lastChild && <SSeparator />}
+        </SCommentContent>
+        <ReportUserModal
+          confirmReportUser={confirmReportUser}
+          user={comment.sender!!}
+          closeModal={() => setConfirmReportUser(false)}
+        />
+        <DeleteCommentModal
+          isVisible={confirmDeleteComment}
+          closeModal={() => setConfirmDeleteComment(false)}
+          handleConfirmDelete={async () => {
+            await handleDeleteComment(comment);
+            setConfirmDeleteComment(false);
+          }}
+        />
+      </SComment>
+      {isMobile ? (
+        <CommentEllipseModal
+          isOpen={ellipseMenuOpen}
+          zIndex={16}
+          canDeleteComment={canDeleteComment ?? false}
+          onClose={handleCloseEllipseMenu}
+          onUserReport={onUserReport}
+          onDeleteComment={onDeleteComment}
+        />
+      ) : null}
+    </>
   );
 };
 
@@ -121,6 +167,7 @@ export default Comment;
 
 Comment.defaultProps = {
   lastChild: false,
+  canDeleteComment: false,
 };
 
 const SUserAvatar = styled(UserAvatar)`
@@ -134,10 +181,16 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SComment = styled.div`
+  /* display: grid; */
+
   display: flex;
+
+  width: 100%;
 `;
 
-const SCommentContent = styled.div``;
+const SCommentContent = styled.div`
+  width: 100%;
+`;
 
 const SCommentHeader = styled.div`
   font-size: 14px;

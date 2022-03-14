@@ -360,12 +360,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     });
   }, [postParsed, typeOfPost]);
 
-  useEffect(() => {
-    console.log(postStatus)
-  }, [postStatus]);
-
-  console.log(post)
-
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       <Head>
