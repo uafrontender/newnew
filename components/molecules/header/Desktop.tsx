@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -11,6 +11,7 @@ import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { WalletContext } from '../../../contexts/walletContext';
+import { useGetChats } from '../../../contexts/chatContext';
 
 interface IDesktop {}
 
@@ -20,6 +21,7 @@ export const Desktop: React.FC<IDesktop> = () => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
+  const { unreadCount } = useGetChats();
   const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const handleCreateClick = () => {
@@ -41,6 +43,9 @@ export const Desktop: React.FC<IDesktop> = () => {
   const handleSignUpClick = () => {
     router.push('/sign-up');
   };
+  useEffect(() => {
+    console.log(unreadCount);
+  }, [unreadCount]);
 
   return (
     <SContainer>
@@ -63,6 +68,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                   item={{
                     url: '/direct-messages',
                     key: 'direct-messages',
+                    counter: unreadCount,
                   }}
                 />
               </SItemWithMargin>
@@ -84,7 +90,10 @@ export const Desktop: React.FC<IDesktop> = () => {
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
-                    value: !isBalanceLoading && walletBalance?.usdCents ? (parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined) : undefined,
+                    value:
+                      !isBalanceLoading && walletBalance?.usdCents
+                        ? parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined
+                        : undefined,
                   }}
                 />
               </SItemWithMargin>

@@ -65,3 +65,12 @@ export const deleteMessage = (payload: newnewapi.DeleteMessageRequest) =>
     'post',
     payload
   );
+
+export const getTotalUnreadMessageCounts = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.TotalUnreadMessageCounts>(
+    newnewapi.EmptyRequest,
+    newnewapi.TotalUnreadMessageCounts,
+    `${BASE_URL_CHAT}/get_total_unread_message_counts`,
+    'post',
+    payload
+  );
