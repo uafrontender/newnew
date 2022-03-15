@@ -279,7 +279,9 @@
   },
   "CfPost": {
     "BackersStatsSection": {
-      "of_backers": "of {{ targetBackers }} backers"
+      "of_backers": "of {{ targetBackers }} backers",
+      "my": "my",
+      "pledge": "pledge"
     },
     "BackersTab": {
       "info": {

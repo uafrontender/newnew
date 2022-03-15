@@ -137,6 +137,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
   // Pledges
   const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
+  const [myPledgeAmount, setMyPledgeAmount] = useState<newnewapi.MoneyAmount | undefined>(undefined);
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
@@ -326,6 +327,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           <CfBackersStatsSection
             targetBackerCount={post.targetBackerCount}
             currentNumBackers={currentBackers}
+            myPledgeAmount={myPledgeAmount}
           />
           {!isMobile ? (
             <CfPledgeLevelsSection
@@ -400,6 +402,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     postStatus,
     pledgeLevels,
     currentBackers,
+    myPledgeAmount,
     handleFollowDecision,
     handleAddPledgeFromResponse,
   ]);
@@ -549,6 +552,19 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     setPledges,
     sortPleges,
   ]);
+
+  useEffect(() => {
+    const workingAmount = pledges
+      .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
+      .reduce((acc, myPledge) => myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc, 0);
+
+    if (workingAmount !== 0 && workingAmount !== undefined) {
+      setMyPledgeAmount(new newnewapi.MoneyAmount({
+        usdCents: workingAmount
+      }));
+    }
+
+  }, [pledges, user.userData?.userUuid]);
 
   return (
     <SWrapper>
