@@ -458,7 +458,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         {currentTab === 'backers' ? (
           !crowdfundingSuccess ? (
             <CfBackersStatsSectionModeration
-              post={post}
+              targetBackerCount={post.targetBackerCount}
               currentNumBackers={currentBackers}
             />
           ) : (

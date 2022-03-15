@@ -324,7 +324,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         return (
           <>
           <CfBackersStatsSection
-            post={post}
+            targetBackerCount={post.targetBackerCount}
             currentNumBackers={currentBackers}
           />
           {!isMobile ? (

@@ -1,9 +1,9 @@
 import React, {
+  useMemo,
   useRef,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
 import { useAppSelector } from '../../../../../redux-store/store';
@@ -14,12 +14,12 @@ import Headline from '../../../../atoms/Headline';
 import { formatNumber } from '../../../../../utils/format';
 
 interface ICfBackersStatsSectionModeration {
-  post: newnewapi.Crowdfunding;
+  targetBackerCount: number;
   currentNumBackers: number;
 }
 
 const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSectionModeration> = ({
-  post,
+  targetBackerCount,
   currentNumBackers,
 }) => {
   const theme = useTheme();
@@ -27,7 +27,13 @@ const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSe
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const percentage = (currentNumBackers / post.targetBackerCount) * 100;
+  const percentage = useMemo(() => {
+    const realPercentage = (currentNumBackers / targetBackerCount) * 100;
+
+    if (realPercentage < 3) return 3;
+
+    return realPercentage;
+  }, [currentNumBackers, targetBackerCount]);
   const size = isTablet ? 240 : 280
   const radius = (size - 12) / 2;
 
@@ -86,7 +92,7 @@ const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSe
         </SHeadline>
         <STarget>
           {t('CfPost.BackersStatsSection.of_backers', {
-            targetBackers: formatNumber(post.targetBackerCount, true),
+            targetBackers: formatNumber(targetBackerCount, true),
           })}
         </STarget>
       </SCaptionSection>
