@@ -9,12 +9,12 @@ import TextArea from '../creation/TextArea';
 interface ICommentForm {
   onSubmit: (text: string) => void;
   onBlur?: () => void;
-}
+};
 
-const CommentForm: React.FC<ICommentForm> = ({
+const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
   onSubmit,
   onBlur,
-}) => {
+}, ref) => {
   const { t } = useTranslation('decision');
   const theme = useTheme();
 
@@ -39,7 +39,13 @@ const CommentForm: React.FC<ICommentForm> = ({
   }, [onBlur]);
 
   return (
-    <SCommentsForm>
+    <SCommentsForm
+      {...{
+        ...(ref ? {
+          ref,
+        } : {}),
+      }}
+    >
       <SInputWrapper focus={focusedInput}>
         <TextArea
           id="title"
@@ -70,7 +76,7 @@ const CommentForm: React.FC<ICommentForm> = ({
       )}
     </SCommentsForm>
   );
-};
+});
 
 export default CommentForm;
 

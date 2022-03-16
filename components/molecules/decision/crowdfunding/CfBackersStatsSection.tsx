@@ -34,7 +34,7 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> = (
   const percentage = useMemo(() => {
     const realPercentage = (currentNumBackers / targetBackerCount) * 100;
 
-    if (realPercentage < 3) return 3;
+    if (currentNumBackers > 0 && realPercentage < 3) return 3;
 
     return realPercentage;
   }, [currentNumBackers, targetBackerCount]);
@@ -50,8 +50,6 @@ const CfBackersStatsSection: React.FunctionComponent<ICfBackersStatsSection> = (
 
   const progressRingCircleRef = useRef<SVGCircleElement>();
   const bgRingCircleRef = useRef<SVGCircleElement>();
-
-  console.log(myPledgeAmount)
 
   return (
     <>

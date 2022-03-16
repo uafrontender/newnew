@@ -91,10 +91,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
   const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
 
-  const sessionId = isBrowser()
+  const [sessionId, setSessionId] = useState(() => (
+    isBrowser()
     ? new URL(window.location.href).searchParams.get('?session_id') ||
       new URL(window.location.href).searchParams.get('session_id')
-    : undefined;
+    : undefined
+  ));
+
+  const resetSessionId = () => setSessionId(undefined);
 
   const [open, setOpen] = useState(false);
 
@@ -188,6 +192,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.MultipleChoice}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -201,6 +206,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
+          resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -213,6 +219,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Crowdfunding}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -433,6 +440,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 style={{
                   position: 'relative',
                   bottom: '10px',
+                  ...(recommenedPostsLoading ? {
+                    display: 'none'
+                  } : {}),
                 }}
               />
             </SRecommendationsSection>

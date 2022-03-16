@@ -1,9 +1,10 @@
+import { isNumber } from 'lodash';
 import React from 'react';
 import styled from 'styled-components';
 
 interface IGradientMask {
   active: boolean;
-  positionTop?: boolean;
+  positionTop?: boolean | number;
   positionBottom?: number;
 }
 
@@ -16,7 +17,7 @@ export default GradientMask;
 const SGradientMask = styled.div<IGradientMask>`
   ${(props) => {
     if (props.positionTop) {
-      return 'top: 0';
+      return `top: ${isNumber(props.positionTop) ? props.positionTop : 0}px`;
     }
     return `bottom: ${props.positionBottom ?? 0}px`;
   }};

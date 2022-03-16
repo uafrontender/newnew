@@ -12,27 +12,19 @@ import { newnewapi } from 'newnew-api';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
 import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import switchPostType from '../../../utils/switchPostType';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
-import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
 import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
@@ -132,12 +124,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
-
-  // Comments
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   // Respone upload
   const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<newnewapi.IVideoUrls | undefined>(undefined);

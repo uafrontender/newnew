@@ -30,7 +30,7 @@ const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSe
   const percentage = useMemo(() => {
     const realPercentage = (currentNumBackers / targetBackerCount) * 100;
 
-    if (realPercentage < 3) return 3;
+    if (currentNumBackers > 0 && realPercentage < 3) return 3;
 
     return realPercentage;
   }, [currentNumBackers, targetBackerCount]);

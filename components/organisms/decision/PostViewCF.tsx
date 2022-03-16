@@ -51,6 +51,7 @@ interface IPostViewCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
   sessionId?: string;
+  resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
@@ -59,6 +60,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   post,
   postStatus,
   sessionId,
+  resetSessionId,
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
@@ -144,12 +146,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
   // Mobile choose pledge modal
   const [choosePledgeModalOpen, setChoosePledgeModalOpen] = useState(false);
-
-  // Comments
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -481,6 +477,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         console.error(err);
         setLoadingModalOpen(false);
       }
+      resetSessionId();
     };
 
     makePledgeFromSessionId();
