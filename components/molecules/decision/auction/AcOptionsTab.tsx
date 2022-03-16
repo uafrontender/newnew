@@ -674,7 +674,11 @@ const SNoOptionsYet = styled.div`
   align-items: center;
 
   width: 100%;
-  min-height: 400px;
+  min-height: 300px;
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 400px;
+  }
 `;
 
 const SNoOptionsImgContainer = styled.div`

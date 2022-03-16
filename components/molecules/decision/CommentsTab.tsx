@@ -48,13 +48,17 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   // Scrolling gradients
   const scrollRef: any = useRef();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   // Infinite load
   const {
     ref: loadingRef,
     inView,
   } = useInView();
+
+  // Submit form ref
+  const commentFormRef = useRef<HTMLFormElement>();
+  const [heightDelta, setHeightDelta] = useState(70);
 
   // Comments
   const [comments, setComments] = useState<TCommentWithReplies[]>([]);
@@ -297,6 +301,21 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     []
   );
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entry) => {
+      const size = entry[0]?.borderBoxSize
+        ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
+      if (size) {
+        setHeightDelta(size);
+      }
+    });
+
+    if (commentFormRef.current) {
+      resizeObserver.observe(commentFormRef.current!!);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <STabContainer
@@ -304,10 +323,14 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        ref={scrollRef}
       >
-        <SActionSection>
+        <SActionSection
+          ref={scrollRef}
+        >
           <CommentForm
+            ref={(el) => {
+              commentFormRef.current = el!!;
+            }}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
           <SCommentsWrapper>
@@ -326,6 +349,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             {!isMobile && (
               <SLoaderDiv
                 ref={loadingRef}
+                style={{
+                  ...(commentsLoading ? {
+                    display: 'none'
+                  } : {}),
+                }}
               />
             )}
             {isMobile && comments && (
@@ -344,7 +372,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             )}
           </SCommentsWrapper>
         </SActionSection>
-        <GradientMask positionTop active={showTopGradient} />
+        <GradientMask positionTop={heightDelta} active={showTopGradient} />
         <GradientMask active={showBottomGradient} />
       </STabContainer>
     </>
