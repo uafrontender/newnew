@@ -10,7 +10,6 @@ import Headline from '../../../atoms/Headline';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { setUserData } from '../../../../redux-store/slices/userStateSlice';
-import { fetchSetStripeLinkCreator } from '../../../../api/endpoints/payments';
 import { getMyOnboardingState } from '../../../../api/endpoints/user';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
@@ -85,24 +84,6 @@ export const YourTodos = () => {
     }
   }, [collection, allCompleted]);
 
-  const handleRedirectToStripesetup = async () => {
-    try {
-      const payload = new newnewapi.SetupStripeCreatorAccountRequest({
-        refreshUrl: window.location.href,
-        returnUrl: window.location.href,
-      });
-
-      const res = await fetchSetStripeLinkCreator(payload);
-
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      const url = res.data.setupUrl;
-      window.location.href = url;
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const renderItem = useCallback(
     (item, index) => (
       <SListItem key={item.id} completed={item.completed} isFirst={index === 0}>
@@ -123,12 +104,12 @@ export const YourTodos = () => {
           </SItemTitle>
         </SItemText>
         {!item.completed && item.id === 'complete-profile' && (
-          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/profile')}>
+          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/creator-onboarding-about')}>
             {t('dashboard.todos.complete-profile-btn')}
           </SBottomActionButton>
         )}
         {!item.completed && item.id === 'add-cashout-method' && (
-          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => handleRedirectToStripesetup()}>
+          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/creator-onboarding-stripe')}>
             {t('dashboard.todos.add-cashout-method-btn')}
           </SBottomActionButton>
         )}
