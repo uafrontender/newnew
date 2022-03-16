@@ -1,9 +1,10 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React, { useMemo, useRef, useState } from 'react';
-import moment from 'moment';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import moment from 'moment';
 
 import Button from '../Button';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
@@ -34,8 +35,9 @@ const Comment: React.FC<IComment> = ({
   handleAddComment,
   handleDeleteComment,
 }) => {
-  const { t } = useTranslation('decision');
   const theme = useTheme();
+  const router = useRouter();
+  const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -63,10 +65,14 @@ const Comment: React.FC<IComment> = ({
 
   const onDeleteComment = () => {
     setConfirmDeleteComment(true);
-  }
+  };
 
   const replyHandler = () => {
     setIsReplyFormOpen(!isReplyFormOpen);
+  };
+
+  const handleRedirectToUser = () => {
+    router.push(`/u/${comment.sender?.username}`)
   };
 
   return (
@@ -74,7 +80,10 @@ const Comment: React.FC<IComment> = ({
       <SComment
         key={(comment.id).toString()}
       >
-        <SUserAvatar avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''} />
+        <SUserAvatar
+          avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''}
+          onClick={() => handleRedirectToUser()}
+        />
         <SCommentContent ref={formRef}>
           <SCommentHeader>
             <SNickname>{comment.sender?.nickname}</SNickname>

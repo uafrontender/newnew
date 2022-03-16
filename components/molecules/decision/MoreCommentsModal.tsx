@@ -1,16 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 
 import preventParentClick from '../../../utils/preventParentClick';
-import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 
 
 import Modal from '../../organisms/Modal';
 import GoBackButton from '../GoBackButton';
 import Comment from '../../atoms/decision/Comment';
-import GradientMask from '../../atoms/GradientMask';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import CommentForm from '../../atoms/decision/CommentForm';
 
@@ -37,8 +35,6 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
   handleFetchComments,
   closeMoreCommentsModal,
 }) => {
-  const scrollRef: any = useRef();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
   const { t } = useTranslation('decision');
 
   // Infinite load
@@ -66,7 +62,7 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
               <SModalTitle>{t('comments.comments')}</SModalTitle>
             </GoBackButton>
           </SModalHeader>
-          <SWrapper ref={scrollRef}>
+          <SWrapper>
             <SActionSection>
               <SCommentsWrapper>
                 {comments && comments.map((item, index) => (
@@ -80,6 +76,11 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
                 ))}
                 <SLoaderDiv
                   ref={loadingRef}
+                  style={{
+                    ...(commentsLoading ? {
+                      display: 'none'
+                    } : {}),
+                  }}
                 />
               </SCommentsWrapper>
               <SCommentFormWrapper>
@@ -88,8 +89,6 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
                 />
               </SCommentFormWrapper>
             </SActionSection>
-            <GradientMask positionTop active={showTopGradient} />
-            <GradientMask active={showBottomGradient} />
           </SWrapper>
         </SModal>
       </SContainer>
@@ -124,6 +123,8 @@ const SModal = styled.div`
   height: 100%;
   overflow: auto;
 
+  padding-top: 64px;
+
   ${(props) => props.theme.media.tablet} {
     height: auto;
     padding: 24px;
@@ -133,6 +134,13 @@ const SModal = styled.div`
 `;
 
 const SModalHeader = styled.div`
+  position: fixed;
+  top: 0;
+  width: 100%;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+  z-index: 10;
+
   display: flex;
   height: 58px;
   align-items: center;
