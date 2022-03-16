@@ -40,6 +40,7 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostViewMC {
   post: newnewapi.MultipleChoice;
   sessionId?: string;
+  resetSessionId: () => void;
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -49,6 +50,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   post,
   postStatus,
   sessionId,
+  resetSessionId,
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
@@ -162,12 +164,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   // Winning option
   const [winningOption, setWinningOption] = useState<newnewapi.MultipleChoice.Option | undefined>();
-
-  // Comments
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -367,7 +363,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   ]);
 
   useEffect(() => {
-    setComments([]);
     setOptions([]);
     setOptionsNextPageToken('');
     fetchOptions();
@@ -399,6 +394,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   useEffect(() => {
     const makeVoteFromSessionId = async () => {
+
       if (!sessionId) return;
       try {
         setLoadingModalOpen(true);
@@ -421,6 +417,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         console.error(err);
         setLoadingModalOpen(false);
       }
+      resetSessionId();
     };
 
     makeVoteFromSessionId();
