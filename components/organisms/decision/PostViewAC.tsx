@@ -44,6 +44,7 @@ interface IPostViewAC {
   postStatus: TPostStatusStringified;
   optionFromUrl?: newnewapi.Auction.Option;
   sessionId?: string;
+  resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
@@ -52,6 +53,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   post,
   optionFromUrl,
   sessionId,
+  resetSessionId,
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
@@ -421,6 +423,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         console.error(err);
         setLoadingModalOpen(false);
       }
+      resetSessionId();
     };
 
     makeBidFromSessionId();
