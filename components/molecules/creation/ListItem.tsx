@@ -9,9 +9,12 @@ import Caption from '../../atoms/Caption';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import acImage from '../../../public/images/creation/AC.png';
-import mcImage from '../../../public/images/creation/MC.png';
-import cfImage from '../../../public/images/creation/CF.png';
+// import acImage from '../../../public/images/creation/AC.png';
+// import mcImage from '../../../public/images/creation/MC.png';
+// import cfImage from '../../../public/images/creation/CF.png';
+import acImage from '../../../public/images/creation/AC.webp';
+import mcImage from '../../../public/images/creation/MC.webp';
+import cfImage from '../../../public/images/creation/CF.webp';
 
 const IMAGES: any = {
   auction: acImage,
@@ -56,7 +59,7 @@ export const ListItem: React.FC<IListItem> = (props) => {
               alt="Post type image"
               width={isMobile ? 80 : 120}
               height={isMobile ? 80 : 120}
-              objectFit="cover"
+              objectFit="contain"
             />
           </SImageWrapper>
         </SWrapper>

@@ -39,6 +39,7 @@ import Button from '../../atoms/Button';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -510,10 +511,16 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
-          postType="ac"
-        />
+        {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
+          <ResponseTimer
+            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+          />
+        ) : (
+          <PostTimer
+            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            postType="ac"
+          />
+        )}
       </SExpiresSection>
       <PostVideoModeration
         postId={post.postUuid}
@@ -617,6 +624,7 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
+    grid-template-rows: max-content max-content 1fr;
     grid-template-columns: 410px 538px;
 
     padding-bottom: initial;

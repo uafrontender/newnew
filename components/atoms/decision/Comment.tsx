@@ -38,6 +38,7 @@ const Comment: React.FC<IComment> = ({
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -86,11 +87,16 @@ const Comment: React.FC<IComment> = ({
         />
         <SCommentContent ref={formRef}>
           <SCommentHeader>
-            <SNickname>{comment.sender?.nickname}</SNickname>
+            <SNickname>
+              {comment.sender?.uuid === user.userData?.userUuid ? t('comments.me') : (comment.sender?.nickname ?? comment.sender?.username)}
+            </SNickname>
             <SBid>
               {' '}
             </SBid>
-            <SDate> &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')}</SDate>
+            <SDate>
+              {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
+              &bull; {moment(comment.createdAt?.seconds as number * 1000).fromNow()}
+            </SDate>
             <SActionsDiv>
               <SMoreButton
                 view="transparent"
