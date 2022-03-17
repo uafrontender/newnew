@@ -13,6 +13,13 @@
     "ended_on": "ended on",
     "at_time": "at"
   },
+  "expiresResponse": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "left_to_respond": "left to respond"
+  },
   "socials": {
     "share-to": "Share to",
     "twitter": "Twitter",
@@ -392,12 +399,14 @@
     "heading": "More like this"
   },
   "comments": {
+    "me": "me",
     "title": "Comments",
     "placeholder": "Add a comment ...",
     "bid": "bid",
     "report": "Report",
     "send-reply": "Reply",
     "reply": "reply",
+    "delete": "Delete",
     "replies": "replies",
     "view-replies": "View",
     "hide-replies": "Hide",

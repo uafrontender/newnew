@@ -268,12 +268,14 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
               handleOpenMakePledgeForm={handleOpenCustomPledgeForm}
             />
             <GradientMaskHorizontal
+              gradientType="secondary"
               height={`${buttonsContainerRef.current?.getBoundingClientRect().height}px`}
               positionBottom="0px"
               positionLeft="0px"
               active={showLeftGradient}
             />
             <GradientMaskHorizontal
+              gradientType="secondary"
               height={`${buttonsContainerRef.current?.getBoundingClientRect().height}px`}
               positionBottom="0px"
               positionRight="0px"

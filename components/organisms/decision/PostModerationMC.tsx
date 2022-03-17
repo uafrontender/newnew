@@ -38,6 +38,7 @@ import McWinnerTabModeration from '../../molecules/decision/multiple_choice/mode
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -471,10 +472,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
-          postType="mc"
-        />
+        {postStatus === 'waiting_for_response' ? (
+          <ResponseTimer
+            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+          />
+        ) : (
+          <PostTimer
+            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            postType="mc"
+          />
+        )}
       </SExpiresSection>
       <PostVideoModeration
         postId={post.postUuid}
