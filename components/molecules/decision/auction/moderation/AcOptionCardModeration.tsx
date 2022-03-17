@@ -391,7 +391,6 @@ const SEllipseButton = styled(Button)`
   top: 12px;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   width: 24px;
 

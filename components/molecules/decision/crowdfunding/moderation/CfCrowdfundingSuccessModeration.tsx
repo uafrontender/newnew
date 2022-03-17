@@ -14,14 +14,18 @@ import Headline from '../../../../atoms/Headline';
 import { formatNumber } from '../../../../../utils/format';
 
 import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
+import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 
 interface ICfCrowdfundingSuccessModeration {
   post: newnewapi.Crowdfunding;
+  postStatus: TPostStatusStringified;
   currentNumBackers: number;
 }
 
 const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSuccessModeration> = ({
   post,
+  postStatus,
   currentNumBackers,
 }) => {
   const theme = useTheme();
@@ -100,17 +104,17 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
               }
             </SSpanThin>
           </SNumBidders>
-          <SHeadline
+          <SDetailsHeadline
             variant={4}
           >
             { post.title }
-          </SHeadline>
+          </SDetailsHeadline>
           <SYouMade
             variant={3}
           >
             { t('CfPostModeration.WinnerTab.WinnerOptionCard.you_made') }
           </SYouMade>
-          <SHeadline
+          <SDetailsHeadline
             variant={4}
           >
             $
@@ -118,7 +122,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
               post.totalAmount?.usdCents ? (post.totalAmount.usdCents!! / 100) : 100,
               true,
             )}
-          </SHeadline>
+          </SDetailsHeadline>
         </SOptionDetails>
         {isMobile && (
           <STrophyImgCard
@@ -126,6 +130,19 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
           />
         )}
       </SWinnerCard>
+      {postStatus === 'succeeded' ? (
+        <PostSuccessBoxModeration
+          title={t('PostSuccessModeration.title')}
+          body={t('PostSuccessModeration.body')}
+          buttonCaption={t('PostSuccessModeration.ctaButton')}
+          style={{
+            marginTop: '24px',
+          }}
+          handleButtonClick={() => {
+            console.log('Share')
+          }}
+        />
+      ) : null}
     </SSectionContainer>
   );
 };
@@ -216,10 +233,6 @@ const SCaptionSection = styled.div`
   }
 `;
 
-const SHeadline = styled(Headline)`
-
-`;
-
 const SHeadlineNumBackers = styled(Headline)`
   margin-top: 48px;
   color: ${({ theme }) => theme.colorsThemed.accent.green};
@@ -255,35 +268,34 @@ const SWinnerCard = styled.div`
 
     padding: 24px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 
 // Option details
 const SOptionDetails = styled.div`
-  color: #FFFFFF;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 `;
 
-const SNumBidders = styled(Text)`
+const SDetailsHeadline = styled(Headline)`
+  color: #FFFFFF;
+`;
 
+const SNumBidders = styled(Text)`
+  color: #FFFFFF;
 `;
 
 const SYouMade = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SSpanBold = styled.span`
-
+  color: #FFFFFF;
 `;
 
 const SSpanThin = styled.span`
+  color: #FFFFFF;
   opacity: 0.8;
 `;
 

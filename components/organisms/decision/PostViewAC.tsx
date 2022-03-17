@@ -612,7 +612,8 @@ const SWrapper = styled.div`
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: 46px min-content 1fr;
+    grid-template-rows: max-content max-content 1fr;
+
     grid-column-gap: 16px;
 
     align-items: flex-start;
@@ -623,7 +624,7 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
-    grid-template-columns: 410px 538px;
+    grid-template-columns: 410px 1fr;
   }
 `;
 
@@ -664,22 +665,15 @@ const SActivitesContainer = styled.div<{
   height: 100%;
   width: 100%;
 
-  min-height: calc(728px - 46px - 64px - 40px - 72px);
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px - 72px);
-
     ${({ showSelectingWinnerOption }) => (
       showSelectingWinnerOption
       ? css`
-        max-height: calc(728px - 46px - 64px - 72px - 130px);
+        max-height: calc(500px - 130px);
       `
-      : null
+      : css`
+        max-height: calc(580px);
+      `
     )}
   }
 `;

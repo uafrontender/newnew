@@ -388,7 +388,6 @@ export default CommentsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  padding-right: 20px;
   height: calc(100% - 50px);
   align-self: flex-end;
 
@@ -400,12 +399,12 @@ const STabContainer = styled(motion.div)`
 const SActionSection = styled.div`
   padding-right: 0;
   height: 100%;
+
+  max-height: 500px;
+
   overflow: hidden;
   &:hover {
     overflow-y: auto;
-  }
-  ${(props) => props.theme.media.desktop} {
-    padding-right: 24px;
   }
 
   // Scrollbar

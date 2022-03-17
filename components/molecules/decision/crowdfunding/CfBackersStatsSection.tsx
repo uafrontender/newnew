@@ -168,7 +168,7 @@ const SSectionContainer = styled(motion.div)`
   align-items: center;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 320px;
+    height: 290px;
   }
 
   ${({ theme }) => theme.media.laptop} {
