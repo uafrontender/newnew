@@ -188,10 +188,26 @@ declare module 'styled-components' {
       calendarTop: string,
       calendarBottom: string,
       creationSubmit: string,
-      listTop: string,
-      listBottom: string,
-      listLeft: string,
-      listRight: string,
+      listTop: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
+      listBottom: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
+      listLeft: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
+      listRight: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
       decisionOption: {
         yellow: string,
         blue: string,
