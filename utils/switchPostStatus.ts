@@ -10,7 +10,7 @@ export type TPostStatusStringified =
   | 'flagged'
   | 'succeeded'
   | 'failed'
-  | 'cancelled'
+  | 'deleted'
   | 'processing';
 
 // TODO: Resolve stringification issue
@@ -36,8 +36,8 @@ export default function switchPostStatus(
       case newnewapi.Auction.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.Auction.Status.CANCELLED: {
-        return 'cancelled';
+      case newnewapi.Auction.Status.DELETED: {
+        return 'deleted';
       }
       case newnewapi.Auction.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -74,8 +74,8 @@ export default function switchPostStatus(
       case newnewapi.Crowdfunding.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.Crowdfunding.Status.CANCELLED: {
-        return 'cancelled';
+      case newnewapi.Crowdfunding.Status.DELETED: {
+        return 'deleted';
       }
       case newnewapi.Crowdfunding.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -112,8 +112,8 @@ export default function switchPostStatus(
       case newnewapi.MultipleChoice.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.MultipleChoice.Status.CANCELLED: {
-        return 'cancelled';
+      case newnewapi.MultipleChoice.Status.DELETED: {
+        return 'deleted';
       }
       case newnewapi.MultipleChoice.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';

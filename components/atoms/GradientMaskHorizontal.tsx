@@ -8,6 +8,7 @@ interface IGradientMaskHorizontal {
   positionRight?: string;
   positionBottom?: string;
   height?: string;
+  gradientType?: 'primary' | 'secondary' | 'tertiary';
 }
 
 const GradientMaskHorizontal: React.FC<IGradientMaskHorizontal> = ({
@@ -16,6 +17,7 @@ const GradientMaskHorizontal: React.FC<IGradientMaskHorizontal> = ({
   positionRight,
   positionBottom,
   height,
+  gradientType,
 }) => (
   <SGradientMaskHorizontal
     active={active}
@@ -23,6 +25,7 @@ const GradientMaskHorizontal: React.FC<IGradientMaskHorizontal> = ({
     positionRight={positionRight}
     positionBottom={positionBottom}
     height={height}
+    gradientType={gradientType ?? undefined}
   />
 );
 
@@ -42,9 +45,9 @@ const SGradientMaskHorizontal = styled.div<IGradientMaskHorizontal>`
   transition: opacity linear 0.1s;
   background: ${(props) => {
     if (props.positionLeft) {
-      return props.theme.gradients.listLeft;
+      return props.theme.gradients.listLeft[props.gradientType ?? 'primary'];
     }
-    return props.theme.gradients.listRight;
+    return props.theme.gradients.listRight[props.gradientType ?? 'primary'];
   }};
   pointer-events: none;
 
