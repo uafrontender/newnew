@@ -407,6 +407,33 @@ const SActionSection = styled.div`
   ${(props) => props.theme.media.desktop} {
     padding-right: 24px;
   }
+
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    transition: .2s linear;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: .2s linear;
+  }
+
+  &:hover {
+    &::-webkit-scrollbar-track {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    }
+  }
 `;
 
 const SCommentsWrapper = styled.div`
