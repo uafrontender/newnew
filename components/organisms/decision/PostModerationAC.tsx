@@ -16,29 +16,23 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
-import Button from '../../atoms/Button';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -510,10 +504,16 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
-          postType="ac"
-        />
+        {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
+          <ResponseTimer
+            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+          />
+        ) : (
+          <PostTimer
+            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            postType="ac"
+          />
+        )}
       </SExpiresSection>
       <PostVideoModeration
         postId={post.postUuid}
@@ -617,6 +617,7 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
+    grid-template-rows: max-content max-content 1fr;
     grid-template-columns: 410px 538px;
 
     padding-bottom: initial;

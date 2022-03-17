@@ -30,6 +30,7 @@ import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import CfBackersStatsSectionModeration from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration';
 import CfCrowdfundingSuccessModeration from '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -406,10 +407,16 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
-          postType="cf"
-        />
+        {postStatus === 'waiting_for_response' ? (
+          <ResponseTimer
+            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+          />
+        ) : (
+          <PostTimer
+            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            postType="cf"
+          />
+        )}
       </SExpiresSection>
       <PostVideoModeration
         postId={post.postUuid}
