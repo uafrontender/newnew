@@ -9,6 +9,7 @@ import DynamicSection from '../../molecules/creator/dashboard/DynamicSection';
 import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
 import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
 import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
+import YourTodos from '../../molecules/creator/dashboard/YourTodos';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -23,13 +24,12 @@ export const Dashboard = () => {
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>
-            {t('dashboard.title')}
-          </STitle>
-          {!isMobile && (
-            <DynamicSection />
-          )}
+          <STitle variant={4}>{t('dashboard.title')}</STitle>
+          {!isMobile && <DynamicSection />}
         </STitleBlock>
+        <SBlock>
+          <YourTodos />
+        </SBlock>
         <SBlock>
           <ExpirationPosts />
         </SBlock>
@@ -86,9 +86,11 @@ interface ISBlock {
 }
 
 const SBlock = styled.section<ISBlock>`
-  ${(props) => !props.noMargin && css`
-    margin-bottom: 24px;
-  `}
+  ${(props) =>
+    !props.noMargin &&
+    css`
+      margin-bottom: 24px;
+    `}
   ${(props) => props.theme.media.tablet} {
     min-width: 608px;
     max-width: 100%;

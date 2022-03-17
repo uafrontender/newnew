@@ -1,11 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -24,8 +19,7 @@ import { setMyCreatorTags, updateMe, validateUsernameTextField } from '../../../
 import { logoutUserClearCookiesAndRedirect, setUserData } from '../../../redux-store/slices/userStateSlice';
 import { validateText } from '../../../api/endpoints/infrastructure';
 
-const errorSwitch = (
-  status: newnewapi.ValidateTextResponse.Status) => {
+const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
 
   switch (status) {
@@ -54,75 +48,68 @@ interface IOnboardingSectionAbout {
   currentTags: newnewapi.ICreatorTag[];
 }
 
-const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> = ({
-  availableTags,
-  currentTags,
-}) => {
+const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> = ({ availableTags, currentTags }) => {
   const router = useRouter();
   const { t } = useTranslation('creator-onboarding');
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
 
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-
 
   // Bio
   const [bioInEdit, setBioInEdit] = useState(user.userData?.bio ?? '');
   const [bioError, setBioError] = useState('');
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-  const validateBioViaApi = useCallback(async (
-    text: string,
-  ) => {
-    setIsAPIValidateLoading(true);
-    try {
-      const payload = new newnewapi.ValidateTextRequest({
-        kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
-        text,
-      });
+  const validateBioViaApi = useCallback(
+    async (text: string) => {
+      setIsAPIValidateLoading(true);
+      try {
+        const payload = new newnewapi.ValidateTextRequest({
+          kind: newnewapi.ValidateTextRequest.Kind.CREATOR_BIO,
+          text,
+        });
 
-      const res = await validateText(
-        payload,
-      );
+        const res = await validateText(payload);
 
-      if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occured');
 
-      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-        setBioError(errorSwitch(res.data?.status!!));
-      } else {
-        setBioError('');
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setBioError(errorSwitch(res.data?.status!!));
+        } else {
+          setBioError('');
+        }
+
+        setIsAPIValidateLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsAPIValidateLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+        }
       }
+    },
+    [setBioError, dispatch]
+  );
 
-      setIsAPIValidateLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsAPIValidateLoading(false);
-      if ((err as Error).message === 'No token') {
-        dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
-        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
-      }
-    }
-  }, [setBioError, dispatch]);
-
-  const validateBioViaApiDebounced = useMemo(() => debounce((
-    text: string,
-  ) => {
-    validateBioViaApi(text);
-  }, 250),
-  [validateBioViaApi]);
+  const validateBioViaApiDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateBioViaApi(text);
+      }, 250),
+    [validateBioViaApi]
+  );
 
   const handleUpdateBioInEdit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBioInEdit(e.target.value);
 
-    validateBioViaApiDebounced(
-      e.target.value,
-    );
+    validateBioViaApiDebounced(e.target.value);
   };
 
   // Tags
@@ -130,12 +117,12 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
   const handleAddTag = (tag: newnewapi.ICreatorTag) => {
     if (selectedTags.find((i) => i.id?.toString() === tag.id?.toString())) return;
-    setSelectedTags((tags) => [...tags, tag])
-  }
+    setSelectedTags((tags) => [...tags, tag]);
+  };
 
   const handleRemoveTag = (tag: newnewapi.ICreatorTag) => {
     setSelectedTags((tags) => tags.filter((i) => i.id?.toString() !== tag.id?.toString()));
-  }
+  };
 
   // Is form valid
   const [isFormValid, setIsFormValid] = useState(false);
@@ -152,9 +139,11 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
       if (!updateMeRes.data || updateMeRes.error) throw new Error(updateMeRes.error?.message ?? 'Request failed');
 
-      dispatch(setUserData({
-        bio: updateMeRes.data.me?.bio,
-      }));
+      dispatch(
+        setUserData({
+          bio: updateMeRes.data.me?.bio,
+        })
+      );
 
       const updateTagsPayload = new newnewapi.SetMyCreatorTagsRequest({
         tagIds: selectedTags.map((i) => i.id) as number[],
@@ -168,7 +157,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 
       setLoadingModalOpen(false);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setLoadingModalOpen(false);
       if ((err as Error).message === 'No token') {
         dispatch(logoutUserClearCookiesAndRedirect());
@@ -182,11 +171,7 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
   }, [bioInEdit, dispatch, selectedTags, router]);
 
   useEffect(() => {
-    if (
-      selectedTags.length >= 3
-      && bioInEdit.length > 0
-      && bioError === ''
-    ) {
+    if (selectedTags.length >= 3 && bioInEdit.length > 0 && bioError === '') {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
@@ -196,16 +181,8 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
   return (
     <>
       <SContainer>
-        {isMobile && (
-          <SGoBackButton
-            onClick={() => router.back()}
-          />
-        )}
-        <SHeading
-          variant={5}
-        >
-          {t('AboutSection.heading')}
-        </SHeading>
+        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        <SHeading variant={5}>{t('AboutSection.heading')}</SHeading>
         <STopContainer>
           <SFormItemContainer>
             <OnboardingBioTextarea
@@ -227,35 +204,27 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
             />
           </SFormItemContainer>
         </STopContainer>
-      <SControlsDiv>
-        {!isMobile && (
-          <GoBackButton
-            noArrow
-            onClick={() => router.back()}
+        <SControlsDiv>
+          {!isMobile && (
+            <GoBackButton noArrow onClick={() => router.back()}>
+              {t('AboutSection.backButton')}
+            </GoBackButton>
+          )}
+          <Button
+            view="primaryGrad"
+            disabled={!isFormValid}
+            style={{
+              width: isMobile ? '100%' : 'initial',
+              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+            }}
+            onClick={() => handleSubmit()}
           >
-            { t('AboutSection.backButton') }
-          </GoBackButton>
-        )}
-        <Button
-          view="primaryGrad"
-          disabled={!isFormValid}
-          style={{
-            width: isMobile ? '100%' : 'initial',
-            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-          }}
-          onClick={() => handleSubmit()}
-        >
-          {isMobile ? (
-            t('AboutSection.submitMobile')
-          ) : t('AboutSection.submitDesktop') }
-        </Button>
-      </SControlsDiv>
+            {isMobile ? t('AboutSection.submitMobile') : t('AboutSection.submitDesktop')}
+          </Button>
+        </SControlsDiv>
       </SContainer>
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </>
   );
 };
@@ -353,7 +322,6 @@ const SControlsDiv = styled.div`
 
   display: flex;
   justify-content: space-between;
-
 
   button {
     width: 100%;
