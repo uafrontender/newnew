@@ -15,7 +15,11 @@ import { getMyCreatorTags, getMyOnboardingState } from '../../../../api/endpoint
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-export const YourTodos = () => {
+interface IFunctionProps {
+  todosCompleted: (value: boolean) => void;
+}
+
+export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -107,8 +111,9 @@ export const YourTodos = () => {
         if (!item.completed) done = false;
       });
       setAllcompleted(done);
+      todosCompleted(done);
     }
-  }, [collection, allCompleted]);
+  }, [collection, allCompleted, todosCompleted]);
 
   const renderItem = useCallback(
     (item, index) => (
