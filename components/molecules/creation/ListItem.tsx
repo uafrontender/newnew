@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styled from 'styled-components';
@@ -15,11 +16,20 @@ import { useAppSelector } from '../../../redux-store/store';
 import acImage from '../../../public/images/creation/AC.webp';
 import mcImage from '../../../public/images/creation/MC.webp';
 import cfImage from '../../../public/images/creation/CF.webp';
+import acImageStatic from '../../../public/images/creation/AC-static.png';
+import mcImageStatic from '../../../public/images/creation/MC-static.png';
+import cfImageStatic from '../../../public/images/creation/CF-static.png';
 
 const IMAGES: any = {
   auction: acImage,
   crowdfunding: cfImage,
   'multiple-choice': mcImage,
+};
+
+const IMAGES_STATIC: any = {
+  auction: acImageStatic,
+  crowdfunding: cfImageStatic,
+  'multiple-choice': mcImageStatic,
 };
 
 interface IListItem {
@@ -34,6 +44,9 @@ export const ListItem: React.FC<IListItem> = (props) => {
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+
+  const [mouseEntered, setMouseEntered] = useState(false);
 
   let link = `${router.pathname}/${item.key}`;
 
@@ -43,7 +56,14 @@ export const ListItem: React.FC<IListItem> = (props) => {
 
   return (
     <Link href={link}>
-      <a>
+      <a
+        onMouseEnter={() => {
+          setMouseEntered(true);
+        }}
+        onMouseLeave={() => {
+          setMouseEntered(false);
+        }}
+      >
         <SWrapper>
           <SContent>
             <STitle variant={1} weight={700}>
@@ -55,11 +75,12 @@ export const ListItem: React.FC<IListItem> = (props) => {
           </SContent>
           <SImageWrapper>
             <Image
-              src={IMAGES[item.key]}
+              src={ (isMobile || isTablet) ? IMAGES[item.key] : (mouseEntered ? IMAGES[item.key] : IMAGES_STATIC[item.key])}
               alt="Post type image"
               width={isMobile ? 80 : 120}
               height={isMobile ? 80 : 120}
               objectFit="contain"
+              priority
             />
           </SImageWrapper>
         </SWrapper>
