@@ -132,8 +132,8 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
         >
           {!isMobile ? (
             <>
-              <GradientMask positionTop active={showTopGradient} />
-              <GradientMask positionBottom={0} active={showBottomGradient} />
+              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
+              <GradientMask gradientType="secondary" positionBottom={0} active={showBottomGradient} />
             </>
           ) : null}
           {options.map((option, i) => (

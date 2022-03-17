@@ -6,11 +6,18 @@ interface IGradientMask {
   active: boolean;
   positionTop?: boolean | number;
   positionBottom?: number;
+  gradientType?: 'primary' | 'secondary' | 'tertiary';
 }
 
-const GradientMask: React.FC<IGradientMask> = ({ active, positionTop, positionBottom, }) => (
-  <SGradientMask active={active} positionTop={positionTop} positionBottom={positionBottom} />
+const GradientMask: React.FC<IGradientMask> = ({
+  active, positionTop, positionBottom, gradientType,
+}) => (
+  <SGradientMask active={active} positionTop={positionTop} positionBottom={positionBottom} gradientType={gradientType ?? undefined} />
 );
+
+GradientMask.defaultProps = {
+  gradientType: undefined,
+}
 
 export default GradientMask;
 
@@ -29,9 +36,9 @@ const SGradientMask = styled.div<IGradientMask>`
   transition: height ease 0.5s;
   background: ${(props) => {
     if (props.positionTop) {
-      return props.theme.gradients.listTop;
+      return props.theme.gradients.listTop[props.gradientType ?? 'primary'];
     }
-    return props.theme.gradients.listBottom;
+    return props.theme.gradients.listBottom[props.gradientType ?? 'primary'];
   }};
   pointer-events: none;
 

@@ -16,26 +16,19 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
 
 // Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
 import isBrowser from '../../../utils/isBrowser';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
-import Button from '../../atoms/Button';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
