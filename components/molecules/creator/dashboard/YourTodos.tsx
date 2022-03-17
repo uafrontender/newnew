@@ -25,8 +25,9 @@ export const YourTodos = () => {
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
 
   const isProfileComplete = useCallback(() => {
-    if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0)
+    if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0) {
       return true;
+    }
     return false;
   }, [user.userData?.bio, currentTags]);
 
