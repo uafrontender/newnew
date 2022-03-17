@@ -24,8 +24,8 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'CANCELLED': {
-        return 'cancelled';
+      case 'DELETED': {
+        return 'deleted';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -62,8 +62,8 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'CANCELLED': {
-        return 'cancelled';
+      case 'DELETED': {
+        return 'deleted';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -100,8 +100,8 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'CANCELLED': {
-        return 'cancelled';
+      case 'DELETED': {
+        return 'deleted';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';

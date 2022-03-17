@@ -386,7 +386,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             modalContainerRef.current = el!!;
           }}
         >
-          {postStatus !== 'cancelled' ? (
+          {postStatus !== 'deleted' ? (
             isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)
           ) : isMyPost ? (
               <PostFailedBox
