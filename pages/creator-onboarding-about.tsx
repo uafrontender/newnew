@@ -18,14 +18,11 @@ import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import OnboardingSectionAbout from '../components/molecules/creator-onboarding/OnboardingSectionAbout';
 
-
 interface ICreatorOnboardingAbout {
   availableTags: newnewapi.CreatorTags;
 }
 
-const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
-  availableTags,
-}) => {
+const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({ availableTags }) => {
   const { t } = useTranslation('creator-onboarding');
 
   const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
@@ -61,14 +58,11 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
+        <title>{t('meta.title')}</title>
         <meta name="description" content={t('meta.description')} />
       </Head>
       {!isLoading ? (
-        <OnboardingSectionAbout
-          availableTags={availableTags.tags}
-          currentTags={currentTags}
-        />
+        <OnboardingSectionAbout availableTags={availableTags.tags} currentTags={currentTags} />
       ) : (
         <Lottie
           width={64}
@@ -85,22 +79,13 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
 };
 
 (CreatorOnboardingAbout as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return (
-    <CreatorOnboardingLayout
-      hideProgressBar
-    >
-      { page }
-    </CreatorOnboardingLayout>
-  );
+  return <CreatorOnboardingLayout hideProgressBar>{page}</CreatorOnboardingLayout>;
 };
 
 export default CreatorOnboardingAbout;
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['creator-onboarding', 'profile'],
-  );
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const translationContext = await serverSideTranslations(context.locale!!, ['creator-onboarding', 'profile']);
 
   try {
     const tagsPayload = new newnewapi.EmptyRequest({});

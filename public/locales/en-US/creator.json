@@ -80,6 +80,16 @@
         "last_90_days": "Last 90 days",
         "last_12_months": "Last 12 months"
       }
+    },
+    "todos": {
+      "title": "Your to-do’s",
+      "subtitle": "Let’s get you ready to cash out your earnings, next steps are",
+      "sign-up": "Sign up",
+      "basic-info": "Basic info",
+      "complete-profile": "Complete your profile",
+      "complete-profile-btn": "Complete profile",
+      "add-cashout-method": "Add a cashout method",
+      "add-cashout-method-btn": "Connect Stripe"
     }
   },
   "subscriptions": {
