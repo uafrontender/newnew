@@ -27,6 +27,7 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -282,6 +283,13 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         isVisible={isDeleteModalOpen}
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
+      />
+      {/* Ellipse modal */}
+      <AcOptionCardModerationEllipseModal
+        isOpen={isEllipseMenuOpen}
+        zIndex={16}
+        onClose={() => setIsEllipseMenuOpen(false)}
+        handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
       />
     </>
   );

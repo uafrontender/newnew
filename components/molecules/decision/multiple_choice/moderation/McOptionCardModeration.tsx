@@ -29,6 +29,7 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMenu';
 import McConfirmDeleteOption from './McConfirmDeleteOption';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
+import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -226,6 +227,13 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         isVisible={isDeleteModalOpen}
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
+      />
+      {/* Ellipse modal */}
+      <McOptionCardModerationEllipseModal
+        isOpen={isEllipseMenuOpen}
+        zIndex={16}
+        onClose={() => setIsEllipseMenuOpen(false)}
+        handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
       />
     </>
   );

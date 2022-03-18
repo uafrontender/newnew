@@ -194,6 +194,8 @@ export default AcWinnerTabModeration;
 const STabContainer = styled(motion.div)`
   width: 100%;
   height: calc(100% - 112px);
+
+  min-height: 300px;
 `;
 
 const SWinnerOptionCard = styled.div`
