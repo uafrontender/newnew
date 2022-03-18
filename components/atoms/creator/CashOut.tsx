@@ -59,7 +59,7 @@ const SCashOutTopBlock = styled.div`
 `;
 
 const SDescriptionWrapper = styled.div`
-  p {
+  div {
     display: inline;
   }
 `;

@@ -72,7 +72,7 @@ const SButton = styled(Button)`
   width: auto;
   display: block;
   flex-shrink: 0;
-  color: ${(props) => props.theme.colorsThemed.text.quaternary};
+  color: #2C2C33;
   padding: 16px 20px;
   margin-top: 16px;
   background: ${(props) => props.theme.colors.white};

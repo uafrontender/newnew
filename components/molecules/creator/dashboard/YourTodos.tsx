@@ -27,6 +27,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
   const dispatch = useAppDispatch();
   const [allCompleted, setAllcompleted] = useState<boolean | null>(null);
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isProfileComplete = useCallback(() => {
     if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0) {
@@ -94,14 +95,21 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
         console.error(err);
       }
     }
-    if (!allCompleted) {
-      if (user.userData?.options?.creatorStatus !== 2) {
-        fetchOnboardingState();
-      }
-      if (currentTags.length < 1) {
-        fetchCreatorTags();
+
+    async function checkAndLoad() {
+      if (!allCompleted) {
+        setIsLoading(true);
+        if (user.userData?.options?.creatorStatus !== 2) {
+          await fetchOnboardingState();
+        }
+        if (currentTags.length < 1) {
+          await fetchCreatorTags();
+        }
+        setIsLoading(false);
       }
     }
+
+    checkAndLoad();
   }, [user, dispatch, currentTags, allCompleted]);
 
   useEffect(() => {
@@ -155,7 +163,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
     ),
     [t, router, theme.name]
   );
-  return allCompleted === false ? (
+  return allCompleted === false && !isLoading ? (
     <SContainer>
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.todos.title')}</STitle>
