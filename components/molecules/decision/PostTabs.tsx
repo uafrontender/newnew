@@ -120,10 +120,6 @@ const STabs = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 16px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding-right: 16px;
-  }
 `;
 
 const STabsContainer = styled.div`

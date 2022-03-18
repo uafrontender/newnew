@@ -49,6 +49,7 @@ const CfBackersStatsSectionModeration: React.FunctionComponent<ICfBackersStatsSe
   return (
     <SSectionContainer>
       <SProgressRingSvg
+        key={`key_${isTablet ? 'tablet' : ''}`}
         width={size}
         height={size}
       >

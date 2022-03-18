@@ -192,12 +192,12 @@ export const lightTheme: DefaultTheme = {
     creationSubmit: 'linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);',
     listTop: {
       primary: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
-      secondary: 'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0.8) 100%)',
+      secondary: 'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0) 100%)',
       tertiary: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
     },
     listBottom: {
       primary: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
-      secondary: 'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0.8) 100%)',
+      secondary: 'linear-gradient(180deg, rgba(241, 243, 249, 0) 0%, rgba(241, 243, 249, 0.8) 100%)',
       tertiary: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
     },
     listLeft: {

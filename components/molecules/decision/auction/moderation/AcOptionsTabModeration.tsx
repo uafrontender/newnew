@@ -1,13 +1,11 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useEffect,
+  useRef,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -33,9 +31,7 @@ interface IAcOptionsTabModeration {
   options: newnewapi.Auction.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
   handleLoadBids: (token?: string) => void;
-  handleRemoveOption: (optionToRemove: newnewapi.Auction.Option) => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
@@ -45,14 +41,10 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
   handleLoadBids,
-  handleRemoveOption,
   handleUpdatePostStatus,
 }) => {
   const { t } = useTranslation('decision');
-  const router = useRouter();
-  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   // Infinite load
@@ -64,10 +56,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
-
   const mainContainer = useRef<HTMLDivElement>();
-  const overviewedRefId = useRef('');
 
   const handleConfirmWinningOption = async (winningOption: newnewapi.Auction.Option) => {
     try {
@@ -174,7 +163,6 @@ export default AcOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 112px);
 `;
 
 const SBidsContainer = styled.div`
@@ -217,41 +205,6 @@ const SBidsContainer = styled.div`
   }
 `;
 
-const SShadowTop = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0;
-
-  width: calc(100% - 18px);
-  height: 0px;
-
-  z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
-  ;
-  clip-path: inset(0px 0px -100px 0px);
-
-  transition: linear .2s;
-`;
-
-const SShadowBottom = styled.div<{
-  heightDelta: number;
-}>`
-  position: absolute;
-  bottom: ${({ heightDelta }) => heightDelta}px;
-  left: 0;
-
-  width: calc(100% - 18px);
-  height: 0px;
-
-  z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
-  ;
-  clip-path: inset(-100px 0px 0px 0px);
-  transition: linear .2s;
-`;
-
 const SLoaderDiv = styled.div`
   height: 10px;
 `;
@@ -260,49 +213,6 @@ const SLoadMoreBtn = styled(Button)`
   width: calc(100% - 16px);
   height: 56px;
 `;
-
-const SActionButton = styled(Button)`
-  position: fixed;
-  z-index: 2;
-
-  width: calc(100% - 32px);
-  bottom: 16px;
-  left: 16px;
-`;
-
-const SSuggestNewContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  padding: 16px;
-
-  textarea {
-    width: 100%;
-  }
-`;
-
-const SActionSection = styled.div`
-  display: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 16px;
-
-    position: absolute;
-    min-height: 50px;
-    width: 100%;
-    z-index: 5;
-    bottom: 0;
-
-    padding-top: 8px;
-
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-  }
-`;
-
 
 // No options yet
 const SNoOptionsYet = styled.div`

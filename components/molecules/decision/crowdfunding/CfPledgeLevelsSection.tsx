@@ -321,7 +321,7 @@ export default CfPledgeLevelsSection;
 const SSectionContainer = styled.div`
   position: relative;
 
-  width: calc(100% - 16px);
+  max-width: 520px;
 
   ${({ theme }) => theme.media.tablet} {
     flex-direction: row;
@@ -400,7 +400,6 @@ const SCancelButton = styled(Button)`
   width: auto;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
