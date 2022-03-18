@@ -184,19 +184,28 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     }
   }, [commentsRoomId]);
 
-  const deleteCommentIterativelyById = useCallback((comment: TCommentWithReplies) => {
+  const markCommentAsDeleted = useCallback((comment: TCommentWithReplies) => {
     setComments((curr) => {
       const workingArr = [...curr];
 
       if (!comment.parentId || comment.parentId === 0) {
-        return workingArr.filter((c) => c.id !== comment.id)
+        const commentIdx = workingArr.findIndex((c) => c.id === comment.id);
+        if (commentIdx === -1) return workingArr;
+        workingArr[commentIdx].isDeleted = true;
+        workingArr[commentIdx].content!!.text = '';
+        return workingArr;
       }
 
       const parentIdx = workingArr.findIndex((c) => c.id === comment.parentId);
 
-      if (!parentIdx || parentIdx === -1) return workingArr;
+      if (parentIdx === -1) return workingArr;
 
-      workingArr[parentIdx].replies = workingArr[parentIdx].replies?.filter((c) => c.id !== comment.id);
+      const commentIdx = workingArr[parentIdx].replies?.findIndex((c) => c.id === comment.id);
+
+      if (commentIdx === -1) return workingArr;
+
+      workingArr[parentIdx].replies!![commentIdx!!].isDeleted = true;
+      workingArr[parentIdx].replies!![commentIdx!!].content!!.text = '';
 
       return workingArr;
     });
@@ -211,12 +220,12 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       const res = await deleteMessage(payload);
 
       if (!res.error) {
-        deleteCommentIterativelyById(comment);
+        markCommentAsDeleted(comment);
       }
     } catch (err) {
       console.log(err);
     }
-  }, [deleteCommentIterativelyById]);
+  }, [markCommentAsDeleted]);
 
   useEffect(() => {
     fetchComments();
@@ -277,13 +286,26 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       }
     };
 
+    const socketHandlerMessageDeleted = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageDeleted.decode(arr);
+      if (decoded) {
+        console.log('Deleting comment from socket');
+        console.log(decoded);
+        // NB! Commented out for now
+        // markCommentAsDeleted(decoded.deletedMessage);
+      }
+    };
+
     if (socketConnection) {
       socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection.on('ChatMessageDeleted', socketHandlerMessageDeleted);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+        socketConnection.off('ChatMessageDeleted', socketHandlerMessageDeleted);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

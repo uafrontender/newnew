@@ -23,14 +23,20 @@ const DeleteCommentModal: React.FC<IDeleteCommentModal> = ({
       additionalZ={12}
       onClose={closeModal}
     >
-      <SContainer>
+      <SContainer
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <SModal>
           <SModalTitle>{t('DeleteCommentModal.title')}</SModalTitle>
           <SModalMessage>
             {t('DeleteCommentModal.body')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>
+            <SCancelButton
+              onClick={() => closeModal()}
+            >
               {t('DeleteCommentModal.cancelBtn')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
