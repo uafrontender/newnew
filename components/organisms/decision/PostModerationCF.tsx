@@ -1,36 +1,35 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useMemo, useRef, useState,
+  useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
+import { SocketContext } from '../../../contexts/socketContext';
+import { ChannelsContext } from '../../../contexts/channelsContext';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
+import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
-import PostTimer from '../../molecules/decision/PostTimer';
 import GoBackButton from '../../molecules/GoBackButton';
-
-// Icons
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import switchPostType from '../../../utils/switchPostType';
-import LoadingModal from '../../molecules/LoadingModal';
-import isBrowser from '../../../utils/isBrowser';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import PostTimer from '../../molecules/decision/PostTimer';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import CfBackersStatsSectionModeration from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration';
 import CfCrowdfundingSuccessModeration from '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
+
+import switchPostType from '../../../utils/switchPostType';
+import isBrowser from '../../../utils/isBrowser';
+
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -49,18 +48,14 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [heightDelta, setHeightDelta] = useState(256);
-
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channelsWithSubs,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
@@ -106,19 +101,11 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     }
   }, []);
 
-  // Vote from sessionId
-  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-
   // Current backers
   const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
   const crowdfundingSuccess = useMemo(() => {
     return currentBackers >= post.targetBackerCount
   }, [post, currentBackers]);
-
-  // Pledge levels
-  const [pledgeLevels, setPledgeLevels] = useState<newnewapi.IMoneyAmount[]>([]);
-  const [pledgeLevelsLoading, setPledgeLevelsLoading] = useState(false);
-  const [loadingPledgeLevelsError, setLoadingPledgeLevelsError] = useState('');
 
   // Pledges
   const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
@@ -185,27 +172,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     return workingSortedUnique;
   }, [user.userData?.userUuid]);
 
-  const fetchPledgeLevelsForPost = useCallback(async () => {
-    try {
-      setPledgeLevelsLoading(true);
-      setLoadingPledgeLevelsError('');
-
-      const fetchPledgeLevelsPayload = new newnewapi.EmptyRequest({});
-
-      const res = await fetchPledgeLevels(fetchPledgeLevelsPayload);
-
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      setPledgeLevels(res.data.amounts);
-
-      setPledgeLevelsLoading(false);
-    } catch (err) {
-      console.error(err);
-      setPledgeLevelsLoading(false);
-      setLoadingPledgeLevelsError((err as Error).message);
-    }
-  }, []);
-
   const fetchPledgesForPost = useCallback(async (
     pageToken?: string,
   ) => {
@@ -250,15 +216,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     post,
   ]);
 
-  const handleAddPledgeFromResponse = useCallback((newPledge: newnewapi.Crowdfunding.Pledge) => {
-    setPledges((curr) => {
-      const workingArrUnsorted = [...curr, newPledge as TCfPledgeWithHighestField];
-      return sortPleges(workingArrUnsorted);
-    });
-  }, [
-    setPledges,
-    sortPleges,
-  ]);
 
   const fetchPostLatestData = useCallback(async () => {
     try {
@@ -296,35 +253,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mark post as viewed if logged in
-  useEffect(() => {
-    async function markAsViewed() {
-      if (
-        !user.loggedIn
-        || user.userData?.userUuid === post.creator?.uuid) return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    markAsViewed();
-  }, [
-    post,
-    user.loggedIn,
-    user.userData?.userUuid,
-  ]);
-
   useEffect(() => {
     setPledges([]);
     setPledgesNextPageToken('');
-    fetchPledgeLevelsForPost();
     fetchPledgesForPost();
     fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -470,11 +401,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         )
       }
       </SActivitesContainer>
-      {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
     </SWrapper>
   );
 };

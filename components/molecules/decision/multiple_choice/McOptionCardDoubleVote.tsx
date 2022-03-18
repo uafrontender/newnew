@@ -298,6 +298,8 @@ const SOptionSymbolImg = styled.img`
 const SOptionInfo = styled(Text)`
   grid-area: optionInfo;
 
+  color: #FFFFFF;
+
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {

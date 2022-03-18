@@ -5,7 +5,7 @@
 import React, {
   useCallback, useContext, useEffect, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -17,31 +17,25 @@ import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
 
+import Button from '../../atoms/Button';
+import GoBackButton from '../../molecules/GoBackButton';
+import LoadingModal from '../../molecules/LoadingModal';
 import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import CommentsTab from '../../molecules/decision/CommentsTab';
-import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
+import PostSuccessBox from '../../molecules/decision/PostSuccessBox';
+import PostWaitingForResponseBox from '../../molecules/decision/PostWaitingForResponseBox';
+import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
 import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
-import GoBackButton from '../../molecules/GoBackButton';
-import LoadingModal from '../../molecules/LoadingModal';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
+import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
-import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
-import Button from '../../atoms/Button';
-import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
-import PostSuccessBox from '../../molecules/decision/PostSuccessBox';
-import PostWaitingForResponseBox from '../../molecules/decision/PostWaitingForResponseBox';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -64,7 +58,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -72,12 +65,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [heightDelta, setHeightDelta] = useState( isMobile ? 0 : 256);
-
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channelsWithSubs,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
@@ -434,6 +424,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         });
 
         const res = await markPost(markAsViewedPayload);
+
+        if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
         console.error(err);
       }

@@ -1,13 +1,14 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -16,22 +17,24 @@ import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import { fetchCurrentOptionsForMCPost, getMcOption, voteOnPost } from '../../../api/endpoints/multiple_choice';
 
+import Lottie from '../../atoms/Lottie';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import McWinnerTab from '../../molecules/decision/multiple_choice/McWinnerTab';
 import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
 import GoBackButton from '../../molecules/GoBackButton';
 import LoadingModal from '../../molecules/LoadingModal';
+
+// Assets
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import McWinnerTab from '../../molecules/decision/multiple_choice/McWinnerTab';
-import Lottie from '../../atoms/Lottie';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -54,7 +57,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -63,7 +65,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channelsWithSubs,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
@@ -73,11 +74,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   // Tabs
   const tabs = useMemo(() => {
-    // NB! Will a check for winner option here
-    if (
-      postStatus === 'waiting_for_response'
-      || postStatus === 'succeeded'
-    ) {
+    if (post.winningOptionId) {
       return [
         {
           label: 'winner',
@@ -103,7 +100,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         value: 'comments',
       },
     ];
-  }, [postStatus]);
+  }, [post.winningOptionId]);
+
   const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
       return 'options'
@@ -112,11 +110,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     if (hash && (hash === '#options' || hash === '#comments' || hash === '#winner')) {
       return hash.substring(1) as 'options' | 'comments' | 'winner';
     }
-    // NB! Will a check for winner option here
-    if (
-      postStatus === 'waiting_for_response'
-      || postStatus === 'succeeded'
-    ) return 'winner';
+    if (post.winningOptionId) return 'winner';
     return 'options';
   });
 
@@ -350,6 +344,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         });
 
         const res = await markPost(markAsViewedPayload);
+
+        if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
         console.error(err);
       }
@@ -504,6 +500,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     setOptions,
     sortOptions,
   ]);
+
+  useEffect(() => {
+    if (loadingOptionsError) {
+      toast.error(loadingOptionsError);
+    }
+  }, [loadingOptionsError]);
 
   return (
     <SWrapper>
@@ -665,15 +667,12 @@ const SActivitesContainer = styled.div`
   height: 100%;
   width: 100%;
 
-  min-height: calc(728px - 46px - 64px - 40px - 72px);
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
+    max-height: calc(500px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px - 72px);
+    max-height: calc(580px);
   }
 `;
 

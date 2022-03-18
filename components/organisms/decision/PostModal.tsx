@@ -1,7 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-lonely-if */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -14,12 +11,15 @@ import Head from 'next/head';
 
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
+import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
 import List from '../search/List';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
+import PostFailedBox from '../../molecules/decision/PostFailedBox';
+// Posts views
 import PostViewAC from './PostViewAC';
 import PostViewMC from './PostViewMC';
 import PostViewCF from './PostViewCF';
@@ -28,15 +28,14 @@ import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
 
-
+// Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
+// Utils
 import isBrowser from '../../../utils/isBrowser';
-import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
-import PostFailedBox from '../../molecules/decision/PostFailedBox';
 
 interface IPostModal {
   isOpen: boolean;
@@ -105,7 +104,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const modalContainerRef = useRef<HTMLDivElement>();
 
   // Recommendations (with infinite scroll)
-  // NB! Will require a separate endpoint for this one
   const innerHistoryStack = useRef<newnewapi.Post[]>([]);
   const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null | undefined>('');
