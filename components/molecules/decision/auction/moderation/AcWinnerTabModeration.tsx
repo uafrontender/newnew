@@ -13,13 +13,17 @@ import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-t
 import { formatNumber } from '../../../../../utils/format';
 import Headline from '../../../../atoms/Headline';
 import Text from '../../../../atoms/Text';
+import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
+import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 
 interface IAcWinnerTabModeration {
   option: newnewapi.Auction.Option;
+  postStatus: TPostStatusStringified;
 }
 
 const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = ({
   option,
+  postStatus,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -165,6 +169,19 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
             </>
           )}
         </SWinnerOptionCard>
+        {postStatus === 'succeeded' ? (
+          <PostSuccessBoxModeration
+            title={t('PostSuccessModeration.title')}
+            body={t('PostSuccessModeration.body')}
+            buttonCaption={t('PostSuccessModeration.ctaButton')}
+            style={{
+              marginTop: '24px',
+            }}
+            handleButtonClick={() => {
+              console.log('Share')
+            }}
+          />
+        ) : null}
       </STabContainer>
     </>
   );
@@ -177,6 +194,8 @@ export default AcWinnerTabModeration;
 const STabContainer = styled(motion.div)`
   width: 100%;
   height: calc(100% - 112px);
+
+  min-height: 300px;
 `;
 
 const SWinnerOptionCard = styled.div`
@@ -201,11 +220,9 @@ const SWinnerOptionCard = styled.div`
 
     height: fit-content;
 
-    padding: 24px;
-  }
+    width: 100%;
 
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
+    padding: 24px;
   }
 `;
 
@@ -292,10 +309,11 @@ const SOptionDetails = styled.div`
 `;
 
 const SNumBidders = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SHeadline = styled(Headline)`
+  color: #FFFFFF;
   margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -304,17 +322,18 @@ const SHeadline = styled(Headline)`
 `;
 
 const SYouMade = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SOptionCreator = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SSpanBold = styled.span`
-
+  color: #FFFFFF;
 `;
 
 const SSpanThin = styled.span`
+  color: #FFFFFF;
   opacity: 0.8;
 `;
