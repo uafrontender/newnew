@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import moment from 'moment';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';

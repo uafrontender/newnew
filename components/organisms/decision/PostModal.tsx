@@ -27,6 +27,7 @@ import PostModerationAC from './PostModerationAC';
 import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
+import PostViewProcessing from './PostViewProcessing';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
@@ -176,7 +177,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
-          postType={typeOfPost!!}
+          handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+        />
+      );
+    }
+
+    if (postStatus === 'processing') {
+      return (
+        <PostViewProcessing
+          key={postParsed?.postUuid}
+          post={postParsed!!}
+          postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -227,6 +239,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostModeration = (postToRender: TPostType) => {
+    if (postStatus === 'processing') {
+      return (
+        <PostViewProcessing
+          key={postParsed?.postUuid}
+          post={postParsed!!}
+          postStatus={postStatus}
+          handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+        />
+      );
+    }
+
     if (postToRender === 'mc') {
       return (
         <PostModerationMC
