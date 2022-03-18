@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -12,7 +12,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
-import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 
 const CommentEllipseMenu = dynamic(() => import('../../molecules/decision/CommentEllipseMenu'));
@@ -55,11 +54,6 @@ const Comment: React.FC<IComment> = ({
     comment.replies ?? []
   ), [comment.replies]);
 
-  const formRef: any = useRef();
-  useOnClickOutside(formRef, () => {
-    setIsReplyFormOpen(false);
-  });
-
   const onUserReport = () => {
     setConfirmReportUser(true);
   };
@@ -76,16 +70,27 @@ const Comment: React.FC<IComment> = ({
     router.push(`/u/${comment.sender?.username}`)
   };
 
+  if (comment.isDeleted) {
+    console.log(`Comment ${comment.id} is deleted`)
+  }
+
   return (
     <>
       <SComment
         key={(comment.id).toString()}
       >
-        <SUserAvatar
-          avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''}
-          onClick={() => handleRedirectToUser()}
-        />
-        <SCommentContent ref={formRef}>
+        {!comment.isDeleted ? (
+          <SUserAvatar
+            avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''}
+            onClick={() => handleRedirectToUser()}
+          />
+          ) : (
+          <SUserAvatar
+            avatarUrl=''
+            onClick={() => {}}
+          />
+        )}
+        <SCommentContent>
           <SCommentHeader>
             <SNickname>
               {comment.sender?.uuid === user.userData?.userUuid ? t('comments.me') : (comment.sender?.nickname ?? comment.sender?.username)}
@@ -144,7 +149,7 @@ const Comment: React.FC<IComment> = ({
               canDeleteComment={canDeleteComment}
               comment={item}
               handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
-              handleDeleteComment={() => handleDeleteComment(item as TCommentWithReplies)}
+              handleDeleteComment={handleDeleteComment}
             />
             )
           )}

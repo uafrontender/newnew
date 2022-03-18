@@ -1,12 +1,12 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -15,24 +15,24 @@ import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import { fetchAcOptionById, fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
 
+import Lottie from '../../atoms/Lottie';
+import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
+import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
 import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import LoadingModal from '../../molecules/LoadingModal';
-import GoBackButton from '../../molecules/GoBackButton';
+
+// Assets
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
-import Lottie from '../../atoms/Lottie';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import { getMessages, sendMessage } from '../../../api/endpoints/chat';
-import { TCommentWithReplies } from '../../interfaces/tcomment';
 
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
@@ -58,8 +58,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -71,18 +69,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Response viewed
   const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
 
   // Tabs
   const tabs = useMemo(() => {
-    // NB! Will a check for winner option here
-    if (
-      postStatus === 'waiting_for_response'
-      || postStatus === 'succeeded'
-    ) {
+    if (post.winningOptionId) {
       return [
         {
           label: 'winner',
@@ -108,7 +102,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         value: 'comments',
       },
     ];
-  }, [postStatus]);
+  }, [post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -118,10 +112,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
       return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
-    // NB! Will a check for winner option here
     if (
-      postStatus === 'waiting_for_response'
-      || postStatus === 'succeeded'
+      post.winningOptionId
     ) return 'winner';
     return 'bids';
   });
@@ -174,7 +166,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   // Animating options
   const [optionToAnimate, setOptionToAnimate] = useState('');
 
-  const currLocation = `/?post=${post.postUuid}`;
+  // const currLocation = `/?post=${post.postUuid}`;
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -362,6 +354,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         });
 
         const res = await markPost(markAsViewedPayload);
+
+        if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
         console.error(err);
       }
@@ -504,6 +498,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, post, user.userData?.userUuid, setOptions, sortOptions]);
 
+  useEffect(() => {
+    if (loadingOptionsError) {
+      toast.error(loadingOptionsError);
+    }
+  }, [loadingOptionsError]);
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -612,7 +612,8 @@ const SWrapper = styled.div`
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: 46px min-content 1fr;
+    grid-template-rows: max-content max-content 1fr;
+
     grid-column-gap: 16px;
 
     align-items: flex-start;
@@ -623,7 +624,7 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
-    grid-template-columns: 410px 538px;
+    grid-template-columns: 410px 1fr;
   }
 `;
 
@@ -664,22 +665,19 @@ const SActivitesContainer = styled.div<{
   height: 100%;
   width: 100%;
 
-  min-height: calc(728px - 46px - 64px - 40px - 72px);
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
+    max-height: calc(500px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px - 72px);
-
     ${({ showSelectingWinnerOption }) => (
       showSelectingWinnerOption
       ? css`
-        max-height: calc(728px - 46px - 64px - 72px - 130px);
+        max-height: calc(580px - 130px);
       `
-      : null
+      : css`
+        max-height: calc(580px);
+      `
     )}
   }
 `;

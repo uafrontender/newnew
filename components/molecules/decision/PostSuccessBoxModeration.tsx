@@ -77,10 +77,6 @@ const SWaitingForResponseBox = styled.div`
     ;
     grid-template-columns: 64px 5fr 3fr;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 const SIconImg = styled.img`

@@ -571,7 +571,6 @@ const SSupportButton = styled(Button)`
     width: auto;
 
     padding: 0px 12px;
-    margin-right: 16px;
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
     background: none;
