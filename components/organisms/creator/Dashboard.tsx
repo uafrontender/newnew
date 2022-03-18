@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -13,6 +13,8 @@ import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
 import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
 import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
 import YourTodos from '../../molecules/creator/dashboard/YourTodos';
+
+import { getMyPosts } from '../../../api/endpoints/user';
 
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
@@ -38,6 +40,39 @@ export const Dashboard = () => {
       fetchMySubscriptionProduct();
     }
   }, [mySubscriptionProduct]);
+  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  // const [expirationPosts, setExprirationPost] = useState<newnewapi.Post[]>([]);
+  const [hasMyPosts, setHasMyPosts] = useState(false);
+
+  const todosCompleted = (value: boolean) => {
+    setIsTodosCompleted(value);
+  };
+
+  const loadMyPosts = useCallback(async () => {
+    if (isLoading) return;
+    try {
+      setIsLoading(true);
+      const payload = new newnewapi.GetRelatedToMePostsRequest({
+        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
+      });
+      const postsResponse = await getMyPosts(payload);
+
+      if (postsResponse.data && postsResponse.data.posts) {
+        if (postsResponse.data.posts.length > 0) setHasMyPosts(true);
+      }
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+      console.error(err);
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isTodosCompleted && !hasMyPosts && !isLoading) {
+      loadMyPosts();
+    }
+  }, [isTodosCompleted, isLoading, hasMyPosts, loadMyPosts]);
 
   return (
     <SContainer>
@@ -47,14 +82,16 @@ export const Dashboard = () => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        <SBlock>
-          <YourTodos />
+        <SBlock name="your-todos">
+          <YourTodos todosCompleted={todosCompleted} />
         </SBlock>
+        {hasMyPosts && (
+          <SBlock>
+            <ExpirationPosts />
+          </SBlock>
+        )}
         <SBlock>
-          <ExpirationPosts />
-        </SBlock>
-        <SBlock>
-          <Earnings />
+          <Earnings isTodosCompleted={isTodosCompleted} hasMyPosts={hasMyPosts} />
         </SBlock>
         <SBlock>
           <SubscriptionStats />
@@ -104,6 +141,7 @@ const SContent = styled.div`
 const STitle = styled(Headline)``;
 
 interface ISBlock {
+  name?: string;
   noMargin?: boolean;
 }
 

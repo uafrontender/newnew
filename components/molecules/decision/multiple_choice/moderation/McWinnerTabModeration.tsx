@@ -14,13 +14,17 @@ import isBrowser from '../../../../../utils/isBrowser';
 import { formatNumber } from '../../../../../utils/format';
 
 import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
+import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 
 interface MAcWinnerTabModeration {
   option: newnewapi.MultipleChoice.Option;
+  postStatus: TPostStatusStringified;
 }
 
 const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> = ({
   option,
+  postStatus,
 }) => {
   const { t } = useTranslation('decision');
   const router = useRouter();
@@ -176,6 +180,19 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> = (
             </>
           )}
         </SWinnerOptionCard>
+        {postStatus === 'succeeded' ? (
+          <PostSuccessBoxModeration
+            title={t('PostSuccessModeration.title')}
+            body={t('PostSuccessModeration.body')}
+            buttonCaption={t('PostSuccessModeration.ctaButton')}
+            style={{
+              marginTop: '24px',
+            }}
+            handleButtonClick={() => {
+              console.log('Share')
+            }}
+          />
+        ) : null}
       </STabContainer>
     </>
   );
@@ -188,6 +205,8 @@ export default McWinnerTabModeration;
 const STabContainer = styled(motion.div)`
   width: 100%;
   height: calc(100% - 112px);
+
+  min-height: 300px;
 `;
 
 const SWinnerOptionCard = styled.div`
@@ -213,10 +232,6 @@ const SWinnerOptionCard = styled.div`
     height: fit-content;
 
     padding: 24px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
   }
 `;
 
@@ -295,37 +310,36 @@ const SBottomScoop = styled.div`
 
 // Option details
 const SOptionDetails = styled.div`
-  color: #FFFFFF;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 `;
 
 const SNumBidders = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SHeadline = styled(Headline)`
   margin-bottom: 8px;
-
+  color: #FFFFFF;
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
   }
 `;
 
 const SYouMade = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SOptionCreator = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SSpanBold = styled.span`
-
+  color: #FFFFFF;
 `;
 
 const SSpanThin = styled.span`
+  color: #FFFFFF;
   opacity: 0.8;
 `;

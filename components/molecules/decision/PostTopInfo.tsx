@@ -480,10 +480,8 @@ const SSelectingWinnerOption = styled.div`
 
     margin-top: 32px;
 
-  }
+    width: 100%;
 
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
   }
 `;
 

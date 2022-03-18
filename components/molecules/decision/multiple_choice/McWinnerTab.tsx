@@ -269,10 +269,6 @@ const SWinnerOptionCard = styled.div`
 
     padding: 24px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 const STrophyImg = styled.img`

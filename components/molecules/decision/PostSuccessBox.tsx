@@ -70,10 +70,6 @@ const SSuccessBox = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 const SIconImg = styled.img`

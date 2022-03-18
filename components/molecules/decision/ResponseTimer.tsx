@@ -157,10 +157,6 @@ const SWrapper = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     color: #FFFFFF;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 const SInlineSvg = styled(InlineSvg)`
