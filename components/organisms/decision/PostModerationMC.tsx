@@ -73,11 +73,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   // Tabs
   const tabs = useMemo(() => {
-    // NB! Will a check for winner option here
-    if (
-      postStatus === 'waiting_for_response'
-      || postStatus === 'succeeded'
-    ) {
+    if (post.winningOptionId) {
       return [
         {
           label: 'winner',
@@ -103,7 +99,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         value: 'comments',
       },
     ];
-  }, [postStatus]);
+  }, [post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -113,6 +109,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     if (hash && (hash === '#options' || hash === '#comments'|| hash === '#winner')) {
       return hash.substring(1) as 'options' | 'comments';
     }
+    if (post.winningOptionId) return 'winner';
     return 'options';
   });
 
@@ -162,12 +159,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   // Winning option
   const [winningOption, setWinningOption] = useState<newnewapi.MultipleChoice.Option | undefined>();
-
-  // Comments
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -324,33 +315,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mark post as viewed if logged in
   useEffect(() => {
-    async function markAsViewed() {
-      if (
-        !user.loggedIn
-        || user.userData?.userUuid === post.creator?.uuid) return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    markAsViewed();
-  }, [
-    post,
-    user.loggedIn,
-    user.userData?.userUuid,
-  ]);
-
-  useEffect(() => {
-    setComments([]);
     setOptions([]);
     setOptionsNextPageToken('');
     fetchOptions();
@@ -530,6 +495,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
             ) : winningOption ? (
               <McWinnerTabModeration
                 option={winningOption}
+                postStatus={postStatus}
               />
             ) : (
               <SAnimationContainer>
@@ -572,7 +538,8 @@ const SWrapper = styled.div`
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: 46px min-content 1fr;
+    grid-template-rows: max-content max-content 1fr;
+
     grid-column-gap: 16px;
 
     align-items: flex-start;
@@ -583,7 +550,7 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
-    grid-template-columns: 410px 538px;
+    grid-template-columns: 410px 1fr;
   }
 `;
 
@@ -622,15 +589,12 @@ const SActivitesContainer = styled.div`
   height: 100%;
   width: 100%;
 
-  min-height: calc(728px - 46px - 64px - 40px - 72px);
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
+    max-height: calc(500px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px - 72px);
+    max-height: calc(580px);
   }
 `;
 

@@ -277,10 +277,6 @@ const SWinnerOptionCard = styled.div`
 
     padding: 24px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 const STrophyImg = styled.img`
@@ -367,19 +363,19 @@ const SBottomScoop = styled.div`
 
 // Option details
 const SOptionDetails = styled.div`
-  color: #FFFFFF;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 `;
 
 const SNumBidders = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SHeadline = styled(Headline)`
   margin-bottom: 8px;
+
+  color: #FFFFFF;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
@@ -389,13 +385,14 @@ const SHeadline = styled(Headline)`
 `;
 
 const SOptionCreator = styled(Text)`
-
+  color: #FFFFFF;
 `;
 
 const SSpanBold = styled.span`
-
+  color: #FFFFFF;
 `;
 
 const SSpanThin = styled.span`
+  color: #FFFFFF;
   opacity: 0.8;
 `;

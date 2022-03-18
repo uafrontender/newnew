@@ -128,8 +128,6 @@ const SContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: 12px;
-
-  width: calc(100% - 16px);
 `;
 
 const SPledgeDetails = styled.div`

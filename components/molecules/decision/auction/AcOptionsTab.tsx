@@ -74,7 +74,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
-  const [heightDelta, setHeightDelta] = useState(56);
+  const [heightDelta, setHeightDelta] = useState(postStatus === 'voting' ? 56 : 0);
   const actionSectionContainer = useRef<HTMLDivElement>();
 
   const mainContainer = useRef<HTMLDivElement>();
@@ -534,10 +534,6 @@ const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
   height: calc(100% - 50px);
-
-  ${({ theme }) => theme.media.tablet} {
-    height: calc(100% - 56px);
-  }
 `;
 
 const SBidsContainer = styled.div<{
@@ -554,6 +550,8 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+
+
     &::-webkit-scrollbar {
       width: 4px;
     }

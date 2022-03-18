@@ -199,10 +199,6 @@ const SWinnerCard = styled.div`
 
     padding: 24px;
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 

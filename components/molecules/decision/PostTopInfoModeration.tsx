@@ -382,10 +382,6 @@ const SSelectWinnerOption = styled.div`
     margin-top: 32px;
 
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
-  }
 `;
 
 const STrophyImg = styled.img`
