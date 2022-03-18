@@ -15,7 +15,11 @@ import { getMyCreatorTags, getMyOnboardingState } from '../../../../api/endpoint
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-export const YourTodos = () => {
+interface IFunctionProps {
+  todosCompleted: (value: boolean) => void;
+}
+
+export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -23,6 +27,7 @@ export const YourTodos = () => {
   const dispatch = useAppDispatch();
   const [allCompleted, setAllcompleted] = useState<boolean | null>(null);
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isProfileComplete = useCallback(() => {
     if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0) {
@@ -90,14 +95,21 @@ export const YourTodos = () => {
         console.error(err);
       }
     }
-    if (!allCompleted) {
-      if (user.userData?.options?.creatorStatus !== 2) {
-        fetchOnboardingState();
-      }
-      if (currentTags.length < 1) {
-        fetchCreatorTags();
+
+    async function checkAndLoad() {
+      if (!allCompleted) {
+        setIsLoading(true);
+        if (user.userData?.options?.creatorStatus !== 2) {
+          await fetchOnboardingState();
+        }
+        if (currentTags.length < 1) {
+          await fetchCreatorTags();
+        }
+        setIsLoading(false);
       }
     }
+
+    checkAndLoad();
   }, [user, dispatch, currentTags, allCompleted]);
 
   useEffect(() => {
@@ -107,8 +119,9 @@ export const YourTodos = () => {
         if (!item.completed) done = false;
       });
       setAllcompleted(done);
+      todosCompleted(done);
     }
-  }, [collection, allCompleted]);
+  }, [collection, allCompleted, todosCompleted]);
 
   const renderItem = useCallback(
     (item, index) => (
@@ -150,7 +163,7 @@ export const YourTodos = () => {
     ),
     [t, router, theme.name]
   );
-  return allCompleted === false ? (
+  return allCompleted === false && !isLoading ? (
     <SContainer>
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.todos.title')}</STitle>
