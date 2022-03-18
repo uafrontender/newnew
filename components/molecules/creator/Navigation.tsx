@@ -22,64 +22,64 @@ export const Navigation = () => {
   const { t } = useTranslation('creator');
   const router = useRouter();
 
-  const collection = useMemo(() => ([
-    {
-      url: '/creator/dashboard',
-      label: t('navigation.dashboard'),
-      iconFilled: dashboardFilledIcon,
-      iconOutlined: dashboardOutlinedIcon,
-    },
-    {
-      url: '/creator/subscriptions',
-      label: t('navigation.subscriptions'),
-      iconFilled: subscriptionsFilledIcon,
-      iconOutlined: subscriptionsOutlinedIcon,
-    },
-    {
-      url: '/creator/earnings',
-      label: t('navigation.earnings'),
-      iconFilled: earningsFilledIcon,
-      iconOutlined: earningsOutlinedIcon,
-    },
-    {
-      url: '/creator/get-paid',
-      label: t('navigation.getPaid'),
-      iconFilled: walletFilledIcon,
-      iconOutlined: walletOutlinedIcon,
-    },
-    {
-      url: '/creator/transactions',
-      label: t('navigation.transactions'),
-      iconFilled: transactionsFilledIcon,
-      iconOutlined: transactionsOutlinedIcon,
-    },
-  ]), [t]);
-
-  const renderItem = useCallback((item) => {
-    const active = item.url === router.route;
-
-    return (
-      <Link href={item.url} key={item.url}>
-        <SItem active={active}>
-          <SInlineSVG
-            svg={active ? item.iconFilled : item.iconOutlined}
-            fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-            width="24px"
-            height="24px"
-          />
-          <SLabel>
-            {item.label}
-          </SLabel>
-        </SItem>
-      </Link>
-    );
-  }, [router.route, theme.colorsThemed.accent.blue, theme.colorsThemed.text.tertiary]);
-
-  return (
-    <SContainer>
-      {collection.map(renderItem)}
-    </SContainer>
+  const collection = useMemo(
+    () => [
+      {
+        url: '/creator/dashboard',
+        label: t('navigation.dashboard'),
+        iconFilled: dashboardFilledIcon,
+        iconOutlined: dashboardOutlinedIcon,
+      },
+      {
+        url: '/creator/subscribers',
+        label: t('navigation.subscriptions'),
+        iconFilled: subscriptionsFilledIcon,
+        iconOutlined: subscriptionsOutlinedIcon,
+      },
+      {
+        url: '/creator/earnings',
+        label: t('navigation.earnings'),
+        iconFilled: earningsFilledIcon,
+        iconOutlined: earningsOutlinedIcon,
+      },
+      {
+        url: '/creator/get-paid',
+        label: t('navigation.getPaid'),
+        iconFilled: walletFilledIcon,
+        iconOutlined: walletOutlinedIcon,
+      },
+      {
+        url: '/creator/transactions',
+        label: t('navigation.transactions'),
+        iconFilled: transactionsFilledIcon,
+        iconOutlined: transactionsOutlinedIcon,
+      },
+    ],
+    [t]
   );
+
+  const renderItem = useCallback(
+    (item) => {
+      const active = item.url === router.route;
+
+      return (
+        <Link href={item.url} key={item.url}>
+          <SItem active={active}>
+            <SInlineSVG
+              svg={active ? item.iconFilled : item.iconOutlined}
+              fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
+              width="24px"
+              height="24px"
+            />
+            <SLabel>{item.label}</SLabel>
+          </SItem>
+        </Link>
+      );
+    },
+    [router.route, theme.colorsThemed.accent.blue, theme.colorsThemed.text.tertiary]
+  );
+
+  return <SContainer>{collection.map(renderItem)}</SContainer>;
 };
 
 export default Navigation;
@@ -117,21 +117,24 @@ const SItem = styled.a<ISItem>`
   }
 
   label {
-    color: ${(props) => (props.active ? props.theme.colorsThemed.text.primary : props.theme.colorsThemed.text.secondary)};
+    color: ${(props) =>
+      props.active ? props.theme.colorsThemed.text.primary : props.theme.colorsThemed.text.secondary};
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 
-  ${(props) => !props.active && css`
-    &:hover {
-      svg {
-        fill: ${props.theme.colorsThemed.text.primary};
-      }
+  ${(props) =>
+    !props.active &&
+    css`
+      &:hover {
+        svg {
+          fill: ${props.theme.colorsThemed.text.primary};
+        }
 
-      label {
-        color: ${props.theme.colorsThemed.text.primary};
+        label {
+          color: ${props.theme.colorsThemed.text.primary};
+        }
       }
-    }
-  `}
+    `}
 `;
 
 const SInlineSVG = styled(InlineSVG)`

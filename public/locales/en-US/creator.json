@@ -13,8 +13,8 @@
       "earlier": "Earlier"
     },
     "enableSubscription": {
-      "title": "Grow your passive income with  timely subscriptions",
-      "description": "Add a subscription to your channel button and start earning a fixed income.",
+      "title": "Grow your passive income with timely subscriptions",
+      "description": "Add a subscription and start earning a fixed income.",
       "learnMore": "Learn more",
       "submit": "Enable subscription"
     },
@@ -142,5 +142,29 @@
   "chat": {
     "today": "Today",
     "placeholder": "Write a message..."
+  },
+  "SubrateSection": {
+    "heading": "Your subscription rate",
+    "selectInput": {
+      "perMonth": "/month",
+      "select": "Select",
+      "featured": "Popular"
+    },
+    "submitDesktop": "Enable",
+    "backButton": "Cancel"
+  },
+  "subscribersFeatures": {
+    "title": "Subscribers have access to exclusive features",
+    "firstFeature": "Send you private messages.",
+    "secondFeature": "Vote for free on your multiple choices. ",
+    "thirdFeature": "Suggest on your multiple choices."
+  },
+  "enableSubModal": {
+    "title": "Unlock subscriptions",
+    "text": "You’re almost done – We just need you to confirm enabling the subscription service to your fans.",
+    "note": "Subscription price is locked for 30 days from the day you enable the service.",
+    "bntText": "Yes, enable subscription",
+    "confirmationTextFirstPart": "Enable",
+    "confirmationTextSecondPart": "monthly subscription price for my fans"
   }
 }

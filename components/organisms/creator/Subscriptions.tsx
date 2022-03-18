@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
 
 import Headline from '../../atoms/Headline';
 import Navigation from '../../molecules/creator/Navigation';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
+import SubproductsSelect from '../../molecules/creator/dashboard/SubproductsSelect';
 
 export const Subscriptions = () => {
   const { t } = useTranslation('creator');
@@ -13,15 +16,37 @@ export const Subscriptions = () => {
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+
+  const fetchMySubscriptionProduct = async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest();
+      const res = await getMySubscriptionProduct(payload);
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (!mySubscriptionProduct) {
+      fetchMySubscriptionProduct();
+    }
+  }, [mySubscriptionProduct]);
+
+  const goToMySubscribers = () => {
+    fetchMySubscriptionProduct();
+  };
+
   return (
     <SContainer>
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>
-            {t('subscriptions.title')}
-          </STitle>
+          <STitle variant={4}>{mySubscriptionProduct ? t('subscriptions.title') : t('SubrateSection.heading')}</STitle>
         </STitleBlock>
+        {!mySubscriptionProduct && <SubproductsSelect goToMySubscribers={goToMySubscribers} />}
       </SContent>
     </SContainer>
   );
@@ -45,17 +70,18 @@ const SContainer = styled.div`
 
 const SContent = styled.div`
   min-height: calc(100vh - 120px);
+  margin-bottom: 30px;
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 320px);
+    width: calc(100vw - 415px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     margin-left: 224px;
-    border-top-left-radius: 24px;
+    border-radius: 24px;
   }
 `;
 

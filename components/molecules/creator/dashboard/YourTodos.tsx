@@ -137,12 +137,7 @@ export const YourTodos = () => {
           </SBottomActionButton>
         )}
         {!item.completed && item.id === 'add-cashout-method' && (
-          <SBottomActionButton
-            withDim
-            withShrink
-            view="primaryGrad"
-            onClick={() => router.push('/creator-onboarding-stripe')}
-          >
+          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/creator/get-paid')}>
             {t('dashboard.todos.add-cashout-method-btn')}
           </SBottomActionButton>
         )}
