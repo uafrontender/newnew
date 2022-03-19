@@ -1,5 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
+/* eslint-disable no-lonely-if */
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -17,10 +18,10 @@ import loadingAnimation from '../../../../public/animations/logo-loading-blue.js
 import EnableSubModal from '../../../atoms/dashboard/EnableSubModal';
 
 interface ISubproductsSelect {
-  goToMySubscribers: () => void;
+  mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
 }
 
-const SubproductsSelect: React.FC<ISubproductsSelect> = ({ goToMySubscribers }) => {
+const SubproductsSelect: React.FC<ISubproductsSelect> = ({ mySubscriptionProduct }) => {
   const { t } = useTranslation('creator');
   const [standardProducts, setStandardProducts] = useState<newnewapi.ISubscriptionProduct[]>([]);
   const [featuredProductsIds, setFeaturedProductsIds] = useState<string[]>([]);
@@ -48,12 +49,16 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ goToMySubscribers }) 
   }, []);
 
   useEffect(() => {
-    if (featuredProductsIds.length > 0 && standardProducts.length > 0) {
-      setSelectedProduct(
-        standardProducts[standardProducts.findIndex((p) => featuredProductsIds.includes(p.id as string))]
-      );
+    if (mySubscriptionProduct) {
+      setSelectedProduct(mySubscriptionProduct);
+    } else {
+      if (featuredProductsIds.length > 0 && standardProducts.length > 0) {
+        setSelectedProduct(
+          standardProducts[standardProducts.findIndex((p) => featuredProductsIds.includes(p.id as string))]
+        );
+      }
     }
-  }, [featuredProductsIds, standardProducts]);
+  }, [mySubscriptionProduct, featuredProductsIds, standardProducts]);
 
   const handleSetSelectedProduct = (product: newnewapi.ISubscriptionProduct) => {
     setSelectedProduct(product);
@@ -63,7 +68,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ goToMySubscribers }) 
     setConfirmSubEnable(true);
   };
 
-  const subEnabled = async () => {
+  const setRate = async () => {
     try {
       const payload = new newnewapi.SetMySubscriptionProductRequest({
         productId: selectedProduct!!.id,
@@ -73,10 +78,15 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ goToMySubscribers }) 
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       setConfirmSubEnable(false);
-      goToMySubscribers();
+      router.push('/creator/subscribers');
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handlerUpdateRate = async () => {
+    await setRate();
+    router.push('/creator/subscribers');
   };
 
   return (
@@ -96,19 +106,34 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ goToMySubscribers }) 
           </SProductOptions>
           <SubsFeatures />
           <SActions>
-            <Button view="quaternary" onClick={() => router.push('/creator/dashboard')}>
+            <Button
+              view="quaternary"
+              onClick={() =>
+                !mySubscriptionProduct ? router.push('/creator/dashboard') : router.push('/creator/subscribers')
+              }
+            >
               {t('SubrateSection.backButton')}
             </Button>
-            <Button view="primaryGrad" onClick={() => handlerConfirmEnable()}>
-              {t('SubrateSection.submitDesktop')}
-            </Button>
+            {!mySubscriptionProduct ? (
+              <Button view="primaryGrad" onClick={() => handlerConfirmEnable()}>
+                {t('SubrateSection.submitDesktop')}
+              </Button>
+            ) : (
+              <Button
+                view="primaryGrad"
+                disabled={mySubscriptionProduct.id === selectedProduct!!.id}
+                onClick={() => handlerUpdateRate()}
+              >
+                {t('SubrateSection.updateRate')}
+              </Button>
+            )}
           </SActions>
-          {selectedProduct && (
+          {selectedProduct && !mySubscriptionProduct && (
             <EnableSubModal
               confirmEnableSub={confirmSubEnable}
               selectedProduct={selectedProduct}
               closeModal={() => setConfirmSubEnable(false)}
-              subEnabled={subEnabled}
+              subEnabled={setRate}
             />
           )}
         </SContainer>

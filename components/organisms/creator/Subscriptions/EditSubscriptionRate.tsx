@@ -3,34 +3,26 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import Headline from '../../atoms/Headline';
-import Navigation from '../../molecules/creator/Navigation';
+import Headline from '../../../atoms/Headline';
+import Navigation from '../../../molecules/creator/Navigation';
 
-import { useAppSelector } from '../../../redux-store/store';
-import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
-import SubproductsSelect from '../../molecules/creator/dashboard/SubproductsSelect';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
-import NoResults from '../../molecules/creator/dashboard/NoResults';
+import { useAppSelector } from '../../../../redux-store/store';
+import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
+import SubproductsSelect from '../../../molecules/creator/dashboard/SubproductsSelect';
 
-export const Subscriptions = () => {
+export const EditSubscriptionRate = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
-  const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isLoadingPr, setIsLoadingPr] = useState(false);
 
   const fetchMySubscriptionProduct = async () => {
     try {
-      setIsLoadingPr(true);
       const payload = new newnewapi.EmptyRequest();
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
-      setIsLoadingPr(false);
     } catch (err) {
-      setIsLoadingPr(false);
       console.error(err);
     }
   };
@@ -41,27 +33,20 @@ export const Subscriptions = () => {
     }
   }, [mySubscriptionProduct]);
 
-  const goToMySubscribers = () => {
-    fetchMySubscriptionProduct();
-  };
-
   return (
     <SContainer>
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>
-            {!mySubscriptionProduct && !isLoadingPr ? t('SubrateSection.heading') : t('subscriptions.title')}
-          </STitle>
+          <STitle variant={4}>{t('SubrateSection.heading')}</STitle>
         </STitleBlock>
-        {!mySubscriptionProduct && !isLoadingPr && <SubproductsSelect goToMySubscribers={goToMySubscribers} />}
-        {mySubscribers.length < 1 && <NoResults />}
+        <SubproductsSelect mySubscriptionProduct={mySubscriptionProduct} />
       </SContent>
     </SContainer>
   );
 };
 
-export default Subscriptions;
+export default EditSubscriptionRate;
 
 const SContainer = styled.div`
   position: relative;

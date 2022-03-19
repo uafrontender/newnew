@@ -104,7 +104,18 @@
     "meta": {
       "title": "Creator Subscriptions"
     },
-    "title": "Subscriptions"
+    "title": "Subscribers",
+    "table": {
+      "subscribers": "Subscribers",
+      "date": "Date subscribed",
+      "menu": {
+        "report": "Report user",
+        "block": "Block user",
+        "unblock": "Unblock user",
+        "view": "View profile"
+      },
+      "updateSub": "Update subscription"
+    }
   },
   "earnings": {
     "meta": {
@@ -159,7 +170,8 @@
       "featured": "Popular"
     },
     "submitDesktop": "Enable",
-    "backButton": "Cancel"
+    "backButton": "Cancel",
+    "updateRate": "Save changes"
   },
   "subscribersFeatures": {
     "title": "Subscribers have access to exclusive features",
