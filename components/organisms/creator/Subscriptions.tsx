@@ -9,22 +9,28 @@ import Navigation from '../../molecules/creator/Navigation';
 import { useAppSelector } from '../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
 import SubproductsSelect from '../../molecules/creator/dashboard/SubproductsSelect';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import NoResults from '../../molecules/creator/dashboard/NoResults';
 
 export const Subscriptions = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const [isLoadingPr, setIsLoadingPr] = useState(false);
 
   const fetchMySubscriptionProduct = async () => {
     try {
+      setIsLoadingPr(true);
       const payload = new newnewapi.EmptyRequest();
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+      setIsLoadingPr(false);
     } catch (err) {
+      setIsLoadingPr(false);
       console.error(err);
     }
   };
@@ -44,9 +50,12 @@ export const Subscriptions = () => {
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>{mySubscriptionProduct ? t('subscriptions.title') : t('SubrateSection.heading')}</STitle>
+          <STitle variant={4}>
+            {!mySubscriptionProduct && !isLoadingPr ? t('SubrateSection.heading') : t('subscriptions.title')}
+          </STitle>
         </STitleBlock>
-        {!mySubscriptionProduct && <SubproductsSelect goToMySubscribers={goToMySubscribers} />}
+        {!mySubscriptionProduct && !isLoadingPr && <SubproductsSelect goToMySubscribers={goToMySubscribers} />}
+        {mySubscribers.length < 1 && <NoResults />}
       </SContent>
     </SContainer>
   );
@@ -71,17 +80,18 @@ const SContainer = styled.div`
 const SContent = styled.div`
   min-height: calc(100vh - 120px);
   margin-bottom: 30px;
+  width: calc(100vw - 180px);
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    width: calc(100vw - 415px);
+    width: calc(100vw - 365px);
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
-    margin-left: 224px;
     border-radius: 24px;
+  }
+
+  ${(props) => props.theme.media.desktop} {
+    margin-left: 224px;
   }
 `;
 

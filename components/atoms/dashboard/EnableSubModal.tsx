@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -6,6 +7,7 @@ import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import Button from '../Button';
 import CloseModalButton from './CloseModalButton';
+import { formatNumber } from '../../../utils/format';
 
 interface IEnableSubModal {
   confirmEnableSub: boolean;
@@ -30,8 +32,9 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({ confirmEnableSub, selectedP
           </SModalHeader>
           <SModalContent>
             <SText>{t('enableSubModal.text')}</SText>
-            <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')} ${selectedProduct?.monthlyRate
-              ?.usdCents!!} ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
+            <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
+            $${formatNumber(selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
+            ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
             <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
           <SConfirmButton view="primaryGrad" onClick={handleSubmit}>

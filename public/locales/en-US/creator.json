@@ -174,5 +174,11 @@
     "bntText": "Yes, enable subscription",
     "confirmationTextFirstPart": "Enable",
     "confirmationTextSecondPart": "monthly subscription price for my fans"
+  },
+  "noResults": {
+    "title": "No results",
+    "text": "Bring more exposure, share with your network.",
+    "btnShare": "Share with friends",
+    "updateSub": "Update subscription"
   }
 }
