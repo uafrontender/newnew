@@ -1,6 +1,9 @@
-import React, { useMemo, useState, useCallback } from 'react';
+/* eslint-disable no-unsafe-optional-chaining */
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import moment from 'moment';
 
 import Text from '../../../atoms/Text';
 import Caption from '../../../atoms/Caption';
@@ -10,6 +13,9 @@ import CashOut from '../../../atoms/creator/CashOut';
 
 import FinishProfileSetup from '../../../atoms/creator/FinishProfileSetup';
 import MakeDecision from '../../../atoms/creator/MakeDecision';
+import { getMyEarnings } from '../../../../api/endpoints/payments';
+import dateToTimestamp from '../../../../utils/dateToTimestamp';
+import { formatNumber } from '../../../../utils/format';
 
 interface IFunctionProps {
   isTodosCompleted: boolean;
@@ -18,25 +24,63 @@ interface IFunctionProps {
 
 export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPosts }) => {
   const { t } = useTranslation('creator');
-  const [filter, setFilter] = useState('last_7_days');
+  const [filter, setFilter] = useState('7_days');
+  const [isLoading, setIsLoading] = useState<boolean | null>(null);
+  const [myEarnings, setMyEarnings] = useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchMyEarnings() {
+      try {
+        setIsLoading(true);
+        const payload = new newnewapi.GetMyEarningsRequest({
+          beginDate: dateToTimestamp(
+            moment()
+              .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
+              .startOf('day')
+          ),
+          endDate: dateToTimestamp(new Date()),
+        });
+        const res = await getMyEarnings(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setMyEarnings(res.data);
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsLoading(null);
+      }
+    }
+    if (isLoading === null) {
+      fetchMyEarnings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
+
+  useEffect(() => {
+    if (myEarnings) {
+      let sum = 0;
+      if (myEarnings.auEarnings?.usdCents) sum += myEarnings.auEarnings?.usdCents;
+      if (myEarnings.cfEarnings?.usdCents) sum += myEarnings.cfEarnings?.usdCents;
+      if (myEarnings.mcEarnings?.usdCents) sum += myEarnings.mcEarnings?.usdCents;
+      if (myEarnings.auEarnings?.usdCents) sum += myEarnings.auEarnings?.usdCents;
+      setTotalEarnings(sum);
+    }
+  }, [myEarnings]);
 
   const collection = useMemo(
     () => [
       {
         id: 'ac',
-        value: '$10.00',
       },
       {
         id: 'cf',
-        value: '$25.00',
       },
       {
         id: 'mc',
-        value: '$25.00',
       },
       {
         id: 'subscriptions',
-        value: '$15.50',
       },
     ],
     []
@@ -44,56 +88,99 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
   const filterOptions = useMemo(
     () => [
       {
-        id: 'today',
+        id: '0_days',
         label: t('dashboard.earnings.filter.today'),
       },
       {
-        id: 'yesterday',
+        id: '1_days',
         label: t('dashboard.earnings.filter.yesterday'),
       },
       {
-        id: 'last_7_days',
+        id: '7_days',
         label: t('dashboard.earnings.filter.last_7_days'),
       },
       {
-        id: 'last_30_days',
+        id: '30_days',
         label: t('dashboard.earnings.filter.last_30_days'),
       },
       {
-        id: 'last_90_days',
+        id: '90_days',
         label: t('dashboard.earnings.filter.last_90_days'),
       },
       {
-        id: 'last_12_months',
+        id: '12_months',
         label: t('dashboard.earnings.filter.last_12_months'),
       },
     ],
     [t]
   );
+
+  const getValue = (id: string) => {
+    switch (id) {
+      case 'ac':
+        return myEarnings?.auEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.auEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      case 'cf':
+        return myEarnings?.cfEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.cfEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      case 'mc':
+        return myEarnings?.mcEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.mcEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      case 'subscriptions':
+        return myEarnings?.subsEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.subsEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      default:
+        return '$0.00';
+    }
+  };
+
   const renderListItem = useCallback(
     (item) => (
       <SListItem key={`list-item-earnings-${item.id}`}>
         <SListItemTitle variant={2} weight={700}>
           {t(`dashboard.earnings.list.${item.id}`)}
         </SListItemTitle>
-        <SListItemValue variant={6}>{item.value}</SListItemValue>
+        <SListItemValue variant={6}>{getValue(item.id)}</SListItemValue>
       </SListItem>
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [t]
   );
+
+  const handleChangeFilter = (e: any) => {
+    if (filter !== e) {
+      setIsLoading(null);
+      setFilter(e);
+    }
+  };
+
+  const splitPeriod = () => {
+    const arr = filter.split('_');
+    if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
+    if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
+    return `${t('dashboard.earnings.earned')} ${arr[0]} ${arr[1]}`;
+  };
   /* eslint-disable no-nested-ternary */
   return (
     <SContainer>
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.earnings.title')}</STitle>
         <STotalInsights>
-          <DropDown value={filter} options={filterOptions} handleChange={setFilter} />
+          <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
         </STotalInsights>
       </SHeaderLine>
       <STotalLine>
         <STotalTextWrapper>
-          <STotal variant={4}>$50.50</STotal>
-          <STotalText weight={600}>{t('dashboard.earnings.earned')}</STotalText>
+          <STotal variant={4}>{totalEarnings ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}` : '$0.00'}</STotal>
+          <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
         {/* <STotalInsights>
           <STotalInsightsText>
@@ -108,7 +195,15 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
         </STotalInsights> */}
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {isTodosCompleted ? hasMyPosts ? <CashOut /> : <MakeDecision /> : <FinishProfileSetup />}
+      {isTodosCompleted ? (
+        hasMyPosts && myEarnings?.nextCashoutAmount ? (
+          <CashOut nextCashoutAmount={myEarnings?.nextCashoutAmount} nextCashoutDate={myEarnings?.nextCashoutDate} />
+        ) : (
+          <MakeDecision />
+        )
+      ) : (
+        <FinishProfileSetup />
+      )}
     </SContainer>
   );
 };
@@ -175,7 +270,9 @@ const STotal = styled(Headline)`
   margin-right: 8px;
 `;
 
-const STotalText = styled(Text)``;
+const STotalText = styled(Text)`
+  font-size: 14px;
+`;
 
 const STotalInsights = styled.div`
   cursor: pointer;
