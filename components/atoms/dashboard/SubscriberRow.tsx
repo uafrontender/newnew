@@ -1,5 +1,6 @@
-import { newnewapi } from 'newnew-api';
 import React, { useEffect, useState } from 'react';
+import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
@@ -15,7 +16,7 @@ import BlockUserModal from '../../molecules/chat/BlockUserModal';
 import { useAppSelector } from '../../../redux-store/store';
 
 interface ISubscriberRow {
-  subscriber: newnewapi.IUser;
+  subscriber: newnewapi.ISubscriber;
 }
 
 const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
@@ -34,13 +35,14 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
 
   useEffect(() => {
     if (usersIBlocked.length > 0) {
-      const isBlocked = usersIBlocked.find((i) => i === subscriber.uuid);
+      const isBlocked = usersIBlocked.find((i) => i === subscriber.user?.uuid);
       if (isBlocked) {
         setIsSubscriberBlocked(true);
       }
       console.log(usersIBlocked);
     }
     if (isSubscriberBlocked) setIsSubscriberBlocked(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usersIBlocked, subscriber]);
 
@@ -48,11 +50,11 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
     try {
       const payload = new newnewapi.MarkUserRequest({
         markAs: 4,
-        userUuid: subscriber.uuid,
+        userUuid: subscriber.user?.uuid,
       });
       const res = await markUser(payload);
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(subscriber.uuid!!);
+      unblockUser(subscriber.user?.uuid!!);
     } catch (err) {
       console.error(err);
     }
@@ -74,18 +76,20 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
     <SContainer>
       <SUser>
         <SUserAvatar>
-          <UserAvatar avatarUrl={subscriber.avatarUrl ? subscriber.avatarUrl : ''} />
+          <UserAvatar avatarUrl={subscriber.user?.avatarUrl ? subscriber.user.avatarUrl : ''} />
         </SUserAvatar>
-        {subscriber.username}
+        {subscriber.user?.nickname ? subscriber.user?.nickname : subscriber.user?.username}
       </SUser>
-      <SDate>00 December 0000</SDate>
+      {subscriber.firstSubscribedAt && (
+        <SDate>{moment(subscriber.firstSubscribedAt.seconds as number).format('DD MMMM YYYY')}</SDate>
+      )}
       <SActions>
-        {!isMobile && <Link href={`/direct-messages?chatwith=${subscriber.uuid}`}>DM</Link>}
+        {!isMobile && <Link href={`/direct-messages?chatwith=${subscriber.user?.uuid}`}>DM</Link>}
         <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
           <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
         </SMoreButton>
         <ChatEllipseMenu
-          user={subscriber}
+          user={subscriber.user!!}
           isVisible={ellipseMenuOpen}
           handleClose={handleCloseEllipseMenu}
           userBlocked={isSubscriberBlocked}
@@ -95,7 +99,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         {confirmReportUser && (
           <ReportUserModal
             confirmReportUser={confirmReportUser}
-            user={subscriber}
+            user={subscriber.user!!}
             closeModal={() => setConfirmReportUser(false)}
           />
         )}
@@ -104,7 +108,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
             <BlockUserModal
               confirmBlockUser={confirmBlockUser}
               onUserBlock={() => setIsSubscriberBlocked(true)}
-              user={subscriber}
+              user={subscriber.user!!}
               closeModal={() => setConfirmBlockUser(false)}
             />
           ))}

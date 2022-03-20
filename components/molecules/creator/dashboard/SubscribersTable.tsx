@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
@@ -11,6 +11,7 @@ import Button from '../../../atoms/Button';
 import InlineSVG from '../../../atoms/InlineSVG';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
+import randomID from '../../../../utils/randomIdGenerator';
 
 export const SubscribersTable = () => {
   const { t } = useTranslation('creator');
@@ -18,8 +19,10 @@ export const SubscribersTable = () => {
 
   const [isSortDirectionDesc, setIsSortDirectionDesc] = useState<boolean>(true);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
-  const [mySubscribers, setMySubscribers] = useState<newnewapi.IUser[]>([]);
-  // const [mySubsPageToken, setMySubsPageToken] = useState<string | undefined | null>('');
+  const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>([]);
+  const [mySubsNextPageToken, setMySubsNextPageToken] = useState<string | undefined | null>('');
+  const [mySubsPrevPageToken, setMySubsPrevPageToken] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
   const fetchMySubscribers = useCallback(
     async (pageToken?: string) => {
@@ -40,11 +43,8 @@ export const SubscribersTable = () => {
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
         if (res.data && res.data.subscribers.length > 0) {
-          setMySubscribers((curr) => {
-            const arr = [...curr, ...(res.data?.subscribers as newnewapi.IUser[])];
-            return arr;
-          });
-          // setMySubsPageToken(res.data.paging?.nextPageToken);
+          setMySubscribers(res.data?.subscribers as newnewapi.ISubscriber[]);
+          setMySubsNextPageToken(res.data.paging?.nextPageToken);
         }
         setMySubscribersIsLoading(false);
       } catch (err) {
@@ -60,50 +60,39 @@ export const SubscribersTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (mySubscribers.length > 0) console.log(mySubscribers);
-  }, [mySubscribers]);
-
   const changeSortDirection = () => {
     setIsSortDirectionDesc(!isSortDirectionDesc);
   };
 
-  const collection = useMemo(
-    () => [
-      {
-        uuid: 'c01fe3a3-d899-44a6-b2c4-0b06f5dc3fbf',
-        username: 'dmitry60740',
-        nickname: 'Dmitry',
-        avatarUrl:
-          'https://d3hqmhx7uxxlrw.cloudfront.net/users/c01fe3a3-d899-44a6-b2c4-0b06f5dc3fbf/5K7r5LaAfNut/orig.jpg',
-        options: {
-          isCreator: true,
-          isVerified: false,
-          isActivityPrivate: false,
-          isOfferingSubscription: true,
-        },
-        coverUrl:
-          'https://d3hqmhx7uxxlrw.cloudfront.net/users/c01fe3a3-d899-44a6-b2c4-0b06f5dc3fbf/4iantptpFSZa/orig.jpg',
-      },
-      {
-        uuid: '12ad742f-453d-4181-943f-deef49a5d69c',
-        username: 'goodbadugly305i',
-        nickname: 'goodbadugly305i',
-        avatarUrl:
-          'https://d3hqmhx7uxxlrw.cloudfront.net/users/12ad742f-453d-4181-943f-deef49a5d69c/mcXrGZhUUjny/orig.jpg',
-        options: {
-          isCreator: true,
-          isVerified: false,
-          isActivityPrivate: false,
-          isOfferingSubscription: true,
-        },
-        coverUrl: 'https://d3hqmhx7uxxlrw.cloudfront.net/assets/default-avatars-and-covers/cover_0.png',
-      },
-    ],
-    []
-  );
+  const renderItem = useCallback((subscriber) => <SubscriberRow key={randomID()} subscriber={subscriber} />, []);
 
-  const renderItem = useCallback((subscriber) => <SubscriberRow subscriber={subscriber} />, []);
+  const goNextPage = () => {
+    if (mySubsNextPageToken) setMySubsPrevPageToken((curr) => [...curr, mySubsNextPageToken!!]);
+    fetchMySubscribers(mySubsNextPageToken!!);
+    setCurrentPage((curr) => curr + 1);
+  };
+
+  const goPrevPage = () => {
+    if (!mySubsPrevPageToken[mySubsPrevPageToken.length - 2]) {
+      fetchMySubscribers();
+      setMySubsPrevPageToken([]);
+    } else {
+      fetchMySubscribers(mySubsPrevPageToken[mySubsPrevPageToken.length - 2]);
+      setMySubsPrevPageToken((curr) => {
+        const arr = curr;
+        arr.pop();
+        return arr;
+      });
+    }
+
+    setCurrentPage((curr) => curr - 1);
+  };
+
+  const goFirstPage = () => {
+    fetchMySubscribers();
+    setMySubsPrevPageToken([]);
+    setCurrentPage(0);
+  };
 
   return (
     <STable>
@@ -122,26 +111,23 @@ export const SubscribersTable = () => {
           </SDateWrapper>
         </SDate>
       </SThead>
-      <STBody>{collection.map(renderItem)}</STBody>
+      <STBody>{mySubscribers.map(renderItem)}</STBody>
       <STfoot>
         <SUpdateSub href="/creator/subscribers/edit-subscription-rate">{t('subscriptions.table.updateSub')}</SUpdateSub>
         <STools>
-          <SCount>1-10 of 0,000</SCount>
+          {!mySubsNextPageToken && mySubsPrevPageToken.length < 1 ? (
+            <SCount>
+              1-{mySubscribers.length} of {mySubscribers.length}
+            </SCount>
+          ) : (
+            <SCount>{`${currentPage !== 0 ? currentPage : ''}1-${currentPage + 1}0 of 0,000`}</SCount>
+          )}
+
           <STableNav>
-            <SButton
-              onClick={() => {
-                console.log('1');
-              }}
-              view="transparent"
-            >
+            <SButton onClick={goFirstPage} view="transparent" disabled={mySubsPrevPageToken.length < 1}>
               <SInlineSVG svg={ChevronFirstPage} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
             </SButton>
-            <SButton
-              onClick={() => {
-                console.log('1');
-              }}
-              view="transparent"
-            >
+            <SButton onClick={goPrevPage} view="transparent" disabled={mySubsPrevPageToken.length < 1}>
               <SInlineSVG
                 type="prev"
                 svg={ChevronDown}
@@ -150,12 +136,7 @@ export const SubscribersTable = () => {
                 height="20px"
               />
             </SButton>
-            <SButton
-              onClick={() => {
-                console.log('1');
-              }}
-              view="transparent"
-            >
+            <SButton onClick={goNextPage} view="transparent" disabled={!mySubsNextPageToken}>
               <SInlineSVG
                 type="next"
                 svg={ChevronDown}
@@ -169,6 +150,7 @@ export const SubscribersTable = () => {
                 console.log('1');
               }}
               view="transparent"
+              disabled={!mySubsNextPageToken}
             >
               <SInlineSVG
                 type="last-page"
