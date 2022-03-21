@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -17,6 +17,8 @@ import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import McOptionCardModeration from './McOptionCardModeration';
+import GradientMask from '../../../../atoms/GradientMask';
+import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 
 interface IMcOptionsTabModeration {
   post: newnewapi.MultipleChoice;
@@ -48,6 +50,8 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
     inView,
   } = useInView();
 
+  const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
@@ -64,7 +68,17 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <SBidsContainer>
+        <SBidsContainer
+          ref={(el) => {
+            containerRef.current = el!!;
+          }}
+        >
+          {!isMobile ? (
+            <>
+              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
+              <GradientMask gradientType="secondary" positionBottom={0} active={showBottomGradient} />
+            </>
+          ) : null}
           {options.map((option, i) => (
             <McOptionCardModeration
               index={i}
@@ -103,7 +117,7 @@ export default McOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 112px);
+  height: calc(100% - 56px);
 `;
 
 const SBidsContainer = styled.div`
@@ -114,10 +128,6 @@ const SBidsContainer = styled.div`
   display: flex;
   flex-direction: column;
   /* gap: 16px; */
-
-  ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 125px;
-  }
 `;
 
 const SLoaderDiv = styled.div`
