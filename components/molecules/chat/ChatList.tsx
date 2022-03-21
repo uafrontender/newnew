@@ -112,6 +112,8 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         const res = await getMyRooms(payload);
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
         setChatRooms(res.data.rooms);
+        console.log(res.data.rooms);
+
         setLoadingRooms(false);
       } catch (err) {
         console.error(err);
