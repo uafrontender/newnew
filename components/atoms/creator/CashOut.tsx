@@ -41,7 +41,7 @@ const CashOut: React.FC<ICashOut> = ({ nextCashoutAmount, nextCashoutDate }) => 
           {nextCashoutDate && (
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
-                date: moment(nextCashoutDate.seconds as number).format('MMM DD,YYYY'),
+                date: moment(nextCashoutDate.seconds as number * 1000).format('MMM DD,YYYY'),
               })}
             </SDescription>
           )}

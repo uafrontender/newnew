@@ -42,6 +42,7 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
           endDate: dateToTimestamp(new Date()),
         });
         const res = await getMyEarnings(payload);
+
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
         setMyEarnings(res.data);
 
@@ -115,7 +116,7 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
     [t]
   );
 
-  const getValue = (id: string) => {
+  const getValue = useCallback((id: string) => {
     switch (id) {
       case 'ac':
         return myEarnings?.auEarnings?.usdCents
@@ -140,7 +141,9 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
       default:
         return '$0.00';
     }
-  };
+  }, [
+    myEarnings,
+  ]);
 
   const renderListItem = useCallback(
     (item) => (
@@ -151,8 +154,7 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
         <SListItemValue variant={6}>{getValue(item.id)}</SListItemValue>
       </SListItem>
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t]
+    [t, getValue]
   );
 
   const handleChangeFilter = (e: any) => {
