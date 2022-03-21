@@ -306,7 +306,7 @@
     },
     "WinnerTab": {
       "WinnerOptionCard": {
-        "backers_founed": "backers successfully funded",
+        "backers_founded": "backers successfully funded",
         "backer_founded": "backer successfully funded"
       }
     },
