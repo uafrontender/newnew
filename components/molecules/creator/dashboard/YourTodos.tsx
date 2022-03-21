@@ -27,7 +27,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
   const dispatch = useAppDispatch();
   const [allCompleted, setAllcompleted] = useState<boolean | null>(null);
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean | null>(null);
 
   const isProfileComplete = useCallback(() => {
     if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0) {
@@ -97,7 +97,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
     }
 
     async function checkAndLoad() {
-      if (!allCompleted) {
+      if (!allCompleted && !isLoading) {
         setIsLoading(true);
         if (user.userData?.options?.creatorStatus !== 2) {
           await fetchOnboardingState();
@@ -110,10 +110,11 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
     }
 
     checkAndLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, dispatch, currentTags, allCompleted]);
 
   useEffect(() => {
-    if (!allCompleted) {
+    if (!allCompleted && isLoading === false) {
       let done = true;
       collection.forEach((item) => {
         if (!item.completed) done = false;
@@ -121,7 +122,8 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
       setAllcompleted(done);
       todosCompleted(done);
     }
-  }, [collection, allCompleted, todosCompleted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, allCompleted, todosCompleted, isLoading]);
 
   const renderItem = useCallback(
     (item, index) => (
@@ -150,12 +152,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
           </SBottomActionButton>
         )}
         {!item.completed && item.id === 'add-cashout-method' && (
-          <SBottomActionButton
-            withDim
-            withShrink
-            view="primaryGrad"
-            onClick={() => router.push('/creator-onboarding-stripe')}
-          >
+          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/creator/get-paid')}>
             {t('dashboard.todos.add-cashout-method-btn')}
           </SBottomActionButton>
         )}
