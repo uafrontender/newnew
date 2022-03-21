@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { useAppSelector } from '../../../redux-store/store';
+import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
 
 import Headline from '../../atoms/Headline';
 import Earnings from '../../molecules/creator/dashboard/Earnings';
@@ -12,19 +14,36 @@ import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionSta
 import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
 import YourTodos from '../../molecules/creator/dashboard/YourTodos';
 
-import { useAppSelector } from '../../../redux-store/store';
 import { getMyPosts } from '../../../api/endpoints/user';
 
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
+  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const fetchMySubscriptionProduct = async () => {
+    try {
+      const payload = new newnewapi.EmptyRequest();
+      const res = await getMySubscriptionProduct(payload);
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (!mySubscriptionProduct) {
+      fetchMySubscriptionProduct();
+    }
+  }, [mySubscriptionProduct]);
   const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   // const [expirationPosts, setExprirationPost] = useState<newnewapi.Post[]>([]);
   const [hasMyPosts, setHasMyPosts] = useState(false);
-
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const todosCompleted = (value: boolean) => {
     setIsTodosCompleted(value);
@@ -77,9 +96,11 @@ export const Dashboard = () => {
         <SBlock>
           <SubscriptionStats />
         </SBlock>
-        <SBlock noMargin>
-          <EnableSubscription />
-        </SBlock>
+        {!mySubscriptionProduct && (
+          <SBlock noMargin>
+            <EnableSubscription />
+          </SBlock>
+        )}
       </SContent>
     </SContainer>
   );
