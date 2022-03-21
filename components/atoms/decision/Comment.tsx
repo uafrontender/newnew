@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 import React, { useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -70,10 +71,6 @@ const Comment: React.FC<IComment> = ({
     router.push(`/u/${comment.sender?.username}`)
   };
 
-  if (comment.isDeleted) {
-    console.log(`Comment ${comment.id} is deleted`)
-  }
-
   return (
     <>
       <SComment
@@ -93,7 +90,11 @@ const Comment: React.FC<IComment> = ({
         <SCommentContent>
           <SCommentHeader>
             <SNickname>
-              {comment.sender?.uuid === user.userData?.userUuid ? t('comments.me') : (comment.sender?.nickname ?? comment.sender?.username)}
+              {!comment.isDeleted ? (
+                comment.sender?.uuid === user.userData?.userUuid ? t('comments.me') : (comment.sender?.nickname ?? comment.sender?.username)
+              ) : (
+                t('comments.comment_deleted')
+              )}
             </SNickname>
             <SBid>
               {' '}
@@ -130,9 +131,14 @@ const Comment: React.FC<IComment> = ({
             !isReplyFormOpen ? (
               <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
             ) : (
-              <CommentForm
-                onSubmit={(newMsg: string) => handleAddComment(newMsg)}
-              />
+              <>
+                {replies.length === 0 ? (
+                  <SReply onClick={replyHandler}>{t('comments.hide-replies')}</SReply>
+                ) : null}
+                <CommentForm
+                  onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+                />
+              </>
             )
           )}
           {!comment.parentId && replies && replies.length > 0 && (
