@@ -100,7 +100,9 @@ export const SubscribersTable = () => {
         <SSub>{t('subscriptions.table.subscribers')}</SSub>
         <SDate onClick={changeSortDirection}>
           <SDateWrapper>
-            {t('subscriptions.table.date')}
+            <div>
+              {t('subscriptions.table.date')}
+            </div>
             <SDateInlineSVG
               svg={arrowDown}
               fill={theme.colorsThemed.text.tertiary}
@@ -194,8 +196,11 @@ const SSub = styled.div`
 
 const SDate = styled.div`
   padding: 0 0 0 16px;
-  width: 33%;
   display: flex;
+
+  ${(props) => props.theme.media.tablet} {
+    width: 33%;
+  }
 `;
 
 const SDateWrapper = styled.div`
