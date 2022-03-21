@@ -11,7 +11,9 @@ export const useLeavePageConfirm = (
 
   useEffect(() => {
     const handler = (route: string) => {
-      if (!allowedRoutes.includes(route) && isConfirm && !window.confirm(message)) {
+      const routeTrimmed = route.slice(0, (route.indexOf('?') !== -1 ? route.indexOf('?') : undefined));
+
+      if (!allowedRoutes.includes(routeTrimmed) && isConfirm && !window.confirm(message)) {
         // eslint-disable-next-line no-throw-literal
         throw 'Route Canceled';
       }

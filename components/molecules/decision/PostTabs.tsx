@@ -4,8 +4,13 @@ import React, {
   useState,
   useEffect,
 } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+
+import InlineSvg from '../../atoms/InlineSVG';
+
+import BackersIcon from '../../../public/images/svg/icons/filled/Backers.svg';
+import CommentsIcon from '../../../public/images/svg/icons/outlined/Comments.svg';
 
 type TDecisonTab = {
   label: string;
@@ -19,11 +24,20 @@ interface IDecisionTabs {
   handleChangeTab: (val: string) => void;
 }
 
+const Icons = {
+  bids: BackersIcon,
+  options: BackersIcon,
+  backers: BackersIcon,
+  winner: BackersIcon,
+  comments: CommentsIcon,
+};
+
 const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
   tabs,
   activeTab,
   handleChangeTab,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const [activeTabIndicator, setActiveTabIndicator] = useState<{
     width: number;
@@ -71,8 +85,17 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
             onClick={() => handleChangeTab(tab.value)}
             activeTab={tab.value === activeTab}
           >
-            {t(`tabs.${tab.label}`)}
-            {tab.amount ? ` ${tab.amount}` : ''}
+            <InlineSvg
+              // @ts-ignore
+              svg={Icons[tab.value]}
+              fill={tab.value === activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary}
+              width="24px"
+              height="24px"
+            />
+            <div>
+              {t(`tabs.${tab.label}`)}
+              {tab.amount ? ` ${tab.amount}` : ''}
+            </div>
           </STab>
         ))}
         <SActiveTabIndicator
@@ -106,7 +129,7 @@ const STabsContainer = styled.div`
 
   z-index: 2;
 
-  width: min-content;
+  width: 100%;
   overflow: hidden;
   position: relative;
 `;
@@ -116,13 +139,18 @@ interface ISTab {
 }
 
 const STab = styled.button<ISTab>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
   position: relative;
-  width: min-content;
+  width: 50%;
 
   background: transparent;
   border: transparent;
 
-  padding-bottom: 6px;
+  padding-bottom: 12px;
 
   white-space: nowrap;
   font-weight: 600;
@@ -186,7 +214,7 @@ const SActiveTabIndicator = styled.div`
 
   border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
-  background: ${({ theme }) => theme.gradients.blueHorizontal};
+  background: ${({ theme }) => theme.colorsThemed.text.primary};
 
   transition: opacity .35s ease-in-out, left .25s linear, width .27s linear;
 `;

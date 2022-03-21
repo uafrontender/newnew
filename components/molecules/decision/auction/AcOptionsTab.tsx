@@ -1,82 +1,85 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
 import { useAppSelector } from '../../../../redux-store/store';
+import { WalletContext } from '../../../../contexts/walletContext';
+import { placeBidWithWallet } from '../../../../api/endpoints/auction';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
+import { validateText } from '../../../../api/endpoints/infrastructure';
 
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
 import AcOptionCard from './AcOptionCard';
-import OptionOverview from './AcOptionOverview';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import PlaceBidForm from './PlaceAcBidForm';
-import PaymentModal from '../PaymentModal';
 import LoadingModal from '../../LoadingModal';
+import PaymentModal from '../../checkout/PaymentModal';
+import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import Button from '../../../atoms/Button';
-import { validateText } from '../../../../api/endpoints/infrastructure';
+
+import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
+import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IAcOptionsTab {
   postId: string;
+  postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   optionToAnimate?: string;
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
   handleLoadBids: (token?: string) => void;
-  overviewedOption?: newnewapi.Auction.Option;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
-  handleCloseOptionBidHistory: () => void;
-  handleOpenOptionBidHistory: (
-    optionToOpen: newnewapi.Auction.Option
-  ) => void;
 }
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
+  postStatus,
   options,
   optionToAnimate,
   optionsLoading,
   pagingToken,
   minAmount,
   handleLoadBids,
-  overviewedOption,
   handleAddOrUpdateOptionFromResponse,
-  handleCloseOptionBidHistory,
-  handleOpenOptionBidHistory,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const { walletBalance } = useContext(WalletContext);
+
   // Infinite load
   const {
     ref: loadingRef,
     inView,
   } = useInView();
 
-  const [shadowTop, setShadowTop] = useState(false);
-  const [shadowBottom, setShadowBottom] = useState(!isMobile);
-  const [heightDelta, setHeightDelta] = useState(56);
   const containerRef = useRef<HTMLDivElement>();
+  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
+
+  const [heightDelta, setHeightDelta] = useState(postStatus === 'voting' ? 56 : 0);
   const actionSectionContainer = useRef<HTMLDivElement>();
 
-  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
-
   const mainContainer = useRef<HTMLDivElement>();
-  const overviewedRefId = useRef('');
+
+  const [optionBeingSupported, setOptionBeingSupported] = useState<string>('');
 
   // New option/bid
   const [newBidText, setNewBidText] = useState('');
@@ -91,10 +94,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
-    if (!user.loggedIn) {
-      router.push('/sign-up?reason=bid');
-      return;
-    }
     setPaymentModalOpen(true);
   };
 
@@ -149,33 +148,85 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     setNewBidText, validateTextViaAPIDebounced,
   ]);
 
-  const handleSubmitNewOption = useCallback(async () => {
+  const handleSubmitNewOptionWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.PlaceBidRequest({
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(newBidAmount, 10) * 100,
-        }),
-        optionTitle: newBidText,
-        postUuid: postId,
-      });
+      // Check if user is logged and if the wallet balance is sufficient
+      if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(newBidAmount, 10) * 100)) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
+          ...(!user.loggedIn ? {
+            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+          } : {}),
+          acBidRequest: {
+            amount: new newnewapi.MoneyAmount({
+              usdCents: parseInt(newBidAmount, 10) * 100,
+            }),
+            optionTitle: newBidText,
+            postUuid: postId,
+          }
+        });
 
-      const res = await placeBidOnAuction(makeBidPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data
-        || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data
+          || !res.data.sessionUrl
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
 
-      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makeBidPayload = new newnewapi.PlaceBidRequest({
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(newBidAmount, 10) * 100,
+          }),
+          optionTitle: newBidText,
+          postUuid: postId,
+        });
 
-      setNewBidAmount('');
-      setNewBidText('');
-      setSuggestNewMobileOpen(false);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await placeBidWithWallet(makeBidPayload);
+
+        // Additional handler if balance turned out to be insufficient
+        if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
+            acBidRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(newBidAmount, 10) * 100,
+              }),
+              optionTitle: newBidText,
+              postUuid: postId,
+            }
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+
+          if (!resStripeRedirect.data
+            || !resStripeRedirect.data.sessionUrl
+            || resStripeRedirect.error
+          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data
+          || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        setNewBidAmount('');
+        setNewBidText('');
+        setSuggestNewMobileOpen(false);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -185,7 +236,47 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     newBidAmount,
     newBidText,
     postId,
+    user,
+    walletBalance,
     handleAddOrUpdateOptionFromResponse,
+  ]);
+
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
+        ...(!user.loggedIn ? {
+          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+        } : {}),
+        acBidRequest: {
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(newBidAmount, 10) * 100,
+          }),
+          optionTitle: newBidText,
+          postUuid: postId,
+        }
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data
+        || !res.data.sessionUrl
+        || res.error
+      ) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [
+    user.loggedIn,
+    newBidAmount,
+    newBidText,
+    postId,
   ]);
 
   useEffect(() => {
@@ -196,7 +287,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   }, [inView, pagingToken, optionsLoading]);
 
   useEffect(() => {
-    if (optionBeingSupported && containerRef.current) {
+    if (optionBeingSupported && containerRef.current && !isMobile) {
       let optIdx = options.findIndex((o) => o.id.toString() === optionBeingSupported);
       optIdx += 2;
       const childDiv = containerRef.current.children[optIdx];
@@ -210,32 +301,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         top: scrollBy,
       });
     }
-  }, [options, optionBeingSupported]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolledToTop = (containerRef.current?.scrollTop ?? 0) < 10;
-      const isScrolledToBottom = (
-        (containerRef.current?.scrollTop ?? 0) + (containerRef.current?.clientHeight ?? 0))
-        >= (containerRef.current?.scrollHeight ?? 0);
-
-      if (!isScrolledToTop) {
-        setShadowTop(true);
-      } else {
-        setShadowTop(false);
-      }
-
-      if (!isScrolledToBottom) {
-        setShadowBottom(true);
-      } else {
-        setShadowBottom(false);
-      }
-    };
-
-    containerRef.current?.addEventListener('scroll', handleScroll);
-
-    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
-  }, [overviewedOption]);
+  }, [options, optionBeingSupported, isMobile]);
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
@@ -246,44 +312,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       }
     });
 
-    resizeObserver.observe(actionSectionContainer.current!!);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (overviewedOption) {
-      overviewedRefId.current = overviewedOption.id.toString();
-
-      if (isMobile) {
-        document.getElementById('post-modal-container')
-          ?.scrollTo({
-            top: window.innerHeight,
-            behavior: 'smooth',
-          });
-      }
-    } else if (!overviewedOption && overviewedRefId.current) {
-      let optIdx = options.findIndex((o) => o.id.toString() === overviewedRefId.current);
-      optIdx += 2;
-      const childDiv = containerRef.current!!.children[optIdx];
-
-      if (childDiv) {
-        if (isMobile) {
-          childDiv.scrollIntoView();
-        } else {
-          const childRect = childDiv.getBoundingClientRect();
-          const parentRect = containerRef.current!!.getBoundingClientRect();
-          const scrollBy = childRect.top - parentRect.top;
-
-          containerRef.current!!.scrollBy({
-            top: scrollBy,
-          });
-        }
-      }
-
-      overviewedRefId.current = '';
+    if (actionSectionContainer.current) {
+      resizeObserver.observe(actionSectionContainer.current!!);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overviewedOption, options]);
+  }, []);
 
   return (
     <>
@@ -296,105 +329,118 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {
-          !overviewedOption ? (
-            <SBidsContainer
-              ref={(el) => {
-                containerRef.current = el!!;
-              }}
-              heightDelta={heightDelta}
+        {options.length === 0 && !optionsLoading ? (
+          <SNoOptionsYet>
+            <SNoOptionsImgContainer>
+              <img
+                src={NoContentYetImg.src}
+                alt='No content yet'
+              />
+            </SNoOptionsImgContainer>
+            <SNoOptionsCaption
+              variant={3}
             >
-              <SShadowTop
-                style={{
-                  opacity: shadowTop && !optionBeingSupported ? 1 : 0,
-                }}
+              { t('AcPost.OptionsTab.NoOptions.caption_1') }
+            </SNoOptionsCaption>
+            <SNoOptionsCaption
+              variant={3}
+            >
+              { t('AcPost.OptionsTab.NoOptions.caption_2') }
+            </SNoOptionsCaption>
+            {!isMobile && (
+              <SMakeBidArrowSvg
+                svg={MakeFirstBidArrow}
+                fill={theme.colorsThemed.background.quinary}
+                width="36px"
               />
-              <SShadowBottom
-                heightDelta={heightDelta}
-                style={{
-                  opacity: shadowBottom && !optionBeingSupported ? 1 : 0,
-                }}
-              />
-              {options.map((option, i) => (
-                <AcOptionCard
-                  key={option.id.toString()}
-                  option={option as TAcOptionWithHighestField}
-                  shouldAnimate={optionToAnimate === option.id.toString()}
-                  postId={postId}
-                  index={i}
-                  minAmount={minAmount}
-                  optionBeingSupported={optionBeingSupported}
-                  handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
-                  handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
-                  handleOpenOptionBidHistory={() => handleOpenOptionBidHistory(option)}
-                />
-              ))}
-              {!isMobile ? (
-                <SLoaderDiv
-                  ref={loadingRef}
-                />
-              ) : (
-                pagingToken ? (
-                  (
-                    <SLoadMoreBtn
-                      view="secondary"
-                      onClick={() => handleLoadBids(pagingToken)}
-                    >
-                      { t('AcPost.OptionsTab.loadMoreBtn') }
-                    </SLoadMoreBtn>
-                  )
-                ) : null
-              )}
-            </SBidsContainer>
-          ) : (
-            <OptionOverview
-              postUuid={postId}
-              overviewedOption={overviewedOption}
-              handleCloseOptionBidHistory={handleCloseOptionBidHistory}
-            />
-          )
-          }
-        <SActionSection
+            )}
+          </SNoOptionsYet>
+        ) : null}
+        <SBidsContainer
           ref={(el) => {
-            actionSectionContainer.current = el!!;
+            containerRef.current = el!!;
           }}
+          heightDelta={heightDelta}
         >
-          <SuggestionTextArea
-            value={newBidText}
-            disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
-            placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
-            onChange={handleUpdateNewOptionText}
-          />
-          <BidAmountTextInput
-            value={newBidAmount}
-            inputAlign="left"
-            horizontalPadding="16px"
-            disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
-            onChange={(newValue: string) => setNewBidAmount(newValue)}
-            minAmount={minAmount}
-            style={{
-              width: '60px',
+          {!isMobile ? (
+            <>
+              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
+              <GradientMask gradientType="secondary" positionBottom={heightDelta} active={showBottomGradient} />
+            </>
+          ) : null}
+          {options.map((option, i) => (
+            <AcOptionCard
+              key={option.id.toString()}
+              option={option as TAcOptionWithHighestField}
+              shouldAnimate={optionToAnimate === option.id.toString()}
+              postId={postId}
+              index={i}
+              minAmount={minAmount}
+              votingAllowed={postStatus === 'voting'}
+              optionBeingSupported={optionBeingSupported}
+              handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+              handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
+            />
+          ))}
+          {!isMobile ? (
+            <SLoaderDiv
+              ref={loadingRef}
+            />
+          ) : (
+            pagingToken ? (
+              (
+                <SLoadMoreBtn
+                  view="secondary"
+                  onClick={() => handleLoadBids(pagingToken)}
+                >
+                  { t('loadMoreBtn') }
+                </SLoadMoreBtn>
+              )
+            ) : null
+          )}
+        </SBidsContainer>
+        {postStatus === 'voting' && (
+          <SActionSection
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
             }}
-          />
-          <Button
-            view="primaryGrad"
-            size="sm"
-            disabled={!newBidText
-              || parseInt(newBidAmount, 10) < minAmount
-              || optionBeingSupported !== ''
-              || overviewedOption !== undefined
-              || !newBidTextValid}
-            style={{
-              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-            }}
-            onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
-          </Button>
-        </SActionSection>
+            <SuggestionTextArea
+              value={newBidText}
+              disabled={optionBeingSupported !== ''}
+              placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
+              onChange={handleUpdateNewOptionText}
+            />
+            <BidAmountTextInput
+              value={newBidAmount}
+              inputAlign="center"
+              disabled={optionBeingSupported !== ''}
+              onChange={(newValue: string) => setNewBidAmount(newValue)}
+              minAmount={minAmount}
+              style={{
+                width: '60px',
+              }}
+            />
+            <Button
+              view="primaryGrad"
+              size="sm"
+              disabled={!newBidText
+                || !newBidAmount
+                || parseInt(newBidAmount, 10) < minAmount
+                || optionBeingSupported !== ''
+                || !newBidTextValid}
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClick={() => handleTogglePaymentModalOpen()}
+            >
+              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+            </Button>
+          </SActionSection>
+        )}
       </STabContainer>
       {/* Suggest new Modal */}
-      {isMobile ? (
+      {isMobile && postStatus === 'voting' ? (
         <OptionActionMobileModal
           isOpen={suggestNewMobileOpen}
           onClose={() => setSuggestNewMobileOpen(false)}
@@ -403,15 +449,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           <SSuggestNewContainer>
             <SuggestionTextArea
               value={newBidText}
-              disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
+              disabled={optionBeingSupported !== ''}
+              autofocus={suggestNewMobileOpen}
               placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
               value={newBidAmount}
               inputAlign="left"
-              horizontalPadding="16px"
-              disabled={optionBeingSupported !== '' || overviewedOption !== undefined}
+              disabled={optionBeingSupported !== ''}
+              style={{
+                textAlign: 'center',
+                paddingLeft: '12px',
+              }}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
             />
@@ -419,9 +469,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               view="primaryGrad"
               size="sm"
               disabled={!newBidText
+                || !newBidAmount
                 || parseInt(newBidAmount, 10) < minAmount
                 || optionBeingSupported !== ''
-                || overviewedOption !== undefined
                 || !newBidTextValid}
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
@@ -438,13 +488,22 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${newBidAmount}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={handleSubmitNewOptionWallet}
         >
-          <PlaceBidForm
-            optionTitle={newBidText}
-            amountRounded={newBidAmount}
-            handlePlaceBid={handleSubmitNewOption}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle
+              variant={3}
+            >
+              { t('AcPost.paymenModalHeader.subtitle') }
+            </SPaymentModalTitle>
+            <SPaymentModalOptionText>
+              { newBidText }
+            </SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
       {/* Loading Modal */}
@@ -453,7 +512,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         zIndex={14}
       />
       {/* Mobile floating button */}
-      {isMobile && !suggestNewMobileOpen ? (
+      {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}
@@ -466,7 +525,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 };
 
 AcOptionsTab.defaultProps = {
-  overviewedOption: undefined,
   optionToAnimate: undefined,
 };
 
@@ -475,7 +533,7 @@ export default AcOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 112px);
+  height: calc(100% - 56px);
 `;
 
 const SBidsContainer = styled.div<{
@@ -492,6 +550,8 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+
+
     &::-webkit-scrollbar {
       width: 4px;
     }
@@ -520,47 +580,12 @@ const SBidsContainer = styled.div<{
   }
 `;
 
-const SShadowTop = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0;
-
-  width: calc(100% - 18px);
-  height: 0px;
-
-  z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
-  ;
-  clip-path: inset(0px 0px -100px 0px);
-
-  transition: linear .2s;
-`;
-
-const SShadowBottom = styled.div<{
-  heightDelta: number;
-}>`
-  position: absolute;
-  bottom: ${({ heightDelta }) => heightDelta}px;
-  left: 0;
-
-  width: calc(100% - 18px);
-  height: 0px;
-
-  z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 1)' : 'rgba(241, 243, 249, 1)')};
-  ;
-  clip-path: inset(-100px 0px 0px 0px);
-  transition: linear .2s;
-`;
-
 const SLoaderDiv = styled.div`
   height: 10px;
 `;
 
 const SLoadMoreBtn = styled(Button)`
-  width: calc(100% - 16px);
+  width: 100%;
   height: 56px;
 `;
 
@@ -592,16 +617,92 @@ const SActionSection = styled.div`
     display: flex;
     flex-direction: row;
     align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 16px;
 
-    position: absolute;
     min-height: 50px;
     width: 100%;
     z-index: 5;
-    bottom: 0;
 
     padding-top: 8px;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+    border-top: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+
+    textarea {
+      width: 100%;
+    }
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-wrap: nowrap;
+    justify-content: initial;
+
+    textarea {
+      width: 277px;
+    }
+  }
+`;
+
+// Payment modal header
+const SPaymentModalHeader = styled.div`
+
+`;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+// No options yet
+const SNoOptionsYet = styled.div`
+  position: absolute;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 300px;
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 400px;
+  }
+`;
+
+const SNoOptionsImgContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  margin-bottom: 16px;
+`;
+
+const SNoOptionsCaption = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SMakeBidArrowSvg = styled(InlineSvg)`
+  position: absolute;
+  left: 26%;
+  bottom: -58px;
+
 `;

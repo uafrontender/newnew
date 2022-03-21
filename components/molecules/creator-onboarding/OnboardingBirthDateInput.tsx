@@ -1,271 +1,227 @@
-/* eslint-disable global-require */
-/* eslint-disable import/no-dynamic-require */
 /* eslint-disable no-plusplus */
-/* eslint-disable arrow-body-style */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  forwardRef, useState, useEffect, useRef,
+  useState, useEffect, useMemo, useCallback,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
-import DatePicker, { ReactDatePickerCustomHeaderProps, registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { newnewapi } from 'newnew-api';
+
+import { useAppSelector } from '../../../redux-store/store';
 
 // Components
 import InlineSvg from '../../atoms/InlineSVG';
 import DropdownSelect, { TDropdownSelectItem } from '../../atoms/DropdownSelect';
 
-// Icons
-import CalendarIcon from '../../../public/images/svg/icons/filled/Calendar.svg';
-// Signs
-import CakeIcon from '../../../public/images/png/astrology-signs/Cake.png';
-import AquariusIcon from '../../../public/images/png/astrology-signs/Aquarius.png';
-import PiscesIcon from '../../../public/images/png/astrology-signs/Pisces.png';
-import AriesIcon from '../../../public/images/png/astrology-signs/Aries.png';
-import TaurusIcon from '../../../public/images/png/astrology-signs/Taurus.png';
-import GeminiIcon from '../../../public/images/png/astrology-signs/Gemini.png';
-import CancerIcon from '../../../public/images/png/astrology-signs/Cancer.png';
-import LeoIcon from '../../../public/images/png/astrology-signs/Leo.png';
-import VirgoIcon from '../../../public/images/png/astrology-signs/Virgo.png';
-import LibraIcon from '../../../public/images/png/astrology-signs/Libra.png';
-import ScorpioIcon from '../../../public/images/png/astrology-signs/Scorpio.png';
-import SagittariusIcon from '../../../public/images/png/astrology-signs/Sagittarius.png';
-import CapricornIcon from '../../../public/images/png/astrology-signs/Capricorn.png';
-
-// Datepicker utils
-import findAstrologySign, { IAstrologySigns } from '../../../utils/findAstrologySign';
+// Utils
 import getLocalizedMonth from '../../../utils/getMonth';
-import { SUPPORTED_LANGUAGES } from '../../../constants/general';
+import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-// Import and register locales (for weekdays)
-for (let i = 0; i < SUPPORTED_LANGUAGES.length; i++) {
-  let localeName = SUPPORTED_LANGUAGES[i];
+import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
+import Modal from '../../organisms/Modal';
+import BirthDateMobileInput from '../BirthDateMobileInput';
 
-  if (localeName === 'en') localeName = 'en-us';
-  if (localeName === 'es-MX') localeName = 'es';
-
-  const importedLocale = require(`date-fns/locale/${localeName}/index.js`);
-  registerLocale(SUPPORTED_LANGUAGES[i], importedLocale as any);
-}
 const minDate = new Date(new Date().setFullYear(1900));
-const maxDate = new Date(new Date().setFullYear(new Date().getFullYear() - 18));
-const years: TDropdownSelectItem<number>[] = [];
-for (let i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++) {
-  years.push({
-    name: i.toString(),
-    value: i,
-  });
-}
-
-const signs: IAstrologySigns = {
-  Cake: CakeIcon,
-  Aquarius: AquariusIcon,
-  Pisces: PiscesIcon,
-  Aries: AriesIcon,
-  Taurus: TaurusIcon,
-  Gemini: GeminiIcon,
-  Cancer: CancerIcon,
-  Leo: LeoIcon,
-  Virgo: VirgoIcon,
-  Libra: LibraIcon,
-  Scorpio: ScorpioIcon,
-  Sagittarius: SagittariusIcon,
-  Capricorn: CapricornIcon,
-};
 
 interface IOnboardingBirthDateInput {
-  value?: Date;
+  value?: newnewapi.IDateComponents;
+  maxDate: Date;
   locale?: string;
   disabled: boolean;
+  isValid: boolean;
   labelCaption: string;
   bottomCaption: string;
-  onChange: (date: Date) => void;
+  errorCaption: string;
+  onChange: (newValue: newnewapi.IDateComponents) => void;
+  handleResetIsValid: () => void;
   handleSetActive?: () => void;
 }
 
 const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInput> = ({
   value,
+  maxDate,
   locale,
   disabled,
+  isValid,
   labelCaption,
   bottomCaption,
+  errorCaption,
   onChange,
+  handleResetIsValid,
   handleSetActive,
 }) => {
   const theme = useTheme();
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const months: TDropdownSelectItem<number>[] = Array(12).fill('').map((_, i) => {
-    return {
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const months: TDropdownSelectItem<number>[] = useMemo(() => (
+    Array(12).fill('').map((_, i) => ({
       name: getLocalizedMonth(i, locale),
-      value: i,
-    };
-  });
+      value: i + 1,
+    }))
+  ), [locale]);
 
-  const handleToggleCalendarOpen = () => setCalendarOpen((curr) => !curr);
+  const years: TDropdownSelectItem<number>[] = useMemo(() => {
+    const workingArr = [];
+    for (let i = maxDate.getFullYear(); i >= minDate.getFullYear(); i--) {
+      workingArr.push({
+        name: i.toString(),
+        value: i,
+      });
+    }
+    return workingArr;
+  }, [maxDate]);
 
-  const handleRenderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
-    return (
-      <SDatePickerHeader>
-        <DropdownSelect<number>
-          label={props.date.getFullYear().toString()}
-          options={years}
-          selected={props.date.getFullYear()}
-          width="110px"
-          maxItems={4}
-          closeOnSelect
-          onSelect={(val) => props.changeYear(val)}
-        />
-        <DropdownSelect<number>
-          label={getLocalizedMonth(props.date.getMonth(), locale)}
-          options={months}
-          selected={props.date.getMonth()}
-          width="183px"
-          maxItems={4}
-          closeOnSelect
-          onSelect={(val) => props.changeMonth(val)}
-        />
-      </SDatePickerHeader>
-    );
+  const [availableDays, setAvailableDays] = useState<
+    TDropdownSelectItem<number>[]>(() => {
+      if (!value?.month || !value?.year) {
+        return Array(31).fill('').map((_, i) => ({
+          name: (i + 1).toString(),
+          value: i + 1,
+        }));
+      }
+
+      return Array(new Date(value?.year, value?.month, 0).getDate()).fill('').map((_, i) => ({
+        name: (i + 1).toString(),
+        value: i + 1,
+      }));
+    });
+
+  const handleUpdateDay = useCallback((day: number) => {
+    const working = { ...value };
+    working.day = day;
+    onChange(working);
+  }, [value, onChange]);
+
+  const handleUpdateMonth = (month: number) => {
+    const working = { ...value };
+    working.month = month;
+    onChange(working);
   };
 
-  const CustomInputForwardRef = forwardRef<
-    HTMLInputElement,
-    React.DetailedHTMLProps<
-      React.InputHTMLAttributes<HTMLInputElement>,
-      HTMLInputElement
-  >>((props, ref) => {
-    const [inputData, setInputData] = useState(props.value);
+  const handleUpdateYear = (year: number) => {
+    const working = { ...value };
+    working.year = year;
+    onChange(working);
+  };
 
-    const [placeholder, setPlaceholder] = useState(props.placeholder);
-    const explicitInputRef = useRef<HTMLInputElement>();
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Input contains invalid characters
-      if (e.target.value.length > 0 && !e.target.value.match(/^[0-9-]+$/)) {
-        return;
+  useEffect(() => {
+    setAvailableDays(() => {
+      if (!value?.month || !value?.year) {
+        return Array(31).fill('').map((_, i) => ({
+          name: (i + 1).toString(),
+          value: i + 1,
+        }));
       }
+      return Array(new Date(value?.year, value?.month, 0).getDate()).fill('').map((_, i) => ({
+        name: (i + 1).toString(),
+        value: i + 1,
+      }));
+    });
+  }, [value?.month, value?.year, setAvailableDays]);
 
-      // Input too long
-      if (e.target.value.length > 8) return;
-
-      // No hyphen
-      if ((e.target.value.length === 3 || e.target.value.length === 6)
-        && e.target.value.charAt(e.target.value.length - 1) !== '-'
-      ) {
-        return;
-      }
-
-      // Insert hyphen
-      if ((e.target.value.length === 2 || e.target.value.length === 5)
-        && e.target.value.length > (inputData as string)?.length
-      ) {
-        e.target.value += '-';
-        setInputData(e.target.value);
-        props.onChange?.(e);
-        return;
-      }
-
-      setInputData(e.target.value);
-
-      // The length is valid, call the outer onChange()
-      if (e.target.value.length === 8 || e.target.value.length === 0) {
-        props.onChange?.(e);
-      }
-    };
-
-    useEffect(() => {
-      const arr1 = Array((inputData as string).length).fill(' ');
-      const arr = arr1.map((val, i) => {
-        if (i === 2 || i === 5) {
-          return '<span>&nbsp;</span>';
-        }
-        return '<span>&nbsp;&nbsp;&nbsp;</span>';
-      });
-      const newVal = arr.join('') + (props.placeholder?.slice((inputData as string).length) || '');
-      setPlaceholder(newVal);
-    }, [inputData, props.placeholder]);
-
-    return (
-      <SCustomInput>
-        <input
-          ref={(node) => {
-            explicitInputRef.current = node!!;
-            (ref as Function)(node);
-          }}
-          inputMode="numeric"
-          value={inputData}
-          onChange={handleChange}
-          onPaste={(e) => e.preventDefault()}
-        />
-        <SPseudoPlaceholder
-          dangerouslySetInnerHTML={{
-            __html: placeholder ?? '',
-          }}
-          onClick={() => explicitInputRef.current?.focus()}
-        />
-        <CalendarButton
-          type="button"
-          onClick={props.onClick as any}
-        >
-          <InlineSvg
-            svg={CalendarIcon}
-            width="24px"
-            height="24px"
-            fill={!calendarOpen
-              ? theme.colorsThemed.text.quaternary : theme.colorsThemed.text.primary}
-          />
-        </CalendarButton>
-      </SCustomInput>
-    );
-  });
+  useEffect(() => {
+    if (value?.day && availableDays.findIndex((o) => o.value === value.day) === -1) {
+      handleUpdateDay(availableDays[availableDays.length - 1].value);
+    }
+  }, [availableDays, handleUpdateDay, value?.day]);
 
   return (
-    <SContainer
-      onMouseEnter={() => handleSetActive?.()}
-    >
-      <SLabel>
-        { labelCaption }
-      </SLabel>
-      <SAstrologyImg
-        src={signs[findAstrologySign(value)].src}
-      />
-      <SDatePicker>
-        <DatePicker
-          disabled={disabled}
-          selected={value ?? undefined}
-          placeholderText="DD-MM-YY"
-          dateFormat="dd-MM-yy"
-          minDate={minDate}
-          maxDate={maxDate}
-          shouldCloseOnSelect={false}
-          fixedHeight
-          preventOpenOnFocus
-          adjustDateOnChange
-          onInputClick={() => {}}
-          // Locales
-          locale={locale ?? 'en-US'}
-          formatWeekDay={(d) => d[0].toUpperCase()}
-          // Custom render elements
-          renderCustomHeader={handleRenderCustomHeader}
-          customInput={<CustomInputForwardRef />}
-          // Calendar
-          popperPlacement="top-end"
-          popperModifiers={[
-            {
-              name: 'offset',
-              options: {
-                offset: [0, 6],
-              },
-            },
-          ]}
-          // Handlers
-          onChange={onChange}
-          onCalendarOpen={() => handleToggleCalendarOpen()}
-          onCalendarClose={() => handleToggleCalendarOpen()}
-        />
-      </SDatePicker>
-      <SBottomCaption>
-        { bottomCaption }
-      </SBottomCaption>
-    </SContainer>
+    <>
+      <SContainer
+        onMouseEnter={() => handleSetActive?.()}
+        onClickCapture={() => handleResetIsValid()}
+      >
+        <SLabel>
+          { labelCaption }
+        </SLabel>
+        {!isMobile ? (
+          <SDropdownsContainer
+            isValid={isValid}
+          >
+            <DropdownSelect<number>
+              closeOnSelect
+              width="120px"
+              label={value?.day ? value?.day.toString() : 'Day'}
+              options={availableDays}
+              selected={value?.day!!}
+              maxItems={6}
+              onSelect={handleUpdateDay}
+            />
+            <DropdownSelect<number>
+              closeOnSelect
+              width="160px"
+              label={value?.month ? months.find((o) => o.value === value.month)?.name!! : 'Month'}
+              options={months}
+              selected={value?.month!!}
+              maxItems={6}
+              onSelect={handleUpdateMonth}
+            />
+            <DropdownSelect<number>
+              closeOnSelect
+              width={isTablet ? '100%' : '120px'}
+              label={value?.year ? years.find((o) => o.value === value.year)?.name!! : 'Year'}
+              options={years}
+              selected={value?.year!!}
+              maxItems={6}
+              onSelect={handleUpdateYear}
+            />
+          </SDropdownsContainer>
+        ) : (
+          <SLabelButton
+            disabled={disabled ?? false}
+            isValid={isValid}
+            onClick={() => setIsModalOpen(true)}
+          >
+            <span>
+              {value?.day && value.month && value.year ? (
+                `${value?.day} ${months.find((o) => o.value === value?.month!!)?.name!!} ${value?.year}`
+              ) : 'Please select date'}
+            </span>
+            <SInlineSVG
+              svg={ArrowDown}
+              fill={theme.colorsThemed.text.quaternary}
+              width="24px"
+              height="24px"
+              focused={isModalOpen}
+            />
+          </SLabelButton>
+        )}
+        {!isValid ? (
+          <AnimatedPresence
+            animation="t-09"
+          >
+            <SErrorDiv>
+              <InlineSvg
+                svg={AlertIcon}
+                width="16px"
+                height="16px"
+              />
+              { errorCaption }
+            </SErrorDiv>
+          </AnimatedPresence>
+        ) : null }
+      </SContainer>
+      <Modal
+        show={isModalOpen}
+        customBackdropFilterValue={1}
+        onClose={() => setIsModalOpen(false)}
+      >
+        {isModalOpen && (
+          <BirthDateMobileInput
+            currentDate={value!!}
+            months={months}
+            years={years}
+            handleChangeDate={onChange}
+            handleClose={() => setIsModalOpen(false)}
+          />
+        )}
+      </Modal>
+    </>
   );
 };
 
@@ -280,14 +236,6 @@ export default OnboardingBirthDateInput;
 const SContainer = styled.div`
   position: relative;
   width: 100%;
-
-  ${({ theme }) => theme.media.tablet} {
-    width: 284px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: 296px;
-  }
 `;
 
 const SLabel = styled.div`
@@ -312,267 +260,99 @@ const SBottomCaption = styled.div`
   margin-top: 6px;
 `;
 
-const SAstrologyImg = styled.img`
-  position: absolute;
-  left: 20px;
-  top: calc(50% - 11px);
-
-
-  width: 24px;
-  height: 24px;
-
-  z-index: 1;
-`;
-
-const CalendarButton = styled.button`
-  position: absolute;
-  right: 20px;
-  top: calc(50% - 11px);
-
-  background: none;
-
-  width: 24px;
-  height: 24px;
-
-  z-index: 1;
-
-  outline: none;
-  border: none;
-
-  cursor: pointer;
-
-  &:focus:enabled, &:hover:enabled {
-    outline: none;
-
-    svg {
-      fill: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
-  }
-`;
-
-const SDatePicker = styled.div`
-  display: block;
-  width: 100%;
-
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-  .react-datepicker-wrapper {
-
-    .react-datepicker__input-container {
-      height: 44px;
-      width: 100%;
-
-      input {
-        width: 100%;
-        color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-        border-radius: ${({ theme }) => theme.borderRadius.medium};
-        border-width: 1.5px;
-        border-style: solid;
-        border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
-
-        color: ${({ theme }) => theme.colorsThemed.text.primary};
-        background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-
-        padding: 12px 20px 12px 52px;
-
-        font-weight: 500;
-        font-size: 14px;
-        line-height: 20px;
-
-        color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-        &:hover:enabled, &:focus, &:active {
-          outline: none;
-
-          border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
-        }
-      }
-    }
-  }
-  .react-datepicker-popper {
-    width: 356px;
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
-    border: transparent;
-
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-    background: ${({ theme }) => theme.colorsThemed.background.secondary};
-    box-shadow: 0px 0px 35px 20px rgba(0, 0, 0, 0.2);
-
-    div {
-      border: none;
-
-      .react-datepicker {
-        background: transparent;
-        width: 100%;
-
-        .react-datepicker__triangle, .react-datepicker__navigation {
-          display: none;
-        }
-
-        .react-datepicker__month-container {
-          width: 100%;
-
-
-          .react-datepicker__header {
-            background: transparent;
-
-            .react-datepicker__current-month {
-              display: none;
-            }
-
-            .react-datepicker__header__dropdown {
-              display: flex;
-
-              .react-datepicker__month-dropdown-container {
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: center;
-                padding: 12px 12px 12px 20px;
-
-                background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-                border-radius: ${({ theme }) => theme.borderRadius.medium};
-              }
-
-              .react-datepicker__year-dropdown-container {
-
-              }
-            }
-
-            .react-datepicker__day-names {
-              display: flex;
-              gap: 16px;
-
-              padding-left: 34px;
-              padding-right: 34px;
-
-              div {
-                font-weight: 500;
-                font-size: 16px;
-                line-height: 24px;
-                color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-              }
-            }
-          }
-
-          // Days
-          .react-datepicker__month {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-
-            .react-datepicker__week {
-              display: flex;
-              gap: 16px;
-
-              padding-left: 28px;
-              padding-right: 28px;
-
-              div {
-                font-weight: 500;
-                font-size: 16px;
-                line-height: 24px;
-              }
-
-              .react-datepicker__day {
-                color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-                &:hover {
-                  position: relative;
-                  color: #FFFFFF;
-                  background: transparent;
-
-                  &:before {
-                    position: absolute;
-                    top: calc(50% - 22px);
-                    left: calc(50% - 22px);
-                    content: '';
-
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 50%;
-
-                    background: ${({ theme }) => theme.colorsThemed.accent.blue};
-
-                    z-index: -1;
-                  }
-                }
-              }
-
-              .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
-                position: relative;
-                color: #FFFFFF;
-                background: transparent;
-                outline: none;
-
-                &:before {
-                  position: absolute;
-                  top: calc(50% - 22px);
-                  left: calc(50% - 22px);
-                  content: '';
-
-                  width: 44px;
-                  height: 44px;
-                  border-radius: 50%;
-
-                  background: ${({ theme }) => theme.colorsThemed.accent.blue};
-
-                  z-index: -1;
-                }
-              }
-
-              .react-datepicker__day--outside-month {
-                color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-              }
-
-              .react-datepicker__day--disabled {
-                opacity: 0.5;
-              }
-            }
-          }
-        }
-      }
-
-    }
-  }
-`;
-
-const SDatePickerHeader = styled.div`
+const SErrorDiv = styled.div`
   display: flex;
   justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 16px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
+`;
+
+// Desktop
+const SDropdownsContainer = styled.div<{
+  isValid: boolean;
+}>`
+  display: flex;
+  flex-direction: row;
   gap: 16px;
 
+  button {
+    border-width: 1.5px;
+    border-style: solid;
+    border-color: ${({ isValid, theme }) => (isValid ? 'transparent' : theme.colorsThemed.accent.error)};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    justify-content: space-between;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    justify-content: flex-start;
+  }
+`;
+
+// Mobile
+const SLabelButton = styled.button<{
+  isValid: boolean;
+}>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   width: 100%;
-  padding: 16px 24px !important;
-`;
 
-const SCustomInput = styled.div`
 
-`;
+  border-width: 1.5px;
+  border-style: solid;
+  border-color: ${({ isValid, theme }) => (isValid ? 'transparent' : theme.colorsThemed.accent.error)};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-const SPseudoPlaceholder = styled.div`
-  position: absolute;
-  white-space: nowrap;
-  top: 0;
-  left: 5;
-  z-index: 1;
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
-  padding: 14px 20px 12px 53.5px;
-
-  font-weight: 500;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 14px;
+  font-weight: 500;
   line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
 
-  cursor: text;
+  padding: 12px 20px 12px 20px;
 
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  span {
+    margin-right: 8px;
+  }
+
+  transition: .2s linear;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover:enabled, &:focus:active {
+    cursor: pointer;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+`;
+
+const SInlineSVG = styled(InlineSvg)<{
+  focused: boolean;
+}>`
+
+  transform: ${({ focused }) => (focused ? 'rotate(180deg)' : 'unset')};
+
 `;

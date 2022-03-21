@@ -9,9 +9,9 @@ import {
 export const BASE_URL_MULTICHOICE = `${BASE_URL}/multiple_choice`;
 
 export const fetchTopMultipleChoices = (
-  payload: newnewapi.PagedRequest,
-) => fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedMultipleChoicesResponse>(
-  newnewapi.PagedRequest,
+  payload: newnewapi.PagedMultipleChoicesRequest,
+) => fetchProtobuf<newnewapi.PagedMultipleChoicesRequest, newnewapi.PagedMultipleChoicesResponse>(
+  newnewapi.PagedMultipleChoicesRequest,
   newnewapi.PagedMultipleChoicesResponse,
   `${BASE_URL_MULTICHOICE}/get_top_multiple_choices`,
   'post',
@@ -26,18 +26,52 @@ export const fetchCurrentOptionsForMCPost = (
   `${BASE_URL_MULTICHOICE}/get_mc_options`,
   'post',
   payload,
-  // Optional authentication to get indidualized list of options
+  // Optional authentication to get individualized list of options
+  (cookiesInstance.get('accessToken') ? {
+    'x-auth-token': cookiesInstance.get('accessToken'),
+  } : {}),
+);
+
+export const getMcOption = (
+  payload: newnewapi.GetMcOptionRequest,
+) => fetchProtobuf<newnewapi.GetMcOptionRequest, newnewapi.GetMcOptionResponse>(
+  newnewapi.GetMcOptionRequest,
+  newnewapi.GetMcOptionResponse,
+  `${BASE_URL_MULTICHOICE}/get_mc_option`,
+  'post',
+  payload,
+  // Optional authentication to get individualized list of options
   (cookiesInstance.get('accessToken') ? {
     'x-auth-token': cookiesInstance.get('accessToken'),
   } : {}),
 );
 
 export const voteOnPost = (
+  payload: newnewapi.FulfillPaymentPurposeRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.FulfillPaymentPurposeRequest, newnewapi.VoteOnPostResponse>(
+  newnewapi.FulfillPaymentPurposeRequest,
+  newnewapi.VoteOnPostResponse,
+  `${BASE_URL_MULTICHOICE}/vote_on_post`,
+  'post',
+  payload,
+);
+
+export const voteOnPostWithWallet = (
   payload: newnewapi.VoteOnPostRequest,
 ) => fetchProtobufProtectedIntercepted<newnewapi.VoteOnPostRequest, newnewapi.VoteOnPostResponse>(
   newnewapi.VoteOnPostRequest,
   newnewapi.VoteOnPostResponse,
-  `${BASE_URL_MULTICHOICE}/vote_on_post`,
+  `${BASE_URL_MULTICHOICE}/vote_on_post_with_wallet`,
+  'post',
+  payload,
+);
+
+export const deleteMcOption = (
+  payload: newnewapi.DeleteMcOptionRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DeleteMcOptionRequest, newnewapi.EmptyResponse>(
+  newnewapi.DeleteMcOptionRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_MULTICHOICE}/delete_mc_option`,
   'post',
   payload,
 );

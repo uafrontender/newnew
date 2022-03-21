@@ -33,7 +33,7 @@ Text.defaultProps = {
 
 export default Text;
 
-const SText = styled.p<IText>`
+const SText = styled.div<IText>`
   color: ${(props) => props.theme.colorsThemed.text.primary};
   font-weight: ${(props) => props.weight};
 `;

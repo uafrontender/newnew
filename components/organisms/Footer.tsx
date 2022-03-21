@@ -202,7 +202,7 @@ export const Footer: React.FC<IFooter> = () => {
 export default Footer;
 
 const SWrapper = styled.footer`
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundFooter};
+  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.secondary : props.theme.colorsThemed.background.primary)};
 `;
 
 const SContent = styled.div`

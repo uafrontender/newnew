@@ -116,10 +116,13 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
           bio: data.me?.bio,
+          dateOfBirth: data.me?.dateOfBirth,
+          countryCode: data.me?.countryCode,
           options: {
             isActivityPrivate: data.me?.options?.isActivityPrivate,
             isCreator: data.me?.options?.isCreator,
             isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
           },
         }));
         // Set credential cookies
@@ -128,6 +131,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           data.credential?.accessToken,
           {
             expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+            path: '/',
           },
         );
         setCookie(
@@ -136,6 +140,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           {
             // Expire in 10 years
             maxAge: (10 * 365 * 24 * 60 * 60),
+            path: '/',
           },
         );
 

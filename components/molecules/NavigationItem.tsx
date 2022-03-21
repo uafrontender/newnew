@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import _map from 'lodash/map';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
@@ -10,11 +9,11 @@ import Text from '../atoms/Text';
 import Indicator from '../atoms/Indicator';
 
 export type TNavigationItem = {
-  key: string,
-  url: string,
-  value?: number,
-  counter?: number,
-}
+  key: string;
+  url: string;
+  value?: number;
+  counter?: number;
+};
 
 export interface INavigationItem {
   item: TNavigationItem;
@@ -33,30 +32,26 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
     setCookie(cookieKey, true);
   };
 
-  useEffect(() => {
-    _map(cookies, (value, key) => {
-      if (key.includes(item.key) && key !== cookieKey) {
-        setCookie(key, '');
-      }
-    });
-  }, [cookieKey, cookies, item.counter, item.key, setCookie]);
+  // useEffect(() => {
+  //   _map(cookies, (value, key) => {
+  //     if (key.includes(item.key) && key !== cookieKey) {
+  //       setCookie(key, '');
+  //     }
+  //   });
+  // }, [cookieKey, cookies, item.counter, item.key, setCookie]);
 
   return (
     <Link href={item.url}>
       <a>
-        <SNavItem variant={3} active={active} weight={600}>
-          <div className="navText">
+        <SNavItem variant={3} weight={600}>
+          <div className="navText" style={{ opacity: active ? 1 : 0.5 }}>
             {t(`mobile-top-navigation-${item.key}`, {
               value: item.value,
             })}
           </div>
           {!!item.counter && (
             <SIndicatorContainer bigCounter={item.counter > 9}>
-              <Indicator
-                counter={item.counter}
-                animate={!cookies[cookieKey]}
-                onAnimationEnd={handleAnimationEnd}
-              />
+              <Indicator counter={item.counter} animate={!cookies[cookieKey]} onAnimationEnd={handleAnimationEnd} />
             </SIndicatorContainer>
           )}
         </SNavItem>
@@ -67,11 +62,7 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
 
 export default NavigationItem;
 
-interface ISNavItem {
-  active: boolean;
-}
-
-const SNavItem = styled(Text)<ISNavItem>`
+const SNavItem = styled(Text)`
   display: flex;
   padding: 12px;
   align-items: center;
@@ -88,7 +79,6 @@ const SNavItem = styled(Text)<ISNavItem>`
     opacity: 0.5;
     transition: opacity ease 0.5s;
   }
-
   ${(props) => props.theme.media.tablet} {
     padding: 12px 6px;
   }

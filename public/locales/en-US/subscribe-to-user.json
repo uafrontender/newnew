@@ -1,0 +1,53 @@
+{
+  "TopSection": {
+    "headline": {
+      "line_1": "Subscribe to {{username}}",
+      "line_2": "for exclusive features"
+    },
+    "bullets": {
+      "dms": {
+        "title": "DMs",
+        "body": "Lorem ipsum dolor sit amet, consectetur."
+      },
+      "freeVotes": {
+        "title": "Free votes on multiple choices",
+        "body": "Lorem ipsum dolor sit amet, consectetur."
+      },
+      "suggestions": {
+        "title": "Suggestions in multiple choices",
+        "body": "Lorem ipsum dolor sit amet, consectetur."
+      }
+    }
+  },
+  "subscribeBtn": "Subscribe for ${{amount}}/mo",
+  "learnMoreBtn": "Learn more",
+  "FAQ": {
+    "heading": "Frequently asked questions",
+    "helpCenterFooter": {
+      "text": "Still have a question?",
+      "link": "Visit the NewNew Help Center"
+    },
+    "items": {
+      "0": {
+        "q": "What is the NewNew subscription model?",
+        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+      },
+      "1": {
+        "q": "What's included in a subscription?",
+        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+      },
+      "2": {
+        "q": "Can I switch my subscription to another creator?",
+        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+      },
+      "3": {
+        "q": "How can I cancel my subscription?",
+        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+      }
+    }
+  },
+  "paymenModalHeader": {
+    "subtitle": "Subscribe to",
+    "numSubscribers": "subscribers"
+  }
+}

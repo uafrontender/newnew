@@ -4,17 +4,20 @@
     "purchases": "My purchases",
     "viewHistory": "My view history",
     "subscriptions": "My subscriptions",
+    "myposts": "My posts",
     "favorites": "My favorites",
     "userInitial": "Creator’s decisions",
     "activity": "Activity"
   },
   "posts-filter": {
     "decisions": "decisions",
+    "no-decisions": "No decisions yet",
     "filter-0": "All",
     "filter-1": "Auctions",
     "filter-2": "Crowdfunding",
     "filter-3": "Multiple choices"
   },
+  "AccountPrivate": "User preferred to hide their activity",
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",
@@ -93,6 +96,16 @@
           "balance": "Balance",
           "caption": "Use your NewNew wallet and make your bets with no fees.",
           "topUpBtn": "Top up my wallet"
+        },
+        "non-empty": {
+          "balance": "Balance",
+          "topUpBtn": "Top up"
+        },
+        "TopUpWalletModal": {
+          "heading": "Top up amount",
+          "checkoutButtonMobile": "Check out",
+          "checkoutButtonDesktop": "Check out",
+          "cancelButtonDesktop": "Cancel"
         }
       },
       "PersonalInformation": {
@@ -107,6 +120,9 @@
         },
         "birthDateInput": {
           "label": "Date of birth",
+          "errors": {
+            "tooYoung": "You must be 18 years or older."
+          },
           "captions": {
             "twoTimesOnly": "Birthdate can be changed 2 times only.",
             "cannotChange": "You can’t change birthdate."

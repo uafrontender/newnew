@@ -42,7 +42,7 @@ const Search: NextPage<ISearch> = ({
   const { loggedIn, userData } = useAppSelector((state) => state.user);
 
   const router = useRouter();
-  const categoryRef = useRef('');
+  const categoryRef = useRef(router.query.category?.toString() ?? 'ac');
   const sortingRef = useRef<string | undefined>('');
 
   // Posts
@@ -108,7 +108,7 @@ const Search: NextPage<ISearch> = ({
       }
 
       if (categoryToFetch === 'ac') {
-        const liveAuctionsPayload = new newnewapi.PagedRequest({
+        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
           ...(pageToken ? {
             paging: {
               pageToken,
@@ -137,7 +137,7 @@ const Search: NextPage<ISearch> = ({
       }
 
       if (categoryToFetch === 'mc') {
-        const multichoicePayload = new newnewapi.PagedRequest({
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
           ...(pageToken ? {
             paging: {
               pageToken,
@@ -166,7 +166,7 @@ const Search: NextPage<ISearch> = ({
       }
 
       if (categoryToFetch === 'cf') {
-        const cfPayload = new newnewapi.PagedRequest({
+        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
           ...(pageToken ? {
             paging: {
               pageToken,
@@ -263,7 +263,7 @@ const Search: NextPage<ISearch> = ({
 
   // Load collection on category change && scroll
   useEffect(() => {
-    const category = router.query.category?.toString() ?? '';
+    const category = router.query.category?.toString() ?? 'ac';
     const sort = router.query.sort?.toString() ? JSON.parse(router.query.sort?.toString()) : '';
     // eslint-disable-next-line no-undef-init
     let sorting: newnewapi.PostSorting | undefined = undefined;
@@ -272,12 +272,13 @@ const Search: NextPage<ISearch> = ({
         sorting = newnewapi.PostSorting.MOST_FUNDED_FIRST;
       } else if (sort.sortingtype as TSortingType === 'num_bids') {
         sorting = newnewapi.PostSorting.MOST_VOTED_FIRST;
-      } else {
+      } else if (sort.sortingType as TSortingType === 'newest') {
         sorting = newnewapi.PostSorting.NEWEST_FIRST;
       }
     }
 
-    console.log(sorting);
+    console.log(`Sorting is ${sorting}`);
+    console.log(`Sorting ref is ${sortingRef.current}`);
 
     if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {
@@ -298,6 +299,11 @@ const Search: NextPage<ISearch> = ({
         categoryRef.current = category;
         sortingRef.current = sorting?.toString();
       } else if (sorting?.toString() !== sortingRef.current) {
+        console.log('Sorting changed')
+
+        setCollectionLoaded([]);
+        setNextPageToken(undefined);
+
         loadPosts({
           categoryToFetch: category as TCollectionType,
           ...(sorting ? {
@@ -332,6 +338,7 @@ const Search: NextPage<ISearch> = ({
       )}
       <SWrapper name={router.query.category?.toString() ?? ''}>
         <TitleBlock
+          category={categoryRef.current}
           authenticated={loggedIn}
           disabled={isCollectionLoading}
         />
@@ -370,7 +377,7 @@ export default Search;
 export const getServerSideProps:GetServerSideProps = async (context) => {
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'home', 'decision'],
+    ['common', 'home', 'decision', 'payment-modal'],
   );
 
   const top10payload = new newnewapi.EmptyRequest({});

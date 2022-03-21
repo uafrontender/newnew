@@ -4,12 +4,21 @@
     "mc": "Multiple Choice",
     "cf": "Crowdfunding"
   },
+  "loadMoreBtn": "Load more",
   "expires": {
     "days": "d",
     "hours": "h",
     "minutes": "m",
+    "seconds": "s",
     "ended_on": "ended on",
     "at_time": "at"
+  },
+  "expiresResponse": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "left_to_respond": "left to respond"
   },
   "socials": {
     "share-to": "Share to",
@@ -19,36 +28,191 @@
     "tiktok": "TikTok",
     "copy": "Copy Link"
   },
+  "PostFailedBoxModeration": {
+    "title": "Decision failed",
+    "body": "Let's start again and share more.",
+    "ctaButton": "Make a new one"
+  },
+  "PostDeletedByMe": {
+    "title": "Decision deleted",
+    "body": {
+      "by_creator": "You deleted this decision"
+    },
+    "ctaButton": "Make a new one"
+  },
+  "PostDeleted": {
+    "title": "Decision deleted",
+    "body": {
+      "by_creator": "Creator deleted this decision"
+    },
+    "ctaButton": "See others"
+  },
+  "PostFailed": {
+    "title": "Decision failed",
+    "body": {
+      "not_reached_goal": "Decision hasn't reached its goal"
+    },
+    "ctaButton": "See others"
+  },
+  "PostFailedBox": {
+    "title": "Decision failed",
+    "body": "Let's start again and share more.",
+    "ctaButton": "Make a new one"
+  },
+  "PostSuccessModeration": {
+    "title": "You're done!",
+    "body": "Share it with the world!",
+    "ctaButton": "Share it now"
+  },
+  "PostWaitingForResponse": {
+    "title": "Time for response",
+    "body": "Don't miss the update. Stay tuned!",
+    "ctaButton": "Notify me"
+  },
+  "PostSuccess": {
+    "title": "This decision is finished!",
+    "body": "Checkout more like it.",
+    "ctaButton": "See more"
+  },
   "ellipse": {
     "follow-creator": "Follow creator",
+    "unfollow-creator": "Unfollow creator",
     "follow-decision": "Follow decision",
-    "report": "Report"
+    "unfollow-decision": "Unfollow decision",
+    "report": "Report",
+    "deleteDecision": "Delete decision",
+    "cancel": "Cancel"
+  },
+  "PostVideo": {
+    "tabs": {
+      "announcement": "Decision",
+      "response": "Response",
+      "back_to_original": "Back to original",
+      "back_to_response": "Watch response"
+    },
+    "UploadResponseForm": {
+      "fileUpload": {
+        "title_1": "Your voters are waiting!",
+        "title_2": "Respond now with a video.",
+        "description": "Max size of the video 100 MB",
+        "button": "Select file"
+      },
+      "button": {
+        "retry": "Retry",
+        "cancel": "Cancel"
+      },
+      "block": {
+        "title": {
+          "file": "Upload file",
+          "decision": "Decision information",
+          "advanced": "Advanced settings",
+          "floating": "Preview"
+        },
+        "subTitle": {
+          "votesInfo": "All votes start at a $1 dollar by default",
+          "floating": "Upload file to preview your brand new decision"
+        }
+      },
+      "modal": {
+        "leave": {
+          "message": "Are you sure want to leave this page?"
+        },
+        "deleteFile": {
+          "title": "Delete file",
+          "description": "Are you sure you want to permanently delete this file? You can’t undo the action."
+        }
+      },
+      "video": {
+        "error": {
+          "minLength": "Video duration too small, choose from 10 seconds",
+          "maxLength": "Video duration too long, choose up to 5 minutes",
+          "maxSize": "Video size too big, choose up to 100mb",
+          "title": "Ooops...",
+          "description": "There was an error and your file could not be uploaded. Would you like to try again."
+        },
+        "deleteFile": "Delete file",
+        "previewFull": "Preview",
+        "full": {
+          "title": "Preview",
+          "cancelBtn": "Cancel",
+          "publishBtn": "Publish"
+        },
+        "loading":  {
+          "title": "Just a minute",
+          "description": "Your file is uploading. Just give us a second to finish your upload.",
+          "process": "{{progress}}% • {{time}} left"
+        }
+      }
+    }
+  },
+  "DeletePostModal": {
+    "title": "Delete decision",
+    "body": "Are you sure you want to permanently delete this decision? You can't undo the action.",
+    "cancelBtn": "Cancel",
+    "confirmBtn": "Delete permenently"
+  },
+  "DeleteCommentModal": {
+    "title": "Delete comment",
+    "body": "Are you sure you want to permanently delete this comment? You can't undo the action.",
+    "cancelBtn": "Cancel",
+    "confirmBtn": "Delete permenently"
   },
   "tabs": {
     "comments": "Comments",
     "bids": "Bids",
-    "history": "History",
-    "options": "Options"
+    "options": "Options",
+    "backers": "Backers",
+    "winner": "Winner",
+    "history": "History"
+  },
+  "PostScheduled": {
+    "PostScheduledSection": {
+      "title": "Coming soon",
+      "subtitle_1": "Decision is not active yet.",
+      "subtitle_2": "Follow to not miss the update.",
+      "timer": {
+        "days": "Days",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+      },
+      "followBtn": "Follow decision",
+      "unfollowBtn": "Unfollow decision"
+    }
   },
   "AcPost": {
+    "paymenModalHeader": {
+      "subtitle": "You bid on"
+    },
     "PostTopInfo": {
+      "SelectWinner": {
+        "title": "Time's up!",
+        "body": "Auction ended. Now it's time for the creator to choose a winner. Stay tuned!"
+      },
       "in_bids": "in bids"
     },
     "OptionsTab": {
       "me": "me",
+      "NoOptions": {
+        "caption_1": "No active bids yet.",
+        "caption_2": "Be the first to make a bid!"
+      },
       "tags": {
         "my_vote": "My vote",
         "my_bid": "My bid",
         "highest": "Highest",
         "vip": "VIP"
       },
-      "loadMoreBtn": "Load more",
       "OptionCard": {
         "by": "by",
         "bidders": "bidders",
+        "others": "others",
+        "bid": "bid",
         "supportBtn": "Support",
+        "raiseBidBtn": "Raise bid",
         "placeABidBtn": "Place a bid",
-        "cancelBtn": "Cancel"
+        "cancelBtn": "Cancel",
+        "moreBtn": "More"
       },
       "BidCard": {
         "didABid": "bid"
@@ -56,6 +220,16 @@
       "ActionSection": {
         "suggestionPlaceholder": "Add a suggestion ...",
         "placeABidBtn": "Place a bid"
+      }
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "bidders_bid_amount": "bidders bid",
+        "bidder_bid_amount": "bidder bid",
+        "on": "on",
+        "suggested_by_me": "my",
+        "suggested_by_user": "{{username}}'s",
+        "bid_to": "bid to"
       }
     },
     "FloatingActionButton": {
@@ -66,6 +240,9 @@
     "PostTopInfo": {
       "votes": "votes"
     },
+    "paymenModalHeader": {
+      "subtitle": "You vote for"
+    },
     "OptionsTab": {
       "me": "me",
       "tags": {
@@ -74,21 +251,33 @@
         "highest": "Highest",
         "vip": "VIP"
       },
-      "loadMoreBtn": "Load more",
       "OptionCard": {
+        "noVotes": "no votes",
         "votes": "votes",
+        "my_suggestion": "My suggestion",
+        "subscriber_suggestion": "{{ nickname }}'s suggestion",
+        "others": "others",
+        "voters": "voters",
+        "voted": "voted",
         "supportBtn": "Vote",
         "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
         "doubleMyVoteButton": "Double my vote",
-        "placeABidBtn": "Vote",
-        "cancelBtn": "Cancel"
+        "placeABidBtn": "Place a vote",
+        "cancelBtn": "Cancel",
+        "moreBtn": "More"
       },
       "BidCard": {
         "didABid": "bid"
       },
       "ActionSection": {
+        "votesAmount": {
+          "placeholder": {
+            "votes": "votes",
+            "vote": "vote"
+          }
+        },
         "suggestionPlaceholder": "Add a suggestion ...",
-        "placeABidBtn": "Place a bid"
+        "placeABidBtn": "Place a vote"
       }
     },
     "FloatingActionButton": {
@@ -96,9 +285,133 @@
     }
   },
   "CfPost": {
-
+    "BackersStatsSection": {
+      "of_backers": "of {{ targetBackers }} backers",
+      "my": "my",
+      "pledge": "pledge"
+    },
+    "BackersTab": {
+      "info": {
+        "title": "Back the decision",
+        "caption": "You won't get charged until a decision has been made."
+      },
+      "CustomPledge": {
+        "pledgeBtn": "Pledge",
+        "continue": "Continue",
+        "cancelBtn": "Cancel"
+      },
+      "free_sub": "FREE SUB",
+      "custom": "Custom",
+      "cancel": "Cancel"
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "backers_founed": "backers successfully funded",
+        "backer_founded": "backer successfully funded"
+      }
+    },
+    "paymenModalHeader": {
+      "subtitle": "You pledge for"
+    },
+    "FloatingActionButton": {
+      "choosePledgeBtn": "Make pledge"
+    }
+  },
+  "AcPostModeration": {
+    "PostTopInfo": {
+      "SelectWinner": {
+        "title": "Time's up!",
+        "body": "It's time to select the winning bid."
+      }
+    },
+    "OptionsTab": {
+      "me": "me",
+      "NoOptions": {
+        "caption_1": "No active bids yet.",
+        "caption_2": "Share the decision to get as many as possible!"
+      },
+      "selectWinner": {
+        "title": "Confirm winner",
+        "body": "You are about to select a winner.",
+        "cancelBtn": "Cancel",
+        "confirmBtn": "Confirm winner"
+      },
+      "OptionCard": {
+        "pickBtn": "Pick",
+        "ellipse": {
+          "report": "Report bid",
+          "block": "Block user",
+          "remove": "Remove bid"
+        }
+      }
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "bidders_told_you": "bidders told you to",
+        "bidder_told_you": "bidder told you to",
+        "you_made": "You made",
+        "created_by": "The bid was created by"
+      }
+    },
+    "DeleteOptionModal": {
+      "title": "Delete option",
+      "body": "Are you sure you want to permanently delete this option? You can't undo the action.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Delete permenently"
+    },
+    "floatingUploadResponseBtn": "Respond now with a video"
+  },
+  "McPostModeration": {
+    "OptionsTab": {
+      "OptionCard": {
+        "ellipse": {
+          "report": "Report option",
+          "block": "Block user",
+          "remove": "Remove option"
+        }
+      }
+    },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "voters_told_you": "voters told you to",
+        "voter_told_you": "voter told you to",
+        "you_made": "You made",
+        "created_by": "The option was created by"
+      }
+    },
+    "DeleteOptionModal": {
+      "title": "Delete option",
+      "body": "Are you sure you want to permanently delete this option? You can't undo the action.",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Delete permenently"
+    }
+  },
+  "CfPostModeration": {
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "backers_told_you": "backers told you to",
+        "backer_told_you": "backer told you to",
+        "you_made": "You made"
+      }
+    }
   },
   "RecommendationsSection": {
     "heading": "More like this"
+  },
+  "comments": {
+    "me": "me",
+    "title": "Comments",
+    "placeholder": "Add a comment ...",
+    "comment_deleted": "Comment deleted",
+    "bid": "bid",
+    "report": "Report",
+    "send-reply": "Reply",
+    "reply": "reply",
+    "delete": "Delete",
+    "replies": "replies",
+    "view-replies": "View",
+    "hide-replies": "Hide",
+    "view-more": "View more comments",
+    "comments": "Comments"
   }
 }

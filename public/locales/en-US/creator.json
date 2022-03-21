@@ -1,0 +1,198 @@
+{
+  "dashboard": {
+    "meta": {
+      "title": "Creator Dashboard"
+    },
+    "title": "Dashboard",
+    "button": {
+      "notifications": "Notifications",
+      "dms": "DMs",
+      "markAllAsRead": "Mark all as read",
+      "minimize": "Minimize",
+      "new": "New",
+      "earlier": "Earlier"
+    },
+    "enableSubscription": {
+      "title": "Grow your passive income with timely subscriptions",
+      "description": "Add a subscription and start earning a fixed income.",
+      "learnMore": "Learn more",
+      "submit": "Enable subscription"
+    },
+    "earnings": {
+      "title": "Earnings",
+      "earned": "earned in last",
+      "earnedToday": "earned today",
+      "earnedYesterday": "earned yesterday",
+      "insights": "Insights",
+      "insights_tablet": "Go to insights",
+      "cashOut": {
+        "amount": "You have",
+        "date": ", will be available to cash out on {{date}}.",
+        "submit": "Cash out"
+      },
+      "todosIssue": {
+        "text": "Finish setting up your profile and complete cashout method to get paid",
+        "btnText": "See To-Dos"
+      },
+      "makeDecision": {
+        "text": "Start making decisions and start earning money!",
+        "btnText": "Make a decision"
+      },
+      "list": {
+        "ac": "Auctions",
+        "cf": "Crowdfunding",
+        "mc": "Multiple Choices",
+        "subscriptions": "Subscriptions"
+      },
+      "filter": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last_7_days": "Last 7 days",
+        "last_30_days": "Last 30 days",
+        "last_90_days": "Last 90 days",
+        "last_12_months": "Last 12 months"
+      }
+    },
+    "expirationPosts": {
+      "title": "Expiration Posts",
+      "submit": "Show 10 more posts",
+      "decide": "Decide",
+      "table": {
+        "header": {
+          "post": "Post",
+          "total": "Total",
+          "contributions": "Contributions",
+          "actions": "Actions"
+        }
+      }
+    },
+    "subscriptionStats": {
+      "title": "Subscriptions",
+      "newTitle": "New subscribers",
+      "newLink": "Subscriptions",
+      "newLink_tablet": "Go to subscriptions",
+      "seeAll": "See all new subs",
+      "prevWeek": "vs prev week",
+      "banner": {
+        "description": "Send welcome message to greet your new subscribers.",
+        "submit": "Send message"
+      },
+      "list": {
+        "subscribers": "Subscribers",
+        "activeSubs": "Active subs",
+        "views": "Views"
+      },
+      "filter": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last_7_days": "Last 7 days",
+        "last_30_days": "Last 30 days",
+        "last_90_days": "Last 90 days",
+        "last_12_months": "Last 12 months"
+      }
+    },
+    "todos": {
+      "title": "Your to-do’s",
+      "subtitle": "Let’s get you ready to cash out your earnings, next steps are",
+      "sign-up": "Sign up",
+      "basic-info": "Basic info",
+      "complete-profile": "Complete your profile",
+      "complete-profile-btn": "Complete profile",
+      "add-cashout-method": "Add a cashout method",
+      "add-cashout-method-btn": "Connect Stripe"
+    }
+  },
+  "subscriptions": {
+    "meta": {
+      "title": "Creator Subscriptions"
+    },
+    "title": "Subscribers",
+    "table": {
+      "subscribers": "Subscribers",
+      "date": "Date subscribed",
+      "menu": {
+        "report": "Report user",
+        "block": "Block user",
+        "unblock": "Unblock user",
+        "view": "View profile"
+      },
+      "updateSub": "Update subscription"
+    }
+  },
+  "earnings": {
+    "meta": {
+      "title": "Creator Earnings"
+    },
+    "title": "Earnings"
+  },
+  "getPaid": {
+    "meta": {
+      "title": "Creator Get Paid"
+    },
+    "title": "Get Paid",
+    "title-set-up-stripe": "Set payment system",
+    "title-stripe-active": "account is active",
+    "bullets": {
+      "1": "$2.00 USD NewNew withdrawal fee.",
+      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
+      "3": "Set up will take you to Stripe."
+    },
+    "requestSetupLinkBtn": "Connect with Stripe",
+    "getPaidBtn": "Get paid",
+    "updateBtn": "Update account"
+  },
+  "transactions": {
+    "meta": {
+      "title": "Creator Transactions"
+    },
+    "title": "Transactions"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "subscriptions": "Subscribers",
+    "myPosts": "My Posts",
+    "insights": "Insights",
+    "earnings": "Earnings",
+    "getPaid": "Get Paid",
+    "transactions": "Transactions"
+  },
+  "tabs": {
+    "chat": "DMs",
+    "notifications": "Notifications"
+  },
+  "chat": {
+    "today": "Today",
+    "placeholder": "Write a message..."
+  },
+  "SubrateSection": {
+    "heading": "Your subscription rate",
+    "selectInput": {
+      "perMonth": "/month",
+      "select": "Select",
+      "featured": "Popular"
+    },
+    "submitDesktop": "Enable",
+    "backButton": "Cancel",
+    "updateRate": "Save changes"
+  },
+  "subscribersFeatures": {
+    "title": "Subscribers have access to exclusive features",
+    "firstFeature": "Send you private messages.",
+    "secondFeature": "Vote for free on your multiple choices. ",
+    "thirdFeature": "Suggest on your multiple choices."
+  },
+  "enableSubModal": {
+    "title": "Unlock subscriptions",
+    "text": "You’re almost done – We just need you to confirm enabling the subscription service to your fans.",
+    "note": "Subscription price is locked for 30 days from the day you enable the service.",
+    "bntText": "Yes, enable subscription",
+    "confirmationTextFirstPart": "Enable",
+    "confirmationTextSecondPart": "monthly subscription price for my fans"
+  },
+  "noResults": {
+    "title": "No results",
+    "text": "Bring more exposure, share with your network.",
+    "btnShare": "Share with friends",
+    "updateSub": "Update subscription"
+  }
+}

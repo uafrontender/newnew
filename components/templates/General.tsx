@@ -1,8 +1,9 @@
+/* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
-import styled, { useTheme } from 'styled-components';
 import { SkeletonTheme } from 'react-loading-skeleton';
+import styled, { useTheme } from 'styled-components';
 
 import Row from '../atoms/Grid/Row';
 import Col from '../atoms/Grid/Col';
@@ -12,10 +13,11 @@ import Cookie from '../molecules/Cookie';
 import Container from '../atoms/Grid/Container';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 import BottomNavigation from '../organisms/BottomNavigation';
+import FloatingMessages from '../molecules/creator/dashboard/FloatingMessages';
 
-import { useAppSelector } from '../../redux-store/store';
 import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
+import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
 import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
@@ -23,15 +25,14 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 
 interface IGeneral {
   children: React.ReactNode;
+  withChat?: boolean;
+  specialStatusBarColor?: string;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { children } = props;
+  const { children, withChat, specialStatusBarColor } = props;
   const user = useAppSelector((state) => state.user);
-  const {
-    banner,
-    resizeMode,
-  } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
   const wrapperRef: any = useRef();
@@ -53,10 +54,9 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '20%',
           },
           {
-            key: 'notifications',
-            url: '/notifications',
+            key: 'dashboard',
+            url: '/creator/dashboard',
             width: '20%',
-            counter: user.notificationsCount,
           },
           {
             key: 'add',
@@ -64,13 +64,14 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '20%',
           },
           {
-            key: 'dashboard',
-            url: '/dashboard',
+            key: 'notifications',
+            url: '/notifications',
             width: '20%',
+            counter: user.notificationsCount,
           },
           {
-            key: 'share',
-            url: '/share',
+            key: 'more',
+            url: '/more',
             width: '20%',
           },
         ];
@@ -111,40 +112,36 @@ export const General: React.FC<IGeneral> = (props) => {
         baseColor={theme.colorsThemed.background.secondary}
         highlightColor={theme.colorsThemed.background.tertiary}
       >
-        <SWrapper
-          id="generalScrollContainer"
-          ref={wrapperRef}
-          withBanner={!!banner?.show}
-          {...props}
-        >
+        <SWrapper id="generalScrollContainer" ref={wrapperRef} withBanner={!!banner?.show} {...props}>
           <Head>
-            <meta name="theme-color" content={theme.colorsThemed.statusBar.background} />
+            <meta
+              name="theme-color"
+              content={specialStatusBarColor ? specialStatusBarColor : theme.colorsThemed.statusBar.background}
+            />
           </Head>
           <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
           <SContent>
             <Container noMaxContent>
               <Row>
-                <Col>
-                  {children}
-                </Col>
+                <Col>{children}</Col>
               </Row>
             </Container>
           </SContent>
           <Footer />
-          <BottomNavigation
-            visible={isMobile && scrollDirection !== 'down'}
-            collection={bottomNavigation}
-          />
+          <BottomNavigation visible={isMobile && scrollDirection !== 'down'} collection={bottomNavigation} />
           <SortingContainer
             id="sorting-container"
             withCookie={cookies.accepted !== 'true'}
             bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
           />
-          <CookieContainer
-            bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-          >
+          <CookieContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
             <Cookie />
           </CookieContainer>
+          {withChat && isMobile && (
+            <ChatContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
+              <FloatingMessages withCounter />
+            </ChatContainer>
+          )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>
@@ -152,6 +149,11 @@ export const General: React.FC<IGeneral> = (props) => {
 };
 
 export default General;
+
+General.defaultProps = {
+  withChat: false,
+  specialStatusBarColor: undefined,
+};
 
 interface ISWrapper {
   withBanner: boolean;
@@ -208,6 +210,18 @@ const CookieContainer = styled.div<ICookieContainer>`
   }
 `;
 
+interface IChatContainer {
+  bottomNavigationVisible: boolean;
+}
+
+const ChatContainer = styled.div<IChatContainer>`
+  right: 16px;
+  bottom: ${(props) => (props.bottomNavigationVisible ? 72 : 16)}px;
+  z-index: 10;
+  position: fixed;
+  transition: bottom ease 0.5s;
+`;
+
 interface ISortingContainer {
   withCookie: boolean;
   bottomNavigationVisible: boolean;
@@ -215,7 +229,8 @@ interface ISortingContainer {
 
 const SortingContainer = styled.div<ISortingContainer>`
   left: 50%;
-  bottom: ${(props) => (props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`)}px;
+  bottom: ${(props) =>
+    props.bottomNavigationVisible ? `${props.withCookie ? 128 : 72}` : `${props.withCookie ? 72 : 16}`}px;
   z-index: 10;
   position: fixed;
   transform: translateX(-50%);

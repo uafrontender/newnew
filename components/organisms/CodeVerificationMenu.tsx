@@ -92,10 +92,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         coverUrl: data.me?.coverUrl,
         userUuid: data.me?.userUuid,
         bio: data.me?.bio,
+        dateOfBirth: data.me?.dateOfBirth,
+        countryCode: data.me?.countryCode,
         options: {
           isActivityPrivate: data.me?.options?.isActivityPrivate,
           isCreator: data.me?.options?.isCreator,
           isVerified: data.me?.options?.isVerified,
+          creatorStatus: data.me?.options?.creatorStatus,
         },
       }));
       // Set credential cookies
@@ -104,6 +107,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         data.credential?.accessToken,
         {
           expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
+          path: '/',
         },
       );
       setCookie(
@@ -112,6 +116,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         {
           // Expire in 10 years
           maxAge: (10 * 365 * 24 * 60 * 60),
+          path: '/',
         },
       );
 
@@ -125,7 +130,11 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
       setIsSigninWithEmailLoading(false);
       setIsSuccess(true);
 
-      router.push('/');
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setIsSigninWithEmailLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -149,6 +158,7 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: signupEmailInput,
+        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
       });
 
       const { data, error } = await sendVerificationEmail(payload);
@@ -222,10 +232,13 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
         { t('heading.heading') }
       </SHeadline>
       <SSubheading variant={2} weight={600}>
-        {t('heading.subheading')}
-        <br />
-        {/* NB! Temp */}
-        {signupEmailInput.length > 0 ? signupEmailInput : 'email@email.com'}
+        {signupEmailInput.length > 0 ? (
+          <>
+            {t('heading.subheading')}
+            <br />
+            { signupEmailInput }
+          </>
+        ) : null}
       </SSubheading>
       <VerficationCodeInput
         initialValue={codeInitial}
