@@ -87,14 +87,16 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         lastParentId = workingItem.parentId;
         lastParentIdx = goalArr.findIndex((o) => o.id === workingItem.parentId);
 
-        if (!goalArr[lastParentIdx].replies) {
-          goalArr[lastParentIdx].replies = []
+        if (lastParentIdx !== -1) {
+          if (!goalArr[lastParentIdx].replies) {
+            goalArr[lastParentIdx].replies = []
+          }
+
+          // @ts-ignore
+          const workingSubarr = [...goalArr[lastParentIdx].replies];
+
+          goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
         }
-
-        // @ts-ignore
-        const workingSubarr = [...goalArr[lastParentIdx].replies];
-
-        goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
       }
     });
 
