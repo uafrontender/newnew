@@ -20,7 +20,9 @@
     },
     "earnings": {
       "title": "Earnings",
-      "earned": "earned in last 7 days",
+      "earned": "earned in last",
+      "earnedToday": "earned today",
+      "earnedYesterday": "earned yesterday",
       "insights": "Insights",
       "insights_tablet": "Go to insights",
       "cashOut": {
