@@ -402,6 +402,7 @@
     "me": "me",
     "title": "Comments",
     "placeholder": "Add a comment ...",
+    "comment_deleted": "Comment deleted",
     "bid": "bid",
     "report": "Report",
     "send-reply": "Reply",
