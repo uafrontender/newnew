@@ -200,7 +200,7 @@ const SAvatar = styled.div`
 
   overflow: hidden;
   position: relative;
-  
+
   grid-area: avatar;
   justify-self: left;
 

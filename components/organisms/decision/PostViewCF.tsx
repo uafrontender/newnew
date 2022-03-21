@@ -3,33 +3,39 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useRef, useState,
+  useCallback, useContext, useEffect, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
-import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
-import PostTimer from '../../molecules/decision/PostTimer';
-import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import { fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
+import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import switchPostType from '../../../utils/switchPostType';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import CfPledgesSection from '../../molecules/decision/crowdfunding/CfPledgesSection';
-import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
+import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
 
-// Temp
-const MockVideo = '/video/mock/mock_video_1.mp4';
+import Button from '../../atoms/Button';
+import GoBackButton from '../../molecules/GoBackButton';
+import LoadingModal from '../../molecules/LoadingModal';
+import PostVideo from '../../molecules/decision/PostVideo';
+import PostTimer from '../../molecules/decision/PostTimer';
+import PostTopInfo from '../../molecules/decision/PostTopInfo';
+import DecisionTabs from '../../molecules/decision/PostTabs';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import PostSuccessBox from '../../molecules/decision/PostSuccessBox';
+import PostWaitingForResponseBox from '../../molecules/decision/PostWaitingForResponseBox';
+import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
+import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
+import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
+import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
+import switchPostType from '../../../utils/switchPostType';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -37,28 +43,81 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 
 interface IPostViewCF {
   post: newnewapi.Crowdfunding;
+  postStatus: TPostStatusStringified;
+  sessionId?: string;
+  resetSessionId: () => void;
   handleGoBack: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   post,
+  postStatus,
+  sessionId,
+  resetSessionId,
   handleGoBack,
+  handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
+  const router = useRouter();
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [heightDelta, setHeightDelta] = useState(256);
-
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channelsWithSubs,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
+
+  // Response viewed
+  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
+
+  // Tabs
+  const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
+    if (!isBrowser()) {
+      return 'backers'
+    }
+    const { hash } = window.location;
+    if (hash && (hash === '#backers' || hash === '#comments')) {
+      return hash.substring(1) as 'backers' | 'comments';
+    }
+    return 'backers';
+  });
+
+  const handleChangeTab = (tab: string) => {
+    if (tab === 'comments' && isMobile) {
+      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    } else {
+      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+    }
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { hash } = window.location;
+      if (!hash) {
+        setCurrentTab('backers');
+        return;
+      }
+      const parsedHash = hash.substring(1);
+      if (parsedHash === 'backers' || parsedHash === 'comments') {
+        setCurrentTab(parsedHash);
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange, false);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange, false);
+    }
+  }, []);
+
+  // Vote from sessionId
+  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
   // Current backers
   const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
@@ -70,9 +129,13 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
   // Pledges
   const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
+  const [myPledgeAmount, setMyPledgeAmount] = useState<newnewapi.MoneyAmount | undefined>(undefined);
   const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
+
+  // Mobile choose pledge modal
+  const [choosePledgeModalOpen, setChoosePledgeModalOpen] = useState(false);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -216,11 +279,119 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
+      handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
     } catch (err) {
       console.error(err);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleFollowDecision = useCallback(async () => {
+    try {
+      if (!user.loggedIn) {
+        router.push('/sign-up?reason=follow-decision');
+      }
+      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+        postUuid: post.postUuid,
+      });
+
+      const res = await markPost(markAsViewedPayload);
+
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [post.postUuid, router, user.loggedIn]);
+
+  // Render functions
+  const renderBackersSection = useCallback(() => {
+    switch(postStatus) {
+      case 'voting': {
+        return (
+          <>
+          <CfBackersStatsSection
+            targetBackerCount={post.targetBackerCount}
+            currentNumBackers={currentBackers}
+            myPledgeAmount={myPledgeAmount}
+          />
+          {!isMobile ? (
+            <CfPledgeLevelsSection
+              post={post}
+              pledgeLevels={pledgeLevels}
+              handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+            />
+          ) : null }
+        </>
+        );
+      }
+      case 'waiting_for_response': {
+        return (
+          <>
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            <PostWaitingForResponseBox
+              title={t('PostWaitingForResponse.title')}
+              body={t('PostWaitingForResponse.body')}
+              buttonCaption={t('PostWaitingForResponse.ctaButton')}
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                handleFollowDecision();
+              }}
+            />
+          </>
+        );
+      }
+      case 'succeeded': {
+        return (
+          <>
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
+            <PostSuccessBox
+              title={t('PostSuccess.title')}
+              body={t('PostSuccess.body')}
+              buttonCaption={t('PostSuccess.ctaButton')}
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                document.getElementById('post-modal-container')?.scrollTo({
+                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  behavior: 'smooth',
+                })
+              }}
+            />
+          </>
+        );
+      }
+      default: {
+        <>
+          <CfCrowdfundingSuccess
+            post={post}
+            currentNumBackers={currentBackers}
+          />
+        </>
+      }
+    }
+
+    return null;
+  }, [
+    t,
+    post,
+    isMobile,
+    postStatus,
+    pledgeLevels,
+    currentBackers,
+    myPledgeAmount,
+    handleFollowDecision,
+    handleAddPledgeFromResponse,
+  ]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -254,7 +425,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
         const res = await markPost(markAsViewedPayload);
 
-        console.log(res);
+        if (res.error) throw new Error('Failed to mark post as viewed');
       } catch (err) {
         console.error(err);
       }
@@ -275,6 +446,35 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     fetchPostLatestData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    const makePledgeFromSessionId = async () => {
+      if (!sessionId) return;
+      try {
+        setLoadingModalOpen(true);
+        const payload = new newnewapi.FulfillPaymentPurposeRequest({
+          paymentSuccessUrl: `session_id=${sessionId}`,
+        });
+
+        const res = await doPledgeCrowdfunding(payload);
+
+        if (!res.data
+          || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
+          || res.error
+        ) throw new Error(res.error?.message ?? 'Request failed');
+
+        handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
+        setLoadingModalOpen(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingModalOpen(false);
+      }
+      resetSessionId();
+    };
+
+    makePledgeFromSessionId();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const socketHandlerPledgeCreated = (data: any) => {
@@ -311,15 +511,27 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       }
     };
 
+    const socketHandlerPostStatus = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+      if (!decoded) return;
+      if (decoded.postUuid === post.postUuid) {
+        handleUpdatePostStatus(decoded.crowdfunding!!);
+      }
+    };
+
     if (socketConnection) {
       socketConnection.on('CfPledgeCreated', socketHandlerPledgeCreated);
       socketConnection.on('PostUpdated', socketHandlerPostData);
+      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('CfPledgeCreated', socketHandlerPledgeCreated);
         socketConnection.off('PostUpdated', socketHandlerPostData);
+        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -330,11 +542,24 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     sortPleges,
   ]);
 
+  useEffect(() => {
+    const workingAmount = pledges
+      .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
+      .reduce((acc, myPledge) => myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc, 0);
+
+    if (workingAmount !== 0 && workingAmount !== undefined) {
+      setMyPledgeAmount(new newnewapi.MoneyAmount({
+        usdCents: workingAmount
+      }));
+    }
+
+  }, [pledges, user.userData?.userUuid]);
+
   return (
     <SWrapper>
       <SExpiresSection>
         {isMobile && (
-          <GoBackButton
+          <SGoBackButton
             style={{
               gridArea: 'closeBtnMobile',
             }}
@@ -345,87 +570,99 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
           postType="cf"
         />
-        {!isMobile && (
-          <SGoBackButtonDesktop
-            onClick={handleGoBack}
-          >
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SGoBackButtonDesktop>
-        )}
       </SExpiresSection>
       <PostVideo
         postId={post.postUuid}
         announcement={post.announcement!!}
+        response={post.response ?? undefined}
+        responseViewed={responseViewed}
+        handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <div
-        style={{
-          gridArea: 'title',
-        }}
-      >
-        <PostTitle>
-          { post.title }
-        </PostTitle>
-      </div>
+      <PostTopInfo
+        postType="cf"
+        postId={post.postUuid}
+        postStatus={postStatus}
+        title={post.title}
+        creator={post.creator!!}
+        startsAtSeconds={post.startsAt?.seconds as number}
+        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+      />
       <SActivitesContainer>
-        <PostTopInfo
-          postId={post.postUuid}
-          postType="cf"
-          currentBackers={currentBackers}
-          targetBackers={post.targetBackerCount}
-          creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
-          handleFollowCreator={() => {}}
-          handleReportAnnouncement={() => {}}
+        <DecisionTabs
+          tabs={[
+            {
+              label: 'backers',
+              value: 'backers',
+            },
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]}
+          activeTab={currentTab}
+          handleChangeTab={handleChangeTab}
         />
-        <CfPledgeLevelsSection
-          pledgeLevels={pledgeLevels}
-          post={post}
-          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-          handleSetHeightDelta={(newValue: number) => setHeightDelta(newValue)}
-        />
-        <CfPledgesSection
-          pledges={pledges}
-          pagingToken={pledgesNextPageToken}
-          pledgesLoading={pledgesLoading}
-          post={post}
-          heightDelta={heightDelta ?? 256}
-          handleLoadPledges={fetchPledgesForPost}
-        />
+        {currentTab === 'backers' ? (
+          renderBackersSection()
+        ) : (
+          <CommentsTab
+            commentsRoomId={post.commentsRoomId as number}
+            handleGoBack={() => handleChangeTab('backers')}
+          />
+        )
+      }
       </SActivitesContainer>
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={loadingModalOpen}
+        zIndex={14}
+      />
+      {/* Choose pledge mobile modal */}
+      {isMobile ? (
+        <CfPledgeLevelsModal
+          zIndex={11}
+          post={post}
+          pledgeLevels={pledgeLevels}
+          isOpen={choosePledgeModalOpen}
+          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+          onClose={() => setChoosePledgeModalOpen(false)}
+        />
+      ) : null}
+      {/* Mobile floating button */}
+      {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
+        <SActionButton
+          view="primaryGrad"
+          onClick={() => setChoosePledgeModalOpen(true)}
+        >
+          { t('CfPost.FloatingActionButton.choosePledgeBtn') }
+        </SActionButton>
+      ) : null}
     </SWrapper>
   );
+};
+
+PostViewCF.defaultProps = {
+  sessionId: undefined,
 };
 
 export default PostViewCF;
 
 const SWrapper = styled.div`
-  display: grid;
-
-  grid-template-areas:
-    'expires'
-    'video'
-    'title'
-    'activities'
-  ;
+  width: 100%;
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
-      'video activities'
-    ;
+      'video activities';
     grid-template-columns: 284px 1fr;
-    /* grid-template-rows: 46px 64px 40px calc(506px - 46px); */
-    grid-template-rows: 46px min-content 1fr;
+    grid-template-rows: max-content max-content 1fr;
+
     grid-column-gap: 16px;
 
     align-items: flex-start;
@@ -435,69 +672,50 @@ const SWrapper = styled.div`
     grid-template-areas:
       'video expires'
       'video title'
-      'video activities'
-    ;
-
-    /* grid-template-rows: 46px 64px 40px calc(728px - 46px - 64px - 40px); */
-    /* grid-template-rows: 1fr max-content; */
-
-    // NB! 1fr results in unstable width
-    /* grid-template-columns: 410px 1fr; */
-    grid-template-columns: 410px 538px;
+      'video activities';
+    grid-template-columns: 410px 1fr;
   }
 `;
 
 const SExpiresSection = styled.div`
   grid-area: expires;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: 'closeBtnMobile timer closeBtnDesktop';
-
-  width: 100%;
-
-  margin-bottom: 6px;
-`;
-
-const SGoBackButtonDesktop = styled.button`
-  grid-area: closeBtnDesktop;
+  position: relative;
 
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: center;
 
   width: 100%;
-  border: transparent;
-  background: transparent;
-  padding: 24px;
+  margin-bottom: 6px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: bold;
-  text-transform: capitalize;
+  padding-left: 24px;
 
-  cursor: pointer;
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: initial;
+  }
+`;
+
+const SGoBackButton = styled(GoBackButton)`
+  position: absolute;
+  left: 0;
+  top: 4px;
+`;
+
+const SActionButton = styled(Button)`
+  position: fixed;
+  z-index: 2;
+
+  width: calc(100% - 32px);
+  bottom: 16px;
+  left: 16px;
 `;
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
 
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
 
-  align-self: bottom;
-
   height: 100%;
-
-  min-height: calc(728px - 46px - 64px - 40px - 72px);
-
-  ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px);
-  }
+  width: 100%;
 `;

@@ -7,22 +7,22 @@ export const useOverlay = (ref: any) => {
   const scrollPosition = useRef(0);
 
   useEffect(() => {
-    // eslint-disable-next-line no-param-reassign
-    ref.current.style.overflow = overlay ? 'hidden' : 'visible';
-
     if (overlay) {
       scrollPosition.current = window ? window.scrollY : 0;
 
       // eslint-disable-next-line no-param-reassign
       ref.current.style.cssText = `
-          top: -${scrollPosition.current}px;
-          left: 0px;
-          right: 0px;
-          position: fixed;
-       `;
+        top: -${scrollPosition.current}px;
+        left: 0px;
+        right: 0px;
+        overflow: hidden;
+        position: fixed;
+     `;
     } else {
       // eslint-disable-next-line no-param-reassign
-      ref.current.style.cssText = '';
+      ref.current.style.cssText = `
+        overflow: auto;
+      `;
       window.scroll(0, scrollPosition.current);
       scrollPosition.current = 0;
     }

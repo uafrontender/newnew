@@ -46,6 +46,10 @@ const uiPersistConfig = {
 const userPersistConfig = {
   key: 'user',
   storage,
+  whitelist: [
+    'loggedIn',
+    'userData',
+  ],
 };
 
 const creationPersistConfig = {

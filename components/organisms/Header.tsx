@@ -17,12 +17,12 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = (props) => {
   const { visible } = props;
-  const { banner } = useAppSelector((state) => state.ui);
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode } = useAppSelector((state) => state.ui);
 
   return (
     <SWrapper
       name="top-reload"
+      id="top-nav-header"
       visible={visible}
       withBanner={!!banner.show}
     >
@@ -32,8 +32,8 @@ export const Header: React.FC<IHeader> = (props) => {
           <Row>
             <Col>
               {['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode) && <Mobile />}
-              {['tablet'].includes(resizeMode) && <Tablet />}
-              {['laptop', 'laptopL', 'desktop'].includes(resizeMode) && <Desktop />}
+              {['tablet', 'laptop'].includes(resizeMode) && <Tablet />}
+              {['laptopM', 'laptopL', 'desktop'].includes(resizeMode) && <Desktop />}
             </Col>
           </Row>
         </Container>

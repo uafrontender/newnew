@@ -7,16 +7,22 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseModal {
+  isFollowing: boolean;
+  isFollowingDecision: boolean;
   isOpen: boolean;
   zIndex: number;
   handleFollowDecision: () => void;
+  handleToggleFollowingCreator: () => void;
   onClose: () => void;
 }
 
 const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
+  isFollowing,
+  isFollowingDecision,
   isOpen,
   zIndex,
   handleFollowDecision,
+  handleToggleFollowingCreator,
   onClose,
 }) => {
   const { t } = useTranslation('decision');
@@ -35,7 +41,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
           }}
         >
           <SButton
-            onClick={() => {}}
+            onClick={() => handleToggleFollowingCreator()}
             style={{
               marginBottom: '28px',
             }}
@@ -43,7 +49,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             <Text
               variant={3}
             >
-              { t('ellipse.follow-creator') }
+              { !isFollowing ? t('ellipse.follow-creator') : t('ellipse.unfollow-creator') }
             </Text>
           </SButton>
           <SButton
@@ -52,7 +58,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             <Text
               variant={3}
             >
-              { t('ellipse.follow-decision') }
+              { !isFollowingDecision ? t('ellipse.follow-decision') : t('ellipse.unfollow-decision') }
             </Text>
           </SButton>
           <SSeparator />

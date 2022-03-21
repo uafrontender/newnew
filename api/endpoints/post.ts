@@ -27,6 +27,26 @@ export const markPost = (
   payload,
 );
 
+export const deleteMyPost = (
+  payload: newnewapi.DeleteMyPostRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DeleteMyPostRequest, newnewapi.EmptyResponse>(
+  newnewapi.DeleteMyPostRequest,
+  newnewapi.EmptyResponse,
+  `${BASE_URL_POST}/cancel_my_post`,
+  'post',
+  payload,
+);
+
+export const uploadPostResponse = (
+  payload: newnewapi.UploadPostResponseRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.UploadPostResponseRequest, newnewapi.Post>(
+  newnewapi.UploadPostResponseRequest,
+  newnewapi.Post,
+  `${BASE_URL_POST}/upload_post_response`,
+  'post',
+  payload,
+);
+
 export const fetchPostByUUID = (
   payload: newnewapi.GetPostRequest,
 ) => fetchProtobuf<newnewapi.GetPostRequest, newnewapi.Post>(
@@ -39,9 +59,9 @@ export const fetchPostByUUID = (
 
 export const fetchUsersPosts = (
   payload: newnewapi.GetUserPostsRequest,
-) => fetchProtobuf<newnewapi.GetUserPostsRequest, newnewapi.PagedPostsResponse>(
+) => fetchProtobuf<newnewapi.GetUserPostsRequest, newnewapi.PagedCountedPostsResponse>(
   newnewapi.GetUserPostsRequest,
-  newnewapi.PagedPostsResponse,
+  newnewapi.PagedCountedPostsResponse,
   `${BASE_URL_POST}/get_user_posts`,
   'post',
   payload,
@@ -63,7 +83,7 @@ export const fetchFeaturedCreatorPosts = (
 ) => fetchProtobuf<newnewapi.EmptyRequest, newnewapi.NonPagedPostsResponse>(
   newnewapi.EmptyRequest,
   newnewapi.NonPagedPostsResponse,
-  `${BASE_URL_POST}/get_featured_creator_posts`,
+  `${BASE_URL_POST}/get_featured_creators_posts`,
   'post',
   payload,
 );

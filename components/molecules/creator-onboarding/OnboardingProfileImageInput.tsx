@@ -22,7 +22,7 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
   const theme = useTheme();
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const imageInputRef = useRef<HTMLInputElement>();
 
@@ -76,7 +76,7 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
       </SInputContainer>
       {true && (
         <SCaption>
-          {isMobile ? (
+          {isMobileOrTablet ? (
             t('DetailsSection.form.profilePicture.captionMobile')
           ) : t('DetailsSection.form.profilePicture.captionDesktop') }
         </SCaption>
@@ -116,7 +116,7 @@ const SCaption = styled.label`
 
   margin-bottom: 6px;
 
-  ${({ theme }) => theme.media.tablet} {
+  ${({ theme }) => theme.media.laptop} {
     position: static;
   }
 `;
@@ -139,6 +139,7 @@ const SUploadButton = styled(Button)`
   span {
     display: flex;
     gap: 4px;
+    font-weight: 600;
   }
 `;
 

@@ -2,8 +2,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useContext, useMemo, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -24,31 +24,37 @@ import PostShareModal from './PostShareModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
 import { markPost } from '../../../api/endpoints/post';
+import { FollowingsContext } from '../../../contexts/followingContext';
+import { markUser } from '../../../api/endpoints/user';
+import Headline from '../../atoms/Headline';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+
+import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import Text from '../../atoms/Text';
+import PostFailedBox from './PostFailedBox';
 
 interface IPostTopInfo {
   postId: string;
+  postStatus: TPostStatusStringified;
+  title: string;
   creator: newnewapi.IUser;
-  postType: TPostType;
+  isFollowingDecisionInitial: boolean;
+  postType?: TPostType;
   startsAtSeconds: number;
   amountInBids?: number;
   totalVotes?: number;
-  currentBackers?: number;
-  targetBackers?: number;
-  handleFollowCreator: () => void;
-  handleReportAnnouncement: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postId,
+  postStatus,
+  title,
   creator,
   postType,
   startsAtSeconds,
+  isFollowingDecisionInitial,
   amountInBids,
   totalVotes,
-  currentBackers,
-  targetBackers,
-  handleFollowCreator,
-  handleReportAnnouncement,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -57,6 +63,14 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const showSelectingWinnerOption = useMemo(() => (
+    postType === 'ac' && postStatus === 'wating_for_decision'
+  ), [postType, postStatus]);
+
+  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+
+  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial)
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
@@ -83,150 +97,241 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
       const res = await markPost(markAsViewedPayload);
 
-      console.log(res);
+      if (!res.error) {
+        setIsFollowingDecision(!isFollowingDecision);
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
+  const handleToggleFollowingCreator = async () => {
+    try {
+      if (!user.loggedIn) {
+        router.push('/sign-up?reason=follow-creator');
+      }
+
+      const payload = new newnewapi.MarkUserRequest({
+        userUuid: creator.uuid,
+        markAs: followingsIds.includes(creator.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+      });
+
+      const res = await markUser(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      if (followingsIds.includes(creator.uuid as string)) {
+        removeId(creator.uuid as string);
+      } else {
+        addId(creator.uuid as string);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   return (
-    <SWrapper>
-      {postType === 'ac' && amountInBids && (
-        <SBidsAmount>
-          <span>
-            $
-            {formatNumber((amountInBids / 100) ?? 0, true)}
-          </span>
-          {' '}
-          { t('AcPost.PostTopInfo.in_bids') }
-        </SBidsAmount>
-      )}
-      {postType === 'mc' && totalVotes && (
-        <SBidsAmount>
-          <span>
-            {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
-          </span>
-          {' '}
-          { t('McPost.PostTopInfo.votes') }
-        </SBidsAmount>
-      )}
-      <CreatorCard
-        onClick={() => handleRedirectToUser()}
+    <SContainer>
+      <SWrapper
+        showSelectingWinnerOption={showSelectingWinnerOption}
       >
-        <SAvatarArea>
-          <img
-            src={creator.avatarUrl!! as string}
-            alt={creator.username!!}
-          />
-        </SAvatarArea>
-        <SUsername>
-          @
-          { creator.username }
-        </SUsername>
-        <SStartsAt>
-          { startingDateParsed.getDate() }
-          {' '}
-          { startingDateParsed.toLocaleString('default', { month: 'short' }) }
-          {' '}
-          { startingDateParsed.getFullYear() }
-          {' '}
-        </SStartsAt>
-      </CreatorCard>
-      <SActionsDiv>
-        <SShareButton
-          view="transparent"
-          iconOnly
-          withDim
-          withShrink
-          style={{
-            padding: '8px',
+        {postType === 'ac' && amountInBids ? (
+          <SBidsAmount>
+            <span>
+              $
+              {formatNumber((amountInBids / 100) ?? 0, true)}
+            </span>
+            {' '}
+            { t('AcPost.PostTopInfo.in_bids') }
+          </SBidsAmount>
+        ) : null}
+        {postType === 'mc' && totalVotes ? (
+          <SBidsAmount>
+            <span>
+              {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
+            </span>
+            {' '}
+            { t('McPost.PostTopInfo.votes') }
+          </SBidsAmount>
+        ) : null}
+        <CreatorCard
+          onClick={() => handleRedirectToUser()}
+        >
+          <SAvatarArea>
+            <img
+              src={creator.avatarUrl!! as string}
+              alt={creator.username!!}
+            />
+          </SAvatarArea>
+          <SUsername>
+            { creator.nickname ?? `@${creator.username}` }
+          </SUsername>
+        </CreatorCard>
+        <SActionsDiv>
+          <SShareButton
+            view="transparent"
+            iconOnly
+            withDim
+            withShrink
+            style={{
+              padding: '8px',
+            }}
+            onClick={() => handleOpenShareMenu()}
+          >
+            <InlineSvg
+              svg={ShareIconFilled}
+              fill={theme.colorsThemed.text.secondary}
+              width="20px"
+              height="20px"
+            />
+          </SShareButton>
+          <SMoreButton
+            view="transparent"
+            iconOnly
+            onClick={() => handleOpenEllipseMenu()}
+          >
+            <InlineSvg
+              svg={MoreIconFilled}
+              fill={theme.colorsThemed.text.secondary}
+              width="20px"
+              height="20px"
+            />
+          </SMoreButton>
+          {/* Share menu */}
+          {!isMobile && (
+            <PostShareMenu
+              isVisible={shareMenuOpen}
+              handleClose={handleCloseShareMenu}
+            />
+          )}
+          {isMobile && shareMenuOpen ? (
+            <PostShareModal
+              isOpen={shareMenuOpen}
+              zIndex={11}
+              onClose={handleCloseShareMenu}
+            />
+          ) : null}
+          {/* Ellipse menu */}
+          {!isMobile && (
+            <PostEllipseMenu
+              isFollowing={followingsIds.includes(creator.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              isVisible={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleClose={handleCloseEllipseMenu}
+            />
+          )}
+          {isMobile && ellipseMenuOpen ? (
+            <PostEllipseModal
+              isFollowing={followingsIds.includes(creator.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              zIndex={11}
+              isOpen={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              onClose={handleCloseEllipseMenu}
+            />
+          ) : null}
+        </SActionsDiv>
+        <SPostTitle
+          variant={5}
+        >
+          {title}
+        </SPostTitle>
+        {showSelectingWinnerOption ? (
+          <SSelectingWinnerOption>
+            <SHeadline
+              variant={4}
+            >
+              { t('AcPost.PostTopInfo.SelectWinner.title') }
+            </SHeadline>
+            <SText
+              variant={3}
+            >
+              { t('AcPost.PostTopInfo.SelectWinner.body') }
+            </SText>
+            <STrophyImg
+              src={AcSelectWinnerIcon.src}
+            />
+          </SSelectingWinnerOption>
+        ) : null}
+      </SWrapper>
+      {postStatus === 'failed' && (
+        <PostFailedBox
+          title={t('PostFailed.title')}
+          body={t('PostFailed.body.not_reached_goal')}
+          buttonCaption={t('PostFailed.ctaButton')}
+          handleButtonClick={() => {
+            document.getElementById('post-modal-container')?.scrollTo({
+              top: document.getElementById('recommendations-section-heading')?.offsetTop,
+              behavior: 'smooth',
+            })
           }}
-          onClick={() => handleOpenShareMenu()}
-        >
-          <InlineSvg
-            svg={ShareIconFilled}
-            fill={theme.colorsThemed.text.secondary}
-            width="20px"
-            height="20px"
-          />
-        </SShareButton>
-        <SMoreButton
-          view="transparent"
-          iconOnly
-          onClick={() => handleOpenEllipseMenu()}
-        >
-          <InlineSvg
-            svg={MoreIconFilled}
-            fill={theme.colorsThemed.text.secondary}
-            width="20px"
-            height="20px"
-          />
-        </SMoreButton>
-        {/* Share menu */}
-        {!isMobile && (
-          <PostShareMenu
-            isVisible={shareMenuOpen}
-            handleClose={handleCloseShareMenu}
-          />
-        )}
-        {isMobile && shareMenuOpen ? (
-          <PostShareModal
-            isOpen={shareMenuOpen}
-            zIndex={11}
-            onClose={handleCloseShareMenu}
-          />
-        ) : null}
-        {/* Ellipse menu */}
-        {!isMobile && (
-          <PostEllipseMenu
-            isVisible={ellipseMenuOpen}
-            handleFollowDecision={handleFollowDecision}
-            handleClose={handleCloseEllipseMenu}
-          />
-        )}
-        {isMobile && ellipseMenuOpen ? (
-          <PostEllipseModal
-            isOpen={ellipseMenuOpen}
-            zIndex={11}
-            handleFollowDecision={handleFollowDecision}
-            onClose={handleCloseEllipseMenu}
-          />
-        ) : null}
-      </SActionsDiv>
-    </SWrapper>
+        />
+      )}
+    </SContainer>
   );
 };
 
 PostTopInfo.defaultProps = {
+  postType: undefined,
   amountInBids: undefined,
   totalVotes: undefined,
-  currentBackers: undefined,
-  targetBackers: undefined,
 };
 
 export default PostTopInfo;
 
-const SWrapper = styled.div`
+const SContainer = styled.div`
+  grid-area: title;
+
+  margin-bottom: 24px;
+`;
+
+const SWrapper = styled.div<{
+  showSelectingWinnerOption: boolean;
+}>`
   display: grid;
 
   grid-template-areas:
-    'stats stats stats'
+    'title title title'
     'userCard userCard actions'
+    'stats stats stats';
   ;
 
   height: fit-content;
 
-  margin-bottom: 24px;
+  margin-top: 24px;
+  margin-bottom: 12px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
-    grid-template-areas:
-      'userCard stats actions'
-    ;
+    ${({ showSelectingWinnerOption }) => (
+      showSelectingWinnerOption
+      ? css`
+        grid-template-areas:
+          'userCard stats actions'
+          'title title title'
+          'selectWinner selectWinner selectWinner'
+        ;
+      `
+      : css`
+        grid-template-areas:
+          'userCard stats actions'
+          'title title title'
+        ;
+      `
+    )}
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
+
+    margin-top: initial;
   }
+`;
+
+const SPostTitle = styled(Headline)`
+  grid-area: title;
 `;
 
 // Creator card
@@ -234,11 +339,11 @@ const CreatorCard = styled.div`
   grid-area: userCard;
 
   display: grid;
+  align-items: center;
   grid-template-areas:
     'avatar username'
-    'avatar startsAt'
   ;
-  grid-template-columns: 44px 1fr;
+  grid-template-columns: 36px 1fr;
 
   height: 36px;
 
@@ -262,8 +367,8 @@ const SAvatarArea = styled.div`
 
   overflow: hidden;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
 
   display: flex;
   justify-content: center;
@@ -271,8 +376,8 @@ const SAvatarArea = styled.div`
 
   img {
     display: block;
-    width: 36px;
-    height: 36px;
+    width: 24px;
+    height: 24px;
   }
 `;
 
@@ -283,15 +388,6 @@ const SUsername = styled.div`
   font-size: 14px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-`;
-
-const SStartsAt = styled.div`
-  grid-area: startsAt;
-
-  font-weight: bold;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 // Action buttons
@@ -320,7 +416,6 @@ const SMoreButton = styled(Button)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
   padding: 8px;
-  margin-right: 18px;
 
   span {
     display: flex;
@@ -352,4 +447,54 @@ const SBidsAmount = styled.div`
     margin-bottom: initial;
     justify-self: flex-end;
   }
+`;
+
+
+// Winner option
+const SSelectingWinnerOption = styled.div`
+  position: fixed;
+  bottom: 16px;
+  left: 16;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  z-index: 20;
+
+  height: 130px;
+  width: calc(100% - 48px);
+
+  padding: 24px 16px;
+  padding-right: 134px;
+
+  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  border-radius: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    grid-area: selectWinner;
+
+    position: relative;
+
+    width: auto;
+
+    margin-top: 32px;
+
+    width: 100%;
+
+  }
+`;
+
+const STrophyImg = styled.img`
+  position: absolute;
+  right: -16px;
+  top: 8px;
+`;
+
+const SHeadline = styled(Headline)`
+  color: #FFFFFF;
+`;
+
+const SText = styled(Text)`
+  color:#FFFFFF;
 `;

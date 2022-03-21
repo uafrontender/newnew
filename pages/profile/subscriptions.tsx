@@ -25,7 +25,9 @@ interface IMyProfileSubscriptions {
   postsFilter: newnewapi.Post.Filter;
   nextPageTokenFromServer?: string;
   pageToken: string | null | undefined;
+  totalCount: number;
   handleUpdatePageToken: (value: string | null | undefined) => void;
+  handleUpdateCount: (value: number) => void;
   handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
   handleSetPosts: React.Dispatch<React.SetStateAction<newnewapi.Post[]>>;
 }
@@ -37,7 +39,9 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   posts,
   postsFilter,
   pageToken,
+  totalCount,
   handleUpdatePageToken,
+  handleUpdateCount,
   handleUpdateFilter,
   handleSetPosts,
 }) => {
@@ -70,6 +74,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   // TODO: filters and other parameters
   const loadPosts = useCallback(async (
     token?: string,
+    needCount?: boolean,
   ) => {
     if (isLoading) return;
     try {
@@ -81,16 +86,23 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
         paging: {
           ...(token ? { pageToken: token } : {}),
         },
+        ...(needCount ? {
+          needTotalCount: true,
+        } : {}),
       });
       const postsResponse = await getMyPosts(
         payload,
       );
 
-      console.log(postsResponse);
-
       if (postsResponse.data && postsResponse.data.posts) {
         handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
         handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
+
+        if (postsResponse.data.totalCount) {
+          handleUpdateCount(postsResponse.data.totalCount);
+        } else if (needCount) {
+          handleUpdateCount(0);
+        }
       }
       setIsLoading(false);
     } catch (err) {
@@ -100,6 +112,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   }, [
     handleSetPosts,
     handleUpdatePageToken,
+    handleUpdateCount,
     postsFilter,
     isLoading,
   ]);
@@ -109,7 +122,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
       if (pageToken) {
         loadPosts(pageToken);
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts();
+        loadPosts(undefined, true);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,15 +131,15 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   useUpdateEffect(() => {
     handleUpdatePageToken('');
     handleSetPosts([]);
-    loadPosts(pageToken ?? undefined);
+    loadPosts(undefined, true);
   }, [postsFilter]);
 
   return (
     <div>
-      <main>
+      <SMain>
         <PostsFilterSection
-          // Temp
-          numDecisions={1000}
+          numDecisions={totalCount}
+          isLoading={isLoading}
           postsFilter={postsFilter}
           handleUpdateFilter={handleUpdateFilter}
         />
@@ -146,7 +159,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
         <div
           ref={loadingRef}
         />
-      </main>
+      </SMain>
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}
@@ -166,6 +179,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
       postsCachedSubscriptions={page.props.pagedPosts.posts}
       postsCachedSubscriptionsFilter={newnewapi.Post.Filter.ALL}
       postsCachedSubscriptionsPageToken={page.props.nextPageTokenFromServer}
+      postsCachedSubscriptionsCount={page.props.pagedPosts.totalCount}
     >
       { page }
     </MyProfileLayout>
@@ -180,7 +194,7 @@ export async function getServerSideProps(
   try {
     const translationContext = await serverSideTranslations(
       context.locale!!,
-      ['common', 'profile', 'home', 'decision'],
+      ['common', 'profile', 'home', 'decision', 'payment-modal'],
     );
 
     const { req } = context;
@@ -189,6 +203,7 @@ export async function getServerSideProps(
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_SUBSCRIPTIONS,
         filter: newnewapi.Post.Filter.ALL,
+        needTotalCount: true,
       });
       const res = await getMyPosts(
         payload,
@@ -204,8 +219,6 @@ export async function getServerSideProps(
           );
         },
       );
-
-      console.log(res);
 
       if (res.data) {
         return {
@@ -239,14 +252,15 @@ export async function getServerSideProps(
   }
 }
 
+const SMain = styled.main`
+  min-height: 60vh;
+`;
+
 const SCardsSection = styled.div`
   display: flex;
   flex-wrap: wrap;
 
-  margin-right: -16px !important;
-
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
   }
-
 `;

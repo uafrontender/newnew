@@ -3,9 +3,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
-import React, {
-  createContext, useState, useMemo, useEffect, useContext, useCallback,
-} from 'react';
+import React, { createContext, useState, useMemo, useEffect, useContext, useCallback } from 'react';
 import { SocketContext } from './socketContext';
 
 interface IChannels {
@@ -33,23 +31,15 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
         return curr;
       }
 
-      if (
-        shouldSubscribe
-        && socketConnection && socketConnection.connected
-      ) {
+      if (shouldSubscribe && socketConnection && socketConnection.connected) {
         const subscribeMsg = new newnewapi.SubscribeToChannels({
-          channels: [
-            channel,
-          ],
+          channels: [channel],
         });
 
         const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-        socketConnection.emit(
-          'SubscribeToChannels',
-          subscribeMsgEncoded,
-        );
+        socketConnection.emit('SubscribeToChannels', subscribeMsgEncoded);
       }
-      workingObj[id] = (shouldSubscribe ? 1 : workingObj[id] + 1);
+      workingObj[id] = shouldSubscribe ? 1 : workingObj[id] + 1;
       return workingObj;
     });
   };
@@ -64,12 +54,15 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
     });
   };
 
-  const contextValue = useMemo(() => ({
-    channelsWithSubs,
-    addChannel,
-    removeChannel,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [channelsWithSubs]);
+  const contextValue = useMemo(
+    () => ({
+      channelsWithSubs,
+      addChannel,
+      removeChannel,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [channelsWithSubs]
+  );
 
   useEffect(() => {
     if (socketConnection.connected) {
@@ -79,28 +72,35 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
             setChannelsWithSubs((curr) => {
               const workingObj = { ...curr };
               const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
-              if (
-                shouldSubscribe
-                && socketConnection && socketConnection.connected
-              ) {
-                const subscribeMsg = new newnewapi.SubscribeToChannels({
-                  channels: [
-                    {
-                      postUpdates: {
-                        postUuid: val,
+              if (shouldSubscribe && socketConnection && socketConnection.connected) {
+                let subscribeMsg;
+                if (val.startsWith('chat_')) {
+                  const chatId = parseInt(val.split('_')[1], 10);
+                  subscribeMsg = new newnewapi.SubscribeToChannels({
+                    channels: [
+                      {
+                        chatRoomUpdates: {
+                          chatRoomId: chatId,
+                        },
                       },
-                    },
-                  ],
-                });
-                const subscribeMsgEncoded = newnewapi
-                  .SubscribeToChannels.encode(subscribeMsg).finish();
-
-                socketConnection.emit(
-                  'SubscribeToChannels',
-                  subscribeMsgEncoded,
-                );
+                    ],
+                  });
+                } else {
+                  subscribeMsg = new newnewapi.SubscribeToChannels({
+                    channels: [
+                      {
+                        postUpdates: {
+                          postUuid: val,
+                        },
+                      },
+                    ],
+                  });
+                }
+                const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+                socketConnection.emit('SubscribeToChannels', subscribeMsgEncoded);
               }
-              workingObj[val] = (shouldSubscribe ? 1 : workingObj[val] + 1);
+              workingObj[val] = shouldSubscribe ? 1 : workingObj[val] + 1;
+
               return workingObj;
             });
           });
@@ -111,38 +111,34 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
   }, [socketConnection, scheduledArr]);
 
   useEffect(() => {
-    const shouldUnsubArray:newnewapi.IChannel[] = [];
-
+    const shouldUnsubArray: newnewapi.IChannel[] = [];
     for (let i = 0; i < Object.values(channelsWithSubs).length; i++) {
       if (Object.values(channelsWithSubs)[i] < 1) {
-        shouldUnsubArray.push({
-          postUpdates: {
-            postUuid: Object.keys(channelsWithSubs)[i]!!,
-          },
-        } as newnewapi.IChannel);
+        if (Object.keys(channelsWithSubs)[i].startsWith('chat_')) {
+          const chatId = parseInt(Object.keys(channelsWithSubs)[i].split('_')[1], 10);
+          shouldUnsubArray.push({
+            chatRoomUpdates: {
+              chatRoomId: chatId,
+            },
+          } as newnewapi.IChannel);
+        } else {
+          shouldUnsubArray.push({
+            postUpdates: {
+              postUuid: Object.keys(channelsWithSubs)[i]!!,
+            },
+          } as newnewapi.IChannel);
+        }
       }
     }
     if (shouldUnsubArray.length > 0) {
       const unsubMsg = new newnewapi.UnsubscribeFromChannels({
         channels: shouldUnsubArray,
       });
-      socketConnection.emit(
-        'UnsubscribeFromChannels',
-        newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish(),
-      );
+      socketConnection.emit('UnsubscribeFromChannels', newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish());
     }
-  }, [
-    socketConnection,
-    channelsWithSubs,
-  ]);
+  }, [socketConnection, channelsWithSubs]);
 
-  return (
-    <ChannelsContext.Provider
-      value={contextValue}
-    >
-      {children}
-    </ChannelsContext.Provider>
-  );
+  return <ChannelsContext.Provider value={contextValue}>{children}</ChannelsContext.Provider>;
 };
 
 export default ChannelsContextProvider;

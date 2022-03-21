@@ -14,8 +14,7 @@ import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationPreview {
-}
+interface ICreationPreview {}
 
 export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   const { t } = useTranslation('creation');
@@ -42,18 +41,12 @@ export const CreationPreview: React.FC<ICreationPreview> = (props) => {
     allowedRoutes.push('/');
   }
 
-  useLeavePageConfirm(
-    true,
-    t('secondStep.modal.leave.message'),
-    allowedRoutes,
-  );
+  useLeavePageConfirm(true, t('secondStep.modal.leave.message'), allowedRoutes);
 
   return (
     <SWrapper>
       <Head>
-        <title>
-          {t(`preview.meta.title-${router?.query?.tab}`)}
-        </title>
+        <title>{t(`preview.meta.title-${router?.query?.tab}`)}</title>
       </Head>
       <PreviewContent {...props} />
     </SWrapper>
@@ -61,18 +54,13 @@ export const CreationPreview: React.FC<ICreationPreview> = (props) => {
 };
 
 (CreationPreview as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>
-    {page}
-  </CreationLayout>
+  <CreationLayout>{page}</CreationLayout>
 );
 
 export default CreationPreview;
 
 export async function getServerSideProps(context: NextPageContext): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale as string,
-    ['common', 'creation'],
-  );
+  const translationContext = await serverSideTranslations(context.locale as string, ['common', 'creation']);
 
   // @ts-ignore
   if (!context?.req?.cookies?.accessToken) {
@@ -93,9 +81,11 @@ export async function getServerSideProps(context: NextPageContext): Promise<any>
 
 const SWrapper = styled.div`
   display: flex;
+  min-height: calc(100vh - 60px);
+  margin: 30px;
   padding-bottom: 104px;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
 
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: unset;

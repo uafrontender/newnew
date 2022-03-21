@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppSelector } from '../redux-store/store';
@@ -12,46 +13,63 @@ import { useAppSelector } from '../redux-store/store';
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import OnboardingSectionDetails from '../components/molecules/creator-onboarding/OnboardingSectionDetails';
+import useLeavePageConfirm from '../utils/hooks/useLeavePageConfirm';
+import { getSupportedCreatorCountries } from '../api/endpoints/payments';
+import { getMyOnboardingState } from '../api/endpoints/user';
+import Lottie from '../components/atoms/Lottie';
+import loadingAnimation from '../public/animations/logo-loading-blue.json';
 
-export type CountryOption = {
-  value: string;
-  en: string;
-}
-
-const countriesMock: CountryOption[] = [
+const countriesMock: Omit<newnewapi.Country, 'toJSON'>[] = [
   {
-    value: 'US',
-    en: 'United States',
+    code: 'US',
+    name: 'United States',
   },
-  {
-    value: 'Canada',
-    en: 'Canada',
-  },
-];
-
-const genericAvatarsMock = [
-  'someurl',
-  'anotherurl',
 ];
 
 interface ICreatorOnboardingStage2 {
-  genericAvatarsUrls: string[];
-  availableCountries: any[];
+  availableCountriesRes: newnewapi.GetSupportedCreatorCountriesResponse;
 }
 
 const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
-  genericAvatarsUrls,
-  availableCountries,
+  availableCountriesRes,
 }) => {
   const { t } = useTranslation('creator-onboarding');
 
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
+  useLeavePageConfirm(
+    true,
+    t('DetailsSection.leaveMsg'),
+    [
+      '/creator/dashboard',
+      '/verify-new-email',
+    ],
+  );
+
+  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+
   // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
   const goToNext = () => {
-    router.push('/dashboard');
+    router.push('/creator/dashboard');
   };
+
+  useEffect(() => {
+    async function fetchOnboardingState() {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getMyOnboardingState(payload);
+
+        if (res.data) {
+          setOnboardingState(res.data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchOnboardingState();
+  }, []);
 
   return (
     <>
@@ -59,11 +77,23 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
         <title>{ t('meta.title') }</title>
         <meta name="description" content={t('meta.description')} />
       </Head>
-      <OnboardingSectionDetails
-        genericAvatarsUrls={genericAvatarsUrls}
-        availableCountries={availableCountries}
-        goToDashboard={goToNext}
-      />
+      {onboardingState ? (
+        <OnboardingSectionDetails
+          isAvatarCustom={onboardingState?.isCustomAvatar ?? false}
+          availableCountries={availableCountriesRes.countries as newnewapi.Country[]}
+          goToDashboard={goToNext}
+        />
+      ) : (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      )}
     </>
   );
 };
@@ -84,11 +114,31 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     ['creator-onboarding', 'profile'],
   );
 
-  return {
-    props: {
-      availableCountries: countriesMock,
-      genericAvatarsUrls: genericAvatarsMock,
-      ...translationContext,
-    },
-  };
+  try {
+    const countriesPayload = new newnewapi.EmptyRequest({});
+
+    const countriesRes = await getSupportedCreatorCountries(countriesPayload);
+
+    if (!countriesRes.data) throw new Error('Countries API not working');
+
+    return {
+      props: {
+        availableCountriesRes: countriesRes.data?.toJSON(),
+        ...translationContext,
+      },
+    };
+  } catch (err) {
+    console.error(err);
+
+    const mockRes = new newnewapi.GetSupportedCreatorCountriesResponse({
+      countries: countriesMock,
+    });
+
+    return {
+      props: {
+        availableCountriesRes: mockRes.toJSON(),
+        ...translationContext,
+      },
+    };
+  }
 };

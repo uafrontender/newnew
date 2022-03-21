@@ -18,7 +18,7 @@ import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 
 export interface ICreatorOnboardingLayout {
-
+  hideProgressBar?: boolean;
 }
 
 const SCreatorOnboardingLayout = styled.div`
@@ -29,13 +29,25 @@ const SCreatorOnboardingLayout = styled.div`
 `;
 
 const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout> = ({
+  hideProgressBar,
   children,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+
+  const SideTextSwitch = () => {
+    if (router.pathname.includes('creator-onboarding-stripe')) {
+      return 'StripeSection'
+    }
+    if (router.pathname.includes('creator-onboarding-subrate')) {
+      return 'SubrateSection'
+    }
+    return 'DetailsSection';
+  }
 
   return (
     <ErrorBoundary>
@@ -45,24 +57,41 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
       >
         <SCreatorOnboardingLayout>
           <HomeLogoButton />
+          {
+            isTablet && hideProgressBar ? (
+              <SHomeLogoButton
+                style={{
+                  display: 'block',
+                }}
+              >
+                <Row>
+                  <Col>
+                    <SLogo />
+                  </Col>
+                </Row>
+              </SHomeLogoButton>
+            ) : null
+          }
           <SContentContainer>
-            <OnboardingProgressBar
-              numStages={2}
-              currentStage={router.pathname.includes('creator-onboarding-stage-1') ? 1 : 2}
-            />
+            {!hideProgressBar && (
+              <OnboardingProgressBar
+                numStages={2}
+                currentStage={router.pathname.includes('creator-onboarding-stage-1') ? 1 : 2}
+              />
+            )}
             {children}
           </SContentContainer>
-          {!isMobileOrTablet && router.pathname.includes('creator-onboarding-stage-2') && (
+          {!isMobileOrTablet && !router.pathname.includes('creator-onboarding-stage-1') && (
             <SSideMessage>
               <SHeadline
                 variant={3}
               >
-                { t('DetailsSection.side.heading') }
+                { t(`${SideTextSwitch()}.side.heading`) }
               </SHeadline>
               <Text
                 variant={2}
               >
-                { t('DetailsSection.side.subheading') }
+                { t(`${SideTextSwitch()}.side.subheading`) }
               </Text>
             </SSideMessage>
           )}
@@ -88,8 +117,6 @@ const SHomeLogoButton = styled(Container)`
   display: none;
 
   ${({ theme }) => theme.media.tablet} {
-    /* display: block; */
-
     position: relative;
     margin: 12px 0px;
   }

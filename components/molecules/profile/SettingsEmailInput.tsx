@@ -5,6 +5,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 
 type TSettingsEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
@@ -22,6 +23,14 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
   ...rest
 }) => {
   const [errorBordersShown, setErrorBordersShown] = useState(false);
+
+  useUpdateEffect(() => {
+    if (!isValid) {
+      setErrorBordersShown(true);
+    } else {
+      setErrorBordersShown(false);
+    }
+  }, [isValid]);
 
   return (
     <SContainer>

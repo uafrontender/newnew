@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -9,15 +9,19 @@ import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
 
 type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
+  isTaken?: boolean;
   labelCaption: string;
   errorCaption: string;
+  cantChangeInfoCaption: string;
 }
 
 const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   value,
   isValid,
+  isTaken,
   labelCaption,
   errorCaption,
+  cantChangeInfoCaption,
   readOnly,
   onChange,
   onFocus,
@@ -26,11 +30,13 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
   const theme = useTheme();
   const [errorBordersShown, setErrorBordersShown] = useState(false);
 
+  useEffect(() => {
+    if (isTaken) setErrorBordersShown(true);
+  }, [isTaken]);
+
   return (
     <SContainer>
-      <SLabel
-        htmlFor="settings_email_input"
-      >
+      <SLabel>
         { labelCaption }
       </SLabel>
       {readOnly && (
@@ -39,7 +45,7 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
             svg={LockIcon}
             width="24px"
             height="24px"
-            fill={theme.colorsThemed.text.secondary}
+            fill={theme.colorsThemed.text.tertiary}
           />
         </SReadonlyLock>
       )}
@@ -50,6 +56,12 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
         readOnly={readOnly}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
+        style={{
+          ...(readOnly ? {
+            cursor: 'default',
+            userSelect: 'none',
+          } : {}),
+        }}
         onBlur={() => {
           if (value && (value as string).length > 0 && !isValid) {
             setErrorBordersShown(true);
@@ -63,6 +75,11 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
         }}
         {...rest}
       />
+      {readOnly && (
+      <SReadonlyCaption>
+        { cantChangeInfoCaption }
+      </SReadonlyCaption>
+      )}
       {
         errorBordersShown ? (
           <AnimatedPresence
@@ -86,6 +103,7 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
 
 OnboardingEmailInput.defaultProps = {
   isValid: undefined,
+  isTaken: undefined,
 };
 
 export default OnboardingEmailInput;
@@ -95,15 +113,16 @@ const SContainer = styled.div`
   width: 100%;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 284px;
+    /* width: 284px; */
+    width: 100%;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 296px;
+    /* width: 296px; */
   }
 `;
 
-const SLabel = styled.label`
+const SLabel = styled.div`
   display: block;
 
   font-weight: 600;
@@ -112,6 +131,18 @@ const SLabel = styled.label`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   margin-bottom: 6px;
+`;
+
+const SReadonlyCaption = styled.div`
+  display: block;
+
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  margin-bottom: 6px;
+  margin-top: 6px;
 `;
 
 interface ISOnboardingEmailInput {
@@ -136,7 +167,7 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       // NB! Temp
-      return theme.colorsThemed.background.outlines1;
+      return 'transparent';
     } return (theme.colorsThemed.accent.error);
   }};
 
@@ -153,7 +184,15 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   }
 
-  &:hover:enabled, &:focus, &:active {
+  &:hover:enabled,
+  &:focus,
+  &:active {
+    outline: none;
+  }
+
+  &:hover:enabled:not(:read-only),
+  &:focus:not(:read-only),
+  &:active:not(:read-only) {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {

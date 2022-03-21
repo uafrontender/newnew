@@ -19,40 +19,38 @@ interface ITabletFieldBlock {
     min?: number;
     type?: 'text' | 'number' | 'tel';
     pattern?: string;
+    max?: number;
   };
   formattedValue?: any;
   formattedDescription?: any;
 }
 
 export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
-  const {
-    id,
-    type,
-    value,
-    options,
-    maxItems,
-    inputProps,
-    formattedValue,
-    formattedDescription,
-    onChange,
-  } = props;
+  const { id, type, value, options, maxItems, inputProps, formattedValue, formattedDescription, onChange } = props;
   const { t } = useTranslation('creation');
   const inputRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const handleChange = useCallback((e) => {
-    onChange(id, e?.target?.value || e);
-  }, [id, onChange]);
+  const handleChange = useCallback(
+    (e) => {
+      onChange(id, e?.target?.value || e);
+    },
+    [id, onChange]
+  );
   const handleBlur = useCallback(() => {
-    if (inputProps?.type === 'number' && inputProps?.min as number > value) {
+    if (inputProps?.type === 'number' && (inputProps?.min as number) > value) {
       onChange(id, inputProps?.min as number);
     }
+    if (inputProps?.type === 'number' && (inputProps?.max as number) < value) {
+      onChange(id, inputProps?.max as number);
+    }
   }, [inputProps, id, onChange, value]);
-  const getSelectOptions = () => options?.map((item: any) => ({
-    name: item.title,
-    value: item.id,
-  })) || [];
+  const getSelectOptions = () =>
+    options?.map((item: any) => ({
+      name: item.title,
+      value: item.id,
+    })) || [];
 
   const inputLabel = t(`secondStep.field.${id}.label`);
 
@@ -65,11 +63,7 @@ export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
         {type === 'input' ? (
           <SInputWrapper>
             <SInputContent>
-              {inputLabel && (
-                <SInputLabel htmlFor={id}>
-                  {inputLabel}
-                </SInputLabel>
-              )}
+              {inputLabel && <SInputLabel htmlFor={id}>{inputLabel}</SInputLabel>}
               <SInput
                 id={id}
                 ref={inputRef}

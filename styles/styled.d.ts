@@ -36,7 +36,6 @@ declare module 'styled-components' {
         // Used for both hover and focus states.
         outlines2: string;
         numbers: string;
-        backgroundFooter: string;
         backgroundHeader: string;
         backgroundErrorPopup: string;
         // Used for overlaydim
@@ -176,6 +175,7 @@ declare module 'styled-components' {
       intenseBlue: string,
       mediumGrey: string,
       cookie: string,
+      dashboardNotifications: string,
     },
     gradients: {
       arrowLeft: string,
@@ -188,6 +188,26 @@ declare module 'styled-components' {
       calendarTop: string,
       calendarBottom: string,
       creationSubmit: string,
+      listTop: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
+      listBottom: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
+      listLeft: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
+      listRight: {
+        primary: string,
+        secondary: string,
+        tertiary: string,
+      },
       decisionOption: {
         yellow: string,
         blue: string,

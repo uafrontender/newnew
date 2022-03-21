@@ -3,74 +3,75 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, {
-  useCallback, useMemo, useRef, useState,
-} from 'react';
-import styled, { css } from 'styled-components';
-import { placeBidOnAuction } from '../../../../api/endpoints/auction';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
-
-import Button from '../../../atoms/Button';
-import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
-import Text from '../../../atoms/Text';
+import { WalletContext } from '../../../../contexts/walletContext';
+import { placeBidWithWallet } from '../../../../api/endpoints/auction';
+import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
-import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../PaymentModal';
-import PlaceBidForm from './PlaceAcBidForm';
-import OptionActionMobileModal from '../OptionActionMobileModal';
-import { formatNumber } from '../../../../utils/format';
 
+import Text from '../../../atoms/Text';
+import Button from '../../../atoms/Button';
 import Lottie from '../../../atoms/Lottie';
+import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import LoadingModal from '../../LoadingModal';
+import PaymentModal from '../../checkout/PaymentModal';
+import OptionActionMobileModal from '../OptionActionMobileModal';
+
+import { formatNumber } from '../../../../utils/format';
 
 // NB! temp sample
 import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
 import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
 
+// Icons
+import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
+import CoinIcon from '../../../../public/images/decision/coin-mock.png';
+
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   shouldAnimate: boolean;
+  votingAllowed: boolean;
   postId: string;
   index: number;
   optionBeingSupported?: string;
   minAmount: number;
   handleSetSupportedBid: (id: string) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
-  handleOpenOptionBidHistory: () => void;
 }
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
   shouldAnimate,
+  votingAllowed,
   postId,
   index,
   optionBeingSupported,
   minAmount,
   handleSetSupportedBid,
   handleAddOrUpdateOptionFromResponse,
-  handleOpenOptionBidHistory,
 }) => {
-  const { t } = useTranslation('decision');
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const { walletBalance } = useContext(WalletContext);
 
   const highest = useMemo(() => option.isHighest, [option.isHighest]);
-  const myVote = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const myBid = useMemo(() => option.creator?.uuid === user.userData?.userUuid, [
-    option.creator?.uuid,
-    user.userData?.userUuid,
-  ]);
-  const bgVariant = highest ? 'yellow' : (
-    myBid ? 'blue' : myVote ? 'green' : undefined);
+  const isSupportedByMe = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
+  const isMyBid = useMemo(
+    () => option.creator?.uuid === user.userData?.userUuid,
+    [option.creator?.uuid, user.userData?.userUuid]
+  );
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -87,47 +88,92 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToUser = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    if (!user.loggedIn) {
-      router.push('/sign-up?reason=bid');
-      return;
-    }
     setPaymentModalOpen(true);
   };
 
-  const handleSubmitSupportBid = useCallback(async () => {
+  const handlePayWithWallet = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const makeBidPayload = new newnewapi.PlaceBidRequest({
-        amount: new newnewapi.MoneyAmount({
-          usdCents: parseInt(supportBidAmount, 10) * 100,
-        }),
-        optionId: option.id,
-        postUuid: postId,
-      });
+      // Check if user is logged and if the wallet balance is sufficient
+      if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(supportBidAmount, 10) * 100)) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+          successUrl: `${window.location.href.split('#')[0]}&`,
+          cancelUrl: `${window.location.href.split('#')[0]}&`,
+          ...(!user.loggedIn
+            ? {
+                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+              }
+            : {}),
+          acBidRequest: {
+            amount: new newnewapi.MoneyAmount({
+              usdCents: parseInt(supportBidAmount, 10) * 100,
+            }),
+            optionId: option.id,
+            postUuid: postId,
+          },
+        });
 
-      const res = await placeBidOnAuction(makeBidPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-      if (!res.data
-        || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-      const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
-      optionFromResponse.isSupportedByMe = true;
-      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+        window.location.href = res.data.sessionUrl;
+      } else {
+        const makeBidPayload = new newnewapi.PlaceBidRequest({
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(supportBidAmount, 10) * 100,
+          }),
+          optionId: option.id,
+          postUuid: postId,
+        });
 
-      handleSetSupportedBid('');
-      setSupportBidAmount('');
-      setIsSupportFormOpen(false);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
+        const res = await placeBidWithWallet(makeBidPayload);
+
+        if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${window.location.href.split('#')[0]}&`,
+            cancelUrl: `${window.location.href.split('#')[0]}&`,
+            acBidRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(supportBidAmount, 10) * 100,
+              }),
+              optionId: option.id,
+              postUuid: postId,
+            },
+          });
+
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+            getTopUpWalletWithPaymentPurposeUrlPayload
+          );
+
+          if (!resStripeRedirect.data || !resStripeRedirect.data.sessionUrl || resStripeRedirect.error)
+            throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+
+          window.location.href = resStripeRedirect.data.sessionUrl;
+          return;
+        }
+
+        if (!res.data || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+        optionFromResponse.isSupportedByMe = true;
+        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+        handleSetSupportedBid('');
+        setSupportBidAmount('');
+        setIsSupportFormOpen(false);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -143,42 +189,58 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     supportBidAmount,
     option.id,
     postId,
+    user.loggedIn,
+    walletBalance,
   ]);
+
+  const handlePayWithCardStripeRedirect = useCallback(async () => {
+    setLoadingModalOpen(true);
+    try {
+      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
+        successUrl: `${window.location.href.split('#')[0]}&`,
+        cancelUrl: `${window.location.href.split('#')[0]}&`,
+        ...(!user.loggedIn
+          ? {
+              nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+            }
+          : {}),
+        acBidRequest: {
+          amount: new newnewapi.MoneyAmount({
+            usdCents: parseInt(supportBidAmount, 10) * 100,
+          }),
+          optionId: option.id,
+          postUuid: postId,
+        },
+      });
+
+      const res = await createPaymentSession(createPaymentSessionPayload);
+
+      if (!res.data || !res.data.sessionUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      window.location.href = res.data.sessionUrl;
+    } catch (err) {
+      setPaymentModalOpen(false);
+      setLoadingModalOpen(false);
+      console.error(err);
+    }
+  }, [user.loggedIn, supportBidAmount, option.id, postId]);
 
   return (
     <motion.div
       key={index}
-      // layout="position"
-      // transition={{
-      //   type: 'spring',
-      //   damping: 20,
-      //   stiffness: 300,
-      // }}
       style={{
         display: 'flex',
         flexDirection: 'column',
         marginBottom: '16px',
-        ...(!isMobile && isSupportFormOpen ? {
-          gap: '16px',
-        } : {}),
+        ...(!isMobile && isSupportFormOpen
+          ? {
+              gap: '16px',
+            }
+          : {}),
       }}
     >
-      <SContainer
-        // layout="position"
-        // transition={{
-        //   type: 'spring',
-        //   damping: 20,
-        //   stiffness: 300,
-        // }}
-        isDisabled={disabled}
-      >
-        <SBidDetails
-          bgVariant={bgVariant}
-          onClick={() => {
-            if (optionBeingSupported) return;
-            handleOpenOptionBidHistory();
-          }}
-        >
+      <SContainer isDisabled={disabled} isBlue={isSupportedByMe || isMyBid}>
+        <SBidDetails isBlue={isSupportedByMe || isMyBid}>
           <SLottieAnimationContainer>
             {shouldAnimate ? (
               <Lottie
@@ -192,70 +254,63 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               />
             ) : null}
           </SLottieAnimationContainer>
-          <SBidInfo>
-            {highest
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.highest')}</STag>
-              ) : null}
-            {myVote
-              && !myBid
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.my_vote')}</STag>
-              ) : null}
-            {myBid
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.my_bid')}</STag>
-              ) : null}
-            {/* Comment out for now */}
-            {/* {option.creator.isVIP
-              ? (
-                <STag>{t('AcPost.OptionsTab.tags.vip')}</STag>
-              ) : null} */}
-            <SAvatar
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
+          <SBidAmount isWhite={isSupportedByMe || isMyBid}>
+            <SCoinImg src={CoinIcon.src} />
+            <div>
+              {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
+            </div>
+          </SBidAmount>
+          <SOptionInfo isWhite={isSupportedByMe || isMyBid} variant={3}>
+            {option.title}
+          </SOptionInfo>
+          <SBiddersInfo variant={3}>
+            <SSpanBiddersHighlighted
+              className="spanHighlighted"
+              onClick={() => {
+                if (!isMyBid) {
+                  handleRedirectToOptionCreator();
+                }
               }}
-              src={option?.creator?.avatarUrl!! as string}
-              alt={option?.creator?.username!!}
-              draggable={false}
-            />
-            <SUsername
-              isColored={bgVariant !== undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRedirectToUser();
+              style={{
+                ...(!isMyBid && option.isCreatedBySubscriber
+                  ? {
+                      color: theme.colorsThemed.accent.yellow,
+                    }
+                  : {}),
+                ...(!isMyBid
+                  ? {
+                      cursor: 'pointer',
+                    }
+                  : {}),
               }}
             >
-              { option.creator?.uuid === user.userData?.userUuid
-                ? t('me') : option?.creator?.username }
-            </SUsername>
-            <SBidTitle
-              variant={3}
-            >
-              { option.title }
-            </SBidTitle>
-          </SBidInfo>
-          <SAmount>
-            {option.totalAmount?.usdCents
-              ? (
-                `$${formatNumber((option?.totalAmount?.usdCents / 100) ?? 0, true)}`
-              ) : '$0'}
-          </SAmount>
+              {isMyBid ? t('me') : option.creator?.nickname ?? option.creator?.username}
+            </SSpanBiddersHighlighted>
+            {isSupportedByMe && !isMyBid ? (
+              <SSpanBiddersHighlighted className="spanHighlighted">{`, ${t('me')}`}</SSpanBiddersHighlighted>
+            ) : null}
+            {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
+              <>
+                <SSpanBiddersRegular className="spanRegular">{` & `}</SSpanBiddersRegular>
+                <SSpanBiddersHighlighted className="spanHighlighted">
+                  {formatNumber(option.supporterCount - (isSupportedByMe && !isMyBid ? 2 : 1), true)}{' '}
+                  {t('AcPost.OptionsTab.OptionCard.others')}
+                </SSpanBiddersHighlighted>
+              </>
+            ) : null}{' '}
+            <SSpanBiddersRegular className="spanRegular">{t('AcPost.OptionsTab.OptionCard.bid')}</SSpanBiddersRegular>
+          </SBiddersInfo>
         </SBidDetails>
-        {optionBeingSupported && !disabled ? (
-          <div
-            style={{
-              minWidth: isMobileOrTablet ? '82px' : '92px',
-            }}
-          />
-        ) : (
-          <SSupportButton
-            view="secondary"
-            disabled={disabled}
-            onClick={() => handleOpenSupportForm()}
-          >
-            { t('AcPost.OptionsTab.OptionCard.supportBtn') }
+        {(optionBeingSupported && !disabled) || !votingAllowed ? null : (
+          <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
+            {!isMobile ? (
+              <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
+            ) : (
+              <>
+                <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
+                <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
+              </>
+            )}
           </SSupportButton>
         )}
       </SContainer>
@@ -268,78 +323,75 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           stiffness: 300,
         }}
       >
-      {!isMobile && isSupportFormOpen && (
-        <>
-          <BidAmountTextInput
-            value={supportBidAmount}
-            inputAlign="left"
-            horizontalPadding="20px"
-            onChange={(newValue: string) => setSupportBidAmount(newValue)}
-            minAmount={minAmount}
-          />
-          <Button
-            view="primaryGrad"
-            disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
-            onClick={() => handleTogglePaymentModalOpen()}
-          >
-            { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
-          </Button>
-          <SCancelButton
-            view="secondary"
-            onClick={() => handleCloseSupportForm()}
-          >
-            { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
-          </SCancelButton>
-        </>
-      )}
-      {isMobile ? (
-        <OptionActionMobileModal
-          isOpen={isSupportFormOpen}
-          onClose={() => handleCloseSupportForm()}
-          zIndex={12}
-        >
-          <SSuggestSupportMobileContainer>
-            <div>
-              { option.title }
-            </div>
+        {!isMobile && isSupportFormOpen && (
+          <>
             <BidAmountTextInput
               value={supportBidAmount}
               inputAlign="left"
-              horizontalPadding="16px"
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
+              style={{
+                padding: '12.5px 16px',
+              }}
             />
             <Button
               view="primaryGrad"
-              size="sm"
-              disabled={!supportBidAmount}
+              disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+              {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
             </Button>
-          </SSuggestSupportMobileContainer>
-        </OptionActionMobileModal>
-      ) : null}
+            <SCancelButton view="secondary" onClick={() => handleCloseSupportForm()}>
+              {t('AcPost.OptionsTab.OptionCard.cancelBtn')}
+            </SCancelButton>
+          </>
+        )}
+        {isMobile ? (
+          <OptionActionMobileModal isOpen={isSupportFormOpen} onClose={() => handleCloseSupportForm()} zIndex={12}>
+            <SSuggestSupportMobileContainer>
+              <div>{option.title}</div>
+              <BidAmountTextInput
+                value={supportBidAmount}
+                inputAlign="left"
+                autofocus={isSupportFormOpen}
+                minAmount={minAmount}
+                style={{
+                  textAlign: 'center',
+                  paddingLeft: '12px',
+                }}
+                onChange={(newValue: string) => setSupportBidAmount(newValue)}
+              />
+              <Button
+                view="primaryGrad"
+                size="sm"
+                disabled={!supportBidAmount}
+                onClick={() => handleTogglePaymentModalOpen()}
+              >
+                {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
+              </Button>
+            </SSuggestSupportMobileContainer>
+          </OptionActionMobileModal>
+        ) : null}
       </SSupportBidForm>
       {/* Payment Modal */}
-      {paymentModalOpen ? (
+      {paymentModalOpen && (
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          amount={`$${supportBidAmount}`}
+          showTocApply
           onClose={() => setPaymentModalOpen(false)}
+          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+          handlePayWithWallet={handlePayWithWallet}
         >
-          <PlaceBidForm
-            optionTitle={option.title}
-            amountRounded={supportBidAmount}
-            handlePlaceBid={handleSubmitSupportBid}
-          />
+          <SPaymentModalHeader>
+            <SPaymentModalTitle variant={3}>{t('AcPost.paymenModalHeader.subtitle')}</SPaymentModalTitle>
+            <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
+          </SPaymentModalHeader>
         </PaymentModal>
-      ) : null }
+      )}
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </motion.div>
   );
 };
@@ -352,12 +404,19 @@ export default AcOptionCard;
 
 const SContainer = styled(motion.div)<{
   isDisabled: boolean;
+  isBlue: boolean;
 }>`
   display: flex;
   flex-direction: column;
   gap: 12px;
 
-  width: calc(100% - 16px);
+  width: 100%;
+
+  padding: 16px;
+
+  background-color: ${({ theme, isBlue }) =>
+    isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
 
@@ -366,38 +425,111 @@ const SContainer = styled(motion.div)<{
     flex-direction: row;
     justify-content: space-between;
     gap: 16px;
+
+    padding: initial;
+    background-color: initial;
+    border-radius: initial;
   }
 `;
 
 const SBidDetails = styled.div<{
-  bgVariant?: 'yellow' | 'green' | 'blue';
+  isBlue: boolean;
 }>`
   position: relative;
 
   display: grid;
   grid-template-areas:
-    'info amount'
-    'doubleVote doubleVote'
-  ;
+    'amount amount'
+    'optionInfo optionInfo'
+    'bidders bidders';
   grid-template-columns: 7fr 1fr;
-  gap: 16px;
 
   width: 100%;
 
-  padding: 14px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-
-  ${({ bgVariant }) => (
-    bgVariant
+  ${({ isBlue }) =>
+    isBlue
       ? css`
-        background: ${({ theme }) => theme.gradients.decisionOption[bgVariant]};
-      ` : null
-  )};
+          .spanRegular {
+            color: #ffffff;
+            opacity: 0.6;
+          }
+          .spanHighlighted {
+            color: #ffffff;
+          }
+        `
+      : null}
 
-  &:hover {
-    cursor: pointer;
+  ${({ theme }) => theme.media.tablet} {
+    grid-template-areas:
+      'amount bidders'
+      'optionInfo optionInfo';
+    grid-template-columns: 3fr 7fr;
+
+    background-color: ${({ theme, isBlue }) =>
+      isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary};
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    padding: 14px;
   }
+`;
+
+const SBidAmount = styled.div<{
+  isWhite: boolean;
+}>`
+  grid-area: amount;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  margin-bottom: 6px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
+`;
+
+const SCoinImg = styled.img`
+  height: 24px;
+`;
+
+const SOptionInfo = styled(Text)<{
+  isWhite: boolean;
+}>`
+  grid-area: optionInfo;
+
+  margin-bottom: 8px;
+
+  ${({ isWhite }) =>
+    isWhite
+      ? css`
+          color: #ffffff;
+        `
+      : null};
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: initial;
+  }
+`;
+
+const SBiddersInfo = styled(Text)`
+  grid-area: bidders;
+
+  ${({ theme }) => theme.media.tablet} {
+    justify-self: flex-end;
+  }
+`;
+
+const SSpanBiddersHighlighted = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SSpanBiddersRegular = styled.span`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
 const SLottieAnimationContainer = styled.div`
@@ -408,98 +540,27 @@ const SLottieAnimationContainer = styled.div`
   z-index: 100;
 `;
 
-const SBidInfo = styled.div`
-  grid-area: info;
-
-  /* display: flex; */
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-
-
-  vertical-align: middle;
-  line-height: 24px;
-`;
-
-const STag = styled.span`
-  background-color: ${({ theme }) => theme.colorsThemed.text.primary};
-  border-radius: 50px;
-  padding: 6px;
-
-  font-weight: bold;
-  font-size: 10px;
-  line-height: 12px;
-  color: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  margin-right: 8px;
-`;
-
-const SAvatar = styled.img`
-  position: relative;
-  top: 7.5px;
-
-  display: inline;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-
-  margin-right: 8px;
-
-  cursor: pointer;
-`;
-
-const SUsername = styled.div<{
-  isColored?: boolean;
-}>`
-  display: inline;
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 24px;
-  color: ${({ theme, isColored }) => (isColored ? 'rgba(255, 255, 255, 0.8)' : theme.colorsThemed.text.secondary)};
-  margin-right: 8px;
-
-  transition: 0.2s linear;
-  cursor: pointer;
-
-  &:hover {
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
-  }
-`;
-
-const SBidTitle = styled(Text)`
-  display: inline;
-  line-break: loose;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-`;
-
-const SAmount = styled.div`
-  grid-area: amount;
-  align-self: center;
-  justify-self: flex-end;
-
-
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-`;
-
 const SSupportButton = styled(Button)`
   width: 100%;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+  }
 
   ${({ theme }) => theme.media.tablet} {
     width: auto;
 
     padding: 0px 12px;
-    margin-right: 16px;
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
+    background: none;
 
-    &:hover:enabled, &:focus:enabled {
+    &:hover:enabled,
+    &:focus:enabled {
       background: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
@@ -527,11 +588,11 @@ const SCancelButton = styled(Button)`
   width: auto;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  &:hover:enabled, &:focus:enabled {
+  &:hover:enabled,
+  &:focus:enabled {
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -543,5 +604,18 @@ const SSuggestSupportMobileContainer = styled.div`
   gap: 24px;
 
   padding: 16px;
+`;
 
+// Payment modal header
+const SPaymentModalHeader = styled.div``;
+
+const SPaymentModalTitle = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  margin-bottom: 6px;
+`;
+
+const SPaymentModalOptionText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;

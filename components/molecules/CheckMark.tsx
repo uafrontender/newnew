@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import InlineSvg from '../atoms/InlineSVG';
 
 import Text from '../atoms/Text';
@@ -10,6 +10,7 @@ interface ICheckMark {
   id?: string;
   label: string;
   selected?: boolean;
+  disabled?: boolean;
   handleChange: (e: any, id?: string) => void;
 }
 
@@ -18,22 +19,37 @@ export const CheckMark: React.FC<ICheckMark> = (props) => {
     id,
     label,
     selected,
+    disabled,
     handleChange,
     ...rest
   } = props;
+  const theme = useTheme();
 
   const onClick = useCallback((e) => {
+    if (disabled) return;
     handleChange(e, id);
-  }, [id, handleChange]);
+  }, [id, handleChange, disabled]);
 
   return (
     <SWrapper
       onClick={onClick}
+      style={{
+        ...(disabled ? {
+          cursor: 'default',
+        } : {}),
+      }}
       {...rest}
     >
       <SAnimation>
         <SCheckmark
           selected={selected ?? false}
+          disabled={disabled}
+          style={{
+            ...(disabled ? {
+              borderColor: theme.colorsThemed.background.outlines1,
+              cursor: 'default',
+            } : {}),
+          }}
         >
           {selected && (
             <InlineSvg
@@ -56,6 +72,7 @@ export default CheckMark;
 CheckMark.defaultProps = {
   id: '',
   selected: false,
+  disabled: false,
 };
 
 const SWrapper = styled.div`

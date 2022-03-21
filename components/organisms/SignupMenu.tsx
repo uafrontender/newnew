@@ -75,6 +75,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
     try {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
+        useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
       });
 
       const { data, error } = await sendVerificationEmail(payload);
@@ -190,53 +191,62 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
               innerSpan={<SContinueWithSpan>{t('signupOptions.or_continue_with')}</SContinueWithSpan>}
             />
           </motion.div>
-          <motion.div
-            variants={item}
+          <SEmailSignInForm
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!emailInputValid || isSubmitLoading || emailInput.length === 0) return;
+              handleSubmitEmail();
+            }}
           >
-            <SignInTextInput
-              name="email"
-              type="email"
-              autoComplete="true"
-              value={emailInput}
-              isValid={emailInputValid}
-              disabled={isSubmitLoading}
-              onFocus={() => {
-                if (submitError) setSubmitError('');
-              }}
-              onChange={(e) => setEmailInput(e.target.value)}
-              placeholder={t('signupOptions.email')}
-              errorCaption={t('errors.email_invalid')}
-            />
-          </motion.div>
-          {
-            submitError ? (
-              <AnimatedPresence
-                animateWhenInView={false}
-                animation="t-09"
-              >
-                <SErrorDiv>
-                  <InlineSvg
-                    svg={AlertIcon}
-                    width="16px"
-                    height="16px"
-                  />
-                  { t(`errors.${submitError}`) }
-                </SErrorDiv>
-              </AnimatedPresence>
-            ) : null
-          }
-          <motion.div
-            variants={item}
-          >
-            <EmailSignInButton
-              disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
-              onClick={() => handleSubmitEmail()}
+            <motion.div
+              variants={item}
             >
-              <span>
-                {t('signupOptions.signInBtn')}
-              </span>
-            </EmailSignInButton>
-          </motion.div>
+              <SignInTextInput
+                name="email"
+                type="email"
+                autoComplete="true"
+                value={emailInput}
+                isValid={emailInputValid}
+                disabled={isSubmitLoading}
+                onFocus={() => {
+                  if (submitError) setSubmitError('');
+                }}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder={t('signupOptions.email')}
+                errorCaption={t('errors.email_invalid')}
+              />
+            </motion.div>
+            {
+              submitError ? (
+                <AnimatedPresence
+                  animateWhenInView={false}
+                  animation="t-09"
+                >
+                  <SErrorDiv>
+                    <InlineSvg
+                      svg={AlertIcon}
+                      width="16px"
+                      height="16px"
+                    />
+                    { t(`errors.${submitError}`) }
+                  </SErrorDiv>
+                </AnimatedPresence>
+              ) : null
+            }
+            <motion.div
+              variants={item}
+            >
+              <EmailSignInButton
+                type="submit"
+                disabled={!emailInputValid || isSubmitLoading || emailInput.length === 0}
+                onClick={() => {}}
+              >
+                <span>
+                  {t('signupOptions.signInBtn')}
+                </span>
+              </EmailSignInButton>
+            </motion.div>
+          </SEmailSignInForm>
         </MSContentWrapper>
         <AnimatedPresence
           animateWhenInView={false}
@@ -449,14 +459,14 @@ const SHeadline = styled(Headline)`
 `;
 
 const SSubheading = styled(Text)`
-  display: none;
+  display: none !important;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-style: normal;
 
   ${({ theme }) => theme.media.tablet} {
-    display: block;
+    display: block !important;
     margin-bottom: 24px;
 
     font-size: 16px;
@@ -476,6 +486,12 @@ const SContinueWithSpan = styled.span`
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+`;
+
+const SEmailSignInForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const SErrorDiv = styled.div`
@@ -522,7 +538,6 @@ const SLegalText = styled(Text)`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    text-align: left;
     font-size: 14px;
     line-height: 20px;
   }

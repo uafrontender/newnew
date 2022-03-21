@@ -10,12 +10,13 @@ import Indicator from '../atoms/Indicator';
 
 import addIconFilled from '../../public/images/svg/icons/filled/Create.svg';
 import addIconOutlined from '../../public/images/svg/icons/outlined/Create.svg';
+import menuIconOutlined from '../../public/images/svg/icons/outlined/Menu.svg';
 import homeIconFilled from '../../public/images/svg/icons/filled/Home.svg';
 import homeIconOutlined from '../../public/images/svg/icons/outlined/Home.svg';
 import shareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 import shareIconOutlined from '../../public/images/svg/icons/outlined/Share.svg';
-import dashboardIconFilled from '../../public/images/svg/icons/filled/Dashboard.svg';
-import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Dashboard.svg';
+import dashboardIconFilled from '../../public/images/svg/icons/filled/Earnings.svg';
+import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Earnings.svg';
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
 
@@ -25,6 +26,7 @@ const icons: any = {
   outlined: {
     add: addIconOutlined,
     home: homeIconOutlined,
+    more: menuIconOutlined,
     share: shareIconOutlined,
     dashboard: dashboardIconOutlined,
     notifications: notificationsIconOutlined,
@@ -32,6 +34,7 @@ const icons: any = {
   filled: {
     add: addIconFilled,
     home: homeIconFilled,
+    more: menuIconOutlined,
     share: shareIconFilled,
     dashboard: dashboardIconFilled,
     notifications: notificationsIconFilled,

@@ -1,6 +1,4 @@
-import React, {
-  useState, useRef, ReactElement, useEffect,
-} from 'react';
+import React, { useState, useRef, ReactElement, useEffect } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -15,20 +13,20 @@ import InlineSvg from './InlineSVG';
 export type TDropdownSelectItem<T> = {
   name: string;
   value: T;
-}
+};
 
 interface IDropdownSelect<T> {
   label: string;
   selected?: T;
   options: TDropdownSelectItem<T>[];
-  maxItems?: number,
+  maxItems?: number;
   width?: string;
   disabled?: boolean;
-  closeOnSelect?: boolean,
+  closeOnSelect?: boolean;
   onSelect: (val: T) => void;
 }
 
-const DropdownSelect = <T, >({
+const DropdownSelect = <T,>({
   label,
   selected,
   options,
@@ -54,8 +52,7 @@ const DropdownSelect = <T, >({
 
   useEffect(() => {
     if (isOpen && selected) {
-      const itemTopPos = optionsRefs
-        .current[options.findIndex((o) => o.value === selected)].offsetTop;
+      const itemTopPos = optionsRefs.current[options.findIndex((o) => o.value === selected)].offsetTop;
 
       if (optionsContainerRef.current) {
         optionsContainerRef.current.scrollTop = itemTopPos;
@@ -76,9 +73,7 @@ const DropdownSelect = <T, >({
           ...(width ? { width } : {}),
         }}
       >
-        <span>
-          {label}
-        </span>
+        <span>{label}</span>
         <SInlineSVG
           svg={ArrowDown}
           fill={theme.colorsThemed.text.quaternary}
@@ -93,33 +88,36 @@ const DropdownSelect = <T, >({
             ref={(el) => {
               optionsContainerRef.current = el!!;
             }}
-            width={containerRef.current?.getBoundingClientRect().width
-              ? `${containerRef.current?.getBoundingClientRect().width}px`
-              : 'inherit'}
-            height={maxItems ? `${(maxItems * 44) + 16}px` : undefined}
+            width={
+              containerRef.current?.getBoundingClientRect().width
+                ? `${containerRef.current?.getBoundingClientRect().width}px`
+                : 'inherit'
+            }
+            height={maxItems ? `${maxItems * 44 + 16}px` : undefined}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
             <div>
-              {options && options.map((o, i) => (
-                <SOption
-                  key={o.name}
-                  ref={(el) => {
-                    optionsRefs.current[i] = el!!;
-                  }}
-                  selected={o.value === selected}
-                  onClick={() => {
-                    onSelect(o.value);
-                    if (closeOnSelect) handleClose();
-                  }}
-                >
-                  {o.name}
-                </SOption>
-              ))}
+              {options &&
+                options.map((o, i) => (
+                  <SOption
+                    key={o.name}
+                    ref={(el) => {
+                      optionsRefs.current[i] = el!!;
+                    }}
+                    selected={o.value === selected}
+                    onClick={() => {
+                      onSelect(o.value);
+                      if (closeOnSelect) handleClose();
+                    }}
+                  >
+                    {o.name}
+                  </SOption>
+                ))}
             </div>
           </SOptionsContainer>
-        ) : null }
+        ) : null}
       </AnimatePresence>
     </SWrapper>
   );
@@ -143,7 +141,6 @@ const SLabelButton = styled.button`
   display: flex;
   justify-content: space-between;
   align-items: center;
-
 
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -171,13 +168,14 @@ const SLabelButton = styled.button`
     margin-right: 8px;
   }
 
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   &:focus {
     outline: none;
   }
 
-  &:hover:enabled, &:focus:active {
+  &:hover:enabled,
+  &:focus:active {
     cursor: pointer;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
@@ -227,13 +225,17 @@ const SOption = styled.button<{
   background-color: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'transparent')};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 14px;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 24px;
+  line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
 
   /* width: 100%; */
   padding: 8px 10px;
-
 
   cursor: ${({ selected }) => (selected ? 'default' : 'pointer')};
 
@@ -241,19 +243,21 @@ const SOption = styled.button<{
     margin-right: 8px;
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
 
-    ${({ selected }) => (!selected ? css`
-      background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
-    ` : null)};
+    ${({ selected }) =>
+      !selected
+        ? css`
+            background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+          `
+        : null};
   }
 `;
 
 const SInlineSVG = styled(InlineSvg)<{
   focused: boolean;
 }>`
-
   transform: ${({ focused }) => (focused ? 'rotate(180deg)' : 'unset')};
-
 `;

@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  ReactElement, useEffect, useState,
-} from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -32,22 +30,19 @@ import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 
 interface IHome {
-  top10posts: newnewapi.NonPagedPostsResponse,
-  postFromQuery?: newnewapi.Post,
+  top10posts: newnewapi.NonPagedPostsResponse;
+  postFromQuery?: newnewapi.Post;
 }
 
-const Home: NextPage<IHome> = ({
-  top10posts,
-  postFromQuery,
-}) => {
+const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const { t } = useTranslation('home');
   const user = useAppSelector((state) => state.user);
 
   // Posts
   // Top section/Curated posts
-  const [
-    topSectionCollection, setTopSectionCollection,
-  ] = useState<newnewapi.Post[]>(top10posts.posts as newnewapi.Post[] ?? []);
+  const [topSectionCollection, setTopSectionCollection] = useState<newnewapi.Post[]>(
+    (top10posts.posts as newnewapi.Post[]) ?? []
+  );
   // For you - authenticated users only
   const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
   const [collectionFYInitialLoading, setCollectionFYInitialLoading] = useState(false);
@@ -75,8 +70,7 @@ const Home: NextPage<IHome> = ({
 
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
-  const [displayedPost, setDisplayedPost] = useState<
-  newnewapi.IPost | undefined>(postFromQuery ?? undefined);
+  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>(postFromQuery ?? undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     setDisplayedPost(post);
@@ -118,7 +112,7 @@ const Home: NextPage<IHome> = ({
     if (user.loggedIn) {
       fetchFYPosts();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Live Auctions posts
@@ -127,7 +121,7 @@ const Home: NextPage<IHome> = ({
       try {
         setCollectionACInitialLoading(true);
 
-        const liveAuctionsPayload = new newnewapi.PagedRequest({});
+        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({});
 
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
@@ -151,7 +145,7 @@ const Home: NextPage<IHome> = ({
     async function fetchMultipleChoices() {
       try {
         setCollectionMCInitialLoading(true);
-        const multichoicePayload = new newnewapi.PagedRequest({});
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({});
 
         const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
 
@@ -175,7 +169,7 @@ const Home: NextPage<IHome> = ({
     async function fetchCrowdfundings() {
       try {
         setCollectionCFInitialLoading(true);
-        const cfPayload = new newnewapi.PagedRequest({});
+        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({});
 
         const resCF = await fetchTopCrowdfundings(cfPayload);
 
@@ -228,6 +222,8 @@ const Home: NextPage<IHome> = ({
         const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(creatorOnRisePayload);
 
         if (resCreatorOnRisePayload) {
+          // TODO: change logic and layout here, because we have multiple creators on the rise
+          // console.log(resCreatorOnRisePayload.data?.posts);
           setCollectionCreator(() => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]);
           setCollectionCreatorInitialLoading(false);
         } else {
@@ -245,16 +241,11 @@ const Home: NextPage<IHome> = ({
   return (
     <>
       <Head>
-        <title>
-          {t('home.meta.title')}
-        </title>
+        <title>{t('home.meta.title')}</title>
       </Head>
       {!user.loggedIn && <HeroSection />}
       {topSectionCollection.length > 0 && (
-        <TopSection
-          collection={topSectionCollection}
-          handlePostClicked={handleOpenPostModal}
-        />
+        <TopSection collection={topSectionCollection} handlePostClicked={handleOpenPostModal} />
       )}
       {user.loggedIn && !collectionFYError && (
         <CardsSection
@@ -326,21 +317,22 @@ const Home: NextPage<IHome> = ({
   );
 };
 
-(Home as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <HomeLayout>
-    {page}
-  </HomeLayout>
-);
+(Home as NextPageWithLayout).getLayout = (page: ReactElement) => <HomeLayout>{page}</HomeLayout>;
 
 export default Home;
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const { post } = context.query;
 
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'home', 'decision'],
-  );
+  // console.log(context.query['?session_id']);
+
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'home',
+    'decision',
+    'payment-modal',
+    'chat',
+  ]);
 
   const top10payload = new newnewapi.EmptyRequest({});
 
@@ -358,12 +350,16 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
     const res = await fetchPostByUUID(getPostPayload);
 
+    // NB! Need to tackle toJSON() method
+
     if (res.data && !res.error) {
       return {
         props: {
-          ...(resTop10.data ? {
-            top10posts: resTop10.data.toJSON(),
-          } : {}),
+          ...(resTop10.data
+            ? {
+                top10posts: resTop10.data.toJSON(),
+              }
+            : {}),
           postFromQuery: res.data.toJSON(),
           ...translationContext,
         },
@@ -373,9 +369,11 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 
   return {
     props: {
-      ...(resTop10.data ? {
-        top10posts: resTop10.data.toJSON(),
-      } : {}),
+      ...(resTop10.data
+        ? {
+            top10posts: resTop10.data.toJSON(),
+          }
+        : {}),
       ...translationContext,
     },
   };
