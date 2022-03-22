@@ -35,6 +35,7 @@ interface IButton {
   withRipple?: boolean,
   withShrink?: boolean,
   withProgress?: boolean,
+  customDebounce?: number,
 }
 
 const Button: React.FunctionComponent<IButton & TButton> = (props) => {
@@ -44,6 +45,7 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     disabled,
     withRipple,
     withProgress,
+    customDebounce,
     onClick,
     ...rest
   } = props;
@@ -65,8 +67,8 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
   const handleRestoreRippling = useMemo(() => debounce(() => {
     if (!withRipple) return;
     setIsRippling(false);
-  }, 750),
-  [withRipple, setIsRippling]);
+  }, customDebounce ?? 750),
+  [withRipple, setIsRippling, customDebounce]);
 
   const handleOnBlurCapture = () => setIsRippling(false);
   const handleOnMouseDown = (e: any) => {
@@ -159,6 +161,7 @@ Button.defaultProps = {
   withShrink: false,
   withRipple: false,
   withProgress: false,
+  customDebounce: undefined,
   onClick: () => {
   },
 };
@@ -303,7 +306,7 @@ const SButton = styled.button<ISButton>`
       border-radius: 50%;
 
       z-index: 2;
-      
+
       width: ${props.elementWidth * 2}px;
       height: ${props.elementWidth * 2}px;
 

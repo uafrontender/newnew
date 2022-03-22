@@ -319,9 +319,12 @@ const SListWrapper = styled.div`
   overflow-x: auto;
   flex-direction: column;
 
+  /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
     left: -32px;

@@ -272,6 +272,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             // @ts-ignore
             const workingSubarr = [...workingArr[parentMsgIdx].replies];
 
+            // NB! Fix
             workingArr[parentMsgIdx].replies = [(decoded.newMessage as newnewapi.ChatMessage), ...workingSubarr];
 
             return workingArr;
@@ -430,12 +431,18 @@ const SActionSection = styled.div`
     background: transparent;
     border-radius: 4px;
     transition: .2s linear;
+
+    background: blue;
+
   }
 
   &::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 4px;
     transition: .2s linear;
+
+    background: blue;
+
   }
 
   &:hover {

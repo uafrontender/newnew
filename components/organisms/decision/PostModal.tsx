@@ -506,6 +506,13 @@ const SPostModalContainer = styled.div<{
   -ms-user-select: none;
   user-select: none;
 
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   ${({ theme }) => theme.media.tablet} {
     top: 64px;
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};

@@ -165,6 +165,7 @@ export const HeroSection = () => {
                 withRipple
                 withShadow
                 view="primaryGrad"
+                customDebounce={0}
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}
