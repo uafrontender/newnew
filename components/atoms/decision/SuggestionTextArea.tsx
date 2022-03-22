@@ -40,7 +40,7 @@ const SuggestionTextArea:React.FunctionComponent<ISuggestionTextArea> = ({
       onChangeCapture={() => {
         if (textareaRef?.current) {
           textareaRef.current.style.height = '';
-          textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+          textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 3}px`;
         }
       }}
       onChange={onChange}
