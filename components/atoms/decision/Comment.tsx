@@ -68,7 +68,10 @@ const Comment: React.FC<IComment> = ({
   };
 
   const handleRedirectToUser = () => {
-    router.push(`/u/${comment.sender?.username}`)
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${comment.sender?.username}`);
   };
 
   return (

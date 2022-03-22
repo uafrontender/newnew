@@ -57,7 +57,12 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
   const [isPickOptionModalOpen, setIsPickOptionModalOpen] = useState(false);
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${option.creator?.username}`);
+  }
 
   const handleConfirmDelete = async () => {
     try {

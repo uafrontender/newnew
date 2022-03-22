@@ -88,7 +88,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${option.creator?.username}`);
+  }
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);

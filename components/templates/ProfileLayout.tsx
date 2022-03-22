@@ -282,6 +282,26 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
   }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
 
+  useEffect(() => {
+    const handlerHistory = () => {
+      console.log('Popstate')
+
+      const postId = new URL(window?.location?.href).searchParams.get('post');
+
+      if (postId && window?.history?.state?.fromPost) {
+        // router.back();
+        // window.history.back()
+        router.push(`/?post=${postId}`);
+      }
+    }
+
+    window?.addEventListener('popstate', handlerHistory);
+
+    return () => {
+      window?.removeEventListener('popstate', handlerHistory);
+    }
+  }, [router]);
+
   return (
     <ErrorBoundary>
       <SGeneral>

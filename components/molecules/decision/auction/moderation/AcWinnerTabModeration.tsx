@@ -34,6 +34,9 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   const handleRedirectToUser = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
     router.push(`/u/${option.creator?.username!!}`);
   };
 
