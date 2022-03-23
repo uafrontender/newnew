@@ -12,87 +12,68 @@ import InlineSVG from '../../../atoms/InlineSVG';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
 import randomID from '../../../../utils/randomIdGenerator';
+import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 
 export const SubscribersTable = () => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
+  const { mySubscribersTotal } = useGetSubscriptions();
 
   const [isSortDirectionDesc, setIsSortDirectionDesc] = useState<boolean>(true);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
   const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>([]);
-  const [mySubsNextPageToken, setMySubsNextPageToken] = useState<string | undefined | null>('');
-  const [mySubsPrevPageToken, setMySubsPrevPageToken] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [lastPage, setLastPage] = useState<number>(0);
 
-  const fetchMySubscribers = useCallback(
-    async (pageToken?: string) => {
-      if (isMySubscribersIsLoading) return;
-      try {
-        if (!pageToken) setMySubscribers([]);
-        setMySubscribersIsLoading(true);
-        const payload = new newnewapi.GetMySubscribersRequest({
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-        const res = await getMySubscribers(payload);
+  const fetchMySubscribers = useCallback(async () => {
+    if (isMySubscribersIsLoading) return;
+    try {
+      console.log(currentPage, isSortDirectionDesc);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data && res.data.subscribers.length > 0) {
-          setMySubscribers(res.data?.subscribers as newnewapi.ISubscriber[]);
-          setMySubsNextPageToken(res.data.paging?.nextPageToken);
-        }
-        setMySubscribersIsLoading(false);
-      } catch (err) {
-        console.error(err);
-        setMySubscribersIsLoading(false);
+      setMySubscribersIsLoading(true);
+      const payload = new newnewapi.GetMySubscribersRequest({
+        sortBy: 1,
+        order: isSortDirectionDesc ? 2 : 1,
+        paging: {
+          limit: 10,
+          offset: currentPage * 10,
+        },
+      });
+      const res = await getMySubscribers(payload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.subscribers.length > 0) {
+        setMySubscribers(res.data?.subscribers as newnewapi.ISubscriber[]);
       }
-    },
-    [isMySubscribersIsLoading]
-  );
+      setMySubscribersIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setMySubscribersIsLoading(false);
+    }
+  }, [isMySubscribersIsLoading, currentPage, isSortDirectionDesc]);
 
   useEffect(() => {
-    if (mySubscribers.length < 1) fetchMySubscribers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (mySubscribersTotal > 10) setLastPage(Math.floor(mySubscribersTotal / 10));
 
-  const changeSortDirection = () => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mySubscribersTotal]);
+
+  const goNextPage = useCallback(() => setCurrentPage((curr) => curr + 1), []);
+  const goPrevPage = useCallback(() => setCurrentPage((curr) => curr - 1), []);
+  const goFirstPage = useCallback(() => setCurrentPage(0), []);
+  const goLastPage = useCallback(() => setCurrentPage(lastPage), [lastPage]);
+
+  const changeSortDirection = useCallback(() => {
     setIsSortDirectionDesc(!isSortDirectionDesc);
-  };
+    setCurrentPage(0);
+  }, [isSortDirectionDesc]);
+
+  useEffect(() => {
+    fetchMySubscribers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, changeSortDirection]);
 
   const renderItem = useCallback((subscriber) => <SubscriberRow key={randomID()} subscriber={subscriber} />, []);
-
-  const goNextPage = () => {
-    if (mySubsNextPageToken) setMySubsPrevPageToken((curr) => [...curr, mySubsNextPageToken!!]);
-    fetchMySubscribers(mySubsNextPageToken!!);
-    setCurrentPage((curr) => curr + 1);
-  };
-
-  const goPrevPage = () => {
-    if (!mySubsPrevPageToken[mySubsPrevPageToken.length - 2]) {
-      fetchMySubscribers();
-      setMySubsPrevPageToken([]);
-    } else {
-      fetchMySubscribers(mySubsPrevPageToken[mySubsPrevPageToken.length - 2]);
-      setMySubsPrevPageToken((curr) => {
-        const arr = curr;
-        arr.pop();
-        return arr;
-      });
-    }
-
-    setCurrentPage((curr) => curr - 1);
-  };
-
-  const goFirstPage = () => {
-    fetchMySubscribers();
-    setMySubsPrevPageToken([]);
-    setCurrentPage(0);
-  };
 
   return (
     <STable>
@@ -100,9 +81,7 @@ export const SubscribersTable = () => {
         <SSub>{t('subscriptions.table.subscribers')}</SSub>
         <SDate onClick={changeSortDirection}>
           <SDateWrapper>
-            <div>
-              {t('subscriptions.table.date')}
-            </div>
+            <div>{t('subscriptions.table.date')}</div>
             <SDateInlineSVG
               svg={arrowDown}
               fill={theme.colorsThemed.text.tertiary}
@@ -117,19 +96,19 @@ export const SubscribersTable = () => {
       <STfoot>
         <SUpdateSub href="/creator/subscribers/edit-subscription-rate">{t('subscriptions.table.updateSub')}</SUpdateSub>
         <STools>
-          {!mySubsNextPageToken && mySubsPrevPageToken.length < 1 ? (
+          {mySubscribersTotal < 10 ? (
             <SCount>
-              1-{mySubscribers.length} of {mySubscribers.length}
+              1-{mySubscribersTotal} of {mySubscribersTotal}
             </SCount>
           ) : (
-            <SCount>{`${currentPage !== 0 ? currentPage : ''}1-${currentPage + 1}0 of 0,000`}</SCount>
+            <SCount>{`${currentPage !== 0 ? currentPage : ''}1-${currentPage + 1}0 of ${mySubscribersTotal}`}</SCount>
           )}
 
           <STableNav>
-            <SButton onClick={goFirstPage} view="transparent" disabled={mySubsPrevPageToken.length < 1}>
+            <SButton onClick={goFirstPage} view="transparent" disabled={currentPage === 0}>
               <SInlineSVG svg={ChevronFirstPage} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
             </SButton>
-            <SButton onClick={goPrevPage} view="transparent" disabled={mySubsPrevPageToken.length < 1}>
+            <SButton onClick={goPrevPage} view="transparent" disabled={currentPage === 0}>
               <SInlineSVG
                 type="prev"
                 svg={ChevronDown}
@@ -138,7 +117,7 @@ export const SubscribersTable = () => {
                 height="20px"
               />
             </SButton>
-            <SButton onClick={goNextPage} view="transparent" disabled={!mySubsNextPageToken}>
+            <SButton onClick={goNextPage} view="transparent" disabled={currentPage === lastPage}>
               <SInlineSVG
                 type="next"
                 svg={ChevronDown}
@@ -147,13 +126,7 @@ export const SubscribersTable = () => {
                 height="20px"
               />
             </SButton>
-            <SButton
-              onClick={() => {
-                console.log('1');
-              }}
-              view="transparent"
-              disabled={!mySubsNextPageToken}
-            >
+            <SButton onClick={goLastPage} view="transparent" disabled={currentPage === lastPage}>
               <SInlineSVG
                 type="last-page"
                 svg={ChevronFirstPage}

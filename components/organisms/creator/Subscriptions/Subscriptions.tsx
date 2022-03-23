@@ -19,7 +19,7 @@ export const Subscriptions = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const router = useRouter();
 
-  const { mySubscribers } = useGetSubscriptions();
+  const { mySubscribersTotal } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
 
   const fetchMySubscriptionProduct = async () => {
@@ -49,9 +49,11 @@ export const Subscriptions = () => {
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>{t('subscriptions.title')}</STitle>
+          <STitle variant={4}>
+            {t('subscriptions.title')} {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
+          </STitle>
         </STitleBlock>
-        {mySubscribers.length < 1 ? <NoResults /> : <SubscribersTable />}
+        {!mySubscribersTotal || mySubscribersTotal < 1 ? <NoResults /> : <SubscribersTable />}
       </SContent>
     </SContainer>
   );

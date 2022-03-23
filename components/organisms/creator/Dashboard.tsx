@@ -11,10 +11,12 @@ import Navigation from '../../molecules/creator/Navigation';
 import DynamicSection from '../../molecules/creator/dashboard/DynamicSection';
 import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
 import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
+import EmptySubscriptionStats from '../../molecules/creator/dashboard/EmptySubscriptionStats';
 import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
 import YourTodos from '../../molecules/creator/dashboard/YourTodos';
 
 import { getMyPosts } from '../../../api/endpoints/user';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
@@ -23,6 +25,8 @@ export const Dashboard = () => {
   const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const { mySubscribers } = useGetSubscriptions();
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -93,13 +97,12 @@ export const Dashboard = () => {
         <SBlock>
           <Earnings isTodosCompleted={isTodosCompleted} hasMyPosts={hasMyPosts} />
         </SBlock>
-        <SBlock>
-          <SubscriptionStats />
-        </SBlock>
-        {!mySubscriptionProduct && (
+        {!mySubscriptionProduct ? (
           <SBlock noMargin>
             <EnableSubscription />
           </SBlock>
+        ) : (
+          <SBlock noMargin>{mySubscribers.length > 0 ? <SubscriptionStats /> : <EmptySubscriptionStats />}</SBlock>
         )}
       </SContent>
     </SContainer>

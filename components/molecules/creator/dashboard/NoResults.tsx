@@ -21,7 +21,7 @@ export const NoResults = () => {
         </Button>
       </SWrapper>
       <SUpdateSubs>
-        <Link href="/creator-onboarding-subrate">{t('noResults.updateSub')}</Link>
+        <Link href="/creator/subscribers/edit-subscription-rate">{t('noResults.updateSub')}</Link>
       </SUpdateSubs>
     </SContainer>
   );

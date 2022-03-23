@@ -1,6 +1,9 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import moment from 'moment';
+import { useRouter } from 'next/router';
+import { google, newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -15,212 +18,256 @@ import { useAppSelector } from '../../../../redux-store/store';
 import handIcon from '../../../../public/images/svg/icons/filled/Hand.svg';
 import arrowUpIcon from '../../../../public/images/svg/icons/filled/ArrowUp.svg';
 import arrowDownIcon from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
-import arrowRightIcon from '../../../../public/images/svg/icons/outlined/ArrowRight.svg';
+import { getMySubscribers } from '../../../../api/endpoints/subscription';
+import dateToTimestamp from '../../../../utils/dateToTimestamp';
 
 export const SubscriptionStats = () => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const [filter, setFilter] = useState('last_7_days');
+  const router = useRouter();
+  const [filter, setFilter] = useState('7_days');
+  const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
+  const [newSubs, setNewSubs] = useState<newnewapi.ISubscriber[]>([]);
+  const [thisWeekSubs, setThisWeekSubs] = useState<newnewapi.ISubscriber[] | null>(null);
+  const [pastWeekSubs, setPastWeekSubs] = useState<newnewapi.ISubscriber[] | null>(null);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const collection = useMemo(() => ([
-    {
-      id: 'subscribers',
-      value: '1,000',
-      direction: 'up',
-      score: 20,
-    },
-    {
-      id: 'activeSubs',
-      value: '530',
-      direction: 'down',
-      score: '5%',
-    },
-    {
-      id: 'views',
-      value: '2,345',
-      direction: 'up',
-      score: '5%',
-    },
-  ]), []);
-  const newSubscribersCollection = useMemo(() => ([
-    {
-      id: '1',
-      name: 'Bugaboo👻😈',
-      nickName: '@markwilson1995',
-    },
-    {
-      id: '2',
-      name: 'Bugaboo👻😈',
-      nickName: '@markwilson1995',
-    },
-    {
-      id: '3',
-      name: 'SandyCandy',
-      nickName: '@markwilson1995',
-    },
-    {
-      id: '4',
-      name: 'SandyCandy',
-      nickName: '@markwilson1995',
-    },
-    {
-      id: '5',
-      name: 'CaptainCyborg',
-      nickName: '@marcus0lson13',
-    },
-    {
-      id: '6',
-      name: 'CaptainCyborg',
-      nickName: '@marcus0lson13',
-    },
-  ]), []);
-  const filterOptions = useMemo(() => ([
-    {
-      id: 'today',
-      label: t('dashboard.subscriptionStats.filter.today'),
-    },
-    {
-      id: 'yesterday',
-      label: t('dashboard.subscriptionStats.filter.yesterday'),
-    },
-    {
-      id: 'last_7_days',
-      label: t('dashboard.subscriptionStats.filter.last_7_days'),
-    },
-    {
-      id: 'last_30_days',
-      label: t('dashboard.subscriptionStats.filter.last_30_days'),
-    },
-    {
-      id: 'last_90_days',
-      label: t('dashboard.subscriptionStats.filter.last_90_days'),
-    },
-    {
-      id: 'last_12_months',
-      label: t('dashboard.subscriptionStats.filter.last_12_months'),
-    },
-  ]), [t]);
-  const renderListItem = useCallback((item) => (
-    <SListItem key={`list-item-subscriptionStats-${item.id}`}>
-      <SListItemTitle variant={2} weight={700}>
-        {t(`dashboard.subscriptionStats.list.${item.id}`)}
-      </SListItemTitle>
-      <SListItemCenterBlock>
-        <SListItemValue variant={6}>
-          {item.value}
-        </SListItemValue>
-        <SListItemDirection>
-          <InlineSVG
-            svg={item.direction === 'up' ? arrowUpIcon : arrowDownIcon}
-            fill={item.direction === 'up' ? theme.colorsThemed.accent.success : theme.colorsThemed.accent.error}
-            width="16px"
-            height="16px"
-          />
-          <SListItemDirectionValue
-            weight={600}
-            variant={3}
-            direction={item.direction}
-          >
-            {item.score}
-          </SListItemDirectionValue>
-        </SListItemDirection>
-      </SListItemCenterBlock>
-      {!isMobile && (
-        <SListItemBottomDescription variant={3} weight={600}>
-          {t('dashboard.subscriptionStats.prevWeek')}
-        </SListItemBottomDescription>
-      )}
-    </SListItem>
-  ), [t, isMobile, theme.colorsThemed.accent.error, theme.colorsThemed.accent.success]);
-  const renderSubscriber = useCallback((item) => {
-    const handleUserClick = () => {
-    };
+  async function fetchMySubscribers(
+    startDate: google.protobuf.ITimestamp,
+    endDate: google.protobuf.ITimestamp,
+    type: string
+  ) {
+    try {
+      if (!mySubscribersIsLoading) {
+        setMySubscribersIsLoading(true);
+        const payload = new newnewapi.GetMySubscribersRequest({
+          paging: null,
+          order: 2,
+          dateFilter: {
+            startDate,
+            endDate,
+          },
+        });
+        const res = await getMySubscribers(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (type === 'range') setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
+        if (type === 'past') setPastWeekSubs(res.data.subscribers as newnewapi.ISubscriber[]);
+        if (type === 'this') setThisWeekSubs(res.data.subscribers as newnewapi.ISubscriber[]);
+        setMySubscribersIsLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setMySubscribersIsLoading(false);
+    }
+  }
 
-    return (
-      <SSubscribersItem key={`list-item-subscriptionStats-subscriber-${item.id}`}>
-        <SSubscribersItemAvatar
-          withClick
-          onClick={handleUserClick}
-          avatarUrl={user.userData?.avatarUrl}
-        />
-        <SSubscribersItemInfo>
-          <SSubscribersItemName variant={3} weight={600}>
-            {item.name}
-          </SSubscribersItemName>
-          <SSubscribersItemNick variant={2} weight={600}>
-            {item.nickName}
-          </SSubscribersItemNick>
-        </SSubscribersItemInfo>
-      </SSubscribersItem>
-    );
-  }, [user.userData?.avatarUrl]);
-  const handleSubmit = useCallback(() => {
-    console.log('Send message');
+  useEffect(() => {
+    if (!mySubscribersIsLoading) {
+      if (!pastWeekSubs) {
+        const startDate = dateToTimestamp(moment().startOf('week').subtract(7, 'days'));
+        const endDate = dateToTimestamp(moment().endOf('week').subtract(7, 'days'));
+        fetchMySubscribers(startDate, endDate, 'past');
+      }
+      if (!thisWeekSubs) {
+        const startDate = dateToTimestamp(moment().startOf('week'));
+        const endDate = dateToTimestamp(moment().endOf('week'));
+        fetchMySubscribers(startDate, endDate, 'this');
+      }
+
+      const startDate = dateToTimestamp(
+        moment()
+          .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
+          .startOf('day')
+      );
+      const endDate = dateToTimestamp(new Date());
+      fetchMySubscribers(startDate, endDate, 'range');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, pastWeekSubs, thisWeekSubs]);
+
+  useEffect(() => {
+    if (pastWeekSubs && thisWeekSubs) {
+      // console.log(pastWeekSubs, thisWeekSubs);
+    }
+  }, [pastWeekSubs, thisWeekSubs]);
+
+  const handleChangeFilter = (e: any) => {
+    if (filter !== e) {
+      setFilter(e);
+    }
+  };
+
+  const collection = useMemo(
+    () => [
+      {
+        id: 'subscribers',
+        value: '1,000',
+        direction: 'up',
+        score: 20,
+      },
+      {
+        id: 'activeSubs',
+        value: '530',
+        direction: 'down',
+        score: '5%',
+      },
+      {
+        id: 'views',
+        value: '2,345',
+        direction: 'up',
+        score: '5%',
+      },
+    ],
+    []
+  );
+  // const newSubscribersCollection = useMemo(
+  //   () => [
+  //     {
+  //       id: '1',
+  //       name: 'Bugaboo👻😈',
+  //       nickName: '@markwilson1995',
+  //     },
+  //     {
+  //       id: '2',
+  //       name: 'Bugaboo👻😈',
+  //       nickName: '@markwilson1995',
+  //     },
+  //     {
+  //       id: '3',
+  //       name: 'SandyCandy',
+  //       nickName: '@markwilson1995',
+  //     },
+  //     {
+  //       id: '4',
+  //       name: 'SandyCandy',
+  //       nickName: '@markwilson1995',
+  //     },
+  //     {
+  //       id: '5',
+  //       name: 'CaptainCyborg',
+  //       nickName: '@marcus0lson13',
+  //     },
+  //     {
+  //       id: '6',
+  //       name: 'CaptainCyborg',
+  //       nickName: '@marcus0lson13',
+  //     },
+  //   ],
+  //   []
+  // );
+  const filterOptions = useMemo(
+    () => [
+      {
+        id: '0_days',
+        label: t('dashboard.subscriptionStats.filter.today'),
+      },
+      {
+        id: '1_days',
+        label: t('dashboard.subscriptionStats.filter.yesterday'),
+      },
+      {
+        id: '7_days',
+        label: t('dashboard.subscriptionStats.filter.last_7_days'),
+      },
+      {
+        id: '30_days',
+        label: t('dashboard.subscriptionStats.filter.last_30_days'),
+      },
+      {
+        id: '90_days',
+        label: t('dashboard.subscriptionStats.filter.last_90_days'),
+      },
+      {
+        id: '12_months',
+        label: t('dashboard.subscriptionStats.filter.last_12_months'),
+      },
+    ],
+    [t]
+  );
+  const renderListItem = useCallback(
+    (item) => (
+      <SListItem key={`list-item-subscriptionStats-${item.id}`}>
+        <SListItemTitle variant={2} weight={700}>
+          {t(`dashboard.subscriptionStats.list.${item.id}`)}
+        </SListItemTitle>
+        <SListItemCenterBlock>
+          <SListItemValue variant={6}>{item.value}</SListItemValue>
+          <SListItemDirection>
+            <InlineSVG
+              svg={item.direction === 'up' ? arrowUpIcon : arrowDownIcon}
+              fill={item.direction === 'up' ? theme.colorsThemed.accent.success : theme.colorsThemed.accent.error}
+              width="16px"
+              height="16px"
+            />
+            <SListItemDirectionValue weight={600} variant={3} direction={item.direction}>
+              {item.score}
+            </SListItemDirectionValue>
+          </SListItemDirection>
+        </SListItemCenterBlock>
+        {!isMobile && (
+          <SListItemBottomDescription variant={3} weight={600}>
+            {t('dashboard.subscriptionStats.prevWeek')}
+          </SListItemBottomDescription>
+        )}
+      </SListItem>
+    ),
+    [t, isMobile, theme.colorsThemed.accent.error, theme.colorsThemed.accent.success]
+  );
+  const renderSubscriber = useCallback((item: newnewapi.ISubscriber, index) => {
+    const handleUserClick = () => {};
+    if (index < 6) {
+      return (
+        <SSubscribersItem key={`list-item-subscriptionStats-subscriber-${item.user?.uuid}`}>
+          {item.user?.avatarUrl && (
+            <SSubscribersItemAvatar withClick onClick={handleUserClick} avatarUrl={item.user?.avatarUrl} />
+          )}
+          <SSubscribersItemInfo>
+            <SSubscribersItemName variant={3} weight={600}>
+              {item.user?.nickname ? item.user?.nickname : item.user?.username}
+            </SSubscribersItemName>
+            <SSubscribersItemNick variant={2} weight={600}>
+              {item.user?.username ? item.user?.username : item.user?.nickname}
+            </SSubscribersItemNick>
+          </SSubscribersItemInfo>
+        </SSubscribersItem>
+      );
+    }
+    return null;
   }, []);
+  const handleSubmit = useCallback(() => {
+    router.push('/creator/subscribers');
+  }, [router]);
 
   return (
     <SContainer>
       <SHeaderLine>
-        <STitle variant={6}>
-          {t('dashboard.subscriptionStats.title')}
-        </STitle>
+        <STitle variant={6}>{t('dashboard.subscriptionStats.title')}</STitle>
         <STotalInsights>
-          <DropDown
-            value={filter}
-            options={filterOptions}
-            handleChange={setFilter}
-          />
+          <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
         </STotalInsights>
       </SHeaderLine>
-      <SListHolder>
-        {collection.map(renderListItem)}
-      </SListHolder>
+      <SListHolder>{collection.map(renderListItem)}</SListHolder>
       <STotalLine>
         <STotalTextWrapper>
           <STotalText variant={2} weight={600}>
             {t('dashboard.subscriptionStats.newTitle')}
           </STotalText>
         </STotalTextWrapper>
-        <STotalInsights>
-          <STotalInsightsText>
-            {t(`dashboard.subscriptionStats.${isMobile ? 'newLink' : 'newLink_tablet'}`)}
-          </STotalInsightsText>
-          <STotalInsightsArrow
-            svg={arrowRightIcon}
-            fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
-          />
-        </STotalInsights>
       </STotalLine>
-      <SSubscribersList>
-        {newSubscribersCollection.map(renderSubscriber)}
-      </SSubscribersList>
-      <SButtonSubmit
-        view="secondary"
-        onClick={handleSubmit}
-      >
+      <SSubscribersList>{newSubs.map(renderSubscriber)}</SSubscribersList>
+      <SButtonSubmit view="secondary" onClick={handleSubmit}>
         {t('dashboard.subscriptionStats.seeAll')}
       </SButtonSubmit>
       <SBannerContainer>
         <SBannerTopBlock>
-          <SInlineSVG
-            svg={handIcon}
-            width="24px"
-            height="24px"
-          />
+          <SInlineSVG svg={handIcon} width="24px" height="24px" />
           <SDescription variant={3} weight={600}>
             {t('dashboard.subscriptionStats.banner.description')}
           </SDescription>
         </SBannerTopBlock>
-        <SButton
-          view="primaryGrad"
-          onClick={handleSubmit}
-        >
+        <SButton view="primaryGrad" onClick={handleSubmit}>
           {t('dashboard.subscriptionStats.banner.submit')}
         </SButton>
       </SBannerContainer>
@@ -236,7 +283,10 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.primary
+      : props.theme.colorsThemed.background.secondary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
@@ -300,7 +350,8 @@ const SButtonSubmit = styled(Button)`
     width: unset;
     margin: 0 auto;
     padding: 12px 24px;
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
   }
 `;
 
@@ -353,18 +404,6 @@ const STotalInsights = styled.div`
   flex-direction: row;
 `;
 
-const STotalInsightsText = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  font-size: 14px;
-  line-height: 24px;
-  margin-right: 4px;
-`;
-
-const STotalInsightsArrow = styled(InlineSVG)`
-  min-width: 24px;
-  min-height: 24px;
-`;
-
 const SListHolder = styled.div`
   gap: 16px;
   display: flex;
@@ -415,7 +454,8 @@ interface ISListItemDirectionValue {
 }
 
 const SListItemDirectionValue = styled(Text)<ISListItemDirectionValue>`
-  color: ${(props) => (props.direction === 'up' ? props.theme.colorsThemed.accent.success : props.theme.colorsThemed.accent.error)};
+  color: ${(props) =>
+    props.direction === 'up' ? props.theme.colorsThemed.accent.success : props.theme.colorsThemed.accent.error};
 `;
 
 const SListItemBottomDescription = styled(Text)`
@@ -461,8 +501,7 @@ const SSubscribersItemInfo = styled.div`
   flex-direction: column;
 `;
 
-const SSubscribersItemName = styled(Text)`
-`;
+const SSubscribersItemName = styled(Text)``;
 
 const SSubscribersItemNick = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
