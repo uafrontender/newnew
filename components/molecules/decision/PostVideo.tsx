@@ -196,15 +196,11 @@ const SSoundButton = styled(Button)`
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
-    right: initial;
-    left: 16px;
+    width: 36px;
+    height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    right: initial;
-    left: 24px;
-    bottom: 24px;
-
     padding: 12px;
     width: 48px;
     height: 48px;

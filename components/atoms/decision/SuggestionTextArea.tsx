@@ -40,7 +40,7 @@ const SuggestionTextArea:React.FunctionComponent<ISuggestionTextArea> = ({
       onChangeCapture={() => {
         if (textareaRef?.current) {
           textareaRef.current.style.height = '';
-          textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+          textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 3}px`;
         }
       }}
       onChange={onChange}
@@ -67,6 +67,13 @@ const STextarea = styled.textarea`
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border: 1.5px solid transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};

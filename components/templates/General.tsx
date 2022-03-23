@@ -173,6 +173,13 @@ const SWrapper = styled.div<ISWrapper>`
   ${({ theme }) => theme.media.tablet} {
     padding-top: ${(props) => (props.withBanner ? 112 : 72)}px;
     padding-bottom: 0;
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   ${({ theme }) => theme.media.laptop} {

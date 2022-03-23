@@ -137,7 +137,7 @@
           "cancelBtn": "Cancel",
           "publishBtn": "Publish"
         },
-        "loading":  {
+        "loading": {
           "title": "Just a minute",
           "description": "Your file is uploading. Just give us a second to finish your upload.",
           "process": "{{progress}}% • {{time}} left"
