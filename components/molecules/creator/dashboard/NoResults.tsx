@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import Link from 'next/link';
@@ -6,9 +6,41 @@ import { useTranslation } from 'next-i18next';
 
 import emptyFolder from '../../../../public/images/dashboard/empty-folder.png';
 import Button from '../../../atoms/Button';
+import { useAppSelector } from '../../../../redux-store/store';
 
-export const NoResults = () => {
+interface INoResults {
+  isCreatorConnectedToStripe: boolean | undefined;
+}
+
+export const NoResults: React.FC<INoResults> = ({ isCreatorConnectedToStripe }) => {
   const { t } = useTranslation('creator');
+  const user = useAppSelector((state) => state.user);
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const shareHandler = useCallback(() => {
+    if (window && user.userData?.username) {
+      const url = `${window.location.origin}/u/${user.userData?.username}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [user.userData?.username]);
 
   return (
     <SContainer>
@@ -16,12 +48,16 @@ export const NoResults = () => {
         <Image src={emptyFolder} alt={t('noResults.title')} width={49} height={48} />
         <STitle>{t('noResults.title')}</STitle>
         <SText>{t('noResults.text')}</SText>
-        <Button view="primaryGrad" onClick={() => console.log('1')}>
-          {t('noResults.btnShare')}
+        <Button view="primaryGrad" onClick={shareHandler}>
+          {isCopiedUrl ? t('dashboard.subscriptionStats.copied') : t('noResults.btnShare')}
         </Button>
       </SWrapper>
       <SUpdateSubs>
-        <Link href="/creator-onboarding-subrate">{t('noResults.updateSub')}</Link>
+        {isCreatorConnectedToStripe ? (
+          <Link href="/creator/subscribers/edit-subscription-rate">{t('noResults.updateSub')}</Link>
+        ) : (
+          <Link href="/creator/get-paid">{t('noResults.updateSub')}</Link>
+        )}
       </SUpdateSubs>
     </SContainer>
   );
