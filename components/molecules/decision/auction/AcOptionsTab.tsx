@@ -85,7 +85,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [newBidText, setNewBidText] = useState('');
   const [newBidTextValid, setNewBidTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-  const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
+  const [newBidAmount, setNewBidAmount] = useState('');
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal

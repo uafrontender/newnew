@@ -54,11 +54,11 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
           width="20px"
           height="20px"
         />
-        {parsedSeconds.days !== '00' && (
+        {parsedSeconds.days !== '0' && (
           <>
-            <span>
+            <STimeSpan>
               {parsedSeconds.days}
-            </span>
+            </STimeSpan>
             <span>
               {t('expiresResponse.days')}
             </span>
@@ -67,11 +67,11 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
             </span>
           </>
         )}
-        {parsedSeconds.hours !== '00' && (
+        {parsedSeconds.hours !== '0' && (
           <>
-            <span>
+            <STimeSpan>
               {parsedSeconds.hours}
-            </span>
+            </STimeSpan>
             <span>
               {t('expiresResponse.hours')}
             </span>
@@ -80,11 +80,11 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
             </span>
           </>
         )}
-        {parsedSeconds.minutes !== '00' && (
+        {parsedSeconds.minutes !== '0' && (
           <>
-            <span>
+            <STimeSpan>
               {parsedSeconds.minutes}
-            </span>
+            </STimeSpan>
             <span>
               {t('expiresResponse.minutes')}
             </span>
@@ -93,11 +93,11 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
             </span>
           </>
         )}
-        {parsedSeconds.days === '00' && (
+        {parsedSeconds.days === '0' && (
           <>
-            <span>
+            <STimeSpan>
               {parsedSeconds.seconds}
-            </span>
+            </STimeSpan>
             <span>
               {t('expiresResponse.seconds')}
             </span>
@@ -166,4 +166,9 @@ const SInlineSvg = styled(InlineSvg)`
   top: 5px;
 
   margin-right: 0.3rem;
+`;
+
+const STimeSpan = styled.span`
+  display: inline-block;
+  min-width: 0.9rem;
 `;

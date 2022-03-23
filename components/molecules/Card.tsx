@@ -555,8 +555,10 @@ const SImageHolder = styled.div<ISWrapper>`
 `;
 
 const SImageMask = styled.div`
+  width: calc(100% + 10px);
+
   top: 0;
-  left: 0;
+  left: -5px;
   right: 0;
   bottom: 0;
   z-index: 1;
