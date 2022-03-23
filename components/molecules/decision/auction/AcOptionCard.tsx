@@ -244,7 +244,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           : {}),
       }}
     >
-      <SContainer isDisabled={disabled} isBlue={isSupportedByMe || isMyBid}>
+      <SContainer
+        isDisabled={disabled}
+        isBlue={isSupportedByMe || isMyBid}
+        onClick={() => {
+          if (!isMobile && !disabled) {
+            handleOpenSupportForm();
+          }
+        }}
+      >
         <SBidDetails isBlue={isSupportedByMe || isMyBid}>
           <SLottieAnimationContainer>
             {shouldAnimate ? (

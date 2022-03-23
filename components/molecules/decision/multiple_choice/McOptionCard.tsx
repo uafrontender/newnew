@@ -245,6 +245,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           stiffness: 300,
         }}
         isDisabled={disabled}
+        onClick={() => {
+          if (!isMobile && !disabled) {
+            handleOpenSupportForm();
+          }
+        }}
       >
         <SBidDetails>
           <SBidAmount>
