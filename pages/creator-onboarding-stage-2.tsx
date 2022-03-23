@@ -54,6 +54,12 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
     router.push('/creator/dashboard');
   };
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/creator/dashboard');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     async function fetchOnboardingState() {
       try {

@@ -169,6 +169,12 @@ export const CardsSection: React.FC<ICardSection> = ({
     }
   };
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch(`/search?category=${category}`);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
       const currentScrollPosition = scrollContainerRef.current.scrollLeft;
@@ -319,9 +325,12 @@ const SListWrapper = styled.div`
   overflow-x: auto;
   flex-direction: column;
 
+  /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
     left: -32px;
