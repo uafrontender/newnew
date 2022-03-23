@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/dist/client/router';
+import { motion } from 'framer-motion';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppSelector } from '../redux-store/store';
@@ -50,7 +51,11 @@ const Signup: NextPage<ISignup> = ({
 (Signup as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
   return (
     <AuthLayout>
-      { page }
+      <motion.div
+        key="sign-up"
+      >
+        { page }
+      </motion.div>
     </AuthLayout>
   );
 };
