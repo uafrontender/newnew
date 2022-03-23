@@ -234,12 +234,14 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         handleConfirmDelete={handleConfirmDelete}
       />
       {/* Ellipse modal */}
-      <McOptionCardModerationEllipseModal
-        isOpen={isEllipseMenuOpen}
-        zIndex={16}
-        onClose={() => setIsEllipseMenuOpen(false)}
-        handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
-      />
+      {isMobile && (
+        <McOptionCardModerationEllipseModal
+          isOpen={isEllipseMenuOpen}
+          zIndex={16}
+          onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+        />
+      )}
     </>
   );
 };

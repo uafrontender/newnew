@@ -290,12 +290,14 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         handleConfirmDelete={handleConfirmDelete}
       />
       {/* Ellipse modal */}
-      <AcOptionCardModerationEllipseModal
-        isOpen={isEllipseMenuOpen}
-        zIndex={16}
-        onClose={() => setIsEllipseMenuOpen(false)}
-        handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
-      />
+      {isMobile && (
+        <AcOptionCardModerationEllipseModal
+          isOpen={isEllipseMenuOpen}
+          zIndex={16}
+          onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+        />
+      )}
     </>
   );
 };
