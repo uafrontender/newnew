@@ -51,6 +51,10 @@ const Comment: React.FC<IComment> = ({
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
+  const isMyComment = useMemo(() => (
+    user.loggedIn && user.userData?.userUuid === comment.sender?.uuid
+  ), [user.loggedIn, user.userData?.userUuid, comment.sender?.uuid])
+
   const replies = useMemo(() => (
     comment.replies ?? []
   ), [comment.replies]);
@@ -121,7 +125,7 @@ const Comment: React.FC<IComment> = ({
               {!isMobile && (
                 <CommentEllipseMenu
                   isVisible={ellipseMenuOpen}
-                  canDeleteComment={canDeleteComment ?? false}
+                  canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
                   onUserReport={onUserReport}
@@ -155,7 +159,7 @@ const Comment: React.FC<IComment> = ({
           {isReplyFormOpen && replies && replies.map((item) => (
             <Comment
               key={(item.id).toString()}
-              canDeleteComment={canDeleteComment}
+              canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
               comment={item}
               handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
               handleDeleteComment={handleDeleteComment}
@@ -182,7 +186,7 @@ const Comment: React.FC<IComment> = ({
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={16}
-          canDeleteComment={canDeleteComment ?? false}
+          canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
           onClose={handleCloseEllipseMenu}
           onUserReport={onUserReport}
           onDeleteComment={onDeleteComment}
