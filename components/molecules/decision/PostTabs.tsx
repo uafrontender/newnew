@@ -9,8 +9,10 @@ import { useTranslation } from 'next-i18next';
 
 import InlineSvg from '../../atoms/InlineSVG';
 
-import BackersIcon from '../../../public/images/svg/icons/filled/Backers.svg';
+import StatisticsIcon from '../../../public/images/svg/icons/outlined/Statistics.svg';
+import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
 import CommentsIcon from '../../../public/images/svg/icons/outlined/Comments.svg';
+import CommentsIconFilled from '../../../public/images/svg/icons/filled/Comments.svg';
 
 type TDecisonTab = {
   label: string;
@@ -25,11 +27,14 @@ interface IDecisionTabs {
 }
 
 const Icons = {
-  bids: BackersIcon,
-  options: BackersIcon,
-  backers: BackersIcon,
-  winner: BackersIcon,
+  bids: StatisticsIcon,
+  bidsFilled: StatisticsIconFilled,
+  options: StatisticsIcon,
+  optionsFilled: StatisticsIconFilled,
+  backers: StatisticsIcon,
+  winnerFilled: StatisticsIconFilled,
   comments: CommentsIcon,
+  commentsFilled: CommentsIconFilled,
 };
 
 const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
@@ -87,7 +92,7 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
           >
             <InlineSvg
               // @ts-ignore
-              svg={Icons[tab.value]}
+              svg={tab.value === activeTab ? Icons[`${tab.value}Filled`] : Icons[tab.value]}
               fill={tab.value === activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary}
               width="24px"
               height="24px"

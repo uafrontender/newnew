@@ -1,5 +1,5 @@
 // Temp disabled until backend is in place
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/dist/client/router';
@@ -42,6 +42,7 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 
 // Utils
 import isBrowser from '../../utils/isBrowser';
+import { AuthLayoutContext } from '../templates/AuthLayout';
 
 export interface ISignupMenu {
   reason?: SignupReason;
@@ -52,8 +53,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   const router = useRouter();
   const { t } = useTranslation('sign-up');
 
+  const authLayoutContext = useContext(AuthLayoutContext);
+
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -85,7 +89,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       dispatch(setSignupEmailInput(emailInput));
       setIsSubmitLoading(false);
 
-      router.push('/verify-email');
+      authLayoutContext.setShouldHeroUnmount(true);
+
+      setTimeout(() => {
+        router.push('/verify-email');
+      }, 1000);
+
+      // router.push('/verify-email');
     } catch (err: any) {
       setIsSubmitLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -108,6 +118,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   return (
     <SSignupMenu
       isLoading={isSubmitLoading}
+      style={{
+        ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
+          transform: 'translateX(-200px)',
+          transition: '0.6s linear'
+        } : {})
+      }}
     >
       <SMenuWrapper>
         <SSignInBackButton

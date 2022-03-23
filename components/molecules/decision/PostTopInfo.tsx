@@ -76,6 +76,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
   const handleRedirectToUser = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
     router.push(`/u/${creator.username}`);
   };
 

@@ -126,8 +126,6 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data && res.data.messages) {
-          console.log(res.data.messages)
-
           setComments((curr) => {
             const workingArr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
 
@@ -236,7 +234,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   useEffect(() => {
     if (inView && !commentsLoading && commentsNextPageToken) {
-      console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
+      // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
       fetchComments(commentsNextPageToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -258,14 +256,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (decoded.newMessage!!.sender?.uuid!! !== user.userData?.userUuid) {
-        console.log('Adding comment from socket');
 
         setComments((curr) => {
           const workingArr = [...curr];
 
           if (decoded.newMessage?.parentId && decoded.newMessage !== 0) {
-            console.log('Searching for parent comment')
-
             const parentMsgIdx = workingArr.findIndex((msg) => msg.id === decoded.newMessage?.parentId);
 
             if (parentMsgIdx === -1 || !workingArr[parentMsgIdx]) return workingArr;
@@ -277,11 +272,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             // @ts-ignore
             const workingSubarr = [...workingArr[parentMsgIdx].replies];
 
+            // NB! Fix
             workingArr[parentMsgIdx].replies = [(decoded.newMessage as newnewapi.ChatMessage), ...workingSubarr];
 
             return workingArr;
           }
-          console.log('Adding comment directly');
 
           return [decoded.newMessage, ...workingArr] as TCommentWithReplies[];
         })
@@ -291,11 +286,8 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     const socketHandlerMessageDeleted = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageDeleted.decode(arr);
-      if (decoded) {
-        console.log('Deleting comment from socket');
-        console.log(decoded);
-        // NB! Commented out for now
-        // markCommentAsDeleted(decoded.deletedMessage);
+      if (decoded.deletedMessage) {
+        markCommentAsDeleted(decoded.deletedMessage as TCommentWithReplies);
       }
     };
 
@@ -439,12 +431,18 @@ const SActionSection = styled.div`
     background: transparent;
     border-radius: 4px;
     transition: .2s linear;
+
+    background: blue;
+
   }
 
   &::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 4px;
     transition: .2s linear;
+
+    background: blue;
+
   }
 
   &:hover {
