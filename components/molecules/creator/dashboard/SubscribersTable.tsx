@@ -28,8 +28,6 @@ export const SubscribersTable = () => {
   const fetchMySubscribers = useCallback(async () => {
     if (isMySubscribersIsLoading) return;
     try {
-      console.log(currentPage, isSortDirectionDesc);
-
       setMySubscribersIsLoading(true);
       const payload = new newnewapi.GetMySubscribersRequest({
         sortBy: 1,

@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { google, newnewapi } from 'newnew-api';
@@ -13,32 +13,23 @@ import DropDown from '../../../atoms/creator/DropDown';
 import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../UserAvatar';
 
-import { useAppSelector } from '../../../../redux-store/store';
-
 import handIcon from '../../../../public/images/svg/icons/filled/Hand.svg';
-import arrowUpIcon from '../../../../public/images/svg/icons/filled/ArrowUp.svg';
-import arrowDownIcon from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
+// import arrowUpIcon from '../../../../public/images/svg/icons/filled/ArrowUp.svg';
+// import arrowDownIcon from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
 
 export const SubscriptionStats = () => {
   const { t } = useTranslation('creator');
-  const theme = useTheme();
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  // const theme = useTheme();
+  // const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
   const [filter, setFilter] = useState('7_days');
   const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
   const [newSubs, setNewSubs] = useState<newnewapi.ISubscriber[]>([]);
-  const [thisWeekSubs, setThisWeekSubs] = useState<newnewapi.ISubscriber[] | null>(null);
-  const [pastWeekSubs, setPastWeekSubs] = useState<newnewapi.ISubscriber[] | null>(null);
+  // const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
-  async function fetchMySubscribers(
-    startDate: google.protobuf.ITimestamp,
-    endDate: google.protobuf.ITimestamp,
-    type: string
-  ) {
+  async function fetchMySubscribers(startDate: google.protobuf.ITimestamp, endDate: google.protobuf.ITimestamp) {
     try {
       if (!mySubscribersIsLoading) {
         setMySubscribersIsLoading(true);
@@ -52,9 +43,7 @@ export const SubscriptionStats = () => {
         });
         const res = await getMySubscribers(payload);
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        if (type === 'range') setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
-        if (type === 'past') setPastWeekSubs(res.data.subscribers as newnewapi.ISubscriber[]);
-        if (type === 'this') setThisWeekSubs(res.data.subscribers as newnewapi.ISubscriber[]);
+        setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
         setMySubscribersIsLoading(false);
       }
     } catch (err) {
@@ -64,34 +53,15 @@ export const SubscriptionStats = () => {
   }
 
   useEffect(() => {
-    if (!mySubscribersIsLoading) {
-      if (!pastWeekSubs) {
-        const startDate = dateToTimestamp(moment().startOf('week').subtract(7, 'days'));
-        const endDate = dateToTimestamp(moment().endOf('week').subtract(7, 'days'));
-        fetchMySubscribers(startDate, endDate, 'past');
-      }
-      if (!thisWeekSubs) {
-        const startDate = dateToTimestamp(moment().startOf('week'));
-        const endDate = dateToTimestamp(moment().endOf('week'));
-        fetchMySubscribers(startDate, endDate, 'this');
-      }
-
-      const startDate = dateToTimestamp(
-        moment()
-          .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
-          .startOf('day')
-      );
-      const endDate = dateToTimestamp(new Date());
-      fetchMySubscribers(startDate, endDate, 'range');
-    }
+    const startDate = dateToTimestamp(
+      moment()
+        .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
+        .startOf('day')
+    );
+    const endDate = dateToTimestamp(new Date());
+    fetchMySubscribers(startDate, endDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, pastWeekSubs, thisWeekSubs]);
-
-  useEffect(() => {
-    if (pastWeekSubs && thisWeekSubs) {
-      // console.log(pastWeekSubs, thisWeekSubs);
-    }
-  }, [pastWeekSubs, thisWeekSubs]);
+  }, [filter]);
 
   const handleChangeFilter = (e: any) => {
     if (filter !== e) {
@@ -99,29 +69,29 @@ export const SubscriptionStats = () => {
     }
   };
 
-  const collection = useMemo(
-    () => [
-      {
-        id: 'subscribers',
-        value: '1,000',
-        direction: 'up',
-        score: 20,
-      },
-      {
-        id: 'activeSubs',
-        value: '530',
-        direction: 'down',
-        score: '5%',
-      },
-      {
-        id: 'views',
-        value: '2,345',
-        direction: 'up',
-        score: '5%',
-      },
-    ],
-    []
-  );
+  // const collection = useMemo(
+  //   () => [
+  //     {
+  //       id: 'subscribers',
+  //       value: '1,000',
+  //       direction: 'up',
+  //       score: 20,
+  //     },
+  //     {
+  //       id: 'activeSubs',
+  //       value: '530',
+  //       direction: 'down',
+  //       score: '5%',
+  //     },
+  //     {
+  //       id: 'views',
+  //       value: '2,345',
+  //       direction: 'up',
+  //       score: '5%',
+  //     },
+  //   ],
+  //   []
+  // );
   // const newSubscribersCollection = useMemo(
   //   () => [
   //     {
@@ -186,35 +156,35 @@ export const SubscriptionStats = () => {
     ],
     [t]
   );
-  const renderListItem = useCallback(
-    (item) => (
-      <SListItem key={`list-item-subscriptionStats-${item.id}`}>
-        <SListItemTitle variant={2} weight={700}>
-          {t(`dashboard.subscriptionStats.list.${item.id}`)}
-        </SListItemTitle>
-        <SListItemCenterBlock>
-          <SListItemValue variant={6}>{item.value}</SListItemValue>
-          <SListItemDirection>
-            <InlineSVG
-              svg={item.direction === 'up' ? arrowUpIcon : arrowDownIcon}
-              fill={item.direction === 'up' ? theme.colorsThemed.accent.success : theme.colorsThemed.accent.error}
-              width="16px"
-              height="16px"
-            />
-            <SListItemDirectionValue weight={600} variant={3} direction={item.direction}>
-              {item.score}
-            </SListItemDirectionValue>
-          </SListItemDirection>
-        </SListItemCenterBlock>
-        {!isMobile && (
-          <SListItemBottomDescription variant={3} weight={600}>
-            {t('dashboard.subscriptionStats.prevWeek')}
-          </SListItemBottomDescription>
-        )}
-      </SListItem>
-    ),
-    [t, isMobile, theme.colorsThemed.accent.error, theme.colorsThemed.accent.success]
-  );
+  // const renderListItem = useCallback(
+  //   (item) => (
+  //     <SListItem key={`list-item-subscriptionStats-${item.id}`}>
+  //       <SListItemTitle variant={2} weight={700}>
+  //         {t(`dashboard.subscriptionStats.list.${item.id}`)}
+  //       </SListItemTitle>
+  //       <SListItemCenterBlock>
+  //         <SListItemValue variant={6}>{item.value}</SListItemValue>
+  //         <SListItemDirection>
+  //           <InlineSVG
+  //             svg={item.direction === 'up' ? arrowUpIcon : arrowDownIcon}
+  //             fill={item.direction === 'up' ? theme.colorsThemed.accent.success : theme.colorsThemed.accent.error}
+  //             width="16px"
+  //             height="16px"
+  //           />
+  //           <SListItemDirectionValue weight={600} variant={3} direction={item.direction}>
+  //             {item.score}
+  //           </SListItemDirectionValue>
+  //         </SListItemDirection>
+  //       </SListItemCenterBlock>
+  //       {!isMobile && (
+  //         <SListItemBottomDescription variant={3} weight={600}>
+  //           {t('dashboard.subscriptionStats.prevWeek')}
+  //         </SListItemBottomDescription>
+  //       )}
+  //     </SListItem>
+  //   ),
+  //   [t, isMobile, theme.colorsThemed.accent.error, theme.colorsThemed.accent.success]
+  // );
   const renderSubscriber = useCallback((item: newnewapi.ISubscriber, index) => {
     const handleUserClick = () => {};
     if (index < 6) {
@@ -248,7 +218,7 @@ export const SubscriptionStats = () => {
           <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
         </STotalInsights>
       </SHeaderLine>
-      <SListHolder>{collection.map(renderListItem)}</SListHolder>
+      {/* <SListHolder>{collection.map(renderListItem)}</SListHolder> */}
       <STotalLine>
         <STotalTextWrapper>
           <STotalText variant={2} weight={600}>
@@ -404,64 +374,64 @@ const STotalInsights = styled.div`
   flex-direction: row;
 `;
 
-const SListHolder = styled.div`
-  gap: 16px;
-  display: flex;
-  position: relative;
-  margin-bottom: 24px;
-  flex-direction: row;
+// const SListHolder = styled.div`
+//   gap: 16px;
+//   display: flex;
+//   position: relative;
+//   margin-bottom: 24px;
+//   flex-direction: row;
 
-  ${(props) => props.theme.media.laptop} {
-    gap: 24px;
-  }
-`;
+//   ${(props) => props.theme.media.laptop} {
+//     gap: 24px;
+//   }
+// `;
 
-const SListItem = styled.div`
-  flex: 1;
-  padding: 16px;
-  background: ${(props) => props.theme.colorsThemed.background.tertiary};
-  border-radius: 16px;
-`;
+// const SListItem = styled.div`
+//   flex: 1;
+//   padding: 16px;
+//   background: ${(props) => props.theme.colorsThemed.background.tertiary};
+//   border-radius: 16px;
+// `;
 
-const SListItemTitle = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  margin-bottom: 12px;
-`;
+// const SListItemTitle = styled(Caption)`
+//   color: ${(props) => props.theme.colorsThemed.text.secondary};
+//   margin-bottom: 12px;
+// `;
 
-const SListItemCenterBlock = styled.div`
-  display: flex;
-  flex-direction: column;
+// const SListItemCenterBlock = styled.div`
+//   display: flex;
+//   flex-direction: column;
 
-  ${(props) => props.theme.media.tablet} {
-    align-items: center;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`;
+//   ${(props) => props.theme.media.tablet} {
+//     align-items: center;
+//     flex-direction: row;
+//     justify-content: space-between;
+//   }
+// `;
 
-const SListItemValue = styled(Headline)`
-  margin-bottom: 2px;
-`;
+// const SListItemValue = styled(Headline)`
+//   margin-bottom: 2px;
+// `;
 
-const SListItemDirection = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-`;
+// const SListItemDirection = styled.div`
+//   display: flex;
+//   align-items: center;
+//   flex-direction: row;
+// `;
 
-interface ISListItemDirectionValue {
-  direction: 'up' | 'down';
-}
+// interface ISListItemDirectionValue {
+//   direction: 'up' | 'down';
+// }
 
-const SListItemDirectionValue = styled(Text)<ISListItemDirectionValue>`
-  color: ${(props) =>
-    props.direction === 'up' ? props.theme.colorsThemed.accent.success : props.theme.colorsThemed.accent.error};
-`;
+// const SListItemDirectionValue = styled(Text)<ISListItemDirectionValue>`
+//   color: ${(props) =>
+//     props.direction === 'up' ? props.theme.colorsThemed.accent.success : props.theme.colorsThemed.accent.error};
+// `;
 
-const SListItemBottomDescription = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  margin-top: 4px;
-`;
+// const SListItemBottomDescription = styled(Text)`
+//   color: ${(props) => props.theme.colorsThemed.text.secondary};
+//   margin-top: 4px;
+// `;
 
 const SSubscribersList = styled.div`
   left: -8px;
