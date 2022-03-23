@@ -272,6 +272,12 @@ const MyProfileSettginsIndex: NextPage = () => {
     },
   ];
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch(`/`);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!loggedIn) router.push('/');
   }, [loggedIn, router]);

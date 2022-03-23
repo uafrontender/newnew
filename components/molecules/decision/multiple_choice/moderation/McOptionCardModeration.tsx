@@ -67,7 +67,12 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${creator?.username}`);
+  }
 
   const handleConfirmDelete = async () => {
     try {
@@ -229,12 +234,14 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         handleConfirmDelete={handleConfirmDelete}
       />
       {/* Ellipse modal */}
-      <McOptionCardModerationEllipseModal
-        isOpen={isEllipseMenuOpen}
-        zIndex={16}
-        onClose={() => setIsEllipseMenuOpen(false)}
-        handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
-      />
+      {isMobile && (
+        <McOptionCardModerationEllipseModal
+          isOpen={isEllipseMenuOpen}
+          zIndex={16}
+          onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+        />
+      )}
     </>
   );
 };

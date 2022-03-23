@@ -303,9 +303,12 @@ const SScroller = styled.div`
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
 
-  &::-webkit-scrollbar {
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   padding-bottom: 64px;
   padding-top: 64px;

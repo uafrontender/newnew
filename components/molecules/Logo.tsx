@@ -68,7 +68,7 @@ export const Logo: React.FunctionComponent<{
           isStopped={!loading}
         />
       </SAnimationWrapper>
-      <InlineSVG
+      <SInlineSVG
         svg={logoText}
         fill={theme.colorsThemed.text.primary}
         width={isMobile ? '81px' : '94px'}
@@ -104,4 +104,10 @@ const SAnimationWrapper = styled.div`
   left: -8px;
   position: absolute;
   transform: translateY(-50%);
+`;
+
+const SInlineSVG = styled(InlineSVG)`
+  path {
+    fill: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
 `;

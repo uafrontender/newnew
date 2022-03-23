@@ -525,6 +525,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/profile/settings');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ErrorBoundary>
       <SGeneral>

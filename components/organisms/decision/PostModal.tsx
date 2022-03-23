@@ -389,6 +389,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     });
   }, [postParsed, typeOfPost]);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/sign-up');
+    router.prefetch('/creation');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       <Head>
@@ -505,6 +512,13 @@ const SPostModalContainer = styled.div<{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${({ theme }) => theme.media.tablet} {
     top: 64px;
