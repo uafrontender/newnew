@@ -65,6 +65,7 @@ const SContainer = styled.div`
 const SContent = styled.div`
   min-height: calc(100vh - 120px);
   margin-bottom: 30px;
+  width: calc(100vw - 180px);
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
@@ -72,8 +73,6 @@ const SContent = styled.div`
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     border-radius: 24px;
-
-    width: calc(100vw - 180px);
   }
 
   ${(props) => props.theme.media.desktop} {
