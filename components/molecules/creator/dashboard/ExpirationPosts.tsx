@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -14,7 +15,11 @@ import { useAppSelector } from '../../../../redux-store/store';
 import infoIcon from '../../../../public/images/svg/icons/filled/Info.svg';
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 
-export const ExpirationPosts = () => {
+interface IExpirationPosts {
+  expirationPosts: newnewapi.IPost[];
+}
+
+export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -23,51 +28,78 @@ export const ExpirationPosts = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const collection = useMemo(() => ([
-    {
-      id: 1,
-      title: 'Should I get a forehead',
-      date: '15m 10s left',
-      total: '$45.00',
-      contributions: '120 bids',
-    },
-    {
-      id: 2,
-      title: 'Should I get a forehead',
-      date: '15m 10s left',
-      total: '$45.00',
-      contributions: '120 bids',
-    },
-    {
-      id: 3,
-      title: 'Should I get a forehead',
-      date: '15m 10s left',
-      total: '$45.00',
-      contributions: '120 bids',
-    },
-  ]), []);
-  const renderItem = useCallback((item, index) => {
-    const handleUserClick = () => {
-    };
-    const handleInfoClick = () => {
-    };
-    const handleDecideClick = () => {
-    };
+  const collection = useMemo(
+    () => [
+      {
+        id: 1,
+        title: 'Should I get a forehead',
+        date: '15m 10s left',
+        total: '$45.00',
+        contributions: '120 bids',
+      },
+      {
+        id: 2,
+        title: 'Should I get a forehead',
+        date: '15m 10s left',
+        total: '$45.00',
+        contributions: '120 bids',
+      },
+      {
+        id: 3,
+        title: 'Should I get a forehead',
+        date: '15m 10s left',
+        total: '$45.00',
+        contributions: '120 bids',
+      },
+    ],
+    []
+  );
 
-    return (
-      <SListItemWrapper key={`item-expiration-${item.id}`}>
-        <SListItem>
-          {isDesktop ? (
-            <>
-              <SListBodyItem
-                width="calc(100% - 300px)"
-                align="flex-start"
-              >
-                <SAvatar
-                  withClick
-                  onClick={handleUserClick}
-                  avatarUrl={user.userData?.avatarUrl}
-                />
+  useEffect(() => {
+    console.log(expirationPosts);
+  }, [expirationPosts]);
+
+  const renderItem = useCallback(
+    (item, index) => {
+      const handleUserClick = () => {};
+      const handleInfoClick = () => {};
+      const handleDecideClick = () => {};
+
+      return (
+        <SListItemWrapper key={`item-expiration-${item.id}`}>
+          <SListItem>
+            {isDesktop ? (
+              <>
+                <SListBodyItem width="calc(100% - 300px)" align="flex-start">
+                  <SAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
+                  <SListItemTitleWrapper>
+                    <SListItemTitle variant={3} weight={600}>
+                      {item.title}
+                    </SListItemTitle>
+                    <SListItemDate variant={2} weight={600}>
+                      {item.date}
+                    </SListItemDate>
+                  </SListItemTitleWrapper>
+                </SListBodyItem>
+                <SListBodyItem width="100px" align="flex-start">
+                  <SListBodyItemText variant={3} weight={600}>
+                    {item.total}
+                  </SListBodyItemText>
+                </SListBodyItem>
+                <SListBodyItem width="100px" align="flex-start">
+                  <SListBodyItemText variant={3} weight={600}>
+                    {item.contributions}
+                  </SListBodyItemText>
+                </SListBodyItem>
+                <SListBodyItem width="100px" align="center">
+                  <SListDecideButton view="secondary" onClick={handleDecideClick}>
+                    {t('dashboard.expirationPosts.decide')}
+                  </SListDecideButton>
+                </SListBodyItem>
+              </>
+            ) : (
+              <>
+                <SAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
                 <SListItemTitleWrapper>
                   <SListItemTitle variant={3} weight={600}>
                     {item.title}
@@ -76,96 +108,26 @@ export const ExpirationPosts = () => {
                     {item.date}
                   </SListItemDate>
                 </SListItemTitleWrapper>
-              </SListBodyItem>
-              <SListBodyItem
-                width="100px"
-                align="flex-start"
-              >
-                <SListBodyItemText variant={3} weight={600}>
-                  {item.total}
-                </SListBodyItemText>
-              </SListBodyItem>
-              <SListBodyItem
-                width="100px"
-                align="flex-start"
-              >
-                <SListBodyItemText variant={3} weight={600}>
-                  {item.contributions}
-                </SListBodyItemText>
-              </SListBodyItem>
-              <SListBodyItem
-                width="100px"
-                align="center"
-              >
-                <SListDecideButton
-                  view="secondary"
-                  onClick={handleDecideClick}
-                >
+                <SListShareButton view="secondary" onClick={handleDecideClick}>
+                  <InlineSVG svg={shareIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                </SListShareButton>
+                {!isMobile && (
+                  <SListShareButton view="secondary" onClick={handleInfoClick}>
+                    <InlineSVG svg={infoIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                  </SListShareButton>
+                )}
+                <SListDecideButton view="secondary" onClick={handleDecideClick}>
                   {t('dashboard.expirationPosts.decide')}
                 </SListDecideButton>
-              </SListBodyItem>
-            </>
-          ) : (
-            <>
-              <SAvatar
-                withClick
-                onClick={handleUserClick}
-                avatarUrl={user.userData?.avatarUrl}
-              />
-              <SListItemTitleWrapper>
-                <SListItemTitle variant={3} weight={600}>
-                  {item.title}
-                </SListItemTitle>
-                <SListItemDate variant={2} weight={600}>
-                  {item.date}
-                </SListItemDate>
-              </SListItemTitleWrapper>
-              <SListShareButton
-                view="secondary"
-                onClick={handleDecideClick}
-              >
-                <InlineSVG
-                  svg={shareIcon}
-                  fill={theme.colorsThemed.text.primary}
-                  width="20px"
-                  height="20px"
-                />
-              </SListShareButton>
-              {!isMobile && (
-                <SListShareButton
-                  view="secondary"
-                  onClick={handleInfoClick}
-                >
-                  <InlineSVG
-                    svg={infoIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SListShareButton>
-              )}
-              <SListDecideButton
-                view="secondary"
-                onClick={handleDecideClick}
-              >
-                {t('dashboard.expirationPosts.decide')}
-              </SListDecideButton>
-            </>
-          )}
-        </SListItem>
-        {index !== collection.length - 1 && (
-          <SListItemSeparator />
-        )}
-      </SListItemWrapper>
-    );
-  }, [
-    t,
-    isMobile,
-    isDesktop,
-    collection.length,
-    user.userData?.avatarUrl,
-    theme.colorsThemed.text.primary,
-  ]);
+              </>
+            )}
+          </SListItem>
+          {index !== collection.length - 1 && <SListItemSeparator />}
+        </SListItemWrapper>
+      );
+    },
+    [t, isMobile, isDesktop, collection.length, user.userData?.avatarUrl, theme.colorsThemed.text.primary]
+  );
 
   const handleSubmit = useCallback(() => {
     console.log('load more 10');
@@ -174,44 +136,22 @@ export const ExpirationPosts = () => {
   return (
     <SContainer>
       <SHeaderLine>
-        <STitle variant={6}>
-          {t('dashboard.expirationPosts.title')}
-        </STitle>
+        <STitle variant={6}>{t('dashboard.expirationPosts.title')}</STitle>
       </SHeaderLine>
       <SListWrapper>
         {isDesktop && (
           <>
             <SListHeader>
-              <SListHeaderItem
-                width="calc(100% - 300px)"
-                align="start"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="calc(100% - 300px)" align="start" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.post')}
               </SListHeaderItem>
-              <SListHeaderItem
-                width="100px"
-                align="start"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="100px" align="start" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.total')}
               </SListHeaderItem>
-              <SListHeaderItem
-                width="100px"
-                align="start"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="100px" align="start" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.contributions')}
               </SListHeaderItem>
-              <SListHeaderItem
-                width="100px"
-                align="center"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="100px" align="center" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.actions')}
               </SListHeaderItem>
             </SListHeader>
@@ -221,10 +161,7 @@ export const ExpirationPosts = () => {
         {collection.map(renderItem)}
       </SListWrapper>
       {isMobile && (
-        <SButton
-          view="secondary"
-          onClick={handleSubmit}
-        >
+        <SButton view="secondary" onClick={handleSubmit}>
           {t('dashboard.expirationPosts.submit')}
         </SButton>
       )}
@@ -240,7 +177,10 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.primary
+      : props.theme.colorsThemed.background.secondary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
@@ -251,7 +191,8 @@ const SContainer = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
   }
 `;
 
