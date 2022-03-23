@@ -68,6 +68,13 @@ const STextarea = styled.textarea`
   border: 1.5px solid transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
   }
