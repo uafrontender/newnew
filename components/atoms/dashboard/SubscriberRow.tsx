@@ -81,7 +81,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         {subscriber.user?.nickname ? subscriber.user?.nickname : subscriber.user?.username}
       </SUser>
       {subscriber.firstSubscribedAt && (
-        <SDate>{moment(subscriber.firstSubscribedAt.seconds as number).format('DD MMMM YYYY')}</SDate>
+        <SDate>{moment((subscriber.firstSubscribedAt.seconds as number) * 1000).format('DD MMMM YYYY')}</SDate>
       )}
       <SActions>
         {!isMobile && <Link href={`/direct-messages?chatwith=${subscriber.user?.uuid}`}>DM</Link>}

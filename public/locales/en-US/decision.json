@@ -137,7 +137,7 @@
           "cancelBtn": "Cancel",
           "publishBtn": "Publish"
         },
-        "loading":  {
+        "loading": {
           "title": "Just a minute",
           "description": "Your file is uploading. Just give us a second to finish your upload.",
           "process": "{{progress}}% • {{time}} left"
@@ -306,7 +306,7 @@
     },
     "WinnerTab": {
       "WinnerOptionCard": {
-        "backers_founed": "backers successfully funded",
+        "backers_founded": "backers successfully funded",
         "backer_founded": "backer successfully funded"
       }
     },
@@ -402,6 +402,7 @@
     "me": "me",
     "title": "Comments",
     "placeholder": "Add a comment ...",
+    "comment_deleted": "Comment deleted",
     "bid": "bid",
     "report": "Report",
     "send-reply": "Reply",

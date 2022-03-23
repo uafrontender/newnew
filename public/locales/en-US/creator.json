@@ -20,7 +20,9 @@
     },
     "earnings": {
       "title": "Earnings",
-      "earned": "earned in last 7 days",
+      "earned": "earned in last",
+      "earnedToday": "earned today",
+      "earnedYesterday": "earned yesterday",
       "insights": "Insights",
       "insights_tablet": "Go to insights",
       "cashOut": {
@@ -66,6 +68,7 @@
     },
     "subscriptionStats": {
       "title": "Subscriptions",
+      "no-subs": "Bring more exposure to your business, share with your network",
       "newTitle": "New subscribers",
       "newLink": "Subscriptions",
       "newLink_tablet": "Go to subscriptions",
@@ -87,7 +90,9 @@
         "last_30_days": "Last 30 days",
         "last_90_days": "Last 90 days",
         "last_12_months": "Last 12 months"
-      }
+      },
+      "copy-link": "Copy your link",
+      "copied": "Copied"
     },
     "todos": {
       "title": "Your to-do’s",
