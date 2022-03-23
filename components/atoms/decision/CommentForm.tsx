@@ -4,7 +4,8 @@ import { useTranslation } from 'next-i18next';
 import Button from '../Button';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import InlineSVG from '../InlineSVG';
-import TextArea from '../creation/TextArea';
+import CommentTextArea from './CommentTextArea';
+import { useAppSelector } from '../../../redux-store/store';
 
 interface ICommentForm {
   onSubmit: (text: string) => void;
@@ -15,8 +16,10 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
   onSubmit,
   onBlur,
 }, ref) => {
-  const { t } = useTranslation('decision');
   const theme = useTheme();
+  const { t } = useTranslation('decision');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [commentText, setCommentText] = useState('');
   const [focusedInput, setFocusedInput] = useState<boolean>(false);
@@ -47,7 +50,7 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
       }}
     >
       <SInputWrapper focus={focusedInput}>
-        <TextArea
+        <CommentTextArea
           id="title"
           maxlength={150}
           value={commentText}
@@ -69,8 +72,8 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
           <SInlineSVG
             svg={sendIcon}
             fill={commentText ? theme.colors.white : theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
           />
         </SButton>
       )}
@@ -85,18 +88,28 @@ CommentForm.defaultProps = {
 };
 
 const SInlineSVG = styled(InlineSVG)`
-  min-width: 24px;
-  min-height: 24px;
 `;
 
 const SButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
 
-  height: 52.5px;
+  height: 36px;
+  width: 36px;
+  border-radius: 12px;
+
+  position: relative;
+  top: 6px;
 
   &:disabled {
     background: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    top: 0px;
+    height: 48px;
+    width: 48px;
+    border-radius: 16px;
   }
 `;
 

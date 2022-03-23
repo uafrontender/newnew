@@ -93,7 +93,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
       setTimeout(() => {
         router.push('/verify-email');
-      }, 1200);
+      }, 1000);
 
       // router.push('/verify-email');
     } catch (err: any) {
