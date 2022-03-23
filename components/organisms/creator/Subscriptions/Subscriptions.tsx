@@ -12,6 +12,7 @@ import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import NoResults from '../../../molecules/creator/dashboard/NoResults';
 import SubscribersTable from '../../../molecules/creator/dashboard/SubscribersTable';
+import { getMyOnboardingState } from '../../../../api/endpoints/user';
 
 export const Subscriptions = () => {
   const { t } = useTranslation('creator');
@@ -19,8 +20,11 @@ export const Subscriptions = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const router = useRouter();
 
-  const { mySubscribers } = useGetSubscriptions();
+  const { mySubscribersTotal } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+
+  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [isLoadingOnboardingState, setIsLoadingOnboardingState] = useState(true);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -30,7 +34,10 @@ export const Subscriptions = () => {
       if (res.data?.myProduct) {
         setMySubscriptionProduct(res.data?.myProduct);
       } else {
-        router.push('/creator/subscribers/edit-subscription-rate');
+        /* eslint-disable no-unused-expressions */
+        !onboardingState?.isCreatorConnectedToStripe
+          ? router.push('/creator/get-paid')
+          : router.push('/creator/subscribers/edit-subscription-rate');
       }
     } catch (err) {
       console.error(err);
@@ -38,20 +45,44 @@ export const Subscriptions = () => {
   };
 
   useEffect(() => {
-    if (!mySubscriptionProduct) {
+    async function fetchOnboardingState() {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getMyOnboardingState(payload);
+
+        if (res.data) {
+          setOnboardingState(res.data);
+        }
+        setIsLoadingOnboardingState(false);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchOnboardingState();
+  }, []);
+
+  useEffect(() => {
+    if (!mySubscriptionProduct && !isLoadingOnboardingState) {
       fetchMySubscriptionProduct();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mySubscriptionProduct]);
+  }, [mySubscriptionProduct, isLoadingOnboardingState]);
 
   return (
     <SContainer>
       {!isMobile && <Navigation />}
       <SContent>
         <STitleBlock>
-          <STitle variant={4}>{t('subscriptions.title')}</STitle>
+          <STitle variant={4}>
+            {t('subscriptions.title')} {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
+          </STitle>
         </STitleBlock>
-        {mySubscribers.length < 1 ? <NoResults /> : <SubscribersTable />}
+        {!mySubscribersTotal || mySubscribersTotal < 1 ? (
+          <NoResults isCreatorConnectedToStripe={onboardingState?.isCreatorConnectedToStripe} />
+        ) : (
+          <SubscribersTable />
+        )}
       </SContent>
     </SContainer>
   );
