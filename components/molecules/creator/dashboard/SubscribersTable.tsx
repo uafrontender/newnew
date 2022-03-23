@@ -13,6 +13,8 @@ import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
 import randomID from '../../../../utils/randomIdGenerator';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
+import Lottie from '../../../atoms/Lottie';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
 export const SubscribersTable = () => {
   const { t } = useTranslation('creator');
@@ -74,69 +76,92 @@ export const SubscribersTable = () => {
   const renderItem = useCallback((subscriber) => <SubscriberRow key={randomID()} subscriber={subscriber} />, []);
 
   return (
-    <STable>
-      <SThead>
-        <SSub>{t('subscriptions.table.subscribers')}</SSub>
-        <SDate onClick={changeSortDirection}>
-          <SDateWrapper>
-            <div>{t('subscriptions.table.date')}</div>
-            <SDateInlineSVG
-              svg={arrowDown}
-              fill={theme.colorsThemed.text.tertiary}
-              width="20px"
-              height="20px"
-              sortDirectionDesc={isSortDirectionDesc}
-            />
-          </SDateWrapper>
-        </SDate>
-      </SThead>
-      <STBody>{mySubscribers.map(renderItem)}</STBody>
-      <STfoot>
-        <SUpdateSub href="/creator/subscribers/edit-subscription-rate">{t('subscriptions.table.updateSub')}</SUpdateSub>
-        <STools>
-          {mySubscribersTotal < 10 ? (
-            <SCount>
-              1-{mySubscribersTotal} of {mySubscribersTotal}
-            </SCount>
-          ) : (
-            <SCount>{`${currentPage !== 0 ? currentPage : ''}1-${currentPage + 1}0 of ${mySubscribersTotal}`}</SCount>
-          )}
+    <>
+      {!isMySubscribersIsLoading ? (
+        <STable>
+          <SThead>
+            <SSub>{t('subscriptions.table.subscribers')}</SSub>
+            <SDate onClick={changeSortDirection}>
+              <SDateWrapper>
+                <div>{t('subscriptions.table.date')}</div>
+                <SDateInlineSVG
+                  svg={arrowDown}
+                  fill={theme.colorsThemed.text.tertiary}
+                  width="20px"
+                  height="20px"
+                  sortDirectionDesc={isSortDirectionDesc}
+                />
+              </SDateWrapper>
+            </SDate>
+          </SThead>
+          <STBody>{mySubscribers.map(renderItem)}</STBody>
+          <STfoot>
+            <SUpdateSub href="/creator/subscribers/edit-subscription-rate">
+              {t('subscriptions.table.updateSub')}
+            </SUpdateSub>
+            <STools>
+              {mySubscribersTotal < 10 ? (
+                <SCount>
+                  1-{mySubscribersTotal} of {mySubscribersTotal}
+                </SCount>
+              ) : (
+                <SCount>{`${currentPage !== 0 ? currentPage : ''}1-${
+                  currentPage + 1
+                }0 of ${mySubscribersTotal}`}</SCount>
+              )}
 
-          <STableNav>
-            <SButton onClick={goFirstPage} view="transparent" disabled={currentPage === 0}>
-              <SInlineSVG svg={ChevronFirstPage} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
-            </SButton>
-            <SButton onClick={goPrevPage} view="transparent" disabled={currentPage === 0}>
-              <SInlineSVG
-                type="prev"
-                svg={ChevronDown}
-                fill={theme.colorsThemed.text.secondary}
-                width="20px"
-                height="20px"
-              />
-            </SButton>
-            <SButton onClick={goNextPage} view="transparent" disabled={currentPage === lastPage}>
-              <SInlineSVG
-                type="next"
-                svg={ChevronDown}
-                fill={theme.colorsThemed.text.secondary}
-                width="20px"
-                height="20px"
-              />
-            </SButton>
-            <SButton onClick={goLastPage} view="transparent" disabled={currentPage === lastPage}>
-              <SInlineSVG
-                type="last-page"
-                svg={ChevronFirstPage}
-                fill={theme.colorsThemed.text.secondary}
-                width="20px"
-                height="20px"
-              />
-            </SButton>
-          </STableNav>
-        </STools>
-      </STfoot>
-    </STable>
+              <STableNav>
+                <SButton onClick={goFirstPage} view="transparent" disabled={currentPage === 0}>
+                  <SInlineSVG
+                    svg={ChevronFirstPage}
+                    fill={theme.colorsThemed.text.secondary}
+                    width="20px"
+                    height="20px"
+                  />
+                </SButton>
+                <SButton onClick={goPrevPage} view="transparent" disabled={currentPage === 0}>
+                  <SInlineSVG
+                    type="prev"
+                    svg={ChevronDown}
+                    fill={theme.colorsThemed.text.secondary}
+                    width="20px"
+                    height="20px"
+                  />
+                </SButton>
+                <SButton onClick={goNextPage} view="transparent" disabled={currentPage === lastPage}>
+                  <SInlineSVG
+                    type="next"
+                    svg={ChevronDown}
+                    fill={theme.colorsThemed.text.secondary}
+                    width="20px"
+                    height="20px"
+                  />
+                </SButton>
+                <SButton onClick={goLastPage} view="transparent" disabled={currentPage === lastPage}>
+                  <SInlineSVG
+                    type="last-page"
+                    svg={ChevronFirstPage}
+                    fill={theme.colorsThemed.text.secondary}
+                    width="20px"
+                    height="20px"
+                  />
+                </SButton>
+              </STableNav>
+            </STools>
+          </STfoot>
+        </STable>
+      ) : (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      )}
+    </>
   );
 };
 
