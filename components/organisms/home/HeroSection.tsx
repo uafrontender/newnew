@@ -114,6 +114,12 @@ export const HeroSection = () => {
     }, 0);
   }, []);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/sign-up');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <SWrapper>
       <STopWrapper>

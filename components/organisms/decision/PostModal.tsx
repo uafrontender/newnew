@@ -389,6 +389,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     });
   }, [postParsed, typeOfPost]);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/sign-up');
+    router.prefetch('/creation');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       <Head>

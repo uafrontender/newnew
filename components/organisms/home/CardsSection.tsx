@@ -169,6 +169,12 @@ export const CardsSection: React.FC<ICardSection> = ({
     }
   };
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch(`/search?category=${category}`);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
       const currentScrollPosition = scrollContainerRef.current.scrollLeft;

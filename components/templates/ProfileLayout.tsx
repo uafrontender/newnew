@@ -275,6 +275,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
   };
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/sign-up?reason=follow-creator');
+    router.prefetch(`/u/${user.username}/subscribe`);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (currentUser.loggedIn && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
