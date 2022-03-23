@@ -6,20 +6,22 @@ import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 
 const SubscriptionsContext = createContext({
-  mySubscribers: [] as newnewapi.IUser[],
-  addSubscriber: (subscriber: newnewapi.IUser) => {},
-  removeSubscriber: (subscriber: newnewapi.IUser) => {},
+  mySubscribers: [] as newnewapi.ISubscriber[],
+  addSubscriber: (subscriber: newnewapi.ISubscriber) => {},
+  removeSubscriber: (subscriber: newnewapi.ISubscriber) => {},
   creatorsImSubscribedTo: [] as newnewapi.IUser[],
   addCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
   removeCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
   isMySubscribersIsLoading: false,
   isCreatorsImSubscribedToLoading: false,
   newSubscriber: {} as newnewapi.ICreatorSubscriptionChanged,
+  mySubscribersTotal: 0,
 });
 
 export const SubscriptionsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
-  const [mySubscribers, setMySubscribers] = useState<newnewapi.IUser[]>([]);
+  const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>([]);
+  const [mySubscribersTotal, setMySubscribersTotal] = useState<number>(0);
   const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<newnewapi.IUser[]>([]);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
   const [isCreatorsImSubscribedToLoading, setCreatorsImSubscribedToLoading] = useState(false);
@@ -28,12 +30,12 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
 
   const socketConnection = useContext(SocketContext);
 
-  const addSubscriber = (subscriber: newnewapi.IUser) => {
+  const addSubscriber = (subscriber: newnewapi.ISubscriber) => {
     setMySubscribers((curr) => [...curr, subscriber]);
   };
 
-  const removeSubscriber = (subscriber: newnewapi.IUser) => {
-    setMySubscribers((curr) => curr.filter((i) => i.uuid !== subscriber.uuid));
+  const removeSubscriber = (subscriber: newnewapi.ISubscriber) => {
+    setMySubscribers((curr) => curr.filter((i) => i.user?.uuid !== subscriber.user?.uuid));
   };
 
   const addCreatorsImSubscribedTo = (creator: newnewapi.IUser) => {
@@ -55,6 +57,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       isMySubscribersIsLoading,
       isCreatorsImSubscribedToLoading,
       newSubscriber,
+      mySubscribersTotal,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -65,6 +68,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       addCreatorsImSubscribedTo,
       removeCreatorsImSubscribedTo,
       newSubscriber,
+      mySubscribersTotal,
     ]
   );
 
@@ -78,7 +82,8 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
         });
         const res = await getMySubscribers(payload);
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setMySubscribers(res.data.subscribers as newnewapi.IUser[]);
+        setMySubscribers(res.data.subscribers as newnewapi.ISubscriber[]);
+        if (res.data.paging?.total) setMySubscribersTotal(res.data.paging?.total);
       } catch (err) {
         console.error(err);
         setMySubscribersIsLoading(false);

@@ -93,7 +93,11 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       try {
         setCollectionFYInitialLoading(true);
 
-        const fyPayload = new newnewapi.PagedRequest({});
+        const fyPayload = new newnewapi.PagedRequest({
+          paging: {
+            limit: 10
+          }
+        });
 
         const resFY = await fetchForYouPosts(fyPayload);
 

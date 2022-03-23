@@ -1,44 +1,39 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import styled, { css, useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { toast } from 'react-toastify';
 
 import { SocketContext } from '../../../contexts/socketContext';
-import { fetchAcOptionById, fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import { ChannelsContext } from '../../../contexts/channelsContext';
+import { fetchAcOptionById, fetchCurrentBidsForPost } from '../../../api/endpoints/auction';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
-import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
+import Lottie from '../../atoms/Lottie';
 import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
 import CommentsTab from '../../molecules/decision/CommentsTab';
 import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
+import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
+import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 // Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import { ChannelsContext } from '../../../contexts/channelsContext';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+
+import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
-import isBrowser from '../../../utils/isBrowser';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
-import Button from '../../atoms/Button';
-import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import Lottie from '../../atoms/Lottie';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -57,8 +52,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   postStatus,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -71,7 +64,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
   const {
-    channelsWithSubs,
     addChannel,
     removeChannel,
   } = useContext(ChannelsContext);
@@ -79,10 +71,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   // Tabs
   const tabs = useMemo(() => {
     // NB! Will a check for winner option here
-    if (
-      postStatus === 'waiting_for_response'
-      || postStatus === 'succeeded'
-    ) {
+    if (post.winningOptionId) {
       return [
         {
           label: 'winner',
@@ -108,7 +97,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         value: 'comments',
       },
     ];
-  }, [postStatus]);
+  }, [post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -118,6 +107,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
       return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
+    if (
+      post.winningOptionId
+    ) return 'winner';
     return 'bids';
   });
 
@@ -165,21 +157,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
 
   // Winning option
   const [winningOption, setWinningOption] = useState<newnewapi.Auction.Option | undefined>();
-
-  // Animating options
-  const [optionToAnimate, setOptionToAnimate] = useState('');
-
-  // Option overview
-  const [
-    overviewedOption, setOverviewedOption,
-  ] = useState<newnewapi.Auction.Option | undefined>(undefined);
-  const currLocation = `/?post=${post.postUuid}`;
-
-  // Comments
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -351,33 +328,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mark post as viewed if logged in
   useEffect(() => {
-    async function markAsViewed() {
-      if (
-        !user.loggedIn
-        || user.userData?.userUuid === post.creator?.uuid) return;
-      try {
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
-          markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
-          postUuid: post.postUuid,
-        });
-
-        const res = await markPost(markAsViewedPayload);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    markAsViewed();
-  }, [
-    post,
-    user.loggedIn,
-    user.userData?.userUuid,
-  ]);
-
-  useEffect(() => {
-    setComments([]);
     setOptions([]);
     setOptionsNextPageToken('');
     fetchBids();
@@ -427,15 +378,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           }
 
           return sortOptions(workingArrUnsorted);
-        });
-
-        setOverviewedOption((curr) => {
-          if (curr === undefined) return curr;
-          const workingObj = { ...curr };
-          if (workingObj.totalAmount) {
-            workingObj.totalAmount.usdCents = decoded.option?.totalAmount?.usdCents!!;
-          }
-          return workingObj as newnewapi.Auction.Option;
         });
       }
     };
@@ -499,6 +441,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     sortOptions,
   ]);
 
+  useEffect(() => {
+    if (loadingOptionsError) {
+      toast.error(loadingOptionsError);
+    }
+  }, [loadingOptionsError]);
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -510,10 +458,16 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
-          postType="ac"
-        />
+        {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
+          <ResponseTimer
+            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+          />
+        ) : (
+          <PostTimer
+            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            postType="ac"
+          />
+        )}
       </SExpiresSection>
       <PostVideoModeration
         postId={post.postUuid}
@@ -548,12 +502,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
               options={options}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
-              minAmount={post.minimalBid?.usdCents
-                ? (
-                  parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10)
-                ) : 5}
               handleLoadBids={fetchBids}
-              handleRemoveOption={handleRemoveOption}
               handleUpdatePostStatus={handleUpdatePostStatus}
             />
           ) : (
@@ -567,6 +516,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             ) : winningOption ? (
               <AcWinnerTabModeration
                 option={winningOption}
+                postStatus={postStatus}
               />
             ) : (
               <SAnimationContainer>
@@ -604,7 +554,8 @@ const SWrapper = styled.div`
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: 46px min-content 1fr;
+    grid-template-rows: max-content max-content 1fr;
+
     grid-column-gap: 16px;
 
     align-items: flex-start;
@@ -617,7 +568,7 @@ const SWrapper = styled.div`
       'video expires'
       'video title'
       'video activities';
-    grid-template-columns: 410px 538px;
+    grid-template-columns: 410px 1fr;
 
     padding-bottom: initial;
   }
@@ -660,22 +611,19 @@ const SActivitesContainer = styled.div<{
   height: 100%;
   width: 100%;
 
-  min-height: calc(728px - 46px - 64px - 40px - 72px);
-
   ${({ theme }) => theme.media.tablet} {
-    min-height: initial;
-    max-height: calc(728px - 46px - 64px - 40px - 72px);
+    max-height: calc(500px);
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(728px - 46px - 64px - 72px);
-
     ${({ showSelectWinnerOption }) => (
       showSelectWinnerOption
       ? css`
-        max-height: calc(728px - 46px - 64px - 72px - 130px);
+        max-height: calc(580px - 130px);
       `
-      : null
+      : css`
+        max-height: calc(580px);
+      `
     )}
   }
 `;

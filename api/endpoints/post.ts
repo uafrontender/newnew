@@ -27,10 +27,10 @@ export const markPost = (
   payload,
 );
 
-export const cancelMyPost = (
-  payload: newnewapi.CancelMyPostRequest,
-) => fetchProtobufProtectedIntercepted<newnewapi.CancelMyPostRequest, newnewapi.EmptyResponse>(
-  newnewapi.CancelMyPostRequest,
+export const deleteMyPost = (
+  payload: newnewapi.DeleteMyPostRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.DeleteMyPostRequest, newnewapi.EmptyResponse>(
+  newnewapi.DeleteMyPostRequest,
   newnewapi.EmptyResponse,
   `${BASE_URL_POST}/cancel_my_post`,
   'post',

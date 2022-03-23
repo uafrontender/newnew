@@ -321,8 +321,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         >
           {!isMobile ? (
             <>
-              <GradientMask positionTop active={showTopGradient} />
-              <GradientMask positionBottom={heightDelta} active={showBottomGradient} />
+              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
+              <GradientMask gradientType="secondary" positionBottom={heightDelta} active={showBottomGradient} />
             </>
           ) : null}
           {options.map((option, i) => (
@@ -538,10 +538,6 @@ const STabContainer = styled(motion.div)`
   ${({ theme }) => theme.media.tablet} {
     height: calc(100% - 56px);
   }
-
-  ${({ theme }) => theme.media.laptop} {
-    padding-right: 16px;
-  }
 `;
 
 const SBidsContainer = styled.div<{
@@ -645,8 +641,6 @@ const SActionSection = styled.div`
   ${({ theme }) => theme.media.laptop} {
     flex-wrap: nowrap;
     justify-content: initial;
-
-    padding-right: 16px;
 
     textarea {
       width: 277px;

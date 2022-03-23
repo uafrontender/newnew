@@ -74,7 +74,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
-  const [heightDelta, setHeightDelta] = useState(56);
+  const [heightDelta, setHeightDelta] = useState(postStatus === 'voting' ? 56 : 0);
   const actionSectionContainer = useRef<HTMLDivElement>();
 
   const mainContainer = useRef<HTMLDivElement>();
@@ -85,7 +85,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [newBidText, setNewBidText] = useState('');
   const [newBidTextValid, setNewBidTextValid] = useState(true);
   const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
-  const [newBidAmount, setNewBidAmount] = useState(minAmount.toString());
+  const [newBidAmount, setNewBidAmount] = useState('');
   // Mobile modal for new option
   const [suggestNewMobileOpen, setSuggestNewMobileOpen] = useState(false);
   // Payment modal
@@ -364,8 +364,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         >
           {!isMobile ? (
             <>
-              <GradientMask positionTop active={showTopGradient} />
-              <GradientMask positionBottom={heightDelta} active={showBottomGradient} />
+              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
+              <GradientMask gradientType="secondary" positionBottom={heightDelta} active={showBottomGradient} />
             </>
           ) : null}
           {options.map((option, i) => (
@@ -533,11 +533,7 @@ export default AcOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 50px);
-
-  ${({ theme }) => theme.media.tablet} {
-    height: calc(100% - 56px);
-  }
+  height: calc(100% - 56px);
 `;
 
 const SBidsContainer = styled.div<{
@@ -554,6 +550,8 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+
+
     &::-webkit-scrollbar {
       width: 4px;
     }
@@ -674,7 +672,11 @@ const SNoOptionsYet = styled.div`
   align-items: center;
 
   width: 100%;
-  min-height: 400px;
+  min-height: 300px;
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 400px;
+  }
 `;
 
 const SNoOptionsImgContainer = styled.div`

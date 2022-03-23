@@ -1,7 +1,4 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-lonely-if */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -14,12 +11,15 @@ import Head from 'next/head';
 
 import { fetchMoreLikePosts } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
+import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
 import List from '../search/List';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
+import PostFailedBox from '../../molecules/decision/PostFailedBox';
+// Posts views
 import PostViewAC from './PostViewAC';
 import PostViewMC from './PostViewMC';
 import PostViewCF from './PostViewCF';
@@ -27,16 +27,16 @@ import PostModerationAC from './PostModerationAC';
 import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
+import PostViewProcessing from './PostViewProcessing';
 
-
+// Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
+// Utils
 import isBrowser from '../../../utils/isBrowser';
-import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
-import PostFailedBox from '../../molecules/decision/PostFailedBox';
 
 interface IPostModal {
   isOpen: boolean;
@@ -91,17 +91,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
   const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
 
-  const sessionId = isBrowser()
+  const [sessionId, setSessionId] = useState(() => (
+    isBrowser()
     ? new URL(window.location.href).searchParams.get('?session_id') ||
       new URL(window.location.href).searchParams.get('session_id')
-    : undefined;
+    : undefined
+  ));
+
+  const resetSessionId = () => setSessionId(undefined);
 
   const [open, setOpen] = useState(false);
 
   const modalContainerRef = useRef<HTMLDivElement>();
 
   // Recommendations (with infinite scroll)
-  // NB! Will require a separate endpoint for this one
   const innerHistoryStack = useRef<newnewapi.Post[]>([]);
   const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null | undefined>('');
@@ -174,7 +177,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
-          postType={typeOfPost!!}
+          handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+        />
+      );
+    }
+
+    if (postStatus === 'processing') {
+      return (
+        <PostViewProcessing
+          key={postParsed?.postUuid}
+          post={postParsed!!}
+          postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -188,6 +202,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.MultipleChoice}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -201,6 +216,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
+          resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -213,6 +229,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Crowdfunding}
           postStatus={postStatus}
           sessionId={sessionId ?? undefined}
+          resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
@@ -222,6 +239,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostModeration = (postToRender: TPostType) => {
+    if (postStatus === 'processing') {
+      return (
+        <PostViewProcessing
+          key={postParsed?.postUuid}
+          post={postParsed!!}
+          postStatus={postStatus}
+          handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+        />
+      );
+    }
+
     if (postToRender === 'mc') {
       return (
         <PostModerationMC
@@ -360,6 +389,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     });
   }, [postParsed, typeOfPost]);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/sign-up');
+    router.prefetch('/creation');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       <Head>
@@ -379,7 +415,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             modalContainerRef.current = el!!;
           }}
         >
-          {postStatus !== 'cancelled' ? (
+          {postStatus !== 'deleted' ? (
             isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)
           ) : isMyPost ? (
               <PostFailedBox
@@ -433,6 +469,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 style={{
                   position: 'relative',
                   bottom: '10px',
+                  ...(recommenedPostsLoading ? {
+                    display: 'none'
+                  } : {}),
                 }}
               />
             </SRecommendationsSection>
@@ -473,6 +512,13 @@ const SPostModalContainer = styled.div<{
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${({ theme }) => theme.media.tablet} {
     top: 64px;

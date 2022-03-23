@@ -137,6 +137,12 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     };
   }, [isMobile]);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch(`/sign-up?reason=subscribe`);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <SGeneral

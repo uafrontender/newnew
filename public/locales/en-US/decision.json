@@ -13,6 +13,13 @@
     "ended_on": "ended on",
     "at_time": "at"
   },
+  "expiresResponse": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "left_to_respond": "left to respond"
+  },
   "socials": {
     "share-to": "Share to",
     "twitter": "Twitter",
@@ -130,7 +137,7 @@
           "cancelBtn": "Cancel",
           "publishBtn": "Publish"
         },
-        "loading":  {
+        "loading": {
           "title": "Just a minute",
           "description": "Your file is uploading. Just give us a second to finish your upload.",
           "process": "{{progress}}% • {{time}} left"
@@ -279,7 +286,9 @@
   },
   "CfPost": {
     "BackersStatsSection": {
-      "of_backers": "of {{ targetBackers }} backers"
+      "of_backers": "of {{ targetBackers }} backers",
+      "my": "my",
+      "pledge": "pledge"
     },
     "BackersTab": {
       "info": {
@@ -297,7 +306,7 @@
     },
     "WinnerTab": {
       "WinnerOptionCard": {
-        "backers_founed": "backers successfully funded",
+        "backers_founded": "backers successfully funded",
         "backer_founded": "backer successfully funded"
       }
     },
@@ -390,12 +399,15 @@
     "heading": "More like this"
   },
   "comments": {
+    "me": "me",
     "title": "Comments",
     "placeholder": "Add a comment ...",
+    "comment_deleted": "Comment deleted",
     "bid": "bid",
     "report": "Report",
     "send-reply": "Reply",
     "reply": "reply",
+    "delete": "Delete",
     "replies": "replies",
     "view-replies": "View",
     "hide-replies": "Hide",

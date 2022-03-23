@@ -76,6 +76,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
   const handleRedirectToUser = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
     router.push(`/u/${creator.username}`);
   };
 
@@ -480,10 +483,8 @@ const SSelectingWinnerOption = styled.div`
 
     margin-top: 32px;
 
-  }
+    width: 100%;
 
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
   }
 `;
 

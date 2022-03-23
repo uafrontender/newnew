@@ -77,7 +77,12 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
   const [doubleVoteAmount, setDoubleVoteAmount] = useState('');
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${creator?.username}`);
+  }
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -297,6 +302,8 @@ const SOptionSymbolImg = styled.img`
 
 const SOptionInfo = styled(Text)`
   grid-area: optionInfo;
+
+  color: #FFFFFF;
 
   margin-bottom: 8px;
 

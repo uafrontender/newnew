@@ -29,6 +29,7 @@ import InlineSvg from '../../../../atoms/InlineSVG';
 import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMenu';
 import McConfirmDeleteOption from './McConfirmDeleteOption';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
+import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -66,7 +67,12 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${creator?.username}`);
+  }
 
   const handleConfirmDelete = async () => {
     try {
@@ -227,6 +233,15 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
       />
+      {/* Ellipse modal */}
+      {isMobile && (
+        <McOptionCardModerationEllipseModal
+          isOpen={isEllipseMenuOpen}
+          zIndex={16}
+          onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+        />
+      )}
     </>
   );
 };
@@ -336,7 +351,6 @@ const SEllipseButton = styled(Button)`
   top: 12px;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   width: 24px;
 

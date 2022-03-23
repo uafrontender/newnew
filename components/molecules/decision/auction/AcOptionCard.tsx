@@ -88,7 +88,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${option.creator?.username}`);
+  }
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -239,7 +244,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           : {}),
       }}
     >
-      <SContainer isDisabled={disabled} isBlue={isSupportedByMe || isMyBid}>
+      <SContainer
+        isDisabled={disabled}
+        isBlue={isSupportedByMe || isMyBid}
+        onClick={() => {
+          if (!isMobile && !disabled) {
+            handleOpenSupportForm();
+          }
+        }}
+      >
         <SBidDetails isBlue={isSupportedByMe || isMyBid}>
           <SLottieAnimationContainer>
             {shouldAnimate ? (
@@ -555,7 +568,6 @@ const SSupportButton = styled(Button)`
     width: auto;
 
     padding: 0px 12px;
-    margin-right: 16px;
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
     background: none;

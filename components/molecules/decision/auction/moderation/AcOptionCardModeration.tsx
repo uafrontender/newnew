@@ -27,6 +27,7 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -56,7 +57,12 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
   const [isPickOptionModalOpen, setIsPickOptionModalOpen] = useState(false);
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${option.creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${option.creator?.username}`);
+  }
 
   const handleConfirmDelete = async () => {
     try {
@@ -283,6 +289,15 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
       />
+      {/* Ellipse modal */}
+      {isMobile && (
+        <AcOptionCardModerationEllipseModal
+          isOpen={isEllipseMenuOpen}
+          zIndex={16}
+          onClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+        />
+      )}
     </>
   );
 };
@@ -391,7 +406,6 @@ const SEllipseButton = styled(Button)`
   top: 12px;
 
   padding: 0px 12px;
-  margin-right: 16px;
 
   width: 24px;
 

@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 import React, {
   useCallback, useContext, useEffect, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
-
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -21,11 +17,9 @@ import PostScheduledSection from '../../molecules/decision/PostScheduledSection'
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import switchPostType, { TPostType } from '../../../utils/switchPostType';
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
-  postType: TPostType;
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -33,14 +27,10 @@ interface IPostViewScheduled {
 
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   post,
-  postType,
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
-
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -48,7 +38,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { channelsWithSubs, addChannel, removeChannel } = useContext(ChannelsContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const [isFollowing, setIsFollowing] = useState(post.isFavoritedByMe ?? false);
 
@@ -73,6 +63,21 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
       console.error(err);
     }
   };
+
+  // Increment channel subs after mounting
+  // Decrement when unmounting
+  useEffect(() => {
+    addChannel(post.postUuid, {
+      postUpdates: {
+        postUuid: post.postUuid,
+      },
+    });
+
+    return () => {
+      removeChannel(post.postUuid);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const socketHandlerPostStatus = (data: any) => {
@@ -160,7 +165,6 @@ const SWrapper = styled.div`
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    /* grid-template-rows: 46px 64px 40px calc(506px - 46px); */
     grid-template-rows: min-content 1fr;
     grid-column-gap: 16px;
 

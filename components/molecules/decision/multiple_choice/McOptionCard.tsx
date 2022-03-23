@@ -85,7 +85,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   };
 
   // Redirect to user's page
-  const handleRedirectToOptionCreator = () => router.push(`/u/${creator?.username}`);
+  const handleRedirectToOptionCreator = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${creator?.username}`);
+  }
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -240,6 +245,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           stiffness: 300,
         }}
         isDisabled={disabled}
+        onClick={() => {
+          if (!isMobile && !disabled) {
+            handleOpenSupportForm();
+          }
+        }}
       >
         <SBidDetails>
           <SBidAmount>
@@ -571,7 +581,6 @@ const SSupportButton = styled(Button)`
     width: auto;
 
     padding: 0px 12px;
-    margin-right: 16px;
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
     background: none;

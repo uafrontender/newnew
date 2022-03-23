@@ -1,109 +1,190 @@
-import React, { useMemo, useState, useCallback } from 'react';
+/* eslint-disable no-unsafe-optional-chaining */
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import moment from 'moment';
 
 import Text from '../../../atoms/Text';
-import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import DropDown from '../../../atoms/creator/DropDown';
-import InlineSVG from '../../../atoms/InlineSVG';
+import CashOut from '../../../atoms/creator/CashOut';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import FinishProfileSetup from '../../../atoms/creator/FinishProfileSetup';
+import MakeDecision from '../../../atoms/creator/MakeDecision';
+import { getMyEarnings } from '../../../../api/endpoints/payments';
+import dateToTimestamp from '../../../../utils/dateToTimestamp';
+import { formatNumber } from '../../../../utils/format';
 
-import cashOutIcon from '../../../../public/images/svg/icons/filled/CashOut.svg';
-import arrowRightIcon from '../../../../public/images/svg/icons/outlined/ArrowRight.svg';
+interface IFunctionProps {
+  isTodosCompleted: boolean;
+  hasMyPosts: boolean;
+}
 
-export const Earnings = () => {
+export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPosts }) => {
   const { t } = useTranslation('creator');
-  const theme = useTheme();
-  const [filter, setFilter] = useState('last_7_days');
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const [filter, setFilter] = useState('7_days');
+  const [isLoading, setIsLoading] = useState<boolean | null>(null);
+  const [myEarnings, setMyEarnings] = useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const collection = useMemo(() => ([
-    {
-      id: 'ac',
-      value: '$10.00',
-    },
-    {
-      id: 'cf',
-      value: '$25.00',
-    },
-    {
-      id: 'mc',
-      value: '$25.00',
-    },
-    {
-      id: 'subscriptions',
-      value: '$15.50',
-    },
-  ]), []);
-  const filterOptions = useMemo(() => ([
-    {
-      id: 'today',
-      label: t('dashboard.earnings.filter.today'),
-    },
-    {
-      id: 'yesterday',
-      label: t('dashboard.earnings.filter.yesterday'),
-    },
-    {
-      id: 'last_7_days',
-      label: t('dashboard.earnings.filter.last_7_days'),
-    },
-    {
-      id: 'last_30_days',
-      label: t('dashboard.earnings.filter.last_30_days'),
-    },
-    {
-      id: 'last_90_days',
-      label: t('dashboard.earnings.filter.last_90_days'),
-    },
-    {
-      id: 'last_12_months',
-      label: t('dashboard.earnings.filter.last_12_months'),
-    },
-  ]), [t]);
-  const renderListItem = useCallback((item) => (
-    <SListItem key={`list-item-earnings-${item.id}`}>
-      <SListItemTitle variant={2} weight={700}>
-        {t(`dashboard.earnings.list.${item.id}`)}
-      </SListItemTitle>
-      <SListItemValue variant={6}>
-        {item.value}
-      </SListItemValue>
-    </SListItem>
-  ), [t]);
+  useEffect(() => {
+    async function fetchMyEarnings() {
+      try {
+        setIsLoading(true);
+        const payload = new newnewapi.GetMyEarningsRequest({
+          beginDate: dateToTimestamp(
+            moment()
+              .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
+              .startOf('day')
+          ),
+          endDate: dateToTimestamp(new Date()),
+        });
+        const res = await getMyEarnings(payload);
 
-  const handleSubmit = useCallback(() => {
-    console.log('subscribe');
-  }, []);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setMyEarnings(res.data);
 
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsLoading(null);
+      }
+    }
+    if (isLoading === null) {
+      fetchMyEarnings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
+
+  useEffect(() => {
+    if (myEarnings) {
+      let sum = 0;
+      if (myEarnings.auEarnings?.usdCents) sum += myEarnings.auEarnings?.usdCents;
+      if (myEarnings.cfEarnings?.usdCents) sum += myEarnings.cfEarnings?.usdCents;
+      if (myEarnings.mcEarnings?.usdCents) sum += myEarnings.mcEarnings?.usdCents;
+      if (myEarnings.auEarnings?.usdCents) sum += myEarnings.auEarnings?.usdCents;
+      setTotalEarnings(sum);
+    }
+  }, [myEarnings]);
+
+  const collection = useMemo(
+    () => [
+      {
+        id: 'ac',
+      },
+      {
+        id: 'cf',
+      },
+      {
+        id: 'mc',
+      },
+      {
+        id: 'subscriptions',
+      },
+    ],
+    []
+  );
+  const filterOptions = useMemo(
+    () => [
+      {
+        id: '0_days',
+        label: t('dashboard.earnings.filter.today'),
+      },
+      {
+        id: '1_days',
+        label: t('dashboard.earnings.filter.yesterday'),
+      },
+      {
+        id: '7_days',
+        label: t('dashboard.earnings.filter.last_7_days'),
+      },
+      {
+        id: '30_days',
+        label: t('dashboard.earnings.filter.last_30_days'),
+      },
+      {
+        id: '90_days',
+        label: t('dashboard.earnings.filter.last_90_days'),
+      },
+      {
+        id: '12_months',
+        label: t('dashboard.earnings.filter.last_12_months'),
+      },
+    ],
+    [t]
+  );
+
+  const getValue = useCallback((id: string) => {
+    switch (id) {
+      case 'ac':
+        return myEarnings?.auEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.auEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      case 'cf':
+        return myEarnings?.cfEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.cfEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      case 'mc':
+        return myEarnings?.mcEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.mcEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      case 'subscriptions':
+        return myEarnings?.subsEarnings?.usdCents
+          ? `$${formatNumber(myEarnings.subsEarnings.usdCents / 100 ?? 0, true)}`
+          : '$0.00';
+
+      default:
+        return '$0.00';
+    }
+  }, [
+    myEarnings,
+  ]);
+
+  const renderListItem = useCallback(
+    (item) => (
+      <SListItem key={`list-item-earnings-${item.id}`}>
+        <SListItemTitle variant={2} weight={700}>
+          {t(`dashboard.earnings.list.${item.id}`)}
+        </SListItemTitle>
+        <SListItemValue variant={6}>{getValue(item.id)}</SListItemValue>
+      </SListItem>
+    ),
+    [t, getValue]
+  );
+
+  const handleChangeFilter = (e: any) => {
+    if (filter !== e) {
+      setIsLoading(null);
+      setFilter(e);
+    }
+  };
+
+  const splitPeriod = () => {
+    const arr = filter.split('_');
+    if (arr[0] === '0') return t('dashboard.earnings.earnedToday');
+    if (arr[0] === '1') return t('dashboard.earnings.earnedYesterday');
+    return `${t('dashboard.earnings.earned')} ${arr[0]} ${arr[1]}`;
+  };
+  /* eslint-disable no-nested-ternary */
   return (
     <SContainer>
       <SHeaderLine>
-        <STitle variant={6}>
-          {t('dashboard.earnings.title')}
-        </STitle>
+        <STitle variant={6}>{t('dashboard.earnings.title')}</STitle>
         <STotalInsights>
-          <DropDown
-            value={filter}
-            options={filterOptions}
-            handleChange={setFilter}
-          />
+          <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
         </STotalInsights>
       </SHeaderLine>
       <STotalLine>
         <STotalTextWrapper>
-          <STotal variant={4}>
-            $50.50
-          </STotal>
-          <STotalText weight={600}>
-            {t('dashboard.earnings.earned')}
-          </STotalText>
+          <STotal variant={4}>{totalEarnings ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}` : '$0.00'}</STotal>
+          <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
-        <STotalInsights>
+        {/* <STotalInsights>
           <STotalInsightsText>
             {t(`dashboard.earnings.${isMobile ? 'insights' : 'insights_tablet'}`)}
           </STotalInsightsText>
@@ -113,37 +194,18 @@ export const Earnings = () => {
             width="24px"
             height="24px"
           />
-        </STotalInsights>
+        </STotalInsights> */}
       </STotalLine>
-      <SListHolder>
-        {collection.map(renderListItem)}
-      </SListHolder>
-      <SCashOutContainer>
-        <SCashOutTopBlock>
-          <SInlineSVG
-            svg={cashOutIcon}
-            width="48px"
-            height="48px"
-          />
-          <SDescriptionWrapper>
-            <SDescription variant={3} weight={600}>
-              {t('dashboard.earnings.cashOut.amount')}
-            </SDescription>
-            <SAmount variant={3} weight={600}>
-              $456.98
-            </SAmount>
-            <SDescription variant={3} weight={600}>
-              {t('dashboard.earnings.cashOut.date', { date: 'Nov 3, 2021' })}
-            </SDescription>
-          </SDescriptionWrapper>
-        </SCashOutTopBlock>
-        <SButton
-          view="primaryGrad"
-          onClick={handleSubmit}
-        >
-          {t('dashboard.earnings.cashOut.submit')}
-        </SButton>
-      </SCashOutContainer>
+      <SListHolder>{collection.map(renderListItem)}</SListHolder>
+      {isTodosCompleted ? (
+        hasMyPosts && myEarnings?.nextCashoutAmount ? (
+          <CashOut nextCashoutAmount={myEarnings?.nextCashoutAmount} nextCashoutDate={myEarnings?.nextCashoutDate} />
+        ) : (
+          <MakeDecision />
+        )
+      ) : (
+        <FinishProfileSetup />
+      )}
     </SContainer>
   );
 };
@@ -156,7 +218,10 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.primary
+      : props.theme.colorsThemed.background.secondary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
@@ -168,72 +233,6 @@ const SContainer = styled.div`
 `;
 
 const STitle = styled(Headline)``;
-
-const SCashOutContainer = styled.div`
-  padding: 16px;
-  display: flex;
-  background: ${(props) => props.theme.colorsThemed.accent.blue};
-  border-radius: 16px;
-  flex-direction: column;
-
-  ${(props) => props.theme.media.tablet} {
-    align-items: center;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-`;
-
-const SCashOutTopBlock = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-`;
-
-const SDescriptionWrapper = styled.div`
-  p {
-    display: inline;
-  }
-`;
-
-const SAmount = styled(Text)`
-  color: ${(props) => props.theme.colors.white};
-  margin-left: 4px;
-`;
-
-const SDescription = styled(Text)`
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 8px;
-`;
-
-const SButton = styled(Button)`
-  width: 100%;
-  color: ${(props) => props.theme.colors.black};
-  padding: 16px 20px;
-  margin-top: 16px;
-  background: ${(props) => props.theme.colors.white};
-
-  &:after {
-    display: none;
-  }
-
-  &:focus:enabled,
-  &:hover:enabled {
-    background: ${(props) => props.theme.colors.white};
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    width: unset;
-    padding: 12px 24px;
-    margin-top: unset;
-    margin-left: 16px;
-  }
-`;
-
-const SInlineSVG = styled(InlineSVG)`
-  min-width: 48px;
-  min-height: 48px;
-  margin-right: 8px;
-`;
 
 const SHeaderLine = styled.div`
   display: flex;
@@ -273,7 +272,9 @@ const STotal = styled(Headline)`
   margin-right: 8px;
 `;
 
-const STotalText = styled(Text)``;
+const STotalText = styled(Text)`
+  font-size: 14px;
+`;
 
 const STotalInsights = styled.div`
   cursor: pointer;
@@ -282,17 +283,17 @@ const STotalInsights = styled.div`
   flex-direction: row;
 `;
 
-const STotalInsightsText = styled.div`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
-  font-size: 14px;
-  line-height: 24px;
-  margin-right: 4px;
-`;
+// const STotalInsightsText = styled.div`
+//   color: ${(props) => props.theme.colorsThemed.text.secondary};
+//   font-size: 14px;
+//   line-height: 24px;
+//   margin-right: 4px;
+// `;
 
-const STotalInsightsArrow = styled(InlineSVG)`
-  min-width: 24px;
-  min-height: 24px;
-`;
+// const STotalInsightsArrow = styled(InlineSVG)`
+//   min-width: 24px;
+//   min-height: 24px;
+// `;
 
 const SListHolder = styled.div`
   left: -8px;

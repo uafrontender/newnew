@@ -43,6 +43,9 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   const handleRedirectToUser = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
     router.push(`/u/${option.creator?.username!!}`);
   };
 
@@ -268,10 +271,6 @@ const SWinnerOptionCard = styled.div`
     height: fit-content;
 
     padding: 24px;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
   }
 `;
 

@@ -1,9 +1,11 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useMemo, useRef, useState } from 'react';
-import moment from 'moment';
+import React, { useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import moment from 'moment';
 
 import Button from '../Button';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
@@ -11,7 +13,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
-import { useOnClickOutside } from '../../../utils/hooks/useOnClickOutside';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 
 const CommentEllipseMenu = dynamic(() => import('../../molecules/decision/CommentEllipseMenu'));
@@ -34,8 +35,10 @@ const Comment: React.FC<IComment> = ({
   handleAddComment,
   handleDeleteComment,
 }) => {
-  const { t } = useTranslation('decision');
   const theme = useTheme();
+  const router = useRouter();
+  const { t } = useTranslation('decision');
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -48,14 +51,13 @@ const Comment: React.FC<IComment> = ({
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
+  const isMyComment = useMemo(() => (
+    user.loggedIn && user.userData?.userUuid === comment.sender?.uuid
+  ), [user.loggedIn, user.userData?.userUuid, comment.sender?.uuid])
+
   const replies = useMemo(() => (
     comment.replies ?? []
   ), [comment.replies]);
-
-  const formRef: any = useRef();
-  useOnClickOutside(formRef, () => {
-    setIsReplyFormOpen(false);
-  });
 
   const onUserReport = () => {
     setConfirmReportUser(true);
@@ -63,10 +65,17 @@ const Comment: React.FC<IComment> = ({
 
   const onDeleteComment = () => {
     setConfirmDeleteComment(true);
-  }
+  };
 
   const replyHandler = () => {
     setIsReplyFormOpen(!isReplyFormOpen);
+  };
+
+  const handleRedirectToUser = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${comment.sender?.username}`);
   };
 
   return (
@@ -74,14 +83,33 @@ const Comment: React.FC<IComment> = ({
       <SComment
         key={(comment.id).toString()}
       >
-        <SUserAvatar avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''} />
-        <SCommentContent ref={formRef}>
+        {!comment.isDeleted ? (
+          <SUserAvatar
+            avatarUrl={comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''}
+            onClick={() => handleRedirectToUser()}
+          />
+          ) : (
+          <SUserAvatar
+            avatarUrl=''
+            onClick={() => {}}
+          />
+        )}
+        <SCommentContent>
           <SCommentHeader>
-            <SNickname>{comment.sender?.nickname}</SNickname>
+            <SNickname>
+              {!comment.isDeleted ? (
+                comment.sender?.uuid === user.userData?.userUuid ? t('comments.me') : (comment.sender?.nickname ?? comment.sender?.username)
+              ) : (
+                t('comments.comment_deleted')
+              )}
+            </SNickname>
             <SBid>
               {' '}
             </SBid>
-            <SDate> &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')}</SDate>
+            <SDate>
+              {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
+              &bull; {moment(comment.createdAt?.seconds as number * 1000).fromNow()}
+            </SDate>
             <SActionsDiv>
               <SMoreButton
                 view="transparent"
@@ -97,7 +125,7 @@ const Comment: React.FC<IComment> = ({
               {!isMobile && (
                 <CommentEllipseMenu
                   isVisible={ellipseMenuOpen}
-                  canDeleteComment={canDeleteComment ?? false}
+                  canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
                   onUserReport={onUserReport}
@@ -110,9 +138,14 @@ const Comment: React.FC<IComment> = ({
             !isReplyFormOpen ? (
               <SReply onClick={replyHandler}>{t('comments.send-reply')}</SReply>
             ) : (
-              <CommentForm
-                onSubmit={(newMsg: string) => handleAddComment(newMsg)}
-              />
+              <>
+                {replies.length === 0 ? (
+                  <SReply onClick={replyHandler}>{t('comments.hide-replies')}</SReply>
+                ) : null}
+                <CommentForm
+                  onSubmit={(newMsg: string) => handleAddComment(newMsg)}
+                />
+              </>
             )
           )}
           {!comment.parentId && replies && replies.length > 0 && (
@@ -126,10 +159,10 @@ const Comment: React.FC<IComment> = ({
           {isReplyFormOpen && replies && replies.map((item) => (
             <Comment
               key={(item.id).toString()}
-              canDeleteComment={canDeleteComment}
+              canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
               comment={item}
               handleAddComment={(newMsg: string) => handleAddComment(newMsg)}
-              handleDeleteComment={() => handleDeleteComment(item as TCommentWithReplies)}
+              handleDeleteComment={handleDeleteComment}
             />
             )
           )}
@@ -153,7 +186,7 @@ const Comment: React.FC<IComment> = ({
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={16}
-          canDeleteComment={canDeleteComment ?? false}
+          canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
           onClose={handleCloseEllipseMenu}
           onUserReport={onUserReport}
           onDeleteComment={onDeleteComment}

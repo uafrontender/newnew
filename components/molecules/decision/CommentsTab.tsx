@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import moment from 'moment';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -48,13 +47,17 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   // Scrolling gradients
   const scrollRef: any = useRef();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   // Infinite load
   const {
     ref: loadingRef,
     inView,
   } = useInView();
+
+  // Submit form ref
+  const commentFormRef = useRef<HTMLFormElement>();
+  const [heightDelta, setHeightDelta] = useState(70);
 
   // Comments
   const [comments, setComments] = useState<TCommentWithReplies[]>([]);
@@ -84,14 +87,16 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         lastParentId = workingItem.parentId;
         lastParentIdx = goalArr.findIndex((o) => o.id === workingItem.parentId);
 
-        if (!goalArr[lastParentIdx].replies) {
-          goalArr[lastParentIdx].replies = []
+        if (lastParentIdx !== -1) {
+          if (!goalArr[lastParentIdx].replies) {
+            goalArr[lastParentIdx].replies = []
+          }
+
+          // @ts-ignore
+          const workingSubarr = [...goalArr[lastParentIdx].replies];
+
+          goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
         }
-
-        // @ts-ignore
-        const workingSubarr = [...goalArr[lastParentIdx].replies];
-
-        goalArr[lastParentIdx].replies = [...workingSubarr, workingItem];
       }
     });
 
@@ -121,8 +126,6 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data && res.data.messages) {
-          // console.log(res.data.messages)
-
           setComments((curr) => {
             const workingArr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
 
@@ -181,19 +184,28 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     }
   }, [commentsRoomId]);
 
-  const deleteCommentIterativelyById = useCallback((comment: TCommentWithReplies) => {
+  const markCommentAsDeleted = useCallback((comment: TCommentWithReplies) => {
     setComments((curr) => {
       const workingArr = [...curr];
 
       if (!comment.parentId || comment.parentId === 0) {
-        return workingArr.filter((c) => c.id !== comment.id)
+        const commentIdx = workingArr.findIndex((c) => c.id === comment.id);
+        if (commentIdx === -1) return workingArr;
+        workingArr[commentIdx].isDeleted = true;
+        workingArr[commentIdx].content!!.text = '';
+        return workingArr;
       }
 
       const parentIdx = workingArr.findIndex((c) => c.id === comment.parentId);
 
-      if (!parentIdx || parentIdx === -1) return workingArr;
+      if (parentIdx === -1) return workingArr;
 
-      workingArr[parentIdx].replies = workingArr[parentIdx].replies?.filter((c) => c.id !== comment.id);
+      const commentIdx = workingArr[parentIdx].replies?.findIndex((c) => c.id === comment.id);
+
+      if (commentIdx === -1) return workingArr;
+
+      workingArr[parentIdx].replies!![commentIdx!!].isDeleted = true;
+      workingArr[parentIdx].replies!![commentIdx!!].content!!.text = '';
 
       return workingArr;
     });
@@ -208,12 +220,12 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       const res = await deleteMessage(payload);
 
       if (!res.error) {
-        deleteCommentIterativelyById(comment);
+        markCommentAsDeleted(comment);
       }
     } catch (err) {
       console.log(err);
     }
-  }, [deleteCommentIterativelyById]);
+  }, [markCommentAsDeleted]);
 
   useEffect(() => {
     fetchComments();
@@ -222,7 +234,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   useEffect(() => {
     if (inView && !commentsLoading && commentsNextPageToken) {
-      console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
+      // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
       fetchComments(commentsNextPageToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -244,14 +256,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (decoded.newMessage!!.sender?.uuid!! !== user.userData?.userUuid) {
-        console.log('Adding comment from socket');
 
         setComments((curr) => {
           const workingArr = [...curr];
 
           if (decoded.newMessage?.parentId && decoded.newMessage !== 0) {
-            console.log('Searching for parent comment')
-
             const parentMsgIdx = workingArr.findIndex((msg) => msg.id === decoded.newMessage?.parentId);
 
             if (parentMsgIdx === -1 || !workingArr[parentMsgIdx]) return workingArr;
@@ -263,24 +272,34 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             // @ts-ignore
             const workingSubarr = [...workingArr[parentMsgIdx].replies];
 
+            // NB! Fix
             workingArr[parentMsgIdx].replies = [(decoded.newMessage as newnewapi.ChatMessage), ...workingSubarr];
 
             return workingArr;
           }
-          console.log('Adding comment directly');
 
           return [decoded.newMessage, ...workingArr] as TCommentWithReplies[];
         })
       }
     };
 
+    const socketHandlerMessageDeleted = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageDeleted.decode(arr);
+      if (decoded.deletedMessage) {
+        markCommentAsDeleted(decoded.deletedMessage as TCommentWithReplies);
+      }
+    };
+
     if (socketConnection) {
       socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection.on('ChatMessageDeleted', socketHandlerMessageDeleted);
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
         socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+        socketConnection.off('ChatMessageDeleted', socketHandlerMessageDeleted);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -297,6 +316,21 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     []
   );
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entry) => {
+      const size = entry[0]?.borderBoxSize
+        ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
+      if (size) {
+        setHeightDelta(size);
+      }
+    });
+
+    if (commentFormRef.current) {
+      resizeObserver.observe(commentFormRef.current!!);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <STabContainer
@@ -304,10 +338,14 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        ref={scrollRef}
       >
-        <SActionSection>
+        <SActionSection
+          ref={scrollRef}
+        >
           <CommentForm
+            ref={(el) => {
+              commentFormRef.current = el!!;
+            }}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
           <SCommentsWrapper>
@@ -326,6 +364,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             {!isMobile && (
               <SLoaderDiv
                 ref={loadingRef}
+                style={{
+                  ...(commentsLoading ? {
+                    display: 'none'
+                  } : {}),
+                }}
               />
             )}
             {isMobile && comments && (
@@ -344,8 +387,8 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             )}
           </SCommentsWrapper>
         </SActionSection>
-        <GradientMask positionTop active={showTopGradient} />
-        <GradientMask active={showBottomGradient} />
+        <GradientMask gradientType="secondary" positionTop={heightDelta} active={showTopGradient} />
+        <GradientMask gradientType="secondary" active={showBottomGradient} />
       </STabContainer>
     </>
   );
@@ -360,7 +403,6 @@ export default CommentsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  padding-right: 20px;
   height: calc(100% - 50px);
   align-self: flex-end;
 
@@ -372,12 +414,45 @@ const STabContainer = styled(motion.div)`
 const SActionSection = styled.div`
   padding-right: 0;
   height: 100%;
+
+  max-height: 500px;
+
   overflow: hidden;
   &:hover {
     overflow-y: auto;
   }
-  ${(props) => props.theme.media.desktop} {
-    padding-right: 24px;
+
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    transition: .2s linear;
+
+    background: blue;
+
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: .2s linear;
+
+    background: blue;
+
+  }
+
+  &:hover {
+    &::-webkit-scrollbar-track {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    }
   }
 `;
 

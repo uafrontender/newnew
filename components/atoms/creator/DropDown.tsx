@@ -17,22 +17,17 @@ import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 type TItem = {
   id: string;
   label: string;
-}
+};
 
 interface IDropDown {
-  value: string,
-  options: TItem[],
+  value: string;
+  options: TItem[];
   disabled?: boolean;
   handleChange: (id: string) => void;
 }
 
 export const DropDown: React.FC<IDropDown> = (props) => {
-  const {
-    value,
-    options,
-    disabled,
-    handleChange,
-  } = props;
+  const { value, options, disabled, handleChange } = props;
   const { t } = useTranslation();
   const theme = useTheme();
   const ref: any = useRef();
@@ -53,25 +48,29 @@ export const DropDown: React.FC<IDropDown> = (props) => {
   const handleCloseClick = () => {
     setFocused(false);
   };
-  const renderItem = useCallback((item: TItem) => {
-    const selected = value === item.id;
-    const handleItemClick = () => {
-      handleChange(item.id);
-    };
+  const renderItem = useCallback(
+    (item: TItem) => {
+      const selected = value === item.id;
+      const handleItemClick = () => {
+        handleChange(item.id);
+        handleCloseClick();
+      };
 
-    return (
-      <SButton
-        key={`dd-option-${item.id}`}
-        view={selected ? 'modalSecondarySelected' : 'modalSecondary'}
-        onClick={handleItemClick}
-        selected={selected}
-      >
-        <SItemTitle variant={3} weight={600}>
-          {item.label}
-        </SItemTitle>
-      </SButton>
-    );
-  }, [value, handleChange]);
+      return (
+        <SButton
+          key={`dd-option-${item.id}`}
+          view={selected ? 'modalSecondarySelected' : 'modalSecondary'}
+          onClick={handleItemClick}
+          selected={selected}
+        >
+          <SItemTitle variant={3} weight={600}>
+            {item.label}
+          </SItemTitle>
+        </SButton>
+      );
+    },
+    [value, handleChange]
+  );
 
   useOnClickEsc(ref, handleCloseClick);
   useOnClickOutside(ref, () => {
@@ -82,13 +81,8 @@ export const DropDown: React.FC<IDropDown> = (props) => {
 
   return (
     <SContainer ref={ref}>
-      <SLabelButton
-        onClick={handleDropDownClick}
-        disabled={disabled ?? false}
-      >
-        <span>
-          {selectedItem?.label}
-        </span>
+      <SLabelButton onClick={handleDropDownClick} disabled={disabled ?? false}>
+        <span>{selectedItem?.label}</span>
         <SInlineSVG
           svg={ArrowDown}
           fill={theme.colorsThemed.text.secondary}
@@ -100,23 +94,14 @@ export const DropDown: React.FC<IDropDown> = (props) => {
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>
-              {options.map(renderItem)}
-            </SMobileList>
-            <SCancelButton
-              view="modalSecondary"
-              onClick={handleCloseClick}
-            >
+            <SMobileList>{options.map(renderItem)}</SMobileList>
+            <SCancelButton view="modalSecondary" onClick={handleCloseClick}>
               {t('button-cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
       ) : (
-        <SListHolder
-          height={ddHeight}
-          focused={focused}
-          direction={direction}
-        >
+        <SListHolder height={ddHeight} focused={focused} direction={direction}>
           {options.map(renderItem)}
         </SListHolder>
       )}
@@ -231,11 +216,13 @@ const SLabelButton = styled.button`
   justify-content: space-between;
   align-items: center;
 
-
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.primary
+      : props.theme.colorsThemed.background.secondary};
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   font-size: 14px;
@@ -256,7 +243,7 @@ const SLabelButton = styled.button`
     margin-right: 4px;
   }
 
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   &:focus {
     outline: none;
@@ -266,7 +253,10 @@ const SLabelButton = styled.button`
   &:focus:active {
     cursor: pointer;
 
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colorsThemed.background.primary
+        : props.theme.colorsThemed.background.secondary};
   }
 
   &:disabled {

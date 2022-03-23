@@ -115,15 +115,17 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         nameToken: 'subscriptions',
         url: '/profile/subscriptions',
       },
-      {
-        nameToken: 'myposts',
-        url: '/profile/my-posts',
-      },
+      ...(user.userData?.options?.isCreator ? [
+        {
+          nameToken: 'myposts',
+          url: '/profile/my-posts',
+        },
+      ] : []),
       {
         nameToken: 'favorites',
         url: '/profile/favorites',
       },
-    ]), []);
+    ]), [user.userData?.options?.isCreator]);
 
   // Show skeleton on route change
   // const [routeChangeLoading, setRouteChangeLoading] = useState(false);
@@ -522,6 +524,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   //   };
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
+
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/profile/settings');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ErrorBoundary>

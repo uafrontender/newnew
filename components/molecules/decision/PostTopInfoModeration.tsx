@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { cancelMyPost } from '../../../api/endpoints/post';
+import { deleteMyPost } from '../../../api/endpoints/post';
 
 import { TPostType } from '../../../utils/switchPostType';
 
@@ -77,15 +77,15 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
 
   const handleDeletePost = async () => {
     try {
-      const payload = new newnewapi.CancelMyPostRequest({
+      const payload = new newnewapi.DeleteMyPostRequest({
         postUuid: postId,
       });
 
-      const res = await cancelMyPost(payload);
+      const res = await deleteMyPost(payload);
 
       if (!res.error) {
         console.log('Post deleted/cancelled');
-        handleUpdatePostStatus('CANCELLED');
+        handleUpdatePostStatus('DELETED');
         handleCloseDeletePostModal();
       }
     } catch (err) {
@@ -381,10 +381,6 @@ const SSelectWinnerOption = styled.div`
 
     margin-top: 32px;
 
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    width: calc(100% - 16px);
   }
 `;
 
