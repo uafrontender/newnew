@@ -18,7 +18,12 @@ const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
   const user = useAppSelector((state) => state.user);
   const createdAtParsed = new Date((bid.createdAt?.seconds as number) * 1000);
 
-  const handleRedirectToUser = () => router.push(`/u/${bid.bidder?.username}`);
+  const handleRedirectToUser = () => {
+    window?.history.replaceState({
+      fromPost: true,
+    }, '', '');
+    router.push(`/u/${bid.bidder?.username}`);
+  }
 
   return (
     <motion.div

@@ -114,6 +114,12 @@ export const HeroSection = () => {
     }, 0);
   }, []);
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/sign-up');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <SWrapper>
       <STopWrapper>
@@ -165,6 +171,7 @@ export const HeroSection = () => {
                 withRipple
                 withShadow
                 view="primaryGrad"
+                customDebounce={0}
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}

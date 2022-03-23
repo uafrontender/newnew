@@ -40,6 +40,12 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
     }
   };
 
+  // Try to pre-fetch the content
+  useEffect(() => {
+    router.prefetch('/creator-onboarding-stage-2');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <Head>

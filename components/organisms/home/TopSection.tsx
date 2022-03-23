@@ -230,9 +230,12 @@ const SListWrapper = styled.div`
   overflow-y: hidden;
   margin-top: 24px;
 
+  /* Hide scrollbar */
   ::-webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
     left: -32px;

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { formatNumber } from '../../../utils/format';
 
 interface IBidAmountTextInput {
   value: string;
@@ -24,7 +25,10 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>();
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value.slice(1);
+    const newValue = value.length > 0
+      ? e.target.value
+        .slice(1).split(',').filter((v) => v !== ',').join('')
+      : e.target.value;
     if (/[^0-9]/.test(newValue)) return;
 
     // @ts-ignore
@@ -41,11 +45,13 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        value={`$${value}`}
+        value={
+          value ? `$${formatNumber(parseInt(value, 10), true)}` : value
+        }
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode="numeric"
-        placeholder={minAmount.toString()}
+        placeholder={`$${minAmount.toString()}`}
         onChange={handleOnChange}
         style={style ?? {}}
       />

@@ -117,6 +117,13 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     font-size: 16px;
     line-height: 24px;
 
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     border-width: 1.5px;
     border-style: solid;
@@ -167,7 +174,8 @@ const SCharCounter = styled.div`
   font-size: 16px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  background: ${({ theme }) => (theme.name === 'light' ? 'rgba(241, 243, 249, 0.8)' : 'rgba(20, 21, 31, 0.8)')};
+  /* background: ${({ theme }) => (theme.name === 'light' ? 'rgba(241, 243, 249, 0.8)' : 'rgba(20, 21, 31, 0.8)')}; */
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 `;
 
 const SErrorDiv = styled.div`

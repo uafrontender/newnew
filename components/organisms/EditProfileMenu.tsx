@@ -946,6 +946,13 @@ const SEditProfileMenu = styled(motion.div)`
   width: 100%;
   height: 100%;
 
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.tablet} {
