@@ -279,7 +279,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SBiddersInfo variant={3}>
             <SSpanBiddersHighlighted
               className="spanHighlighted"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (!isMyBid) {
                   handleRedirectToOptionCreator();
                 }

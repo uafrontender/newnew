@@ -294,7 +294,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             ) : (
               <>
                 <SSpanBiddersHighlighted
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     handleRedirectToOptionCreator()
                   }}
                   style={{

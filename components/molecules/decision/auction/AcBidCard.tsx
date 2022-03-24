@@ -43,7 +43,10 @@ const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
     >
       <SCardWrapper>
         <SAvatar
-          onClick={() => handleRedirectToUser()}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRedirectToUser();
+          }}
         >
           <img
             src={bid.bidder?.avatarUrl!! as string}
