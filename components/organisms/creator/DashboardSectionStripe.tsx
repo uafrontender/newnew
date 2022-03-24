@@ -113,30 +113,21 @@ export default DashboardSectionStripe;
 const SContainer = styled.div`
   padding-left: 16px;
   padding-right: 16px;
-
   padding-bottom: 88px;
-
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 0;
-
-    padding-left: 152px;
-    padding-right: 152px;
-
-    margin-bottom: 44px;
-
-    margin-top: 114px;
+    padding: 127px 32px 44px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: fit-content;
-
-    padding-left: 0;
-    padding-right: 104px;
-
-    margin-bottom: 190px;
-    margin-top: 44px;
+    padding: 44px 0 19px;
+  }
+  ${({ theme }) => theme.media.desktop} {
+    padding: 44px 0 19px;
   }
 `;
 
@@ -144,13 +135,14 @@ const SGoBackButton = styled(GoBackButton)`
   padding-top: 16px;
   padding-bottom: 22px;
   margin-left: -4px;
+  display: flex;
 `;
 
 const SControlsDiv = styled.div`
   width: 100%;
-  margin-top: 80%;
+  margin-top: auto;
 
-  display: flex;
+  display: none;
   justify-content: space-between;
 
   button {
@@ -159,12 +151,8 @@ const SControlsDiv = styled.div`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    position: static;
-    margin-top: 24px;
-
-    margin-left: initial;
     width: 100%;
-
+    display: flex;
     button {
       width: 170px;
       height: 48px;
@@ -172,7 +160,11 @@ const SControlsDiv = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-top: 80%;
+    padding-right: 60px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
+    padding-right: 130px;
   }
 `;
 
@@ -181,6 +173,7 @@ const SHeadline = styled(Headline)`
   align-items: flex-start;
   font-weight: 600;
   margin-bottom: 40px;
+  font-size: 24px;
 
   span {
     position: relative;
@@ -242,5 +235,18 @@ const SButtonUpdate = styled(SButton)`
         ? props.theme.colorsThemed.background.secondary
         : props.theme.colors.white} !important;
     color: #434956;
+  }
+
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  margin: 0 16px;
+  width: calc(100% - 32px);
+
+  ${({ theme }) => theme.media.tablet} {
+    position: static;
+    width: auto;
+    margin: 0 0 24px;
+    text-align: center;
   }
 `;

@@ -25,6 +25,7 @@ const SCreatorStripeLayout = styled.div`
 
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
 `;
 
 const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({ hideProgressBar, children }) => {
@@ -108,7 +109,7 @@ const SContentContainer = styled.div`
   height: 100%;
 
   ${({ theme }) => theme.media.laptop} {
-    width: 706px;
+    width: 50%;
     left: unset;
     right: 0;
   }
