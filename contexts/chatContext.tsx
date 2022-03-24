@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, createContext, useContext, useMemo, useState } from 'react';
+import React, { useEffect, createContext, useContext, useMemo, useState, useCallback } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
@@ -19,6 +19,14 @@ export const ChatsProvider: React.FC = ({ children }) => {
 
   const socketConnection = useContext(SocketContext);
 
+  const setData = (data: newnewapi.TotalUnreadMessageCounts) => {
+    if (data.unreadCountForCreator) setUnreadCountForCreator(data.unreadCountForCreator);
+    if (data.unreadCountForUser) setUnreadCountForUser(data.unreadCountForUser);
+
+    if (data.unreadCountForCreator || data.unreadCountForUser)
+      setUnreadCount(data.unreadCountForCreator + data.unreadCountForUser);
+  };
+
   useEffect(() => {
     async function getUnread() {
       if (!user.loggedIn) return;
@@ -27,13 +35,7 @@ export const ChatsProvider: React.FC = ({ children }) => {
         const payload = new newnewapi.EmptyRequest();
         const res = await getTotalUnreadMessageCounts(payload);
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        console.log(res.data);
-
-        if (res.data.unreadCountForCreator) setUnreadCountForCreator(res.data.unreadCountForCreator);
-        if (res.data.unreadCountForUser) setUnreadCountForUser(res.data.unreadCountForUser);
-
-        if (res.data.unreadCountForCreator || res.data.unreadCountForUser)
-          setUnreadCount(res.data.unreadCountForCreator + res.data.unreadCountForUser);
+        setData(res.data);
       } catch (err) {
         console.error(err);
         // setLoadingRooms(false);
@@ -45,15 +47,14 @@ export const ChatsProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     const socketHandlerMessageCreated = async (data: any) => {
-      console.log('1');
       const arr = new Uint8Array(data);
-      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      const decoded = newnewapi.ChatUnreadCountsChanged.decode(arr);
       if (!decoded) return;
+      setData(decoded.chatUnreadCounts as newnewapi.TotalUnreadMessageCounts);
     };
 
     if (socketConnection) {
-      console.log('1');
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+      socketConnection.on('ChatUnreadCountsChanged', socketHandlerMessageCreated);
     }
   }, [socketConnection]);
 

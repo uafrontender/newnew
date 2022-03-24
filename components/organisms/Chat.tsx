@@ -55,10 +55,6 @@ export const Chat = () => {
     setSearchText(str);
   };
 
-  const gotNewMessage = (msg: newnewapi.IChatMessage | null | undefined) => {
-    setNewMessage(msg);
-  };
-
   return (
     <SContainer>
       <SSidebar hidden={chatListHidden !== undefined && chatListHidden}>
@@ -77,10 +73,10 @@ export const Chat = () => {
           />
           <NewMessage openChat={openChat} />
         </SToolbar>
-        <ChatList searchText={searchText} openChat={openChat} gotNewMessage={gotNewMessage} />
+        <ChatList searchText={searchText} openChat={openChat} />
       </SSidebar>
       <SContent>
-        <ChatArea {...chatData} showChatList={showChatList} newMessage={newMessage} />
+        <ChatArea {...chatData} showChatList={showChatList} />
       </SContent>
     </SContainer>
   );

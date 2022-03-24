@@ -1,16 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { toNumber } from 'lodash';
-
+import { useInView } from 'react-intersection-observer';
 import UserAvatar from '../UserAvatar';
 import textTrim from '../../../utils/textTrim';
-
 import { IChatData } from '../../interfaces/ichat';
 
 import {
@@ -26,49 +25,35 @@ import {
 } from '../../atoms/chat/styles';
 import randomID from '../../../utils/randomIdGenerator';
 import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
-import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { useAppSelector } from '../../../redux-store/store';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import InlineSVG from '../../atoms/InlineSVG';
+import { useGetChats } from '../../../contexts/chatContext';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
-  gotNewMessage: (newMessage: newnewapi.IChatMessage | null | undefined) => void;
   searchText: string;
 }
 
-interface IUnreadChatRoom {
-  id: number;
-  count: number;
-  text: string;
-}
-
-export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, searchText }) => {
+export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const { newSubscriber } = useGetSubscriptions();
+  const { unreadCount, unreadCountForCreator, unreadCountForUser } = useGetChats();
+  const { ref: scrollRef, inView } = useInView();
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('chatRooms');
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(null);
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<string | undefined | null>('');
   const [parsingRooms, setParsingRooms] = useState<boolean | null>(null);
   const [chatRoomsCreators, setChatRoomsCreators] = useState<newnewapi.IChatRoom[]>([]);
   const [chatRoomsSubs, setChatRoomsSubs] = useState<newnewapi.IChatRoom[]>([]);
-
   const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
-
-  const [unreadChatRooms, setUnreadChatRooms] = useState<IUnreadChatRoom[]>([]);
-  const [chatRoomsUnreadCount, setChatRoomsUnreadCount] = useState<number>(0);
-  const [chatRoomsCreatorsUnreadCount, setChatRoomsCreatorsUnreadCount] = useState<number>(0);
-  const [chatRoomsSubsUnreadCount, setChatRoomsSubsUnreadCount] = useState<number>(0);
-
-  const [newSubscriberLocal, setNewSubscriberLocal] = useState<newnewapi.ICreatorSubscriptionChanged>({});
+  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(null);
 
   const tabTypes = useMemo(
     () => [
@@ -89,8 +74,6 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
   );
 
   // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   async function markChatAsRead(id: number) {
     try {
@@ -104,40 +87,99 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
     }
   }
 
-  useEffect(() => {
-    async function fetchMyRooms() {
+  const fetchMyRooms = useCallback(
+    async (pageToken?: string) => {
+      if (loadingRooms) return;
       try {
+        if (!pageToken) setChatRooms([]);
         setLoadingRooms(true);
-        const payload = new newnewapi.GetMyRoomsRequest({ paging: { limit: 20 } });
+        const payload = new newnewapi.GetMyRoomsRequest({
+          paging: {
+            limit: 10,
+            pageToken,
+          },
+        });
         const res = await getMyRooms(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setChatRooms(res.data.rooms);
-        console.log(res.data.rooms);
 
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data && res.data.rooms.length > 0) {
+          setChatRooms((curr) => {
+            const arr = [...curr!!];
+            res.data?.rooms.forEach((chat) => {
+              const emptyMassUpdateFromCreator = chat.kind === 4 && chat.myRole === 1 && !chat.lastMessage;
+              if (!emptyMassUpdateFromCreator) arr.push(chat);
+            });
+            return arr;
+          });
+          setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
+        }
+        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken) setChatRoomsNextPageToken(null);
         setLoadingRooms(false);
       } catch (err) {
         console.error(err);
         setLoadingRooms(false);
       }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loadingRooms]
+  );
+
+  const fetchLastActiveRoom = async () => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        paging: {
+          limit: 1,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.rooms.length > 0) {
+        setUpdatedChat(res.data.rooms[0]);
+      }
+    } catch (err) {
+      console.error(err);
     }
-    if (!chatRooms && !loadingRooms) {
+  };
+
+  useEffect(() => {
+    if (!chatRooms) {
       fetchMyRooms();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Cleanup
-  useEffect(
-    () => () => {
-      if (chatRooms) {
-        chatRooms.forEach((chat) => {
-          if (chat.id) removeChannel(`chat_${chat.id.toString()}`);
-        });
-      }
-    },
+  useEffect(() => {
+    if (chatRooms && !searchedRooms) {
+      fetchLastActiveRoom();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chatRooms]
-  );
+  }, [unreadCount, searchedRooms]);
+
+  useEffect(() => {
+    if (updatedChat) {
+      const isAlreadyAdded = chatRooms?.findIndex((chat) => chat.id === updatedChat.id);
+      if (isAlreadyAdded !== undefined) {
+        const arr = chatRooms;
+        arr?.splice(isAlreadyAdded, 1);
+        if (updatedChat.id!!.toString() === activeChatIndex) {
+          arr?.splice(0, 0, updatedChat);
+        } else {
+          arr?.splice(1, 0, updatedChat);
+        }
+        setChatRooms(arr);
+        setUpdatedChat(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updatedChat]);
+
+  useEffect(() => {
+    if (inView && !loadingRooms && chatRoomsNextPageToken) {
+      fetchMyRooms(chatRoomsNextPageToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
   useEffect(() => {
     if (searchText) {
@@ -157,136 +199,34 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
   }, [searchText, chatRooms, searchedRooms]);
 
   useEffect(() => {
-    if (chatRooms && parsingRooms === null && socketConnection) {
+    if (chatRooms && parsingRooms === null) {
       if (chatRooms[0]) {
-        setActiveChatIndex(chatRooms[0].id!!.toString());
+        if (activeChatIndex !== chatRooms[0].id!!.toString()) {
+          setActiveChatIndex(chatRooms[0].id!!.toString());
+          openChat({ chatRoom: chatRooms[0], showChatList: null });
+        }
 
         setParsingRooms(true);
         const subsArr: newnewapi.IChatRoom[] = [];
         const creatorsArr: newnewapi.IChatRoom[] = [];
-        const unreadChats: IUnreadChatRoom[] = [];
-        let unreadCount = chatRoomsUnreadCount;
-        let unreadCreatorsCount = chatRoomsCreatorsUnreadCount;
-        let unreadSubsCount = chatRoomsSubsUnreadCount;
-
-        chatRooms.forEach((chat, index) => {
-          if (chat.unreadMessageCount) {
-            if (index !== 0) {
-              unreadCount += chat.unreadMessageCount;
-              unreadChats.push({
-                id: toNumber(chat.id),
-                count: chat.unreadMessageCount,
-                text: chat.lastMessage?.content?.text ? chat.lastMessage?.content?.text : '',
-              });
-            } else {
-              markChatAsRead(toNumber(chat.id));
-            }
-          }
-          if (chat.id) {
-            addChannel(`chat_${chat.id.toString()}`, {
-              chatRoomUpdates: {
-                chatRoomId: chat.id,
-              },
-            });
-          }
-
+        chatRooms.forEach((chat) => {
           // I am a creator
           if (chat.myRole === 2) {
             subsArr.push(chat);
-            if (index !== 0 && !!chat.unreadMessageCount) unreadSubsCount += chat.unreadMessageCount;
           }
           // I am a subscriber
           if (chat.myRole === 1) {
-            if (index !== 0 && !!chat.unreadMessageCount) unreadCreatorsCount += chat.unreadMessageCount;
             creatorsArr.push(chat);
           }
         });
 
-        openChat({ chatRoom: chatRooms[0], showChatList: null });
-        setChatRoomsUnreadCount(unreadCount);
-        setChatRoomsCreatorsUnreadCount(unreadCreatorsCount);
-        setChatRoomsSubsUnreadCount(unreadSubsCount);
-
-        setUnreadChatRooms(unreadChats);
         setChatRoomsSubs(subsArr);
         setChatRoomsCreators(creatorsArr);
         setParsingRooms(false);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatRooms, socketConnection, addChannel]);
-
-  useEffect(() => {
-    const socketHandlerMessageCreated = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      if (decoded) {
-        const senderId = decoded.newMessage?.sender?.uuid;
-        const roomId = decoded.newMessage?.roomId!!.toString();
-        if (roomId === activeChatIndex) {
-          gotNewMessage(decoded.newMessage);
-        } else {
-          /*
-           * update counts of unread messages in not opened rooms
-           * and update count of unread messages in tabs headers
-           */
-          /* eslint-disable no-lonely-if */
-          if (senderId !== user.userData?.userUuid) {
-            const unreadTemp = [...unreadChatRooms];
-            const isUnreadMessages = unreadTemp.findIndex((item) => item.id === toNumber(decoded.roomId));
-
-            if (isUnreadMessages > -1) {
-              unreadTemp[isUnreadMessages].count += 1;
-              unreadTemp[isUnreadMessages].text = decoded.newMessage?.content?.text!!;
-            } else {
-              unreadTemp.push({ id: toNumber(decoded.roomId), count: 1, text: decoded.newMessage?.content?.text!! });
-            }
-
-            setChatRoomsUnreadCount((prevQty) => prevQty + 1);
-            setUnreadChatRooms([...unreadTemp]);
-
-            const isMessageFromCreator = chatRoomsCreators.findIndex((item) => item.id === toNumber(decoded.roomId));
-
-            if (isMessageFromCreator > -1) {
-              setChatRoomsCreatorsUnreadCount((prevQty) => prevQty + 1);
-            } else {
-              setChatRoomsSubsUnreadCount((prevQty) => prevQty + 1);
-            }
-          }
-        }
-      }
-    };
-    if (socketConnection && activeChatIndex) {
-      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, activeChatIndex, unreadChatRooms]);
-
-  // observe messages from new subscribers
-  useEffect(() => {
-    if (newSubscriber !== newSubscriberLocal && socketConnection) {
-      setNewSubscriberLocal(newSubscriber);
-      if (newSubscriber.status?.oneToOneChatRoomId)
-        addChannel(`chat_${newSubscriber.status?.oneToOneChatRoomId.toString()}`, {
-          chatRoomUpdates: {
-            chatRoomId: newSubscriber.status?.oneToOneChatRoomId,
-          },
-        });
-      if (newSubscriber.status?.massUpdateChatRoomId)
-        addChannel(`chat_${newSubscriber.status?.massUpdateChatRoomId.toString()}`, {
-          chatRoomUpdates: {
-            chatRoomId: newSubscriber.status?.massUpdateChatRoomId,
-          },
-        });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newSubscriber]);
+  }, [chatRooms]);
 
   const isActiveChat = useCallback(
     (chat: newnewapi.IChatRoom) => activeChatIndex === chat.id!!.toString(),
@@ -295,32 +235,18 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
+      const localChat = chat;
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
         setActiveChatIndex(chat.id!!.toString());
         openChat({ chatRoom: chat, showChatList: null });
-        const unreadChat = unreadChatRooms.find((i) => toNumber(chat.id) === i.id);
-        if (unreadChat) {
+        if (chat.unreadMessageCount) {
+          localChat.unreadMessageCount = 0;
           await markChatAsRead(toNumber(chat.id));
-
-          setUnreadChatRooms(unreadChatRooms.filter((item) => item.id !== chat.id));
-          setChatRoomsUnreadCount((val) => val - unreadChat.count);
-
-          switch (chat.myRole) {
-            // I am a creator
-            case 2: {
-              return setChatRoomsSubsUnreadCount((val) => val - unreadChat.count);
-            }
-            // I am a subscriber
-            default: {
-              return setChatRoomsCreatorsUnreadCount((val) => val - unreadChat.count);
-            }
-          }
         }
         return null;
       };
 
-      const emptyMassUpdateFromCreator = chat.kind === 4 && chat.myRole === 1 && !chat.lastMessage;
       let avatar = (
         <SUserAvatar>
           <UserAvatar avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''} />
@@ -352,71 +278,59 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
         )}`;
       }
 
-      const isUnread = unreadChatRooms.find((i) => toNumber(chat.id) === i.id);
-
       let lastMsg = chat.lastMessage?.content?.text;
 
-      if (isUnread) {
-        lastMsg = isUnread.text;
-      } else {
-        if (chat.myRole === 2 && !lastMsg) {
-          if (chat.kind === 4) {
-            lastMsg = textTrim(t('new-announcement.created'));
-          } else {
-            lastMsg = textTrim(t('chat.no-messages-first-line'));
-          }
+      if (chat.myRole === 2 && !lastMsg) {
+        if (chat.kind === 4) {
+          lastMsg = textTrim(t('new-announcement.created'));
+        } else {
+          lastMsg = textTrim(t('chat.no-messages-first-line'));
         }
       }
 
+      const unreadMessageCount =
+        localChat.unreadMessageCount && localChat.unreadMessageCount > 0 ? localChat.unreadMessageCount : 0;
+
       return (
-        !emptyMassUpdateFromCreator && (
-          <SChatItemContainer key={randomID()}>
-            <SChatItem onClick={handleItemClick} className={isActiveChat(chat) ? 'active' : ''}>
-              {avatar}
-              <SChatItemCenter>
-                <SChatItemText variant={3} weight={600}>
-                  {chatName}
-                </SChatItemText>
-                <SChatItemLastMessage variant={3} weight={600}>
-                  {lastMsg}
-                </SChatItemLastMessage>
-              </SChatItemCenter>
-              <SChatItemRight>
-                <SChatItemTime variant={3} weight={600}>
-                  {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
-                </SChatItemTime>
-                {isUnread && <SUnreadCount>{isUnread.count}</SUnreadCount>}
-              </SChatItemRight>
-            </SChatItem>
-            <SChatSeparator />
-          </SChatItemContainer>
-        )
+        <SChatItemContainer key={randomID()}>
+          <SChatItem onClick={handleItemClick} className={isActiveChat(chat) ? 'active' : ''}>
+            {avatar}
+            <SChatItemCenter>
+              <SChatItemText variant={3} weight={600}>
+                {chatName}
+              </SChatItemText>
+              <SChatItemLastMessage variant={3} weight={600}>
+                {lastMsg}
+              </SChatItemLastMessage>
+            </SChatItemCenter>
+            <SChatItemRight>
+              <SChatItemTime variant={3} weight={600}>
+                {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
+              </SChatItemTime>
+              {unreadMessageCount > 0 && <SUnreadCount>{unreadMessageCount}</SUnreadCount>}
+            </SChatItemRight>
+          </SChatItem>
+          <SChatSeparator />
+        </SChatItemContainer>
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      activeChatIndex,
-      chatRoomsUnreadCount,
-      chatRoomsCreatorsUnreadCount,
-      chatRoomsSubsUnreadCount,
-      unreadChatRooms,
-      searchedRooms,
-    ]
+    [activeChatIndex, searchedRooms, chatRooms, updatedChat]
   );
 
   const unreadCountTab = useCallback(
     (e) => {
       switch (e) {
         case 'chatRooms':
-          return chatRoomsUnreadCount !== 0 && chatRoomsUnreadCount;
+          return unreadCount !== 0 && unreadCount;
         case 'chatRoomsSubs':
-          return chatRoomsSubsUnreadCount !== 0 && chatRoomsSubsUnreadCount;
+          return unreadCountForCreator !== 0 && unreadCountForCreator;
         // chatRoomsCreators
         default:
-          return chatRoomsCreatorsUnreadCount !== 0 && chatRoomsCreatorsUnreadCount;
+          return unreadCountForUser !== 0 && unreadCountForUser;
       }
     },
-    [chatRoomsUnreadCount, chatRoomsCreatorsUnreadCount, chatRoomsSubsUnreadCount]
+    [unreadCount, unreadCountForUser, unreadCountForCreator]
   );
 
   const Tabs = useCallback(
@@ -439,6 +353,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, gotNewMessage, se
           <>
             {chatRoomsCreators.length > 0 && chatRoomsSubs.length > 0 && !searchedRooms && <Tabs />}
             {!searchedRooms ? eval(activeTab).map(renderChatItem) : searchedRooms.map(renderChatItem)}
+            {chatRoomsNextPageToken && !searchedRooms && <SRef ref={scrollRef}>Loading...</SRef>}
           </>
         ) : (
           <EmptyInbox />
@@ -533,4 +448,8 @@ const SMyAvatar = styled.div`
   ${SUserAvatar} {
     opacity: ${(props) => (props.theme.name === 'light' ? '1' : '0.5')};
   }
+`;
+
+const SRef = styled.span`
+  text-indent: -9999px;
 `;

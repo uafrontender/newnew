@@ -11,5 +11,4 @@ export interface IChatData {
 
   isNewMessage?: boolean;
   showChatList: { (): void } | null;
-  newMessage?: newnewapi.IChatMessage | null | undefined;
 }

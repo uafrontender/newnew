@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/* eslint-disable consistent-return */
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
@@ -23,6 +24,8 @@ import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { markUser } from '../../../api/endpoints/user';
+import { ChannelsContext } from '../../../contexts/channelsContext';
+import { SocketContext } from '../../../contexts/socketContext';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -34,7 +37,7 @@ const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const ReportUserModal = dynamic(() => import('./ReportUserModal'));
 
-const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) => {
+const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
   const { t } = useTranslation('chat');
   // const scrollRef: any = useRef();
@@ -45,6 +48,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
+
   const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
@@ -52,6 +58,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
   const [isMessagingDisabled, setIsMessagingDisabled] = useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -122,9 +129,39 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
         setIsAnnouncement(false);
         setIsMyAnnouncement(false);
       }
+      if (chatRoom.id) {
+        addChannel(`chat_${chatRoom.id.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: chatRoom.id,
+          },
+        });
+      }
+      return () => {
+        if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
+
+  useEffect(() => {
+    const socketHandlerMessageCreated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      if (decoded) {
+        setNewMessage(decoded.newMessage);
+      }
+    };
+    if (socketConnection) {
+      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   useEffect(() => {
     if (inView && !messagesLoading && messagesNextPageToken) {

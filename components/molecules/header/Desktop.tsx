@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -43,9 +43,6 @@ export const Desktop: React.FC<IDesktop> = () => {
   const handleSignUpClick = () => {
     router.push('/sign-up');
   };
-  useEffect(() => {
-    console.log(unreadCount);
-  }, [unreadCount]);
 
   return (
     <SContainer>
