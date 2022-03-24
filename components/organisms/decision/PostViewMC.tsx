@@ -555,9 +555,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
               options={options}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
-              minAmount={post.votePrice?.usdCents
+              minAmount={2}
+              votePrice={post.votePrice?.usdCents
                 ? (
-                  parseInt((post.votePrice?.usdCents / 100).toFixed(0), 10)
+                  Math.floor(post.votePrice?.usdCents / 100)
                 ) : 1}
               handleLoadOptions={fetchOptions}
               handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}

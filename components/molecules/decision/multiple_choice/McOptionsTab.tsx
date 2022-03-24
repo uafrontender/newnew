@@ -36,6 +36,7 @@ interface IMcOptionsTab {
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
+  votePrice: number;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
@@ -46,6 +47,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   optionsLoading,
   pagingToken,
   minAmount,
+  votePrice,
   handleLoadOptions,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -346,6 +348,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 postId={post.postUuid}
                 index={i}
                 minAmount={minAmount}
+                votePrice={votePrice}
                 optionBeingSupported={optionBeingSupported}
                 noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
@@ -386,19 +389,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               inputAlign="left"
               disabled={optionBeingSupported !== ''}
               placeholder={
-                newBidAmount && parseInt(newBidAmount, 10) > 1
+                !newBidAmount || parseInt(newBidAmount, 10) > 1
                 ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
                 : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
               }
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               bottomPlaceholder={
                 !newBidAmount || parseInt(newBidAmount, 10) === 1
-                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * votePrice}`
               }
               minAmount={minAmount}
             />
-            <Button
+            <SPlaceABidButton
               view="primaryGrad"
               size="sm"
               disabled={!newOptionText
@@ -412,13 +415,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               onClick={() => handleTogglePaymentModalOpen()}
             >
               { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
-            </Button>
+            </SPlaceABidButton>
             {!isMobileOrTablet && (
               <SBottomPlaceholder>
                 {
                   !newBidAmount || parseInt(newBidAmount, 10) === 1
-                  ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-                  : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                  ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+                  : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * votePrice}`
                 }
               </SBottomPlaceholder>
             )}
@@ -454,14 +457,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               inputAlign="left"
               disabled={optionBeingSupported !== ''}
               placeholder={
-                newBidAmount && parseInt(newBidAmount, 10) > 1
+                !newBidAmount || parseInt(newBidAmount, 10) > 1
                 ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
                 : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
               }
               bottomPlaceholder={
                 !newBidAmount || parseInt(newBidAmount, 10) === 1
-                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * votePrice}`
               }
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
@@ -489,7 +492,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${parseInt(newBidAmount, 10) * 5}`}
+          amount={`$${parseInt(newBidAmount, 10) * 1}`}
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -644,7 +647,7 @@ const SActionSection = styled.div`
     justify-content: initial;
 
     textarea {
-      width: 277px;
+      max-width: 277px;
     }
   }
 `;
@@ -680,4 +683,8 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const SPlaceABidButton = styled(Button)`
+  min-width: 123px;
 `;

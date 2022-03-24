@@ -113,7 +113,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 onClick={() => handleRedirectToOptionCreator()}
                 style={{
                   ...(option.isCreatedBySubscriber ? {
-                    color: theme.colorsThemed.accent.yellow,
+                    color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
                     cursor: 'pointer',
                   } : {}),
                 }}
@@ -248,7 +248,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               onClick={() => handleRedirectToOptionCreator()}
               style={{
                 ...(option.isCreatedBySubscriber ? {
-                  color: theme.colorsThemed.accent.yellow,
+                  color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
                   cursor: 'pointer',
                 } : {}),
               }}

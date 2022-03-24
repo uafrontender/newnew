@@ -33,6 +33,7 @@ interface IAcOptionsTabModeration {
   pagingToken: string | undefined | null;
   handleLoadBids: (token?: string) => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleUpdateWinningOptionId: (id: number) => void;
 }
 
 const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> = ({
@@ -43,6 +44,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
   pagingToken,
   handleLoadBids,
   handleUpdatePostStatus,
+  handleUpdateWinningOptionId,
 }) => {
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -69,7 +71,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
 
       if (res.data) {
         handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
-        // handleUpdateWinningOption(winningOption);
+        handleUpdateWinningOptionId(winningOption.id as number);
       }
     } catch (err) {
       console.error(err);

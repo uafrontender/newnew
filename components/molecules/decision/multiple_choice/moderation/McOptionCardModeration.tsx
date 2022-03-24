@@ -164,7 +164,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                       handleRedirectToOptionCreator()
                     }}
                     style={{
-                      color: theme.colorsThemed.accent.yellow,
+                      color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
                       cursor: 'pointer',
                     }}
                   >
