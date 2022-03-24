@@ -33,12 +33,15 @@ import CoinsSampleAnimation from '../../../../public/animations/coins-sample.jso
 // Icons
 import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
 import CoinIcon from '../../../../public/images/decision/coin-mock.png';
+import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
   shouldAnimate: boolean;
   votingAllowed: boolean;
   postId: string;
+  postCreator: string;
+  postDeadline: string;
   index: number;
   optionBeingSupported?: string;
   minAmount: number;
@@ -51,6 +54,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   shouldAnimate,
   votingAllowed,
   postId,
+  postCreator,
+  postDeadline,
   index,
   optionBeingSupported,
   minAmount,
@@ -98,6 +103,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -178,6 +184,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         setIsSupportFormOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -404,6 +411,19 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           </SPaymentModalHeader>
         </PaymentModal>
       )}
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.ac',
+          {
+            postCreator,
+            postDeadline
+          }
+        )}
+      </PaymentSuccessModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </motion.div>

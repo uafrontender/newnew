@@ -29,9 +29,12 @@ import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import McOptionCardDoubleVote from './McOptionCardDoubleVote';
+import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
+  postCreator: string;
+  postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
@@ -43,6 +46,8 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
+  postCreator,
+  postDeadline,
   options,
   optionsLoading,
   pagingToken,
@@ -91,6 +96,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+
   // Handlers
   const handleTogglePaymentModalOpen = async () => {
     if (isAPIValidateLoading) return;
@@ -234,6 +241,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setSuggestNewMobileOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -346,6 +354,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 postId={post.postUuid}
+                postCreator={postCreator}
+                postDeadline={postDeadline}
                 index={i}
                 minAmount={minAmount}
                 votePrice={votePrice}
@@ -515,6 +525,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.mc',
+          {
+            postCreator,
+            postDeadline,
+          }
+        )}
+      </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && !hasVotedOptionId ? (
         <SActionButton
