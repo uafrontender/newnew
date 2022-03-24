@@ -49,7 +49,8 @@
           "tooLong": "Name is too long",
           "tooShort": "Name is too short",
           "invalidChar": "Name has invalid characters",
-          "innappropriate": "Offensive words are forbidden"
+          "innappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
         }
       },
       "username": {
@@ -61,7 +62,8 @@
           "tooShort": "Username is too short",
           "invalidChar": "Username has invalid characters",
           "innappropriate": "Offensive words are forbidden",
-          "taken": "Username is taken"
+          "taken": "Username is taken",
+          "linksForbidden": "Links not allowed"
         },
         "points": {
           "1": "8-15 characters length",
@@ -75,7 +77,8 @@
           "generic": "Please check input",
           "tooLong": "Bio is too long",
           "tooShort": "Bio is too short",
-          "innappropriate": "Offensive words are forbidden"
+          "innappropriate": "Offensive words are forbidden",
+          "linksForbidden": "No links allowed in bio"
         }
       }
     }
