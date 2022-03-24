@@ -360,6 +360,14 @@ const SButtonsContainer = styled.div<{
 
   overflow-x: auto;
 
+
+  /* Hide scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   z-index: 10;
 
   @media (min-width: 800px) {
@@ -390,6 +398,8 @@ const SNewPledgeForm = styled.div`
   gap: 12px;
   align-items: center;
   justify-content: space-between;
+
+  height: 108px;
 
   div:first-child {
     width: 100%;

@@ -713,8 +713,9 @@ const SActionButton = styled(Button)`
 const SActivitesContainer = styled.div`
   grid-area: activities;
 
-  /* display: flex; */
+  display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   height: 100%;
   width: 100%;
