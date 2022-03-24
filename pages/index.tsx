@@ -303,7 +303,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
             username: switchPostType(collectionCreator[0])[0].creator?.username!!,
           }}
           type="creator"
-          category={`u/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
+          category={`/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
           collection={collectionCreator}
           handlePostClicked={handleOpenPostModal}
         />

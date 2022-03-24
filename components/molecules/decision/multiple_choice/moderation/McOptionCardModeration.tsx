@@ -71,7 +71,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${creator?.username}`);
+    router.push(`/${creator?.username}`);
   }
 
   const handleConfirmDelete = async () => {

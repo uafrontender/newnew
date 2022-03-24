@@ -104,7 +104,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     const res = await getSubscriptionStatus(getStatusPayload);
 
     if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-      router.push(`/u/${post.creator?.username}/subscribe`);
+      router.push(`/${post.creator?.username}/subscribe`);
       return;
     }
     setPaymentModalOpen(true);

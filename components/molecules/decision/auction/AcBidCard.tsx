@@ -22,7 +22,7 @@ const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${bid.bidder?.username}`);
+    router.push(`/${bid.bidder?.username}`);
   }
 
   return (

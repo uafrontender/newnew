@@ -61,7 +61,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${option.creator?.username}`);
+    router.push(`/${option.creator?.username}`);
   }
 
   const handleConfirmDelete = async () => {

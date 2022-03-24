@@ -89,7 +89,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${creator?.username}`);
+    router.push(`/${creator?.username}`);
   }
 
   // Payment and Loading modals

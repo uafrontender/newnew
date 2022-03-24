@@ -92,7 +92,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${option.creator?.username}`);
+    router.push(`/${option.creator?.username}`);
   }
 
   // Payment and Loading modals
