@@ -35,6 +35,10 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
       errorMsg = 'innappropriate';
       break;
     }
+    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
+      errorMsg = 'linksForbidden';
+      break;
+    }
     default: {
       break;
     }
