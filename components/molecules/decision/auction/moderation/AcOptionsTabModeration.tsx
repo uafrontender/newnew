@@ -178,16 +178,17 @@ const SBidsContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
+
+    // Scrollbar
     &::-webkit-scrollbar {
       width: 4px;
     }
-
+    scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
       transition: .2s linear;
     }
-
     &::-webkit-scrollbar-thumb {
       background: transparent;
       border-radius: 4px;
@@ -195,6 +196,7 @@ const SBidsContainer = styled.div`
     }
 
     &:hover {
+      scrollbar-width: thin;
       &::-webkit-scrollbar-track {
         background: ${({ theme }) => theme.colorsThemed.background.outlines1};
       }
