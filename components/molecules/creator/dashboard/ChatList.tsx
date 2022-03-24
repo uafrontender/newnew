@@ -1,211 +1,234 @@
-import React, { useMemo, useCallback, useRef } from 'react';
-import styled from 'styled-components';
+/* eslint-disable no-unsafe-optional-chaining */
+import React, { useCallback, useState, useEffect } from 'react';
+import styled, { useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import { useInView } from 'react-intersection-observer';
+import { useTranslation } from 'next-i18next';
+import moment from 'moment';
+
+import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
-import Indicator from '../../../atoms/Indicator';
 import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
+import { getMyRooms } from '../../../../api/endpoints/chat';
+import { useGetChats } from '../../../../contexts/chatContext';
+import textTrim from '../../../../utils/textTrim';
+import randomID from '../../../../utils/randomIdGenerator';
+import InlineSVG from '../../../atoms/InlineSVG';
+import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
 
 export const ChatList = () => {
+  const { t } = useTranslation('creator');
+  const theme = useTheme();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const scrollRef: any = useRef();
+  const { unreadCountForCreator } = useGetChats();
+  const { ref: scrollRef, inView } = useInView();
 
-  const collection = useMemo(
-    () => [
-      {
-        id: '1',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: false,
-      },
-      {
-        id: '2',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 10,
-      },
-      {
-        id: '3',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 2,
-      },
-      {
-        id: '4',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: false,
-      },
-      {
-        id: '5',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: false,
-      },
-      {
-        id: '6',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: false,
-      },
-      {
-        id: '7',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 1,
-      },
-      {
-        id: '8',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: false,
-      },
-      {
-        id: '9',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 6,
-      },
-      {
-        id: '10',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 11,
-      },
-      {
-        id: '11',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 15,
-      },
-      {
-        id: '12',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 6,
-      },
-      {
-        id: '13',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 12,
-      },
-      {
-        id: '14',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 14,
-      },
-      {
-        id: '15',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 15,
-      },
-      {
-        id: '16',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 1,
-      },
-      {
-        id: '17',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 16,
-      },
-      {
-        id: '18',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 20,
-      },
-      {
-        id: '19',
-        time: '30 min',
-        title: 'Dark Moon 🌚',
-        lastMessage: 'Yeah, I know🙈 But I think it’s awe…',
-        unread: true,
-        unreadCount: 100,
-      },
-    ],
-    []
+  const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
+  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(null);
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<string | undefined | null>('');
+  const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
+  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(null);
+
+  const fetchMyRooms = useCallback(
+    async (pageToken?: string) => {
+      if (loadingRooms) return;
+      try {
+        if (!pageToken) setChatRooms([]);
+        setLoadingRooms(true);
+        const payload = new newnewapi.GetMyRoomsRequest({
+          myRole: 2,
+          paging: {
+            limit: 10,
+            pageToken,
+          },
+        });
+        const res = await getMyRooms(payload);
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data && res.data.rooms.length > 0) {
+          setChatRooms((curr) => {
+            const arr = [...curr!!, ...res.data?.rooms!!];
+            return arr;
+          });
+          setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
+        }
+        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken) setChatRoomsNextPageToken(null);
+        setLoadingRooms(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingRooms(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loadingRooms]
   );
 
+  const fetchLastActiveRoom = async () => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        myRole: 2,
+        paging: {
+          limit: 1,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.rooms.length > 0) {
+        setUpdatedChat(res.data.rooms[0]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (!chatRooms) {
+      fetchMyRooms();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (chatRooms && !searchedRooms) {
+      fetchLastActiveRoom();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unreadCountForCreator, searchedRooms]);
+
+  useEffect(() => {
+    if (updatedChat) {
+      const isAlreadyAdded = chatRooms?.findIndex((chat) => chat.id === updatedChat.id);
+      if (isAlreadyAdded !== undefined) {
+        const arr = chatRooms;
+        arr?.splice(isAlreadyAdded, 1);
+        arr?.splice(0, 0, updatedChat);
+        setChatRooms(arr);
+        setUpdatedChat(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updatedChat]);
+
+  useEffect(() => {
+    if (inView && !loadingRooms && chatRoomsNextPageToken) {
+      fetchMyRooms(chatRoomsNextPageToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, loadingRooms, chatRoomsNextPageToken]);
+
+  // useEffect(() => {
+  //   if (searchText) {
+  //     if (chatRooms) {
+  //       setSearchedRooms(null);
+  //       const arr = [] as newnewapi.IChatRoom[];
+  //       chatRooms.forEach((chat) => {
+  //         if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
+  //           arr.push(chat);
+  //         }
+  //       });
+  //       setSearchedRooms(arr);
+  //     }
+  //   } else {
+  //     setSearchedRooms(null);
+  //   }
+  // }, [searchText, chatRooms, searchedRooms]);
+
   const renderChatItem = useCallback(
-    (item, index) => {
-      const handleUserClick = () => {};
-      const handleItemClick = () => {
-        router.push('/creator/dashboard?tab=direct-messages');
+    (chat: newnewapi.IChatRoom) => {
+      const handleItemClick = async () => {
+        if (searchedRooms) setSearchedRooms(null);
+        router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
+        return null;
       };
 
+      let avatar = (
+        <SUserAvatar>
+          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''} />
+        </SUserAvatar>
+      );
+      let chatName = chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username;
+
+      if (chat.kind === 4 && chat.myRole === 2) {
+        avatar = (
+          <SMyAvatar>
+            <SUserAvatar>
+              <UserAvatar avatarUrl={user.userData?.avatarUrl!!} />
+            </SUserAvatar>
+            <SInlineSVG
+              svg={megaphone}
+              fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
+              width="26px"
+              height="26px"
+            />
+          </SMyAvatar>
+        );
+        chatName = `${user.userData?.nickname ? user.userData?.nickname : user.userData?.username} ${t(
+          'announcement.title'
+        )}`;
+      }
+      if (chat.kind === 4 && chat.myRole === 1) {
+        chatName = `${chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username} ${t(
+          'announcement.title'
+        )}`;
+      }
+
+      let lastMsg = chat.lastMessage?.content?.text;
+
+      if (!lastMsg) {
+        if (chat.kind === 4) {
+          lastMsg = textTrim(t('new-announcement.created'));
+        } else {
+          lastMsg = textTrim(t('chat.no-messages-first-line'));
+        }
+      }
+
+      const unreadMessageCount = chat.unreadMessageCount && chat.unreadMessageCount > 0 ? chat.unreadMessageCount : 0;
+
       return (
-        <SChatItemContainer key={`chat-item-${item.id}`}>
+        <SChatItemContainer key={randomID()}>
           <SChatItem onClick={handleItemClick}>
-            <SChatItemAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
+            {avatar}
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
-                {item.title}
+                {chatName}
               </SChatItemText>
               <SChatItemLastMessage variant={3} weight={600}>
-                {item.lastMessage}
+                {lastMsg}
               </SChatItemLastMessage>
             </SChatItemCenter>
             <SChatItemRight>
               <SChatItemTime variant={3} weight={600}>
-                {item.time}
+                {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
               </SChatItemTime>
-              {!!item.unread && <SChatItemIndicator counter={item.unreadCount} />}
+              {unreadMessageCount > 0 && <SUnreadCount>{unreadMessageCount}</SUnreadCount>}
             </SChatItemRight>
           </SChatItem>
-          {index !== collection.length - 1 && <SChatSeparator />}
+          <SChatSeparator />
         </SChatItemContainer>
       );
     },
-    [router, collection.length, user.userData?.avatarUrl]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchedRooms, chatRooms, updatedChat]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
     <>
-      <SSectionContent ref={scrollRef}>{collection.map(renderChatItem)}</SSectionContent>
+      {chatRooms && (
+        <>
+          <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
+          {chatRoomsNextPageToken && !searchedRooms && <SRef ref={scrollRef}>Loading...</SRef>}
+        </>
+      )}
       <GradientMask positionTop active={showTopGradient} />
       <GradientMask active={showBottomGradient} />
     </>
@@ -228,8 +251,6 @@ const SChatItem = styled.div`
   display: flex;
   padding: 8px 0;
 `;
-
-const SChatItemAvatar = styled(UserAvatar)``;
 
 const SChatItemCenter = styled.div`
   width: 100%;
@@ -259,8 +280,6 @@ const SChatItemTime = styled(Text)`
   margin-bottom: 4px;
 `;
 
-const SChatItemIndicator = styled(Indicator)``;
-
 const SChatSeparator = styled.div`
   border: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
   margin-left: 60px;
@@ -268,3 +287,38 @@ const SChatSeparator = styled.div`
 `;
 
 const SChatItemContainer = styled.div``;
+
+const SUnreadCount = styled.span`
+  background: ${({ theme }) => theme.colorsThemed.accent.pink};
+  border-radius: 50%;
+  color: ${({ theme }) => theme.colors.white};
+  padding: 0 6px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: 700;
+  font-size: 10px;
+  margin-left: 6px;
+`;
+const SRef = styled.span`
+  text-indent: -9999px;
+`;
+const SInlineSVG = styled(InlineSVG)`
+  min-width: 24px;
+  min-height: 24px;
+  margin-right: 14px;
+`;
+
+const SMyAvatar = styled.div`
+  position: relative;
+  height: 48px;
+  ${SInlineSVG} {
+    margin-right: 0;
+    position: absolute;
+    left: calc(50% - 13px);
+    top: calc(50% - 13px);
+  }
+  ${SUserAvatar} {
+    opacity: ${(props) => (props.theme.name === 'light' ? '1' : '0.5')};
+  }
+`;

@@ -74,3 +74,12 @@ export const getTotalUnreadMessageCounts = (payload: newnewapi.EmptyRequest) =>
     'post',
     payload
   );
+
+export const getRoom = (payload: newnewapi.GetRoomRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.GetRoomRequest, newnewapi.ChatRoom>(
+    newnewapi.GetRoomRequest,
+    newnewapi.ChatRoom,
+    `${BASE_URL_CHAT}/get_room`,
+    'post',
+    payload
+  );

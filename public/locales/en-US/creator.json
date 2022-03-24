@@ -165,7 +165,13 @@
   },
   "chat": {
     "today": "Today",
-    "placeholder": "Write a message..."
+    "placeholder": "Type a message...",
+    "welcome-message": "You successfully subscribed! Now you can send a message to",
+    "no-messages-first-line": "No messages here yet...",
+    "no-messages-second-line": "Send a message to start conversation.",
+    "select-chat": "Select a chat to start messaging",
+    "typing": "Typing...",
+    "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you."
   },
   "SubrateSection": {
     "heading": "Your subscription rate",
@@ -197,5 +203,21 @@
     "text": "Bring more exposure, share with your network.",
     "btnShare": "Share with friends",
     "updateSub": "Update subscription"
+  },
+  "modal": {
+    "new-message": {
+      "title": "New message",
+      "search-placeholder": "Search",
+      "no-results-title": "No results",
+      "no-results-text": "There were no results for",
+      "no-results-search-text": "Try a new search."
+    }
+  },
+  "new-announcement": {
+    "title": "New announcement",
+    "text": "Only you can send messages to the group.",
+    "created": "You created the announcement",
+    "member": "member",
+    "members": "members"
   }
 }

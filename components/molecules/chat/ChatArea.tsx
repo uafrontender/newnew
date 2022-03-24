@@ -40,7 +40,6 @@ const ReportUserModal = dynamic(() => import('./ReportUserModal'));
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
   const { t } = useTranslation('chat');
-  // const scrollRef: any = useRef();
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);

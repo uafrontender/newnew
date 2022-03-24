@@ -1,160 +1,249 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import moment from 'moment';
-import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import { toNumber } from 'lodash';
+import { useInView } from 'react-intersection-observer';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
-import GradientMask from '../../../atoms/GradientMask';
+// import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
+// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import { SocketContext } from '../../../../contexts/socketContext';
+import { ChannelsContext } from '../../../../contexts/channelsContext';
+import { getMessages, getRoom, markRoomAsRead, sendMessage } from '../../../../api/endpoints/chat';
+import randomID from '../../../../utils/randomIdGenerator';
 
-import { SCROLL_TO_FIRST_MESSAGE } from '../../../../constants/timings';
+interface IChat {
+  roomID: string;
+}
 
-export const Chat = () => {
-  const [message, setMessage] = useState('');
-  const [collection, setCollection] = useState([
-    {
-      id: '1',
-      message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-      mine: true,
-      date: moment(),
-    },
-    {
-      id: '2',
-      message: 'Hiii, Lance 😃',
-      mine: true,
-      date: moment(),
-    },
-    {
-      id: '3',
-      message: 'I don’t beleive...',
-      mine: false,
-      date: moment(),
-    },
-    {
-      id: '4',
-      message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-      mine: false,
-      date: moment(),
-    },
-    {
-      id: '5',
-      message: 'Hey, Annie 👋',
-      mine: false,
-      date: moment(),
-    },
-    {
-      id: '6',
-      message: 'Hey there, Ya, me too 😏',
-      mine: false,
-      date: moment().subtract(2, 'days'),
-    },
-    {
-      id: '7',
-      message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-      mine: true,
-      date: moment().subtract(2, 'days'),
-    },
-    {
-      id: '8',
-      message: 'Yeah, I know🙈 But I think it’s awesome idea!',
-      mine: true,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '9',
-      message: 'Hiii, Lance 😃',
-      mine: true,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '10',
-      message: 'I don’t beleive...',
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '11',
-      message: "Your new decision of getting a tattoo on your face is crazy. I'm shocked! 😱",
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '12',
-      message: 'Hey, Annie 👋',
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '13',
-      message: 'Hey there, Ya, me too 😏',
-      mine: false,
-      date: moment().subtract(3, 'days'),
-    },
-    {
-      id: '14',
-      message: 'Weeelcome 🎉 Happy that you joined NewNew!',
-      mine: true,
-      date: moment().subtract(3, 'days'),
-    },
-  ]);
+export const Chat: React.FC<IChat> = ({ roomID }) => {
   const theme = useTheme();
   const { t } = useTranslation('creator');
   const router = useRouter();
-  const scrollRef: any = useRef();
 
+  const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
-  const handleChange = useCallback((id, value) => {
-    setMessage(value);
+
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
+  const [messageText, setMessageText] = useState<string>('');
+  const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<string | undefined | null>('');
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState<boolean>(false);
+
+  const [chatRoom, setChatRoom] = useState<newnewapi.ChatRoom | undefined>();
+  const [chatRoomLoading, setChatRoomLoading] = useState<boolean>(false);
+
+  const getChatMessages = useCallback(
+    async (pageToken?: string) => {
+      if (messagesLoading) return;
+      try {
+        if (!pageToken) setMessages([]);
+        setMessagesLoading(true);
+        const payload = new newnewapi.GetMessagesRequest({
+          roomId: toNumber(roomID),
+          ...(pageToken
+            ? {
+                paging: {
+                  pageToken,
+                },
+              }
+            : {}),
+        });
+        const res = await getMessages(payload);
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data && res.data.messages.length > 0) {
+          setMessages((curr) => {
+            const arr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
+            return arr;
+          });
+          setMessagesNextPageToken(res.data.paging?.nextPageToken);
+        }
+        setMessagesLoading(false);
+      } catch (err) {
+        console.error(err);
+        setMessagesLoading(false);
+      }
+    },
+    [messagesLoading, roomID]
+  );
+
+  const fetchChatRoom = useCallback(async () => {
+    if (chatRoomLoading) return;
+    try {
+      setChatRoomLoading(true);
+      const payload = new newnewapi.GetRoomRequest({
+        roomId: toNumber(roomID),
+      });
+      const res = await getRoom(payload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data) {
+        setChatRoom(res.data);
+      }
+      setChatRoomLoading(false);
+    } catch (err) {
+      console.error(err);
+      setChatRoomLoading(false);
+    }
+  }, [chatRoomLoading, roomID]);
+
+  async function markChatAsRead() {
+    try {
+      const payload = new newnewapi.MarkRoomAsReadRequest({
+        roomId: toNumber(roomID),
+      });
+      const res = await markRoomAsRead(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  useEffect(() => {
+    getChatMessages();
+    addChannel(`chat_${roomID.toString()}`, {
+      chatRoomUpdates: {
+        chatRoomId: toNumber(roomID),
+      },
+    });
+    return () => {
+      removeChannel(`chat_${roomID.toString()}`);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const handleUserClick = useCallback(() => {}, []);
+
+  useEffect(() => {
+    if (!chatRoom) {
+      fetchChatRoom();
+    }
+    if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0) markChatAsRead();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatRoom]);
+
+  useEffect(() => {
+    const socketHandlerMessageCreated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      if (decoded) {
+        setNewMessage(decoded.newMessage);
+      }
+    };
+    if (socketConnection) {
+      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
+
+  useEffect(() => {
+    if (inView && !messagesLoading && messagesNextPageToken) {
+      getChatMessages(messagesNextPageToken);
+    }
+  }, [inView, messagesLoading, messagesNextPageToken, getChatMessages]);
+
+  useEffect(() => {
+    if (newMessage) {
+      setMessages((curr) => {
+        if (curr.length === 0) {
+          return [newMessage, ...curr];
+        }
+        if (curr[0]?.id !== newMessage.id) {
+          return [newMessage, ...curr];
+        }
+        return curr;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newMessage]);
+
+  const handleChange = useCallback((id, value) => {
+    setMessageText(value);
+  }, []);
+
+  const submitMessage = useCallback(async () => {
+    if (messageText.length > 0) {
+      try {
+        setSendingMessage(true);
+        const payload = new newnewapi.SendMessageRequest({
+          roomId: toNumber(roomID),
+          content: {
+            text: messageText,
+          },
+        });
+        const res = await sendMessage(payload);
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data.message) setMessages([res.data.message].concat(messages));
+
+        setMessageText('');
+        setSendingMessage(false);
+      } catch (err) {
+        console.error(err);
+        setSendingMessage(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomID, messageText]);
+
+  const handleSubmit = useCallback(() => {
+    if (!sendingMessage) submitMessage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageText]);
+
   const handleGoBack = useCallback(() => {
     router.push('/creator/dashboard?tab=chat');
   }, [router]);
 
-  const handleSubmit = useCallback(() => {
-    const newItem = {
-      id: (collection.length + 1).toString(),
-      mine: true,
-      date: moment(),
-      message,
-    };
-    setMessage('');
-    setCollection([newItem, ...collection]);
-  }, [message, collection]);
   const renderMessage = useCallback(
-    (item, index) => {
-      const prevElement = collection[index - 1];
-      const nextElement = collection[index + 1];
+    (item: newnewapi.IChatMessage, index) => {
+      const prevElement = messages[index - 1];
+      const nextElement = messages[index + 1];
+
+      const isMine = item.sender?.uuid === user.userData?.userUuid;
+
+      const prevSameUser = prevElement?.sender?.uuid === item.sender?.uuid;
+      const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <SMessage id={index === 0 ? 'first-element' : `message-${index}`} key={`message-${item.id}`} mine={item.mine}>
-          <SMessageContent
-            mine={item.mine}
-            prevSameUser={prevElement?.mine === item.mine}
-            nextSameUser={nextElement?.mine === item.mine}
-          >
-            <SMessageText mine={item.mine} weight={600} variant={3}>
-              {item.message}
-            </SMessageText>
-          </SMessageContent>
-        </SMessage>
+        <React.Fragment key={item.id ? item.id.toString() : randomID()}>
+          <SMessage id={item.id ? item.id.toString() : randomID()} mine={isMine} prevSameUser={prevSameUser}>
+            <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+              <SMessageText mine={isMine} weight={600} variant={3}>
+                {item.content?.text}
+              </SMessageText>
+            </SMessageContent>
+          </SMessage>
+          {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
+        </React.Fragment>
       );
-
-      if (moment(item.date).format('DD.MM.YYYY') !== moment(nextElement?.date).format('DD.MM.YYYY')) {
-        let date = moment(item.date).format('MMM DD');
-
+      if (
+        item.createdAt?.seconds &&
+        nextElement?.createdAt?.seconds &&
+        moment(toNumber(item.createdAt?.seconds)).format('DD.MM.YYYY') !==
+          moment(toNumber(nextElement?.createdAt?.seconds)).format('DD.MM.YYYY')
+      ) {
+        let date = moment(toNumber(item.createdAt?.seconds)).format('MMM DD');
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -162,11 +251,11 @@ export const Chat = () => {
         return (
           <>
             {content}
-            <SMessage key={`message-date-${moment(item.date).format('DD.MM.YYYY')}`} type="info">
+            <SMessage key={randomID()} type="info">
               <SMessageContent
                 type="info"
-                prevSameUser={prevElement?.mine === item.mine}
-                nextSameUser={nextElement?.mine === item.mine}
+                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
+                nextSameUser={nextElement?.sender?.uuid === item.sender?.uuid}
               >
                 <SMessageText type="info" weight={600} variant={3}>
                   {date}
@@ -179,18 +268,18 @@ export const Chat = () => {
 
       return content;
     },
-    [collection, t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [roomID, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, chatRoom]
   );
 
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
+  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
 
-  useEffect(() => {
-    scroller.scrollTo('first-element', {
-      smooth: 'easeInOutQuart',
-      duration: SCROLL_TO_FIRST_MESSAGE,
-      containerId: 'messagesScrollContainer',
-    });
-  }, [collection.length]);
+  const handleUserClick = useCallback(() => {
+    if (chatRoom?.visavis?.username) {
+      router.push(`/u/${chatRoom?.visavis?.username}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageText]);
 
   return (
     <SContainer>
@@ -203,34 +292,43 @@ export const Chat = () => {
           height="24px"
           onClick={handleGoBack}
         />
-        <SUserAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
+        <SUserAvatar
+          withClick
+          onClick={handleUserClick}
+          avatarUrl={chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''}
+        />
         <SUserDescription>
           <SUserNickName variant={3} weight={600}>
-            {user.userData?.nickname}
+            {chatRoom?.visavis?.nickname ? chatRoom?.visavis?.nickname : chatRoom?.visavis?.username}
           </SUserNickName>
           <SUserName variant={2} weight={600}>
-            {user.userData?.username}
+            {chatRoom?.visavis?.username ? chatRoom?.visavis?.username : chatRoom?.visavis?.nickname}
           </SUserName>
         </SUserDescription>
       </STopPart>
-      <SCenterPart id="messagesScrollContainer" ref={scrollRef}>
-        {collection.map(renderMessage)}
-      </SCenterPart>
+      <SCenterPart id="messagesScrollContainer">{messages.length > 0 && messages.map(renderMessage)}</SCenterPart>
       <SBottomPart>
-        <STextArea>
-          <TextArea value={message} onChange={handleChange} placeholder={t('chat.placeholder')} />
-        </STextArea>
-        <SButton withShadow view={message ? 'primaryGrad' : 'secondary'} onClick={handleSubmit} disabled={!message}>
-          <SInlineSVG
-            svg={sendIcon}
-            fill={message ? theme.colors.white : theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
-          />
-        </SButton>
+        <SBottomTextarea>
+          <STextArea>
+            <TextArea maxlength={500} value={messageText} onChange={handleChange} placeholder={t('chat.placeholder')} />
+          </STextArea>
+          <SButton
+            withShadow
+            view={messageText ? 'primaryGrad' : 'secondary'}
+            onClick={handleSubmit}
+            disabled={!messageText}
+          >
+            <SInlineSVG
+              svg={sendIcon}
+              fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SButton>
+        </SBottomTextarea>
       </SBottomPart>
-      <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} />
+      {/* <GradientMask positionTop active={showTopGradient} />
+      <GradientMask active={showBottomGradient} /> */}
     </SContainer>
   );
 };
@@ -254,18 +352,18 @@ const STopPart = styled.div`
 const SCenterPart = styled.div`
   gap: 8px;
   flex: 1;
-  margin: 24px 0;
-  padding: 0 24px;
+  margin: 0 0 24px;
   display: flex;
   overflow-y: auto;
   flex-direction: column-reverse;
+  padding: 0 24px;
+  position: relative;
 `;
 
 const SBottomPart = styled.div`
   display: flex;
+  flex-direction: column;
   padding: 0 24px;
-  align-items: flex-end;
-  flex-direction: row;
 `;
 
 const STextArea = styled.div`
@@ -307,23 +405,45 @@ const SUserName = styled(Caption)`
 interface ISMessage {
   type?: string;
   mine?: boolean;
+  prevSameUser?: boolean;
 }
 
 const SMessage = styled.div<ISMessage>`
   width: 100%;
+  position: relative;
+
+  ${(props) => {
+    if (props.type !== 'info') {
+      if (props.mine) {
+        return css`
+          ${props.theme.media.mobile} {
+            justify-content: flex-end;
+          }
+        `;
+      }
+      return css`
+        ${props.theme.media.mobile} {
+          padding-left: 0;
+        }
+      `;
+    }
+    return css`
+      justify-content: center;
+    `;
+  }}
+
+  ${(props) => {
+    if (!props.prevSameUser && props.type !== 'info') {
+      return css`
+        margin-bottom: 8px;
+      `;
+    }
+    return css`
+      margin-bottom: 0;
+    `;
+  }}
   display: flex;
   flex-direction: row;
-  justify-content: ${(props) => {
-    if (props.type === 'info') {
-      return 'center';
-    }
-
-    if (props.mine) {
-      return 'flex-end';
-    }
-
-    return 'flex-start';
-  }};
 `;
 
 interface ISMessageContent {
@@ -339,9 +459,11 @@ const SMessageContent = styled.div<ISMessageContent>`
     if (props.type === 'info') {
       return 'transparent';
     }
-
     if (props.mine) {
       return props.theme.colorsThemed.accent.blue;
+    }
+    if (props.theme.name === 'light') {
+      return props.theme.colors.white;
     }
 
     return props.theme.colorsThemed.background.tertiary;
@@ -381,7 +503,7 @@ const SMessageContent = styled.div<ISMessageContent>`
         }
 
         return css`
-          border-radius: 16px 8px 16px 16px;
+          border-radius: 16px 16px 16px 8px;
         `;
       }
     } else {
@@ -420,6 +542,9 @@ const SMessageContent = styled.div<ISMessageContent>`
           border-radius: 8px 16px 16px 16px;
         `;
       }
+      return css`
+        border-radius: 16px 16px 16px 8px;
+      `;
     }
 
     if (props.type === 'info') {
@@ -429,7 +554,7 @@ const SMessageContent = styled.div<ISMessageContent>`
     }
 
     return css`
-      border-radius: 16px;
+      border-radius: 16px 16px 16px 8px;
     `;
   }}
 `;
@@ -440,6 +565,8 @@ interface ISMessageText {
 }
 
 const SMessageText = styled(Text)<ISMessageText>`
+  line-height: 20px;
+  max-width: 412px;
   color: ${(props) => {
     if (props.type === 'info') {
       return props.theme.colorsThemed.text.tertiary;
@@ -451,4 +578,13 @@ const SMessageText = styled(Text)<ISMessageText>`
 
     return props.theme.colorsThemed.text.primary;
   }};
+`;
+
+const SRef = styled.span`
+  text-indent: -9999px;
+`;
+const SBottomTextarea = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
 `;
