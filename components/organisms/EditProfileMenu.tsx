@@ -84,6 +84,10 @@ const errorSwitch = (
       errorMsg = 'innappropriate';
       break;
     }
+    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
+      errorMsg = 'linksForbidden';
+      break;
+    }
     default: {
       break;
     }
@@ -786,7 +790,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   value={dataInEdit.bio}
                   disabled={isLoading}
                   placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
-                  errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.bioError}`)}
+                  errorCaption={t(`EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`)}
                   isValid={!formErrors.bioError}
                   onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
                 />
