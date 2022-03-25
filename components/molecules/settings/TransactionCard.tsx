@@ -62,9 +62,9 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
                 {' '}
               </span>
               <Link
-                href={`/u/${cardInfo.recipient.username}`}
+                href={`/${cardInfo.recipient.username}`}
               >
-                <a href={`/u/${cardInfo.recipient.username}`}>
+                <a href={`/${cardInfo.recipient.username}`}>
                   {cardInfo.recipient.username}
                   {'\'s '}
                 </a>

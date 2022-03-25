@@ -7,16 +7,17 @@ import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
 
-import ProfileLayout from '../../../components/templates/ProfileLayout';
-import { NextPageWithLayout } from '../../_app';
-import { getUserByUsername } from '../../../api/endpoints/user';
-import { fetchUsersPosts } from '../../../api/endpoints/post';
+import ProfileLayout from '../../components/templates/ProfileLayout';
+import { NextPageWithLayout } from '../_app';
+import { getUserByUsername } from '../../api/endpoints/user';
+import { fetchUsersPosts } from '../../api/endpoints/post';
 
-import PostModal from '../../../components/organisms/decision/PostModal';
-import List from '../../../components/organisms/search/List';
-import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../../components/molecules/profile/PostsFilterSection';
+import PostModal from '../../components/organisms/decision/PostModal';
+import List from '../../components/organisms/search/List';
+import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
+import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -45,6 +46,8 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   handleUpdateFilter,
   handleSetPosts,
 }) => {
+  const { t } = useTranslation('profile');
+
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
@@ -137,30 +140,39 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
 
   return (
     <div>
-      <SMain>
-        <PostsFilterSection
-          numDecisions={totalCount}
-          isLoading={isLoading}
-          postsFilter={postsFilter}
-          handleUpdateFilter={handleUpdateFilter}
-        />
-        <SCardsSection>
-          {posts && (
-            <List
-              category=""
-              loading={isLoading}
-              collection={posts}
-              wrapperStyle={{
-                left: 0,
-              }}
-              handlePostClicked={handleOpenPostModal}
+      {
+        user.options?.isActivityPrivate
+        ? (
+          <SMain>
+            { t('AccountPrivate') }
+          </SMain>
+        ) : (
+          <SMain>
+            <PostsFilterSection
+              numDecisions={totalCount}
+              isLoading={isLoading}
+              postsFilter={postsFilter}
+              handleUpdateFilter={handleUpdateFilter}
             />
-          )}
-        </SCardsSection>
-        <div
-          ref={loadingRef}
-        />
-      </SMain>
+            <SCardsSection>
+              {posts && (
+                <List
+                  category=""
+                  loading={isLoading}
+                  collection={posts}
+                  wrapperStyle={{
+                    left: 0,
+                  }}
+                  handlePostClicked={handleOpenPostModal}
+                />
+              )}
+            </SCardsSection>
+            <div
+              ref={loadingRef}
+            />
+          </SMain>
+        )
+      }
       {displayedPost && (
         <PostModal
           isOpen={postModalOpen}

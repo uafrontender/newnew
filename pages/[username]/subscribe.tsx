@@ -10,26 +10,26 @@ import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 
-import { useAppSelector } from '../../../redux-store/store';
-import { WalletContext } from '../../../contexts/walletContext';
-import { getUserByUsername } from '../../../api/endpoints/user';
-import { getSubscriptionStatus, subscribeToCreator } from '../../../api/endpoints/subscription';
+import { useAppSelector } from '../../redux-store/store';
+import { WalletContext } from '../../contexts/walletContext';
+import { getUserByUsername } from '../../api/endpoints/user';
+import { getSubscriptionStatus, subscribeToCreator } from '../../api/endpoints/subscription';
 
-import General from '../../../components/templates/General';
-import Text from '../../../components/atoms/Text';
-import Button from '../../../components/atoms/Button';
-import Headline from '../../../components/atoms/Headline';
-import GoBackButton from '../../../components/molecules/GoBackButton';
-import FaqSection from '../../../components/molecules/subscribe/FaqSection';
-import PaymentModal from '../../../components/molecules/checkout/PaymentModal';
+import General from '../../components/templates/General';
+import Text from '../../components/atoms/Text';
+import Button from '../../components/atoms/Button';
+import Headline from '../../components/atoms/Headline';
+import GoBackButton from '../../components/molecules/GoBackButton';
+import FaqSection from '../../components/molecules/subscribe/FaqSection';
+import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 
 // Images
-import dmsImage from '../../../public/images/subscription/dms.png';
-import votesImage from '../../../public/images/subscription/free-votes.png';
-import suggestionsImage from '../../../public/images/subscription/suggestions.png';
+import dmsImage from '../../public/images/subscription/dms.png';
+import votesImage from '../../public/images/subscription/free-votes.png';
+import suggestionsImage from '../../public/images/subscription/suggestions.png';
 
-import isBrowser from '../../../utils/isBrowser';
-import { formatNumber } from '../../../utils/format';
+import isBrowser from '../../utils/isBrowser';
+import { formatNumber } from '../../utils/format';
 
 interface ISubscribeToUserPage {
   user: Omit<newnewapi.User, 'toJSON'>;

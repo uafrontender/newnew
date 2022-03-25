@@ -68,10 +68,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     removeChannel,
   } = useContext(ChannelsContext);
 
+  const [winningOptionId, setWinningOptionId] = useState(post.winningOptionId ?? undefined);
+
   // Tabs
   const tabs = useMemo(() => {
     // NB! Will a check for winner option here
-    if (post.winningOptionId) {
+    if (winningOptionId) {
       return [
         {
           label: 'winner',
@@ -97,7 +99,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         value: 'comments',
       },
     ];
-  }, [post.winningOptionId]);
+  }, [winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -108,7 +110,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
     if (
-      post.winningOptionId
+      winningOptionId
     ) return 'winner';
     return 'bids';
   });
@@ -291,6 +293,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
       handleUpdatePostStatus(res.data.auction!!.status!!);
+
     } catch (err) {
       console.error(err);
     }
@@ -353,10 +356,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       }
     }
 
-    if (post.winningOptionId) {
-      fetchAndSetWinningOption(post.winningOptionId as number);
+    if (winningOptionId) {
+      fetchAndSetWinningOption(winningOptionId as number);
     }
-  }, [post.winningOptionId]);
+  }, [winningOptionId]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -504,6 +507,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
               pagingToken={optionsNextPageToken}
               handleLoadBids={fetchBids}
               handleUpdatePostStatus={handleUpdatePostStatus}
+              handleUpdateWinningOptionId={(id: number) => setWinningOptionId(id)}
             />
           ) : (
             currentTab === 'comments'

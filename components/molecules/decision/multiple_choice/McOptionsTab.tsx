@@ -29,23 +29,30 @@ import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import McOptionCardDoubleVote from './McOptionCardDoubleVote';
+import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
+  postCreator: string;
+  postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
+  votePrice: number;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
+  postCreator,
+  postDeadline,
   options,
   optionsLoading,
   pagingToken,
   minAmount,
+  votePrice,
   handleLoadOptions,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -89,6 +96,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+
   // Handlers
   const handleTogglePaymentModalOpen = async () => {
     if (isAPIValidateLoading) return;
@@ -104,7 +113,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     const res = await getSubscriptionStatus(getStatusPayload);
 
     if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-      router.push(`/u/${post.creator?.username}/subscribe`);
+      router.push(`/${post.creator?.username}/subscribe`);
       return;
     }
     setPaymentModalOpen(true);
@@ -232,6 +241,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setSuggestNewMobileOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -346,9 +356,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 postId={post.postUuid}
                 index={i}
                 minAmount={minAmount}
+                votePrice={votePrice}
                 optionBeingSupported={optionBeingSupported}
                 noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+                handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
                 handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
               />
             )
@@ -386,19 +398,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               inputAlign="left"
               disabled={optionBeingSupported !== ''}
               placeholder={
-                newBidAmount && parseInt(newBidAmount, 10) > 1
+                !newBidAmount || parseInt(newBidAmount, 10) > 1
                 ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
                 : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
               }
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               bottomPlaceholder={
                 !newBidAmount || parseInt(newBidAmount, 10) === 1
-                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * votePrice}`
               }
               minAmount={minAmount}
             />
-            <Button
+            <SPlaceABidButton
               view="primaryGrad"
               size="sm"
               disabled={!newOptionText
@@ -412,13 +424,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               onClick={() => handleTogglePaymentModalOpen()}
             >
               { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
-            </Button>
+            </SPlaceABidButton>
             {!isMobileOrTablet && (
               <SBottomPlaceholder>
                 {
                   !newBidAmount || parseInt(newBidAmount, 10) === 1
-                  ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-                  : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                  ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+                  : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * votePrice}`
                 }
               </SBottomPlaceholder>
             )}
@@ -454,14 +466,14 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               inputAlign="left"
               disabled={optionBeingSupported !== ''}
               placeholder={
-                newBidAmount && parseInt(newBidAmount, 10) > 1
+                !newBidAmount || parseInt(newBidAmount, 10) > 1
                 ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
                 : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
               }
               bottomPlaceholder={
                 !newBidAmount || parseInt(newBidAmount, 10) === 1
-                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * 5}`
+                ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+                : `${newBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(newBidAmount, 10) * votePrice}`
               }
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
@@ -489,7 +501,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${parseInt(newBidAmount, 10) * 5}`}
+          amount={`$${parseInt(newBidAmount, 10) * 1}`}
           showTocApply
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -512,6 +524,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.mc',
+          {
+            postCreator,
+            postDeadline,
+          }
+        )}
+      </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && !hasVotedOptionId ? (
         <SActionButton
@@ -554,16 +579,16 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    // Scrollbar
     &::-webkit-scrollbar {
       width: 4px;
     }
-
+    scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
       transition: .2s linear;
     }
-
     &::-webkit-scrollbar-thumb {
       background: transparent;
       border-radius: 4px;
@@ -571,6 +596,7 @@ const SBidsContainer = styled.div<{
     }
 
     &:hover {
+      scrollbar-width: thin;
       &::-webkit-scrollbar-track {
         background: ${({ theme }) => theme.colorsThemed.background.outlines1};
       }
@@ -643,7 +669,7 @@ const SActionSection = styled.div`
     justify-content: initial;
 
     textarea {
-      width: 277px;
+      max-width: 277px;
     }
   }
 `;
@@ -679,4 +705,8 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const SPlaceABidButton = styled(Button)`
+  min-width: 123px;
 `;

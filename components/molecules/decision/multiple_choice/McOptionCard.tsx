@@ -37,9 +37,11 @@ interface IMcOptionCard {
   postId: string;
   index: number;
   minAmount: number;
+  votePrice: number;
   noAction: boolean;
   optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
+  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
 
@@ -49,9 +51,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   postId,
   index,
   minAmount,
+  votePrice,
   noAction,
   optionBeingSupported,
   handleSetSupportedBid,
+  handleSetPaymentSuccesModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const router = useRouter();
@@ -89,12 +93,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${creator?.username}`);
+    router.push(`/${creator?.username}`);
   }
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     setPaymentModalOpen(true);
@@ -171,6 +176,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setIsSupportFormOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        handleSetPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -183,6 +189,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsSupportFormOpen,
     setSupportBidAmount,
     handleSetSupportedBid,
+    handleSetPaymentSuccesModalOpen,
     handleAddOrUpdateOptionFromResponse,
     supportBidAmount,
     option.id,
@@ -294,11 +301,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             ) : (
               <>
                 <SSpanBiddersHighlighted
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     handleRedirectToOptionCreator()
                   }}
                   style={{
-                    color: theme.colorsThemed.accent.yellow,
+                    color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
                     cursor: 'pointer',
                   }}
                 >
@@ -370,7 +378,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             value={supportBidAmount}
             widthHardCoded="100%"
             placeholder={
-              supportBidAmount && parseInt(supportBidAmount, 10) > 1
+              !supportBidAmount || parseInt(supportBidAmount, 10) > 1
               ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
               : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
             }
@@ -392,8 +400,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <SBottomPlaceholder>
             {
               !supportBidAmount || parseInt(supportBidAmount, 10) === 1
-              ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${5}`
-              : `${supportBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(supportBidAmount, 10) * 5}`
+              ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
+              : `${supportBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(supportBidAmount, 10) * votePrice}`
             }
           </SBottomPlaceholder>
         </>
@@ -414,7 +422,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               value={supportBidAmount}
               autofocus={isSupportFormOpen}
               placeholder={
-                supportBidAmount && parseInt(supportBidAmount, 10) > 1
+                !supportBidAmount || parseInt(supportBidAmount, 10) > 1
                 ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
                 : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
               }
@@ -438,7 +446,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           zIndex={12}
           showTocApply
           isOpen={paymentModalOpen}
-          amount={`$${parseInt(supportBidAmount, 10) * 5}`}
+          amount={`$${parseInt(supportBidAmount, 10) * 1}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}

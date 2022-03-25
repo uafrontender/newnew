@@ -30,6 +30,7 @@ interface ICfPledgeLevelsModal {
   post: newnewapi.Crowdfunding;
   pledgeLevels: newnewapi.IMoneyAmount[];
   onClose: () => void;
+  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
   handleAddPledgeFromResponse: (newPledge: newnewapi.Crowdfunding.Pledge) => void;
 }
 
@@ -39,6 +40,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   isOpen,
   pledgeLevels,
   onClose,
+  handleSetPaymentSuccesModalOpen,
   handleAddPledgeFromResponse,
 }) => {
   const theme = useTheme();
@@ -150,6 +152,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
         setIsFormOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        handleSetPaymentSuccesModalOpen(true);
         onClose();
       }
     } catch (err) {
@@ -162,6 +165,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
     post.postUuid,
     user.loggedIn,
     handleAddPledgeFromResponse,
+    handleSetPaymentSuccesModalOpen,
     onClose,
   ]);
 
