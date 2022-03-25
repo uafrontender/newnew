@@ -352,31 +352,43 @@ export const Card: React.FC<ICard> = ({
         <SBottomEnd
           type={typeOfPost}
         >
-          <SButton
-            withDim
-            withShrink
-            view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-            onClick={handleBidClick}
-            cardType={typeOfPost}
-            progress={typeOfPost === 'cf' ? (
-              Math.floor((currentBackerCount * 100)
-              / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
-            ) : 0}
-            withProgress={typeOfPost === 'cf'}
-          >
-            {t(`button-card-${typeOfPost}`, {
-              votes: totalVotes,
-              total: formatNumber(
-                (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
-                true,
-              ),
-              backed: formatNumber(
-                currentBackerCount ?? 0,
-                true,
-              ),
-              amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
-            })}
-          </SButton>
+          {
+            totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
+              <SButton
+                withDim
+                withShrink
+                view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                onClick={handleBidClick}
+                cardType={typeOfPost}
+                progress={typeOfPost === 'cf' ? (
+                  Math.floor((currentBackerCount * 100)
+                  / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
+                ) : 0}
+                withProgress={typeOfPost === 'cf'}
+              >
+                {t(`button-card-${typeOfPost}`, {
+                  votes: totalVotes,
+                  total: formatNumber(
+                    (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
+                    true,
+                  ),
+                  backed: formatNumber(
+                    currentBackerCount ?? 0,
+                    true,
+                  ),
+                  amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
+                })}
+              </SButton>
+
+            ) : (
+              <SButtonFirst
+                withShrink
+                onClick={handleBidClick}
+              >
+                {t(`button-card-first-${typeOfPost}`)}
+              </SButtonFirst>
+            )
+          }
         </SBottomEnd>
       </SBottomContentOutside>
     </SWrapperOutside>
@@ -725,8 +737,10 @@ const STextOutside = styled(Text)`
 const SBottomStart = styled.div`
   display: grid;
   grid-template-areas: 'avatar nickname timer';
-  grid-template-columns: 24px 1fr 1fr;
+  grid-template-columns: 24px 5fr 6fr;
   align-items: center;
+
+  height: 32px;
 
   margin-bottom: 4px;
 `;
@@ -803,6 +817,34 @@ const SButton = styled(Button)<ISButtonSpan>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
+  }
+`;
+
+const SButtonFirst = styled(Button)`
+  padding: 12px;
+  border-radius: 12px;
+
+  width: 100%;
+  height: 36px;
+
+  background: #FFFFFF;
+
+  span {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+
+    color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 8px 12px;
+  }
+
+  &:hover, &:active {
+    span {
+      color: #FFFFFF;
+    }
   }
 `;
 
