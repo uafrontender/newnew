@@ -304,10 +304,14 @@ const SWrapper = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;
+
+    /* width: calc(200px * 5 + 32px * 4); */
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: 40px 0;
+
+    /* width: calc(224px * 5 + 32px * 4); */
   }
 `;
 

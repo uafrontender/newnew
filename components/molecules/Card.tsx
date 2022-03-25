@@ -254,7 +254,6 @@ export const Card: React.FC<ICard> = ({
                 iconOnly
                 id="showMore"
                 view="transparent"
-                onClick={handleMoreClick}
               >
                 <InlineSVG
                   svg={moreIcon}
@@ -294,15 +293,9 @@ export const Card: React.FC<ICard> = ({
       >
         <SImageHolderOutside id="animatedPart">
           <video
-            // src={postParsed.announcement?.thumbnailUrl as string}
-            // src="/video/mock/mock_video_1.mp4"
-            // Temp
-            // src={postParsed.announcement?.thumbnailUrl ?? ''}
             ref={(el) => {
               videoRef.current = el!!;
             }}
-            // NB! Might use this one to avoid waisting user's resources
-            // and use a poster here NB!
             // preload="none"
             loop
             muted
@@ -332,7 +325,7 @@ export const Card: React.FC<ICard> = ({
       </SImageBG>
       <SBottomContentOutside>
         <SBottomStart>
-          <SUserAvatar
+          <SUserAvatarOutside
             avatarUrl={postParsed?.creator?.avatarUrl!!}
             withClick
             onClick={(e) => {
@@ -340,10 +333,22 @@ export const Card: React.FC<ICard> = ({
               handleUserClick(postParsed.creator?.username!!);
             }}
           />
-          <STextOutside variant={3} weight={600}>
-            {postParsed.title}
-          </STextOutside>
+          <SUsername
+            variant={2}
+          >
+            {
+              postParsed.creator?.nickname && postParsed.creator?.nickname?.length > 7
+              ? `${postParsed.creator?.nickname?.substring(0, 7)}...`
+              : postParsed.creator?.nickname
+            }
+          </SUsername>
+          <CardTimer
+            timestampSeconds={new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()}
+          />
         </SBottomStart>
+        <STextOutside variant={3} weight={600}>
+          {postParsed.title}
+        </STextOutside>
         <SBottomEnd
           type={typeOfPost}
         >
@@ -372,9 +377,6 @@ export const Card: React.FC<ICard> = ({
               amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
             })}
           </SButton>
-          <CardTimer
-            timestampSeconds={new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()}
-          />
         </SBottomEnd>
       </SBottomContentOutside>
     </SWrapperOutside>
@@ -442,18 +444,11 @@ const SWrapper = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptopL} {
-    width: 25vw;
-    height: unset;
-
     :hover {
       #showMore {
         opacity: 1;
       }
     }
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: 20vw;
   }
 `;
 
@@ -492,8 +487,8 @@ const SNumberImageHolder = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptopL} {
-    left: 0;
-    bottom: 0;
+    left: 10px;
+    bottom: 30px;
     height: 70%;
     position: absolute;
     width: ${(props) => {
@@ -520,9 +515,34 @@ const SImageHolder = styled.div<ISWrapper>`
   justify-content: space-between;
   border-radius: ${(props) => props.theme.borderRadius.medium};
 
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: 212px;
     padding: 12px;
+
+    border: 1.5px solid;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    padding: 18px;
+
+    video {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      object-fit: cover;
+      width: calc(100% - 20px);
+      height: calc(100% - 20px);
+      border-radius: ${({ theme }) => theme.borderRadius.medium};
+    }
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -541,16 +561,6 @@ const SImageHolder = styled.div<ISWrapper>`
 
     return '65%';
   }};
-  }
-
-  video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
   }
 `;
 
@@ -599,6 +609,15 @@ const SWrapperOutside = styled.div<ISWrapper>`
   position: relative;
   flex-direction: column;
 
+  /* padding: 10px; */
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+
+  border: 1.5px solid;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
+
   /* No select */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -608,6 +627,8 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
+    max-width: 200px;
+
     :hover {
       #animatedPart {
         transform: translateY(-10px);
@@ -616,6 +637,8 @@ const SWrapperOutside = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptop} {
+    max-width: 224px;
+
     :hover {
       #showMore {
         opacity: 1;
@@ -630,7 +653,7 @@ interface ISImageBG {
 
 const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  padding: 75% 0;
+  padding: 75% 0px;
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
@@ -647,6 +670,12 @@ const SImageHolderOutside = styled.div`
   padding: 16px;
   position: absolute;
   transition: all ease 0.5s;
+
+  width: calc(100% - 20px);
+  left: 10px;
+  padding: 10px;
+  overflow: hidden;
+  border-radius: ${(props) => props.theme.borderRadius.medium};
 
   ${(props) => props.theme.media.tablet} {
     padding: 12px;
@@ -671,7 +700,7 @@ const SBottomContentOutside = styled.div`
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 14px 0 0;
+    padding: 14px 10px 0 10px;
   }
 `;
 
@@ -680,21 +709,48 @@ const STextOutside = styled(Text)`
   display: -webkit-box;
   overflow: hidden;
   position: relative;
-  margin-left: 12px;
+
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+
+  margin-bottom: 10px;
+
+  height: 40px;
 `;
 
 const SBottomStart = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-areas: 'avatar nickname timer';
+  grid-template-columns: 24px 1fr 1fr;
   align-items: center;
-  margin-bottom: 16px;
-  flex-direction: row;
 
-  ${(props) => props.theme.media.tablet} {
-    margin-bottom: 14px;
-  }
+  margin-bottom: 4px;
 `;
+
+const SUserAvatarOutside = styled(UserAvatar)`
+  grid-area: avatar;
+
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+`;
+
+const SUsername = styled(Text)`
+  grid-area: nickname;
+
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  margin-left: 8px;
+`;
+
 
 interface ISBottomEnd {
   type: 'ac' | 'mc' | 'cf',
@@ -731,10 +787,13 @@ const SButton = styled(Button)<ISButtonSpan>`
   padding: 12px;
   border-radius: 12px;
 
+  width: 100%;
+  height: 36px;
+
   span {
-    font-size: 12px;
     font-weight: 700;
-    line-height: 16px;
+    font-size: 16px;
+    line-height: 20px;
 
     ${(props) => (props.cardType === 'cf' ? css`
       width: 100%;
