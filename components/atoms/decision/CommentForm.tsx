@@ -8,13 +8,17 @@ import CommentTextArea from './CommentTextArea';
 import { useAppSelector } from '../../../redux-store/store';
 
 interface ICommentForm {
-  onSubmit: (text: string) => void;
+  position?: string;
+  zIndex?: number;
   onBlur?: () => void;
+  onSubmit: (text: string) => void;
 };
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
-  onSubmit,
+  position,
+  zIndex,
   onBlur,
+  onSubmit,
 }, ref) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -30,8 +34,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    console.log('submit');
-
     await onSubmit(commentText);
     setCommentText('');
   }, [commentText, onSubmit]);
@@ -48,6 +50,8 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
           ref,
         } : {}),
       }}
+      position={position}
+      zIndex={zIndex}
     >
       <SInputWrapper focus={focusedInput}>
         <CommentTextArea
@@ -85,6 +89,8 @@ export default CommentForm;
 
 CommentForm.defaultProps = {
   onBlur: () => {},
+  zIndex: undefined,
+  position: undefined,
 };
 
 const SInlineSVG = styled(InlineSVG)`
@@ -113,12 +119,15 @@ const SButton = styled(Button)`
   }
 `;
 
-const SCommentsForm = styled.form`
+const SCommentsForm = styled.form<{
+  position: string | undefined;
+  zIndex: number | undefined;
+}>`
   display: flex;
   padding-bottom: 16px;
-  position: sticky;
+  position: ${({ position }) => position ?? 'relative'};
   top: 0;
-  z-index: 1;
+  z-index: ${({ zIndex }) => zIndex ?? 'unset'};
   background: ${({ theme }) => theme.colorsThemed.background.primary};
 
   ${(props) => props.theme.media.tablet} {

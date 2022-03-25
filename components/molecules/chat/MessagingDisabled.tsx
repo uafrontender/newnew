@@ -37,7 +37,7 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = ({ user }) => {
         withShrink
         view="primaryGrad"
         onClick={() => {
-          router.push(`/u/${user.username}`);
+          router.push(`/${user.username}`);
         }}
       >
         {t('messaging-disabled.button-text')}

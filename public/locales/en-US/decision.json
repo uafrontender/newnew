@@ -28,6 +28,13 @@
     "tiktok": "TikTok",
     "copy": "Copy Link"
   },
+  "PaymentSuccessModal": {
+    "title": "Alright! Payment success.",
+    "doneBtn": "Done",
+    "ac": "Stay tuned, {{postCreator}} will choose the winning option on {{postDeadline}}",
+    "mc": "Stay tuned, {{postCreator}} will upload response on {{postDeadline}}",
+    "cf": "Stay tuned, {{postCreator}} will upload response on {{postDeadline}}"
+  },
   "PostFailedBoxModeration": {
     "title": "Decision failed",
     "body": "Let's start again and share more.",

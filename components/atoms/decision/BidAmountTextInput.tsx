@@ -30,9 +30,24 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
         .slice(1).split(',').filter((v) => v !== ',').join('')
       : e.target.value;
     if (/[^0-9]/.test(newValue)) return;
+    if (newValue.length > 5) return;
 
     // @ts-ignore
     onChange(newValue ? (newValue as number) : '');
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = value.length > 0
+      ? e.target.value
+        .slice(1).split(',').filter((v) => v !== ',').join('')
+      : e.target.value;
+    if (/[^0-9]/.test(currentValue)) return;
+
+    // @ts-ignore
+    if (currentValue.length > 0 && currentValue as number < minAmount) {
+      // @ts-ignore
+      onChange(minAmount.toString());
+    }
   };
 
   useEffect(() => {
@@ -53,6 +68,7 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
         inputMode="numeric"
         placeholder={`$${minAmount.toString()}`}
         onChange={handleOnChange}
+        onBlur={handleBlur}
         style={style ?? {}}
       />
       {bottomPlaceholder && (

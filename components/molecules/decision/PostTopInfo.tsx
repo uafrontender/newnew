@@ -79,7 +79,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${creator.username}`);
+    router.push(`/${creator.username}`);
   };
 
   const handleOpenShareMenu = () => setShareMenuOpen(true);

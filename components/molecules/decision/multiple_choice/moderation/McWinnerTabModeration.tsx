@@ -43,7 +43,7 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> = (
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${option.creator?.username!!}`);
+    router.push(`/${option.creator?.username!!}`);
   };
 
   useEffect(() => {

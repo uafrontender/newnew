@@ -46,7 +46,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${option.creator?.username!!}`);
+    router.push(`/${option.creator?.username!!}`);
   };
 
   const handleFollowDecision = useCallback(async () => {
