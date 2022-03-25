@@ -197,5 +197,29 @@
     "text": "Bring more exposure, share with your network.",
     "btnShare": "Share with friends",
     "updateSub": "Update subscription"
+  },
+  "stripe": {
+    "meta": {
+      "title": "Payments made easy with Stripe",
+      "description": "Connect a Stripe account to get paid on time."
+    },
+    "side": {
+      "heading": "Payments made easy with Stripe",
+      "subheading": "Connect a Stripe account to get paid on time."
+    },
+    "title-set-up-stripe": "Set payment system",
+    "title-stripe-active": "account is active",
+    "bullets": {
+      "1": "$2.00 USD NewNew withdrawal fee.",
+      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
+      "3": "Set up will take you to Stripe."
+    },
+    "requestSetupLinkBtn": "Connect with Stripe",
+    "stripeConnectedLinkBtn": "Stripe connected!",
+    "submitMobile": "Done",
+    "submitDesktop": "Done",
+    "backButton": "Close",
+    "updateButton": "Update payment info",
+    "stripe-issue": "Stripe issue!"
   }
 }

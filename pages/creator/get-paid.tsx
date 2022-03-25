@@ -1,55 +1,81 @@
-import React, { ReactElement } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
-import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { GetServerSideProps } from 'next';
+import type { NextPage } from 'next';
+import { newnewapi } from 'newnew-api';
+
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-
-import General from '../../components/templates/General';
-import Content from '../../components/organisms/creator/GetPaid';
-
+import loadingAnimation from '../../public/animations/logo-loading-blue.json';
+import { getMyOnboardingState } from '../../api/endpoints/user';
+import CreatorStripeLayout from '../../components/templates/CreatorStripeLayout';
 import { NextPageWithLayout } from '../_app';
+import Lottie from '../../components/atoms/Lottie';
+import DashboardSectionStripe from '../../components/organisms/creator/DashboardSectionStripe';
 
-export const GetPaid = () => {
+interface ICreatorOnboardingStripe {}
+
+const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
   const { t } = useTranslation('creator');
+
+  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOnboardingState() {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getMyOnboardingState(payload);
+
+        if (res.data) {
+          setOnboardingState(res.data);
+        }
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchOnboardingState();
+  }, []);
 
   return (
     <>
       <Head>
-        <title>
-          {t('getPaid.meta.title')}
-        </title>
+        <title>{t('getPaid.meta.title')}</title>
+        <meta name="description" content={t('getPaid.meta.description')} />
       </Head>
-      <Content />
+      {!isLoading ? (
+        <DashboardSectionStripe isConnectedToStripe={onboardingState?.isCreatorConnectedToStripe ?? false} />
+      ) : (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      )}
     </>
   );
 };
 
-(GetPaid as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <SGeneral withChat>
-    {page}
-  </SGeneral>
-);
+(GetPaid as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+  return <CreatorStripeLayout hideProgressBar>{page}</CreatorStripeLayout>;
+};
 
 export default GetPaid;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'creator'],
-  );
+export async function getStaticProps(context: { locale: string }): Promise<any> {
+  const translationContext = await serverSideTranslations(context.locale, ['creator']);
 
   return {
     props: {
       ...translationContext,
     },
   };
-};
-
-const SGeneral = styled(General)`
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.secondary : props.theme.colorsThemed.background.primary)};
-
-  ${({ theme }) => theme.media.laptop} {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary)};
-  }
-`;
+}
