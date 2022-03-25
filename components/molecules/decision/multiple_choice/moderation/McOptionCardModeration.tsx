@@ -71,7 +71,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${creator?.username}`);
+    router.push(`/${creator?.username}`);
   }
 
   const handleConfirmDelete = async () => {
@@ -164,7 +164,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                       handleRedirectToOptionCreator()
                     }}
                     style={{
-                      color: theme.colorsThemed.accent.yellow,
+                      color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
                       cursor: 'pointer',
                     }}
                   >

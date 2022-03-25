@@ -10,15 +10,15 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import ProfileLayout from '../../../components/templates/ProfileLayout';
-import { NextPageWithLayout } from '../../_app';
-import { getUserByUsername } from '../../../api/endpoints/user';
-import { fetchUsersPosts } from '../../../api/endpoints/post';
+import ProfileLayout from '../../components/templates/ProfileLayout';
+import { NextPageWithLayout } from '../_app';
+import { getUserByUsername } from '../../api/endpoints/user';
+import { fetchUsersPosts } from '../../api/endpoints/post';
 
-import PostModal from '../../../components/organisms/decision/PostModal';
-import List from '../../../components/organisms/search/List';
-import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../../components/molecules/profile/PostsFilterSection';
+import PostModal from '../../components/organisms/decision/PostModal';
+import List from '../../components/organisms/search/List';
+import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
+import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -140,7 +140,13 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
   return (
     <div>
       {
-        !user.options?.isActivityPrivate ? (
+        !user.options?.isCreator && user.options?.isActivityPrivate
+        ? (
+          <SMain>
+            { t('AccountPrivate') }
+          </SMain>
+        )
+        : (
           <SMain>
             <PostsFilterSection
               numDecisions={totalCount}
@@ -164,11 +170,6 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
             <div
               ref={loadingRef}
             />
-          </SMain>
-
-        ) : (
-          <SMain>
-            { t('AccountPrivate') }
           </SMain>
         )
       }
