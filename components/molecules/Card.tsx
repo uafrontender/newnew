@@ -486,14 +486,14 @@ const SNumberImageHolder = styled.div<ISWrapper>`
     height: 280px;
   }
 
-  ${(props) => props.theme.media.laptopL} {
+  ${(props) => props.theme.media.tablet} {
     left: 10px;
     bottom: 30px;
     height: 70%;
     position: absolute;
     width: ${(props) => {
     if (props.index === 10) {
-      return '90%';
+      return '74%';
     }
 
     return '55%';
