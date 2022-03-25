@@ -12,10 +12,9 @@ import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
-import ScrollArrow from '../../atoms/ScrollArrow';
+import ScrollArrowPermanent from '../../atoms/ScrollArrowPermanent';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { formatString } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -55,7 +54,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   const ref: any = useRef();
   const scrollContainerRef: any = useRef();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
@@ -150,17 +149,13 @@ export const CardsSection: React.FC<ICardSection> = ({
         <Card
           item={item}
           index={index + 1}
-          width={isMobile ? '100vw' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
+          width={isMobile ? '100%' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
           height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
         />
       </SItemWrapper>
     );
   };
 
-  const {
-    renderLeftArrow,
-    renderRightArrow,
-  } = useHoverArrows(ref);
   const handleSeeMoreCLick = () => {
     if (type === 'default') {
       router.push(`/search?category=${category}`);
@@ -184,8 +179,10 @@ export const CardsSection: React.FC<ICardSection> = ({
     });
   }, []);
   useEffect(() => {
+
+    console.log(visibleListItem)
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem <= (collection?.length || 0) - scrollStep);
+    setCanScrollRight(visibleListItem + 1 <= (collection?.length || 0) - scrollStep);
   }, [visibleListItem, collection, scrollStep]);
 
   return (
@@ -244,15 +241,15 @@ export const CardsSection: React.FC<ICardSection> = ({
         {!isMobile && (
           <>
             {!isDragging && canScrollLeft && (
-              <ScrollArrow
-                active={renderLeftArrow}
+              <ScrollArrowPermanent
+                active
                 position="left"
                 handleClick={handleLeftClick}
               />
             )}
             {!isDragging && canScrollRight && (
-              <ScrollArrow
-                active={renderRightArrow}
+              <ScrollArrowPermanent
+                active
                 position="right"
                 handleClick={handleRightClick}
               />
@@ -304,10 +301,14 @@ const SWrapper = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;
+
+    /* width: calc(200px * 5 + 32px * 4); */
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: 40px 0;
+
+    /* width: calc(224px * 5 + 32px * 4); */
   }
 `;
 
@@ -316,11 +317,13 @@ const SListContainer = styled.div`
 `;
 
 const SListWrapper = styled.div`
-  left: -16px;
-  width: 100vw;
+
+  width: 100%;
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
+
+
   position: relative;
   overflow-x: auto;
   flex-direction: column;
@@ -333,8 +336,12 @@ const SListWrapper = styled.div`
   -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
-    left: -32px;
-    padding: 24px 24px 0 24px;
+    left: 32px;
+    /* padding: 24px 24px 0 24px; */
+    /* padding: 32px 56px 0 64px; */
+    width: calc(100% - 64px);
+
+
     flex-direction: row;
   }
 
