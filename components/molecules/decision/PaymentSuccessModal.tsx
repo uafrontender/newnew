@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Image from 'next/image';
 
 import Button from '../../atoms/Button';
@@ -8,6 +8,8 @@ import Modal from '../../organisms/Modal';
 import Headline from '../../atoms/Headline';
 
 import PaymentSuccesIcon from '../../../public/images/decision/payment-success.png';
+import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import InlineSvg from '../../atoms/InlineSVG';
 
 interface IPaymentSuccessModal {
   isVisible: boolean,
@@ -19,6 +21,7 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   closeModal,
   children,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
 
   return (
@@ -31,6 +34,15 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <SModal>
+          <SInlineSVG
+            clickable
+            scaleOnClick
+            svg={CloseIcon}
+            fill={theme.colorsThemed.text.primary}
+            width="24px"
+            height="24px"
+            onClick={closeModal}
+          />
           <Image
             src={PaymentSuccesIcon}
             height={140}
@@ -65,6 +77,8 @@ const SContainer = styled.div`
 `;
 
 const SModal = styled.div`
+  position: relative;
+
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
@@ -85,10 +99,20 @@ const SModalTitle = styled(Headline)`
 `;
 
 const SModalMessage = styled.p`
+  text-align: center;
   font-size: 16px;
   margin-bottom: 24px;
 `;
 
 const SDoneButton = styled(Button)`
   width: 100%;
+`;
+
+const SInlineSVG = styled(InlineSvg)`
+  position: absolute;
+  right: 24px;
+  top: 24px;
+
+  z-index: 1;
+  cursor: pointer;
 `;

@@ -34,8 +34,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    console.log('submit');
-
     await onSubmit(commentText);
     setCommentText('');
   }, [commentText, onSubmit]);

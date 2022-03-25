@@ -354,14 +354,13 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 postId={post.postUuid}
-                postCreator={postCreator}
-                postDeadline={postDeadline}
                 index={i}
                 minAmount={minAmount}
                 votePrice={votePrice}
                 optionBeingSupported={optionBeingSupported}
                 noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
+                handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
                 handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
               />
             )

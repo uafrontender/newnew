@@ -26,12 +26,14 @@ import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
   post: newnewapi.Crowdfunding;
+  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
   handleAddPledgeFromResponse: (newPledge: newnewapi.Crowdfunding.Pledge) => void;
 }
 
 const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = ({
   pledgeLevels,
   post,
+  handleSetPaymentSuccesModalOpen,
   handleAddPledgeFromResponse,
 }) => {
   const { t } = useTranslation('decision');
@@ -147,6 +149,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
         setIsFormOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        handleSetPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       console.error(err);
@@ -158,6 +161,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
     post.postUuid,
     user.loggedIn,
     handleAddPledgeFromResponse,
+    handleSetPaymentSuccesModalOpen,
   ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {

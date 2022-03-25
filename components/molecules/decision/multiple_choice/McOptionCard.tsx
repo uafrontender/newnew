@@ -30,20 +30,18 @@ import { formatNumber } from '../../../../utils/format';
 // Icons
 import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
 import McSymbolIcon from '../../../../public/images/decision/mc-option-mock.png';
-import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser,
   postId: string;
-  postCreator: string;
-  postDeadline: string;
   index: number;
   minAmount: number;
   votePrice: number;
   noAction: boolean;
   optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
+  handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
 }
 
@@ -51,14 +49,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
   postId,
-  postCreator,
-  postDeadline,
   index,
   minAmount,
   votePrice,
   noAction,
   optionBeingSupported,
   handleSetSupportedBid,
+  handleSetPaymentSuccesModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const router = useRouter();
@@ -102,7 +99,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -180,7 +176,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         setIsSupportFormOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
-        setPaymentSuccesModalOpen(true);
+        handleSetPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -193,6 +189,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsSupportFormOpen,
     setSupportBidAmount,
     handleSetSupportedBid,
+    handleSetPaymentSuccesModalOpen,
     handleAddOrUpdateOptionFromResponse,
     supportBidAmount,
     option.id,
@@ -230,8 +227,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       console.error(err);
     }
   }, [option.id, postId, supportBidAmount, user.loggedIn]);
-
-console.log(minAmount)
 
   return (
     <motion.div
@@ -468,19 +463,6 @@ console.log(minAmount)
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null }
-      {/* Payment success Modal */}
-      <PaymentSuccessModal
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
-      >
-        {t(
-          'PaymentSuccessModal.mc',
-          {
-            postCreator,
-            postDeadline,
-          }
-        )}
-      </PaymentSuccessModal>
       {/* Loading Modal */}
       <LoadingModal
         isOpen={loadingModalOpen}
