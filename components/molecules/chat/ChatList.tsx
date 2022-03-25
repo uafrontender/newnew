@@ -23,7 +23,6 @@ import {
   SChatSeparator,
   SUserAvatar,
 } from '../../atoms/chat/styles';
-import randomID from '../../../utils/randomIdGenerator';
 import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
 import { useAppSelector } from '../../../redux-store/store';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
@@ -292,7 +291,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
         localChat.unreadMessageCount && localChat.unreadMessageCount > 0 ? localChat.unreadMessageCount : 0;
 
       return (
-        <SChatItemContainer key={randomID()}>
+        <SChatItemContainer key={chat.id?.toString()}>
           <SChatItem onClick={handleItemClick} className={isActiveChat(chat) ? 'active' : ''}>
             {avatar}
             <SChatItemCenter>
@@ -337,7 +336,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
     () => (
       <STabs>
         {tabTypes.map((item) => (
-          <STab active={activeTab === item.id} key={randomID()} onClick={() => setActiveTab(item.id)}>
+          <STab active={activeTab === item.id} key={item.id} onClick={() => setActiveTab(item.id)}>
             {item.title} {unreadCountTab(item.id) && <SUnreadCount>{unreadCountTab(item.id)}</SUnreadCount>}
           </STab>
         ))}

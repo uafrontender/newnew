@@ -1,5 +1,5 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -22,6 +22,7 @@ import useScrollDirection from '../../utils/hooks/useScrollDirection';
 import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
+import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -106,6 +107,16 @@ export const General: React.FC<IGeneral> = (props) => {
   const { scrollDirection } = useScrollDirection(wrapperRef);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const [isOpenedChat, setIsOpenedChat] = useState(true);
+
+  const openChat = () => {
+    setIsOpenedChat(true);
+  };
+
+  const closeChat = () => {
+    setIsOpenedChat(false);
+  };
+
   return (
     <ErrorBoundary>
       <SkeletonTheme
@@ -139,7 +150,11 @@ export const General: React.FC<IGeneral> = (props) => {
           </CookieContainer>
           {withChat && isMobile && (
             <ChatContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
-              <FloatingMessages withCounter />
+              {!isOpenedChat ? (
+                <FloatingMessages withCounter openChat={openChat} />
+              ) : (
+                <MobileDashBoardChat closeChat={closeChat} />
+              )}
             </ChatContainer>
           )}
         </SWrapper>

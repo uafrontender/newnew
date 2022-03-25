@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import clearNameFromEmoji from '../../../../utils/clearNameFromEmoji';
 import { useAppSelector } from '../../../../redux-store/store';
-import randomID from '../../../../utils/randomIdGenerator';
 import {
   SChatItemCenter,
   SChatItemContainer,
@@ -165,7 +164,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
       };
 
       return (
-        <SChatItemContainer key={randomID()}>
+        <SChatItemContainer key={chat.id?.toString()}>
           <SChatItemM onClick={handleItemClick}>
             {chat.visavis?.avatarUrl && (
               <SUserAvatar>
@@ -231,7 +230,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
                   <NewAnnouncement handleClick={createNewAnnouncement} />
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
-                      <SSection key={randomID()}>
+                      <SSection key={section.letter}>
                         <SLetter>{section.letter}</SLetter>
                         {section.chats.map(renderChatItem)}
                       </SSection>

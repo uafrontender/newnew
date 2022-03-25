@@ -171,7 +171,26 @@
     "no-messages-second-line": "Send a message to start conversation.",
     "select-chat": "Select a chat to start messaging",
     "typing": "Typing...",
-    "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you."
+    "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you.",
+    "toolbar": {
+      "search-placeholder": "Search for messages or users"
+    },
+    "modal": {
+      "new-message": {
+        "title": "New message",
+        "search-placeholder": "Search",
+        "no-results-title": "No results",
+        "no-results-text": "There were no results for",
+        "no-results-search-text": "Try a new search."
+      }
+    },
+    "empty-inbox": {
+      "title": "Your inbox is empty",
+      "text": "Once you start a new conversation, you’ll see it listed here"
+    },
+    "default": {
+      "search-placeholder": "Search"
+    }
   },
   "SubrateSection": {
     "heading": "Your subscription rate",

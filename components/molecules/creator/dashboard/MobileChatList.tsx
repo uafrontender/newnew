@@ -2,28 +2,32 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
 import moment from 'moment';
+import { toNumber } from 'lodash';
+
 import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
-import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
-import { getMyRooms } from '../../../../api/endpoints/chat';
+import { getMyRooms, markRoomAsRead } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
 import InlineSVG from '../../../atoms/InlineSVG';
 import megaphone from '../../../../public/images/svg/icons/filled/Megaphone.svg';
+import { IChatData } from '../../../interfaces/ichat';
 
-export const ChatList = () => {
-  const { t } = useTranslation('creator');
+interface IFunctionProps {
+  openChat: (arg: IChatData) => void;
+  searchText: string;
+}
+
+const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
+  const { t } = useTranslation('chat');
   const theme = useTheme();
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { unreadCountForCreator } = useGetChats();
   const { ref: scrollRef, inView } = useInView();
@@ -122,28 +126,44 @@ export const ChatList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
-  // useEffect(() => {
-  //   if (searchText) {
-  //     if (chatRooms) {
-  //       setSearchedRooms(null);
-  //       const arr = [] as newnewapi.IChatRoom[];
-  //       chatRooms.forEach((chat) => {
-  //         if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
-  //           arr.push(chat);
-  //         }
-  //       });
-  //       setSearchedRooms(arr);
-  //     }
-  //   } else {
-  //     setSearchedRooms(null);
-  //   }
-  // }, [searchText, chatRooms, searchedRooms]);
+  useEffect(() => {
+    if (searchText) {
+      if (chatRooms) {
+        setSearchedRooms(null);
+        const arr = [] as newnewapi.IChatRoom[];
+        chatRooms.forEach((chat) => {
+          if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
+            arr.push(chat);
+          }
+        });
+        setSearchedRooms(arr);
+      }
+    } else {
+      setSearchedRooms(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchText]);
+
+  async function markChatAsRead(id: number) {
+    try {
+      const payload = new newnewapi.MarkRoomAsReadRequest({
+        roomId: id,
+      });
+      const res = await markRoomAsRead(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
-        router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
+        openChat({ chatRoom: chat, showChatList: null });
+        if (chat.unreadMessageCount) {
+          await markChatAsRead(toNumber(chat.id));
+        }
         return null;
       };
 
@@ -169,11 +189,6 @@ export const ChatList = () => {
           </SMyAvatar>
         );
         chatName = `${user.userData?.nickname ? user.userData?.nickname : user.userData?.username} ${t(
-          'announcement.title'
-        )}`;
-      }
-      if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = `${chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username} ${t(
           'announcement.title'
         )}`;
       }
@@ -217,18 +232,15 @@ export const ChatList = () => {
     [searchedRooms, chatRooms, updatedChat]
   );
 
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
-
   return (
     <>
-      {chatRooms && (
+      {chatRooms && !searchedRooms && (
         <>
           <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
           {chatRoomsNextPageToken && !searchedRooms && <SRef ref={scrollRef}>Loading...</SRef>}
         </>
       )}
-      <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} />
+      {searchedRooms && <SSectionContent>{searchedRooms.map(renderChatItem)}</SSectionContent>}
     </>
   );
 };
@@ -236,12 +248,11 @@ export const ChatList = () => {
 export default ChatList;
 
 const SSectionContent = styled.div`
-  height: calc(100% - 48px);
   padding: 0 24px;
   display: flex;
-  position: relative;
   overflow-y: auto;
   flex-direction: column;
+  height: calc(100vh - 70px);
 `;
 
 const SChatItem = styled.div`

@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import randomID from '../../../utils/randomIdGenerator';
 import Modal from '../../organisms/Modal';
 import SearchInput from '../../atoms/chat/SearchInput';
 import {
@@ -169,7 +168,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
       };
 
       return (
-        <SChatItemContainer key={randomID()}>
+        <SChatItemContainer key={chat.id?.toString()}>
           <SChatItemM onClick={handleItemClick}>
             {chat.visavis?.avatarUrl && (
               <SUserAvatar>
@@ -234,7 +233,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
                   <NewAnnouncement handleClick={createNewAnnouncement} />
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
-                      <SSection key={randomID()}>
+                      <SSection key={section.letter}>
                         <SLetter>{section.letter}</SLetter>
                         {section.chats.map(renderChatItem)}
                       </SSection>

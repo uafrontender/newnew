@@ -18,7 +18,6 @@ import { IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUserAlias } from '../../atoms/chat/styles';
 import GoBackButton from '../GoBackButton';
-import randomID from '../../../utils/randomIdGenerator';
 import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
@@ -273,8 +272,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <React.Fragment key={item.id ? item.id.toString() : randomID()}>
-          <SMessage id={item.id ? item.id.toString() : randomID()} mine={isMine} prevSameUser={prevSameUser}>
+        <>
+          <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
             {!nextSameUser && (
               <SUserAvatar
                 mine={isMine}
@@ -292,7 +291,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             </SMessageContent>
           </SMessage>
           {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
-        </React.Fragment>
+        </>
       );
       if (
         item.createdAt?.seconds &&
@@ -306,9 +305,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         }
 
         return (
-          <>
+          <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage key={randomID()} type="info">
+            <SMessage type="info">
               <SMessageContent
                 type="info"
                 prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
@@ -319,7 +318,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                 </SMessageText>
               </SMessageContent>
             </SMessage>
-          </>
+          </React.Fragment>
         );
       }
 

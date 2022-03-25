@@ -1,52 +1,56 @@
+/* eslint-disable consistent-return */
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import moment from 'moment';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { toNumber } from 'lodash';
+import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
-
-import Text from '../../../atoms/Text';
-import Button from '../../../atoms/Button';
-import Caption from '../../../atoms/Caption';
-import TextArea from '../../../atoms/creation/TextArea';
-import InlineSVG from '../../../atoms/InlineSVG';
-// import GradientMask from '../../../atoms/GradientMask';
-import UserAvatar from '../../UserAvatar';
-
-import { useAppSelector } from '../../../../redux-store/store';
-// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
+import { toNumber } from 'lodash';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
-import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import { IChatData } from '../../../interfaces/ichat';
+import { useAppSelector } from '../../../../redux-store/store';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
-import { getMessages, getRoom, markRoomAsRead, sendMessage } from '../../../../api/endpoints/chat';
+import { getMessages, sendMessage } from '../../../../api/endpoints/chat';
+import GoBackButton from '../../GoBackButton';
+import { SUserAlias } from '../../../atoms/chat/styles';
+import InlineSVG from '../../../atoms/InlineSVG';
+import Text from '../../../atoms/Text';
+import TextArea from '../../../atoms/chat/TextArea';
+import Button from '../../../atoms/Button';
+import UserAvatar from '../../UserAvatar';
 
-interface IChat {
-  roomID: string;
-}
-
-export const Chat: React.FC<IChat> = ({ roomID }) => {
+const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
   const { t } = useTranslation('creator');
-  const router = useRouter();
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
+
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
-  const [messagesNextPageToken, setMessagesNextPageToken] = useState<string | undefined | null>('');
-  const [messagesLoading, setMessagesLoading] = useState(false);
+
+  const [localUserData, setLocalUserData] = useState({
+    justSubscribed: false,
+    blockedUser: false,
+    isAnnouncement: false,
+    subscriptionExpired: false,
+    messagingDisabled: false,
+    accountDeleted: false,
+  });
+
+  const [isAnnouncement, setIsAnnouncement] = useState<boolean>(false);
+  const [isMyAnnouncement, setIsMyAnnouncement] = useState<boolean>(false);
+
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
-  const [chatRoom, setChatRoom] = useState<newnewapi.ChatRoom | undefined>();
-  const [chatRoomLoading, setChatRoomLoading] = useState<boolean>(false);
+  const [messagesNextPageToken, setMessagesNextPageToken] = useState<string | undefined | null>('');
+  const [messagesLoading, setMessagesLoading] = useState(false);
 
   const getChatMessages = useCallback(
     async (pageToken?: string) => {
@@ -55,7 +59,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         if (!pageToken) setMessages([]);
         setMessagesLoading(true);
         const payload = new newnewapi.GetMessagesRequest({
-          roomId: toNumber(roomID),
+          roomId: chatRoom?.id,
           ...(pageToken
             ? {
                 paging: {
@@ -73,6 +77,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
+          setLocalUserData({ ...localUserData, justSubscribed: false });
         }
         setMessagesLoading(false);
       } catch (err) {
@@ -80,59 +85,33 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         setMessagesLoading(false);
       }
     },
-    [messagesLoading, roomID]
+    [messagesLoading, chatRoom, localUserData]
   );
 
-  const fetchChatRoom = useCallback(async () => {
-    if (chatRoomLoading) return;
-    try {
-      setChatRoomLoading(true);
-      const payload = new newnewapi.GetRoomRequest({
-        roomId: toNumber(roomID),
-      });
-      const res = await getRoom(payload);
+  useEffect(() => {
+    if (chatRoom) {
+      setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data) {
-        setChatRoom(res.data);
+      if (!chatRoom.lastMessage) setLocalUserData({ ...localUserData, justSubscribed: true });
+      getChatMessages();
+      if (chatRoom.kind === 4) {
+        setIsAnnouncement(true);
+        if (chatRoom.myRole === 2) setIsMyAnnouncement(true);
+      } else {
+        setIsAnnouncement(false);
+        setIsMyAnnouncement(false);
       }
-      setChatRoomLoading(false);
-    } catch (err) {
-      console.error(err);
-      setChatRoomLoading(false);
+      if (chatRoom.id) {
+        addChannel(`chat_${chatRoom.id.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: chatRoom.id,
+          },
+        });
+      }
+      return () => {
+        if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
+      };
     }
-  }, [chatRoomLoading, roomID]);
-
-  async function markChatAsRead() {
-    try {
-      const payload = new newnewapi.MarkRoomAsReadRequest({
-        roomId: toNumber(roomID),
-      });
-      const res = await markRoomAsRead(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  useEffect(() => {
-    getChatMessages();
-    addChannel(`chat_${roomID.toString()}`, {
-      chatRoomUpdates: {
-        chatRoomId: toNumber(roomID),
-      },
-    });
-    return () => {
-      removeChannel(`chat_${roomID.toString()}`);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!chatRoom) {
-      fetchChatRoom();
-    }
-    if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0) markChatAsRead();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
 
@@ -182,11 +161,11 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   }, []);
 
   const submitMessage = useCallback(async () => {
-    if (messageText.length > 0) {
+    if (chatRoom && messageText.length > 0) {
       try {
         setSendingMessage(true);
         const payload = new newnewapi.SendMessageRequest({
-          roomId: toNumber(roomID),
+          roomId: chatRoom.id,
           content: {
             text: messageText,
           },
@@ -203,16 +182,12 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomID, messageText]);
+  }, [chatRoom?.id, messageText]);
 
   const handleSubmit = useCallback(() => {
     if (!sendingMessage) submitMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageText]);
-
-  const handleGoBack = useCallback(() => {
-    router.push('/creator/dashboard?tab=chat');
-  }, [router]);
 
   const renderMessage = useCallback(
     (item: newnewapi.IChatMessage, index) => {
@@ -227,6 +202,16 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       const content = (
         <>
           <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
+            {!nextSameUser && (
+              <SUserAvatar
+                mine={isMine}
+                avatarUrl={
+                  !isMine && chatRoom && chatRoom.visavis?.avatarUrl
+                    ? chatRoom.visavis?.avatarUrl
+                    : user.userData?.avatarUrl
+                }
+              />
+            )}
             <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
               <SMessageText mine={isMine} weight={600} variant={3}>
                 {item.content?.text}
@@ -248,7 +233,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         }
 
         return (
-          <React.Fragment key={item.id?.toString()}>
+          <React.Fragment key={toNumber(item.id)}>
             {content}
             <SMessage type="info">
               <SMessageContent
@@ -267,72 +252,78 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
 
       return content;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [roomID, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, chatRoom]
+    [chatRoom, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, scrollRef]
   );
 
-  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
-
-  const handleUserClick = useCallback(() => {
-    if (chatRoom?.visavis?.username) {
-      router.push(`/u/${chatRoom?.visavis?.username}`);
+  const clickHandler = () => {
+    if (showChatList) {
+      showChatList();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageText]);
+  };
+
+  const isTextareaHidden = useCallback(() => {
+    if (!chatRoom) {
+      return false;
+    }
+    if (isAnnouncement && !isMyAnnouncement) {
+      return false;
+    }
+    return true;
+  }, [isAnnouncement, isMyAnnouncement, chatRoom]);
 
   return (
     <SContainer>
-      <STopPart>
-        <SInlineSVG
-          clickable
-          svg={chevronLeftIcon}
-          fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
-          onClick={handleGoBack}
-        />
-        <SUserAvatar
-          withClick
-          onClick={handleUserClick}
-          avatarUrl={chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''}
-        />
-        <SUserDescription>
-          <SUserNickName variant={3} weight={600}>
-            {chatRoom?.visavis?.nickname ? chatRoom?.visavis?.nickname : chatRoom?.visavis?.username}
-          </SUserNickName>
-          <SUserName variant={2} weight={600}>
-            {chatRoom?.visavis?.username ? chatRoom?.visavis?.username : chatRoom?.visavis?.nickname}
-          </SUserName>
-        </SUserDescription>
-      </STopPart>
+      {chatRoom && (
+        <STopPart>
+          <GoBackButton onClick={clickHandler} />
+          <SUserData>
+            <SUserName>
+              {isMyAnnouncement ? user.userData?.nickname : chatRoom.visavis?.nickname}
+              {isAnnouncement && t('announcement.title')}
+            </SUserName>
+            <SUserAlias>
+              {!isAnnouncement
+                ? `@${chatRoom.visavis?.username}`
+                : `${chatRoom.memberCount && chatRoom.memberCount > 0 ? chatRoom.memberCount : 0} ${
+                    chatRoom.memberCount!! > 1 ? t('new-announcement.members') : t('new-announcement.member')
+                  }`}
+            </SUserAlias>
+          </SUserData>
+        </STopPart>
+      )}
       <SCenterPart id="messagesScrollContainer">{messages.length > 0 && messages.map(renderMessage)}</SCenterPart>
       <SBottomPart>
-        <SBottomTextarea>
-          <STextArea>
-            <TextArea maxlength={500} value={messageText} onChange={handleChange} placeholder={t('chat.placeholder')} />
-          </STextArea>
-          <SButton
-            withShadow
-            view={messageText ? 'primaryGrad' : 'secondary'}
-            onClick={handleSubmit}
-            disabled={!messageText}
-          >
-            <SInlineSVG
-              svg={sendIcon}
-              fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SButton>
-        </SBottomTextarea>
+        {isTextareaHidden() && (
+          <SBottomTextarea>
+            <STextArea>
+              <TextArea
+                maxlength={500}
+                value={messageText}
+                onChange={handleChange}
+                placeholder={t('chat.placeholder')}
+              />
+            </STextArea>
+            <SButton
+              withShadow
+              view={messageText ? 'primaryGrad' : 'secondary'}
+              onClick={handleSubmit}
+              disabled={!messageText}
+            >
+              <SInlineSVG
+                svg={sendIcon}
+                fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
+            </SButton>
+          </SBottomTextarea>
+        )}
       </SBottomPart>
-      {/* <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} /> */}
     </SContainer>
   );
 };
 
-export default Chat;
+export default MobileChatArea;
 
 const SContainer = styled.div`
   height: 100%;
@@ -341,11 +332,26 @@ const SContainer = styled.div`
   flex-direction: column;
 `;
 
-const STopPart = styled.div`
+const STopPart = styled.header`
+  height: 80px;
+  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;
-  padding: 0 24px;
   align-items: center;
-  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 10px 0 24px;
+`;
+
+const SUserData = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  margin-right: auto;
+`;
+
+const SUserName = styled.strong`
+  font-weight: 600;
+  font-size: 16px;
+  padding-bottom: 4px;
 `;
 
 const SCenterPart = styled.div`
@@ -355,8 +361,11 @@ const SCenterPart = styled.div`
   display: flex;
   overflow-y: auto;
   flex-direction: column-reverse;
-  padding: 0 24px;
+  padding: 0 12px;
   position: relative;
+  ${({ theme }) => theme.media.tablet} {
+    padding: 0 24px;
+  }
 `;
 
 const SBottomPart = styled.div`
@@ -365,8 +374,33 @@ const SBottomPart = styled.div`
   padding: 0 24px;
 `;
 
+const SBottomTextarea = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+`;
+
 const STextArea = styled.div`
   flex: 1;
+`;
+
+interface ISUserAvatar {
+  mine?: boolean;
+}
+const SUserAvatar = styled(UserAvatar)<ISUserAvatar>`
+  position: absolute;
+  bottom: 0;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  display: none;
+  left: 0;
+
+  ${(props) => props.theme.media.tablet} {
+    display: block;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -377,28 +411,10 @@ const SInlineSVG = styled(InlineSVG)`
 const SButton = styled(Button)`
   padding: 12px;
   margin-left: 12px;
-
   &:disabled {
     background: ${(props) =>
       props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
   }
-`;
-
-const SUserAvatar = styled(UserAvatar)`
-  margin: 0 12px;
-`;
-
-const SUserDescription = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const SUserNickName = styled(Text)`
-  margin-bottom: 2px;
-`;
-
-const SUserName = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
 interface ISMessage {
@@ -418,11 +434,20 @@ const SMessage = styled.div<ISMessage>`
           ${props.theme.media.mobile} {
             justify-content: flex-end;
           }
+          ${props.theme.media.tablet} {
+            padding-right: 0;
+            padding-left: 44px;
+            justify-content: flex-start;
+          }
         `;
       }
       return css`
         ${props.theme.media.mobile} {
           padding-left: 0;
+        }
+        ${props.theme.media.tablet} {
+          justify-content: flex-start;
+          padding-left: 44px;
         }
       `;
     }
@@ -578,12 +603,6 @@ const SMessageText = styled(Text)<ISMessageText>`
     return props.theme.colorsThemed.text.primary;
   }};
 `;
-
 const SRef = styled.span`
   text-indent: -9999px;
-`;
-const SBottomTextarea = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
 `;
