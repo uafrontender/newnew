@@ -278,6 +278,9 @@ const SHeroImage = styled.div`
   width: 100%;
   height: 300px;
 
+  display: flex;
+  align-items: center;
+
   img {
     width: 100%;
   }
