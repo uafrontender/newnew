@@ -50,7 +50,6 @@ interface ISArrowHolder {
 
 const SArrowHolder = styled.div<ISArrowHolder>`
   top: 0;
-  width: ${(props) => (props.active ? '320px' : 0)};
   height: 100%;
   cursor: pointer;
   z-index: 2;
@@ -68,18 +67,16 @@ const SArrowHolder = styled.div<ISArrowHolder>`
 
   ${(props) => (props.position === 'left' ? css`
     left: -32px;
-    background: ${props.theme.gradients.arrowLeft};
 
     ${props.theme.media.laptop} {
-      left: -16px;
+      left: -116px;
     }
   ` : css`
     right: -32px;
-    background: ${props.theme.gradients.arrowRight};
     justify-content: flex-end;
 
     ${props.theme.media.laptop} {
-      right: -16px;
+      right: -116px;
     }
   `)}
 `;

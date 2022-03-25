@@ -53,7 +53,7 @@ const CardTimer: React.FunctionComponent<ICardTimer> = ({
         {' '}
         { expirationDate.getDate() }
         {' '}
-        { expirationDate.toLocaleString('default', { month: 'short' }) }
+        { expirationDate.toLocaleString('default', { month: 'short', year: '2-digit' }) }
         {' '}
         { expirationDate.getFullYear() }
       </SCaption>
@@ -64,5 +64,8 @@ const CardTimer: React.FunctionComponent<ICardTimer> = ({
 export default CardTimer;
 
 const SCaption = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  grid-area: timer;
+  justify-self: flex-end;
+
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
 `;
