@@ -70,11 +70,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       return [
         {
           nameToken: 'userInitial',
-          url: `/u/${user.username}`,
+          url: `/${user.username}`,
         },
         {
           nameToken: 'activity',
-          url: `/u/${user.username}/activity`,
+          url: `/${user.username}/activity`,
         },
       ];
     }
@@ -187,7 +187,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       console.log(res.data);
 
       if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-        router.push(`/u/${user.username}/subscribe`);
+        router.push(`/${user.username}/subscribe`);
       } else if (res.data?.status?.activeRenewsAt) {
         console.log('Subscribed! Redirect to chat will be here');
         router.push(`/direct-messages?user=${user.uuid}`);
@@ -278,7 +278,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/sign-up?reason=follow-creator');
-    router.prefetch(`/u/${user.username}/subscribe`);
+    router.prefetch(`/${user.username}/subscribe`);
+    router.prefetch(`/${user.username}/activity`);
+    router.prefetch(`/${user.username}`);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

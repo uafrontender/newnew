@@ -6,9 +6,11 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -35,6 +37,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -57,6 +60,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -145,6 +149,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
@@ -409,6 +414,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
@@ -552,12 +558,18 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           ? (
             <McOptionsTab
               post={post}
+              postCreator={post.creator?.nickname as string ?? post.creator?.username}
+              postDeadline={
+                moment(post.responseUploadDeadline?.seconds as number * 1000)
+                  .subtract(3, 'days').calendar()
+              }
               options={options}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
-              minAmount={post.votePrice?.usdCents
+              minAmount={2}
+              votePrice={post.votePrice?.usdCents
                 ? (
-                  parseInt((post.votePrice?.usdCents / 100).toFixed(0), 10)
+                  Math.floor(post.votePrice?.usdCents / 100)
                 ) : 1}
               handleLoadOptions={fetchOptions}
               handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
@@ -594,6 +606,21 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.mc',
+          {
+            postCreator: post.creator?.nickname as string ?? post.creator?.username,
+            postDeadline:
+              moment(post.responseUploadDeadline?.seconds as number * 1000)
+                .subtract(3, 'days').calendar(),
+          }
+        )}
+      </PaymentSuccessModal>
     </SWrapper>
   );
 };

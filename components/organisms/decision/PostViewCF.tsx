@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import moment from 'moment';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -36,6 +37,7 @@ import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowd
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -118,6 +120,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Current backers
   const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
@@ -320,6 +323,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
               post={post}
               pledgeLevels={pledgeLevels}
               handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+              handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
             />
           ) : null }
         </>
@@ -465,6 +469,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
         handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
@@ -619,6 +624,21 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.cf',
+          {
+            postCreator: post.creator?.nickname as string ?? post.creator?.username,
+            postDeadline:
+              moment(post.responseUploadDeadline?.seconds as number * 1000)
+                .subtract(3, 'days').calendar(),
+          }
+        )}
+      </PaymentSuccessModal>
       {/* Choose pledge mobile modal */}
       {isMobile ? (
         <CfPledgeLevelsModal
@@ -626,8 +646,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           post={post}
           pledgeLevels={pledgeLevels}
           isOpen={choosePledgeModalOpen}
-          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
           onClose={() => setChoosePledgeModalOpen(false)}
+          handleAddPledgeFromResponse={handleAddPledgeFromResponse}
+          handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
         />
       ) : null}
       {/* Mobile floating button */}
@@ -713,8 +734,9 @@ const SActionButton = styled(Button)`
 const SActivitesContainer = styled.div`
   grid-area: activities;
 
-  /* display: flex; */
+  display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   height: 100%;
   width: 100%;

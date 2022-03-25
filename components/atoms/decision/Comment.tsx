@@ -75,7 +75,7 @@ const Comment: React.FC<IComment> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${comment.sender?.username}`);
+    router.push(`/${comment.sender?.username}`);
   };
 
   return (
