@@ -46,7 +46,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Scrolling gradients
-  const scrollRef: any = useRef();
+  const scrollRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   // Infinite load
@@ -340,12 +340,16 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         exit={{ opacity: 0 }}
       >
         <SActionSection
-          ref={scrollRef}
+          ref={(el) => {
+            scrollRef.current = el!!;
+          }}
         >
           <CommentForm
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
+            position="sticky"
+            zIndex={1}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
           <SCommentsWrapper>
@@ -417,35 +421,26 @@ const SActionSection = styled.div`
 
   max-height: 500px;
 
-  overflow: hidden;
-  &:hover {
-    overflow-y: auto;
-  }
+  overflow-y: auto;
 
   // Scrollbar
   &::-webkit-scrollbar {
     width: 4px;
   }
-
+  scrollbar-width: none;
   &::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 4px;
     transition: .2s linear;
-
-    background: blue;
-
   }
-
   &::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 4px;
     transition: .2s linear;
-
-    background: blue;
-
   }
 
   &:hover {
+    scrollbar-width: thin;
     &::-webkit-scrollbar-track {
       background: ${({ theme }) => theme.colorsThemed.background.outlines1};
     }

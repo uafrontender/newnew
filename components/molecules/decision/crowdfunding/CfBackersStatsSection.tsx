@@ -172,7 +172,7 @@ const SSectionContainer = styled(motion.div)`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height: 400px;
+    height: 340px;
   }
 `;
 

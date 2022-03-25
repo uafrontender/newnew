@@ -5,8 +5,10 @@
 /* eslint-disable arrow-body-style */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -33,7 +35,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-
+import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -58,6 +60,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -149,6 +152,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Total amount
   const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
@@ -413,6 +417,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       } catch (err) {
         console.error(err);
         setLoadingModalOpen(false);
@@ -551,6 +556,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           <AcOptionsTab
             postId={post.postUuid}
             postStatus={postStatus}
+            postCreator={post.creator?.nickname as string ?? post.creator?.username}
+            postDeadline={
+              moment(post.responseUploadDeadline?.seconds as number * 1000)
+                .subtract(3, 'days').calendar()
+            }
             options={options}
             optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
@@ -589,6 +599,21 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.ac',
+          {
+            postCreator: post.creator?.nickname as string ?? post.creator?.username,
+            postDeadline:
+              moment(post.responseUploadDeadline?.seconds as number * 1000)
+                .subtract(3, 'days').calendar(),
+          }
+        )}
+      </PaymentSuccessModal>
     </SWrapper>
   );
 };

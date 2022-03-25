@@ -90,7 +90,7 @@ export const HeroSection = () => {
   const handleExploreClick = () => {
     scroller.scrollTo('topSection', {
       offset: isMobile ? -20 : -100,
-      smooth: 'easeInOutQuart',
+      smooth: 'ease',
       duration: SCROLL_EXPLORE,
       containerId: 'generalScrollContainer',
     });
@@ -168,10 +168,8 @@ export const HeroSection = () => {
             ) : (
               <SButton
                 withShrink
-                withRipple
                 withShadow
                 view="primaryGrad"
-                customDebounce={0}
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}

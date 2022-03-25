@@ -41,7 +41,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   // Posts
   // Top section/Curated posts
   const [topSectionCollection, setTopSectionCollection] = useState<newnewapi.Post[]>(
-    (top10posts.posts as newnewapi.Post[]) ?? []
+    (top10posts?.posts as newnewapi.Post[]) ?? []
   );
   // For you - authenticated users only
   const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
@@ -303,7 +303,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
             username: switchPostType(collectionCreator[0])[0].creator?.username!!,
           }}
           type="creator"
-          category={`u/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
+          category={`/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
           collection={collectionCreator}
           handlePostClicked={handleOpenPostModal}
         />
@@ -341,11 +341,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const top10payload = new newnewapi.EmptyRequest({});
 
   const resTop10 = await fetchCuratedPosts(top10payload);
-
-  // if (!resTop10.data?.posts || resTop10.error) {
-  if (resTop10.error) {
-    throw new Error('Request failed');
-  }
 
   if (post || !Array.isArray(post)) {
     const getPostPayload = new newnewapi.GetPostRequest({

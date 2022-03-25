@@ -125,7 +125,7 @@ export const Card: React.FC<ICard> = ({
     : 0));
 
   const handleUserClick = (username: string) => {
-    router.push(`/u/${username}`);
+    router.push(`/${username}`);
   };
   const handleMoreClick = () => {
     router.push('/post-detailed');
