@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 import React from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -16,14 +17,14 @@ const findActiveTab = (tabs: Tab[], currentPathname: string, pageType: 'myProfil
       .join(''));
   }
 
-  let pathnameCleaned = currentPathname.substring(0, 3) + currentPathname.substring(currentPathname.indexOf('/', 6));
+  let pathnameCleaned = '/' + currentPathname.substring(currentPathname.indexOf('/', 6));
 
-  if (pathnameCleaned.includes('[')) {
-    pathnameCleaned = currentPathname.substring(0, 3);
+  if (pathnameCleaned.includes('[username]')) {
+    pathnameCleaned = '/';
   }
 
   return tabs.findIndex((tab) => {
-    const tabNameCleaned = `/u/${tab.url.indexOf('/', 3) !== -1 ? tab.url.substring(tab.url.indexOf('/', 3)) : ''}`;
+    const tabNameCleaned = `/${tab.url.indexOf('/', 3) !== -1 ? tab.url.substring(tab.url.indexOf('/', 3)) : ''}`;
 
     return pathnameCleaned.split('/')
       .join('') === tabNameCleaned.split('/')

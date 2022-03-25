@@ -87,10 +87,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
-                    value:
-                      !isBalanceLoading && walletBalance?.usdCents
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined
-                        : undefined,
+                    value: !isBalanceLoading && walletBalance && walletBalance?.usdCents !== undefined ? (parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined) : undefined,
                   }}
                 />
               </SItemWithMargin>

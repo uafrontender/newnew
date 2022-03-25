@@ -37,7 +37,10 @@ const AcPickWinningOptionModal: React.FC<IAcPickWinningOptionModal> = ({
           </SModalMessage>
           { children }
           <SModalButtons>
-            <SCancelButton>
+            <SCancelButton
+              view='secondary'
+              onClick={closeModal}
+            >
               {t('AcPostModeration.OptionsTab.selectWinner.cancelBtn')}
             </SCancelButton>
             <SConfirmButton
