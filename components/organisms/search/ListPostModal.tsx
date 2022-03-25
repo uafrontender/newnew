@@ -11,7 +11,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
-interface IList {
+interface IListPostModal {
   category: string;
   collection: any;
   loading: boolean;
@@ -21,7 +21,7 @@ interface IList {
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const List: React.FC<IList> = ({
+export const ListPostModal: React.FC<IListPostModal> = ({
   category,
   collection,
   loading,
@@ -54,7 +54,7 @@ export const List: React.FC<IList> = ({
   };
 
   return (
-    <SListWrapper
+    <SListPostModalWrapper
       // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
     >
       {collection?.map(renderItem)}
@@ -68,25 +68,23 @@ export const List: React.FC<IList> = ({
           highlightColor={skeletonsHighlightColor}
         />
       ))}
-    </SListWrapper>
+    </SListPostModalWrapper>
   );
 };
 
-List.defaultProps = {
+ListPostModal.defaultProps = {
   wrapperStyle: {},
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };
 
-export default List;
+export default ListPostModal;
 
-const SListWrapper = styled.div`
+const SListPostModalWrapper = styled.div`
   width: 100%;
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
@@ -121,14 +119,6 @@ const SListWrapper = styled.div`
       margin: 0 16px 32px 16px;
     }
 
-    ${(props) => props.theme.media.laptopL} {
-      width: calc(20% - 32px);
-    }
-
-    ${(props) => props.theme.media.desktop} {
-      width: calc(16.65% - 32px);
-    }
-
 
     div {
       .skeletonSpan {
@@ -150,16 +140,8 @@ const SItemWrapper = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(25% - 32px);
+    width: calc(30% - 32px);
     margin: 0 16px 32px 16px;
-  }
-
-  ${(props) => props.theme.media.laptopL} {
-    width: calc(20% - 32px);
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: calc(16.65% - 32px);
   }
 
 `;
