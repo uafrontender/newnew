@@ -577,18 +577,24 @@ const SImageHolder = styled.div<ISWrapper>`
 `;
 
 const SImageMask = styled.div`
-  width: calc(100% - 20px);
+  width: 100%;
 
   top: 0;
-  left: 10px;
+  left: 0px;
   right: 0;
-  bottom: 10px;
+  bottom: 0px;
   z-index: 1;
   overflow: hidden;
   position: absolute;
   background: linear-gradient(180deg, rgba(11, 10, 19, 0) 49.87%, rgba(11, 10, 19, 0.8) 100%);
   border-radius: ${(props) => props.theme.borderRadius.medium};
   pointer-events: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: calc(100% - 20px);
+    left: 10px;
+    bottom: 10px;
+  }
 `;
 
 const STopContent = styled.div`

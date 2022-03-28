@@ -192,7 +192,7 @@ export const TopSection: React.FC<ITopSection> = ({
           />
         )}
       </SListContainer>
-      {!isMobile && (
+      {!isMobile && !isTablet && (
         <>
           <GradientMaskHorizontal
             gradientType='primary'
