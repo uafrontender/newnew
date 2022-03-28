@@ -289,6 +289,8 @@ const SButtonsHolder = styled.div`
 // `;
 
 const SHeroImage = styled.div`
+  order: -1;
+
   flex: 1;
   margin-top: 24px;
 
@@ -304,6 +306,7 @@ const SHeroImage = styled.div`
   }
 
   ${({ theme }) => theme.media.tablet} {
+    order: unset;
     height: 642px;
   }
 `;
