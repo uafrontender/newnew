@@ -47,22 +47,17 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
         <meta name="description" content={t('meta.description')} />
       </Head>
       <motion.div
-        // initial={!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-        //   x: 200,
-        //   opacity: 0,
-        // } : {}}
-        // animate={!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-        //   x: 0,
-        //   opacity: 1,
-        // } : {}}
         initial={{
-          x: 100,
+          x: 500,
           y: 500,
           opacity: 0,
         }}
         animate={{
           x: 0,
           opacity: 1,
+          transition: {
+            duration: 1
+          }
         }}
         >
         <CodeVerificationMenu
