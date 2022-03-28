@@ -135,12 +135,17 @@ const SItemWrapper = styled.div`
   margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {
-    width: calc(33% - 16px);
+    width: calc(25% - 16px);
     margin: 0 8px 24px 8px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    width: calc(30% - 32px);
+    width: calc(25% - 32px);
+    margin: 0 16px 32px 16px;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    width: calc(25% - 32px);
     margin: 0 16px 32px 16px;
   }
 

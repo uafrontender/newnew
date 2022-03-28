@@ -33,9 +33,9 @@ export const ScrollArrow: React.FC<IScrollArrow> = (props) => {
     >
       <InlineSVG
         svg={ICONS[position]}
-        fill={theme.colorsThemed.text.primary}
-        width="48px"
-        height="48px"
+        fill={theme.colorsThemed.background.outlines2}
+        width="24px"
+        height="24px"
       />
     </SArrowHolder>
   );
@@ -49,34 +49,54 @@ interface ISArrowHolder {
 }
 
 const SArrowHolder = styled.div<ISArrowHolder>`
-  top: 0;
-  height: 100%;
+  top: calc(40% - 18px);
+  height: 36px;
+  width: 36px;
   cursor: pointer;
   z-index: 2;
-  padding: ${(props) => (props.active ? '16px' : 0)};
   display: flex;
   opacity: ${(props) => (props.active ? 1 : 0)};
   overflow: hidden;
   position: absolute;
   transition: all linear 0.2s;
   align-items: center;
+  justify-content: center;
 
-  svg {
-    z-index: 3;
+  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+
+  border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines2};
+  border-radius: 50%;
+
+  div {
+    width: 100%;
   }
 
   ${(props) => (props.position === 'left' ? css`
-    left: -32px;
+    left: 12px;
 
     ${props.theme.media.laptop} {
       left: -116px;
     }
+    ${props.theme.media.laptopM} {
+      left: -76px;
+    }
   ` : css`
-    right: -32px;
+    right: 12px;
     justify-content: flex-end;
 
     ${props.theme.media.laptop} {
       right: -116px;
     }
+    ${props.theme.media.laptopM} {
+      right: -76px;
+    }
   `)}
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colorsThemed.text.primary};
+
+    path {
+      fill: ${({ theme }) => theme.colorsThemed.text.primary};
+    }
+  }
 `;
