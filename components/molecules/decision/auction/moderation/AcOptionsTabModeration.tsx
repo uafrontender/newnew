@@ -221,8 +221,6 @@ const SLoadMoreBtn = styled(Button)`
 
 // No options yet
 const SNoOptionsYet = styled.div`
-  position: absolute;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -233,6 +231,7 @@ const SNoOptionsYet = styled.div`
 `;
 
 const SNoOptionsImgContainer = styled.div`
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;

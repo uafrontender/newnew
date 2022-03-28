@@ -66,8 +66,8 @@ export const CardsSection: React.FC<ICardSection> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
-  const isLaptop = ['laptop'].includes(resizeMode);
-  const isDesktop = ['laptopL'].includes(resizeMode);
+  // const isLaptop = ['laptop'].includes(resizeMode);
+  // const isDesktop = ['laptopL'].includes(resizeMode);
 
   let collectionToRender = collection;
   let renderShowMore = false;
@@ -78,7 +78,7 @@ export const CardsSection: React.FC<ICardSection> = ({
     collectionToRender = collection.slice(0, 3);
   }
 
-  if (resizeMode === 'tablet') {
+  if (resizeMode === 'tablet' || resizeMode === 'laptop') {
     scrollStep = SCROLL_STEP.tablet;
   }
 
@@ -102,7 +102,7 @@ export const CardsSection: React.FC<ICardSection> = ({
 
     scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
       offset: -32,
-      smooth: 'easeInOutQuart',
+      smooth: 'easeOutQuad',
       duration: SCROLL_CARDS_SECTIONS,
       horizontal: true,
       containerId: `${category}-scrollContainer`,
@@ -149,7 +149,7 @@ export const CardsSection: React.FC<ICardSection> = ({
         <Card
           item={item}
           index={index + 1}
-          width={isMobile ? '100%' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
+          width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
           height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
         />
       </SItemWrapper>
@@ -179,8 +179,6 @@ export const CardsSection: React.FC<ICardSection> = ({
     });
   }, []);
   useEffect(() => {
-
-    console.log(visibleListItem)
     setCanScrollLeft(visibleListItem !== 0);
     setCanScrollRight(visibleListItem + 1 <= (collection?.length || 0) - scrollStep);
   }, [visibleListItem, collection, scrollStep]);
@@ -302,13 +300,16 @@ const SWrapper = styled.div<ISWrapper>`
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;
 
-    /* width: calc(200px * 5 + 32px * 4); */
+    margin: 0 auto;
+    max-width: 696px;
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: 40px 0;
+  }
 
-    /* width: calc(224px * 5 + 32px * 4); */
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
   }
 `;
 

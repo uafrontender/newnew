@@ -577,12 +577,12 @@ const SImageHolder = styled.div<ISWrapper>`
 `;
 
 const SImageMask = styled.div`
-  width: calc(100% + 10px);
+  width: calc(100% - 20px);
 
   top: 0;
-  left: -5px;
+  left: 10px;
   right: 0;
-  bottom: 0;
+  bottom: 10px;
   z-index: 1;
   overflow: hidden;
   position: absolute;

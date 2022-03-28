@@ -10,11 +10,13 @@ import Card from '../../molecules/Card';
 import Headline from '../../atoms/Headline';
 import ScrollArrow from '../../atoms/ScrollArrow';
 
+import useScrollGradientsHorizontal from '../../../utils/hooks/useScrollGradientsHorizontal';
 import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TOP_10 } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
+import GradientMaskHorizontal from '../../atoms/GradientMaskHorizontal';
 
 const SCROLL_STEP = {
   mobile: 1,
@@ -73,7 +75,7 @@ export const TopSection: React.FC<ITopSection> = ({
 
     scroller.scrollTo(`top-section-${scrollTo}`, {
       offset: -32,
-      smooth: 'easeInOutQuart',
+      smooth: 'easeOutQuad',
       duration: SCROLL_TOP_10,
       horizontal: true,
       containerId: 'topScrollContainer',
@@ -130,6 +132,11 @@ export const TopSection: React.FC<ITopSection> = ({
     renderLeftArrow,
     renderRightArrow,
   } = useHoverArrows(ref);
+  const {
+    showLeftGradient,
+    showRightGradient,
+  } = useScrollGradientsHorizontal(scrollContainerRef);
+
 
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
@@ -141,7 +148,7 @@ export const TopSection: React.FC<ITopSection> = ({
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem < (collection?.length || 0) - 1);
+    setCanScrollRight(visibleListItem + 1 < (collection?.length || 0) - 1);
   }, [visibleListItem, collection]);
 
   return (
@@ -153,12 +160,12 @@ export const TopSection: React.FC<ITopSection> = ({
         duration: 1,
       }}
     >
-      <Headline
+      <SHeadline
         variant={4}
         animation="t-01"
       >
         {t('top-block-title', { country })}
-      </Headline>
+      </SHeadline>
       <SListContainer ref={ref}>
         <SListWrapper
           id="topScrollContainer"
@@ -185,6 +192,22 @@ export const TopSection: React.FC<ITopSection> = ({
           />
         )}
       </SListContainer>
+      {!isMobile && (
+        <>
+          <GradientMaskHorizontal
+            gradientType='primary'
+            active={showLeftGradient}
+            positionLeft='-25px'
+            additonalZ={5}
+          />
+          <GradientMaskHorizontal
+            gradientType='primary'
+            active={showRightGradient}
+            positionRight='-25px'
+            additonalZ={5}
+          />
+        </>
+      )}
     </SWrapper>
   );
 };
@@ -197,6 +220,8 @@ interface ISWrapper {
 
 const SWrapper = styled(motion.section)<ISWrapper>`
   padding: 0 0 48px 0;
+
+  position: relative;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -212,6 +237,16 @@ const SWrapper = styled(motion.section)<ISWrapper>`
 
   ${(props) => props.theme.media.laptop} {
     padding: 40px 0;
+  }
+`;
+
+const SHeadline = styled(Headline)`
+  ${(props) => props.theme.media.tablet} {
+    margin: 0 auto;
+    max-width: 702px;
+  }
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
   }
 `;
 

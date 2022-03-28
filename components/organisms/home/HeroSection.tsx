@@ -21,8 +21,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 // Assets
-import HeroDark from '../../../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
-import HeroLight from '../../../public/images/home/Landing-Page-Hold-Frame-Light.webp';
+import HeroDarkPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
+import HeroLightPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Light.webp';
 
 export const HeroSection = () => {
   const router = useRouter();
@@ -185,16 +185,22 @@ export const HeroSection = () => {
         </AnimatedPresence>
       </STopWrapper>
       <SHeroImage>
-        {/* <Image
-          src={theme.name === 'dark' ? HeroDark : HeroLight}
-          width="100%"
-          objectFit="contain"
-          priority
-        /> */}
-        <img
-          src={theme.name === 'dark' ? HeroDark.src : HeroLight.src}
-          alt="hero"
-        />
+        <video
+          loop
+          muted
+          autoPlay
+          playsInline
+          poster={theme.name === 'light' ? HeroLightPlaceholder.src : HeroDarkPlaceholder.src}
+        >
+          <source
+            src={
+              theme.name === 'light'
+              ? '/images/home/Landing-Page-Light.webm'
+              : '/images/home/Landing-Page-Dark.webm'
+            }
+            type="video/webm"
+          />
+        </video>
       </SHeroImage>
       {/* <SNotificationsList>
         <GradientMask />
@@ -214,12 +220,23 @@ const SWrapper = styled.section`
   ${(props) => props.theme.media.tablet} {
     align-items: center;
     flex-direction: row;
+
+    max-width: 702px;
+    margin: 0 auto;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
   }
 `;
 
 const STopWrapper = styled.div`
   flex: 1;
   white-space: pre-line;
+
+  ${(props) => props.theme.media.laptop} {
+    max-width: 40%
+  }
 `;
 
 const SHeadline = styled(Headline)`
@@ -281,12 +298,9 @@ const SHeroImage = styled.div`
   display: flex;
   align-items: center;
 
-  img {
+  video {
     width: 100%;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-
+    object-fit: contain;
   }
 
   ${({ theme }) => theme.media.tablet} {

@@ -686,8 +686,6 @@ const SPaymentModalOptionText = styled.div`
 
 // No options yet
 const SNoOptionsYet = styled.div`
-  position: absolute;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -696,12 +694,20 @@ const SNoOptionsYet = styled.div`
   width: 100%;
   min-height: 300px;
 
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     min-height: 400px;
   }
 `;
 
 const SNoOptionsImgContainer = styled.div`
+  position: absolute;
+
+  top: 100px;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -710,12 +716,18 @@ const SNoOptionsImgContainer = styled.div`
   height: 48px;
 
   img {
+    position: relative;
+    top: -24px;
     display: block;
     width: 100%;
     height: 100%;
   }
 
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: initial;
+  }
 `;
 
 const SNoOptionsCaption = styled(Text)`
