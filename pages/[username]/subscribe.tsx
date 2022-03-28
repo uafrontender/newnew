@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
+import { useTranslation, Trans } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import styled, { useTheme } from 'styled-components';
@@ -24,9 +24,9 @@ import FaqSection from '../../components/molecules/subscribe/FaqSection';
 import PaymentModal from '../../components/molecules/checkout/PaymentModal';
 
 // Images
-import dmsImage from '../../public/images/subscription/dms.png';
-import votesImage from '../../public/images/subscription/free-votes.png';
-import suggestionsImage from '../../public/images/subscription/suggestions.png';
+import dmsImage from '../../public/images/subscription/Sub-DM.webp';
+import suggestionsImage from '../../public/images/subscription/Sub-MC.webp';
+import votesImage from '../../public/images/subscription/Sub-Votes.webp';
 
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
@@ -43,6 +43,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const { banner } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { walletBalance } = useContext(WalletContext);
 
@@ -146,8 +148,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   return (
     <>
       <SGeneral
+        restrictMaxWidth
         {...{
-          ...(isMobile
+          ...(isMobileOrTablet
             ? {
                 specialStatusBarColor: theme.colorsThemed.accent.yellow,
               }
@@ -157,7 +160,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         <div>
           <main
             style={{
-              ...(isMobile && !banner.show
+              ...(isMobileOrTablet && !banner.show
                 ? {
                     marginTop: '-28px',
                   }
@@ -193,12 +196,24 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                 </SScrolledDownTopSection>
               )}
             </AnimatePresence>
+            {isTablet && (
+              <SGoBackButtonTablet
+                defer={500}
+                onClick={() => router.back()}
+              />
+            )}
             <STopSection
               ref={(el) => {
                 topSectionRef.current = el!!;
               }}
             >
-              {isMobile && <SBackButton defer={500} onClick={() => router.back()} />}
+              {!isTablet && (
+                <SBackButton defer={500} onClick={() => router.back()}>
+                  {!isMobileOrTablet && (
+                    t('backBtn')
+                  )}
+                </SBackButton>
+              )}
               <UserInfoSection>
                 <SHeadingSection>
                   <SSHeadingSectionAvatar>
@@ -218,7 +233,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   >
                     {t('subscribeBtn', { amount: subPriceFormatted })}
                   </SSubscribeButtonDesktop>
-                  <Button
+                  {/* <Button
                     view="quaternary"
                     style={{
                       marginBottom: '16px',
@@ -228,24 +243,48 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     onClick={() => {}}
                   >
                     {t('learnMoreBtn')}
-                  </Button>
+                  </Button> */}
                 </SButtonsSection>
               </UserInfoSection>
               <SBulletsSection>
                 <SBullet>
                   <SBulletImg alt="" src={dmsImage.src} />
                   <SBulletTitle variant={5}>{t('TopSection.bullets.dms.title')}</SBulletTitle>
-                  <SBulletBody variant={3}>{t('TopSection.bullets.dms.body')}</SBulletBody>
+                  <SBulletBody variant={3}>
+                    {t(
+                      'TopSection.bullets.dms.body',
+                      {
+                        nickname: user?.nickname
+                      }
+                    )}
+                  </SBulletBody>
                 </SBullet>
                 <SBullet>
                   <SBulletImg alt="" src={votesImage.src} />
                   <SBulletTitle variant={5}>{t('TopSection.bullets.freeVotes.title')}</SBulletTitle>
-                  <SBulletBody variant={3}>{t('TopSection.bullets.freeVotes.body')}</SBulletBody>
+                  <SBulletBody variant={3}>
+                    {t(
+                      'TopSection.bullets.freeVotes.body',
+                      {
+                        nickname: user?.nickname
+                      }
+                    )}
+                  </SBulletBody>
                 </SBullet>
                 <SBullet>
                   <SBulletImg alt="" src={suggestionsImage.src} />
                   <SBulletTitle variant={5}>{t('TopSection.bullets.suggestions.title')}</SBulletTitle>
-                  <SBulletBody variant={3}>{t('TopSection.bullets.suggestions.body')}</SBulletBody>
+                  <SBulletBody variant={3}>
+                    <Trans
+                      t={t}
+                      i18nKey="TopSection.bullets.suggestions.body"
+                      components={[
+                        // @ts-ignore
+                        <BoldSpan/>,
+                        user?.nickname
+                      ]}
+                  />
+                  </SBulletBody>
                 </SBullet>
               </SBulletsSection>
             </STopSection>
@@ -287,6 +326,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 };
 
 export default SubscribeToUserPage;
+
+const BoldSpan: React.FC = ({ children }) => <strong><em>{children}</em></strong>
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
@@ -348,14 +389,10 @@ const SGeneral = styled(General)`
     display: none;
   }
 
-  @media (max-width: 768px) {
-    #top-nav-header {
-      display: none;
-    }
+  @media (max-width: 764px) {
+    margin-top: -68px;
 
     main {
-      margin-top: -68px;
-
       div:first-child {
         padding-left: 0;
         padding-right: 0;
@@ -365,6 +402,12 @@ const SGeneral = styled(General)`
           margin-right: 0;
         }
       }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    #top-nav-header {
+      display: none;
     }
   }
 `;
@@ -387,10 +430,23 @@ const SScrolledDownTopSection = styled(motion.div)<{ pushDown: boolean }>`
 
   z-index: 100;
 
+  ${({ theme }) => theme.media.tablet} {
+    margin: 16px;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     top: ${({ pushDown }) => (pushDown ? '120px' : '80px')};
     padding: 0px calc(50% - 368px);
   }
+`;
+
+const SGoBackButtonTablet = styled(GoBackButton)`
+  position: absolute;
+  top: 24px;
+  left: 34px;
+
+  width: fit-content;
+  height: fit-content;
 `;
 
 const SBackButton = styled(GoBackButton)`
@@ -407,7 +463,10 @@ const SBackButton = styled(GoBackButton)`
     fill: ${({ theme }) => theme.colors.dark} !important;
   }
 
-  &:active {
+  color: ${({ theme }) => theme.colors.dark};
+
+  &:active:enabled, &:hover:enabled, &:focus {
+    color: ${({ theme }) => theme.colors.dark} !important;
     & div > svg {
       path {
         fill: ${({ theme }) => theme.colors.dark} !important;
@@ -419,7 +478,12 @@ const SBackButton = styled(GoBackButton)`
   }
 
   ${({ theme }) => theme.media.tablet} {
-    display: none;
+
+  }
+
+  ${({ theme }) => theme.media.laptopM} {
+    left: 96px;
+    top: 48px;
   }
 `;
 
@@ -491,7 +555,7 @@ const STopSection = styled.div`
     margin-bottom: 60px;
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     display: flex;
     align-items: center;
 
@@ -504,7 +568,7 @@ const STopSection = styled.div`
 `;
 
 const UserInfoSection = styled.div`
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     width: 50%;
   }
 `;
@@ -556,7 +620,7 @@ const SSHeadingSectionAvatar = styled.div`
     }
   }
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.laptopM} {
     width: 84px;
     height: 84px;
     border-radius: 50%;
@@ -632,7 +696,7 @@ const SBulletsSection = styled.div`
     gap: initial;
   }
 
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     width: 50%;
   }
 `;
@@ -644,8 +708,7 @@ const SBullet = styled.div`
   flex-direction: column;
   justify-content: center;
 
-  background: radial-gradient(100% 1411.13% at 0% 0%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%),
-    radial-gradient(100% 1411.13% at 100% 100%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%), #1b1c27;
+  background: ${({ theme }) => theme.colors.dark};
 
   height: 128px;
 
