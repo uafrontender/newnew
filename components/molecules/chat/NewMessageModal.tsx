@@ -182,11 +182,13 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
-          {index !== chatRooms!!.length - 1 && <SChatSeparator />}
+          {filteredChatrooms.length > 0
+            ? index !== filteredChatrooms!!.length - 1 && <SChatSeparator />
+            : index !== chatRooms!!.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
-    [chatRooms, closeModal, openChat]
+    [chatRooms, closeModal, openChat, filteredChatrooms]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);

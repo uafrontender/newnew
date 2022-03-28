@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -51,9 +51,7 @@ export const Chat = () => {
     setChatListHidden(false);
   };
 
-  const passInputValue = (str: string) => {
-    setSearchText(str);
-  };
+  const passInputValue = useCallback((str: string) => setSearchText(str), []);
 
   return (
     <SContainer>

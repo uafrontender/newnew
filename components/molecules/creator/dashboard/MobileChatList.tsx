@@ -37,6 +37,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<string | undefined | null>('');
   const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
   const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(null);
+  const [prevSearchText, setPrevSearchText] = useState<string>('');
+  const [searchedRoomsLoading, setSearchedRoomsLoading] = useState<boolean>(false);
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -127,22 +129,24 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   }, [inView, loadingRooms, chatRoomsNextPageToken]);
 
   useEffect(() => {
-    if (searchText) {
-      if (chatRooms) {
-        setSearchedRooms(null);
+    if (searchText && searchText !== prevSearchText && chatRooms) {
+      if (searchedRooms) setSearchedRooms(null);
+      setPrevSearchText(searchText);
+      if (!searchedRoomsLoading) {
+        setSearchedRoomsLoading(true);
+        console.log(searchText);
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
           if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
             arr.push(chat);
           }
         });
-        setSearchedRooms(arr);
+        if (arr.length > 0) setSearchedRooms(arr);
+        setSearchedRoomsLoading(false);
       }
-    } else {
-      setSearchedRooms(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchText]);
+    if (searchedRooms && !searchText) setSearchedRooms(null);
+  }, [searchText, chatRooms, searchedRooms, prevSearchText, searchedRoomsLoading]);
 
   async function markChatAsRead(id: number) {
     try {
@@ -311,6 +315,8 @@ const SUnreadCount = styled.span`
 `;
 const SRef = styled.span`
   text-indent: -9999px;
+  height: 0;
+  overflow: hidden;
 `;
 const SInlineSVG = styled(InlineSVG)`
   min-width: 24px;

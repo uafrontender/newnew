@@ -50,6 +50,8 @@ export const ChatsProvider: React.FC = ({ children }) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatUnreadCountsChanged.decode(arr);
       if (!decoded) return;
+      console.log(decoded);
+
       setData(decoded.chatUnreadCounts as newnewapi.TotalUnreadMessageCounts);
     };
 

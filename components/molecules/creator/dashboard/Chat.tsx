@@ -93,6 +93,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       const res = await getRoom(payload);
 
       if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
       if (res.data) {
         setChatRoom(res.data);
       }
@@ -225,24 +226,22 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <>
-          <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
-            <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
-              <SMessageText mine={isMine} weight={600} variant={3}>
-                {item.content?.text}
-              </SMessageText>
-            </SMessageContent>
-          </SMessage>
+        <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
+          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+            <SMessageText mine={isMine} weight={600} variant={3}>
+              {item.content?.text}
+            </SMessageText>
+          </SMessageContent>
           {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
-        </>
+        </SMessage>
       );
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
-        moment(toNumber(item.createdAt?.seconds)).format('DD.MM.YYYY') !==
-          moment(toNumber(nextElement?.createdAt?.seconds)).format('DD.MM.YYYY')
+        moment((item.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY') !==
+          moment((nextElement?.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY')
       ) {
-        let date = moment(toNumber(item.createdAt?.seconds)).format('MMM DD');
+        let date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -264,8 +263,23 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           </React.Fragment>
         );
       }
+      if (item.createdAt?.seconds && !nextElement) {
+        const date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        return (
+          <React.Fragment key={item.id?.toString()}>
+            {content}
+            <SMessage type="info">
+              <SMessageContent type="info" prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}>
+                <SMessageText type="info" weight={600} variant={3}>
+                  {date}
+                </SMessageText>
+              </SMessageContent>
+            </SMessage>
+          </React.Fragment>
+        );
+      }
 
-      return content;
+      return <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [roomID, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, chatRoom]
@@ -291,19 +305,40 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           height="24px"
           onClick={handleGoBack}
         />
-        <SUserAvatar
-          withClick
-          onClick={handleUserClick}
-          avatarUrl={chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''}
-        />
-        <SUserDescription>
-          <SUserNickName variant={3} weight={600}>
-            {chatRoom?.visavis?.nickname ? chatRoom?.visavis?.nickname : chatRoom?.visavis?.username}
-          </SUserNickName>
-          <SUserName variant={2} weight={600}>
-            {chatRoom?.visavis?.username ? chatRoom?.visavis?.username : chatRoom?.visavis?.nickname}
-          </SUserName>
-        </SUserDescription>
+        {chatRoom?.kind === 4 ? (
+          <SUserAvatar
+            withClick
+            onClick={handleUserClick}
+            avatarUrl={user?.userData?.avatarUrl ? user?.userData?.avatarUrl : ''}
+          />
+        ) : (
+          <SUserAvatar
+            withClick
+            onClick={handleUserClick}
+            avatarUrl={chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''}
+          />
+        )}
+        {chatRoom?.kind === 4 ? (
+          <SUserDescription>
+            <SUserNickName variant={3} weight={600}>
+              {user.userData?.nickname ? user.userData?.nickname : user.userData?.username} {t('announcement.title')}
+            </SUserNickName>
+            <SUserName variant={2} weight={600}>
+              {`${chatRoom.memberCount && chatRoom.memberCount > 0 ? chatRoom.memberCount : 0} ${
+                chatRoom.memberCount!! > 1 ? t('new-announcement.members') : t('new-announcement.member')
+              }`}
+            </SUserName>
+          </SUserDescription>
+        ) : (
+          <SUserDescription>
+            <SUserNickName variant={3} weight={600}>
+              {chatRoom?.visavis?.nickname ? chatRoom?.visavis?.nickname : chatRoom?.visavis?.username}
+            </SUserNickName>
+            <SUserName variant={2} weight={600}>
+              {chatRoom?.visavis?.username ? `@${chatRoom?.visavis?.username}` : chatRoom?.visavis?.nickname}
+            </SUserName>
+          </SUserDescription>
+        )}
       </STopPart>
       <SCenterPart id="messagesScrollContainer">{messages.length > 0 && messages.map(renderMessage)}</SCenterPart>
       <SBottomPart>
@@ -581,6 +616,8 @@ const SMessageText = styled(Text)<ISMessageText>`
 
 const SRef = styled.span`
   text-indent: -9999px;
+  height: 0;
+  overflow: hidden;
 `;
 const SBottomTextarea = styled.div`
   display: flex;

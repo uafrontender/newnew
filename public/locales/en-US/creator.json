@@ -238,5 +238,8 @@
     "created": "You created the announcement",
     "member": "member",
     "members": "members"
+  },
+  "announcement": {
+    "title": "'s announcement"
   }
 }

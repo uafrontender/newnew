@@ -9,11 +9,11 @@ import moment from 'moment';
 import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
-import GradientMask from '../../../atoms/GradientMask';
+// import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
+// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';
@@ -143,6 +143,8 @@ export const ChatList = () => {
     (chat: newnewapi.IChatRoom) => {
       const handleItemClick = async () => {
         if (searchedRooms) setSearchedRooms(null);
+        // console.log(chat);
+
         router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
         return null;
       };
@@ -214,10 +216,10 @@ export const ChatList = () => {
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchedRooms, chatRooms, updatedChat]
+    [searchedRooms, chatRooms, updatedChat, router, t]
   );
 
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
+  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
     <>
@@ -227,8 +229,8 @@ export const ChatList = () => {
           {chatRoomsNextPageToken && !searchedRooms && <SRef ref={scrollRef}>Loading...</SRef>}
         </>
       )}
-      <GradientMask positionTop active={showTopGradient} />
-      <GradientMask active={showBottomGradient} />
+      {/* <GradientMask positionTop active={showTopGradient} />
+      <GradientMask active={showBottomGradient} /> */}
     </>
   );
 };
@@ -300,6 +302,8 @@ const SUnreadCount = styled.span`
 `;
 const SRef = styled.span`
   text-indent: -9999px;
+  height: 0;
+  overflow: hidden;
 `;
 const SInlineSVG = styled(InlineSVG)`
   min-width: 24px;

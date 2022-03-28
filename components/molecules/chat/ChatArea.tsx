@@ -6,7 +6,6 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
-import { toNumber } from 'lodash';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
@@ -122,7 +121,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
-        if (chatRoom.myRole === 2) setIsMyAnnouncement(true);
+        /* eslint-disable no-unused-expressions */
+        chatRoom.myRole === 2 ? setIsMyAnnouncement(true) : setIsMyAnnouncement(false);
       } else {
         setIsAnnouncement(false);
         setIsMyAnnouncement(false);
@@ -272,34 +272,32 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <>
-          <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
-            {!nextSameUser && (
-              <SUserAvatar
-                mine={isMine}
-                avatarUrl={
-                  !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                    ? chatRoom.visavis?.avatarUrl
-                    : user.userData?.avatarUrl
-                }
-              />
-            )}
-            <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
-              <SMessageText mine={isMine} weight={600} variant={3}>
-                {item.content?.text}
-              </SMessageText>
-            </SMessageContent>
-          </SMessage>
+        <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
+          {!nextSameUser && (
+            <SUserAvatar
+              mine={isMine}
+              avatarUrl={
+                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
+                  ? chatRoom.visavis?.avatarUrl
+                  : user.userData?.avatarUrl
+              }
+            />
+          )}
+          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+            <SMessageText mine={isMine} weight={600} variant={3}>
+              {item.content?.text}
+            </SMessageText>
+          </SMessageContent>
           {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
-        </>
+        </SMessage>
       );
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
-        moment(toNumber(item.createdAt?.seconds)).format('DD.MM.YYYY') !==
-          moment(toNumber(nextElement?.createdAt?.seconds)).format('DD.MM.YYYY')
+        moment((item.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY') !==
+          moment((nextElement?.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY')
       ) {
-        let date = moment(toNumber(item.createdAt?.seconds)).format('MMM DD');
+        let date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -321,8 +319,23 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </React.Fragment>
         );
       }
+      if (item.createdAt?.seconds && !nextElement) {
+        const date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        return (
+          <React.Fragment key={item.id?.toString()}>
+            {content}
+            <SMessage type="info">
+              <SMessageContent type="info" prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}>
+                <SMessageText type="info" weight={600} variant={3}>
+                  {date}
+                </SMessageText>
+              </SMessageContent>
+            </SMessage>
+          </React.Fragment>
+        );
+      }
 
-      return content;
+      return <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>;
     },
     [chatRoom, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, scrollRef]
   );
@@ -408,7 +421,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </SActionsDiv>
         </STopPart>
       )}
-      {localUserData.isAnnouncement && chatRoom && (
+      {isAnnouncement && !isMyAnnouncement && chatRoom && (
         <SAnnouncementHeader>
           <SAnnouncementText>
             {t('announcement.top-message-start')} <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
@@ -419,7 +432,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       <SCenterPart id="messagesScrollContainer">
         {localUserData?.justSubscribed &&
           chatRoom &&
-          !isMyAnnouncement &&
+          messages.length === 0 &&
+          !isAnnouncement &&
           (chatRoom.myRole === 1 ? (
             <WelcomeMessage userAlias={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''} />
           ) : (
@@ -804,4 +818,6 @@ const SAnnouncementName = styled.span`
 
 const SRef = styled.span`
   text-indent: -9999px;
+  height: 0;
+  overflow: hidden;
 `;
