@@ -95,12 +95,21 @@ const SListWrapper = styled.div`
     left: -8px;
     width: calc(100% + 26px);
     padding: 24px 0 0 0;
+
+    margin: 0 auto;
+    max-width: 562px;
   }
 
   ${(props) => props.theme.media.laptop} {
     left: -16px;
     width: calc(100% + 32px);
     padding: 32px 0 0 0;
+
+    max-width: 1248px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    max-width: 1248px;
   }
 
 

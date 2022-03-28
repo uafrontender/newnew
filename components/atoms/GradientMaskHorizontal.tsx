@@ -9,6 +9,7 @@ interface IGradientMaskHorizontal {
   positionBottom?: string;
   height?: string;
   gradientType?: 'primary' | 'secondary' | 'tertiary';
+  additonalZ?: number;
 }
 
 const GradientMaskHorizontal: React.FC<IGradientMaskHorizontal> = ({
@@ -18,6 +19,7 @@ const GradientMaskHorizontal: React.FC<IGradientMaskHorizontal> = ({
   positionBottom,
   height,
   gradientType,
+  additonalZ,
 }) => (
   <SGradientMaskHorizontal
     active={active}
@@ -26,6 +28,7 @@ const GradientMaskHorizontal: React.FC<IGradientMaskHorizontal> = ({
     positionBottom={positionBottom}
     height={height}
     gradientType={gradientType ?? undefined}
+    additonalZ={additonalZ ?? undefined}
   />
 );
 
@@ -40,7 +43,7 @@ const SGradientMaskHorizontal = styled.div<IGradientMaskHorizontal>`
   }};
   bottom: ${({ positionBottom }) => positionBottom ?? '0px'};
   height: ${({ height }) => height ?? '100%'};
-  z-index: 1;
+  z-index: ${({ additonalZ }) => additonalZ ?? 1};
   position: absolute;
   transition: opacity linear 0.1s;
   background: ${(props) => {

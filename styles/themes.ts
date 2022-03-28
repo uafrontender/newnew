@@ -396,12 +396,12 @@ export const darkTheme: DefaultTheme = {
       tertiary: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
     },
     listLeft: {
-      primary: 'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
+      primary: 'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
       secondary: 'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
       tertiary: 'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
     },
     listRight: {
-      primary: 'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
+      primary: 'linear-gradient(270deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0)  100%)',
       secondary: 'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
       tertiary: 'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
     },

@@ -553,7 +553,7 @@ const SImageHolder = styled.div<ISWrapper>`
       object-fit: cover;
       width: calc(100% - 20px);
       height: calc(100% - 20px);
-      border-radius: ${({ theme }) => theme.borderRadius.medium};
+      border-radius: 10px;
     }
   }
 
@@ -577,18 +577,24 @@ const SImageHolder = styled.div<ISWrapper>`
 `;
 
 const SImageMask = styled.div`
-  width: calc(100% + 10px);
+  width: 100%;
 
   top: 0;
-  left: -5px;
+  left: 0px;
   right: 0;
-  bottom: 0;
+  bottom: 0px;
   z-index: 1;
   overflow: hidden;
   position: absolute;
   background: linear-gradient(180deg, rgba(11, 10, 19, 0) 49.87%, rgba(11, 10, 19, 0.8) 100%);
-  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border-radius: 10px;
   pointer-events: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: calc(100% - 20px);
+    left: 10px;
+    bottom: 10px;
+  }
 `;
 
 const STopContent = styled.div`
@@ -669,7 +675,7 @@ const SImageBG = styled.div<ISImageBG>`
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
-    border-radius: ${(props) => props.theme.borderRadius.medium};
+    border-radius: 10px;
   }
 `;
 
@@ -687,12 +693,12 @@ const SImageHolderOutside = styled.div`
   left: 10px;
   padding: 10px;
   overflow: hidden;
-  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border-radius: 10px;
 
   ${(props) => props.theme.media.tablet} {
     padding: 12px;
     overflow: hidden;
-    border-radius: ${(props) => props.theme.borderRadius.medium};
+    border-radius: 10px;
   }
 
   video {
@@ -707,7 +713,7 @@ const SImageHolderOutside = styled.div`
 `;
 
 const SBottomContentOutside = styled.div`
-  padding: 16px 16px 0;
+  padding: 16px 10px 0;
   display: flex;
   flex-direction: column;
 
