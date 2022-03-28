@@ -18,7 +18,7 @@ export const SContainer = styled.div<ISContainer>`
   ${(props) => props.theme.media.laptop} {
     padding: 0 80px;
   }
-  
+
   ${(props) => props.theme.media.laptopL} {
     ${(props) => props.noMaxContent && css`
       max-width: unset;
