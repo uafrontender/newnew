@@ -17,9 +17,12 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 
-import SignInIntro from '../../public/images/signup/hero-visual/sign-in-intro-fade.webp';
-import SignInHold from '../../public/images/signup/hero-visual/Sign-In-Hold-Frame.png';
-import SignInOutro from '../../public/images/signup/hero-visual/sign-in-outro.webp';
+import SignInIntro from '../../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
+import SignInHold from '../../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
+import SignInOutro from '../../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
+import SignInIntroLight from '../../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
+import SignInHoldLight from '../../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
+import SignInOutroLight from '../../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
 
 export const AuthLayoutContext = createContext({
   shouldHeroUnmount: false,
@@ -146,6 +149,7 @@ const SBackgroundVisual = styled.div`
 `;
 
 const HeroVisual: React.FunctionComponent = () => {
+  const theme = useTheme();
   const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>('intro');
 
   const authLayoutContext = useContext(AuthLayoutContext);
@@ -177,7 +181,7 @@ const HeroVisual: React.FunctionComponent = () => {
         }}
       >
         <Image
-          src={SignInIntro}
+          src={theme.name === 'dark' ? SignInIntro : SignInIntroLight}
           height={960}
           objectFit="contain"
           priority
@@ -189,7 +193,7 @@ const HeroVisual: React.FunctionComponent = () => {
         }}
       >
         <Image
-          src={SignInHold}
+          src={theme.name === 'dark' ? SignInHold : SignInHoldLight}
           height={960}
           objectFit="contain"
           priority
@@ -201,7 +205,7 @@ const HeroVisual: React.FunctionComponent = () => {
         }}
       >
         <Image
-          src={SignInOutro}
+          src={theme.name === 'dark' ? SignInOutro : SignInOutroLight}
           height={960}
           objectFit="contain"
           priority

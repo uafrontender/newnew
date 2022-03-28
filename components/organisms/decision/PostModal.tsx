@@ -15,7 +15,7 @@ import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import List from '../search/List';
+import ListPostModal from '../search/ListPostModal';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostFailedBox from '../../molecules/decision/PostFailedBox';
@@ -109,6 +109,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null | undefined>('');
   const [recommenedPostsLoading, setRecommenedPostsLoading] = useState(false);
+  const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
   const handleCloseAndGoBack = () => {
@@ -144,6 +145,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       if (recommenedPostsLoading) return;
       try {
         setRecommenedPostsLoading(true);
+        setTriedLoading(true);
 
         const fetchRecommenedPostsPayload = new newnewapi.GetSimilarPostsRequest({
           postUuid: postParsed?.postUuid,
@@ -370,12 +372,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (inView && !recommenedPostsLoading) {
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
-      } else if (!nextPageToken && recommenedPosts?.length === 0) {
+      } else if (!triedLoading && !nextPageToken && recommenedPosts?.length === 0) {
         loadRecommendedPosts();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, nextPageToken, recommenedPostsLoading]);
+  }, [inView, nextPageToken, recommenedPostsLoading, triedLoading]);
 
   useEffect(() => {
     setPostStatus(() => {
@@ -447,15 +449,17 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               id="recommendations-section-heading"
             >
               <Headline variant={4}>
-                {t('RecommendationsSection.heading')}
+                {
+                  recommenedPosts.length > 0 ? (
+                    t('RecommendationsSection.heading')
+                  ) : null
+                }
               </Headline>
               {recommenedPosts && (
-                <List
+                <ListPostModal
                   category=""
                   loading={recommenedPostsLoading}
-                  // loading
                   collection={recommenedPosts}
-                  // collection={[]}
                   wrapperStyle={{
                     left: '-16px',
                   }}

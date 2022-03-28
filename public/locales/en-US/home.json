@@ -5,9 +5,21 @@
   "hero-block-explore": "Explore",
   "hero-block-explore-now": "Explore now",
   "top-block-title": "Top 10 in {{country}}",
-  "ac-block-title": "Live Auctions",
-  "mc-block-title": "Top Multiple Choices",
-  "cf-block-title": "Top Crowdfunding",
+  "ac-block-title": "Biggest Events",
+  "ac-block-tutorial-card": {
+    "title": "Event",
+    "caption": "Send the creator a bid with what you want them to do, how much you're willing to spend, and see if they do your bid."
+  },
+  "mc-block-title": "Top Superpolls",
+  "mc-block-tutorial-card": {
+    "title": "Event",
+    "caption": "A creator makes a Superpoll that you pay to vote on. When the time's up, watch the creator do the option that gets the most amount of votes."
+  },
+  "cf-block-title": "Popular Goals",
+  "cf-block-tutorial-card": {
+    "title": "Goal",
+    "caption": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you'll watch the creator do it."
+  },
   "biggest-block-title": "Biggest of All Time",
   "button-show-more": "See more",
   "button-show-more-creator": "See more from {{name}}",
@@ -16,6 +28,9 @@
   "button-card-mc": "{{votes}} votes",
   "button-card-cf": "{{backed}} of {{total}} backers",
   "card-time-left": "{{time}} left",
+  "button-card-first-ac": "Be the first to bid!",
+  "button-card-first-mc": "Be the first to vote!",
+  "button-card-first-cf": "Be the first to pledge!",
   "card-time-left-days": "d",
   "card-time-left-hours": "h",
   "card-time-left-minutes": "m",

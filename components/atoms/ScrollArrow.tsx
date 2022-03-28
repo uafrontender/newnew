@@ -59,7 +59,7 @@ const SArrowHolder = styled.div<ISArrowHolder>`
   opacity: ${(props) => (props.active ? 1 : 0)};
   overflow: hidden;
   position: absolute;
-  transition: all ease-in-out 0.5s;
+  transition: all linear 0.2s;
   align-items: center;
 
   svg {

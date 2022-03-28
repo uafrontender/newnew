@@ -533,7 +533,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   return (
     <ErrorBoundary>
-      <SGeneral>
+      <SGeneral
+        // restrictMaxWidth
+      >
         <SMyProfileLayout>
           <ProfileBackground
             // Temp

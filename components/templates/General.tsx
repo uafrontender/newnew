@@ -28,10 +28,11 @@ interface IGeneral {
   children: React.ReactNode;
   withChat?: boolean;
   specialStatusBarColor?: string;
+  restrictMaxWidth?: boolean;
 }
 
 export const General: React.FC<IGeneral> = (props) => {
-  const { children, withChat, specialStatusBarColor } = props;
+  const { children, withChat, specialStatusBarColor, restrictMaxWidth } = props;
   const user = useAppSelector((state) => state.user);
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
@@ -132,7 +133,14 @@ export const General: React.FC<IGeneral> = (props) => {
           </Head>
           <Header visible={!isMobile || (isMobile && scrollDirection !== 'down')} />
           <SContent>
-            <Container noMaxContent>
+            <Container
+              {...(
+                restrictMaxWidth ? {
+                } : {
+                  noMaxContent: true,
+                }
+              )}
+            >
               <Row>
                 <Col>{children}</Col>
               </Row>
@@ -168,6 +176,7 @@ export default General;
 General.defaultProps = {
   withChat: false,
   specialStatusBarColor: undefined,
+  restrictMaxWidth: undefined,
 };
 
 interface ISWrapper {
