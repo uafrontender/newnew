@@ -707,7 +707,7 @@ const SImageHolderOutside = styled.div`
 `;
 
 const SBottomContentOutside = styled.div`
-  padding: 16px 16px 0;
+  padding: 16px 10px 0;
   display: flex;
   flex-direction: column;
 
