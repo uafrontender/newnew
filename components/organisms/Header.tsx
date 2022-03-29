@@ -83,7 +83,8 @@ const SContentWrapper = styled.div`
     content: '';
     z-index: -1;
     position: absolute;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: ${(props) => props.theme.colorsThemed.background.backgroundHeader};
+    opacity: 0.8;
+    filter: blur(10px);
   }
 `;
