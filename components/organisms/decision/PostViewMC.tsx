@@ -558,6 +558,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           ? (
             <McOptionsTab
               post={post}
+              postStatus={postStatus}
               postCreator={post.creator?.nickname as string ?? post.creator?.username}
               postDeadline={
                 moment(post.responseUploadDeadline?.seconds as number * 1000)

@@ -255,7 +255,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         isDisabled={disabled}
         isBlue={isSupportedByMe || isMyBid}
         onClick={() => {
-          if (!isMobile && !disabled) {
+          if (!isMobile && !disabled && votingAllowed) {
             handleOpenSupportForm();
           }
         }}
