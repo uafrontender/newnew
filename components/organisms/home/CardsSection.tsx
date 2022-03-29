@@ -414,6 +414,14 @@ const STopWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 0px 32px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    padding: initial;
+  }
 `;
 
 const SCaption = styled(Caption)`

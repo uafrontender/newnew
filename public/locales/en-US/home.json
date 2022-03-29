@@ -1,6 +1,6 @@
 {
-  "hero-block-title": "Decision making marketplace",
-  "hero-block-subTitle": "Vote to control the outcomes of other people’s lives.",
+  "hero-block-title": "Where millions come together to shape reality",
+  "hero-block-subTitle": "Bid and vote on the world's biggest decisions",
   "hero-block-sign-in": "Sign in now",
   "hero-block-explore": "Explore",
   "hero-block-explore-now": "Explore now",
@@ -12,7 +12,7 @@
   },
   "mc-block-title": "Top Superpolls",
   "mc-block-tutorial-card": {
-    "title": "Event",
+    "title": "Superpolls",
     "caption": "A creator makes a Superpoll that you pay to vote on. When the time's up, watch the creator do the option that gets the most amount of votes."
   },
   "cf-block-title": "Popular Goals",
@@ -20,10 +20,10 @@
     "title": "Goal",
     "caption": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you'll watch the creator do it."
   },
-  "biggest-block-title": "Biggest of All Time",
+  "biggest-block-title": "Greatest of all Time",
   "button-show-more": "See more",
   "button-show-more-creator": "See more from {{name}}",
-  "button-creator-on-the-rise": "Creator on the rise",
+  "button-creator-on-the-rise": "On the Rise",
   "button-card-ac": "{{amount}} in bids",
   "button-card-mc": "{{votes}} votes",
   "button-card-cf": "{{backed}} of {{total}} backers",
