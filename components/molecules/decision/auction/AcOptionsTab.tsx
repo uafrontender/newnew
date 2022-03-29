@@ -33,9 +33,12 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
 import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IAcOptionsTab {
   postId: string;
+  postCreator: string;
+  postDeadline: string;
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
   optionToAnimate?: string;
@@ -48,6 +51,8 @@ interface IAcOptionsTab {
 
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
+  postCreator,
+  postDeadline,
   postStatus,
   options,
   optionToAnimate,
@@ -91,6 +96,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
@@ -226,6 +232,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         setSuggestNewMobileOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
+        setPaymentSuccesModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -374,6 +381,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               option={option as TAcOptionWithHighestField}
               shouldAnimate={optionToAnimate === option.id.toString()}
               postId={postId}
+              postCreator={postCreator}
+              postDeadline={postDeadline}
               index={i}
               minAmount={minAmount}
               votingAllowed={postStatus === 'voting'}
@@ -511,6 +520,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         isOpen={loadingModalOpen}
         zIndex={14}
       />
+      {/* Payment success Modal */}
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
+        {t(
+          'PaymentSuccessModal.ac',
+          {
+            postCreator,
+            postDeadline
+          }
+        )}
+      </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <SActionButton
@@ -551,17 +573,16 @@ const SBidsContainer = styled.div<{
   ${({ theme }) => theme.media.tablet} {
     height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
 
-
+    // Scrollbar
     &::-webkit-scrollbar {
       width: 4px;
     }
-
+    scrollbar-width: none;
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
       transition: .2s linear;
     }
-
     &::-webkit-scrollbar-thumb {
       background: transparent;
       border-radius: 4px;
@@ -569,6 +590,7 @@ const SBidsContainer = styled.div<{
     }
 
     &:hover {
+      scrollbar-width: thin;
       &::-webkit-scrollbar-track {
         background: ${({ theme }) => theme.colorsThemed.background.outlines1};
       }
@@ -664,8 +686,6 @@ const SPaymentModalOptionText = styled.div`
 
 // No options yet
 const SNoOptionsYet = styled.div`
-  position: absolute;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -674,12 +694,20 @@ const SNoOptionsYet = styled.div`
   width: 100%;
   min-height: 300px;
 
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+  }
+
   ${({ theme }) => theme.media.laptop} {
     min-height: 400px;
   }
 `;
 
 const SNoOptionsImgContainer = styled.div`
+  position: absolute;
+
+  top: 100px;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -688,12 +716,18 @@ const SNoOptionsImgContainer = styled.div`
   height: 48px;
 
   img {
+    position: relative;
+    top: -24px;
     display: block;
     width: 100%;
     height: 100%;
   }
 
   margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: initial;
+  }
 `;
 
 const SNoOptionsCaption = styled(Text)`

@@ -32,7 +32,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
   const createdAtParsed = new Date((pledge.createdAt?.seconds as number) * 1000);
 
   // Redirect to user's page
-  const handleRedirectToUser = () => router.push(`/u/${creator?.username}`);
+  const handleRedirectToUser = () => router.push(`/${creator?.username}`);
 
   return (
     <motion.div

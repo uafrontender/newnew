@@ -1,10 +1,11 @@
 import React, {
-  useMemo,
+  // useMemo,
   useState,
   useEffect,
   useCallback,
 } from 'react';
-import styled from 'styled-components';
+// import Image from 'next/image';
+import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -13,75 +14,80 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
-import NotificationItem from '../../molecules/NotificationsItem';
+// import NotificationItem from '../../molecules/NotificationsItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
+// Assets
+import HeroDarkPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
+import HeroLightPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Light.webp';
+
 export const HeroSection = () => {
-  const { t } = useTranslation('home');
   const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation('home');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const [animateTitle, setAnimateTitle] = useState(false);
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
   const [animateButton, setAnimateButton] = useState(false);
 
-  const notifications = useMemo(() => [
-    {
-      id: 'uniqueid-1',
-      bid: 50,
-      bidCurrency: '$',
-      bidUser: {
-        avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-        nickname: '@sugardaddy',
-      },
-      bidForUser: {
-        avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-        nickname: '@unicornbaby',
-      },
-    },
-    {
-      id: 'uniqueid-2',
-      bid: 50,
-      bidCurrency: '$',
-      bidUser: {
-        avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-        nickname: '@sugardaddy',
-      },
-      bidForUser: {
-        avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-        nickname: '@unicornbaby',
-      },
-    },
-    {
-      id: 'uniqueid-3',
-      bid: 50,
-      bidCurrency: '$',
-      bidUser: {
-        avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-        nickname: '@sugardaddy',
-      },
-      bidForUser: {
-        avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-        nickname: '@unicornbaby',
-      },
-    },
-    {
-      id: 'uniqueid-4',
-      bid: 50,
-      bidCurrency: '$',
-      bidUser: {
-        avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-        nickname: '@sugardaddy',
-      },
-      bidForUser: {
-        avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-        nickname: '@unicornbaby',
-      },
-    },
-  ], []);
+  // const notifications = useMemo(() => [
+  //   {
+  //     id: 'uniqueid-1',
+  //     bid: 50,
+  //     bidCurrency: '$',
+  //     bidUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
+  //       nickname: '@sugardaddy',
+  //     },
+  //     bidForUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
+  //       nickname: '@unicornbaby',
+  //     },
+  //   },
+  //   {
+  //     id: 'uniqueid-2',
+  //     bid: 50,
+  //     bidCurrency: '$',
+  //     bidUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
+  //       nickname: '@sugardaddy',
+  //     },
+  //     bidForUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
+  //       nickname: '@unicornbaby',
+  //     },
+  //   },
+  //   {
+  //     id: 'uniqueid-3',
+  //     bid: 50,
+  //     bidCurrency: '$',
+  //     bidUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
+  //       nickname: '@sugardaddy',
+  //     },
+  //     bidForUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
+  //       nickname: '@unicornbaby',
+  //     },
+  //   },
+  //   {
+  //     id: 'uniqueid-4',
+  //     bid: 50,
+  //     bidCurrency: '$',
+  //     bidUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
+  //       nickname: '@sugardaddy',
+  //     },
+  //     bidForUser: {
+  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
+  //       nickname: '@unicornbaby',
+  //     },
+  //   },
+  // ], []);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const handleSignInClick = () => {
@@ -90,16 +96,16 @@ export const HeroSection = () => {
   const handleExploreClick = () => {
     scroller.scrollTo('topSection', {
       offset: isMobile ? -20 : -100,
-      smooth: 'easeInOutQuart',
+      smooth: 'ease',
       duration: SCROLL_EXPLORE,
       containerId: 'generalScrollContainer',
     });
   };
-  const renderItem = (item: any) => (
-    <SNotificationItemHolder key={item.id}>
-      <NotificationItem item={item} />
-    </SNotificationItemHolder>
-  );
+  // const renderItem = (item: any) => (
+  //   <SNotificationItemHolder key={item.id}>
+  //     <NotificationItem item={item} />
+  //   </SNotificationItemHolder>
+  // );
 
   const handleTitleAnimationEnd = useCallback(() => {
     setAnimateSubTitle(true);
@@ -168,10 +174,8 @@ export const HeroSection = () => {
             ) : (
               <SButton
                 withShrink
-                withRipple
                 withShadow
                 view="primaryGrad"
-                customDebounce={0}
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}
@@ -180,10 +184,28 @@ export const HeroSection = () => {
           </SButtonsHolder>
         </AnimatedPresence>
       </STopWrapper>
-      <SNotificationsList>
+      <SHeroImage>
+        <video
+          loop
+          muted
+          autoPlay
+          playsInline
+          poster={theme.name === 'light' ? HeroLightPlaceholder.src : HeroDarkPlaceholder.src}
+        >
+          <source
+            src={
+              theme.name === 'light'
+              ? '/images/home/Landing-Page-Light.webm'
+              : '/images/home/Landing-Page-Dark.webm'
+            }
+            type="video/webm"
+          />
+        </video>
+      </SHeroImage>
+      {/* <SNotificationsList>
         <GradientMask />
         {notifications.map(renderItem)}
-      </SNotificationsList>
+      </SNotificationsList> */}
     </SWrapper>
   );
 };
@@ -198,12 +220,23 @@ const SWrapper = styled.section`
   ${(props) => props.theme.media.tablet} {
     align-items: center;
     flex-direction: row;
+
+    max-width: 702px;
+    margin: 0 auto;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
   }
 `;
 
 const STopWrapper = styled.div`
   flex: 1;
   white-space: pre-line;
+
+  ${(props) => props.theme.media.laptop} {
+    max-width: 40%
+  }
 `;
 
 const SHeadline = styled(Headline)`
@@ -246,42 +279,65 @@ const SButtonsHolder = styled.div`
   }
 `;
 
-const SNotificationsList = styled.div`
+// const SNotificationsList = styled.div`
+//   flex: 1;
+//   display: flex;
+//   position: relative;
+//   margin-top: 44px;
+//   align-items: flex-end;
+//   flex-direction: column;
+// `;
+
+const SHeroImage = styled.div`
+  order: -1;
+
   flex: 1;
-  display: flex;
-  position: relative;
-  margin-top: 44px;
-  align-items: flex-end;
-  flex-direction: column;
-`;
+  margin-top: 24px;
 
-const GradientMask = styled.div`
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  position: absolute;
-  background: ${(props) => props.theme.gradients.heroNotifications};
-  pointer-events: none;
-
-  ${(props) => props.theme.media.tablet} {
-    background: ${(props) => props.theme.gradients.heroNotificationsTablet};
-  }
-`;
-
-const SNotificationItemHolder = styled.div`
   width: 100%;
-  margin-top: 16px;
+  height: 300px;
 
-  ${(props) => props.theme.media.tablet} {
-    max-width: 344px;
+  display: flex;
+  align-items: center;
+
+  video {
+    width: 100%;
+    object-fit: contain;
   }
 
-  ${(props) => props.theme.media.laptop} {
-    max-width: 608px;
+  ${({ theme }) => theme.media.tablet} {
+    order: unset;
+    height: 642px;
   }
 `;
+
+// const GradientMask = styled.div`
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   z-index: 1;
+//   position: absolute;
+//   background: ${(props) => props.theme.gradients.heroNotifications};
+//   pointer-events: none;
+
+//   ${(props) => props.theme.media.tablet} {
+//     background: ${(props) => props.theme.gradients.heroNotificationsTablet};
+//   }
+// `;
+
+// const SNotificationItemHolder = styled.div`
+//   width: 100%;
+//   margin-top: 16px;
+
+//   ${(props) => props.theme.media.tablet} {
+//     max-width: 344px;
+//   }
+
+//   ${(props) => props.theme.media.laptop} {
+//     max-width: 608px;
+//   }
+// `;
 
 const SButton = styled(Button)`
   padding: 12px 24px;

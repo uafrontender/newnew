@@ -55,7 +55,7 @@ export const List: React.FC<IList> = ({
 
   return (
     <SListWrapper
-      style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
+      // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
     >
       {collection?.map(renderItem)}
       {loading && Array(5).fill('_').map((_, i) => (
@@ -81,11 +81,12 @@ List.defaultProps = {
 export default List;
 
 const SListWrapper = styled.div`
-  left: -16px;
-  width: 100vw;
+  width: 100%;
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
   position: relative;
   flex-wrap: wrap;
   flex-direction: row;
@@ -94,12 +95,21 @@ const SListWrapper = styled.div`
     left: -8px;
     width: calc(100% + 26px);
     padding: 24px 0 0 0;
+
+    margin: 0 auto;
+    max-width: 562px;
   }
 
   ${(props) => props.theme.media.laptop} {
     left: -16px;
     width: calc(100% + 32px);
     padding: 32px 0 0 0;
+
+    max-width: 1248px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    max-width: 1248px;
   }
 
 
@@ -140,7 +150,7 @@ const SListWrapper = styled.div`
 `;
 
 const SItemWrapper = styled.div`
-  width: 100vw;
+  width: 100%;
   margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {

@@ -1,21 +1,22 @@
 {
+  "backBtn": "Back",
   "TopSection": {
     "headline": {
       "line_1": "Subscribe to {{username}}",
-      "line_2": "for exclusive features"
+      "line_2": "for limited exclusives"
     },
     "bullets": {
       "dms": {
-        "title": "DMs",
-        "body": "Lorem ipsum dolor sit amet, consectetur."
+        "title": "1-on-1 messages",
+        "body": "Have unlimited personal messages with {{nickname}}"
       },
       "freeVotes": {
-        "title": "Free votes on multiple choices",
-        "body": "Lorem ipsum dolor sit amet, consectetur."
+        "title": "Free superpoll votes",
+        "body": "Get a free vote on every superpoll made by {{nickname}}"
       },
       "suggestions": {
-        "title": "Suggestions in multiple choices",
-        "body": "Lorem ipsum dolor sit amet, consectetur."
+        "title": "More control",
+        "body": "Only <0>you</0> will have the power to add custom options to <1/>'s superpolls"
       }
     }
   },

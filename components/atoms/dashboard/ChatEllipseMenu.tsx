@@ -44,7 +44,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   };
 
   const viewUserProfile = () => {
-    router.push(`/u/${user.username}`);
+    router.push(`/${user.username}`);
   };
 
   return (

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-boolean-value */
 import React from 'react';
 import { AnimateSharedLayout } from 'framer-motion';
 
@@ -10,7 +11,9 @@ const HomeLayout: React.FC = (props) => {
   return (
     <ErrorBoundary>
       <AnimateSharedLayout>
-        <GeneralTemplate>
+        <GeneralTemplate
+          // restrictMaxWidth={true}
+        >
           {children}
         </GeneralTemplate>
       </AnimateSharedLayout>

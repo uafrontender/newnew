@@ -32,6 +32,8 @@ const Icons = {
   options: StatisticsIcon,
   optionsFilled: StatisticsIconFilled,
   backers: StatisticsIcon,
+  backersFilled: StatisticsIconFilled,
+  winner: StatisticsIcon,
   winnerFilled: StatisticsIconFilled,
   comments: CommentsIcon,
   commentsFilled: CommentsIconFilled,

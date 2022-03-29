@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { formatNumber } from '../../../utils/format';
 
 interface IVotesAmountTextInput {
   value: string;
@@ -32,10 +33,13 @@ const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
 
   const inputRef = useRef<HTMLInputElement>();
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+    const newValue = value.length > 0
+      ? e.target.value
+        .split(',').filter((v) => v !== ',').join('')
+      : e.target.value;
     if (/[^0-9]/.test(newValue)) return;
 
-    if (newValue.length > 8) return;
+    if (newValue.length > 5) return;
 
     // @ts-ignore
     onChange(newValue ? (newValue as number) : '');
@@ -51,7 +55,9 @@ const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        value={value}
+        value={
+          value ? `${formatNumber(parseInt(value, 10), true)}` : value
+        }
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode="numeric"
