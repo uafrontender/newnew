@@ -37,6 +37,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
             src={image.src}
             alt={title}
             style={imageStyle ?? {}}
+            draggable={false}
           />
         </SImageHolder>
         <SHeadline
@@ -107,6 +108,7 @@ const SImageBG = styled.div<ISImageBG>`
   position: relative;
 
   padding: 16px;
+  padding-bottom: 0px;
 
   display: flex;
   flex-direction: column;
@@ -150,7 +152,7 @@ const SHeadline = styled(Headline)`
 
 const SBottomContent = styled(Text)`
   text-align: center;
-  padding: 16px 10px;
+  padding: 8px 10px;
 
   font-weight: 600;
 
