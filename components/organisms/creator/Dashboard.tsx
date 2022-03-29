@@ -53,6 +53,7 @@ export const Dashboard = () => {
       if (res.data?.posts) setExprirationPosts(res.data?.posts);
       setIsLoadingExpirationPosts(false);
     } catch (err) {
+      setIsLoadingExpirationPosts(false);
       console.error(err);
     }
   };
@@ -110,7 +111,7 @@ export const Dashboard = () => {
         <SBlock name="your-todos">
           <YourTodos todosCompleted={todosCompleted} />
         </SBlock>
-        {!isLoadingExpirationPosts ? (
+        {isLoadingExpirationPosts ? (
           <SBlock>
             <Lottie
               width={64}

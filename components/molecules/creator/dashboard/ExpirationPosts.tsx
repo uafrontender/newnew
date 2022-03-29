@@ -1,7 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+/* eslint-disable no-unused-expressions */
+/* eslint-disable prefer-template */
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import moment from 'moment';
+import { useRouter } from 'next/router';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -14,6 +18,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import infoIcon from '../../../../public/images/svg/icons/filled/Info.svg';
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
+import { formatNumber } from '../../../../utils/format';
 
 interface IExpirationPosts {
   expirationPosts: newnewapi.IPost[];
@@ -22,90 +27,152 @@ interface IExpirationPosts {
 export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const collection = useMemo(
-    () => [
-      {
-        id: 1,
-        title: 'Should I get a forehead',
-        date: '15m 10s left',
-        total: '$45.00',
-        contributions: '120 bids',
-      },
-      {
-        id: 2,
-        title: 'Should I get a forehead',
-        date: '15m 10s left',
-        total: '$45.00',
-        contributions: '120 bids',
-      },
-      {
-        id: 3,
-        title: 'Should I get a forehead',
-        date: '15m 10s left',
-        total: '$45.00',
-        contributions: '120 bids',
-      },
-    ],
-    []
-  );
+  const router = useRouter();
+
+  const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
 
   useEffect(() => {
-    console.log(expirationPosts);
+    if (expirationPosts) {
+      // eslint-disable-next-line no-param-reassign
+      if (expirationPosts.length > 3) expirationPosts.length = 3;
+      setPosts(expirationPosts);
+    }
   }, [expirationPosts]);
+
+  const getCountdown = (data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice) => {
+    const end = moment((data.responseUploadDeadline?.seconds as number) * 1000);
+    const start = moment(Date.now());
+    const seconds = end.diff(start, 'seconds');
+    const days = Math.floor(seconds / 24 / 60 / 60);
+    const hoursLeft = Math.floor(seconds - days * 86400);
+    const hours = Math.floor(hoursLeft / 3600);
+    const minutesLeft = Math.floor(hoursLeft - hours * 3600);
+    const minutes = Math.floor(minutesLeft / 60);
+    const remainingSeconds = seconds % 60;
+    function pad(n: any) {
+      return n < 10 ? '0' + n : n;
+    }
+    let countdownsrt = pad(days) + 'd ' + pad(hours) + 'h';
+    if (days === 0) {
+      countdownsrt = pad(hours) + 'h ' + pad(minutes) + 'm';
+      if (hours === 0) {
+        countdownsrt = pad(minutes) + 'm ' + pad(remainingSeconds) + 's';
+        if (minutes === 0) {
+          countdownsrt = pad(minutes) + 'm ' + pad(remainingSeconds) + 's';
+        }
+      }
+    }
+    countdownsrt += ' left to respond';
+    return countdownsrt;
+  };
+
+  const getAmountValue = (
+    postType: string,
+    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
+  ) => {
+    let centsQty = 0;
+
+    postType === 'multipleChoice'
+      ? (centsQty =
+          (data as newnewapi.MultipleChoice).totalVotes * (data as newnewapi.MultipleChoice).votePrice!!.usdCents!!)
+      : (centsQty = (data as newnewapi.Crowdfunding | newnewapi.Auction).totalAmount?.usdCents!!);
+
+    return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
+  };
+
+  const getContributorsValue = (
+    postType: string,
+    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
+  ) => {
+    let amount = 0;
+
+    switch (postType) {
+      case 'multipleChoice':
+        amount = (data as newnewapi.MultipleChoice).totalVotes;
+        break;
+      case 'crowdfunding':
+        amount = (data as newnewapi.Crowdfunding).currentBackerCount;
+        break;
+      default:
+        amount = (data as newnewapi.Auction).totalAmount?.usdCents !== 0 ? 1 : 0;
+    }
+
+    return amount;
+  };
 
   const renderItem = useCallback(
     (item, index) => {
+      const postType = Object.keys(item)[0];
+      const data = Object.values(item)[0] as newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
+
       const handleUserClick = () => {};
       const handleInfoClick = () => {};
-      const handleDecideClick = () => {};
+      const handleDecideClick = () => {
+        router.push(`/?post=${data.postUuid}`);
+      };
+
+      const countdownsrt = getCountdown(data);
+      const money = getAmountValue(postType, data);
+      const contributors = getContributorsValue(postType, data);
+      console.log(data);
 
       return (
-        <SListItemWrapper key={`item-expiration-${item.id}`}>
+        <SListItemWrapper key={data.postUuid}>
           <SListItem>
             {isDesktop ? (
               <>
                 <SListBodyItem width="calc(100% - 300px)" align="flex-start">
-                  <SAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
+                  {!data.announcement?.thumbnailImageUrl ? (
+                    <SAvatar withClick onClick={handleUserClick} />
+                  ) : (
+                    <SImg
+                      src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''}
+                      alt=""
+                    />
+                  )}
                   <SListItemTitleWrapper>
                     <SListItemTitle variant={3} weight={600}>
-                      {item.title}
+                      {data.title}
                     </SListItemTitle>
                     <SListItemDate variant={2} weight={600}>
-                      {item.date}
+                      {countdownsrt}
                     </SListItemDate>
                   </SListItemTitleWrapper>
                 </SListBodyItem>
                 <SListBodyItem width="100px" align="flex-start">
                   <SListBodyItemText variant={3} weight={600}>
-                    {item.total}
+                    {money}
                   </SListBodyItemText>
                 </SListBodyItem>
                 <SListBodyItem width="100px" align="flex-start">
                   <SListBodyItemText variant={3} weight={600}>
-                    {item.contributions}
+                    {contributors}
                   </SListBodyItemText>
                 </SListBodyItem>
                 <SListBodyItem width="100px" align="center">
-                  <SListDecideButton view="secondary" onClick={handleDecideClick}>
+                  <SListDecideButton view="primary" onClick={handleDecideClick}>
                     {t('dashboard.expirationPosts.decide')}
                   </SListDecideButton>
                 </SListBodyItem>
               </>
             ) : (
               <>
-                <SAvatar withClick onClick={handleUserClick} avatarUrl={user.userData?.avatarUrl} />
+                {!data.announcement?.thumbnailImageUrl ? (
+                  <SAvatar withClick onClick={handleUserClick} />
+                ) : (
+                  <SImg src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''} alt="" />
+                )}
                 <SListItemTitleWrapper>
                   <SListItemTitle variant={3} weight={600}>
-                    {item.title}
+                    {data.title}
                   </SListItemTitle>
                   <SListItemDate variant={2} weight={600}>
-                    {item.date}
+                    {countdownsrt}
                   </SListItemDate>
                 </SListItemTitleWrapper>
                 <SListShareButton view="secondary" onClick={handleDecideClick}>
@@ -122,16 +189,12 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
               </>
             )}
           </SListItem>
-          {index !== collection.length - 1 && <SListItemSeparator />}
+          {index !== posts.length - 1 && <SListItemSeparator />}
         </SListItemWrapper>
       );
     },
-    [t, isMobile, isDesktop, collection.length, user.userData?.avatarUrl, theme.colorsThemed.text.primary]
+    [t, isMobile, isDesktop, posts.length, theme.colorsThemed.text.primary, router]
   );
-
-  const handleSubmit = useCallback(() => {
-    console.log('load more 10');
-  }, []);
 
   return (
     <SContainer>
@@ -158,13 +221,8 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
             <SListItemSeparator />
           </>
         )}
-        {collection.map(renderItem)}
+        {posts.map(renderItem)}
       </SListWrapper>
-      {isMobile && (
-        <SButton view="secondary" onClick={handleSubmit}>
-          {t('dashboard.expirationPosts.submit')}
-        </SButton>
-      )}
     </SContainer>
   );
 };
@@ -214,16 +272,6 @@ const SHeaderLine = styled.div`
   }
 `;
 
-const SButton = styled(Button)`
-  width: 100%;
-  padding: 16px 20px;
-  margin-top: 16px;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 12px 24px;
-  }
-`;
-
 const SListWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -264,6 +312,21 @@ const SListItem = styled.div`
   flex-direction: row;
 `;
 
+const SImg = styled.img`
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 12px;
+  ${(props) => props.theme.media.laptop} {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 16px;
+  }
+`;
+
 const SAvatar = styled(UserAvatar)`
   width: 36px;
   height: 36px;
@@ -300,7 +363,7 @@ const SListItemTitle = styled(Text)`
 `;
 
 const SListItemDate = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${(props) => props.theme.colorsThemed.accent.pink};
 `;
 
 const SListShareButton = styled(Button)`
