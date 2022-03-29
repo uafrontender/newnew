@@ -120,7 +120,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       isLoading={isSubmitLoading}
       style={{
         ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-          transform: 'translateX(-200px)',
+          transform: 'translateX(-300px)',
           transition: '0.6s linear'
         } : {})
       }}
