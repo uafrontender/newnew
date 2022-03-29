@@ -453,6 +453,7 @@ const SHeadline = styled(Headline)`
 
 const SCreatorsAvatars = styled.div`
   position: relative;
+  top: -2px;
 
   ${({ theme }) => theme.media.tablet} {
     top: -8px;
@@ -467,7 +468,7 @@ const SUserAvatar = styled(UserAvatar)<{
   index: number;
 }>`
   position: absolute;
-  left: ${({ index }) => index * 18}px;
+  left: ${({ index }) => index * 24}px;
 
   width: 36px;
   height: 36px;
@@ -479,7 +480,7 @@ const SUserAvatar = styled(UserAvatar)<{
   ${({ theme }) => theme.media.laptop} {
     width: 48px;
     height: 48px;
-    left: ${({ index }) => index * 24}px;
+    left: ${({ index }) => index * 36}px;
   }
 `;
 
