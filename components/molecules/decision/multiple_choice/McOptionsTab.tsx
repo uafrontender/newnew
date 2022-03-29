@@ -30,9 +30,11 @@ import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import McOptionCardDoubleVote from './McOptionCardDoubleVote';
 import PaymentSuccessModal from '../PaymentSuccessModal';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
+  postStatus: TPostStatusStringified;
   postCreator: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
@@ -46,6 +48,7 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
+  postStatus,
   postCreator,
   postDeadline,
   options,
@@ -344,7 +347,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 postId={post.postUuid}
                 index={i}
                 hasAlreadyVoted={hasVotedOptionId === option.id}
-                noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
+                noAction={(hasVotedOptionId !== undefined && hasVotedOptionId !== option.id) || postStatus === 'failed'}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
                 handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
               />
@@ -358,7 +361,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 minAmount={minAmount}
                 votePrice={votePrice}
                 optionBeingSupported={optionBeingSupported}
-                noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
+                noAction={(hasVotedOptionId !== undefined && hasVotedOptionId !== option.id) || postStatus === 'failed'}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
                 handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
                 handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
@@ -381,7 +384,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             ) : null
           )}
         </SBidsContainer>
-        {post.isSuggestionsAllowed && !hasVotedOptionId ? (
+        {post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting' ? (
           <SActionSection
             ref={(el) => {
               actionSectionContainer.current = el!!;
@@ -538,7 +541,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
       </PaymentSuccessModal>
       {/* Mobile floating button */}
-      {isMobile && !suggestNewMobileOpen && !hasVotedOptionId ? (
+      {isMobile && !suggestNewMobileOpen && !hasVotedOptionId && postStatus === 'voting' ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}

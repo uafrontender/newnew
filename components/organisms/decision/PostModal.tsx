@@ -37,6 +37,7 @@ import isBrowser from '../../../utils/isBrowser';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
+import Button from '../../atoms/Button';
 
 interface IPostModal {
   isOpen: boolean;
@@ -404,7 +405,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <title>{ postParsed?.title }</title>
       </Head>
       {!isMobile && (
-        <SGoBackButtonDesktop onClick={handleCloseAndGoBack}>
+        <SGoBackButtonDesktop
+          view="secondary"
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
           <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
         </SGoBackButtonDesktop>
       )}
@@ -564,7 +569,7 @@ const SRecommendationsSection = styled.div`
   min-height: 600px;
 `;
 
-const SGoBackButtonDesktop = styled.button`
+const SGoBackButtonDesktop = styled(Button)`
   position: absolute;
   right: 0;
   top: 0;
@@ -574,8 +579,6 @@ const SGoBackButtonDesktop = styled.button`
   align-items: center;
 
   border: transparent;
-  background: transparent;
-  padding: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 20px;
@@ -584,4 +587,9 @@ const SGoBackButtonDesktop = styled.button`
   text-transform: capitalize;
 
   cursor: pointer;
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 24px;
+    top: 32px;
+  }
 `;
