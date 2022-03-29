@@ -714,7 +714,7 @@ const SBottomContentOutside = styled.div`
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 14px 10px 0 10px;
+    padding: 8px 10px 0 10px;
   }
 `;
 
