@@ -43,8 +43,8 @@ export const ChatsProvider: React.FC = ({ children }) => {
         // setLoadingRooms(false);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     getUnread();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
 
   useEffect(() => {
@@ -60,6 +60,7 @@ export const ChatsProvider: React.FC = ({ children }) => {
     if (socketConnection) {
       socketConnection.on('ChatUnreadCountsChanged', socketHandlerMessageCreated);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   const contextValue = useMemo(
