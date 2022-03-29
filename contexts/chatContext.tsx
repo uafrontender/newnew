@@ -19,13 +19,15 @@ export const ChatsProvider: React.FC = ({ children }) => {
 
   const socketConnection = useContext(SocketContext);
 
-  const setData = (data: newnewapi.TotalUnreadMessageCounts) => {
-    if (data.unreadCountForCreator) setUnreadCountForCreator(data.unreadCountForCreator);
-    if (data.unreadCountForUser) setUnreadCountForUser(data.unreadCountForUser);
-
-    if (data.unreadCountForCreator || data.unreadCountForUser)
+  const setData = useCallback(
+    (data: newnewapi.TotalUnreadMessageCounts) => {
+      setUnreadCountForCreator(data.unreadCountForCreator);
+      setUnreadCountForUser(data.unreadCountForUser);
       setUnreadCount(data.unreadCountForCreator + data.unreadCountForUser);
-  };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   useEffect(() => {
     async function getUnread() {
@@ -49,8 +51,8 @@ export const ChatsProvider: React.FC = ({ children }) => {
     const socketHandlerMessageCreated = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatUnreadCountsChanged.decode(arr);
+
       if (!decoded) return;
-      console.log(decoded);
 
       setData(decoded.chatUnreadCounts as newnewapi.TotalUnreadMessageCounts);
     };
@@ -67,7 +69,7 @@ export const ChatsProvider: React.FC = ({ children }) => {
       unreadCount,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [unreadCount, unreadCountForUser, unreadCountForCreator]
+    [unreadCount, unreadCountForUser, unreadCountForCreator, setData]
   );
 
   return <ChatsContext.Provider value={contextValue}>{children}</ChatsContext.Provider>;

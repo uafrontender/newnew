@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-eval */
 /* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-expressions */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styled, { css, useTheme } from 'styled-components';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { toNumber } from 'lodash';
 import { useInView } from 'react-intersection-observer';
 import UserAvatar from '../UserAvatar';
 import textTrim from '../../../utils/textTrim';
@@ -52,6 +52,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
   const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<string | undefined | null>('');
   const [chatRoomsCreators, setChatRoomsCreators] = useState<newnewapi.IChatRoom[]>([]);
   const [chatRoomsSubs, setChatRoomsSubs] = useState<newnewapi.IChatRoom[]>([]);
+  const [displayAllRooms, setDisplayAllRooms] = useState(false);
   const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
   const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(null);
   const [prevSearchText, setPrevSearchText] = useState<string>('');
@@ -99,14 +100,15 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
         const res = await getMyRooms(payload);
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data && res.data.rooms.length > 0) {
-          console.log(res.data);
 
+        if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr = [...curr!!];
             res.data?.rooms.forEach((chat) => {
-              const emptyMassUpdateFromCreator = chat.kind === 4 && chat.myRole === 1 && !chat.lastMessage;
-              if (!emptyMassUpdateFromCreator) arr.push(chat);
+              if (arr.findIndex((item) => item.id === chat.id) < 0) {
+                const emptyMassUpdateFromCreator = chat.kind === 4 && chat.myRole === 1 && !chat.lastMessage;
+                if (!emptyMassUpdateFromCreator) arr.push(chat);
+              }
             });
 
             return arr;
@@ -184,22 +186,39 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
     if (chatRooms && !searchedRooms) {
       fetchLastActiveRoom();
     }
-  }, [searchedRooms, chatRooms]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unreadCountForCreator, unreadCountForUser]);
 
   useEffect(() => {
     if (updatedChat) {
-      const isAlreadyAdded = chatRooms?.findIndex((chat) => chat.id === updatedChat.id);
+      let isAlreadyAdded: number | undefined;
+      const isChatWithSub = updatedChat.myRole === 1;
+
+      if (displayAllRooms) {
+        isAlreadyAdded = chatRooms?.findIndex((chat) => chat.id === updatedChat.id);
+      } else {
+        isChatWithSub
+          ? (isAlreadyAdded = chatRoomsSubs?.findIndex((chat) => chat.id === updatedChat.id))
+          : (isAlreadyAdded = chatRoomsCreators?.findIndex((chat) => chat.id === updatedChat.id));
+      }
       if (isAlreadyAdded !== undefined) {
-        const arr = chatRooms;
+        const arr = displayAllRooms ? chatRooms : isChatWithSub ? chatRoomsSubs : chatRoomsCreators;
         arr?.splice(isAlreadyAdded, 1);
+
         if (updatedChat.id!!.toString() === activeChatIndex) {
           arr?.splice(0, 0, updatedChat);
+          markChatAsRead(updatedChat.id as number);
         } else {
           arr?.splice(1, 0, updatedChat);
         }
-        setChatRooms(arr);
-        setUpdatedChat(null);
+        displayAllRooms ? setChatRooms(arr) : isChatWithSub ? setChatRoomsSubs(arr!!) : setChatRoomsCreators(arr!!);
+      } else {
+        const arr = displayAllRooms ? chatRooms : isChatWithSub ? chatRoomsSubs : chatRoomsCreators;
+        arr?.splice(1, 0, updatedChat);
+        displayAllRooms ? setChatRooms(arr) : isChatWithSub ? setChatRoomsSubs(arr!!) : setChatRoomsCreators(arr!!);
       }
+
+      setUpdatedChat(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatedChat]);
@@ -234,8 +253,10 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
     if (!loadingRooms && chatRooms && chatRooms[0])
       if (chatRoomsCreators.length > 0 && chatRoomsSubs.length > 0) {
         openRoom(chatRoomsSubs[0]);
+        if (displayAllRooms) setDisplayAllRooms(false);
       } else {
         openRoom(chatRooms[0]);
+        setDisplayAllRooms(true);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoomsCreators, chatRoomsSubs, chatRooms, loadingRooms]);
@@ -245,6 +266,21 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
     [activeChatIndex]
   );
 
+  const handlerActiveTabSwitch = useCallback(
+    (tabName: string) => {
+      if (activeTab === tabName) return;
+      if (tabName === 'chatRoomsSubs') {
+        openChat({ chatRoom: chatRoomsSubs[0], showChatList: null });
+        setActiveChatIndex(chatRoomsSubs[0].id!!.toString());
+      } else {
+        tabName === 'chatRoomsCreators' && openChat({ chatRoom: chatRoomsCreators[0], showChatList: null });
+        setActiveChatIndex(chatRoomsCreators[0].id!!.toString());
+      }
+      setActiveTab(tabName);
+    },
+    [activeTab, openChat, chatRoomsCreators, chatRoomsSubs]
+  );
+
   const renderChatItem = useCallback(
     (chat: newnewapi.IChatRoom, index) => {
       const localChat = chat;
@@ -252,10 +288,8 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
         if (searchedRooms) setSearchedRooms(null);
         setActiveChatIndex(chat.id!!.toString());
         openChat({ chatRoom: chat, showChatList: null });
-        if (chat.unreadMessageCount) {
-          localChat.unreadMessageCount = 0;
-          await markChatAsRead(toNumber(chat.id));
-        }
+        localChat.unreadMessageCount = 0;
+        await markChatAsRead(chat.id as number);
         return null;
       };
 
@@ -335,41 +369,39 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
               {unreadMessageCount > 0 && <SUnreadCount>{unreadMessageCount}</SUnreadCount>}
             </SChatItemRight>
           </SChatItem>
-          {!searchedRooms && (eval(activeTab) as newnewapi.IChatRoom[]).length - 1 !== index && <SChatSeparator />}
+          {!searchedRooms && !displayAllRooms && (eval(activeTab) as newnewapi.IChatRoom[]).length - 1 !== index && (
+            <SChatSeparator />
+          )}
+
+          {!searchedRooms && displayAllRooms && chatRooms && chatRooms.length - 1 !== index && <SChatSeparator />}
 
           {searchedRooms && searchedRooms.length - 1 !== index && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeChatIndex, searchedRooms, chatRooms, updatedChat, activeTab]
-  );
-
-  const unreadCountTab = useCallback(
-    (e) => {
-      switch (e) {
-        case 'chatRoomsSubs':
-          return unreadCountForCreator !== 0 && unreadCountForCreator;
-        // chatRoomsCreators
-        default:
-          return unreadCountForUser !== 0 && unreadCountForUser;
-      }
-    },
-    [unreadCountForUser, unreadCountForCreator]
+    [activeChatIndex, searchedRooms, chatRooms, displayAllRooms, activeTab]
   );
 
   const Tabs = useCallback(
     () => (
       <STabs>
         {tabTypes.map((item) => (
-          <STab active={activeTab === item.id} key={item.id} onClick={() => setActiveTab(item.id)}>
-            {item.title} {unreadCountTab(item.id) && <SUnreadCount>{unreadCountTab(item.id)}</SUnreadCount>}
+          <STab active={activeTab === item.id} key={item.id} onClick={() => handlerActiveTabSwitch(item.id)}>
+            {item.title}{' '}
+            {item.id === 'chatRoomsSubs' && unreadCountForCreator > 0 && (
+              <SUnreadCount>{unreadCountForCreator}</SUnreadCount>
+            )}
+            {item.id === 'chatRoomsCreators' && unreadCountForUser > 0 && (
+              <SUnreadCount>{unreadCountForUser}</SUnreadCount>
+            )}
           </STab>
         ))}
       </STabs>
     ),
-    [activeTab, tabTypes, unreadCountTab]
+    [activeTab, tabTypes, unreadCountForUser, unreadCountForCreator, handlerActiveTabSwitch]
   );
+
   return (
     <>
       <SSectionContent>
@@ -377,7 +409,7 @@ export const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => 
           <>
             {chatRoomsCreators.length > 0 && chatRoomsSubs.length > 0 && !searchedRooms && <Tabs />}
             {!searchedRooms
-              ? chatRoomsSubs.length > 0 && chatRoomsCreators.length > 0
+              ? !displayAllRooms
                 ? eval(activeTab).map(renderChatItem)
                 : chatRooms.map(renderChatItem)
               : searchedRooms.map(renderChatItem)}

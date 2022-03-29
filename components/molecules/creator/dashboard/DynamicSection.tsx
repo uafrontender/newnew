@@ -248,7 +248,7 @@ const SIndicator = styled(Indicator)`
 const SAnimatedContainer = styled.div`
   top: 144px;
   left: 212px;
-  right: 32px;
+  right: 12px;
   bottom: 34px;
   z-index: 5;
   padding: 24px 0;
