@@ -11,6 +11,7 @@ interface ITutorialCard {
   title: string;
   caption: string;
   height?: string;
+  imageStyle?: React.CSSProperties;
 }
 
 export const TutorialCard: React.FC<ITutorialCard> = ({
@@ -18,6 +19,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   title,
   caption,
   height,
+  imageStyle,
 }) => {
   const {
     resizeMode,
@@ -34,6 +36,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
           <img
             src={image.src}
             alt={title}
+            style={imageStyle ?? {}}
           />
         </SImageHolder>
         <SHeadline
@@ -55,11 +58,11 @@ export default TutorialCard;
 
 TutorialCard.defaultProps = {
   height: '',
+  imageStyle: {},
 };
 
 const SWrapper = styled.div`
   width: 100%;
-  height: 500px;
   display: flex;
   position: relative;
   flex-direction: column;
@@ -129,7 +132,7 @@ const SImageHolder = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     img {
-      height: 182px;
+      height: 160px;
     }
   }
 

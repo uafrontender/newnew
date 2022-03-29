@@ -243,7 +243,7 @@ const STopWrapper = styled.div`
   white-space: pre-line;
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 40%
+    max-width: 45%
   }
 `;
 
@@ -267,13 +267,11 @@ const SSubTitle = styled(Text)`
   text-align: center;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 230px;
 
     text-align: left;
   }
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 340px;
   }
 `;
 
@@ -324,6 +322,11 @@ const SHeroImage = styled.div`
   ${({ theme }) => theme.media.tablet} {
     order: unset;
     height: 642px;
+
+    video {
+      position: relative;
+      top: -10%;
+    }
   }
 `;
 
