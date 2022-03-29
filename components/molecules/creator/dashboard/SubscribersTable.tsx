@@ -11,7 +11,6 @@ import Button from '../../../atoms/Button';
 import InlineSVG from '../../../atoms/InlineSVG';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
-import randomID from '../../../../utils/randomIdGenerator';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import Lottie from '../../../atoms/Lottie';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
@@ -73,7 +72,10 @@ export const SubscribersTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, changeSortDirection]);
 
-  const renderItem = useCallback((subscriber) => <SubscriberRow key={randomID()} subscriber={subscriber} />, []);
+  const renderItem = useCallback(
+    (subscriber: newnewapi.ISubscriber) => <SubscriberRow key={subscriber.user?.uuid} subscriber={subscriber} />,
+    []
+  );
 
   return (
     <>

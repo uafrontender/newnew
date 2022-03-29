@@ -84,7 +84,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         <SDate>{moment((subscriber.firstSubscribedAt.seconds as number) * 1000).format('DD MMMM YYYY')}</SDate>
       )}
       <SActions>
-        {!isMobile && <Link href={`/direct-messages?chatwith=${subscriber.user?.uuid}`}>DM</Link>}
+        {!isMobile && <Link href={`/creator/dashboard?tab=direct-messages&roomID=${subscriber.chatRoomId}`}>DM</Link>}
         <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
           <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
         </SMoreButton>
