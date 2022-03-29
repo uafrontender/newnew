@@ -244,9 +244,12 @@ const SHeadline = styled(Headline)`
   ${(props) => props.theme.media.tablet} {
     margin: 0 auto;
     max-width: 702px;
+
+    padding: 0px 32px;
   }
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
+    padding: initial;
   }
 `;
 

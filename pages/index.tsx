@@ -280,6 +280,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
               image={acImage}
               title={t('ac-block-tutorial-card.title')}
               caption={t('ac-block-tutorial-card.caption')}
+              imageStyle={{
+                position: 'relative',
+                left: '10%'
+              }}
             />
           ) : undefined}
         />
@@ -312,6 +316,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
               image={cfImage}
               title={t('cf-block-tutorial-card.title')}
               caption={t('cf-block-tutorial-card.caption')}
+              imageStyle={{
+                position: 'relative',
+                left: '5%'
+              }}
             />
           ) : undefined}
         />
