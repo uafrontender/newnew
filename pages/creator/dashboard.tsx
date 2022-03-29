@@ -35,7 +35,7 @@ export const Dashboard = () => {
 export default Dashboard;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'creator']);
+  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'creator', 'chat']);
 
   return {
     props: {

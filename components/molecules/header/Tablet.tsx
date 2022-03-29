@@ -9,6 +9,7 @@ import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/SearchInput';
 import NavigationItem from '../NavigationItem';
+import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { WalletContext } from '../../../contexts/walletContext';
@@ -21,6 +22,7 @@ export const Tablet: React.FC<ITablet> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
+  const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
@@ -65,6 +67,7 @@ export const Tablet: React.FC<ITablet> = () => {
                   item={{
                     url: '/direct-messages',
                     key: 'direct-messages',
+                    counter: unreadCount,
                   }}
                 />
               </SItemWithMargin>
@@ -86,7 +89,10 @@ export const Tablet: React.FC<ITablet> = () => {
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
-                    value: !isBalanceLoading && walletBalance?.usdCents ? (parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined) : undefined,
+                    value:
+                      !isBalanceLoading && walletBalance?.usdCents
+                        ? parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined
+                        : undefined,
                   }}
                 />
               </SItemWithMargin>
