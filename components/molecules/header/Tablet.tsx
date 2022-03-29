@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -15,6 +15,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { WalletContext } from '../../../contexts/walletContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
+import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 
 interface ITablet {}
 
@@ -28,7 +29,10 @@ export const Tablet: React.FC<ITablet> = () => {
 
   const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
-  const handleMenuClick = () => {};
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+
+  const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
+
   const handleCreateClick = () => {
     if (!user.userData?.options?.isCreator) {
       router.push('/creator-onboarding-stage-1');
@@ -112,9 +116,17 @@ export const Tablet: React.FC<ITablet> = () => {
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button iconOnly view="quaternary" onClick={handleMenuClick}>
+                  <Button
+                    iconOnly
+                    view="quaternary"
+                    onClick={handleMenuClick}
+                  >
                     <InlineSVG svg={menuIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
                   </Button>
+                  <MoreMenuTablet
+                    isVisible={moreMenuOpen}
+                    handleClose={() => setMoreMenuOpen(false)}
+                  />
                 </SItemWithMargin>
               </>
             ) : (
@@ -172,4 +184,6 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
+
+  position: relative;
 `;

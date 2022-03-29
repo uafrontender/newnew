@@ -37,6 +37,9 @@ export const General: React.FC<IGeneral> = (props) => {
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
+
+  const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
+
   const wrapperRef: any = useRef();
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
@@ -75,6 +78,7 @@ export const General: React.FC<IGeneral> = (props) => {
             key: 'more',
             url: '/more',
             width: '20%',
+            actionHandler: () => setMoreMenuMobileOpen(true),
           },
         ];
       } else {
@@ -147,7 +151,12 @@ export const General: React.FC<IGeneral> = (props) => {
             </Container>
           </SContent>
           <Footer />
-          <BottomNavigation visible={isMobile && scrollDirection !== 'down'} collection={bottomNavigation} />
+          <BottomNavigation
+            collection={bottomNavigation}
+            moreMenuMobileOpen={moreMenuMobileOpen}
+            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+            visible={isMobile && scrollDirection !== 'down'}
+          />
           <SortingContainer
             id="sorting-container"
             withCookie={cookies.accepted !== 'true'}
