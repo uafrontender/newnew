@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import styled from 'styled-components';
 import CountUp from 'react-countup';
@@ -21,7 +23,9 @@ export const Indicator: React.FC<IIndicator> = (props) => {
 
   return (
     <SIndicator bigCounter={bigCounter} {...rest}>
-      {animate ? <CountUp useEasing end={valueToDisplay} onEnd={onAnimationEnd} duration={5} /> : valueToDisplay}
+      {/* NB! Commented this one out as this animated component proved to be quite buggy so far */}
+      {/* {animate ? <CountUp useEasing end={valueToDisplay} onEnd={onAnimationEnd} duration={5} /> : valueToDisplay} */}
+      {valueToDisplay}
       {bigCounter ? '+' : ''}
     </SIndicator>
   );

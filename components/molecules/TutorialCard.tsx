@@ -11,6 +11,7 @@ interface ITutorialCard {
   title: string;
   caption: string;
   height?: string;
+  imageStyle?: React.CSSProperties;
 }
 
 export const TutorialCard: React.FC<ITutorialCard> = ({
@@ -18,6 +19,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   title,
   caption,
   height,
+  imageStyle,
 }) => {
   const {
     resizeMode,
@@ -34,6 +36,8 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
           <img
             src={image.src}
             alt={title}
+            style={imageStyle ?? {}}
+            draggable={false}
           />
         </SImageHolder>
         <SHeadline
@@ -55,14 +59,15 @@ export default TutorialCard;
 
 TutorialCard.defaultProps = {
   height: '',
+  imageStyle: {},
 };
 
 const SWrapper = styled.div`
   width: 100%;
-  height: 500px;
   display: flex;
   position: relative;
   flex-direction: column;
+  align-items: center;
 
   padding: 10px;
 
@@ -81,6 +86,15 @@ const SWrapper = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
+    max-height: 434px;
+    max-width: 200px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height: 100%;
+
+    max-height: 468px;
+    max-width: 224px;
   }
 `;
 
@@ -94,6 +108,7 @@ const SImageBG = styled.div<ISImageBG>`
   position: relative;
 
   padding: 16px;
+  padding-bottom: 0px;
 
   display: flex;
   flex-direction: column;
@@ -101,7 +116,6 @@ const SImageBG = styled.div<ISImageBG>`
   align-items: center;
 
   border-radius: 10px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   ${({ theme }) => theme.media.tablet} {
     height: 320px;
@@ -110,17 +124,24 @@ const SImageBG = styled.div<ISImageBG>`
 `;
 
 const SImageHolder = styled.div`
-  max-height: 180px;
-
   display: flex;
   justify-content: center;
 
   img {
-    width: 120px;
+    height: 180px;
+    object-fit: contain;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    img {
+      height: 160px;
+    }
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 164px;
+    img {
+      height: 182px;
+    }
   }
 `;
 
@@ -131,7 +152,9 @@ const SHeadline = styled(Headline)`
 
 const SBottomContent = styled(Text)`
   text-align: center;
-  padding: 16px 10px;
+  padding: 8px 10px;
+
+  font-weight: 600;
 
   ${(props) => props.theme.media.tablet} {
     width: 180px;

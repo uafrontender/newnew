@@ -234,8 +234,6 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(creatorOnRisePayload);
 
         if (resCreatorOnRisePayload) {
-          // TODO: change logic and layout here, because we have multiple creators on the rise
-          // console.log(resCreatorOnRisePayload.data?.posts);
           setCollectionCreator(() => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]);
           setCollectionCreatorInitialLoading(false);
         } else {
@@ -280,6 +278,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
               image={acImage}
               title={t('ac-block-tutorial-card.title')}
               caption={t('ac-block-tutorial-card.caption')}
+              imageStyle={{
+                position: 'relative',
+                left: '10%'
+              }}
             />
           ) : undefined}
         />
@@ -312,6 +314,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
               image={cfImage}
               title={t('cf-block-tutorial-card.title')}
               caption={t('cf-block-tutorial-card.caption')}
+              imageStyle={{
+                position: 'relative',
+                left: '5%'
+              }}
             />
           ) : undefined}
         />
