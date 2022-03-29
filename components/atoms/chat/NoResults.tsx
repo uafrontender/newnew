@@ -11,8 +11,7 @@ const NoResults: React.FC<INoResults> = ({ text }) => {
 
   return (
     <SEmptyInbox>
-      <SEmptyInboxIcon>🤷‍♀️</SEmptyInboxIcon>
-      <SEmptyInboxText>{t('modal.new-message.no-results-title')}</SEmptyInboxText>
+      <SEmptyInboxIcon>👀</SEmptyInboxIcon>
       <SEmptyInboxText>
         {t('modal.new-message.no-results-text')} “{text}”.
       </SEmptyInboxText>
