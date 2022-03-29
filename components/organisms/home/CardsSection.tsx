@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
@@ -85,8 +84,8 @@ export const CardsSection: React.FC<ICardSection> = ({
     scrollStep = SCROLL_STEP.tablet;
   }
 
-  const handleUserClick = () => {
-    router.push(`/${category}`);
+  const handleUserClick = (username: string) => {
+    router.push(`/${username}`);
   };
   const handleLeftClick = () => {
     scrollListTo(visibleListItem - scrollStep - 1);
@@ -187,8 +186,6 @@ export const CardsSection: React.FC<ICardSection> = ({
   const handleSeeMoreCLick = () => {
     if (type === 'default') {
       router.push(`/search?category=${category}`);
-    } else {
-      handleUserClick();
     }
   };
 
@@ -225,20 +222,33 @@ export const CardsSection: React.FC<ICardSection> = ({
           <AnimatedPresence
             animation="t-01"
           >
-            <SCreatorHeadline onClick={handleUserClick}>
-              <UserAvatar
-                avatarUrl={user?.avatarUrl!!}
-              />
-              <SHeadline variant={4}>
-                {user?.username!!}
-              </SHeadline>
-              <Tag>
-                {t('button-creator-on-the-rise')}
-              </Tag>
-            </SCreatorHeadline>
+            <SHeadline
+              variant={4}
+              animation="t-01"
+            >
+              <SHeadlineInner>
+                <div>
+                  {t('button-creator-on-the-rise')}
+                </div>
+                <SCreatorsAvatars>
+                  { collection
+                      .map((post) => switchPostType(post)[0].creator)
+                      .filter((value, index, arr) => arr.indexOf(value) === index)
+                      .map((creator, i) => (
+                        <SUserAvatar
+                          key={creator?.uuid}
+                          index={i}
+                          avatarUrl={creator?.avatarUrl!!}
+                          onClick={() => handleUserClick(creator?.username as string)}
+                        />
+                      ))
+                  }
+                </SCreatorsAvatars>
+              </SHeadlineInner>
+            </SHeadline>
           </AnimatedPresence>
         )}
-        {!isMobile && (
+        {!isMobile && type === 'default' && (
           <SCaption
             weight={700}
             onClick={handleSeeMoreCLick}
@@ -283,7 +293,7 @@ export const CardsSection: React.FC<ICardSection> = ({
           </>
         )}
       </SListContainer>
-      {renderShowMore && (
+      {renderShowMore && type === 'default' && (
         <SButtonHolder>
           <Button
             size="lg"
@@ -415,12 +425,15 @@ const STopWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
 
+  margin-bottom: 16px;
+
   ${(props) => props.theme.media.tablet} {
     padding: 0px 32px;
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: initial;
+    margin-bottom: initial;
   }
 `;
 
@@ -434,17 +447,44 @@ const SCaption = styled(Caption)`
   }
 `;
 
-const SCreatorHeadline = styled.div`
-  cursor: pointer;
+const SHeadline = styled(Headline)`
   display: flex;
-  align-items: center;
-  flex-direction: row;
 `;
 
-const SHeadline = styled(Headline)`
-  margin: 0 8px;
+const SCreatorsAvatars = styled.div`
+  position: relative;
 
-  ${(props) => props.theme.media.tablet} {
-    margin: 0 16px;
+  ${({ theme }) => theme.media.tablet} {
+    top: -8px;
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    top: -4px;
+  }
+`;
+
+const SUserAvatar = styled(UserAvatar)<{
+  index: number;
+}>`
+  position: absolute;
+  left: ${({ index }) => index * 18}px;
+
+  width: 36px;
+  height: 36px;
+
+  border: 4px solid ${({ theme }) => theme.colorsThemed.background.primary};
+
+  cursor: pointer;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 48px;
+    height: 48px;
+    left: ${({ index }) => index * 24}px;
+  }
+`;
+
+const SHeadlineInner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 `;

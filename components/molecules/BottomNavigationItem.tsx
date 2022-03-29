@@ -46,6 +46,7 @@ export type TBottomNavigationItem = {
   url: string,
   width: string,
   counter?: number,
+  actionHandler?: () => void;
 }
 
 interface IBottomNavigationItem {
@@ -73,7 +74,7 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
   };
 
   return (
-    <SContainer width={item.width} onClick={handleClick}>
+    <SContainer width={item.width} onClick={item?.actionHandler ?? handleClick}>
       <SSVGContainer>
         <InlineSVG
           key={item.key}
