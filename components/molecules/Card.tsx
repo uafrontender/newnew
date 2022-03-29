@@ -127,12 +127,8 @@ export const Card: React.FC<ICard> = ({
   const handleUserClick = (username: string) => {
     router.push(`/${username}`);
   };
-  const handleMoreClick = () => {
-    router.push('/post-detailed');
-  };
-  const handleBidClick = () => {
-    router.push('/post-detailed');
-  };
+  const handleMoreClick = () => {};
+  const handleBidClick = () => {};
 
   useEffect(() => {
     const handleCanplay = () => {
@@ -823,6 +819,16 @@ const SButton = styled(Button)<ISButtonSpan>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    span {
+      font-size: 16px;
+    }
   }
 `;
 
@@ -845,6 +851,16 @@ const SButtonFirst = styled(Button)`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    span {
+      font-size: 16px;
+    }
   }
 
   &:hover, &:active {
