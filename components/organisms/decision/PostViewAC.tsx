@@ -36,6 +36,7 @@ import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
+import HeroPopup from '../../molecules/decision/HeroPopup';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -66,16 +67,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const showSelectingWinnerOption = useMemo(() => (
-    postStatus === 'wating_for_decision'
-  ), [postStatus]);
+  const showSelectingWinnerOption = useMemo(() => postStatus === 'wating_for_decision', [postStatus]);
 
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Response viewed
-  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
+  const [responseViewed, setResponseViewed] = useState(post.isResponseViewedByMe ?? false);
 
   // Tabs
   const tabs = useMemo(() => {
@@ -109,15 +108,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
-      return 'bids'
+      return 'bids';
     }
     const { hash } = window.location;
     if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
       return hash.substring(1) as 'bids' | 'comments' | 'winner';
     }
-    if (
-      post.winningOptionId
-    ) return 'winner';
+    if (post.winningOptionId) return 'winner';
     return 'bids';
   });
 
@@ -128,7 +125,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-  }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -141,13 +138,13 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       if (parsedHash === 'bids' || parsedHash === 'comments' || parsedHash === 'winner') {
         setCurrentTab(parsedHash);
       }
-    }
+    };
 
     window.addEventListener('hashchange', handleHashChange, false);
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange, false);
-    }
+    };
   }, []);
 
   // Vote from sessionId
@@ -171,6 +168,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionToAnimate, setOptionToAnimate] = useState('');
 
   // const currLocation = `/?post=${post.postUuid}`;
+
+  const [isPopupVisible, setIsPopupVisible] = useState(true);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -520,10 +519,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
-          postType="ac"
-        />
+        <PostTimer timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()} postType="ac" />
       </SExpiresSection>
       <PostVideo
         postId={post.postUuid}
@@ -544,23 +540,16 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
       />
-      <SActivitesContainer
-        showSelectingWinnerOption={showSelectingWinnerOption}
-      >
-        <DecisionTabs
-          tabs={tabs}
-          activeTab={currentTab}
-          handleChangeTab={handleChangeTab}
-        />
+      <SActivitesContainer showSelectingWinnerOption={showSelectingWinnerOption}>
+        <DecisionTabs tabs={tabs} activeTab={currentTab} handleChangeTab={handleChangeTab} />
         {currentTab === 'bids' ? (
           <AcOptionsTab
             postId={post.postUuid}
             postStatus={postStatus}
-            postCreator={post.creator?.nickname as string ?? post.creator?.username}
-            postDeadline={
-              moment(post.responseUploadDeadline?.seconds as number * 1000)
-                .subtract(3, 'days').calendar()
-            }
+            postCreator={(post.creator?.nickname as string) ?? post.creator?.username}
+            postDeadline={moment((post.responseUploadDeadline?.seconds as number) * 1000)
+              .subtract(3, 'days')
+              .calendar()}
             options={options}
             optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
@@ -569,51 +558,36 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             handleLoadBids={fetchBids}
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
+        ) : currentTab === 'comments' ? (
+          <CommentsTab commentsRoomId={post.commentsRoomId as number} handleGoBack={() => handleChangeTab('bids')} />
+        ) : winningOption ? (
+          <AcWinnerTab postId={post.postUuid} option={winningOption} postStatus={postStatus} />
         ) : (
-          currentTab === 'comments'
-          ? (
-            <CommentsTab
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('bids')}
+          <SAnimationContainer>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
             />
-          ) : winningOption ? (
-            <AcWinnerTab
-              postId={post.postUuid}
-              option={winningOption}
-              postStatus={postStatus}
-            />
-          ) : (
-            <SAnimationContainer>
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            </SAnimationContainer>
-          )
+          </SAnimationContainer>
         )}
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
-      <PaymentSuccessModal
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
-      >
-        {t(
-          'PaymentSuccessModal.ac',
-          {
-            postCreator: post.creator?.nickname as string ?? post.creator?.username,
-            postDeadline:
-              moment(post.responseUploadDeadline?.seconds as number * 1000)
-                .subtract(3, 'days').calendar(),
-          }
-        )}
+      <PaymentSuccessModal isVisible={paymentSuccesModalOpen} closeModal={() => setPaymentSuccesModalOpen(false)}>
+        {t('PaymentSuccessModal.ac', {
+          postCreator: (post.creator?.nickname as string) ?? post.creator?.username,
+          postDeadline: moment((post.responseUploadDeadline?.seconds as number) * 1000)
+            .subtract(3, 'days')
+            .calendar(),
+        })}
       </PaymentSuccessModal>
+      <HeroPopup isPopupVisible={isPopupVisible} postType="AC" closeModal={() => setIsPopupVisible(false)} />
     </SWrapper>
   );
 };
@@ -695,15 +669,14 @@ const SActivitesContainer = styled.div<{
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectingWinnerOption }) => (
+    ${({ showSelectingWinnerOption }) =>
       showSelectingWinnerOption
-      ? css`
-        max-height: calc(580px - 130px);
-      `
-      : css`
-        max-height: calc(580px);
-      `
-    )}
+        ? css`
+            max-height: calc(580px - 130px);
+          `
+        : css`
+            max-height: calc(580px);
+          `}
   }
 `;
 

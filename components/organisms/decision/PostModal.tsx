@@ -70,18 +70,21 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       return switchPostStatus(typeOfPost, postParsed?.status);
     }
-    return 'processing'
+    return 'processing';
   });
 
-  const handleUpdatePostStatus = useCallback((newStatus: number | string) => {
-    let status;
-    if (typeof newStatus === 'number') {
-      status = switchPostStatus(typeOfPost!!, newStatus);
-    } else {
-      status = switchPostStatusString(typeOfPost!!, newStatus);
-    }
-    setPostStatus(status);
-  }, [typeOfPost]);
+  const handleUpdatePostStatus = useCallback(
+    (newStatus: number | string) => {
+      let status;
+      if (typeof newStatus === 'number') {
+        status = switchPostStatus(typeOfPost!!, newStatus);
+      } else {
+        status = switchPostStatusString(typeOfPost!!, newStatus);
+      }
+      setPostStatus(status);
+    },
+    [typeOfPost]
+  );
 
   const isMyPost = useMemo(
     () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
@@ -92,12 +95,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
   const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
 
-  const [sessionId, setSessionId] = useState(() => (
+  const [sessionId, setSessionId] = useState(() =>
     isBrowser()
-    ? new URL(window.location.href).searchParams.get('?session_id') ||
-      new URL(window.location.href).searchParams.get('session_id')
-    : undefined
-  ));
+      ? new URL(window.location.href).searchParams.get('?session_id') ||
+        new URL(window.location.href).searchParams.get('session_id')
+      : undefined
+  );
 
   const resetSessionId = () => setSessionId(undefined);
 
@@ -126,7 +129,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       handleClose();
       window.history.replaceState('', '', currLocation);
     }
-  }
+  };
 
   const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
     const newPostParsed = switchPostType(newPost)[0];
@@ -299,10 +302,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         additionalHash = '#winner';
       }
       setOpen(true);
-      window.history.pushState(
-        postParsed.postUuid,
-        'Post',
-        `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
+      window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
     }
 
     return () => {
@@ -388,7 +388,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         }
         return switchPostStatus(typeOfPost, postParsed?.status);
       }
-      return 'processing'
+      return 'processing';
     });
   }, [postParsed, typeOfPost]);
 
@@ -396,20 +396,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   useEffect(() => {
     router.prefetch('/sign-up');
     router.prefetch('/creation');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       <Head>
-        <title>{ postParsed?.title }</title>
+        <title>{postParsed?.title}</title>
       </Head>
       {!isMobile && (
-        <SGoBackButtonDesktop
-          view="secondary"
-          iconOnly
-          onClick={handleCloseAndGoBack}
-        >
+        <SGoBackButtonDesktop view="secondary" iconOnly onClick={handleCloseAndGoBack}>
           <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
         </SGoBackButtonDesktop>
       )}
@@ -423,16 +419,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           }}
         >
           {postStatus !== 'deleted' ? (
-            isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)
+            isMyPost ? (
+              renderPostModeration(typeOfPost)
+            ) : (
+              renderPostView(typeOfPost)
+            )
           ) : isMyPost ? (
-              <PostFailedBox
-                title={t('PostDeletedByMe.title')}
-                body={t('PostDeletedByMe.body.by_creator')}
-                buttonCaption={t('PostDeletedByMe.ctaButton')}
-                handleButtonClick={() => {
-                  router.push('/creation');
-                }}
-              />
+            <PostFailedBox
+              title={t('PostDeletedByMe.title')}
+              body={t('PostDeletedByMe.body.by_creator')}
+              buttonCaption={t('PostDeletedByMe.ctaButton')}
+              handleButtonClick={() => {
+                router.push('/creation');
+              }}
+            />
           ) : (
             <PostFailedBox
               title={t('PostDeleted.title')}
@@ -445,21 +445,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 document.getElementById('post-modal-container')?.scrollTo({
                   top: document.getElementById('recommendations-section-heading')?.offsetTop,
                   behavior: 'smooth',
-                })
+                });
               }}
             />
           )}
           {!isMyPost && (
-            <SRecommendationsSection
-              id="recommendations-section-heading"
-            >
-              <Headline variant={4}>
-                {
-                  recommenedPosts.length > 0 ? (
-                    t('RecommendationsSection.heading')
-                  ) : null
-                }
-              </Headline>
+            <SRecommendationsSection id="recommendations-section-heading">
+              <Headline variant={4}>{recommenedPosts.length > 0 ? t('RecommendationsSection.heading') : null}</Headline>
               {recommenedPosts && (
                 <ListPostModal
                   category=""
@@ -478,9 +470,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 style={{
                   position: 'relative',
                   bottom: '10px',
-                  ...(recommenedPostsLoading ? {
-                    display: 'none'
-                  } : {}),
+                  ...(recommenedPostsLoading
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
                 }}
               />
             </SRecommendationsSection>

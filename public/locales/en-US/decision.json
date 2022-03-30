@@ -420,5 +420,20 @@
     "hide-replies": "Hide",
     "view-more": "View more comments",
     "comments": "Comments"
+  },
+  "heroPopupCommon": {
+    "btnText": "Got it"
+  },
+  "heroPopupAC": {
+    "title": "Welcome to Events",
+    "description": "Send the creator a bid with what you want them to do, how much you’re willing to spend, and see if they do your bid."
+  },
+  "heroPopupCF": {
+    "title": "Hello Superpolls",
+    "description": "A creator makes a Superpoll that you pay to vote on. When the time’s up, watch the creator do the option that gets the most amount of votes."
+  },
+  "heroPopupMC": {
+    "title": "Goals Goals Goals",
+    "description": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it."
   }
 }
