@@ -249,7 +249,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!currentUser.loggedIn) {
-        router.push('/sign-up?reason=follow-creator');
+        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
       }
 
       const payload = new newnewapi.MarkUserRequest({

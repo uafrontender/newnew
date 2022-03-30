@@ -400,7 +400,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${supportBidAmount}`}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}

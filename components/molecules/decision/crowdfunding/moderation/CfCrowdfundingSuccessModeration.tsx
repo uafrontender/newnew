@@ -152,7 +152,11 @@ export default CfCrowdfundingSuccessModeration;
 const SSectionContainer = styled(motion.div)`
   position: relative;
   width: 100%;
+  height: 100%;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const SProgressRingContainer = styled.div`
@@ -222,14 +226,15 @@ const SCaptionSection = styled.div`
   ${({ theme }) => theme.media.tablet} {
     padding-left: 55%;
 
-    margin-top: 80px;
-    margin-bottom: 114px;
+    margin-bottom: 16px;
 
     text-align: left;
+
+    height: 150px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-top: 124px;
+    /* margin-top: 124px; */
   }
 `;
 

@@ -147,7 +147,11 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
-        router.push('/');
+        if (data.redirectUrl) {
+          router.push(data.redirectUrl);
+        } else {
+          router.push('/');
+        }
       } catch (err) {
         // NB! Might need an error toast
         console.error(err);
