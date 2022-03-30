@@ -91,7 +91,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-decision');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
       }
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -111,7 +114,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-creator');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
       }
 
       const payload = new newnewapi.MarkUserRequest({
@@ -238,9 +244,12 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           ) : null}
         </SActionsDiv>
         <SPostTitle
-          variant={5}
         >
-          {title}
+          <Headline
+            variant={5}
+          >
+            {title}
+          </Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
@@ -329,12 +338,21 @@ const SWrapper = styled.div<{
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
 
+    margin-bottom: 0px;
+
     margin-top: initial;
   }
 `;
 
-const SPostTitle = styled(Headline)`
+const SPostTitle = styled.div`
   grid-area: title;
+
+  display: flex;
+  align-items: center;
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 64px;
+  }
 `;
 
 // Creator card
