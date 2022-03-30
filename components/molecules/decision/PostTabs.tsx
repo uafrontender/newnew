@@ -122,10 +122,10 @@ const STabs = styled.div`
   position: relative;
   overflow: hidden;
 
-  margin-bottom: 12px;
+  padding-bottom: 12px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 16px;
+    padding-bottom: 16px;
   }
 `;
 

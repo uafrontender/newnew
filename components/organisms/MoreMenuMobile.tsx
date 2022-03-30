@@ -6,12 +6,15 @@ import { useRouter } from 'next/router';
 
 import Text from '../atoms/Text';
 import InlineSvg from '../atoms/InlineSVG';
+import Indicator from '../atoms/Indicator';
 
+import { useGetChats } from '../../contexts/chatContext';
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
-import ChatIconOutlined from '../../public/images/svg/icons/outlined/Comments.svg';
+import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
+
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -23,9 +26,11 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   handleClose,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
-  const router = useRouter();
+
+  const { unreadCount } = useGetChats();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -46,13 +51,38 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
           exit={{ opacity: 0 }}
         >
           <SButton onClick={() => router.route.includes('direct-messages') ? handleClose() : handleClick('/direct-messages')}>
+            {unreadCount && unreadCount > 0 ? (
+              <Indicator
+                counter={unreadCount}
+                animate={false}
+              />
+            ) : null}
+            <SText
+              variant={2}
+              active={router.route.includes('direct-messages')}
+            >
+              {t('mobile-bottom-navigation-dms')}
+            </SText>
             <InlineSvg
-              svg={router.route.includes('direct-messages') ? ChatIconFilled : ChatIconOutlined}
+              svg={ChatIconFilled}
               fill={router.route.includes('direct-messages') ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
               width="24px"
               height="24px"
             />
-            <Text variant={2}>{t('mobile-bottom-navigation-dms')}</Text>
+          </SButton>
+          <SButton onClick={() => {}}>
+            <SText
+              variant={2}
+              active={router.route.includes('share')}
+            >
+              {t('mobile-bottom-navigation-share')}
+            </SText>
+            <InlineSvg
+              svg={ShareIcon}
+              fill={router.route.includes('share') ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
+              width="24px"
+              height="24px"
+            />
           </SButton>
         </SContainer>
       )}
@@ -64,10 +94,10 @@ export default MoreMenuMobile;
 
 const SContainer = styled(motion.div)`
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + 10px);
   z-index: 10;
-  right: 0px;
-  width: 164px;
+  right: 16px;
+  min-width: 114px;
   box-shadow: 0px 0px 35px 20px rgba(0, 0, 0, 0.25);
 
   display: flex;
@@ -77,7 +107,7 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;
@@ -95,7 +125,7 @@ const SButton = styled.button`
   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
 
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   gap: 8px;
 
@@ -105,4 +135,13 @@ const SButton = styled.button`
   &:hover {
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }
+`;
+
+const SText = styled(Text)<{
+  active: boolean;
+}>`
+  color: ${({ theme, active }) => active ? theme.colorsThemed.text.primary: theme.colorsThemed.text.tertiary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
 `;

@@ -294,7 +294,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}
@@ -403,7 +403,7 @@ const SNewPledgeForm = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  height: 108px;
+  /* height: 108px; */
 
   div:first-child {
     width: 100%;
