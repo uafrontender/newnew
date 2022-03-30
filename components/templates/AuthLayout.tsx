@@ -149,7 +149,7 @@ const BackgroundVisual:React.FunctionComponent<IBackgroundVisual> = ({
 const SBackgroundVisual = styled.div`
   display: none;
 
-  ${({ theme }) => theme.media.laptop} {
+  ${({ theme }) => theme.media.tablet} {
     display: block;
 
     position: absolute;
@@ -168,28 +168,23 @@ const SBackgroundVisual = styled.div`
 const HeroVisual: React.FunctionComponent = () => {
   const theme = useTheme();
   const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>('intro');
+  const [introLoaded, setIntroLoaded] = useState(false);
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
   useEffect(() => {
-    setTimeout(() => {
-      setCurrentState('hold');
-    }, 3000);
-  }, []);
+    if (introLoaded) {
+      setTimeout(() => {
+        setCurrentState('hold');
+      }, 3000);
+    }
+  }, [introLoaded]);
 
   useEffect(() => {
     if (authLayoutContext.shouldHeroUnmount) {
       setCurrentState('outro');
     }
   }, [authLayoutContext.shouldHeroUnmount]);
-
-  // useEffect(() => {
-  //   return () => setCurrentState('outro');
-  // }, []);
-
-  // useUnmount(() => {
-  //   setCurrentState('outro');
-  // });
 
   return (
     <SHeroVisual
@@ -215,12 +210,9 @@ const HeroVisual: React.FunctionComponent = () => {
           height={960}
           objectFit="contain"
           priority
-          // onLoad={}={() => {
-          //   console.log('loaded!')
-          //   setTimeout(() => {
-          //     setCurrentState('hold');
-          //   }, 3000);
-          // }}
+          onLoad={() => {
+            setIntroLoaded(true);
+          }}
         />
       </SImageWrapper>
       <SImageWrapper
@@ -236,9 +228,6 @@ const HeroVisual: React.FunctionComponent = () => {
         />
       </SImageWrapper>
       <SImageWrapper
-        // style={{
-        //   opacity: authLayoutContext.shouldHeroUnmount ? 1 : 0,
-        // }}
         style={{
           opacity: currentState === 'outro' ? 1 : 0,
         }}
@@ -256,9 +245,19 @@ const HeroVisual: React.FunctionComponent = () => {
 
 const SHeroVisual = styled(motion.div)`
   position: absolute;
+  display: none;
 
-  right: 50%;
-  top: 180px;
+  ${({ theme }) => theme.media.tablet} {
+    display: block;
+
+    right: 55%;
+    top: 25%
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 50%;
+    top: 180px;
+  }
 `;
 
 const SImageWrapper = styled.div`
@@ -266,8 +265,13 @@ const SImageWrapper = styled.div`
   top: 0;
   right: 0;
 
-  width: 600px;
-  height: 700px;
+  width: 400px;
+  height: 600px;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 600px;
+    height: 700px;
+  }
 `;
 
 const VerifyEmailVisual: React.FunctionComponent = () => {
@@ -340,7 +344,7 @@ const SVerifyEmailBgWrapper = styled.div`
 
   overflow: hidden;
 
-  @media (max-width: 1150px) {
+  @media (max-width: 1440px) {
     display: none;
   }
 

@@ -362,7 +362,22 @@ const SBackButton = styled(GoBackButton)`
   }
 
   ${({ theme }) => theme.media.laptopL} {
-    display: none;
+    top: -20vh;
+    left: -27vw;
+
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    border-radius: 12px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+
+    div {
+      margin-right: 0;
+    }
   }
 `;
 
