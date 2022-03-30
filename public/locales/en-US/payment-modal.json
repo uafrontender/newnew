@@ -2,7 +2,7 @@
   "paymentMethodTitle": "Payment method",
   "options": {
     "wallet": {
-      "subtitle": "Save and pay with",
+      "subtitle": "Pay with",
       "name": "NewNew wallet",
       "fees": "No fees"
     },

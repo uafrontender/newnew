@@ -40,12 +40,12 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
             draggable={false}
           />
         </SImageHolder>
-        <SHeadline
-          variant={4}
-        >
-          {title}
-        </SHeadline>
       </SImageBG>
+      <SHeadline
+        variant={4}
+      >
+        {title}
+      </SHeadline>
       <SBottomContent
         variant={isMobile ? 1 : 3}
       >
@@ -118,7 +118,6 @@ const SImageBG = styled.div<ISImageBG>`
   border-radius: 10px;
 
   ${({ theme }) => theme.media.tablet} {
-    height: 320px;
     justify-content: flex-end;
   }
 `;
