@@ -2,6 +2,7 @@ import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { isString } from 'lodash';
 
 import Chat from './Chat';
 import Button from '../../../atoms/Button';
@@ -19,8 +20,10 @@ import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
 import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg';
-import bulkMessageIcon from '../../../../public/images/svg/icons/filled/BulkMessage.svg';
+import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
+import { useGetChats } from '../../../../contexts/chatContext';
+import NewMessageModal from './NewMessageModal';
 
 export const DynamicSection = () => {
   const theme = useTheme();
@@ -31,9 +34,17 @@ export const DynamicSection = () => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const { unreadCountForCreator } = useGetChats();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
+
+  const [showNewMessageModal, setShowNewMessageModal] = useState<boolean>(false);
+
+  const closeNewMsgModal = () => {
+    setShowNewMessageModal(false);
+  };
+
   const isDesktop = !isMobile && !isTablet;
   const {
     query: { tab = isDesktop ? 'notifications' : '' },
@@ -47,11 +58,11 @@ export const DynamicSection = () => {
       },
       {
         url: '/creator/dashboard?tab=chat',
-        counter: 6,
+        counter: unreadCountForCreator,
         nameToken: 'chat',
       },
     ],
-    []
+    [unreadCountForCreator]
   );
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
@@ -74,7 +85,7 @@ export const DynamicSection = () => {
     console.log('search');
   }, []);
   const handleBulkMessageClick = useCallback(() => {
-    console.log('search');
+    setShowNewMessageModal(true);
   }, []);
 
   useOnClickEsc(containerRef, () => {
@@ -135,7 +146,7 @@ export const DynamicSection = () => {
       >
         <SAnimatedContainer ref={containerRef}>
           {tab === 'direct-messages' ? (
-            <Chat />
+            <Chat roomID={router.query.roomID && isString(router.query.roomID) ? router.query.roomID : ''} />
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>
@@ -166,12 +177,13 @@ export const DynamicSection = () => {
                       </SChatButton>
                       <SChatButton view="secondary" onClick={handleBulkMessageClick}>
                         <SChatInlineSVG
-                          svg={bulkMessageIcon}
+                          svg={NewMessageIcon}
                           fill={theme.colorsThemed.text.primary}
                           width="20px"
                           height="20px"
                         />
                       </SChatButton>
+                      <NewMessageModal showModal={showNewMessageModal} closeModal={closeNewMsgModal} />
                     </>
                   )}
                 </SSectionTopLineButtons>
@@ -236,7 +248,7 @@ const SIndicator = styled(Indicator)`
 const SAnimatedContainer = styled.div`
   top: 144px;
   left: 212px;
-  right: 32px;
+  right: 12px;
   bottom: 34px;
   z-index: 5;
   padding: 24px 0;

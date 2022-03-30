@@ -4,15 +4,22 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 
 import General from '../components/templates/General';
 import Content from '../components/organisms/Chat';
 
 import { NextPageWithLayout } from './_app';
+import { useAppSelector } from '../redux-store/store';
 
 export const Chat = () => {
   const { t } = useTranslation('chat');
-
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
+  if (!user.loggedIn) {
+    router.push('/sign-up');
+    return null;
+  }
   return (
     <>
       <Head>

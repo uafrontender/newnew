@@ -253,7 +253,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }}
         isDisabled={disabled}
         onClick={() => {
-          if (!isMobile && !disabled) {
+          if (!isMobile && !disabled && !noAction) {
             handleOpenSupportForm();
           }
         }}
@@ -444,7 +444,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       {paymentModalOpen ? (
         <PaymentModal
           zIndex={12}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           isOpen={paymentModalOpen}
           amount={`$${parseInt(supportBidAmount, 10) * 1}`}
           onClose={() => setPaymentModalOpen(false)}

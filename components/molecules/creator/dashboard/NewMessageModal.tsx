@@ -2,38 +2,33 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import dynamic from 'next/dynamic';
-import Modal from '../../organisms/Modal';
-import SearchInput from '../../atoms/chat/SearchInput';
+import { useRouter } from 'next/router';
+import { getMyRooms } from '../../../../api/endpoints/chat';
+import clearNameFromEmoji from '../../../../utils/clearNameFromEmoji';
+import { useAppSelector } from '../../../../redux-store/store';
 import {
-  SChatItemContainer,
   SChatItemCenter,
+  SChatItemContainer,
+  SChatItemM,
   SChatItemText,
   SChatSeparator,
   SUserAlias,
-  SChatItemM,
   SUserAvatar,
-} from '../../atoms/chat/styles';
-import UserAvatar from '../UserAvatar';
-import useScrollGradients from '../../../utils/hooks/useScrollGradients';
-import GradientMask from '../../atoms/GradientMask';
-import clearNameFromEmoji from '../../../utils/clearNameFromEmoji';
-import { useAppSelector } from '../../../redux-store/store';
-import InlineSVG from '../../atoms/InlineSVG';
-
-import { getMyRooms } from '../../../api/endpoints/chat';
-
-import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
-import { IChatData } from '../../interfaces/ichat';
-
-const CloseModalButton = dynamic(() => import('../../atoms/chat/CloseModalButton'));
-const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
-const NewAnnouncement = dynamic(() => import('../../atoms/chat/NewAnnouncement'));
+} from '../../../atoms/chat/styles';
+import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
+import Modal from '../../../organisms/Modal';
+import UserAvatar from '../../UserAvatar';
+import SearchInput from '../../../atoms/chat/SearchInput';
+import CloseModalButton from '../../../atoms/chat/CloseModalButton';
+import GradientMask from '../../../atoms/GradientMask';
+import InlineSVG from '../../../atoms/InlineSVG';
+import NewAnnouncement from '../../../atoms/dashboard/NewAnnouncement';
+import NoResults from '../../../atoms/chat/NoResults';
+import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 
 interface INewMessageModal {
   showModal: boolean;
   closeModal: () => void;
-  openChat: (arg: IChatData) => void;
 }
 
 interface IChatRoomUserNameWithoutEmoji extends newnewapi.IChatRoom {
@@ -45,10 +40,11 @@ interface IChatroomsSorted {
   chats: IChatRoomUserNameWithoutEmoji[];
 }
 
-const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, closeModal }) => {
-  const { t } = useTranslation('chat');
+const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) => {
+  const { t } = useTranslation('creator');
   const theme = useTheme();
   const scrollRef: any = useRef();
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -156,14 +152,14 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
   }, [searchValue, chatRooms]);
 
   const createNewAnnouncement = () => {
-    if (myAnnouncement) openChat({ chatRoom: myAnnouncement, showChatList: null });
+    if (myAnnouncement) router.push(`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncement.id}`);
     closeModal();
   };
 
   const renderChatItem = useCallback(
     (chat: IChatRoomUserNameWithoutEmoji, index: number) => {
       const handleItemClick = () => {
-        openChat({ chatRoom: chat, showChatList: null });
+        router.push(`/creator/dashboard?tab=direct-messages&roomID=${chat.id}`);
         closeModal();
       };
 
@@ -182,13 +178,12 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
-          {filteredChatrooms.length > 0
-            ? index !== filteredChatrooms!!.length - 1 && <SChatSeparator />
-            : index !== chatRooms!!.length - 1 && <SChatSeparator />}
+          {index !== chatRooms!!.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
-    [chatRooms, closeModal, openChat, filteredChatrooms]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [chatRooms, closeModal]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);

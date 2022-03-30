@@ -30,9 +30,11 @@ import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import McOptionCardDoubleVote from './McOptionCardDoubleVote';
 import PaymentSuccessModal from '../PaymentSuccessModal';
+import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
+  postStatus: TPostStatusStringified;
   postCreator: string;
   postDeadline: string;
   options: newnewapi.MultipleChoice.Option[];
@@ -46,6 +48,7 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
+  postStatus,
   postCreator,
   postDeadline,
   options,
@@ -102,7 +105,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handleTogglePaymentModalOpen = async () => {
     if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
-      router.push('/sign-up?reason=subscribe-suggest-new-option');
+      router.push(`/${post?.creator?.username}/subscribe`);
       return;
     }
     // Check if subscribed
@@ -300,7 +303,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
       if (size) {
-        setHeightDelta(size);
+        setHeightDelta(size + (!isMobileOrTablet ? 20 : 0));
       }
     });
 
@@ -310,7 +313,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setHeightDelta(0);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasVotedOptionId, post.isSuggestionsAllowed]);
+  }, [hasVotedOptionId, post.isSuggestionsAllowed, isMobileOrTablet]);
 
   return (
     <>
@@ -344,7 +347,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 postId={post.postUuid}
                 index={i}
                 hasAlreadyVoted={hasVotedOptionId === option.id}
-                noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
+                noAction={(hasVotedOptionId !== undefined && hasVotedOptionId !== option.id) || postStatus === 'failed'}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
                 handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
               />
@@ -358,7 +361,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 minAmount={minAmount}
                 votePrice={votePrice}
                 optionBeingSupported={optionBeingSupported}
-                noAction={hasVotedOptionId !== undefined && hasVotedOptionId !== option.id}
+                noAction={(hasVotedOptionId !== undefined && hasVotedOptionId !== option.id) || postStatus === 'failed'}
                 handleSetSupportedBid={(id: string) => setOptionBeingSupported(id)}
                 handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
                 handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
@@ -381,7 +384,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             ) : null
           )}
         </SBidsContainer>
-        {post.isSuggestionsAllowed && !hasVotedOptionId ? (
+        {post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting' ? (
           <SActionSection
             ref={(el) => {
               actionSectionContainer.current = el!!;
@@ -502,7 +505,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${parseInt(newBidAmount, 10) * 1}`}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}
@@ -538,7 +541,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         )}
       </PaymentSuccessModal>
       {/* Mobile floating button */}
-      {isMobile && !suggestNewMobileOpen && !hasVotedOptionId ? (
+      {isMobile && !suggestNewMobileOpen && !hasVotedOptionId && postStatus === 'voting' ? (
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}
@@ -562,6 +565,7 @@ const STabContainer = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     height: calc(100% - 56px);
+    height: 100%;
   }
 `;
 
@@ -681,7 +685,7 @@ const SBottomPlaceholder = styled.div`
     display: block;
 
     position: absolute;
-    bottom: -30px;
+    bottom: 0px;
 
     font-weight: 600;
     font-size: 12px;

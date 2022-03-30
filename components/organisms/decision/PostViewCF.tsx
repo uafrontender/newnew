@@ -292,7 +292,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-decision');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
       }
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,

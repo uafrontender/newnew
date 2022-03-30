@@ -1,15 +1,18 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 
 import Item, { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
+import MoreMenuMobile from './MoreMenuMobile';
 
 interface IBottomNavigation {
   visible: boolean;
+  moreMenuMobileOpen: boolean;
+  handleCloseMobileMenu: () => void;
   collection: TBottomNavigationItem[];
 }
 
 export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
-  const { visible, collection } = props;
+  const { visible, collection, moreMenuMobileOpen, handleCloseMobileMenu } = props;
 
   const renderItem = useCallback((item) => (
     <Item
@@ -18,9 +21,18 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
     />
   ), []);
 
+  useEffect(() => {
+    if (!visible) handleCloseMobileMenu();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
   return (
     <SContainer id="bottom-nav-mobile" visible={visible}>
       {collection?.map(renderItem)}
+      <MoreMenuMobile
+        isVisible={moreMenuMobileOpen}
+        handleClose={handleCloseMobileMenu}
+      />
     </SContainer>
   );
 };

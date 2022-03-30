@@ -1,5 +1,5 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 import { SkeletonTheme } from 'react-loading-skeleton';
@@ -22,6 +22,7 @@ import useScrollDirection from '../../utils/hooks/useScrollDirection';
 import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
+import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -36,6 +37,9 @@ export const General: React.FC<IGeneral> = (props) => {
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
+
+  const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
+
   const wrapperRef: any = useRef();
   const bottomNavigation = useMemo(() => {
     let bottomNavigationShadow: TBottomNavigationItem[] = [
@@ -74,6 +78,7 @@ export const General: React.FC<IGeneral> = (props) => {
             key: 'more',
             url: '/more',
             width: '20%',
+            actionHandler: () => setMoreMenuMobileOpen(true),
           },
         ];
       } else {
@@ -107,6 +112,16 @@ export const General: React.FC<IGeneral> = (props) => {
   const { scrollDirection } = useScrollDirection(wrapperRef);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const [isOpenedChat, setIsOpenedChat] = useState(true);
+
+  const openChat = () => {
+    setIsOpenedChat(true);
+  };
+
+  const closeChat = () => {
+    setIsOpenedChat(false);
+  };
+
   return (
     <ErrorBoundary>
       <SkeletonTheme
@@ -136,7 +151,12 @@ export const General: React.FC<IGeneral> = (props) => {
             </Container>
           </SContent>
           <Footer />
-          <BottomNavigation visible={isMobile && scrollDirection !== 'down'} collection={bottomNavigation} />
+          <BottomNavigation
+            collection={bottomNavigation}
+            moreMenuMobileOpen={moreMenuMobileOpen}
+            handleCloseMobileMenu={() => setMoreMenuMobileOpen(false)}
+            visible={isMobile && scrollDirection !== 'down'}
+          />
           <SortingContainer
             id="sorting-container"
             withCookie={cookies.accepted !== 'true'}
@@ -147,7 +167,11 @@ export const General: React.FC<IGeneral> = (props) => {
           </CookieContainer>
           {withChat && isMobile && (
             <ChatContainer bottomNavigationVisible={isMobile && scrollDirection !== 'down'}>
-              <FloatingMessages withCounter />
+              {!isOpenedChat ? (
+                <FloatingMessages withCounter openChat={openChat} />
+              ) : (
+                <MobileDashBoardChat closeChat={closeChat} />
+              )}
             </ChatContainer>
           )}
         </SWrapper>

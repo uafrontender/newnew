@@ -58,13 +58,9 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
         />
       </SAnimation>
       <SLabelContent>
-        <InlineSvg
-          svg={NewnewLogoBlue}
-          width="48px"
-        />
         <div
           style={{
-            marginLeft: '17px',
+            marginLeft: '4px',
             justifySelf: 'flex-start',
             textAlign: 'left'
           }}
@@ -83,6 +79,10 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
             )}
           </Text>
         </div>
+        <InlineSvg
+          svg={NewnewLogoBlue}
+          width="48px"
+        />
         {/* <SFeesText
           variant={2}
         >
@@ -131,7 +131,7 @@ const SAnimation = styled.div`
 const SLabelContent = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: 48px 2fr 1fr;
+  grid-template-columns: 1fr 48px;
   align-items: flex-end;
   justify-content: left;
 `;

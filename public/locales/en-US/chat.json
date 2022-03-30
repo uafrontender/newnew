@@ -90,8 +90,8 @@
       "title": "New message",
       "search-placeholder": "Search",
       "no-results-title": "No results",
-      "no-results-text": "There were no results for",
-      "no-results-search-text": "Try a new search."
+      "no-results-text": "No results for",
+      "no-results-search-text": "Try a new name..."
     },
     "renewSubcriptionsSubtitle": "Renew subscription to"
   },
@@ -119,8 +119,8 @@
   },
   "usertypes": {
     "all": "All",
-    "subscribers": "Subscribers",
-    "subscribing": "Subscribing"
+    "subscribers": "My Subscribers",
+    "subscribing": "Creators"
   },
   "dates": {
     "now": "now",

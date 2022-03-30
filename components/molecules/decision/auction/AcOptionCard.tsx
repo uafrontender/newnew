@@ -255,7 +255,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         isDisabled={disabled}
         isBlue={isSupportedByMe || isMyBid}
         onClick={() => {
-          if (!isMobile && !disabled) {
+          if (!isMobile && !disabled && votingAllowed) {
             handleOpenSupportForm();
           }
         }}
@@ -400,7 +400,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${supportBidAmount}`}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}

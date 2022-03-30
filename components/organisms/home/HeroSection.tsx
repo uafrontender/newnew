@@ -195,6 +195,14 @@ export const HeroSection = () => {
           <source
             src={
               theme.name === 'light'
+              ? '/images/home/Landing-Page-Light.mp4'
+              : '/images/home/Landing-Page-Dark.mp4'
+            }
+            type="video/mp4"
+          />
+          <source
+            src={
+              theme.name === 'light'
               ? '/images/home/Landing-Page-Light.webm'
               : '/images/home/Landing-Page-Dark.webm'
             }
@@ -235,15 +243,16 @@ const STopWrapper = styled.div`
   white-space: pre-line;
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 40%
+    max-width: 45%
   }
 `;
 
 const SHeadline = styled(Headline)`
-  max-width: 250px;
+  text-align: center;
 
   ${(props) => props.theme.media.tablet} {
     max-width: 320px;
+    text-align: left;
   }
 
   ${(props) => props.theme.media.laptop} {
@@ -254,14 +263,15 @@ const SHeadline = styled(Headline)`
 const SSubTitle = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   margin-top: 16px;
-  max-width: 220px;
+
+  text-align: center;
 
   ${(props) => props.theme.media.tablet} {
-    max-width: 230px;
+
+    text-align: left;
   }
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 340px;
   }
 `;
 
@@ -269,6 +279,7 @@ const SButtonsHolder = styled.div`
   display: flex;
   margin-top: 24px;
   flex-direction: row;
+  justify-content: center;
 
   button {
     margin-right: 16px;
@@ -276,6 +287,7 @@ const SButtonsHolder = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 32px;
+    justify-content: initial;
   }
 `;
 
@@ -300,6 +312,8 @@ const SHeroImage = styled.div`
   display: flex;
   align-items: center;
 
+  z-index: 1;
+
   video {
     width: 100%;
     object-fit: contain;
@@ -308,6 +322,11 @@ const SHeroImage = styled.div`
   ${({ theme }) => theme.media.tablet} {
     order: unset;
     height: 642px;
+
+    video {
+      position: relative;
+      top: -10%;
+    }
   }
 `;
 

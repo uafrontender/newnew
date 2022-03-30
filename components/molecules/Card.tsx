@@ -127,12 +127,8 @@ export const Card: React.FC<ICard> = ({
   const handleUserClick = (username: string) => {
     router.push(`/${username}`);
   };
-  const handleMoreClick = () => {
-    router.push('/post-detailed');
-  };
-  const handleBidClick = () => {
-    router.push('/post-detailed');
-  };
+  const handleMoreClick = () => {};
+  const handleBidClick = () => {};
 
   useEffect(() => {
     const handleCanplay = () => {
@@ -647,10 +643,10 @@ const SWrapperOutside = styled.div<ISWrapper>`
   ${(props) => props.theme.media.tablet} {
     max-width: 200px;
 
+    transition: transform ease 0.5s;
+
     :hover {
-      #animatedPart {
-        transform: translateY(-10px);
-      }
+      transform: translateY(-8px);
     }
   }
 
@@ -671,7 +667,7 @@ interface ISImageBG {
 
 const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  padding: 75% 0px;
+  padding: 70% 0px;
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
@@ -718,7 +714,7 @@ const SBottomContentOutside = styled.div`
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 14px 10px 0 10px;
+    padding: 8px 10px 0 10px;
   }
 `;
 
@@ -823,6 +819,16 @@ const SButton = styled(Button)<ISButtonSpan>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    span {
+      font-size: 16px;
+    }
   }
 `;
 
@@ -845,6 +851,16 @@ const SButtonFirst = styled(Button)`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    span {
+      font-size: 16px;
+    }
   }
 
   &:hover, &:active {
