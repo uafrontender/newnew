@@ -57,7 +57,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  // const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -118,12 +118,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   return (
     <SSignupMenu
       isLoading={isSubmitLoading}
-      style={{
-        ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-          transform: 'translateX(-300px)',
-          transition: '0.6s linear'
-        } : {})
-      }}
+      // style={{
+      //   ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
+      //     transform: 'translateX(-1000px)',
+      //     transition: '0.6s linear'
+      //   } : {})
+      // }}
     >
       <SMenuWrapper>
         <SSignInBackButton

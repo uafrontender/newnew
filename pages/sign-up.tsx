@@ -53,6 +53,14 @@ const Signup: NextPage<ISignup> = ({
     <AuthLayout>
       <motion.div
         key="sign-up"
+        exit={{
+          x: -1000,
+          y: 0,
+          opacity: 0,
+          transition: {
+            duration: 1
+          }
+        }}
       >
         { page }
       </motion.div>

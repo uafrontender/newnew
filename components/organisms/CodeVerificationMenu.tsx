@@ -324,8 +324,9 @@ const SCodeVerificationMenu = styled.div`
   user-select: none;
 
   ${({ theme }) => theme.media.laptopL} {
-    top: calc(50% - 224px);
+    /* top: calc(50% - 224px); */
     left: calc(50% - 304px);
+    margin-top: calc(50vh - 224px);
 
     width: 608px;
     height: 448px;

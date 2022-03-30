@@ -49,6 +49,16 @@ export default class MyDocument extends Document {
           <link rel="preload" href="/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp" as="image" crossOrigin="anonymous" />
           <link rel="preload" href="/images/signup/hero-visual/Light/sign-in-outro-light.webp" as="image" crossOrigin="anonymous" />
             {/* Email verification screen */}
+          <link rel="preload" href="/images/signup/floating-assets/Bottom-Glass-Sphere.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Bottom-Sphere.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Crowdfunding.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Left-Glass-Sphere.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Light-Bulb.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Multiple-Choice.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Right-Glass-Sphere.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Top-Glass-Sphere.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Top-Middle-Sphere.png" as="image" crossOrigin="anonymous" />
+          <link rel="preload" href="/images/signup/floating-assets/Votes.png" as="image" crossOrigin="anonymous" />
             {/* Landing page */}
               {/* Dark */}
               {/* NB! Video is not supported, so preload placeholders */}
