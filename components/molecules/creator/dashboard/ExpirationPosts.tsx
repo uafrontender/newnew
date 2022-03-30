@@ -103,12 +103,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
         amount = (data as newnewapi.Crowdfunding).currentBackerCount;
         break;
       default:
-        amount = (data as newnewapi.Auction).totalAmount?.usdCents !== 0 ? 1 : 0;
-      /**
-        waiting for new version of newnewapi
-       */
-      // default:
-      //   amount = (data as newnewapi.Auction).bidCount as number;
+        amount = (data as newnewapi.Auction).bidCount as number;
     }
 
     return amount;
