@@ -74,8 +74,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
   // need some case for banned users, etc.
   const [submitError, setSubmitError] = useState<string>('');
 
-  console.log(redirectURL)
-
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
     setSubmitError('');
@@ -83,11 +81,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL 
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
         useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
-        // TODO:
-        // @ts-ignore
-        // ...(redirectURL ? {
-        //   redirectURL
-        // } : {}),
+        ...(redirectURL ? {
+          redirectURL
+        } : {}),
       });
 
       const { data, error } = await sendVerificationEmail(payload);

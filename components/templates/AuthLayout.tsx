@@ -340,7 +340,7 @@ const SVerifyEmailBgWrapper = styled.div`
 
   overflow: hidden;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1150px) {
     display: none;
   }
 
