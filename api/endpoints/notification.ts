@@ -3,7 +3,7 @@ import { BASE_URL, fetchProtobuf } from '../apiConfigs';
 
 export const BASE_URL_CHAT = `${BASE_URL}/notification`;
 
-export const GetMyNotifications = (payload: newnewapi.GetMyNotificationsRequest) =>
+export const getMyNotifications = (payload: newnewapi.GetMyNotificationsRequest) =>
   fetchProtobuf<newnewapi.GetMyNotificationsRequest, newnewapi.GetMyNotificationsResponse>(
     newnewapi.GetMyNotificationsRequest,
     newnewapi.GetMyNotificationsResponse,
@@ -12,7 +12,7 @@ export const GetMyNotifications = (payload: newnewapi.GetMyNotificationsRequest)
     payload
   );
 
-export const MarkAsRead = (payload: newnewapi.MarkAsReadRequest) =>
+export const markNotificationsAsRead = (payload: newnewapi.MarkAsReadRequest) =>
   fetchProtobuf<newnewapi.MarkAsReadRequest, newnewapi.EmptyResponse>(
     newnewapi.MarkAsReadRequest,
     newnewapi.EmptyResponse,

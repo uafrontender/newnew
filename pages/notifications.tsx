@@ -1,16 +1,19 @@
-import React, { ReactElement, useCallback, useMemo } from 'react';
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import moment from 'moment';
+import { newnewapi } from 'newnew-api';
 import randomID from '../utils/randomIdGenerator';
 
 import General from '../components/templates/General';
 import Notification from '../components/molecules/Notification';
 
 import { NextPageWithLayout } from './_app';
+import { getMyNotifications } from '../api/endpoints/notification';
+// import { useAppSelector } from '../redux-store/store';
 
 // eslint-disable-next-line no-shadow
 export enum RoutingTarget {
@@ -45,6 +48,44 @@ export interface INotification {
 
 export const Notifications = () => {
   const { t } = useTranslation('notifications');
+  // const user = useAppSelector((state) => state.user);
+  const [notifications, setNotifications] = useState<newnewapi.INotification[] | null>(null);
+  // const [notificationsNextPageToken, setnotificationsNextPageToken] = useState<string | undefined | null>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const fetchNotification = useCallback(
+    async (pageToken?: string) => {
+      if (loading) return;
+      try {
+        if (!pageToken) setNotifications([]);
+        setLoading(true);
+        const payload = new newnewapi.GetMyNotificationsRequest({
+          paging: {
+            limit: 20,
+            pageToken,
+          },
+        });
+        const res = await getMyNotifications(payload);
+
+        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+        console.log(res.data);
+
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loading]
+  );
+
+  useEffect(() => {
+    if (!notifications) {
+      fetchNotification();
+    }
+  }, [notifications, fetchNotification]);
 
   const collection = useMemo(
     () =>
