@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-template */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -19,6 +19,8 @@ import { useAppSelector } from '../../../../redux-store/store';
 import infoIcon from '../../../../public/images/svg/icons/filled/Info.svg';
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
+import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
+import InfoTooltipItem from '../../../atoms/dashboard/InfoTooltipItem';
 
 interface IExpirationPosts {
   expirationPosts: newnewapi.IPost[];
@@ -27,6 +29,7 @@ interface IExpirationPosts {
 export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
+  const ref: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -35,6 +38,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
   const router = useRouter();
 
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
+  const [showInfoTooltip, setShowInfoTooltip] = useState<number | undefined>();
 
   useEffect(() => {
     if (expirationPosts) {
@@ -100,26 +104,48 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
         break;
       default:
         amount = (data as newnewapi.Auction).totalAmount?.usdCents !== 0 ? 1 : 0;
+      /**
+        waiting for new version of newnewapi
+       */
+      // default:
+      //   amount = (data as newnewapi.Auction).bidCount as number;
     }
 
     return amount;
   };
+
+  useOnClickOutside(ref, () => {
+    if (showInfoTooltip) setShowInfoTooltip(undefined);
+  });
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
 
   const renderItem = useCallback(
     (item, index) => {
       const postType = Object.keys(item)[0];
       const data = Object.values(item)[0] as newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
 
-      const handleUserClick = () => {};
-      const handleInfoClick = () => {};
       const handleDecideClick = () => {
         router.push(`/?post=${data.postUuid}`);
+      };
+
+      const handleShareClick = () => {
+        let url;
+        if (window) {
+          url = `${window.location.origin}/?post=${data.postUuid}`;
+          copyPostUrlToClipboard(url);
+        }
       };
 
       const countdownsrt = getCountdown(data);
       const money = getAmountValue(postType, data);
       const contributors = getContributorsValue(postType, data);
-      console.log(data);
 
       return (
         <SListItemWrapper key={data.postUuid}>
@@ -128,7 +154,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
               <>
                 <SListBodyItem width="calc(100% - 300px)" align="flex-start">
                   {!data.announcement?.thumbnailImageUrl ? (
-                    <SAvatar withClick onClick={handleUserClick} />
+                    <SAvatar />
                   ) : (
                     <SImg
                       src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''}
@@ -163,7 +189,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
             ) : (
               <>
                 {!data.announcement?.thumbnailImageUrl ? (
-                  <SAvatar withClick onClick={handleUserClick} />
+                  <SAvatar />
                 ) : (
                   <SImg src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''} alt="" />
                 )}
@@ -175,12 +201,19 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
                     {countdownsrt}
                   </SListItemDate>
                 </SListItemTitleWrapper>
-                <SListShareButton view="secondary" onClick={handleDecideClick}>
+                <SListShareButton view="secondary" onClick={handleShareClick}>
                   <InlineSVG svg={shareIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
                 </SListShareButton>
                 {!isMobile && (
-                  <SListShareButton view="secondary" onClick={handleInfoClick}>
+                  <SListShareButton view="secondary" onClick={() => setShowInfoTooltip(index)}>
                     <InlineSVG svg={infoIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                    {showInfoTooltip === index && (
+                      <InfoTooltipItem
+                        money={money}
+                        contributions={contributors.toString()}
+                        closeTooltip={() => setShowInfoTooltip(undefined)}
+                      />
+                    )}
                   </SListShareButton>
                 )}
                 <SListDecideButton view="secondary" onClick={handleDecideClick}>
@@ -193,7 +226,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
         </SListItemWrapper>
       );
     },
-    [t, isMobile, isDesktop, posts.length, theme.colorsThemed.text.primary, router]
+    [t, isMobile, isDesktop, posts.length, theme.colorsThemed.text.primary, router, showInfoTooltip]
   );
 
   return (
@@ -371,6 +404,7 @@ const SListShareButton = styled(Button)`
   min-width: 36px;
   margin-right: 12px;
   border-radius: 12px;
+  overflow: visible;
 `;
 
 const SListDecideButton = styled(Button)`

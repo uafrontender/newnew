@@ -29,6 +29,7 @@ export const Dashboard = () => {
   const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
   const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
+  const [isTodosCompletedLoading, setIsTodosCompletedLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
   const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>([]);
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] = useState(true);
@@ -74,6 +75,10 @@ export const Dashboard = () => {
     setIsTodosCompleted(value);
   };
 
+  const todosCompletedLoading = (value: boolean) => {
+    setIsTodosCompletedLoading(value);
+  };
+
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
     try {
@@ -109,7 +114,7 @@ export const Dashboard = () => {
           {!isMobile && <DynamicSection />}
         </STitleBlock>
         <SBlock name="your-todos">
-          <YourTodos todosCompleted={todosCompleted} />
+          <YourTodos todosCompleted={todosCompleted} todosCompletedLoading={todosCompletedLoading} />
         </SBlock>
         {isLoadingExpirationPosts ? (
           <SBlock>
@@ -129,7 +134,11 @@ export const Dashboard = () => {
           </SBlock>
         )}
         <SBlock>
-          <Earnings isTodosCompleted={isTodosCompleted} hasMyPosts={hasMyPosts} />
+          <Earnings
+            isTodosCompleted={isTodosCompleted}
+            isTodosCompletedLoading={isTodosCompletedLoading}
+            hasMyPosts={hasMyPosts}
+          />
         </SBlock>
         {!mySubscriptionProduct ? (
           <SBlock noMargin>
