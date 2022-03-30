@@ -57,6 +57,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
+          showTocApply={showTocApply ?? false}
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -140,7 +141,9 @@ const SWrapper = styled.div`
   user-select: none;
 `;
 
-const SContentContainer = styled.div`
+const SContentContainer = styled.div<{
+  showTocApply: boolean;
+}>`
   position: relative;
   width: 100%;
   height: 100%;
@@ -153,7 +156,7 @@ const SContentContainer = styled.div`
     width: 480px;
     height: fit-content;
     min-height: 360px;
-    max-height: 480px;
+    max-height: ${({ showTocApply }) => showTocApply ? '480px' : '412px'};
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

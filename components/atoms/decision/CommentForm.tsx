@@ -1,11 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+
+import { useAppSelector } from '../../../redux-store/store';
+
 import Button from '../Button';
-import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import InlineSVG from '../InlineSVG';
 import CommentTextArea from './CommentTextArea';
-import { useAppSelector } from '../../../redux-store/store';
+
+import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 
 interface ICommentForm {
   position?: string;
@@ -21,7 +25,9 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
   onSubmit,
 }, ref) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
+  const user = useAppSelector((state) => state.user)
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -34,9 +40,18 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
+
+    if (!user.loggedIn) {
+      window?.history.replaceState({
+        fromPost: true,
+      }, '', '');
+      router.push(`/sign-up?reason=comment&redirect=${window.location.href}`);
+    }
+
     await onSubmit(commentText);
     setCommentText('');
-  }, [commentText, onSubmit]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentText, user.loggedIn, onSubmit]);
 
   const handleBlur = useCallback(() => {
     setFocusedInput(false);
@@ -52,6 +67,11 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
       }}
       position={position}
       zIndex={zIndex}
+      onKeyDown={(e) => {
+        if (e.shiftKey && e.key === 'Enter') {
+          handleSubmit(e);
+        }
+      }}
     >
       <SInputWrapper focus={focusedInput}>
         <CommentTextArea

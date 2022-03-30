@@ -316,7 +316,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
               caption={t('cf-block-tutorial-card.caption')}
               imageStyle={{
                 position: 'relative',
-                left: '5%'
+                left: '5%',
               }}
             />
           ) : undefined}
