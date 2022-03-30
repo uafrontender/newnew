@@ -319,7 +319,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${supportBidAmount}`}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}

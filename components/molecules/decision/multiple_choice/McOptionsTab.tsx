@@ -303,7 +303,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
       if (size) {
-        setHeightDelta(size);
+        setHeightDelta(size + (!isMobileOrTablet ? 20 : 0));
       }
     });
 
@@ -313,7 +313,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       setHeightDelta(0);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasVotedOptionId, post.isSuggestionsAllowed]);
+  }, [hasVotedOptionId, post.isSuggestionsAllowed, isMobileOrTablet]);
 
   return (
     <>
@@ -505,7 +505,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${parseInt(newBidAmount, 10) * 1}`}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}
@@ -565,6 +565,7 @@ const STabContainer = styled(motion.div)`
 
   ${({ theme }) => theme.media.tablet} {
     height: calc(100% - 56px);
+    height: 100%;
   }
 `;
 
@@ -684,7 +685,7 @@ const SBottomPlaceholder = styled.div`
     display: block;
 
     position: absolute;
-    bottom: -30px;
+    bottom: 0px;
 
     font-weight: 600;
     font-size: 12px;
