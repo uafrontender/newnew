@@ -1,10 +1,10 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobuf } from '../apiConfigs';
+import { BASE_URL, fetchProtobuf, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 export const BASE_URL_CHAT = `${BASE_URL}/notification`;
 
 export const getMyNotifications = (payload: newnewapi.GetMyNotificationsRequest) =>
-  fetchProtobuf<newnewapi.GetMyNotificationsRequest, newnewapi.GetMyNotificationsResponse>(
+  fetchProtobufProtectedIntercepted<newnewapi.GetMyNotificationsRequest, newnewapi.GetMyNotificationsResponse>(
     newnewapi.GetMyNotificationsRequest,
     newnewapi.GetMyNotificationsResponse,
     `${BASE_URL_CHAT}/get_my_notifications`,
