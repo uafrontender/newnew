@@ -67,10 +67,6 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
-    // if (!user.loggedIn) {
-    //   router.push('/sign-up?reason=bid');
-    //   return;
-    // }
     setPaymentModalOpen(true);
   };
 

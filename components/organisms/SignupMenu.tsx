@@ -46,9 +46,10 @@ import { AuthLayoutContext } from '../templates/AuthLayout';
 
 export interface ISignupMenu {
   reason?: SignupReason;
+  redirectURL?: string;
 }
 
-const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
+const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('sign-up');
@@ -73,6 +74,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   // need some case for banned users, etc.
   const [submitError, setSubmitError] = useState<string>('');
 
+  console.log(redirectURL)
+
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
     setSubmitError('');
@@ -80,6 +83,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
         useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
+        // TODO:
+        // @ts-ignore
+        // ...(redirectURL ? {
+        //   redirectURL
+        // } : {}),
       });
 
       const { data, error } = await sendVerificationEmail(payload);

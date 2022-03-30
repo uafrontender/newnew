@@ -49,7 +49,7 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
       <motion.div
         initial={{
           x: 500,
-          y: isMobileOrTablet ? 10 : 500,
+          y: 0,
           opacity: 0,
         }}
         animate={{
@@ -82,7 +82,7 @@ export default VerifyEmail;
 export async function getStaticProps(context: { locale: string }): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale,
-    ['verify-email'],
+    ['sign-up', 'verify-email'],
   );
 
   return {

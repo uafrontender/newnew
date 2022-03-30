@@ -105,7 +105,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const handleTogglePaymentModalOpen = async () => {
     if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
-      router.push('/sign-up?reason=subscribe-suggest-new-option');
+      router.push(`/${post?.creator?.username}/subscribe`);
       return;
     }
     // Check if subscribed

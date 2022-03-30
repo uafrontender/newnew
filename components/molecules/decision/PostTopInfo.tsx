@@ -91,7 +91,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-decision');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
       }
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -111,7 +114,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-creator');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
       }
 
       const payload = new newnewapi.MarkUserRequest({
