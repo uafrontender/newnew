@@ -251,7 +251,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
       {paymentModalOpen ? (
         <PaymentModal
           zIndex={12}
-          showTocApply
+          showTocApply={!user?.loggedIn}
           isOpen={paymentModalOpen}
           amount={`$${parseInt(doubleVoteAmount, 10) * 5}`}
           onClose={() => setPaymentModalOpen(false)}

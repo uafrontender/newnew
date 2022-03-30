@@ -643,10 +643,10 @@ const SWrapperOutside = styled.div<ISWrapper>`
   ${(props) => props.theme.media.tablet} {
     max-width: 200px;
 
+    transition: transform ease 0.5s;
+
     :hover {
-      #animatedPart {
-        transform: translateY(-10px);
-      }
+      transform: translateY(-8px);
     }
   }
 

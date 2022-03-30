@@ -5,14 +5,14 @@
   },
   "goBackBtn": "Go back",
   "heading": {
-    "heading": "Email verification",
-    "subheading": "Please, enter a code we’ve sent you to"
+    "heading": "Verify your email",
+    "subheading": "Please, enter a code we sent you to"
   },
   "timeExpired": {
-    "not_receieved": "Didn’t receive a code?",
-    "resendBtn": "Resend code"
+    "not_receieved": "I didn't get a code.",
+    "resendBtn": "Resend it"
   },
   "errors": {
-    "invalidCode": "Invalid code. Check the code and try again"
+    "invalidCode": "Wrong code. Try again..."
   }
 }
