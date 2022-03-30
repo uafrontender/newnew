@@ -104,7 +104,7 @@ export const fetchMoreLikePosts = (payload: newnewapi.GetSimilarPostsRequest) =>
   );
 
 export const getMyUrgentPosts = (payload: newnewapi.PagedRequest) =>
-  fetchProtobuf<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
+  fetchProtobufProtectedIntercepted<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
     newnewapi.PagedRequest,
     newnewapi.PagedPostsResponse,
     `${BASE_URL_POST}/get_my_urgent_posts`,
