@@ -142,7 +142,7 @@ const SControlsDiv = styled.div`
   width: 100%;
   margin-top: auto;
 
-  display: none;
+  /* display: none; */
   justify-content: space-between;
 
   button {
