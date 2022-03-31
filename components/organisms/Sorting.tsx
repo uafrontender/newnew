@@ -24,6 +24,7 @@ import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 
 interface ISorting {
+  category: string;
   options: any;
   selected: any;
   onChange: (selected: any) => void;
@@ -31,6 +32,7 @@ interface ISorting {
 
 export const Sorting: React.FC<ISorting> = (props) => {
   const {
+    category,
     options,
     selected,
     onChange,
@@ -75,13 +77,14 @@ export const Sorting: React.FC<ISorting> = (props) => {
       >
         <SortItem
           item={item}
+          category={category}
           selected={selected}
           handleChange={handleChange}
         />
         {isLast && <SSeparator />}
       </SItemWrapper>
     );
-  }, [handleChange, selected, options.length]);
+  }, [handleChange, selected, options.length, category]);
   const handleSubmit = useCallback(() => {
     setFocused(false);
   }, []);

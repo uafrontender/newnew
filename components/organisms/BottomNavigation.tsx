@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
+import { useAppSelector } from '../../redux-store/store';
 
 import Item, { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MoreMenuMobile from './MoreMenuMobile';
@@ -14,6 +15,8 @@ interface IBottomNavigation {
 export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   const { visible, collection, moreMenuMobileOpen, handleCloseMobileMenu } = props;
 
+  const user = useAppSelector((state) => state.user);
+
   const renderItem = useCallback((item) => (
     <Item
       key={item.key}
@@ -27,7 +30,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   }, [visible]);
 
   return (
-    <SContainer id="bottom-nav-mobile" visible={visible}>
+    <SContainer id="bottom-nav-mobile" visible={visible} isCreator={!!user.userData?.options?.isCreator}>
       {collection?.map(renderItem)}
       <MoreMenuMobile
         isVisible={moreMenuMobileOpen}
@@ -41,6 +44,7 @@ export default BottomNavigation;
 
 interface ISContainer {
   visible: boolean;
+  isCreator: boolean;
 }
 
 const SContainer = styled.nav<ISContainer>`
@@ -53,6 +57,6 @@ const SContainer = styled.nav<ISContainer>`
   position: fixed;
   transition: bottom ease 0.5s;
   align-items: center;
-  justify-content: space-around;
+  justify-content: ${({ isCreator }) => isCreator ? 'space-around' : 'center'};
   background-color: ${(props) => props.theme.colorsThemed.background.primary};
 `;

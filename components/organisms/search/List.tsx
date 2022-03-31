@@ -6,10 +6,13 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import Card from '../../molecules/Card';
+import Lottie from '../../atoms/Lottie';
+import CardSkeleton from '../../molecules/CardSkeleton';
 
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
-import CardSkeleton from '../../molecules/CardSkeleton';
+
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 interface IList {
   category: string;
@@ -58,7 +61,7 @@ export const List: React.FC<IList> = ({
       // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
     >
       {collection?.map(renderItem)}
-      {loading && Array(5).fill('_').map((_, i) => (
+      {collection.length > 0 && loading && Array(5).fill('_').map((_, i) => (
         <CardSkeleton
           key={i}
           count={1}
@@ -68,6 +71,23 @@ export const List: React.FC<IList> = ({
           highlightColor={skeletonsHighlightColor}
         />
       ))}
+      {collection.length === 0 && loading && (
+        <SAnimationContainer
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SAnimationContainer>
+      )}
     </SListWrapper>
   );
 };
@@ -171,4 +191,13 @@ const SItemWrapper = styled.div`
     width: calc(16.65% - 32px);
   }
 
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
