@@ -287,9 +287,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (currentUser.loggedIn && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
-      router.push('/profile');
+      router.push(currentUser.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
     }
-  }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
+  }, [currentUser.loggedIn, currentUser.userData?.options?.isCreator, currentUser.userData?.userUuid, router, user.uuid]);
 
   useEffect(() => {
     const handlerHistory = () => {

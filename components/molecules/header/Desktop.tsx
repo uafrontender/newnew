@@ -35,7 +35,7 @@ export const Desktop: React.FC<IDesktop> = () => {
     router.push('/creator/dashboard');
   };
   const handleUserClick = () => {
-    router.push('/profile');
+    router.push(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
   };
   const handleSignInClick = () => {
     router.push('/sign-up');
