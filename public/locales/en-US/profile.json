@@ -1,12 +1,18 @@
 {
+  "subscribed-tag": "SUBSCRIBED",
+  "ellipse": {
+    "unsub": "Unsubscribe",
+    "report": "Report",
+    "block": "Block"
+  },
   "tabs": {
-    "activelyBidding": "Actively bidding on",
-    "purchases": "My purchases",
-    "viewHistory": "My view history",
-    "subscriptions": "My subscriptions",
+    "activelyBidding": "Active",
+    "purchases": "Purchases",
+    "viewHistory": "Viewing history",
+    "subscriptions": "Subscriptions",
     "myposts": "My posts",
-    "favorites": "My favorites",
-    "userInitial": "Creator’s decisions",
+    "favorites": "Favorites",
+    "userInitial": "Creator's decisions",
     "activity": "Activity"
   },
   "posts-filter": {
@@ -17,7 +23,7 @@
     "filter-2": "Crowdfunding",
     "filter-3": "Multiple choices"
   },
-  "AccountPrivate": "User preferred to hide their activity",
+  "AccountPrivate": "{{username}}'s activity is private",
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",

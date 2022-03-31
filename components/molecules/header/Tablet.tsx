@@ -41,7 +41,7 @@ export const Tablet: React.FC<ITablet> = () => {
     }
   };
   const handleUserClick = () => {
-    router.push('/profile');
+    router.push(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
   };
   const handleSignInClick = () => {
     router.push('/sign-up');

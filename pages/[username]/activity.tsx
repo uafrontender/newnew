@@ -2,7 +2,7 @@
 import React, {
   ReactElement, useCallback, useEffect, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -18,6 +18,9 @@ import PostModal from '../../components/organisms/decision/PostModal';
 import List from '../../components/organisms/search/List';
 import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
+import Text from '../../components/atoms/Text';
+import InlineSvg from '../../components/atoms/InlineSVG';
+import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -46,6 +49,7 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
   handleUpdateFilter,
   handleSetPosts,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('profile');
 
   // Display post
@@ -128,6 +132,8 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
         loadPosts(undefined, true);
       }
+    } else if (!triedLoading) {
+      loadPosts(undefined, true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading]);
@@ -144,7 +150,21 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
         user.options?.isActivityPrivate
         ? (
           <SMain>
-            { t('AccountPrivate') }
+            <SAccountPrivate>
+              <SPrivateLock>
+                <InlineSvg
+                  svg={LockIcon}
+                  width="24px"
+                  height="24px"
+                  fill={theme.colorsThemed.text.secondary}
+                />
+              </SPrivateLock>
+              <SAccountPrivateText
+                variant={1}
+              >
+                { t('AccountPrivate', { username: user.nickname ?? user.username }) }
+              </SAccountPrivateText>
+            </SAccountPrivate>
           </SMain>
         ) : (
           <SMain>
@@ -252,36 +272,36 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
   // const isActivityPrivate = res.data.options?.isActivityPrivate;
-  const isActivityPrivate = false;
+  // const isActivityPrivate = false;
 
-  // will fetch only for users with open activity history
-  if (!isActivityPrivate && !context.req.url?.startsWith('/_next')) {
-    const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
-      userUuid: res.data.uuid,
-      filter: newnewapi.Post.Filter.ALL,
-      relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
-      // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
-      needTotalCount: true,
-      paging: {
-        limit: 10,
-      },
-    });
+  // // will fetch only for users with open activity history
+  // if (!isActivityPrivate && !context.req.url?.startsWith('/_next')) {
+  //   const fetchUserPostsPayload = new newnewapi.GetUserPostsRequest({
+  //     userUuid: res.data.uuid,
+  //     filter: newnewapi.Post.Filter.ALL,
+  //     relation: newnewapi.GetUserPostsRequest.Relation.THEY_PURCHASED,
+  //     // relation: newnewapi.GetUserPostsRequest.Relation.UNKNOWN_RELATION,
+  //     needTotalCount: true,
+  //     paging: {
+  //       limit: 10,
+  //     },
+  //   });
 
-    const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
+  //   const postsResponse = await fetchUsersPosts(fetchUserPostsPayload);
 
-    if (postsResponse.data) {
-      return {
-        props: {
-          user: res.data.toJSON(),
-          pagedPosts: postsResponse.data.toJSON(),
-          ...(postsResponse.data.paging?.nextPageToken ? {
-            nextPageTokenFromServer: postsResponse.data.paging?.nextPageToken,
-          } : {}),
-          ...translationContext,
-        },
-      };
-    }
-  }
+  //   if (postsResponse.data) {
+  //     return {
+  //       props: {
+  //         user: res.data.toJSON(),
+  //         pagedPosts: postsResponse.data.toJSON(),
+  //         ...(postsResponse.data.paging?.nextPageToken ? {
+  //           nextPageTokenFromServer: postsResponse.data.paging?.nextPageToken,
+  //         } : {}),
+  //         ...translationContext,
+  //       },
+  //     };
+  //   }
+  // }
 
   return {
     props: {
@@ -303,4 +323,32 @@ const SCardsSection = styled.div`
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
   }
+`;
+
+// Account private
+const SAccountPrivate = styled.div`
+
+`;
+
+const SPrivateLock = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  margin-bottom: 8px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  border-radius: 50%;
+
+  margin-left: auto !important;
+  margin-right: auto !important;
+`;
+
+const SAccountPrivateText = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  text-align: center;
 `;
