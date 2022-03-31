@@ -259,7 +259,7 @@ const Search: NextPage<ISearch> = ({
       offset: -100,
       containerId: 'generalScrollContainer',
     });
-  }, [router.query.category]);
+  }, [router.query.category, router.query.sort]);
 
   // Load collection on category change && scroll
   useEffect(() => {
@@ -277,8 +277,8 @@ const Search: NextPage<ISearch> = ({
       }
     }
 
-    console.log(`Sorting is ${sorting}`);
-    console.log(`Sorting ref is ${sortingRef.current}`);
+    // console.log(`Sorting is ${sorting}`);
+    // console.log(`Sorting ref is ${sortingRef.current}`);
 
     if (inView && category && !isCollectionLoading) {
       if (nextPageToken) {

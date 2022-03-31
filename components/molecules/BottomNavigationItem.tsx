@@ -111,6 +111,8 @@ const SContainer = styled.div<ISContainer>`
   align-items: center;
   flex-direction: column;
   justify-content: center;
+
+  max-width: 56px;
 `;
 
 interface ISTitle {
