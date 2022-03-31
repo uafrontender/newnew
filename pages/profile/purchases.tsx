@@ -89,11 +89,9 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
           needTotalCount: true,
         } : {}),
       });
-      console.log(payload)
       const postsResponse = await getMyPosts(
         payload,
       );
-      console.log(postsResponse)
       if (postsResponse.data && postsResponse.data.posts) {
         handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
         handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
