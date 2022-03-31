@@ -26,8 +26,11 @@ import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favou
 import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
+
 import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
+import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
+import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -66,10 +69,31 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
+  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
-  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+  // Modals
+  const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
+  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const isUserBlocked = useMemo(() => (
+    usersIBlocked.includes(user.uuid)
+  ), [usersIBlocked, user.uuid]);
+
+  const unblockUserAsync = async (uuid: string) => {
+    try {
+      const payload = new newnewapi.MarkUserRequest({
+        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+        userUuid: uuid,
+      });
+      const res = await markUser(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      unblockUser(uuid);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
@@ -373,9 +397,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             <UserEllipseMenu
               isVisible={ellipseMenuOpen}
               isSubscribed={isSubscribed}
+              isBlocked={isUserBlocked}
               loggedIn={currentUser.loggedIn}
               handleClose={() => setIsEllipseMenuOpen(false)}
-              handleClickBlock={() => {}}
+              handleClickBlock={() => {
+                if (isUserBlocked) {
+                  unblockUserAsync(user.uuid);
+                } else {
+                  setBlockUserModalOpen(true);
+                }
+              }}
               handleClickReport={() => {}}
               handleClickUnsubscribe={() => {}}
             />
@@ -445,18 +476,32 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         </SProfileLayout>
         {renderChildren()}
       </SGeneral>
+      {/* Modals */}
       {isMobile && (
         <UserEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={10}
           isSubscribed={isSubscribed}
+          isBlocked={isUserBlocked}
           loggedIn={currentUser.loggedIn}
           onClose={() => setIsEllipseMenuOpen(false)}
-          handleClickBlock={() => {}}
+          handleClickBlock={() => {
+            if (isUserBlocked) {
+              unblockUserAsync(user.uuid);
+            } else {
+              setBlockUserModalOpen(true);
+            }
+          }}
           handleClickReport={() => {}}
           handleClickUnsubscribe={() => {}}
         />
       )}
+      <BlockUserModal
+        confirmBlockUser={blockUserModalOpen}
+        onUserBlock={() => {}}
+        user={user}
+        closeModal={() => setBlockUserModalOpen(false)}
+      />
     </ErrorBoundary>
   );
 };
