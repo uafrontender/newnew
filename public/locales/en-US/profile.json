@@ -3,7 +3,17 @@
   "ellipse": {
     "unsub": "Unsubscribe",
     "report": "Report",
-    "block": "Block"
+    "block": "Block",
+    "unblock": "Unblock"
+  },
+  "modal": {
+    "block-user": {
+      "title": "Block user",
+      "message-first-part": "Do you really want to block",
+      "message-second-part": "?",
+      "button-cancel": "Cancel",
+      "button-confirm": "Block user"
+    }
   },
   "tabs": {
     "activelyBidding": "Active",
@@ -170,7 +180,8 @@
         },
         "blockedusers": {
           "title": "Blocked uses",
-          "unblockBtn": "Unblock"
+          "unblockBtn": "Unblock",
+          "no_blocked_users": "No blocked users"
         },
         "closeAccount": {
           "title": "Close account",

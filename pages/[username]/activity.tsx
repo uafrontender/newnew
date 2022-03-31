@@ -16,7 +16,7 @@ import { fetchUsersPosts } from '../../api/endpoints/post';
 
 import PostModal from '../../components/organisms/decision/PostModal';
 import List from '../../components/organisms/search/List';
-import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
+// import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import Text from '../../components/atoms/Text';
 import InlineSvg from '../../components/atoms/InlineSVG';
@@ -132,17 +132,17 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
         loadPosts(undefined, true);
       }
-    } else if (!triedLoading) {
+    } else if (!triedLoading && posts?.length === 0) {
       loadPosts(undefined, true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading]);
+  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
-  useUpdateEffect(() => {
-    handleUpdatePageToken('');
-    handleSetPosts([]);
-    loadPosts(undefined, true);
-  }, [postsFilter]);
+  // useUpdateEffect(() => {
+  //   handleUpdatePageToken('');
+  //   handleSetPosts([]);
+  //   loadPosts(undefined, true);
+  // }, [postsFilter]);
 
   return (
     <div>

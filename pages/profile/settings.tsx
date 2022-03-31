@@ -16,7 +16,7 @@ import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice'
 import { logoutUser, logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
 
 // API
-import { logout, updateMe } from '../../api/endpoints/user';
+import { getUserByUsername, logout, markUser, updateMe } from '../../api/endpoints/user';
 
 import { NextPageWithLayout } from '../_app';
 import MyProfileSettingsLayout from '../../components/templates/MyProfileSettingsLayout';
@@ -31,6 +31,7 @@ import SettingsNotificationsSection from '../../components/organisms/settings/Se
 import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
 import PrivacySection from '../../components/organisms/settings/PrivacySection';
 import { SocketContext } from '../../contexts/socketContext';
+import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 
 // Mock
 const unicornbabe = {
@@ -64,6 +65,24 @@ const MyProfileSettginsIndex: NextPage = () => {
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
+
+  // Blocked users
+  const { usersIBlocked: usersIBlockedIds, unblockUser } = useGetBlockedUsers();
+  const [blockedUsers, setBlockedUsers] = useState<Omit<newnewapi.User, 'toJSON'>[]>([])
+
+  const unblockUserAsync = async (uuid: string) => {
+    try {
+      const payload = new newnewapi.MarkUserRequest({
+        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+        userUuid: uuid,
+      });
+      const res = await markUser(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      unblockUser(uuid);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   // Logout loading
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
@@ -260,12 +279,10 @@ const MyProfileSettginsIndex: NextPage = () => {
       content: <PrivacySection
         isSpendingHidden={spendingHidden}
         isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
-        blockedUsers={[
-          unicornbabe,
-        ]}
+        blockedUsers={blockedUsers}
         handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
         handleToggleAccountPrivate={handleToggleAccountPrivate}
-        handleUnblockUser={() => {}}
+        handleUnblockUser={unblockUserAsync}
         handleCloseAccount={() => {}}
         handleSetActive={() => {}}
       />,
@@ -306,6 +323,32 @@ const MyProfileSettginsIndex: NextPage = () => {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
+
+  useEffect(() => {
+    async function fetchUsersIblocked() {
+      try {
+        const users: newnewapi.User[] = [];
+
+        usersIBlockedIds.forEach( async (uuid) => {
+          const payload = new newnewapi.GetUserRequest({
+            uuid
+          });
+
+          const res = await getUserByUsername(payload);
+
+          if (res.data) {
+            users.push(res.data);
+          }
+        });
+
+        setBlockedUsers(() => users);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchUsersIblocked();
+  }, [usersIBlockedIds]);
 
   return (
     <div>
