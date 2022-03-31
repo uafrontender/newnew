@@ -11,7 +11,7 @@ import { newnewapi } from 'newnew-api';
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
-import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
+// import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
@@ -123,17 +123,17 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
         loadPosts(undefined, true);
       }
-    } else if (!triedLoading) {
+    } else if (!triedLoading && posts?.length === 0) {
       loadPosts(undefined, true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading]);
+  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
-  useUpdateEffect(() => {
-    handleUpdatePageToken('');
-    handleSetPosts([]);
-    loadPosts(undefined, true);
-  }, [postsFilter]);
+  // useUpdateEffect(() => {
+  //   handleUpdatePageToken('');
+  //   handleSetPosts([]);
+  //   loadPosts(undefined, true);
+  // }, [postsFilter]);
 
   return (
     <div>

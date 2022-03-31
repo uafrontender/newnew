@@ -10,6 +10,7 @@ interface IUserEllipseModal {
   isOpen: boolean;
   zIndex: number;
   isSubscribed: boolean;
+  isBlocked: boolean;
   loggedIn: boolean;
   onClose: () => void;
   handleClickUnsubscribe: () => void;
@@ -21,6 +22,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
   isOpen,
   zIndex,
   isSubscribed,
+  isBlocked,
   loggedIn,
   onClose,
   handleClickUnsubscribe,
@@ -63,7 +65,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
           </SButton>
           {loggedIn && (
             <SButton onClick={blockHandler}>
-              <Text variant={2}>{t('ellipse.block')}</Text>
+              <Text variant={2}>{!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}</Text>
             </SButton>
           )}
         </SContentContainer>

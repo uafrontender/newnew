@@ -10,6 +10,7 @@ import Text from '../../atoms/Text';
 interface IUserEllipseMenu {
   isVisible: boolean;
   isSubscribed: boolean;
+  isBlocked: boolean;
   loggedIn: boolean;
   handleClose: () => void;
   handleClickUnsubscribe: () => void;
@@ -20,6 +21,7 @@ interface IUserEllipseMenu {
 const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
   isVisible,
   isSubscribed,
+  isBlocked,
   loggedIn,
   handleClose,
   handleClickUnsubscribe,
@@ -68,7 +70,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
           </SButton>
           {loggedIn && (
             <SButton onClick={blockHandler}>
-              <Text variant={2}>{t('ellipse.block')}</Text>
+              <Text variant={2}>{!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}</Text>
             </SButton>
           )}
         </SContainer>
