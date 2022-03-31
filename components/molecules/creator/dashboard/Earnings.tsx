@@ -16,13 +16,16 @@ import MakeDecision from '../../../atoms/creator/MakeDecision';
 import { getMyEarnings } from '../../../../api/endpoints/payments';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { formatNumber } from '../../../../utils/format';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import Lottie from '../../../atoms/Lottie';
 
 interface IFunctionProps {
   isTodosCompleted: boolean;
   hasMyPosts: boolean;
+  isTodosCompletedLoading: boolean;
 }
 
-export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPosts }) => {
+export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPosts, isTodosCompletedLoading }) => {
   const { t } = useTranslation('creator');
   const [filter, setFilter] = useState('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
@@ -116,34 +119,35 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
     [t]
   );
 
-  const getValue = useCallback((id: string) => {
-    switch (id) {
-      case 'ac':
-        return myEarnings?.auEarnings?.usdCents
-          ? `$${formatNumber(myEarnings.auEarnings.usdCents / 100 ?? 0, true)}`
-          : '$0.00';
+  const getValue = useCallback(
+    (id: string) => {
+      switch (id) {
+        case 'ac':
+          return myEarnings?.auEarnings?.usdCents
+            ? `$${formatNumber(myEarnings.auEarnings.usdCents / 100 ?? 0, true)}`
+            : '$0.00';
 
-      case 'cf':
-        return myEarnings?.cfEarnings?.usdCents
-          ? `$${formatNumber(myEarnings.cfEarnings.usdCents / 100 ?? 0, true)}`
-          : '$0.00';
+        case 'cf':
+          return myEarnings?.cfEarnings?.usdCents
+            ? `$${formatNumber(myEarnings.cfEarnings.usdCents / 100 ?? 0, true)}`
+            : '$0.00';
 
-      case 'mc':
-        return myEarnings?.mcEarnings?.usdCents
-          ? `$${formatNumber(myEarnings.mcEarnings.usdCents / 100 ?? 0, true)}`
-          : '$0.00';
+        case 'mc':
+          return myEarnings?.mcEarnings?.usdCents
+            ? `$${formatNumber(myEarnings.mcEarnings.usdCents / 100 ?? 0, true)}`
+            : '$0.00';
 
-      case 'subscriptions':
-        return myEarnings?.subsEarnings?.usdCents
-          ? `$${formatNumber(myEarnings.subsEarnings.usdCents / 100 ?? 0, true)}`
-          : '$0.00';
+        case 'subscriptions':
+          return myEarnings?.subsEarnings?.usdCents
+            ? `$${formatNumber(myEarnings.subsEarnings.usdCents / 100 ?? 0, true)}`
+            : '$0.00';
 
-      default:
-        return '$0.00';
-    }
-  }, [
-    myEarnings,
-  ]);
+        default:
+          return '$0.00';
+      }
+    },
+    [myEarnings]
+  );
 
   const renderListItem = useCallback(
     (item) => (
@@ -197,14 +201,26 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
         </STotalInsights> */}
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {isTodosCompleted ? (
-        hasMyPosts && myEarnings?.nextCashoutAmount ? (
-          <CashOut nextCashoutAmount={myEarnings?.nextCashoutAmount} nextCashoutDate={myEarnings?.nextCashoutDate} />
+      {!isTodosCompletedLoading ? (
+        isTodosCompleted ? (
+          hasMyPosts && myEarnings?.nextCashoutAmount ? (
+            <CashOut nextCashoutAmount={myEarnings?.nextCashoutAmount} nextCashoutDate={myEarnings?.nextCashoutDate} />
+          ) : (
+            <MakeDecision />
+          )
         ) : (
-          <MakeDecision />
+          <FinishProfileSetup />
         )
       ) : (
-        <FinishProfileSetup />
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
       )}
     </SContainer>
   );
