@@ -345,7 +345,7 @@ const SVerifyEmailBgWrapper = styled.div`
 
   overflow: hidden;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1150px) {
     display: none;
   }
 
@@ -354,6 +354,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 25vw;
     bottom: -75px;
 
+    @media (max-width: 1440px) {
+      height: 80px;
+    }
     height: 140px;
     object-fit: contain;
 
@@ -365,6 +368,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 50%;
     bottom: 60px;
 
+    @media (max-width: 1440px) {
+      height: 80px;
+    }
     height: 140px;
     object-fit: contain;
 
@@ -376,6 +382,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 9vw;
     top: 140px;
 
+    @media (max-width: 1440px) {
+      height: 210px;
+    }
     height: 280px;
     object-fit: contain;
 
@@ -389,6 +398,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 8vw;
     top: 52vh;
 
+    @media (max-width: 1440px) {
+      height: 50px;
+    }
     height: 80px;
     object-fit: contain;
 
@@ -401,6 +413,9 @@ const SVerifyEmailBgWrapper = styled.div`
     right: 10vw;
     top: -40px;
 
+    @media (max-width: 1440px) {
+      height: 210px;
+    }
     height: 280px;
     object-fit: contain;
 
@@ -412,6 +427,9 @@ const SVerifyEmailBgWrapper = styled.div`
     right: 15vw;
     bottom: -80px;
 
+    @media (max-width: 1440px) {
+      height: 210px;
+    }
     height: 280px;
     object-fit: contain;
 
@@ -423,6 +441,9 @@ const SVerifyEmailBgWrapper = styled.div`
     right: 9.5vw;
     top: 40vh;
 
+    @media (max-width: 1440px) {
+      height: 140px;
+    }
     height: 180px;
     object-fit: contain;
 
@@ -435,6 +456,9 @@ const SVerifyEmailBgWrapper = styled.div`
     right: 35vw;
     top: -45px;
 
+    @media (max-width: 1440px) {
+      height: 80px;
+    }
     height: 140px;
     object-fit: contain;
 
@@ -447,6 +471,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 35vw;
     top: 10vh;
 
+    @media (max-width: 1440px) {
+      height: 70px;
+    }
     height: 100px;
     object-fit: contain;
 
@@ -459,6 +486,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 40vw;
     bottom: 20vh;
 
+    @media (max-width: 1440px) {
+      height: 50px;
+    }
     height: 80px;
     object-fit: contain;
 
@@ -471,6 +501,9 @@ const SVerifyEmailBgWrapper = styled.div`
     left: 14vw;
     bottom: 8vh;
 
+    @media (max-width: 1440px) {
+      height: 180px;
+    }
     height: 240px;
 
     object-fit: contain;

@@ -20,7 +20,7 @@ export const Mobile: React.FC<IMobile> = () => {
 
   const handleUserClick = () => {
     if (user.loggedIn) {
-      router.push('/profile');
+      router.push(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
     } else {
       router.push('/sign-up');
     }

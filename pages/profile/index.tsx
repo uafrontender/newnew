@@ -10,7 +10,7 @@ import { newnewapi } from 'newnew-api';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
-import { TTokenCookie } from '../../api/apiConfigs';
+// import { TTokenCookie } from '../../api/apiConfigs';
 import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
@@ -123,6 +123,8 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
       } else if (!triedLoading && !pageToken && posts?.length === 0) {
         loadPosts(undefined, true);
       }
+    } else if (!triedLoading) {
+      loadPosts(undefined, true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading]);
@@ -196,42 +198,42 @@ export async function getServerSideProps(
       ['common', 'profile', 'home', 'decision', 'payment-modal'],
     );
 
-    const { req } = context;
+    // const { req } = context;
 
-    // Try to fetch only if actual SSR needed
-    if (!context.req.url?.startsWith('/_next')) {
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_ACTIVE_BIDDINGS,
-        filter: newnewapi.Post.Filter.ALL,
-        needTotalCount: true,
-      });
-      const res = await getMyPosts(
-        payload,
-        {
-          accessToken: req.cookies?.accessToken,
-          refreshToken: req.cookies?.refreshToken,
-        },
-        (tokens: TTokenCookie[]) => {
-          const parsedTokens = tokens.map((t) => `${t.name}=${t.value}; ${t.expires ? `expires=${t.expires}; ` : ''} ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`);
-          context.res.setHeader(
-            'set-cookie',
-            parsedTokens,
-          );
-        },
-      );
+    // // Try to fetch only if actual SSR needed
+    // if (!context.req.url?.startsWith('/_next')) {
+    //   const payload = new newnewapi.GetRelatedToMePostsRequest({
+    //     relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_ACTIVE_BIDDINGS,
+    //     filter: newnewapi.Post.Filter.ALL,
+    //     needTotalCount: true,
+    //   });
+    //   const res = await getMyPosts(
+    //     payload,
+    //     {
+    //       accessToken: req.cookies?.accessToken,
+    //       refreshToken: req.cookies?.refreshToken,
+    //     },
+    //     (tokens: TTokenCookie[]) => {
+    //       const parsedTokens = tokens.map((t) => `${t.name}=${t.value}; ${t.expires ? `expires=${t.expires}; ` : ''} ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`);
+    //       context.res.setHeader(
+    //         'set-cookie',
+    //         parsedTokens,
+    //       );
+    //     },
+    //   );
 
-      if (res.data) {
-        return {
-          props: {
-            pagedPosts: res.data.toJSON(),
-            ...(res.data.paging?.nextPageToken ? {
-              nextPageTokenFromServer: res.data.paging?.nextPageToken,
-            } : {}),
-            ...translationContext,
-          },
-        };
-      }
-    }
+    //   if (res.data) {
+    //     return {
+    //       props: {
+    //         pagedPosts: res.data.toJSON(),
+    //         ...(res.data.paging?.nextPageToken ? {
+    //           nextPageTokenFromServer: res.data.paging?.nextPageToken,
+    //         } : {}),
+    //         ...translationContext,
+    //       },
+    //     };
+    //   }
+    // }
 
     return {
       props: {
