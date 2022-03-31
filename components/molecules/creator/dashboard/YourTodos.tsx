@@ -17,9 +17,10 @@ import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IFunctionProps {
   todosCompleted: (value: boolean) => void;
+  todosCompletedLoading: (value: boolean) => void;
 }
 
-export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
+export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompletedLoading }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -98,6 +99,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
 
     async function checkAndLoad() {
       if (!allCompleted && !isLoading) {
+        todosCompletedLoading(true);
         setIsLoading(true);
         if (user.userData?.options?.creatorStatus !== 2) {
           await fetchOnboardingState();
@@ -105,6 +107,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted }) => {
         if (currentTags.length < 1) {
           await fetchCreatorTags();
         }
+        todosCompletedLoading(false);
         setIsLoading(false);
       }
     }
