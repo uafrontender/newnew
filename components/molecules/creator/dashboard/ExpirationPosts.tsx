@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import moment from 'moment';
 import { useRouter } from 'next/router';
 
 import Text from '../../../atoms/Text';
@@ -21,6 +20,7 @@ import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
 import InfoTooltipItem from '../../../atoms/dashboard/InfoTooltipItem';
+import secondsToDHMS from '../../../../utils/secondsToDHMS';
 
 interface IExpirationPosts {
   expirationPosts: newnewapi.IPost[];
@@ -49,29 +49,22 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
   }, [expirationPosts]);
 
   const getCountdown = (data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice) => {
-    const end = moment((data.responseUploadDeadline?.seconds as number) * 1000);
-    const start = moment(Date.now());
-    const seconds = end.diff(start, 'seconds');
-    const days = Math.floor(seconds / 24 / 60 / 60);
-    const hoursLeft = Math.floor(seconds - days * 86400);
-    const hours = Math.floor(hoursLeft / 3600);
-    const minutesLeft = Math.floor(hoursLeft - hours * 3600);
-    const minutes = Math.floor(minutesLeft / 60);
-    const remainingSeconds = seconds % 60;
-    function pad(n: any) {
-      return n < 10 ? '0' + n : n;
-    }
-    let countdownsrt = pad(days) + 'd ' + pad(hours) + 'h';
-    if (days === 0) {
-      countdownsrt = pad(hours) + 'h ' + pad(minutes) + 'm';
-      if (hours === 0) {
-        countdownsrt = pad(minutes) + 'm ' + pad(remainingSeconds) + 's';
-        if (minutes === 0) {
-          countdownsrt = pad(minutes) + 'm ' + pad(remainingSeconds) + 's';
+    const end = (data.responseUploadDeadline?.seconds as number) * 1000;
+    const parsed = (end - Date.now()) / 1000;
+    const dhms = secondsToDHMS(parsed, 'noTrim');
+
+    let countdownsrt = `${dhms.days}${t('dashboard.expirationPosts.expiresTime.days')} ${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')}`;
+
+    if (dhms.days === '0') {
+      countdownsrt = `${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')} ${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')}`;
+      if (dhms.hours === '0') {
+        countdownsrt = `${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')} ${dhms.seconds}${t('dashboard.expirationPosts.expiresTime.seconds')}`;
+        if (dhms.minutes === '0') {
+          countdownsrt = `${dhms.seconds}${t('dashboard.expirationPosts.expiresTime.seconds')}`;
         }
       }
     }
-    countdownsrt += ' left to respond';
+    countdownsrt = `${countdownsrt} ${t('dashboard.expirationPosts.expiresTime.left_to_respond')}`;
     return countdownsrt;
   };
 
@@ -221,6 +214,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
         </SListItemWrapper>
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [t, isMobile, isDesktop, posts.length, theme.colorsThemed.text.primary, router, showInfoTooltip]
   );
 
@@ -346,6 +340,10 @@ const SImg = styled.img`
   min-width: 36px;
   min-height: 36px;
   border-radius: 12px;
+
+  object-fit: cover;
+  object-position: top;
+
   ${(props) => props.theme.media.laptop} {
     width: 48px;
     height: 48px;
