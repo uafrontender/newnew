@@ -1,4 +1,10 @@
 {
+  "subscribed-tag": "SUBSCRIBED",
+  "ellipse": {
+    "unsub": "Unsubscribe",
+    "report": "Report",
+    "block": "Block"
+  },
   "tabs": {
     "activelyBidding": "Active",
     "purchases": "Purchases",
