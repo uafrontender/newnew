@@ -88,10 +88,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           label: 'options',
           value: 'options',
         },
-        {
+        ...(post.isCommentsAllowed ? [{
           label: 'comments',
           value: 'comments',
-        },
+        }] : []),
       ];
     }
     return [
@@ -99,12 +99,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         label: 'options',
         value: 'options',
       },
-      {
+      ...(post.isCommentsAllowed ? [{
         label: 'comments',
         value: 'comments',
-      },
+      }] : []),
     ];
-  }, [post.winningOptionId]);
+  }, [post.isCommentsAllowed, post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -576,7 +576,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
               handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
             />
           ) : (
-            currentTab === 'comments'
+            currentTab === 'comments' && post.isCommentsAllowed
             ? ( <CommentsTab
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('options')}
