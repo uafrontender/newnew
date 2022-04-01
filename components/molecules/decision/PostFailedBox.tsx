@@ -60,7 +60,7 @@ const SFailedBox = styled.div`
     'imageArea headlineArea ctaArea'
     'imageArea bodyArea ctaArea'
   ;
-  grid-template-columns: 64px 5fr 3fr;
+  grid-template-columns: 64px 6fr 5fr;
 
   padding: 16px;
 
