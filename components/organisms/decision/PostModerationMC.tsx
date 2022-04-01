@@ -83,10 +83,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           label: 'options',
           value: 'options',
         },
-        {
+        ...(post.isCommentsAllowed ? [{
           label: 'comments',
           value: 'comments',
-        },
+        }] : []),
       ];
     }
     return [
@@ -94,12 +94,12 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         label: 'options',
         value: 'options',
       },
-      {
+      ...(post.isCommentsAllowed ? [{
         label: 'comments',
         value: 'comments',
-      },
+      }] : []),
     ];
-  }, [post.winningOptionId]);
+  }, [post.isCommentsAllowed, post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -485,7 +485,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
               handleRemoveOption={handleRemoveOption}
             />
           ) : (
-            currentTab === 'comments'
+            currentTab === 'comments' && post.isCommentsAllowed
             ? (
               <CommentsTab
                 canDeleteComments={post.creator?.uuid === user.userData?.userUuid}

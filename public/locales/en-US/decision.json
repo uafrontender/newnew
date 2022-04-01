@@ -419,6 +419,13 @@
     "view-replies": "View",
     "hide-replies": "Hide",
     "view-more": "View more comments",
-    "comments": "Comments"
+    "comments": "Comments",
+    "errors": {
+      "generic": "Please check input",
+      "tooLong": "Comment is too long",
+      "tooShort": "Comment is too short",
+      "innappropriate": "Offensive words are forbidden",
+      "linksForbidden": "No links allowed in comments"
+    }
   }
 }
