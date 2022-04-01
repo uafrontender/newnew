@@ -83,10 +83,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           label: 'bids',
           value: 'bids',
         },
-        {
+        ...(post.isCommentsAllowed ? [{
           label: 'comments',
           value: 'comments',
-        },
+        }] : []),
       ];
     }
     return [
@@ -94,12 +94,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         label: 'bids',
         value: 'bids',
       },
-      {
+      ...(post.isCommentsAllowed ? [{
         label: 'comments',
         value: 'comments',
-      },
+      }] : []),
     ];
-  }, [winningOptionId]);
+  }, [winningOptionId, post.isCommentsAllowed]);
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -510,7 +510,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
               handleUpdateWinningOptionId={(id: number) => setWinningOptionId(id)}
             />
           ) : (
-            currentTab === 'comments'
+            currentTab === 'comments' && post.isCommentsAllowed
             ? (
               <CommentsTab
                 canDeleteComments={post.creator?.uuid === user.userData?.userUuid}

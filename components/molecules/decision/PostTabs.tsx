@@ -81,6 +81,12 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
         ref={(el) => {
           tabsContainerRef.current = el!!;
         }}
+        style={{
+          ...(tabs.length === 1 ? {
+            justifyContent: 'center',
+            visibility: 'hidden'
+          }: {}),
+        }}
       >
         {tabs && tabs.map((tab, i) => (
           <STab

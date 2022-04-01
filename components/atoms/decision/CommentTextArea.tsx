@@ -11,6 +11,7 @@ interface ICommentTextArea {
   id?: string;
   value: string;
   error?: string;
+  focus?: boolean;
   maxlength?: number;
   onBlur?: (key: string, value: string) => void;
   onFocus?: (key: string) => void;
@@ -19,7 +20,7 @@ interface ICommentTextArea {
 }
 
 export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
-  const { id = '', maxlength, value, error, onBlur = () => {}, onFocus = () => {}, onChange, placeholder } = props;
+  const { id = '', maxlength, value, error, focus, onBlur = () => {}, onFocus = () => {}, onChange, placeholder } = props;
 
   const handleChange = useCallback(
     (e) => {
@@ -39,7 +40,7 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
 
   return (
     <SWrapper>
-      <SContent error={!!error}>
+      <SContent error={!!error} focus={focus ?? false}>
         <SCommentTextArea
           value={value}
           onBlur={handleBlur}
@@ -67,6 +68,7 @@ CommentTextArea.defaultProps = {
   id: '',
   error: '',
   maxlength: 524288,
+  focus: undefined,
   onBlur: (key, value) => console.log(key, value),
   onFocus: (key) => console.log(key),
 };
@@ -76,6 +78,7 @@ const SWrapper = styled.div`
 `;
 
 interface ISContent {
+  focus: boolean;
   error: boolean;
 }
 
@@ -85,13 +88,15 @@ const SContent = styled.div<ISContent>`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
 
-  border-width: 1.5px;
-  border-style: solid;
-  border-color: ${({ theme, error }) => {
-    if (!error) {
-      return 'transparent';
+  border: 1.5px solid
+  ${({ focus, theme, error }) => {
+    if (error) {
+      return theme.colorsThemed.accent.error;
     }
-    return theme.colorsThemed.accent.error;
+    if (focus) {
+      return theme.colorsThemed.background.outlines2;
+    }
+    return theme.colorsThemed.background.secondary;
   }};
 `;
 
@@ -106,10 +111,17 @@ const SCommentTextArea = styled(CommentTextAreaAutoSize)`
 
   font-size: 14px;
   line-height: 20px;
+  vertical-align: middle;
+
+  border: 1.5px solid transparent;
 
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
+  }
+
+  &:focus {
+    outline: none;
   }
 
   ::placeholder {

@@ -96,7 +96,13 @@ const Comment: React.FC<IComment> = ({
         )}
         <SCommentContent>
           <SCommentHeader>
-            <SNickname>
+            <SNickname
+              onClick={() => {
+                if (!comment.isDeleted) {
+                  handleRedirectToUser();
+                }
+              }}
+            >
               {!comment.isDeleted ? (
                 comment.sender?.uuid === user.userData?.userUuid ? t('comments.me') : (comment.sender?.nickname ?? comment.sender?.username)
               ) : (
@@ -257,6 +263,12 @@ const SNickname = styled.span`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   cursor: pointer;
   margin-right: 5px;
+
+  transition: 0.2s linear;
+
+  :hover {
+    color: ${(props) => props.theme.colorsThemed.text.primary};
+  }
 `;
 
 const SBid = styled.span`

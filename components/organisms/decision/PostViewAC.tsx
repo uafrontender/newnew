@@ -89,10 +89,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           label: 'bids',
           value: 'bids',
         },
-        {
+        ...(post.isCommentsAllowed ? [{
           label: 'comments',
           value: 'comments',
-        },
+        }] : []),
       ];
     }
     return [
@@ -100,12 +100,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         label: 'bids',
         value: 'bids',
       },
-      {
+      ...(post.isCommentsAllowed ? [{
         label: 'comments',
         value: 'comments',
-      },
+      }] : []),
     ];
-  }, [post.winningOptionId]);
+  }, [post.isCommentsAllowed, post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -570,7 +570,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
         ) : (
-          currentTab === 'comments'
+          currentTab === 'comments' && post.isCommentsAllowed
           ? (
             <CommentsTab
               commentsRoomId={post.commentsRoomId as number}
