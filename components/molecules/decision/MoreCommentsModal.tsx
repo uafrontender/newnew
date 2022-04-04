@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+/* eslint-disable no-plusplus */
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
@@ -12,30 +13,38 @@ import Comment from '../../atoms/decision/Comment';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import CommentForm from '../../atoms/decision/CommentForm';
 
-interface IMoreCommentsModal {
+interface ICommentsModalMobile {
   isVisible: boolean;
   comments: any[];
   commentsLoading: boolean;
   commentsNextPageToken: string | undefined | null;
   canDeleteComment?: boolean;
+  commentIdFromUrl?: string;
+  handleResetCommentIdFromUrl: () => any;
+  handleSetComments: React.Dispatch<React.SetStateAction<TCommentWithReplies[]>>;
   handleFetchComments: (token?: string) => void;
   handleAddComment: (newMsg: string, parentId?: number) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
-  closeMoreCommentsModal: () => void;
+  closeCommentsModalMobile: () => void;
 }
 
-const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
+const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
   comments,
   isVisible,
   commentsLoading,
   commentsNextPageToken,
   canDeleteComment,
+  commentIdFromUrl,
+  handleResetCommentIdFromUrl,
   handleAddComment,
   handleDeleteComment,
+  handleSetComments,
   handleFetchComments,
-  closeMoreCommentsModal,
+  closeCommentsModalMobile,
 }) => {
   const { t } = useTranslation('decision');
+  const scrollRef = useRef<HTMLDivElement>();
+  const commentsWrapper = useRef<HTMLDivElement>();
 
   // Infinite load
   const {
@@ -51,20 +60,79 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, commentsNextPageToken, commentsLoading]);
 
+  useEffect(() => {
+    if (commentIdFromUrl) {
+      const flat: TCommentWithReplies[] = [];
+      for (let i = 0; i < comments.length; i++) {
+        if (comments[i].replies && Array.isArray(comments[i].replies) && comments[i].replies!!.length > 0) {
+          flat.push(...[comments[i], ...comments[i].replies!!])
+        }
+        flat.push(comments[i]);
+      }
+
+      const idx = flat.findIndex((comment) => comment.id === parseInt(commentIdFromUrl, 10))
+
+      if (idx === -1) {
+        console.log('Looking further');
+        scrollRef.current?.scrollBy({
+          top: scrollRef.current.scrollHeight,
+        })
+      } else {
+        console.log('Found the comment');
+
+        if (!flat[idx].parentId || flat[idx].parentId === 0) {
+          const offset = (commentsWrapper?.current?.childNodes[idx] as HTMLDivElement).offsetTop
+
+          scrollRef.current?.scrollTo({
+            top: offset,
+          });
+          document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+        } else if (flat[idx].parentId) {
+          const parentIdx = comments.findIndex((c) => c.id === flat[idx].parentId);
+
+          if (parentIdx !== -1) {
+            handleSetComments((curr) => {
+              const working = [...curr];
+              working[parentIdx].isOpen = true;
+              return working;
+            });
+
+            setTimeout(() => {
+              document?.getElementById(`comment_id_${flat[idx].id}`)?.scrollIntoView();
+              document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+            }, 100);
+          }
+        }
+
+        handleResetCommentIdFromUrl?.();
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentIdFromUrl, comments]);
+
   return (
-    <Modal show={isVisible} onClose={closeMoreCommentsModal}>
+    <Modal show={isVisible} onClose={closeCommentsModalMobile}>
       <SContainer>
-        <SModal onClick={preventParentClick()}>
+        <SModal
+          ref={(el) => {
+            scrollRef.current = el!!;
+          }}
+          onClick={preventParentClick()}
+        >
           <SModalHeader>
             <GoBackButton
-              onClick={closeMoreCommentsModal}
+              onClick={closeCommentsModalMobile}
             >
               <SModalTitle>{t('comments.comments')}</SModalTitle>
             </GoBackButton>
           </SModalHeader>
           <SWrapper>
             <SActionSection>
-              <SCommentsWrapper>
+              <SCommentsWrapper
+                ref={(el) => {
+                  commentsWrapper.current = el!!;
+                }}
+              >
                 {comments && comments.map((item, index) => (
                   <Comment
                     key={(item.id).toString()}
@@ -96,11 +164,12 @@ const MoreCommentsModal: React.FC<IMoreCommentsModal> = ({
   );
 };
 
-MoreCommentsModal.defaultProps = {
+CommentsModalMobile.defaultProps = {
   canDeleteComment: false,
+  commentIdFromUrl: undefined,
 }
 
-export default MoreCommentsModal;
+export default CommentsModalMobile;
 
 const SContainer = styled.div`
   display: flex;

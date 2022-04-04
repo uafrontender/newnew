@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
@@ -38,6 +38,7 @@ import switchPostType, { TPostType } from '../../../utils/switchPostType';
 import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
 import Button from '../../atoms/Button';
+import CommentFromUrlContextProvider, { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 
 interface IPostModal {
   isOpen: boolean;
@@ -98,6 +99,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       new URL(window.location.href).searchParams.get('session_id')
     : undefined
   ));
+
+  const { handleSetCommentIdFromUrl } = useContext(CommentFromUrlContext);
+
+  useEffect(() => {
+    const commentId = isBrowser()
+    ? new URL(window.location.href).searchParams.get('?comment_id') ||
+      new URL(window.location.href).searchParams.get('comment_id')
+    : undefined
+
+    handleSetCommentIdFromUrl?.(commentId ?? '');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const resetSessionId = () => setSessionId(undefined);
 
@@ -497,7 +510,7 @@ PostModal.defaultProps = {
   manualCurrLocation: undefined,
 };
 
-export default PostModal;
+export default (props: any) => <CommentFromUrlContextProvider><PostModal {...props}/></CommentFromUrlContextProvider>;
 
 const SPostModalContainer = styled.div<{
   isMyPost: boolean;
