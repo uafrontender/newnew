@@ -133,6 +133,7 @@ export const HeroSection = () => {
           <AnimatedPresence
             start={animateTitle}
             animation="t-08"
+            delay={0.4}
             onAnimationEnd={handleTitleAnimationEnd}
           >
             {t('hero-block-title')}
