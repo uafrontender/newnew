@@ -24,7 +24,7 @@ import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import { deleteMessage, getMessages, sendMessage } from '../../../api/endpoints/chat';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 
-const CommentsMobileModal = dynamic(() => import('./MoreCommentsModal'));
+const CommentsMobileModal = dynamic(() => import('./CommentsModalMobile'));
 
 interface ICommentsTab {
   commentsRoomId: number;
@@ -132,8 +132,6 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-        console.log(res.data)
-
         if (res.data && res.data.messages) {
           setComments((curr) => {
             const workingArr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
@@ -141,7 +139,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             return processComments(workingArr);
           });
 
-          console.log(res.data.paging?.nextPageToken)
+          // console.log(res.data.paging?.nextPageToken)
           setCommentsNextPageToken(res.data.paging?.nextPageToken);
         }
 
@@ -233,19 +231,18 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         markCommentAsDeleted(comment);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }, [markCommentAsDeleted]);
 
   useEffect(() => {
-    console.log('hey')
     fetchComments();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (inView && !commentsLoading && commentsNextPageToken) {
-      console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
+      // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
       fetchComments(commentsNextPageToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -355,12 +352,12 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       const idx = flat.findIndex((comment) => comment.id === parseInt(commentIdFromUrl, 10))
 
       if (idx === -1) {
-        console.log('Looking further');
+        // console.log('Looking further');
         scrollRef.current?.scrollBy({
           top: scrollRef.current.scrollHeight,
         })
       } else {
-        console.log('Found the comment');
+        // console.log('Found the comment');
 
         if (!flat[idx].parentId || flat[idx].parentId === 0) {
           const offset = (scrollRef.current?.childNodes[1].childNodes[idx] as HTMLDivElement).offsetTop

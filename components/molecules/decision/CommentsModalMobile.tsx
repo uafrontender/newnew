@@ -54,7 +54,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
 
   useEffect(() => {
     if (inView && !commentsLoading && commentsNextPageToken) {
-      console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
+      // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
       handleFetchComments(commentsNextPageToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,12 +73,12 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
       const idx = flat.findIndex((comment) => comment.id === parseInt(commentIdFromUrl, 10))
 
       if (idx === -1) {
-        console.log('Looking further');
+        // console.log('Looking further');
         scrollRef.current?.scrollBy({
           top: scrollRef.current.scrollHeight,
         })
       } else {
-        console.log('Found the comment');
+        // console.log('Found the comment');
 
         if (!flat[idx].parentId || flat[idx].parentId === 0) {
           const offset = (commentsWrapper?.current?.childNodes[idx] as HTMLDivElement).offsetTop
