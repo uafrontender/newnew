@@ -569,7 +569,7 @@ const SNoCommentsYet = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    min-height: 400px;
+    min-height: 300px;
   }
 `;
 
@@ -587,7 +587,6 @@ const SNoCommentsImgContainer = styled.div`
 
   img {
     position: relative;
-    top: -24px;
     display: block;
     width: 100%;
     height: 100%;
@@ -606,8 +605,8 @@ const SNoCommentsCaption = styled(Text)`
 
 const SMakeBidArrowSvg = styled(InlineSvg)`
   position: absolute;
-  left: 28%;
-  top: -86px;
+  left: 30%;
+  top: -56px;
 
   transform: scale(1, -1);
 

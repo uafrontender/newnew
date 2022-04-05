@@ -316,14 +316,13 @@ const SNoCommentsImgContainer = styled.div`
 
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 
   width: 48px;
   height: 48px;
 
   img {
     position: relative;
-    top: -24px;
     display: block;
     width: 100%;
     height: 100%;
