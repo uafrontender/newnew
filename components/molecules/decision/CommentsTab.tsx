@@ -5,7 +5,7 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
@@ -24,6 +24,11 @@ import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import { deleteMessage, getMessages, sendMessage } from '../../../api/endpoints/chat';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 
+import NoContentYetImg from '../../../public/images/decision/no-content-yet-mock.png';
+import MakeFirstBidArrow from '../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
+import InlineSvg from '../../atoms/InlineSVG';
+import Text from '../../atoms/Text';
+
 const CommentsMobileModal = dynamic(() => import('./CommentsModalMobile'));
 
 interface ICommentsTab {
@@ -37,6 +42,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   commentsRoomId,
   handleGoBack,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -415,6 +421,28 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
           <SCommentsWrapper>
+          {comments.length === 0 && !commentsLoading ? (
+            <SNoCommentsYet>
+              <SNoCommentsImgContainer>
+                <img
+                  src={NoContentYetImg.src}
+                  alt='No content yet'
+                />
+              </SNoCommentsImgContainer>
+              <SNoCommentsCaption
+                variant={3}
+              >
+                { t('comments.noCommentsCaption') }
+              </SNoCommentsCaption>
+              {!isMobile && (
+                <SMakeBidArrowSvg
+                  svg={MakeFirstBidArrow}
+                  fill={theme.colorsThemed.background.quinary}
+                  width="36px"
+                />
+              )}
+            </SNoCommentsYet>
+          ) : null}
             {!isMobile && comments && comments.map((item, index) => {
               return (
                 <Comment
@@ -524,4 +552,63 @@ const SCommentsWrapper = styled.div`
 
 const SLoaderDiv = styled.div`
   height: 10px;
+`;
+
+// No Comments yet
+const SNoCommentsYet = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 300px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 400px;
+  }
+`;
+
+const SNoCommentsImgContainer = styled.div`
+  position: absolute;
+
+  top: 100px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  img {
+    position: relative;
+    top: -24px;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: initial;
+  }
+`;
+
+const SNoCommentsCaption = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SMakeBidArrowSvg = styled(InlineSvg)`
+  position: absolute;
+  left: 28%;
+  top: -86px;
+
+  transform: scale(1, -1);
+
 `;

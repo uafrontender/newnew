@@ -420,6 +420,7 @@
     "hide-replies": "Hide",
     "view-more": "View more comments",
     "comments": "Comments",
+    "noCommentsCaption": "Be the first to comment...",
     "errors": {
       "generic": "Please check input",
       "tooLong": "Comment is too long",

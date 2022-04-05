@@ -12,6 +12,9 @@ import GoBackButton from '../GoBackButton';
 import Comment from '../../atoms/decision/Comment';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import CommentForm from '../../atoms/decision/CommentForm';
+import Text from '../../atoms/Text';
+
+import NoContentYetImg from '../../../public/images/decision/no-content-yet-mock.png';
 
 interface ICommentsModalMobile {
   isVisible: boolean;
@@ -133,6 +136,21 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
                   commentsWrapper.current = el!!;
                 }}
               >
+                {comments.length === 0 && !commentsLoading ? (
+                  <SNoCommentsYet>
+                    <SNoCommentsImgContainer>
+                      <img
+                        src={NoContentYetImg.src}
+                        alt='No content yet'
+                      />
+                    </SNoCommentsImgContainer>
+                    <SNoCommentsCaption
+                      variant={3}
+                    >
+                      { t('comments.noCommentsCaption') }
+                    </SNoCommentsCaption>
+                  </SNoCommentsYet>
+                ) : null}
                 {comments && comments.map((item, index) => (
                   <Comment
                     key={(item.id).toString()}
@@ -278,4 +296,46 @@ const SCommentFormWrapper = styled.div`
 
     width: calc(100% - 32px);
   }
+`;
+
+// No Comments yet
+const SNoCommentsYet = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 600px;
+`;
+
+const SNoCommentsImgContainer = styled.div`
+  position: absolute;
+
+  top: 300px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  img {
+    position: relative;
+    top: -24px;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: initial;
+  }
+`;
+
+const SNoCommentsCaption = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;

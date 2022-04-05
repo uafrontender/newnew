@@ -138,6 +138,7 @@ const Comment: React.FC<IComment> = ({
               {!isMobile && (
                 <CommentEllipseMenu
                   isVisible={ellipseMenuOpen}
+                  isMyComment={isMyComment}
                   canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
@@ -199,6 +200,7 @@ const Comment: React.FC<IComment> = ({
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={16}
+          isMyComment={isMyComment}
           canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
           onClose={handleCloseEllipseMenu}
           onUserReport={onUserReport}
@@ -226,13 +228,11 @@ const SUserAvatar = styled(UserAvatar)`
   cursor: pointer;
 `;
 
-const OpenedFlashDiagonal = keyframes`
+const OpenedFlash = keyframes`
   0% {
-    transform: rotate(15deg) translateX(-600px);
     opacity: 0.5;
   }
   100% {
-    transform: rotate(15deg) translateX(0px);
     opacity: 0;
   }
 `;
@@ -240,8 +240,6 @@ const OpenedFlashDiagonal = keyframes`
 const SComment = styled.div`
   position: relative;
   display: flex;
-
-  overflow: hidden;
 
   width: 100%;
 
@@ -251,8 +249,8 @@ const SComment = styled.div`
 
       position: absolute;
 
-      width: 300%;
-      height: 300%;
+      width: 100%;
+      height: 100%;
 
       background: ${({ theme }) =>
         theme.name === 'dark'
@@ -260,7 +258,7 @@ const SComment = styled.div`
         : 'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)'
       };
       box-shadow: 4px 4px 100px 75px rgba(34, 60, 80, 0.2);
-      animation: ${OpenedFlashDiagonal} 1.5s forwards linear;
+      animation: ${OpenedFlash} 1.5s forwards linear;
     }
   }
 `;
