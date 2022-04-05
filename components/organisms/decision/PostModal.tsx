@@ -15,7 +15,7 @@ import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import ListPostModal from '../search/ListPostModal';
+import ListPostModal from '../see-more/ListPostModal';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostFailedBox from '../../molecules/decision/PostFailedBox';

@@ -11,7 +11,7 @@ import ChangeCollectionType from '../../atoms/ChangeCollectionType';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+// import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import closeCircleIcon from '../../../public/images/svg/icons/filled/CloseCircle.svg';
 
 interface ITitleBlock {
@@ -152,16 +152,18 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           disabled={disabled}
           onChange={handleCollectionTypeChange}
         />
-        <Sorting
-          category={category}
-          options={sortOptions}
-          selected={sort}
-          onChange={handleSortChange}
-        />
+        {category !== 'biggest' && category !== 'for-you' && (
+          <Sorting
+            category={category}
+            options={sortOptions}
+            selected={sort}
+            onChange={handleSortChange}
+          />
+        )}
       </SWrapper>
       {sortEnabled && !isMobile && (
         <SSortSelectedWrapper>
-          <SButtonClear
+          {/* <SButtonClear
             view="tertiary"
             onClick={handleClearSorting}
             disabled={disabled}
@@ -172,7 +174,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
               width="24px"
               height="24px"
             />
-          </SButtonClear>
+          </SButtonClear> */}
           {_map(sort, renderSortOption)}
         </SSortSelectedWrapper>
       )}
@@ -194,7 +196,7 @@ const SContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-left: auto;
     margin-right: auto;
-    max-width: 536px;
+    max-width: 696px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -234,13 +236,13 @@ const SButton = styled(Button)`
   }
 `;
 
-const SButtonClear = styled(SButton)`
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
+// const SButtonClear = styled(SButton)`
+//   color: ${(props) => props.theme.colorsThemed.text.secondary};
 
-  svg {
-    fill: ${(props) => props.theme.colorsThemed.text.secondary};
-    min-width: 24px;
-    min-height: 24px;
-    margin-left: 0;
-  }
-`;
+//   svg {
+//     fill: ${(props) => props.theme.colorsThemed.text.secondary};
+//     min-width: 24px;
+//     min-height: 24px;
+//     margin-left: 0;
+//   }
+// `;

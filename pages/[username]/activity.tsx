@@ -15,7 +15,7 @@ import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
 import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/search/List';
+import List from '../../components/organisms/see-more/List';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import Text from '../../components/atoms/Text';

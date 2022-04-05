@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, {
-  useContext, useEffect, useRef, useState,
+  useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -123,6 +123,10 @@ export const Card: React.FC<ICard> = ({
   const [currentBackerCount, setCurrentBackerCount] = useState<number>(() => (typeOfPost === 'cf'
     ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
     : 0));
+
+  const timestampSeconds = useMemo(() => (
+    new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()
+  ), [postParsed.expiresAt?.seconds])
 
   const handleUserClick = (username: string) => {
     router.push(`/${username}`);
@@ -320,7 +324,9 @@ export const Card: React.FC<ICard> = ({
         </SImageHolderOutside>
       </SImageBG>
       <SBottomContentOutside>
-        <SBottomStart>
+        <SBottomStart
+          hasEnded={Date.now() > timestampSeconds}
+        >
           <SUserAvatarOutside
             avatarUrl={postParsed?.creator?.avatarUrl!!}
             withClick
@@ -332,14 +338,21 @@ export const Card: React.FC<ICard> = ({
           <SUsername
             variant={2}
           >
-            {
+          {
+            (Date.now() > timestampSeconds)
+            ? (
+              postParsed.creator?.nickname && postParsed.creator?.nickname?.length > 5
+              ? `${postParsed.creator?.nickname?.substring(0, 3)}...`
+              : postParsed.creator?.nickname
+            ) : (
               postParsed.creator?.nickname && postParsed.creator?.nickname?.length > 7
               ? `${postParsed.creator?.nickname?.substring(0, 7)}...`
               : postParsed.creator?.nickname
-            }
+            )
+          }
           </SUsername>
           <CardTimer
-            timestampSeconds={new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()}
+            timestampSeconds={timestampSeconds}
           />
         </SBottomStart>
         <STextOutside variant={3} weight={600}>
@@ -453,6 +466,7 @@ const SWrapper = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.laptopL} {
     :hover {
+      transform: translateY(-8px);
       #showMore {
         opacity: 1;
       }
@@ -555,6 +569,11 @@ const SImageHolder = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.laptop} {
     width: 256px;
+
+    transition: 0.2s linear;
+    :hover {
+      transform: translateY(-8px);
+    }
   }
 
   ${(props) => props.theme.media.laptopL} {
@@ -736,10 +755,12 @@ const STextOutside = styled(Text)`
   height: 40px;
 `;
 
-const SBottomStart = styled.div`
+const SBottomStart = styled.div<{
+  hasEnded: boolean;
+}>`
   display: grid;
   grid-template-areas: 'avatar nickname timer';
-  grid-template-columns: 24px 5fr 6fr;
+  grid-template-columns: ${({ hasEnded }) => hasEnded ? '24px 3fr 8fr' : '24px 4fr 8fr'};
   align-items: center;
 
   height: 32px;
@@ -764,7 +785,7 @@ const SUsername = styled(Text)`
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  margin-left: 8px;
+  margin-left: 6px;
 `;
 
 

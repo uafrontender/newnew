@@ -185,13 +185,13 @@ export const CardsSection: React.FC<ICardSection> = ({
 
   const handleSeeMoreCLick = () => {
     if (type === 'default') {
-      router.push(`/search?category=${category}`);
+      router.push(`/see-more?category=${category}`);
     }
   };
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch(`/search?category=${category}`);
+    router.prefetch(`/see-more?category=${category}`);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
