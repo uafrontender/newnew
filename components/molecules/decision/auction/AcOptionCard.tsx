@@ -252,8 +252,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }}
     >
       <SContainer
-        isDisabled={disabled}
-        isBlue={isSupportedByMe || isMyBid}
+        $isDisabled={disabled}
+        $isBlue={isSupportedByMe || isMyBid}
         onClick={() => {
           if (!isMobile && !disabled && votingAllowed) {
             handleOpenSupportForm();
@@ -437,8 +437,8 @@ AcOptionCard.defaultProps = {
 export default AcOptionCard;
 
 const SContainer = styled(motion.div)<{
-  isDisabled: boolean;
-  isBlue: boolean;
+  $isDisabled: boolean;
+  $isBlue: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -448,11 +448,11 @@ const SContainer = styled(motion.div)<{
 
   padding: 16px;
 
-  background-color: ${({ theme, isBlue }) =>
-    isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme, $isBlue }) =>
+    $isBlue ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
+  opacity: ${({ $isDisabled }) => ($isDisabled ? 0.5 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
     /* width: 80%; */

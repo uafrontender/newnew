@@ -466,7 +466,6 @@ const SWrapper = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.laptopL} {
     :hover {
-      transform: translateY(-8px);
       #showMore {
         opacity: 1;
       }

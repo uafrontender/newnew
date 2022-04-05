@@ -281,7 +281,8 @@ const SListWrapper = styled.div`
   ${(props) => props.theme.media.laptop} {
     left: -16px;
     width: calc(100% + 32px);
-    padding-top: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
   }
 `;
 
