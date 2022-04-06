@@ -10,6 +10,7 @@ interface ICommentEllipseModal {
   isOpen: boolean;
   zIndex: number;
   canDeleteComment: boolean;
+  isMyComment: boolean;
   onClose: () => void;
   onDeleteComment: () => void;
   onUserReport: () => void;
@@ -18,6 +19,7 @@ interface ICommentEllipseModal {
 const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
   isOpen,
   zIndex,
+  isMyComment,
   canDeleteComment,
   onClose,
   onDeleteComment,
@@ -48,9 +50,11 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
               <Text variant={2}>{t('comments.delete')}</Text>
             </SButton>
           )}
-          <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('comments.report')}</Text>
-          </SButton>
+          {!isMyComment && (
+            <SButton onClick={reportUserHandler}>
+              <Text variant={2}>{t('comments.report')}</Text>
+            </SButton>
+          )}
         </SContentContainer>
         <Button
           view="modalSecondary"

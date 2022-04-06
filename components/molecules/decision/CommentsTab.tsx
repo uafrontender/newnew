@@ -5,12 +5,12 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
-import dynamic from 'next/dynamic';
 import { useInView } from 'react-intersection-observer';
+import dynamic from 'next/dynamic';
 
 import GradientMask from '../../atoms/GradientMask';
 import Comment from '../../atoms/decision/Comment';
@@ -22,8 +22,14 @@ import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import { deleteMessage, getMessages, sendMessage } from '../../../api/endpoints/chat';
+import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 
-const MoreCommentsModal = dynamic(() => import('./MoreCommentsModal'));
+import NoContentYetImg from '../../../public/images/decision/no-content-yet-mock.png';
+import MakeFirstBidArrow from '../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
+import InlineSvg from '../../atoms/InlineSVG';
+import Text from '../../atoms/Text';
+
+const CommentsMobileModal = dynamic(() => import('./CommentsModalMobile'));
 
 interface ICommentsTab {
   commentsRoomId: number;
@@ -36,10 +42,17 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   commentsRoomId,
   handleGoBack,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  // Comment from URL
+  const {
+    commentIdFromUrl,
+    handleResetCommentIdFromUrl,
+  } = useContext(CommentFromUrlContext);
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -132,6 +145,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             return processComments(workingArr);
           });
 
+          // console.log(res.data.paging?.nextPageToken)
           setCommentsNextPageToken(res.data.paging?.nextPageToken);
         }
 
@@ -223,7 +237,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         markCommentAsDeleted(comment);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }, [markCommentAsDeleted]);
 
@@ -331,6 +345,60 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (commentIdFromUrl && !isMobile) {
+      const flat: TCommentWithReplies[] = [];
+      for (let i = 0; i < comments.length; i++) {
+        if (comments[i].replies && Array.isArray(comments[i].replies) && comments[i].replies!!.length > 0) {
+          flat.push(...[comments[i], ...comments[i].replies!!])
+        }
+        flat.push(comments[i]);
+      }
+
+      const idx = flat.findIndex((comment) => comment.id === parseInt(commentIdFromUrl, 10))
+
+      if (idx === -1) {
+        // console.log('Looking further');
+        scrollRef.current?.scrollBy({
+          top: scrollRef.current.scrollHeight,
+        })
+      } else {
+        // console.log('Found the comment');
+
+        if (!flat[idx].parentId || flat[idx].parentId === 0) {
+          const offset = (scrollRef.current?.childNodes[1].childNodes[idx] as HTMLDivElement).offsetTop
+
+          scrollRef.current?.scrollTo({
+            top: offset,
+          });
+          document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+        } else if (flat[idx].parentId) {
+          const parentIdx = comments.findIndex((c) => c.id === flat[idx].parentId);
+
+          if (parentIdx !== -1) {
+            const offsetTopParent = (scrollRef.current?.childNodes[1].childNodes[parentIdx] as HTMLDivElement).offsetTop
+            setComments((curr) => {
+              const working = [...curr];
+              working[parentIdx].isOpen = true;
+              return working;
+            });
+
+            setTimeout(() => {
+              document?.getElementById(`comment_id_${flat[idx].id}`)?.scrollIntoView({
+                block: "end",
+                inline: "nearest"
+              })
+              document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+            }, 100);
+          }
+        }
+
+        handleResetCommentIdFromUrl?.();
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentIdFromUrl, comments, isMobile]);
+
   return (
     <>
       <STabContainer
@@ -353,6 +421,28 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
           <SCommentsWrapper>
+          {comments.length === 0 && !commentsLoading ? (
+            <SNoCommentsYet>
+              <SNoCommentsImgContainer>
+                <img
+                  src={NoContentYetImg.src}
+                  alt='No content yet'
+                />
+              </SNoCommentsImgContainer>
+              <SNoCommentsCaption
+                variant={3}
+              >
+                { t('comments.noCommentsCaption') }
+              </SNoCommentsCaption>
+              {!isMobile && (
+                <SMakeBidArrowSvg
+                  svg={MakeFirstBidArrow}
+                  fill={theme.colorsThemed.background.quinary}
+                  width="36px"
+                />
+              )}
+            </SNoCommentsYet>
+          ) : null}
             {!isMobile && comments && comments.map((item, index) => {
               return (
                 <Comment
@@ -377,15 +467,18 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             )}
             {isMobile && comments && (
               <>
-                <MoreCommentsModal
+                <CommentsMobileModal
                   isVisible={isMobile}
                   comments={comments}
                   commentsLoading={commentsLoading}
                   commentsNextPageToken={commentsNextPageToken}
+                  commentIdFromUrl={commentIdFromUrl ?? undefined}
+                  handleResetCommentIdFromUrl={handleResetCommentIdFromUrl!!}
                   handleAddComment={handleAddComment}
+                  handleSetComments={setComments}
                   handleFetchComments={fetchComments}
                   handleDeleteComment={handleDeleteComment}
-                  closeMoreCommentsModal={() => handleGoBack()}
+                  closeCommentsModalMobile={() => handleGoBack()}
                 />
               </>
             )}
@@ -411,7 +504,7 @@ const STabContainer = styled(motion.div)`
   align-self: flex-end;
 
   ${({ theme }) => theme.media.tablet} {
-    height: calc(100% - 56px);
+    /* height: calc(100% - 56px); */
   }
 `;
 
@@ -459,4 +552,62 @@ const SCommentsWrapper = styled.div`
 
 const SLoaderDiv = styled.div`
   height: 10px;
+`;
+
+// No Comments yet
+const SNoCommentsYet = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-height: 300px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: absolute;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    min-height: 300px;
+  }
+`;
+
+const SNoCommentsImgContainer = styled.div`
+  position: absolute;
+
+  top: 100px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+
+  img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  margin-bottom: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    position: initial;
+  }
+`;
+
+const SNoCommentsCaption = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SMakeBidArrowSvg = styled(InlineSvg)`
+  position: absolute;
+  left: 30%;
+  top: -56px;
+
+  transform: scale(1, -1);
+
 `;
