@@ -16,7 +16,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/search/List';
+import List from '../../components/organisms/see-more/List';
 
 interface IMyProfileIndex {
   user: Omit<newnewapi.User, 'toJSON'>;

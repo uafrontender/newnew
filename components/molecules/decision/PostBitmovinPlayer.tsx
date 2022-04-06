@@ -123,7 +123,7 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   useEffect(() => {
     async function load() {
       setIsLoading(true);
-      console.log(player.current);
+      // console.log(player.current);
       try {
         await player?.current?.load(playerSource);
         player.current?.play();

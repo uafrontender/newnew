@@ -223,7 +223,9 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             }}
           >
             {pledgeLevels.map((p, i, arr) => (
-              <>
+              <React.Fragment
+                key={p.usdCents}
+              >
                 <SItem
                   key={i}
                   onClick={() => {
@@ -240,7 +242,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                   ) : null}
                 </SItem>
                 <SSeparator />
-              </>
+              </React.Fragment>
             ))}
             <SItem
               onClick={() => {

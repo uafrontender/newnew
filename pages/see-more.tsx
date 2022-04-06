@@ -14,8 +14,8 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 
 import { NextPageWithLayout } from './_app';
-import List from '../components/organisms/search/List';
-import TitleBlock from '../components/organisms/search/TitleBlock';
+import List from '../components/organisms/see-more/List';
+import TitleBlock from '../components/organisms/see-more/TitleBlock';
 import HomeLayout from '../components/templates/HomeLayout';
 import TopSection from '../components/organisms/home/TopSection';
 import PostModal from '../components/organisms/decision/PostModal';

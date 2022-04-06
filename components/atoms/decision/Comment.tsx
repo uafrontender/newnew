@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useMemo, useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useEffect, useMemo, useState } from 'react';
+import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
@@ -78,10 +78,17 @@ const Comment: React.FC<IComment> = ({
     router.push(`/${comment.sender?.username}`);
   };
 
+  useEffect(() => {
+    if (comment.isOpen) {
+      setIsReplyFormOpen(true);
+    }
+  }, [comment.isOpen]);
+
   return (
     <>
       <SComment
         key={(comment.id).toString()}
+        id={`comment_id_${comment.id}`}
       >
         {!comment.isDeleted ? (
           <SUserAvatar
@@ -131,6 +138,7 @@ const Comment: React.FC<IComment> = ({
               {!isMobile && (
                 <CommentEllipseMenu
                   isVisible={ellipseMenuOpen}
+                  isMyComment={isMyComment}
                   canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
                   handleClose={handleCloseEllipseMenu}
                   onDeleteComment={onDeleteComment}
@@ -192,6 +200,7 @@ const Comment: React.FC<IComment> = ({
         <CommentEllipseModal
           isOpen={ellipseMenuOpen}
           zIndex={16}
+          isMyComment={isMyComment}
           canDeleteComment={isMyComment ? true : canDeleteComment ?? false}
           onClose={handleCloseEllipseMenu}
           onUserReport={onUserReport}
@@ -219,12 +228,39 @@ const SUserAvatar = styled(UserAvatar)`
   cursor: pointer;
 `;
 
-const SComment = styled.div`
-  /* display: grid; */
+const OpenedFlash = keyframes`
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+`;
 
+const SComment = styled.div`
+  position: relative;
   display: flex;
 
   width: 100%;
+
+  &.opened-flash {
+    &::before {
+      content: '';
+
+      position: absolute;
+
+      width: 100%;
+      height: 100%;
+
+      background: ${({ theme }) =>
+        theme.name === 'dark'
+        ? 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)'
+        : 'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)'
+      };
+      box-shadow: 4px 4px 100px 75px rgba(34, 60, 80, 0.2);
+      animation: ${OpenedFlash} 1.5s forwards linear;
+    }
+  }
 `;
 
 const SCommentContent = styled.div`

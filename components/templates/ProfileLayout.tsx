@@ -673,7 +673,7 @@ const SMoreButton = styled(Button)`
 
 const SProfileLayout = styled.div`
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 
   margin-top: -28px;
   margin-bottom: 24px;
