@@ -82,7 +82,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const [heightDelta, setHeightDelta] = useState(postStatus === 'voting' ? 56 : 0);
   const gradientMaskBottomPosition = useMemo(() => (
-    isTablet ? heightDelta - 12 : heightDelta - 66
+    isTablet ? heightDelta - 12 : heightDelta
   ), [heightDelta, isTablet]);
 
   const actionSectionContainer = useRef<HTMLDivElement>();
@@ -608,7 +608,7 @@ const SBidsContainer = styled.div<{
   }
 
   ${({ theme }) => theme.media.laptop} {
-    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 66px)`};
+    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
   }
 `;
 
