@@ -251,7 +251,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           damping: 20,
           stiffness: 300,
         }}
-        isDisabled={disabled}
+        $isDisabled={disabled}
         onClick={() => {
           if (!isMobile && !disabled && !noAction) {
             handleOpenSupportForm();
@@ -479,7 +479,7 @@ McOptionCard.defaultProps = {
 export default McOptionCard;
 
 const SContainer = styled(motion.div)<{
-  isDisabled: boolean;
+  $isDisabled: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -492,7 +492,7 @@ const SContainer = styled(motion.div)<{
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
+  opacity: ${({ $isDisabled }) => ($isDisabled ? 0.5 : 1)};
 
   ${({ theme }) => theme.media.tablet} {
     /* width: 80%; */

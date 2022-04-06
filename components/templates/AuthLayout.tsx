@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -177,7 +176,7 @@ const HeroVisual: React.FunctionComponent = () => {
     if (introLoaded) {
       setTimeout(() => {
         setCurrentState('hold');
-      }, 3000);
+      }, 2800);
     }
   }, [introLoaded]);
 
@@ -206,11 +205,8 @@ const HeroVisual: React.FunctionComponent = () => {
           opacity: currentState === 'intro' ? 1 : 0,
         }}
       >
-        <Image
-          src={theme.name === 'dark' ? SignInIntro : SignInIntroLight}
-          height={960}
-          objectFit="contain"
-          priority
+        <SImage
+          src={theme.name === 'dark' ? SignInIntro.src : SignInIntroLight.src}
           onLoad={() => {
             setIntroLoaded(true);
           }}
@@ -221,11 +217,8 @@ const HeroVisual: React.FunctionComponent = () => {
           opacity: currentState === 'hold' ? 1 : 0,
         }}
       >
-        <Image
-          src={theme.name === 'dark' ? SignInHold : SignInHoldLight}
-          height={960}
-          objectFit="contain"
-          priority
+        <SImage
+          src={theme.name === 'dark' ? SignInHold.src : SignInHoldLight.src}
         />
       </SImageWrapper>
       <SImageWrapper
@@ -233,11 +226,8 @@ const HeroVisual: React.FunctionComponent = () => {
           opacity: currentState === 'outro' ? 1 : 0,
         }}
       >
-        <Image
-          src={theme.name === 'dark' ? SignInOutro : SignInOutroLight}
-          height={960}
-          objectFit="contain"
-          priority
+        <SImage
+          src={theme.name === 'dark' ? SignInOutro.src : SignInOutroLight.src}
         />
       </SImageWrapper>
     </SHeroVisual>
@@ -273,6 +263,13 @@ const SImageWrapper = styled.div`
     width: 600px;
     height: 700px;
   }
+`;
+
+const SImage = styled.img`
+  object-fit: contain;
+
+  max-height: 960px;
+  max-width: 100%;
 `;
 
 const VerifyEmailVisual: React.FunctionComponent = () => {

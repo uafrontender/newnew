@@ -112,12 +112,12 @@ const SListWrapper = styled.div`
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    left: -8px;
+    left: 16px;
     width: calc(100% + 26px);
     padding: 24px 0 0 0;
 
-    margin: 0 auto;
-    max-width: 562px;
+    margin: 0 auto !important;
+    max-width: 768px;
   }
 
   ${(props) => props.theme.media.laptop} {
