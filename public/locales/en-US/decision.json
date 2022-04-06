@@ -442,5 +442,25 @@
   "heroPopupMC": {
     "title": "Goals Goals Goals",
     "description": "Pool money with others to back the goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it."
+  },
+  "tutorials": {
+    "timer": {
+      "title": "Decision timer",
+      "text": "When the time reach 00:00 the decision is closed."
+    },
+    "ac": {
+      "peopleBids": {
+        "title": "People bids",
+        "text": "Here is where other people bids appear."
+      },
+      "supportPeopleBids": {
+        "title": "Support people bids",
+        "text": "Tapping here you can support other’s people bids."
+      },
+      "createYourBid": {
+        "title": "Create your bid",
+        "text": "Add a suggestion, a price and create your own bid."
+      }
+    }
   }
 }

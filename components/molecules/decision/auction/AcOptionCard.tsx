@@ -34,6 +34,7 @@ import CoinsSampleAnimation from '../../../../public/animations/coins-sample.jso
 import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
 import CoinIcon from '../../../../public/images/decision/coin-mock.png';
 import PaymentSuccessModal from '../PaymentSuccessModal';
+import TutorialTooltip, { DotPositionEnum } from '../../../atoms/decision/TutorialTooltip';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -82,6 +83,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const [supportBidAmount, setSupportBidAmount] = useState('');
   const disabled = optionBeingSupported !== '' && optionBeingSupported !== option.id.toString();
 
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
+
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
     handleSetSupportedBid(option.id.toString());
@@ -94,11 +97,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   // Redirect to user's page
   const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
+    window?.history.replaceState(
+      {
+        fromPost: true,
+      },
+      '',
+      ''
+    );
     router.push(`/${option.creator?.username}`);
-  }
+  };
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -323,16 +330,33 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           </SBiddersInfo>
         </SBidDetails>
         {(optionBeingSupported && !disabled) || !votingAllowed ? null : (
-          <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
-            {!isMobile ? (
-              <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
-            ) : (
-              <>
+          <SSupportButtonHolder>
+            <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
+              {!isMobile ? (
                 <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
-                <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
-              </>
+              ) : (
+                <>
+                  <img
+                    draggable={false}
+                    src={SupportOptionIcon.src}
+                    alt={t('AcPost.OptionsTab.OptionCard.supportBtn')}
+                  />
+                  <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
+                </>
+              )}
+            </SSupportButton>
+            {index === 0 && (
+              <STutorialTooltipHolder>
+                <TutorialTooltip
+                  isTooltipVisible={isTooltipVisible}
+                  closeTooltip={() => setIsTooltipVisible(false)}
+                  title={t('tutorials.ac.supportPeopleBids.title')}
+                  text={t('tutorials.ac.supportPeopleBids.text')}
+                  dotPosition={DotPositionEnum.TopRight}
+                />
+              </STutorialTooltipHolder>
             )}
-          </SSupportButton>
+          </SSupportButtonHolder>
         )}
       </SContainer>
       <SSupportBidForm
@@ -412,17 +436,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         </PaymentModal>
       )}
       {/* Payment success Modal */}
-      <PaymentSuccessModal
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
-      >
-        {t(
-          'PaymentSuccessModal.ac',
-          {
-            postCreator,
-            postDeadline
-          }
-        )}
+      <PaymentSuccessModal isVisible={paymentSuccesModalOpen} closeModal={() => setPaymentSuccesModalOpen(false)}>
+        {t('PaymentSuccessModal.ac', {
+          postCreator,
+          postDeadline,
+        })}
       </PaymentSuccessModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
@@ -652,4 +670,16 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const SSupportButtonHolder = styled.div`
+  margin: auto 0;
+  position: relative;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  right: 35px;
+  top: 25px;
+  text-align: left;
 `;

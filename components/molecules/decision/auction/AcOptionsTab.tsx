@@ -1,8 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
-import React, {
-  useCallback, useContext, useEffect, useMemo, useRef, useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -34,6 +32,7 @@ import NoContentYetImg from '../../../../public/images/decision/no-content-yet-m
 import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import PaymentSuccessModal from '../PaymentSuccessModal';
+import TutorialTooltip, { DotPositionEnum } from '../../../atoms/decision/TutorialTooltip';
 
 interface IAcOptionsTab {
   postId: string;
@@ -71,10 +70,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const { walletBalance } = useContext(WalletContext);
 
   // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
 
   const containerRef = useRef<HTMLDivElement>();
   const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
@@ -97,15 +93,15 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
     setPaymentModalOpen(true);
   };
 
-  const validateTextViaAPI = useCallback(async (
-    text: string,
-  ) => {
+  const validateTextViaAPI = useCallback(async (text: string) => {
     setIsAPIValidateLoading(true);
     try {
       const payload = new newnewapi.ValidateTextRequest({
@@ -114,9 +110,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         text,
       });
 
-      const res = await validateText(
-        payload,
-      );
+      const res = await validateText(payload);
 
       if (!res.data?.status) throw new Error('An error occured');
 
@@ -133,26 +127,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     }
   }, []);
 
-  const validateTextViaAPIDebounced = useMemo(() => debounce((
-    text: string,
-  ) => {
-    validateTextViaAPI(text);
-  }, 250),
-  [validateTextViaAPI]);
+  const validateTextViaAPIDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateTextViaAPI(text);
+      }, 250),
+    [validateTextViaAPI]
+  );
 
-  const handleUpdateNewOptionText = useCallback((
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
-    setNewBidText(e.target.value);
+  const handleUpdateNewOptionText = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setNewBidText(e.target.value);
 
-    if (e.target.value.length > 0) {
-      validateTextViaAPIDebounced(
-        e.target.value,
-      );
-    }
-  }, [
-    setNewBidText, validateTextViaAPIDebounced,
-  ]);
+      if (e.target.value.length > 0) {
+        validateTextViaAPIDebounced(e.target.value);
+      }
+    },
+    [setNewBidText, validateTextViaAPIDebounced]
+  );
 
   const handleSubmitNewOptionWallet = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -162,24 +154,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
           successUrl: `${window.location.href.split('#')[0]}&`,
           cancelUrl: `${window.location.href.split('#')[0]}&`,
-          ...(!user.loggedIn ? {
-            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-          } : {}),
+          ...(!user.loggedIn
+            ? {
+                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+              }
+            : {}),
           acBidRequest: {
             amount: new newnewapi.MoneyAmount({
               usdCents: parseInt(newBidAmount, 10) * 100,
             }),
             optionTitle: newBidText,
             postUuid: postId,
-          }
+          },
         });
 
         const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
 
-        if (!res.data
-          || !res.data.sessionUrl
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
         window.location.href = res.data.sessionUrl;
       } else {
@@ -204,24 +195,22 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }),
               optionTitle: newBidText,
               postUuid: postId,
-            }
+            },
           });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+            getTopUpWalletWithPaymentPurposeUrlPayload
+          );
 
-          if (!resStripeRedirect.data
-            || !resStripeRedirect.data.sessionUrl
-            || resStripeRedirect.error
-          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+          if (!resStripeRedirect.data || !resStripeRedirect.data.sessionUrl || resStripeRedirect.error)
+            throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
 
           window.location.href = resStripeRedirect.data.sessionUrl;
           return;
         }
 
-        if (!res.data
-          || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
         optionFromResponse.isSupportedByMe = true;
@@ -239,14 +228,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       setLoadingModalOpen(false);
       console.error(err);
     }
-  }, [
-    newBidAmount,
-    newBidText,
-    postId,
-    user,
-    walletBalance,
-    handleAddOrUpdateOptionFromResponse,
-  ]);
+  }, [newBidAmount, newBidText, postId, user, walletBalance, handleAddOrUpdateOptionFromResponse]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -254,24 +236,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
         successUrl: `${window.location.href.split('#')[0]}&`,
         cancelUrl: `${window.location.href.split('#')[0]}&`,
-        ...(!user.loggedIn ? {
-          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        } : {}),
+        ...(!user.loggedIn
+          ? {
+              nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+            }
+          : {}),
         acBidRequest: {
           amount: new newnewapi.MoneyAmount({
             usdCents: parseInt(newBidAmount, 10) * 100,
           }),
           optionTitle: newBidText,
           postUuid: postId,
-        }
+        },
       });
 
       const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data
-        || !res.data.sessionUrl
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || !res.data.sessionUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
       window.location.href = res.data.sessionUrl;
     } catch (err) {
@@ -279,18 +260,13 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       setLoadingModalOpen(false);
       console.error(err);
     }
-  }, [
-    user.loggedIn,
-    newBidAmount,
-    newBidText,
-    postId,
-  ]);
+  }, [user.loggedIn, newBidAmount, newBidText, postId]);
 
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
       handleLoadBids(pagingToken);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, optionsLoading]);
 
   useEffect(() => {
@@ -312,8 +288,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
-      const size = entry[0]?.borderBoxSize
-        ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
+      const size = entry[0]?.borderBoxSize ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
       if (size) {
         setHeightDelta(size);
       }
@@ -322,7 +297,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     if (actionSectionContainer.current) {
       resizeObserver.observe(actionSectionContainer.current!!);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -339,27 +314,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         {options.length === 0 && !optionsLoading ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
-              <img
-                src={NoContentYetImg.src}
-                alt='No content yet'
-              />
+              <img src={NoContentYetImg.src} alt="No content yet" />
             </SNoOptionsImgContainer>
-            <SNoOptionsCaption
-              variant={3}
-            >
-              { t('AcPost.OptionsTab.NoOptions.caption_1') }
-            </SNoOptionsCaption>
-            <SNoOptionsCaption
-              variant={3}
-            >
-              { t('AcPost.OptionsTab.NoOptions.caption_2') }
-            </SNoOptionsCaption>
+            <SNoOptionsCaption variant={3}>{t('AcPost.OptionsTab.NoOptions.caption_1')}</SNoOptionsCaption>
+            <SNoOptionsCaption variant={3}>{t('AcPost.OptionsTab.NoOptions.caption_2')}</SNoOptionsCaption>
             {!isMobile && (
-              <SMakeBidArrowSvg
-                svg={MakeFirstBidArrow}
-                fill={theme.colorsThemed.background.quinary}
-                width="36px"
-              />
+              <SMakeBidArrowSvg svg={MakeFirstBidArrow} fill={theme.colorsThemed.background.quinary} width="36px" />
             )}
           </SNoOptionsYet>
         ) : null}
@@ -392,21 +352,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             />
           ))}
           {!isMobile ? (
-            <SLoaderDiv
-              ref={loadingRef}
-            />
-          ) : (
-            pagingToken ? (
-              (
-                <SLoadMoreBtn
-                  view="secondary"
-                  onClick={() => handleLoadBids(pagingToken)}
-                >
-                  { t('loadMoreBtn') }
-                </SLoadMoreBtn>
-              )
-            ) : null
-          )}
+            <SLoaderDiv ref={loadingRef} />
+          ) : pagingToken ? (
+            <SLoadMoreBtn view="secondary" onClick={() => handleLoadBids(pagingToken)}>
+              {t('loadMoreBtn')}
+            </SLoadMoreBtn>
+          ) : null}
         </SBidsContainer>
         {postStatus === 'voting' && (
           <SActionSection
@@ -433,20 +384,40 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <Button
               view="primaryGrad"
               size="sm"
-              disabled={!newBidText
-                || !newBidAmount
-                || parseInt(newBidAmount, 10) < minAmount
-                || optionBeingSupported !== ''
-                || !newBidTextValid}
+              disabled={
+                !newBidText ||
+                !newBidAmount ||
+                parseInt(newBidAmount, 10) < minAmount ||
+                optionBeingSupported !== '' ||
+                !newBidTextValid
+              }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+              {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
             </Button>
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={isTooltipVisible}
+                closeTooltip={() => setIsTooltipVisible(false)}
+                title={t('tutorials.ac.createYourBid.title')}
+                text={t('tutorials.ac.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomLeft}
+              />
+            </STutorialTooltipHolder>
           </SActionSection>
         )}
+        <STutorialTooltipHolder>
+          <TutorialTooltip
+            isTooltipVisible={isTooltipVisible}
+            closeTooltip={() => setIsTooltipVisible(false)}
+            title={t('tutorials.ac.peopleBids.title')}
+            text={t('tutorials.ac.peopleBids.text')}
+            dotPosition={DotPositionEnum.BottomLeft}
+          />
+        </STutorialTooltipHolder>
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && postStatus === 'voting' ? (
@@ -477,17 +448,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <Button
               view="primaryGrad"
               size="sm"
-              disabled={!newBidText
-                || !newBidAmount
-                || parseInt(newBidAmount, 10) < minAmount
-                || optionBeingSupported !== ''
-                || !newBidTextValid}
+              disabled={
+                !newBidText ||
+                !newBidAmount ||
+                parseInt(newBidAmount, 10) < minAmount ||
+                optionBeingSupported !== '' ||
+                !newBidTextValid
+              }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('AcPost.OptionsTab.ActionSection.placeABidBtn') }
+              {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
             </Button>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
@@ -504,42 +477,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           handlePayWithWallet={handleSubmitNewOptionWallet}
         >
           <SPaymentModalHeader>
-            <SPaymentModalTitle
-              variant={3}
-            >
-              { t('AcPost.paymenModalHeader.subtitle') }
-            </SPaymentModalTitle>
-            <SPaymentModalOptionText>
-              { newBidText }
-            </SPaymentModalOptionText>
+            <SPaymentModalTitle variant={3}>{t('AcPost.paymenModalHeader.subtitle')}</SPaymentModalTitle>
+            <SPaymentModalOptionText>{newBidText}</SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
-      ) : null }
+      ) : null}
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
-      <PaymentSuccessModal
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
-      >
-        {t(
-          'PaymentSuccessModal.ac',
-          {
-            postCreator,
-            postDeadline
-          }
-        )}
+      <PaymentSuccessModal isVisible={paymentSuccesModalOpen} closeModal={() => setPaymentSuccesModalOpen(false)}>
+        {t('PaymentSuccessModal.ac', {
+          postCreator,
+          postDeadline,
+        })}
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
-        <SActionButton
-          view="primaryGrad"
-          onClick={() => setSuggestNewMobileOpen(true)}
-        >
-          { t('AcPost.FloatingActionButton.suggestNewBtn') }
+        <SActionButton view="primaryGrad" onClick={() => setSuggestNewMobileOpen(true)}>
+          {t('AcPost.FloatingActionButton.suggestNewBtn')}
         </SActionButton>
       ) : null}
     </>
@@ -571,7 +526,7 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -581,12 +536,12 @@ const SBidsContainer = styled.div<{
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
-      transition: .2s linear;
+      transition: 0.2s linear;
     }
     &::-webkit-scrollbar-thumb {
       background: transparent;
       border-radius: 4px;
-      transition: .2s linear;
+      transition: 0.2s linear;
     }
 
     &:hover {
@@ -634,6 +589,7 @@ const SSuggestNewContainer = styled.div`
 
 const SActionSection = styled.div`
   display: none;
+  position: relative;
 
   ${({ theme }) => theme.media.tablet} {
     display: flex;
@@ -669,9 +625,7 @@ const SActionSection = styled.div`
 `;
 
 // Payment modal header
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
@@ -738,5 +692,11 @@ const SMakeBidArrowSvg = styled(InlineSvg)`
   position: absolute;
   left: 26%;
   bottom: -58px;
+`;
 
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: 60px;
+  bottom: 97%;
+  text-align: left;
 `;

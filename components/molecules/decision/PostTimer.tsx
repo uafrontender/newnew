@@ -6,16 +6,14 @@ import styled, { css } from 'styled-components';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import { TPostType } from '../../../utils/switchPostType';
+import { DotPositionEnum, TutorialTooltip } from '../../atoms/decision/TutorialTooltip';
 
 interface IPostTimer {
   timestampSeconds: number;
   postType: TPostType;
 }
 
-const PostTimer: React.FunctionComponent<IPostTimer> = ({
-  timestampSeconds,
-  postType,
-}) => {
+const PostTimer: React.FunctionComponent<IPostTimer> = ({ timestampSeconds, postType }) => {
   const { t } = useTranslation('decision');
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -26,6 +24,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const interval = useRef<number>();
 
   const shouldTurnRed = useMemo(() => !hasEnded && seconds <= 60 * 60, [hasEnded, seconds]);
+
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   useEffect(() => {
     if (isBrowser()) {
@@ -41,86 +41,72 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   }, [seconds]);
 
   return (
-    <SWrapper
-      shouldTurnRed={shouldTurnRed}
-    >
+    <SWrapper shouldTurnRed={shouldTurnRed}>
       {!hasEnded ? (
         <>
           {parsedSeconds.days !== '00' && (
             <>
-              <STimerItem
-                className="timerItem"
-              >
-                <div>
-                  {parsedSeconds.days}
-                </div>
-                <div>
-                  {t('expires.days')}
-                </div>
+              <STimerItem className="timerItem">
+                <div>{parsedSeconds.days}</div>
+                <div>{t('expires.days')}</div>
+                <STutorialTooltipHolder>
+                  <TutorialTooltip
+                    isTooltipVisible={isTooltipVisible}
+                    closeTooltip={() => setIsTooltipVisible(false)}
+                    title={t('tutorials.timer.title')}
+                    text={t('tutorials.timer.text')}
+                    dotPosition={DotPositionEnum.TopRight}
+                  />
+                </STutorialTooltipHolder>
               </STimerItem>
-              <div>
-                :
-              </div>
+              <div>:</div>
             </>
           )}
-          <STimerItem
-            className="timerItem"
-          >
-            <div>
-              {parsedSeconds.hours}
-            </div>
-            <div>
-              {t('expires.hours')}
-            </div>
+          <STimerItem className="timerItem">
+            <div>{parsedSeconds.hours}</div>
+            <div>{t('expires.hours')}</div>
+            {parsedSeconds.days === '00' && (
+              <STutorialTooltipHolder>
+                <TutorialTooltip
+                  isTooltipVisible={isTooltipVisible}
+                  closeTooltip={() => setIsTooltipVisible(false)}
+                  title={t('tutorials.timer.title')}
+                  text={t('tutorials.timer.text')}
+                  dotPosition={DotPositionEnum.TopRight}
+                />
+              </STutorialTooltipHolder>
+            )}
           </STimerItem>
-          <div>
-            :
-          </div>
-            <STimerItem
-              className="timerItem"
-            >
-            <div>
-              {parsedSeconds.minutes}
-            </div>
-            <div>
-              {t('expires.minutes')}
-            </div>
+          <div>:</div>
+          <STimerItem className="timerItem">
+            <div>{parsedSeconds.minutes}</div>
+            <div>{t('expires.minutes')}</div>
           </STimerItem>
           {parsedSeconds.days === '00' && (
             <>
-              <div>
-                :
-              </div>
-              <STimerItem
-                className="timerItem"
-              >
-                <div>
-                  {parsedSeconds.seconds}
-                </div>
-                <div>
-                  {t('expires.seconds')}
-                </div>
+              <div>:</div>
+              <STimerItem className="timerItem">
+                <div>{parsedSeconds.seconds}</div>
+                <div>{t('expires.seconds')}</div>
               </STimerItem>
             </>
           )}
         </>
       ) : (
         <STimerItemEnded>
-          { t(`postType.${postType}`) }
-          {' '}
-          { t('expires.ended_on') }
-          {' '}
-          { expirationDate.getDate() }
-          {' '}
-          { expirationDate.toLocaleString('default', { month: 'short' }) }
-          {' '}
-          { expirationDate.getFullYear() }
-          {' '}
-          { t('expires.at_time') }
-          {' '}
-          { ('0' + expirationDate.getHours()).slice(-2) }
-          :
-          { ('0' + expirationDate.getMinutes()).slice(-2) }
+          {t(`postType.${postType}`)} {t('expires.ended_on')} {expirationDate.getDate()}{' '}
+          {expirationDate.toLocaleString('default', { month: 'short' })} {expirationDate.getFullYear()}{' '}
+          {t('expires.at_time')} {('0' + expirationDate.getHours()).slice(-2)}:
+          {('0' + expirationDate.getMinutes()).slice(-2)}
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={isTooltipVisible}
+              closeTooltip={() => setIsTooltipVisible(false)}
+              title={t('tutorials.timer.title')}
+              text={t('tutorials.timer.text')}
+              dotPosition={DotPositionEnum.TopRight}
+            />
+          </STutorialTooltipHolder>
         </STimerItemEnded>
       )}
     </SWrapper>
@@ -150,14 +136,15 @@ const SWrapper = styled.div<{
   position: relative;
   top: -4px;
 
-  ${({ shouldTurnRed }) => (shouldTurnRed ? (
-    css`
-      .timerItem {
-        background-color: ${({ theme }) => theme.colorsThemed.accent.pink} !important;
-        color: #FFFFFF;
-      }
-    `
-  ) : null)};
+  ${({ shouldTurnRed }) =>
+    shouldTurnRed
+      ? css`
+          .timerItem {
+            background-color: ${({ theme }) => theme.colorsThemed.accent.pink} !important;
+            color: #ffffff;
+          }
+        `
+      : null};
 
   ${({ theme }) => theme.media.tablet} {
     position: initial;
@@ -175,6 +162,8 @@ const STimerItem = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
+  position: relative;
+
   div:nth-child(1) {
     text-align: center;
   }
@@ -189,4 +178,12 @@ const STimerItemEnded = styled.div`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  position: relative;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  right: 100%;
+  top: 5px;
+  text-align: left;
 `;
