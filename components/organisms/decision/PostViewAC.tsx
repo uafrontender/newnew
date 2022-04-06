@@ -88,10 +88,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           label: 'bids',
           value: 'bids',
         },
-        {
-          label: 'comments',
-          value: 'comments',
-        },
+        ...(post.isCommentsAllowed
+          ? [
+              {
+                label: 'comments',
+                value: 'comments',
+              },
+            ]
+          : []),
       ];
     }
     return [
@@ -99,12 +103,16 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         label: 'bids',
         value: 'bids',
       },
-      {
-        label: 'comments',
-        value: 'comments',
-      },
+      ...(post.isCommentsAllowed
+        ? [
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]
+        : []),
     ];
-  }, [post.winningOptionId]);
+  }, [post.isCommentsAllowed, post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -558,7 +566,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             handleLoadBids={fetchBids}
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
-        ) : currentTab === 'comments' ? (
+        ) : currentTab === 'comments' && post.isCommentsAllowed ? (
           <CommentsTab commentsRoomId={post.commentsRoomId as number} handleGoBack={() => handleChangeTab('bids')} />
         ) : winningOption ? (
           <AcWinnerTab postId={post.postUuid} option={winningOption} postStatus={postStatus} />
@@ -576,6 +584,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           </SAnimationContainer>
         )}
       </SActivitesContainer>
+
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}

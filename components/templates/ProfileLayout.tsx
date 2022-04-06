@@ -20,11 +20,17 @@ import ProfileBackground from '../molecules/profile/ProfileBackground';
 
 // Icons
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
-import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
 import MoreIconFilled from '../../public/images/svg/icons/filled/More.svg';
+import FavouritesIconFilled from '../../public/images/svg/icons/filled/Favourites.svg';
+import FavouritesIconOutlined from '../../public/images/svg/icons/outlined/Favourites.svg';
 import { getSubscriptionStatus } from '../../api/endpoints/subscription';
 import { FollowingsContext } from '../../contexts/followingContext';
 import { markUser } from '../../api/endpoints/user';
+
+import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
+import UserEllipseModal from '../molecules/profile/UserEllipseModal';
+import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
+import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -60,9 +66,34 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+
+  // Modals
+  const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
+  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const isUserBlocked = useMemo(() => (
+    usersIBlocked.includes(user.uuid)
+  ), [usersIBlocked, user.uuid]);
+
+  const unblockUserAsync = async (uuid: string) => {
+    try {
+      const payload = new newnewapi.MarkUserRequest({
+        markAs: newnewapi.MarkUserRequest.MarkAs.NOT_BLOCKED,
+        userUuid: uuid,
+      });
+      const res = await markUser(payload);
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      unblockUser(uuid);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
@@ -176,26 +207,17 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
-  const handleClickSendMessage = useCallback(async () => {
+  const handleClickSendMessage = useCallback(() => {
     try {
-      const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-        creatorUuid: user.uuid,
-      });
-
-      const res = await getSubscriptionStatus(getStatusPayload);
-
-      console.log(res.data);
-
-      if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
+      if (!isSubscribed) {
         router.push(`/${user.username}/subscribe`);
-      } else if (res.data?.status?.activeRenewsAt) {
-        console.log('Subscribed! Redirect to chat will be here');
+      } else if (isSubscribed) {
         router.push(`/direct-messages?user=${user.uuid}`);
       }
     } catch (err) {
       console.error(err);
     }
-  }, [router, user]);
+  }, [router, user, isSubscribed]);
 
   const renderChildren = () => {
     let postsForPage = {};
@@ -287,9 +309,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
     if (currentUser.loggedIn && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
-      router.push('/profile');
+      router.push(currentUser.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
     }
-  }, [currentUser.loggedIn, currentUser.userData?.userUuid, router, user.uuid]);
+  }, [currentUser.loggedIn, currentUser.userData?.options?.isCreator, currentUser.userData?.userUuid, router, user.uuid]);
 
   useEffect(() => {
     const handlerHistory = () => {
@@ -311,6 +333,26 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     }
   }, [router]);
 
+  useEffect(() => {
+    async function fetchIsSubscribed() {
+      try {
+        const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+          creatorUuid: user.uuid,
+        });
+
+        const res = await getSubscriptionStatus(getStatusPayload);
+
+        if (res.data?.status?.activeRenewsAt) {
+          setIsSubscribed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchIsSubscribed();
+  }, [user.uuid]);
+
   return (
     <ErrorBoundary>
       <SGeneral
@@ -318,33 +360,63 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       >
         <SProfileLayout>
           <ProfileBackground
-            // Temp
             pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
           />
           {/* Favorites and more options buttons */}
           <SFavoritesButton
-            view={followingsIds.includes(user.uuid as string) ? 'primaryGrad' : 'transparent'}
+            view="transparent"
             iconOnly
             onClick={() => handleToggleFollowingCreator()}
           >
-            <InlineSvg
-              svg={FavouritesIconFilled}
-              fill={theme.colorsThemed.text.primary}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-            />
+            <SSVGContainer
+              active={false}
+            >
+              <InlineSvg
+                svg={followingsIds.includes(user.uuid as string) ? FavouritesIconFilled : FavouritesIconOutlined}
+                fill={followingsIds.includes(user.uuid as string) ? theme.colorsThemed.accent.blue : 'none'}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
+              />
+            </SSVGContainer>
             {t('ProfileLayout.buttons.favorites')}
           </SFavoritesButton>
-          <SMoreButton view="transparent" iconOnly onClick={() => {}}>
-            <InlineSvg
-              svg={MoreIconFilled}
-              fill={theme.colorsThemed.text.primary}
-              width={isMobileOrTablet ? '20px' : '24px'}
-              height={isMobileOrTablet ? '20px' : '24px'}
-            />
+          <SMoreButton view="transparent" iconOnly onClick={() => setIsEllipseMenuOpen(true)}>
+            <SSVGContainer
+              active={ellipseMenuOpen}
+            >
+              <InlineSvg
+                svg={MoreIconFilled}
+                fill={theme.colorsThemed.text.primary}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
+              />
+            </SSVGContainer>
             {t('ProfileLayout.buttons.more')}
           </SMoreButton>
-          <ProfileImage src={user.avatarUrl ?? ''} />
+          {!isMobile && (
+            <UserEllipseMenu
+              isVisible={ellipseMenuOpen}
+              isSubscribed={isSubscribed}
+              isBlocked={isUserBlocked}
+              loggedIn={currentUser.loggedIn}
+              handleClose={() => setIsEllipseMenuOpen(false)}
+              handleClickBlock={() => {
+                if (isUserBlocked) {
+                  unblockUserAsync(user.uuid);
+                } else {
+                  setBlockUserModalOpen(true);
+                }
+              }}
+              handleClickReport={() => {}}
+              handleClickUnsubscribe={() => {}}
+            />
+          )}
+          <ProfileImage src={user.avatarUrl ?? ''}/>
+          {isSubscribed && (
+            <SSubcribedTag>
+              {t('subscribed-tag')}
+            </SSubcribedTag>
+          )}
           <div
             style={{
               position: 'relative',
@@ -355,7 +427,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           >
             <SUsername variant={4}>{user.nickname}</SUsername>
             <SShareDiv>
-              <Button
+              <SUsernameButton
                 view="tertiary"
                 iconOnly
                 style={{
@@ -372,7 +444,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     ? `${user.username.substring(0, 6)}...${user.username.substring(user.username.length - 3)}`
                     : user.username}
                 </SUsernameButtonText>
-              </Button>
+              </SUsernameButton>
               <Button
                 view="tertiary"
                 iconOnly
@@ -404,6 +476,32 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         </SProfileLayout>
         {renderChildren()}
       </SGeneral>
+      {/* Modals */}
+      {isMobile && (
+        <UserEllipseModal
+          isOpen={ellipseMenuOpen}
+          zIndex={10}
+          isSubscribed={isSubscribed}
+          isBlocked={isUserBlocked}
+          loggedIn={currentUser.loggedIn}
+          onClose={() => setIsEllipseMenuOpen(false)}
+          handleClickBlock={() => {
+            if (isUserBlocked) {
+              unblockUserAsync(user.uuid);
+            } else {
+              setBlockUserModalOpen(true);
+            }
+          }}
+          handleClickReport={() => {}}
+          handleClickUnsubscribe={() => {}}
+        />
+      )}
+      <BlockUserModal
+        confirmBlockUser={blockUserModalOpen}
+        onUserBlock={() => {}}
+        user={user}
+        closeModal={() => setBlockUserModalOpen(false)}
+      />
     </ErrorBoundary>
   );
 };
@@ -460,11 +558,21 @@ const SShareDiv = styled.div`
   margin-bottom: 16px;
 `;
 
+const SUsernameButton = styled(Button)`
+  cursor: default;
+
+  &:active:enabled, &:hover:enabled, &:focus:enabled {
+    background: ${({ theme }) => theme.colorsThemed.background.primary};
+  }
+`;
+
 const SUsernameButtonText = styled(Text)`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+
+  user-select: text;
 `;
 
 const SBioText = styled(Text)`
@@ -480,12 +588,31 @@ const SBioText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
 
+const SSVGContainer = styled.div<{
+  active: boolean;
+}>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  ${({ theme }) => theme.media.laptop} {
+    padding: 12px;
+    border-radius: 16px;
+    margin-bottom: 8px;
+    background: ${({ theme, active }) => active ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;' : theme.colorsThemed.background.quinary};
+    transition: .2s linear;
+  }
+`;
+
 const SFavoritesButton = styled(Button)`
   position: absolute;
   top: 164px;
   right: 4px;
 
-  /* background: none; */
+  background: none;
+  &:active:enabled, &:hover:enabled, &:focus:enabled {
+    background: none;
+  }
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
@@ -494,6 +621,9 @@ const SFavoritesButton = styled(Button)`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 12px;
   }
 
   ${(props) => props.theme.media.tablet} {
@@ -503,6 +633,7 @@ const SFavoritesButton = styled(Button)`
 
   ${(props) => props.theme.media.laptop} {
     top: 244px;
+    right: calc(4px + 68px);
   }
 `;
 
@@ -512,6 +643,9 @@ const SMoreButton = styled(Button)`
   left: 4px;
 
   background: none;
+  &:active:enabled, &:hover:enabled, &:focus:enabled {
+    background: none;
+  }
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
 
@@ -520,6 +654,10 @@ const SMoreButton = styled(Button)`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 12px;
   }
 
   ${(props) => props.theme.media.tablet} {
@@ -550,5 +688,33 @@ const SProfileLayout = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-top: -16px;
+  }
+`;
+
+const SSubcribedTag = styled.div`
+  position: absolute;
+  top: 195px;
+  left: calc(50% - 38px);
+
+  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+  width: 76px;
+  padding: 6px 8px;
+  border-radius: 50px;
+
+  color: ${({ theme }) => theme.colors.dark};
+  text-align: center;
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 12px;
+
+  z-index: 10;
+
+  ${({ theme }) => theme.media.tablet} {
+    top: 235px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    top: 275px;
   }
 `;

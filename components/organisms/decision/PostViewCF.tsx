@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
@@ -574,19 +575,23 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
               label: 'backers',
               value: 'backers',
             },
-            {
-              label: 'comments',
-              value: 'comments',
-            },
+            ...(post.isCommentsAllowed
+              ? [
+                  {
+                    label: 'comments',
+                    value: 'comments',
+                  },
+                ]
+              : []),
           ]}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />
         {currentTab === 'backers' ? (
           renderBackersSection()
-        ) : (
+        ) : post.isCommentsAllowed ? (
           <CommentsTab commentsRoomId={post.commentsRoomId as number} handleGoBack={() => handleChangeTab('backers')} />
-        )}
+        ) : null}
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -10,6 +10,7 @@ import Text from '../../components/atoms/Text';
 import InlineSVG from '../../components/atoms/InlineSVG';
 import CreationLayout from '../../components/templates/CreationLayout';
 import CreationFirstStepContent from '../../components/organisms/creation/first/index';
+import HeroPopup from '../../components/molecules/creation/HeroPopup';
 
 import { clearCreation } from '../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -28,6 +29,8 @@ export const CreationFirstStep = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
+
+  const [isPopupVisible, setIsPopupVisible] = useState(true);
 
   const handleGoBack = useCallback(() => {
     if (window.history.length > 2) {
@@ -55,29 +58,24 @@ export const CreationFirstStep = () => {
       </SBackLine>
       <SWrapper>
         <Head>
-          <title>
-            {t('firstStep.meta.title')}
-          </title>
+          <title>{t('firstStep.meta.title')}</title>
         </Head>
         <CreationFirstStepContent />
+        {/* DC - Decision Creation abbr */}
+        <HeroPopup isPopupVisible={isPopupVisible} postType="DC" closeModal={() => setIsPopupVisible(false)} />
       </SWrapper>
     </>
   );
 };
 
 (CreationFirstStep as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>
-    {page}
-  </CreationLayout>
+  <CreationLayout>{page}</CreationLayout>
 );
 
 export default CreationFirstStep;
 
 export async function getServerSideProps(context: NextPageContext): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale as string,
-    ['common', 'creation'],
-  );
+  const translationContext = await serverSideTranslations(context.locale as string, ['common', 'creation']);
 
   // @ts-ignore
   if (!context?.req?.cookies?.accessToken) {

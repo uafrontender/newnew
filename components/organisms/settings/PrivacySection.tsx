@@ -15,7 +15,7 @@ type TPrivacySection = {
   blockedUsers: Omit<newnewapi.User, 'toJSON'>[];
   handleToggleSpendingHidden: () => void;
   handleToggleAccountPrivate: () => void;
-  handleUnblockUser: () => void;
+  handleUnblockUser: (uuid: string) => void;
   handleCloseAccount: () => void;
   // Allows handling visuals for active/inactive state
   handleSetActive: () => void;
@@ -85,6 +85,13 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         >
           { t('Settings.sections.Privacy.blockedusers.title') }
         </SBlockedUsersContainerTitle>
+        {blockedUsers.length === 0 && (
+          <Text
+            variant={3}
+          >
+            {t('Settings.sections.Privacy.blockedusers.no_blocked_users')}
+          </Text>
+        )}
         {blockedUsers && blockedUsers.map((u) => (
           <SBlockedUserCard>
             <SAvatar>
@@ -104,7 +111,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
               { u.username }
             </SUsername>
             <SUnblockButton
-              onClick={handleUnblockUser}
+              onClick={() => handleUnblockUser(u.uuid)}
               view="secondary"
             >
               { t('Settings.sections.Privacy.blockedusers.unblockBtn') }

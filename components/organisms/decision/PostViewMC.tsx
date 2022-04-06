@@ -84,10 +84,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           label: 'options',
           value: 'options',
         },
-        {
-          label: 'comments',
-          value: 'comments',
-        },
+        ...(post.isCommentsAllowed
+          ? [
+              {
+                label: 'comments',
+                value: 'comments',
+              },
+            ]
+          : []),
       ];
     }
     return [
@@ -95,12 +99,16 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         label: 'options',
         value: 'options',
       },
-      {
-        label: 'comments',
-        value: 'comments',
-      },
+      ...(post.isCommentsAllowed
+        ? [
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]
+        : []),
     ];
-  }, [post.winningOptionId]);
+  }, [post.isCommentsAllowed, post.winningOptionId]);
 
   const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
     if (!isBrowser()) {
@@ -526,7 +534,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
             handleLoadOptions={fetchOptions}
             handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
           />
-        ) : currentTab === 'comments' ? (
+        ) : currentTab === 'comments' && post.isCommentsAllowed ? (
           <CommentsTab commentsRoomId={post.commentsRoomId as number} handleGoBack={() => handleChangeTab('options')} />
         ) : winningOption ? (
           <McWinnerTab postId={post.postUuid} option={winningOption} postStatus={postStatus} />
@@ -544,6 +552,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           </SAnimationContainer>
         )}
       </SActivitesContainer>
+
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}

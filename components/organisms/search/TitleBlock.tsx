@@ -52,9 +52,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
         {
           key: 'most_funded',
         },
-        {
-          key: 'newest',
-        },
       ],
     },
   ], []);
@@ -135,7 +132,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
         {t(`sort-title-option-${key}`)}
         {' '}
         (
-        {t(`sort-title-option-${key}-${option}`)}
+        {t(`sort-title-option-${key}-${option}${option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category) ? `-${category}` : ''}`)}
         )
         <InlineSVG
           svg={closeCircleIcon}
@@ -144,7 +141,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
         />
       </SButton>
     );
-  }, [handleSortChange, sort, disabled, t]);
+  }, [handleSortChange, sort, disabled, category, t]);
 
   return (
     <SContainer>
@@ -156,6 +153,7 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
           onChange={handleCollectionTypeChange}
         />
         <Sorting
+          category={category}
           options={sortOptions}
           selected={sort}
           onChange={handleSortChange}
@@ -192,6 +190,16 @@ export default TitleBlock;
 const SContainer = styled.div`
   display: flex;
   flex-direction: column;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 536px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    max-width: 1200px;
+  }
 `;
 
 const SWrapper = styled.div`

@@ -5,28 +5,35 @@ import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
 
+import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
-import Earnings from '../../molecules/creator/dashboard/Earnings';
 import Navigation from '../../molecules/creator/Navigation';
+import Earnings from '../../molecules/creator/dashboard/Earnings';
+import YourTodos from '../../molecules/creator/dashboard/YourTodos';
 import DynamicSection from '../../molecules/creator/dashboard/DynamicSection';
 import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
-import EmptySubscriptionStats from '../../molecules/creator/dashboard/EmptySubscriptionStats';
 import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
-import YourTodos from '../../molecules/creator/dashboard/YourTodos';
+import EmptySubscriptionStats from '../../molecules/creator/dashboard/EmptySubscriptionStats';
 
 import { getMyPosts } from '../../../api/endpoints/user';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
+import { getMyUrgentPosts } from '../../../api/endpoints/post';
 
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const { mySubscribers } = useGetSubscriptions();
+  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
+  const [isTodosCompletedLoading, setIsTodosCompletedLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>([]);
+  const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] = useState(true);
+  const [hasMyPosts, setHasMyPosts] = useState(false);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -39,24 +46,42 @@ export const Dashboard = () => {
     }
   };
 
+  const fetchMyExpirationPosts = async () => {
+    try {
+      const payload = new newnewapi.PagedRequest();
+      const res = await getMyUrgentPosts(payload);
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data?.posts) setExprirationPosts(res.data?.posts);
+      setIsLoadingExpirationPosts(false);
+    } catch (err) {
+      setIsLoadingExpirationPosts(false);
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoadingExpirationPosts) {
+      fetchMyExpirationPosts();
+    }
+  }, [isLoadingExpirationPosts]);
+
   useEffect(() => {
     if (!mySubscriptionProduct) {
       fetchMySubscriptionProduct();
     }
   }, [mySubscriptionProduct]);
-  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(false);
-  // const [expirationPosts, setExprirationPost] = useState<newnewapi.Post[]>([]);
-  const [hasMyPosts, setHasMyPosts] = useState(false);
 
   const todosCompleted = (value: boolean) => {
     setIsTodosCompleted(value);
   };
 
+  const todosCompletedLoading = (value: boolean) => {
+    setIsTodosCompletedLoading(value);
+  };
+
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
     try {
-      setIsLoading(true);
       const payload = new newnewapi.GetRelatedToMePostsRequest({
         relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_CREATIONS,
       });
@@ -75,6 +100,8 @@ export const Dashboard = () => {
   useEffect(() => {
     if (isTodosCompleted && !hasMyPosts && !isLoading) {
       loadMyPosts();
+    } else {
+      setIsLoading(false);
     }
   }, [isTodosCompleted, isLoading, hasMyPosts, loadMyPosts]);
 
@@ -87,15 +114,31 @@ export const Dashboard = () => {
           {!isMobile && <DynamicSection />}
         </STitleBlock>
         <SBlock name="your-todos">
-          <YourTodos todosCompleted={todosCompleted} />
+          <YourTodos todosCompleted={todosCompleted} todosCompletedLoading={todosCompletedLoading} />
         </SBlock>
-        {hasMyPosts && (
+        {isLoadingExpirationPosts ? (
           <SBlock>
-            <ExpirationPosts />
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SBlock>
+        ) : (
+          <SBlock>
+            <ExpirationPosts expirationPosts={expirationPosts} />
           </SBlock>
         )}
         <SBlock>
-          <Earnings isTodosCompleted={isTodosCompleted} hasMyPosts={hasMyPosts} />
+          <Earnings
+            isTodosCompleted={isTodosCompleted}
+            isTodosCompletedLoading={isTodosCompletedLoading}
+            hasMyPosts={hasMyPosts}
+          />
         </SBlock>
         {!mySubscriptionProduct ? (
           <SBlock noMargin>

@@ -99,6 +99,12 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const tabs: Tab[] = useMemo(() => (
     [
+      ...(user.userData?.options?.isCreator ? [
+        {
+          nameToken: 'myposts',
+          url: '/profile/my-posts',
+        },
+      ] : []),
       {
         nameToken: 'activelyBidding',
         url: '/profile',
@@ -115,12 +121,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         nameToken: 'subscriptions',
         url: '/profile/subscriptions',
       },
-      ...(user.userData?.options?.isCreator ? [
-        {
-          nameToken: 'myposts',
-          url: '/profile/my-posts',
-        },
-      ] : []),
       {
         nameToken: 'favorites',
         url: '/profile/favorites',

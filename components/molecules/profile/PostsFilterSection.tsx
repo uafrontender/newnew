@@ -1,18 +1,10 @@
-import React, { useState } from 'react';
-import styled, { useTheme } from 'styled-components';
+/* eslint-disable no-unused-vars */
+import React from 'react';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
-
-import ProfilePostTypeFilterMenu from './ProfilePostTypeFilterMenu';
-import ProfilePostTypeFilterModal from './ProfilePostTypeFilterModal';
-import Button from '../../atoms/Button';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import ArrowDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
 
 export type PostsFilterOption = {
   nameToken: string;
@@ -32,16 +24,11 @@ const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
   postsFilter,
   handleUpdateFilter,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('profile');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
-  const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <SFiltersSection>
-      <Text
+      <SText
         variant={3}
       >
         {(numDecisions && numDecisions !== 0) ? (
@@ -57,38 +44,7 @@ const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
           </>
         ) : null}
         {' '}
-      </Text>
-      <SFilterButton
-        view="secondary"
-        onClick={() => setFilterOpen(true)}
-      >
-        <span>
-          { t(`posts-filter.filter-${postsFilter?.toString() ?? '0'}`) }
-        </span>
-        <InlineSvg
-          svg={ArrowDown}
-          fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
-        />
-      </SFilterButton>
-      {!isMobile ? (
-        <ProfilePostTypeFilterMenu
-          isVisible={filterOpen}
-          selected={postsFilter}
-          handleSelect={handleUpdateFilter}
-          handleClose={() => setFilterOpen(false)}
-        />
-      ) : null}
-      {isMobile ? (
-        <ProfilePostTypeFilterModal
-          isOpen={filterOpen}
-          zIndex={10}
-          selected={postsFilter}
-          handleSelect={handleUpdateFilter}
-          onClose={() => setFilterOpen(false)}
-        />
-      ) : null}
+      </SText>
     </SFiltersSection>
   );
 };
@@ -103,7 +59,7 @@ export default PostsFilterSection;
 const SFiltersSection = styled.div`
   position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 
   padding: 0 16px !important;
@@ -113,8 +69,9 @@ const SFiltersSection = styled.div`
   }
 `;
 
-const SFilterButton = styled(Button)`
-  span {
-    display: flex;
-  }
+const SText = styled(Text)`
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;

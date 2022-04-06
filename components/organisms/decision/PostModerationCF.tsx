@@ -371,10 +371,10 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
               label: 'backers',
               value: 'backers',
             },
-            {
+            ...(post.isCommentsAllowed ? [{
               label: 'comments',
               value: 'comments',
-            },
+            }] : []),
           ]}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
@@ -392,13 +392,13 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
               currentNumBackers={currentBackers}
             />
           )
-        ) : (
+        ) : post.isCommentsAllowed ? (
           <CommentsTab
             canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
             commentsRoomId={post.commentsRoomId as number}
             handleGoBack={() => handleChangeTab('backers')}
           />
-        )
+        ) : null
       }
       </SActivitesContainer>
     </SWrapper>
