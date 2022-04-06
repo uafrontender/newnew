@@ -1,4 +1,5 @@
 {
+  "my": "my",
   "postType": {
     "ac": "Auction",
     "mc": "Multiple Choice",
@@ -215,9 +216,9 @@
         "bidders": "bidders",
         "others": "others",
         "bid": "bid",
-        "supportBtn": "Support",
+        "supportBtn": "Bid",
         "raiseBidBtn": "Raise bid",
-        "placeABidBtn": "Place a bid",
+        "placeABidBtn": "Place bid",
         "cancelBtn": "Cancel",
         "moreBtn": "More"
       },
@@ -226,7 +227,10 @@
       },
       "ActionSection": {
         "suggestionPlaceholder": "Add a suggestion ...",
-        "placeABidBtn": "Place a bid"
+        "suggestionPlaceholder-desktop": "What should {{username}} do?",
+        "amountPlaceholder-desktop": "Min bid ${{amount}}",
+        "amountPlaceholder-boost": "Boost bid ${{amount}}",
+        "placeABidBtn": "Place bid"
       }
     },
     "WinnerTab": {
@@ -420,6 +424,7 @@
     "hide-replies": "Hide",
     "view-more": "View more comments",
     "comments": "Comments",
+    "noCommentsCaption": "Be the first to comment...",
     "errors": {
       "generic": "Please check input",
       "tooLong": "Comment is too long",

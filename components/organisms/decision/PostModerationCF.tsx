@@ -360,6 +360,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       />
       <PostTopInfoModeration
         postType="cf"
+        postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
         handleUpdatePostStatus={handleUpdatePostStatus}
@@ -416,13 +417,15 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    height: 648px;
+
     display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content 1fr;
+    grid-template-rows: max-content max-content minmax(0, 1fr);
 
     grid-column-gap: 16px;
 
@@ -430,6 +433,8 @@ const SWrapper = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
+    height: 728px;
+
     grid-template-areas:
       'video expires'
       'video title'

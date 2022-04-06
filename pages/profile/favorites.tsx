@@ -14,7 +14,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/search/List';
+import List from '../../components/organisms/see-more/List';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 

@@ -6,7 +6,7 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -459,12 +459,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       />
       <PostTopInfoModeration
         postType="mc"
+        postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
         totalVotes={totalVotes}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
-      <SActivitesContainer>
+      <SActivitesContainer
+        decisionFailed={postStatus === 'failed'}
+      >
         <DecisionTabs
           tabs={tabs}
           activeTab={currentTab}
@@ -532,13 +535,15 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    height: 648px;
+
     display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content 1fr;
+    grid-template-rows: max-content max-content minmax(0, 1fr);
 
     grid-column-gap: 16px;
 
@@ -546,6 +551,8 @@ const SWrapper = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
+    height: 728px;
+
     grid-template-areas:
       'video expires'
       'video title'
@@ -578,7 +585,9 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  decisionFailed: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -594,7 +603,14 @@ const SActivitesContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(580px);
+    ${({ decisionFailed }) => (
+      !decisionFailed
+      ? css`
+        max-height: 580px;
+      ` : css`
+        max-height: calc(580px - 120px);
+      `
+    )}
   }
 `;
 

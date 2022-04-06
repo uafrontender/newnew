@@ -126,7 +126,7 @@ export default DecisionTabs;
 
 const STabs = styled.div`
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 
   padding-bottom: 12px;
 

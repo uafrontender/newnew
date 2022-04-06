@@ -545,6 +545,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
       />
       <SActivitesContainer
+        decisionFailed={postStatus === 'failed'}
         showSelectingWinnerOption={showSelectingWinnerOption}
       >
         <DecisionTabs
@@ -562,7 +563,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
                 .subtract(3, 'days').calendar()
             }
             options={options}
-            optionToAnimate={optionToAnimate}
+            // optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
             minAmount={post.minimalBid?.usdCents ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10) : 5}
@@ -631,13 +632,16 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    display: grid;
+    height: 648px;
+    min-height: 0;
+
+    display: inline-grid;
     grid-template-areas:
       'expires expires'
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content 1fr;
+    grid-template-rows: max-content max-content minmax(0, 1fr);
 
     grid-column-gap: 16px;
 
@@ -645,6 +649,8 @@ const SWrapper = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
+    height: 728px;
+
     grid-template-areas:
       'video expires'
       'video title'
@@ -679,6 +685,7 @@ const SGoBackButton = styled(GoBackButton)`
 
 const SActivitesContainer = styled.div<{
   showSelectingWinnerOption: boolean;
+  decisionFailed: boolean;
 }>`
   grid-area: activities;
 
@@ -695,14 +702,19 @@ const SActivitesContainer = styled.div<{
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectingWinnerOption }) => (
+    ${({ showSelectingWinnerOption, decisionFailed }) => (
       showSelectingWinnerOption
       ? css`
         max-height: calc(580px - 130px);
       `
-      : css`
-        max-height: calc(580px);
-      `
+      : (
+        !decisionFailed
+        ? css`
+          max-height: 580px;
+        ` : css`
+          max-height: calc(580px - 120px);
+        `
+      )
     )}
   }
 `;
