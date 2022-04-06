@@ -48,6 +48,7 @@ export interface INotification {
 
 export const Notifications = () => {
   const { t } = useTranslation('notifications');
+  // const { user } = useAppSelector((state) => state);
   // const user = useAppSelector((state) => state.user);
   const [notifications, setNotifications] = useState<newnewapi.INotification[] | null>(null);
   // const [notificationsNextPageToken, setnotificationsNextPageToken] = useState<string | undefined | null>('');
@@ -69,7 +70,7 @@ export const Notifications = () => {
 
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-        console.log(res.data);
+        console.log(res.data.notifications);
 
         setLoading(false);
       } catch (err) {
@@ -82,6 +83,8 @@ export const Notifications = () => {
   );
 
   useEffect(() => {
+    // console.log(user);
+
     if (!notifications) {
       fetchNotification();
     }
