@@ -176,7 +176,7 @@ const HeroVisual: React.FunctionComponent = () => {
     if (introLoaded) {
       setTimeout(() => {
         setCurrentState('hold');
-      }, 3000);
+      }, 2800);
     }
   }, [introLoaded]);
 

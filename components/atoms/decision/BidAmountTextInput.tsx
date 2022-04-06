@@ -10,6 +10,7 @@ interface IBidAmountTextInput {
   onChange: (newValue: string) => void;
   inputAlign: 'left' | 'center';
   bottomPlaceholder?: string;
+  placeholder?: string;
   style?: React.CSSProperties;
 }
 
@@ -21,6 +22,7 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
   inputAlign,
   onChange,
   bottomPlaceholder,
+  placeholder,
   style,
 }) => {
   const inputRef = useRef<HTMLInputElement>();
@@ -66,7 +68,7 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode="numeric"
-        placeholder={`$${minAmount.toString()}`}
+        placeholder={placeholder ?? `$${minAmount.toString()}`}
         onChange={handleOnChange}
         onBlur={handleBlur}
         style={style ?? {}}
@@ -84,6 +86,7 @@ BidAmountTextInput.defaultProps = {
   disabled: undefined,
   autofocus: undefined,
   bottomPlaceholder: undefined,
+  placeholder: undefined,
   style: {},
 };
 
@@ -106,6 +109,8 @@ const SInput = styled.input<{
   font-weight: 600;
   font-size: 32px;
   line-height: 40px;
+
+  height: 48px;
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   text-align: left;

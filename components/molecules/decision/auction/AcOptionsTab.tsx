@@ -41,7 +41,7 @@ interface IAcOptionsTab {
   postDeadline: string;
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
-  optionToAnimate?: string;
+  // optionToAnimate?: string;
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   minAmount: number;
@@ -55,7 +55,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postDeadline,
   postStatus,
   options,
-  optionToAnimate,
+  // optionToAnimate,
   optionsLoading,
   pagingToken,
   minAmount,
@@ -66,6 +66,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const isTablet = ['tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const { walletBalance } = useContext(WalletContext);
@@ -80,6 +81,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(postStatus === 'voting' ? 56 : 0);
+  const gradientMaskBottomPosition = useMemo(() => (
+    isTablet ? heightDelta - 12 : heightDelta - 66
+  ), [heightDelta, isTablet]);
+
   const actionSectionContainer = useRef<HTMLDivElement>();
 
   const mainContainer = useRef<HTMLDivElement>();
@@ -372,14 +377,14 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
-              <GradientMask gradientType="secondary" positionBottom={heightDelta} active={showBottomGradient} />
+              <GradientMask gradientType="secondary" positionBottom={gradientMaskBottomPosition} active={showBottomGradient} />
             </>
           ) : null}
           {options.map((option, i) => (
             <AcOptionCard
               key={option.id.toString()}
               option={option as TAcOptionWithHighestField}
-              shouldAnimate={optionToAnimate === option.id.toString()}
+              // shouldAnimate={optionToAnimate === option.id.toString()}
               postId={postId}
               postCreator={postCreator}
               postDeadline={postDeadline}
@@ -417,7 +422,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <SuggestionTextArea
               value={newBidText}
               disabled={optionBeingSupported !== ''}
-              placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder')}
+              placeholder={t('AcPost.OptionsTab.ActionSection.suggestionPlaceholder-desktop', { username: postCreator })}
               onChange={handleUpdateNewOptionText}
             />
             <BidAmountTextInput
@@ -426,6 +431,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               disabled={optionBeingSupported !== ''}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
+              placeholder={t('AcPost.OptionsTab.ActionSection.amountPlaceholder-desktop', { amount: minAmount.toString() })}
               style={{
                 width: '60px',
               }}
@@ -547,7 +553,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 };
 
 AcOptionsTab.defaultProps = {
-  optionToAnimate: undefined,
+  // optionToAnimate: undefined,
 };
 
 export default AcOptionsTab;
@@ -571,7 +577,7 @@ const SBidsContainer = styled.div<{
   padding-top: 16px;
 
   ${({ theme }) => theme.media.tablet} {
-    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
+    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 10px)`};
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -599,6 +605,10 @@ const SBidsContainer = styled.div<{
         background: ${({ theme }) => theme.colorsThemed.background.outlines2};
       }
     }
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    height:  ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 66px)`};
   }
 `;
 
@@ -654,16 +664,28 @@ const SActionSection = styled.div`
     border-top: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
 
     textarea {
+      width: 75% !important;
+    }
+
+    div {
+      width: 20%;
+
+      input {
+        width: 100% !important;
+      }
+    }
+
+    button {
       width: 100%;
     }
   }
 
   ${({ theme }) => theme.media.laptop} {
-    flex-wrap: nowrap;
-    justify-content: initial;
+    /* flex-wrap: nowrap; */
+    /* justify-content: initial; */
 
     textarea {
-      width: 277px;
+      /* width: 277px; */
     }
   }
 `;

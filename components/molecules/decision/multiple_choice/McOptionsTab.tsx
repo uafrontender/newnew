@@ -561,7 +561,7 @@ export default McOptionsTab;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 50px);
+  /* height: calc(100% - 50px); */
 
   ${({ theme }) => theme.media.tablet} {
     height: calc(100% - 56px);

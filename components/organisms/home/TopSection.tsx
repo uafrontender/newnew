@@ -243,11 +243,12 @@ const SWrapper = styled(motion.section)<ISWrapper>`
 const SHeadline = styled(Headline)`
   ${(props) => props.theme.media.tablet} {
     margin: 0 auto;
-    max-width: 702px;
+    max-width: 696px;
+    padding: 0 32px;
   }
-  ${(props) => props.theme.media.laptop} {
+  ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
-    padding: 0 16px;
+    padding: initial;
   }
 `;
 

@@ -18,7 +18,7 @@ import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewA
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-import Lottie from '../../../atoms/Lottie';
+// import Lottie from '../../../atoms/Lottie';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
@@ -27,17 +27,18 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import { formatNumber } from '../../../../utils/format';
 
 // NB! temp sample
-import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
-import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
+// import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
+// import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
 
 // Icons
 import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
-import CoinIcon from '../../../../public/images/decision/coin-mock.png';
+// import CoinIcon from '../../../../public/images/decision/coin-mock.png';
+import AcIcon from '../../../../public/images/creation/AC-static.png';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
-  shouldAnimate: boolean;
+  // shouldAnimate: boolean;
   votingAllowed: boolean;
   postId: string;
   postCreator: string;
@@ -51,7 +52,7 @@ interface IAcOptionCard {
 
 const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   option,
-  shouldAnimate,
+  // shouldAnimate,
   votingAllowed,
   postId,
   postCreator,
@@ -71,7 +72,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   const { walletBalance } = useContext(WalletContext);
 
-  const highest = useMemo(() => option.isHighest, [option.isHighest]);
+  // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
   const isMyBid = useMemo(
     () => option.creator?.uuid === user.userData?.userUuid,
@@ -262,7 +263,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       >
         <SBidDetails isBlue={isSupportedByMe || isMyBid}>
           <SLottieAnimationContainer>
-            {shouldAnimate ? (
+            {/* {shouldAnimate ? (
               <Lottie
                 width={80}
                 height={80}
@@ -272,10 +273,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   animationData: highest ? CoinsSampleAnimation : HeartsSampleAnimation,
                 }}
               />
-            ) : null}
+            ) : null} */}
           </SLottieAnimationContainer>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
-            <SCoinImg src={CoinIcon.src} />
+            <SCoinImg src={AcIcon.src} />
             <div>
               {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
             </div>
@@ -305,7 +306,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                   : {}),
               }}
             >
-              {isMyBid ? t('me') : option.creator?.nickname ?? option.creator?.username}
+              {isMyBid ? t('my') : option.creator?.nickname ?? option.creator?.username}
             </SSpanBiddersHighlighted>
             {isSupportedByMe && !isMyBid ? (
               <SSpanBiddersHighlighted className="spanHighlighted">{`, ${t('me')}`}</SSpanBiddersHighlighted>
@@ -323,16 +324,20 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           </SBiddersInfo>
         </SBidDetails>
         {(optionBeingSupported && !disabled) || !votingAllowed ? null : (
-          <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
-            {!isMobile ? (
+          isMobile ? (
+            <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
               <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
-            ) : (
-              <>
-                <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
-                <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
-              </>
-            )}
-          </SSupportButton>
+              <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
+            </SSupportButton>
+          ) : (
+            <SSupportButtonDesktop
+              view="secondary"
+              disabled={disabled}
+              onClick={() => handleOpenSupportForm()}
+            >
+            {t('AcPost.OptionsTab.OptionCard.supportBtn')}
+            </SSupportButtonDesktop>
+          )
         )}
       </SContainer>
       <SSupportBidForm
@@ -351,6 +356,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               inputAlign="left"
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
+              placeholder={t('AcPost.OptionsTab.ActionSection.amountPlaceholder-boost', { amount: minAmount.toString() })}
               style={{
                 padding: '12.5px 16px',
               }}
@@ -458,6 +464,7 @@ const SContainer = styled(motion.div)<{
     /* width: 80%; */
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     gap: 16px;
 
     padding: initial;
@@ -528,7 +535,7 @@ const SBidAmount = styled.div<{
 `;
 
 const SCoinImg = styled.img`
-  height: 24px;
+  height: 28px;
 `;
 
 const SOptionInfo = styled(Text)<{
@@ -599,6 +606,12 @@ const SSupportButton = styled(Button)`
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
   }
+`;
+
+const SSupportButtonDesktop = styled(Button)`
+  height: 48px;
+
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 `;
 
 const SSupportBidForm = styled(motion.div)`

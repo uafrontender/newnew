@@ -504,7 +504,7 @@ const STabContainer = styled(motion.div)`
   align-self: flex-end;
 
   ${({ theme }) => theme.media.tablet} {
-    height: calc(100% - 56px);
+    /* height: calc(100% - 56px); */
   }
 `;
 

@@ -261,6 +261,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = (
           >
             {pledgeLevels.map((pledgeLevel, i, arr) => (
               <CfMakeStandardPledgeCard
+                key={pledgeLevel.usdCents}
                 amount={pledgeLevel}
                 grandsVipStatus={i === arr.length - 1}
                 handleOpenMakePledgeForm={() => {
