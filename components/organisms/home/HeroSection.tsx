@@ -201,20 +201,8 @@ export const HeroSection = () => {
             }
             type="video/mp4"
           />
-          <source
-            src={
-              theme.name === 'light'
-              ? '/images/home/Landing-Page-Light.webm'
-              : '/images/home/Landing-Page-Dark.webm'
-            }
-            type="video/webm"
-          />
         </video>
       </SHeroImage>
-      {/* <SNotificationsList>
-        <GradientMask />
-        {notifications.map(renderItem)}
-      </SNotificationsList> */}
     </SWrapper>
   );
 };
@@ -331,6 +319,14 @@ const SHeroImage = styled.div`
   }
 `;
 
+const SButton = styled(Button)`
+  padding: 12px 24px;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 16px;
+  }
+`;
+
 // const GradientMask = styled.div`
 //   top: 0;
 //   left: 0;
@@ -358,11 +354,3 @@ const SHeroImage = styled.div`
 //     max-width: 608px;
 //   }
 // `;
-
-const SButton = styled(Button)`
-  padding: 12px 24px;
-
-  ${(props) => props.theme.media.tablet} {
-    font-size: 16px;
-  }
-`;
