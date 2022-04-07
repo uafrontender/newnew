@@ -14,7 +14,13 @@ module.exports = {
     return config;
   },
   images: {
-    domains: ['randomuser.me', 'i.pravatar.cc', 'd3hqmhx7uxxlrw.cloudfront.net'],
+    domains: [
+      'randomuser.me',
+      'i.pravatar.cc',
+      'd3hqmhx7uxxlrw.cloudfront.net',
+      'd2ya8a6kszdsc6.cloudfront.net',
+      'd2x9we5puoe468.cloudfront.net',
+    ],
   },
   async headers() {
     return [

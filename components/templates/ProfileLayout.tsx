@@ -315,14 +315,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   useEffect(() => {
     const handlerHistory = () => {
-      console.log('Popstate')
+      console.log('Popstate');
 
-      const postId = new URL(window?.location?.href).searchParams.get('post');
-
+      const postId = window?.history?.state?.postId;
       if (postId && window?.history?.state?.fromPost) {
-        // router.back();
-        // window.history.back()
-        router.push(`/?post=${postId}`);
+        router.push(`/post/${postId}`);
       }
     }
 

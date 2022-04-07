@@ -8,6 +8,7 @@ import React, {
 import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../atoms/Text';
@@ -127,7 +128,13 @@ export const HeroSection = () => {
   }, []);
 
   return (
-    <SWrapper>
+    <SWrapper
+      layoutId="heroSection"
+      transition={{
+        ease: 'easeInOut',
+        duration: 1,
+      }}
+    >
       <STopWrapper>
         <SHeadline>
           <AnimatedPresence
@@ -201,27 +208,15 @@ export const HeroSection = () => {
             }
             type="video/mp4"
           />
-          <source
-            src={
-              theme.name === 'light'
-              ? '/images/home/Landing-Page-Light.webm'
-              : '/images/home/Landing-Page-Dark.webm'
-            }
-            type="video/webm"
-          />
         </video>
       </SHeroImage>
-      {/* <SNotificationsList>
-        <GradientMask />
-        {notifications.map(renderItem)}
-      </SNotificationsList> */}
     </SWrapper>
   );
 };
 
 export default HeroSection;
 
-const SWrapper = styled.section`
+const SWrapper = styled(motion.section)`
   display: flex;
   margin-bottom: 24px;
   flex-direction: column;
@@ -331,6 +326,14 @@ const SHeroImage = styled.div`
   }
 `;
 
+const SButton = styled(Button)`
+  padding: 12px 24px;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 16px;
+  }
+`;
+
 // const GradientMask = styled.div`
 //   top: 0;
 //   left: 0;
@@ -358,11 +361,3 @@ const SHeroImage = styled.div`
 //     max-width: 608px;
 //   }
 // `;
-
-const SButton = styled(Button)`
-  padding: 12px 24px;
-
-  ${(props) => props.theme.media.tablet} {
-    font-size: 16px;
-  }
-`;

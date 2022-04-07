@@ -13,6 +13,7 @@ import {
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
 import Lottie from '../../atoms/Lottie';
+import isSafari from '../../../utils/isSafari';
 
 interface IPostBitmovinPlayer {
   id: string;
@@ -147,6 +148,15 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
       <SVideoWrapper>
         <SWrapper
           id={id}
+          onClick={() => {
+            if (isSafari()) {
+              if (player.current?.isPlaying()) {
+                player.current?.pause()
+              } else {
+                player.current?.play()
+              }
+            }
+          }}
           ref={playerRef}
         />
       </SVideoWrapper>
