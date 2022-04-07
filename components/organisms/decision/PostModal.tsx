@@ -149,7 +149,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       top: 0,
       behavior: 'smooth',
     });
-    // window.history.pushState(newPostParsed.postUuid, 'Post', `/?post=${newPostParsed.postUuid}`);
     window.history.pushState(
       {
         postId: newPostParsed.postUuid,
@@ -319,11 +318,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         additionalHash = '#winner';
       }
       setOpen(true);
-      // window.history.pushState(
-      //   postParsed.postUuid,
-      //   'Post',
-      //   `/?post=${postParsed.postUuid}${additionalHash ?? ''}`
-      // );
       window.history.pushState(
         {
           postId: postParsed.postUuid,

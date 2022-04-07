@@ -126,7 +126,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
       const handleShareClick = () => {
         let url;
         if (window) {
-          url = `${window.location.origin}/?post=${data.postUuid}`;
+          url = `${window.location.origin}/post/${data.postUuid}`;
           copyPostUrlToClipboard(url);
         }
       };

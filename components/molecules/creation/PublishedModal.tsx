@@ -95,7 +95,7 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
       if (val === 'copy' && postData) {
         let url;
         if (window) {
-          url = `${window.location.origin}/?post=`;
+          url = `${window.location.origin}/post/`;
           if (url) {
             if (postData.auction) {
               url += postData.auction.postUuid;

@@ -2,11 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
-import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
+import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
@@ -18,6 +17,7 @@ import HomeLayout from '../../components/templates/HomeLayout';
 import PostModal from '../../components/organisms/decision/PostModal';
 import TopSection from '../../components/organisms/home/TopSection';
 import HeroSection from '../../components/organisms/home/HeroSection';
+import switchPostType from '../../utils/switchPostType';
 
 interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -32,6 +32,10 @@ const PostPage: NextPage<IPostPage> = ({
 }) => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
+
+  const [postParsed, typeOfPost] = useMemo(() => (
+    post ? switchPostType(post) : [undefined, undefined]
+  ), [post]);
 
   // Posts
   // Top section/Curated posts
@@ -67,14 +71,12 @@ const PostPage: NextPage<IPostPage> = ({
     <>
       <Head>
         <title>
-          {post.auction ? (
-            post.auction.title
-          ) : (
-            post.crowdfunding ? (
-              post.crowdfunding.title
-            ) : post.multipleChoice?.title
-          )}
+          {postParsed?.title}
         </title>
+        <meta property="og:title" content={postParsed?.title} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_APP_URL}/post/${postUuid}`} />
+        <meta property="og:image" content={postParsed?.announcement?.thumbnailImageUrl ?? ''} />
       </Head>
       {!user.loggedIn && <HeroSection />}
       {topSectionCollection.length > 0 && (
