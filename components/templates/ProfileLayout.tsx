@@ -705,7 +705,7 @@ const SSubcribedTag = styled.div`
   font-size: 10px;
   line-height: 12px;
 
-  z-index: 10;
+  z-index: 5;
 
   ${({ theme }) => theme.media.tablet} {
     top: 235px;
