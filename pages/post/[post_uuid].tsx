@@ -9,7 +9,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import { useAppSelector } from '../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import { fetchCuratedPosts, fetchPostByUUID } from '../../api/endpoints/post';
 
 import { NextPageWithLayout } from '../_app';
@@ -18,6 +18,8 @@ import PostModal from '../../components/organisms/decision/PostModal';
 import TopSection from '../../components/organisms/home/TopSection';
 import HeroSection from '../../components/organisms/home/HeroSection';
 import switchPostType from '../../utils/switchPostType';
+import isSafari from '../../utils/isSafari';
+import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 
 interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -31,7 +33,9 @@ const PostPage: NextPage<IPostPage> = ({
   post,
 }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+  const { mutedMode } = useAppSelector((state) => state.ui);
 
   const [postParsed, typeOfPost] = useMemo(() => (
     post ? switchPostType(post) : [undefined, undefined]
@@ -66,6 +70,13 @@ const PostPage: NextPage<IPostPage> = ({
   useEffect(() => {
     router.prefetch('/');
   }, [router]);
+
+  useEffect(() => {
+    if (isSafari() && !mutedMode) {
+      dispatch(toggleMutedMode(false));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
