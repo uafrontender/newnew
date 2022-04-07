@@ -3,11 +3,12 @@
 import React, {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
+import { useInView } from 'react-intersection-observer';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 
 import { useAppSelector } from '../../../../redux-store/store';
@@ -63,6 +64,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -165,8 +167,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       // Check if user is logged and if the wallet balance is sufficient
       if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(newBidAmount, 10) * 100)) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href.split('#')[0]}&`,
-          cancelUrl: `${window.location.href.split('#')[0]}&`,
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
+          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -201,8 +203,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         // Additional handler if balance turned out to be insufficient
         if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href.split('#')[0]}&`,
-            cancelUrl: `${window.location.href.split('#')[0]}&`,
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
             acBidRequest: {
               amount: new newnewapi.MoneyAmount({
                 usdCents: parseInt(newBidAmount, 10) * 100,
@@ -250,6 +252,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     postId,
     user,
     walletBalance,
+    router.locale,
     handleAddOrUpdateOptionFromResponse,
   ]);
 
@@ -257,8 +260,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href.split('#')[0]}&`,
-        cancelUrl: `${window.location.href.split('#')[0]}&`,
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
+        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
         ...(!user.loggedIn ? {
           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
         } : {}),
@@ -286,6 +289,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
     }
   }, [
     user.loggedIn,
+    router.locale,
     newBidAmount,
     newBidText,
     postId,
@@ -341,7 +345,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {options.length === 0 && !optionsLoading ? (
+        {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
               <img

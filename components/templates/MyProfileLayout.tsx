@@ -531,6 +531,23 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const handlerHistory = () => {
+      console.log('Popstate');
+
+      const postId = window?.history?.state?.postId;
+      if (postId && window?.history?.state?.fromPost) {
+        router.push(`/post/${postId}`);
+      }
+    }
+
+    window?.addEventListener('popstate', handlerHistory);
+
+    return () => {
+      window?.removeEventListener('popstate', handlerHistory);
+    }
+  }, [router]);
+
   return (
     <ErrorBoundary>
       <SGeneral
