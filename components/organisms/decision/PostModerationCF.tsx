@@ -74,9 +74,13 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
 
   const handleChangeTab = (tab: string) => {
     if (tab === 'comments' && isMobile) {
-      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+      window.history.pushState(        {
+        postId: post.postUuid,
+      }, 'Post', `/post/${post.postUuid}#${tab}`);
     } else {
-      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+      window.history.replaceState(        {
+        postId: post.postUuid,
+      }, 'Post', `/post/${post.postUuid}#${tab}`);
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }

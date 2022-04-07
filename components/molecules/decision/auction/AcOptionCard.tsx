@@ -117,8 +117,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       // Check if user is logged and if the wallet balance is sufficient
       if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(supportBidAmount, 10) * 100)) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href.split('#')[0]}&`,
-          cancelUrl: `${window.location.href.split('#')[0]}&`,
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
+          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
           ...(!user.loggedIn
             ? {
                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
@@ -151,8 +151,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
         if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href.split('#')[0]}&`,
-            cancelUrl: `${window.location.href.split('#')[0]}&`,
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
             acBidRequest: {
               amount: new newnewapi.MoneyAmount({
                 usdCents: parseInt(supportBidAmount, 10) * 100,
@@ -204,14 +204,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     postId,
     user.loggedIn,
     walletBalance,
+    router.locale,
   ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href.split('#')[0]}&`,
-        cancelUrl: `${window.location.href.split('#')[0]}&`,
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
+        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
         ...(!user.loggedIn
           ? {
               nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
@@ -236,7 +237,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       setLoadingModalOpen(false);
       console.error(err);
     }
-  }, [user.loggedIn, supportBidAmount, option.id, postId]);
+  }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
 
   return (
     <motion.div

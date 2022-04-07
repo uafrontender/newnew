@@ -6,8 +6,9 @@ import React, {
   useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -44,6 +45,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   handleAddPledgeFromResponse,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
 
@@ -85,8 +87,8 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
       // Check if user is logged in
       if (!user.loggedIn) {
         const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href.split('#')[0]}&`,
-          cancelUrl: `${window.location.href.split('#')[0]}&`,
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${post.postUuid}`,
+          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${post.postUuid}`,
           ...(!user.loggedIn ? {
             nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
           } : {}),
@@ -118,8 +120,8 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
 
         if (res.data && res.data.status === newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
           const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href.split('#')[0]}&`,
-            cancelUrl: `${window.location.href.split('#')[0]}&`,
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${post.postUuid}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${post.postUuid}`,
             cfPledgeRequest: {
               amount: new newnewapi.MoneyAmount({
                 usdCents: parseInt(pledgeAmount?.toString()!!, 10),
@@ -164,6 +166,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
     pledgeAmount,
     post.postUuid,
     user.loggedIn,
+    router.locale,
     handleAddPledgeFromResponse,
     handleSetPaymentSuccesModalOpen,
     onClose,
@@ -173,8 +176,8 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
     setLoadingModalOpen(true);
     try {
       const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href.split('#')[0]}&`,
-        cancelUrl: `${window.location.href.split('#')[0]}&`,
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${post.postUuid}`,
+        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${post.postUuid}`,
         ...(!user.loggedIn ? {
           nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
         } : {}),
@@ -203,6 +206,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
     user.loggedIn,
     pledgeAmount,
     post.postUuid,
+    router.locale,
   ]);
 
   useEffect(() => {

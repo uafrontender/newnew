@@ -47,17 +47,11 @@ const Signup: NextPage<ISignup> = ({
 
   useEffect(() => {
     const handlerHistory = () => {
-      console.log('Popstate')
+      console.log('Popstate');
 
-      const postId = new URL(window?.location?.href).searchParams.get('post');
-
-      // console.log(postId)
-      // console.log(window?.history?.state)
-
-      if (window?.history?.state?.fromPost) {
-        // router.back();
-        // window.history.back()
-        router.push(`/?post=${postId}`);
+      const postId = window?.history?.state?.postId;
+      if (postId && window?.history?.state?.fromPost) {
+        router.push(`/post/${postId}`);
       }
     }
 

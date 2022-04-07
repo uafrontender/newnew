@@ -77,6 +77,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const handleRedirectToUser = () => {
     window?.history.replaceState({
+      ...{...window.history.state},
       fromPost: true,
     }, '', '');
     router.push(`/${creator.username}`);
