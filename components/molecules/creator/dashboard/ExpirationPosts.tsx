@@ -120,13 +120,13 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
       const data = Object.values(item)[0] as newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
 
       const handleDecideClick = () => {
-        router.push(`/?post=${data.postUuid}`);
+        router.push(`/post/${data.postUuid}`);
       };
 
       const handleShareClick = () => {
         let url;
         if (window) {
-          url = `${window.location.origin}/?post=${data.postUuid}`;
+          url = `${window.location.origin}/post/${data.postUuid}`;
           copyPostUrlToClipboard(url);
         }
       };

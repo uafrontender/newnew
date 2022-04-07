@@ -149,7 +149,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       top: 0,
       behavior: 'smooth',
     });
-    window.history.pushState(newPostParsed.postUuid, 'Post', `/?post=${newPostParsed.postUuid}`);
+    window.history.pushState(
+      {
+        postId: newPostParsed.postUuid,
+      },
+      'Post',
+      `/post/${newPostParsed.postUuid}`
+    );
     setRecommenedPosts([]);
     setNextPageToken('');
   };
@@ -313,9 +319,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       setOpen(true);
       window.history.pushState(
-        postParsed.postUuid,
+        {
+          postId: postParsed.postUuid,
+        },
         'Post',
-        `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
+        `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+      );
     }
 
     return () => {
@@ -358,7 +367,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     const verify = () => {
       if (!isBrowser()) return;
 
-      const postId = new URL(window.location.href).searchParams.get('post');
+      const postId = new URL(window.location.href).searchParams.get('post') || window?.history?.state?.postId;
 
       if (innerHistoryStack.current && innerHistoryStack.current[innerHistoryStack.current.length - 1]) {
         handleOpenAnotherPost?.(innerHistoryStack.current[innerHistoryStack.current.length - 1]);

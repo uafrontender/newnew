@@ -96,7 +96,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {options.length === 0 && !optionsLoading ? (
+        {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
               <img
