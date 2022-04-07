@@ -299,7 +299,7 @@ const Search: NextPage<ISearch> = ({
         categoryRef.current = category;
         sortingRef.current = sorting?.toString();
       } else if (sorting?.toString() !== sortingRef.current) {
-        console.log('Sorting changed')
+        // console.log('Sorting changed')
 
         setCollectionLoaded([]);
         setNextPageToken(undefined);

@@ -8,6 +8,7 @@ import React, {
 import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../atoms/Text';
@@ -127,7 +128,13 @@ export const HeroSection = () => {
   }, []);
 
   return (
-    <SWrapper>
+    <SWrapper
+      layoutId="heroSection"
+      transition={{
+        ease: 'easeInOut',
+        duration: 1,
+      }}
+    >
       <STopWrapper>
         <SHeadline>
           <AnimatedPresence
@@ -209,7 +216,7 @@ export const HeroSection = () => {
 
 export default HeroSection;
 
-const SWrapper = styled.section`
+const SWrapper = styled(motion.section)`
   display: flex;
   margin-bottom: 24px;
   flex-direction: column;
