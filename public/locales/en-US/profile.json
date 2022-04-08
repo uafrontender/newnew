@@ -145,7 +145,7 @@
           },
           "captions": {
             "twoTimesOnly": "Birthdate can be changed 2 times only.",
-            "cannotChange": "You can’t change birthdate."
+            "cannotChange": "You can only change this once"
           },
           "saveBtn": "Save",
           "cancelBtn": "Cancel"
