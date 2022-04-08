@@ -94,7 +94,7 @@ const SContainer = styled(motion.div)`
   padding: 16px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;

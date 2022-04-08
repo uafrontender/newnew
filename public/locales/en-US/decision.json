@@ -27,7 +27,8 @@
     "facebook": "Facebook",
     "instagram": "Instagram",
     "tiktok": "TikTok",
-    "copy": "Copy Link"
+    "copy": "Copy Link",
+    "copied": "Link copied!"
   },
   "PaymentSuccessModal": {
     "title": "Alright! Payment success.",
@@ -216,8 +217,8 @@
         "bidders": "bidders",
         "others": "others",
         "bid": "bid",
-        "supportBtn": "Bid",
-        "raiseBidBtn": "Raise bid",
+        "supportBtn": "Boost",
+        "raiseBidBtn": "Boost bid",
         "placeABidBtn": "Place bid",
         "cancelBtn": "Cancel",
         "moreBtn": "More"

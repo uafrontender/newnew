@@ -132,6 +132,35 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
+
+  // Share
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handleCopyLink = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/${user.userData?.username}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [user.userData?.username]);
+
   // Cached posts
   const [
     postsActivelyBiddingOn, setPostsActivelyBiddingOn,
@@ -606,11 +635,9 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               {user.userData?.nickname}
             </SUsername>
             <SShareDiv>
-              <SShareButton
+              <SUsernameButton
                 view="tertiary"
                 iconOnly
-                withShrink
-                withDim
                 style={{
                   paddingTop: '8px',
                   paddingBottom: '8px',
@@ -627,7 +654,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                     ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring((user.userData?.username.length || 0) - 3)}`
                     : user.userData?.username}
                 </SUsernameButtonText>
-              </SShareButton>
+              </SUsernameButton>
               <SShareButton
                 view="tertiary"
                 iconOnly
@@ -636,15 +663,13 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                 style={{
                   padding: '8px',
                 }}
-                onClick={() => {
-                }}
+                onClick={() => handleCopyLink()}
               >
-                <InlineSvg
-                  svg={ShareIconFilled}
-                  fill={theme.colorsThemed.text.primary}
-                  width="20px"
-                  height="20px"
-                />
+                {isCopiedUrl ? (
+                  t('ProfileLayout.buttons.copied')
+                ): (
+                  <InlineSvg svg={ShareIconFilled} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                )}
               </SShareButton>
             </SShareDiv>
             {user.userData?.bio ? (
@@ -763,12 +788,11 @@ const SShareDiv = styled.div`
   margin-bottom: 16px;
 `;
 
-const SShareButton = styled(Button)`
-  &:focus:enabled {
-    background: ${({
-    theme,
-    view,
-  }) => theme.colorsThemed.button.background[view!!]};
+const SUsernameButton = styled(Button)`
+  cursor: default;
+
+  &:active:enabled, &:hover:enabled, &:focus:enabled {
+    background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
 `;
 
@@ -777,6 +801,15 @@ const SUsernameButtonText = styled(Text)`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+`;
+
+const SShareButton = styled(Button)`
+  span {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
 `;
 
 const SBioText = styled(Text)`
