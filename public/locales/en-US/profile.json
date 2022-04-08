@@ -42,7 +42,8 @@
     "buttons": {
       "favorites": "Favorites",
       "more": "More",
-      "sendMessage": "Send message"
+      "sendMessage": "Send message",
+      "copied": "Link copied!"
     }
   },
   "EditProfileMenu": {

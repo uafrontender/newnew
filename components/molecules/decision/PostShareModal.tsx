@@ -121,19 +121,19 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = ({
             {/* <SSocials>
               {socialButtons.map(renderItem)}
             </SSocials> */}
-                      <SItem>
-            <SItemButtonWide
-              type="copy"
-              onClick={() => handlerCopy()}
-            >
-              <InlineSvg
-                svg={SOCIAL_ICONS.copy as string}
-                width="24px"
-                height="24px"
-              />
-              {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
-            </SItemButtonWide>
-          </SItem>
+            <SItem>
+              <SItemButtonWide
+                type="copy"
+                onClick={() => handlerCopy()}
+              >
+                <InlineSvg
+                  svg={SOCIAL_ICONS.copy as string}
+                  width="24px"
+                  height="24px"
+                />
+                {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
+              </SItemButtonWide>
+            </SItem>
           </SSocialsSection>
         </SContentContainer>
         <Button
