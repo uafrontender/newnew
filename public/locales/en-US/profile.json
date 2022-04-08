@@ -59,7 +59,7 @@
         "changeCoverImage": "Change cover image"
       },
       "nickname": {
-        "placeholder": "Nickname",
+        "placeholder": "Display name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Name is too long",
@@ -71,7 +71,8 @@
       },
       "username": {
         "placeholder": "@username",
-        "frequencyCaption": "Username can be changed once a month.",
+        "frequencyCaption": "{{domain}}{{username}}",
+        "cannotBeChangedCaption": "Username can be changed once a month.",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Username is too long",
