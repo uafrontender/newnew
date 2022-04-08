@@ -151,6 +151,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
           {/* Share menu */}
           {!isMobile && (
             <PostShareMenu
+              postId={postId}
               isVisible={shareMenuOpen}
               handleClose={handleCloseShareMenu}
             />
@@ -159,6 +160,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
             <PostShareModal
               isOpen={shareMenuOpen}
               zIndex={11}
+              postId={postId}
               onClose={handleCloseShareMenu}
             />
           ) : null}

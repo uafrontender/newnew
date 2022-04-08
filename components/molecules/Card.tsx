@@ -346,7 +346,7 @@ export const Card: React.FC<ICard> = ({
               : postParsed.creator?.nickname
             ) : (
               postParsed.creator?.nickname && postParsed.creator?.nickname?.length > 7
-              ? `${postParsed.creator?.nickname?.substring(0, 7)}...`
+              ? `${postParsed.creator?.nickname?.substring(0, 6)}...`
               : postParsed.creator?.nickname
             )
           }
