@@ -27,7 +27,8 @@
     "facebook": "Facebook",
     "instagram": "Instagram",
     "tiktok": "TikTok",
-    "copy": "Copy Link"
+    "copy": "Copy Link",
+    "copied": "Link copied!"
   },
   "PaymentSuccessModal": {
     "title": "Alright! Payment success.",
