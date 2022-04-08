@@ -28,6 +28,16 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [focused, setFocused] = useState(false);
 
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = (value as string).length > 0
+      ? e.target.value
+        .slice(1)
+      : e.target.value;
+
+    // @ts-ignore
+    onChange(newValue || '');
+  };
+
   useEffect(() => {
     if (focused) return;
     if (isValid) setErrorBordersShown(false);
@@ -36,10 +46,10 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   return (
     <SWrapper>
       <SUsernameInput
-        value={value}
+        value={(value as string).length > 0 ? `@${value}` : value}
         disabled={disabled}
         errorBordersShown={errorBordersShown}
-        onChange={onChange}
+        onChange={handleOnChange}
         onBlur={() => {
           setIsPopupVisible(false);
           setFocused(false);

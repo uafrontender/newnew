@@ -234,6 +234,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               (ref as Function)(node);
             }}
             readOnly
+            disabled={props.disabled}
             inputMode="numeric"
             value={inputData}
             onChange={handleChange}
@@ -247,7 +248,8 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           />
           <CalendarButton
             type="button"
-            onClick={props.onClick as any}
+            disabled={props.disabled}
+            onClick={props.disabled ? () => {} : (props.onClick as any)}
           >
             <InlineSvg
               svg={CalendarIcon}
@@ -290,7 +292,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           formatWeekDay={(d) => d[0].toUpperCase()}
           // Custom render elements
           renderCustomHeader={handleRenderCustomHeader}
-          customInput={<CustomInputForwardRef />}
+          customInput={<CustomInputForwardRef disabled={disabled} />}
           // Calendar
           popperPlacement="top-end"
           popperModifiers={[
@@ -403,6 +405,10 @@ const CalendarButton = styled.button`
   border: none;
 
   cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
 
   &:focus:enabled, &:hover:enabled {
     outline: none;

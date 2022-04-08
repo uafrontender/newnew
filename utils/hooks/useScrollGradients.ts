@@ -21,7 +21,7 @@ export const useScrollGradients = (ref: any, reverse: boolean = false) => {
         setShowBottomGradient(scrollY !== 0);
       } else {
         setShowTopGradient(scrollY !== 0);
-        setShowBottomGradient(scrollHeight - scrollY !== clientHeight);
+        setShowBottomGradient((scrollHeight - scrollY) - clientHeight > 2);
       }
     };
 
