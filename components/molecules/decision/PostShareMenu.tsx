@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
@@ -24,11 +26,13 @@ const SOCIAL_ICONS: any = {
 };
 
 interface IPostShareMenu {
+  postId: string;
   isVisible: boolean;
   handleClose: () => void;
 }
 
 const PostShareMenu: React.FunctionComponent<IPostShareMenu> = ({
+  postId,
   isVisible,
   handleClose,
 }) => {
@@ -67,6 +71,33 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = ({
     </SItem>
   );
 
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handlerCopy = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/post/${postId}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [postId]);
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -78,18 +109,21 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SSocials>
+          {/* <SSocials>
             {socialButtons.map(renderItem)}
-          </SSocials>
-          <SSeparator />
+          </SSocials> */}
+          {/* <SSeparator /> */}
           <SItem>
-            <SItemButtonWide type="copy">
+            <SItemButtonWide
+              type="copy"
+              onClick={() => handlerCopy()}
+            >
               <InlineSvg
                 svg={SOCIAL_ICONS.copy as string}
                 width="24px"
                 height="24px"
               />
-              {t('socials.copy')}
+              {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
             </SItemButtonWide>
           </SItem>
         </SContainer>
@@ -106,11 +140,13 @@ const SContainer = styled(motion.div)`
   z-index: 10;
   right: 48px;
   max-width: 260px;
+  min-width: 260px;
 
-  padding: 16px;
+  /* padding: 16px; */
+  padding: 12px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 48px;
@@ -175,4 +211,5 @@ const SItemButtonWide = styled.div<ISItemButton>`
   line-height: 24px;
 
   color: #FFFFFF;
+  cursor: pointer;
 `;

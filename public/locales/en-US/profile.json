@@ -42,7 +42,8 @@
     "buttons": {
       "favorites": "Favorites",
       "more": "More",
-      "sendMessage": "Send message"
+      "sendMessage": "Send message",
+      "copied": "Link copied!"
     }
   },
   "EditProfileMenu": {
@@ -59,7 +60,7 @@
         "changeCoverImage": "Change cover image"
       },
       "nickname": {
-        "placeholder": "Nickname",
+        "placeholder": "Display name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Name is too long",
@@ -71,7 +72,8 @@
       },
       "username": {
         "placeholder": "@username",
-        "frequencyCaption": "Username can be changed once a month.",
+        "frequencyCaption": "{{domain}}{{username}}",
+        "cannotBeChangedCaption": "Username can be changed once a month.",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Username is too long",
@@ -144,7 +146,7 @@
           },
           "captions": {
             "twoTimesOnly": "Birthdate can be changed 2 times only.",
-            "cannotChange": "You can’t change birthdate."
+            "cannotChange": "You can only change this once"
           },
           "saveBtn": "Save",
           "cancelBtn": "Cancel"

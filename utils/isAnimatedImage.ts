@@ -1,16 +1,10 @@
 /* eslint-disable no-plusplus */
 const imgExtenstions = [
-  '.jpg',
-  '.JPG',
-  '.png',
-  '.PNG',
-  '.jpeg',
-  '.JPEG',
   '.webp',
-  '.WEBP'
+  '.WEBP',
 ];
 
-const isImage = (name: string) => {
+const isAnimatedImage = (name: string) => {
   let result = false;
   if (!name) return result;
   for (let i = 0; i < imgExtenstions.length; i++) {
@@ -23,4 +17,4 @@ const isImage = (name: string) => {
   return result;
 };
 
-export default isImage;
+export default isAnimatedImage;

@@ -19,6 +19,15 @@ export const validateUsernameTextField = (payload: newnewapi.ValidateUsernameReq
     payload
   );
 
+export const getMe = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetMeResponse>(
+    newnewapi.EmptyRequest,
+    newnewapi.GetMeResponse,
+    `${BASE_URL_USER}/get_me`,
+    'post',
+    payload
+  );
+
 export const updateMe = (payload: newnewapi.UpdateMeRequest) =>
   fetchProtobufProtectedIntercepted<newnewapi.UpdateMeRequest, newnewapi.UpdateMeResponse>(
     newnewapi.UpdateMeRequest,
