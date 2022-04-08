@@ -3,24 +3,6 @@ import { BASE_URL, fetchProtobufProtectedIntercepted, fetchProtobuf, cookiesInst
 
 export const BASE_URL_CHAT = `${BASE_URL}/chat`;
 
-export const createRoom = (payload: newnewapi.CreateRoomRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.CreateRoomRequest, newnewapi.CreateRoomResponse>(
-    newnewapi.CreateRoomRequest,
-    newnewapi.CreateRoomResponse,
-    `${BASE_URL_CHAT}/create_room`,
-    'post',
-    payload
-  );
-
-export const deleteMyRoom = (payload: newnewapi.DeleteMyRoomRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.DeleteMyRoomRequest, newnewapi.EmptyResponse>(
-    newnewapi.DeleteMyRoomRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_CHAT}/delete_room`,
-    'post',
-    payload
-  );
-
 export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
   fetchProtobufProtectedIntercepted<newnewapi.MarkRoomAsReadRequest, newnewapi.EmptyResponse>(
     newnewapi.MarkRoomAsReadRequest,
