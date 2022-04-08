@@ -216,8 +216,8 @@
         "bidders": "bidders",
         "others": "others",
         "bid": "bid",
-        "supportBtn": "Bid",
-        "raiseBidBtn": "Raise bid",
+        "supportBtn": "Boost",
+        "raiseBidBtn": "Boost bid",
         "placeABidBtn": "Place bid",
         "cancelBtn": "Cancel",
         "moreBtn": "More"

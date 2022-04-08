@@ -22,6 +22,7 @@ import Button from '../../../atoms/Button';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
+import PaymentSuccessModal from '../PaymentSuccessModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
 import { formatNumber } from '../../../../utils/format';
@@ -31,10 +32,7 @@ import { formatNumber } from '../../../../utils/format';
 // import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
 
 // Icons
-import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
-// import CoinIcon from '../../../../public/images/decision/coin-mock.png';
 import AcIcon from '../../../../public/images/creation/AC-static.png';
-import PaymentSuccessModal from '../PaymentSuccessModal';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -240,7 +238,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
 
   return (
-    <motion.div
+    <div
       key={index}
       style={{
         display: 'flex',
@@ -327,7 +325,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         {(optionBeingSupported && !disabled) || !votingAllowed ? null : (
           isMobile ? (
             <SSupportButton view="quaternary" disabled={disabled} onClick={() => handleOpenSupportForm()}>
-              <img draggable={false} src={SupportOptionIcon.src} alt={t('AcPost.OptionsTab.OptionCard.supportBtn')} />
               <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
             </SSupportButton>
           ) : (
@@ -433,7 +430,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       </PaymentSuccessModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-    </motion.div>
+    </div>
   );
 };
 

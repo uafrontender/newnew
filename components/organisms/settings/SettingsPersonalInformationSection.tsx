@@ -88,7 +88,11 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         }
 
         dispatch(setUserData({
-          dateOfBirth: updateDateResponse.data.me?.dateOfBirth,
+          dateOfBirth: {
+            day: updateDateResponse.data.me?.dateOfBirth?.day,
+            month: updateDateResponse.data.me?.dateOfBirth?.month,
+            year: updateDateResponse.data.me?.dateOfBirth?.year,
+          },
         }));
       }
 
