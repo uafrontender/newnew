@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -17,21 +12,19 @@ import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import searchIcon from '../../public/images/svg/icons/outlined/Search.svg';
+import TopDecisionsResults from './TopDecisionsResults';
+import PopularCreatorsResults from './PopularCreatorsResults';
+import Button from './Button';
 
-interface ISearchInput {
-}
-
-export const SearchInput: React.FC<ISearchInput> = () => {
+export const SearchInput: React.FC = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
   const inputContainerRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
   const [inputRightPosition, setInputRightPosition] = useState(0);
-  const {
-    resizeMode,
-    globalSearchActive,
-  } = useAppSelector((state) => state.ui);
+  const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
+  const { resizeMode, globalSearchActive } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -42,7 +35,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
     setSearchValue('');
     dispatch(setGlobalSearchActive(false));
   };
-  const handleInoutChange = (e: any) => {
+  const handleInputChange = (e: any) => {
     setSearchValue(e.target.value);
   };
   const handleKeyDown = (e: any) => {
@@ -50,8 +43,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
       handleSearchClose();
     }
   };
-  const handleSubmit = () => {
-  };
+  const handleSubmit = () => {};
   const handleCloseIconClick = () => {
     if (searchValue) {
       setSearchValue('');
@@ -80,10 +72,13 @@ export const SearchInput: React.FC<ISearchInput> = () => {
       }
     }, 1000);
   }, [globalSearchActive]);
+
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       // eslint-disable-next-line max-len
-      setInputRightPosition(-(window.innerWidth - (inputContainerRef.current?.getBoundingClientRect()?.right || 0) - (isMobile ? 16 : 32)));
+      setInputRightPosition(
+        -(window.innerWidth - (inputContainerRef.current?.getBoundingClientRect()?.right || 0) - (isMobile ? 16 : 32))
+      );
     });
 
     resizeObserver.observe(document.body);
@@ -92,6 +87,14 @@ export const SearchInput: React.FC<ISearchInput> = () => {
       resizeObserver.disconnect();
     };
   }, [isMobile]);
+
+  useEffect(() => {
+    if (searchValue) {
+      setIsResultsDropVisible(true);
+    } else {
+      setIsResultsDropVisible(false);
+    }
+  }, [searchValue]);
 
   return (
     <SContainer ref={inputContainerRef}>
@@ -111,7 +114,7 @@ export const SearchInput: React.FC<ISearchInput> = () => {
         <SInput
           ref={inputRef}
           value={searchValue}
-          onChange={handleInoutChange}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Titles, genres, people"
         />
@@ -124,6 +127,13 @@ export const SearchInput: React.FC<ISearchInput> = () => {
           onClick={handleCloseIconClick}
         />
       </SInputWrapper>
+      {isResultsDropVisible && (
+        <SResultsDrop>
+          <TopDecisionsResults keyword={searchValue} />
+          <PopularCreatorsResults keyword={searchValue} />
+          <SButton view="quaternary">All results</SButton>
+        </SResultsDrop>
+      )}
     </SContainer>
   );
 };
@@ -142,6 +152,31 @@ const SContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     width: 48px;
     height: 48px;
+  }
+`;
+
+const SResultsDrop = styled.div`
+  border-radius: 16px;
+  padding: 16px;
+  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  position: absolute;
+  right: 0;
+  width: 420px;
+  margin-top: 0;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+    padding: 16px 48px;
+    top: 64px;
+  }
+
+  ${({ theme }) => theme.media.mobile} {
+    position: fixed;
+    border-radius: 0;
+    width: 100vw;
+    height: 100vh;
+    top: 56px;
+    padding: 16px;
   }
 `;
 
@@ -168,18 +203,21 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   border-radius: 12px;
   flex-direction: row;
   justify-content: space-between;
+  z-index: 200;
 
-  ${(props) => !props.active && css`
-    cursor: pointer;
-    background: ${(props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary)};
+  ${(props) =>
+    !props.active &&
+    css`
+      cursor: pointer;
+      background: ${props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary};
 
-    :hover {
-      background: ${(props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary)};
-    }
-  `}
+      /* :hover {
+        background: ${props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary};
+      } */
+    `}
 
   ${({ theme }) => theme.media.tablet} {
-    width: ${(props) => (props.active ? 'calc(100vw - 64px)' : '48px')};
+    width: ${(props) => (props.active ? 'calc(100vw - 60px)' : '48px')};
     padding: 10.5px;
     border-radius: 16px;
   }
@@ -188,11 +226,11 @@ const SInputWrapper = styled.div<ISInputWrapper>`
     right: 0;
     width: ${(props) => (props.active ? '420px' : '48px')};
 
-    background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary)};
+    background: '#E5E5E5';
 
-    :hover {
+    /* :hover {
       background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary)};
-    }
+    } */
   }
 `;
 
@@ -230,4 +268,9 @@ const SRightInlineSVG = styled(InlineSVG)`
     min-width: 24px;
     min-height: 24px;
   }
+`;
+
+const SButton = styled(Button)`
+  display: block;
+  width: 100%;
 `;
