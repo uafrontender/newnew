@@ -39,6 +39,10 @@ import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 
+// Hotjar variables
+const HOTJAR_ID = parseInt(process.env.NEXT_PUBLIC_HOTJAR_ID!!, 10);
+const HOTJAR_SV = parseInt(process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION!!, 10);
+
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -77,7 +81,7 @@ const MyApp = (props: IMyApp): ReactElement => {
   };
 
   useEffect(() => {
-    hotjar.initialize(2915791, 6);
+    hotjar.initialize(HOTJAR_ID, HOTJAR_SV);
   }, []);
 
   store.dispatch(setResizeMode(getInitialResizeMode()));
