@@ -3,7 +3,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useContext, useEffect, useMemo, useRef, useState,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -21,7 +26,11 @@ import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import useScrollGradients from '../../../utils/hooks/useScrollGradients';
-import { deleteMessage, getMessages, sendMessage } from '../../../api/endpoints/chat';
+import {
+  deleteMessage,
+  getMessages,
+  sendMessage,
+} from '../../../api/endpoints/chat';
 import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 
 import NoContentYetImg from '../../../public/images/decision/no-content-yet-mock.png';
@@ -46,13 +55,14 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Comment from URL
-  const {
-    commentIdFromUrl,
-    handleResetCommentIdFromUrl,
-  } = useContext(CommentFromUrlContext);
+  const { commentIdFromUrl, handleResetCommentIdFromUrl } = useContext(
+    CommentFromUrlContext
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -63,10 +73,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
 
   // Submit form ref
   const commentFormRef = useRef<HTMLFormElement>();
@@ -74,12 +81,13 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   // Comments
   const [comments, setComments] = useState<TCommentWithReplies[]>([]);
-  const [commentsNextPageToken, setCommentsNextPageToken] = useState<string | undefined | null>('');
+  const [commentsNextPageToken, setCommentsNextPageToken] =
+    useState<string | undefined | null>('');
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [loadingCommentsError, setLoadingCommentsError] = useState('');
 
   const processComments = (
-    commentsRaw: Array<newnewapi.ChatMessage | TCommentWithReplies>,
+    commentsRaw: Array<newnewapi.ChatMessage | TCommentWithReplies>
   ): TCommentWithReplies[] => {
     let lastParentId;
     let lastParentIdx;
@@ -88,7 +96,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     const workingArr = [...commentsRaw];
 
     workingArr.forEach((rawItem, i) => {
-      const workingItem = {...rawItem};
+      const workingItem = { ...rawItem };
 
       if (!rawItem.parentId || rawItem.parentId === 0) {
         lastParentId = undefined;
@@ -102,7 +110,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
         if (lastParentIdx !== -1) {
           if (!goalArr[lastParentIdx].replies) {
-            goalArr[lastParentIdx].replies = []
+            goalArr[lastParentIdx].replies = [];
           }
 
           // @ts-ignore
@@ -127,20 +135,24 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
           roomId: commentsRoomId,
           ...(pageToken
             ? {
-              paging: {
-                pageToken,
-              },
-            }
+                paging: {
+                  pageToken,
+                },
+              }
             : {}),
         });
 
         const res = await getMessages(getCommentsPayload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data && res.data.messages) {
           setComments((curr) => {
-            const workingArr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
+            const workingArr = [
+              ...curr,
+              ...(res.data?.messages as newnewapi.ChatMessage[]),
+            ];
 
             return processComments(workingArr);
           });
@@ -159,99 +171,127 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     [commentsLoading, commentsRoomId]
   );
 
-  const handleAddComment = useCallback(async (content: string, parentMsgId?: number) => {
-    try {
-      const payload = new newnewapi.SendMessageRequest({
-        roomId: commentsRoomId,
-        content: {
-          text: content,
-        },
-        ...(parentMsgId ? {
-          parentMessageId: parentMsgId,
-        } : {}),
-      });
+  const handleAddComment = useCallback(
+    async (content: string, parentMsgId?: number) => {
+      try {
+        const payload = new newnewapi.SendMessageRequest({
+          roomId: commentsRoomId,
+          content: {
+            text: content,
+          },
+          ...(parentMsgId
+            ? {
+                parentMessageId: parentMsgId,
+              }
+            : {}),
+        });
 
-      const res = await sendMessage(payload);
+        const res = await sendMessage(payload);
 
-      if (res.data?.message) {
-        setComments((curr) => {
-          const workingArr = [...curr];
+        if (res.data?.message) {
+          setComments((curr) => {
+            const workingArr = [...curr];
 
-          if (res.data?.message?.parentId && res.data?.message?.parentId !== 0) {
-            const parentMsgIdx = workingArr.findIndex((msg) => msg.id === res.data?.message?.parentId);
+            if (
+              res.data?.message?.parentId &&
+              res.data?.message?.parentId !== 0
+            ) {
+              const parentMsgIdx = workingArr.findIndex(
+                (msg) => msg.id === res.data?.message?.parentId
+              );
 
-            if (parentMsgIdx === -1 || !workingArr[parentMsgIdx]) return workingArr;
+              if (parentMsgIdx === -1 || !workingArr[parentMsgIdx])
+                return workingArr;
 
-            if (workingArr[parentMsgIdx].replies && Array.isArray(workingArr[parentMsgIdx].replies)) {
-              workingArr[parentMsgIdx].replies!!.push(res.data.message as newnewapi.ChatMessage);
+              if (
+                workingArr[parentMsgIdx].replies &&
+                Array.isArray(workingArr[parentMsgIdx].replies)
+              ) {
+                workingArr[parentMsgIdx].replies!!.push(
+                  res.data.message as newnewapi.ChatMessage
+                );
+                return workingArr;
+              }
+
+              workingArr[parentMsgIdx].replies = [
+                res.data.message as newnewapi.ChatMessage,
+              ];
               return workingArr;
             }
-
-            workingArr[parentMsgIdx].replies = [(res.data.message as newnewapi.ChatMessage)];
-            return workingArr;
-          }
-          return [res.data?.message, ...curr] as TCommentWithReplies[];
-        });
+            return [res.data?.message, ...curr] as TCommentWithReplies[];
+          });
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [commentsRoomId]);
+    },
+    [commentsRoomId]
+  );
 
-  const markCommentAsDeleted = useCallback((comment: TCommentWithReplies) => {
-    setComments((curr) => {
-      const workingArr = [...curr];
+  const markCommentAsDeleted = useCallback(
+    (comment: TCommentWithReplies) => {
+      setComments((curr) => {
+        const workingArr = [...curr];
 
-      if (!comment.parentId || comment.parentId === 0) {
-        const commentIdx = workingArr.findIndex((c) => c.id === comment.id);
+        if (!comment.parentId || comment.parentId === 0) {
+          const commentIdx = workingArr.findIndex((c) => c.id === comment.id);
+          if (commentIdx === -1) return workingArr;
+          workingArr[commentIdx].isDeleted = true;
+          workingArr[commentIdx].content!!.text = '';
+          return workingArr;
+        }
+
+        const parentIdx = workingArr.findIndex(
+          (c) => c.id === comment.parentId
+        );
+
+        if (parentIdx === -1) return workingArr;
+
+        const commentIdx = workingArr[parentIdx].replies?.findIndex(
+          (c) => c.id === comment.id
+        );
+
         if (commentIdx === -1) return workingArr;
-        workingArr[commentIdx].isDeleted = true;
-        workingArr[commentIdx].content!!.text = '';
+
+        workingArr[parentIdx].replies!![commentIdx!!].isDeleted = true;
+        workingArr[parentIdx].replies!![commentIdx!!].content!!.text = '';
+
         return workingArr;
-      }
-
-      const parentIdx = workingArr.findIndex((c) => c.id === comment.parentId);
-
-      if (parentIdx === -1) return workingArr;
-
-      const commentIdx = workingArr[parentIdx].replies?.findIndex((c) => c.id === comment.id);
-
-      if (commentIdx === -1) return workingArr;
-
-      workingArr[parentIdx].replies!![commentIdx!!].isDeleted = true;
-      workingArr[parentIdx].replies!![commentIdx!!].content!!.text = '';
-
-      return workingArr;
-    });
-  }, [setComments]);
-
-  const handleDeleteComment = useCallback(async (comment: TCommentWithReplies) => {
-    try {
-      const payload = new newnewapi.DeleteMessageRequest({
-        messageId: comment.id,
       });
+    },
+    [setComments]
+  );
 
-      const res = await deleteMessage(payload);
+  const handleDeleteComment = useCallback(
+    async (comment: TCommentWithReplies) => {
+      try {
+        const payload = new newnewapi.DeleteMessageRequest({
+          messageId: comment.id,
+        });
 
-      if (!res.error) {
-        markCommentAsDeleted(comment);
+        const res = await deleteMessage(payload);
+
+        if (!res.error) {
+          markCommentAsDeleted(comment);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [markCommentAsDeleted]);
+    },
+    [markCommentAsDeleted]
+  );
 
   useEffect(() => {
     fetchComments();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (inView && !commentsLoading && commentsNextPageToken) {
       // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
       fetchComments(commentsNextPageToken);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, commentsNextPageToken, commentsLoading]);
 
   useEffect(() => {
@@ -270,14 +310,16 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
       if (decoded.newMessage!!.sender?.uuid!! !== user.userData?.userUuid) {
-
         setComments((curr) => {
           const workingArr = [...curr];
 
           if (decoded.newMessage?.parentId && decoded.newMessage !== 0) {
-            const parentMsgIdx = workingArr.findIndex((msg) => msg.id === decoded.newMessage?.parentId);
+            const parentMsgIdx = workingArr.findIndex(
+              (msg) => msg.id === decoded.newMessage?.parentId
+            );
 
-            if (parentMsgIdx === -1 || !workingArr[parentMsgIdx]) return workingArr;
+            if (parentMsgIdx === -1 || !workingArr[parentMsgIdx])
+              return workingArr;
 
             if (!workingArr[parentMsgIdx].replies) {
               workingArr[parentMsgIdx].replies = [];
@@ -287,13 +329,16 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             const workingSubarr = [...workingArr[parentMsgIdx].replies];
 
             // NB! Fix
-            workingArr[parentMsgIdx].replies = [(decoded.newMessage as newnewapi.ChatMessage), ...workingSubarr];
+            workingArr[parentMsgIdx].replies = [
+              decoded.newMessage as newnewapi.ChatMessage,
+              ...workingSubarr,
+            ];
 
             return workingArr;
           }
 
           return [decoded.newMessage, ...workingArr] as TCommentWithReplies[];
-        })
+        });
       }
     };
 
@@ -323,7 +368,8 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   useEffect(
     () => () => {
       if (commentsRoomId) {
-        if (commentsRoomId) removeChannel(`comments_${commentsRoomId.toString()}`);
+        if (commentsRoomId)
+          removeChannel(`comments_${commentsRoomId.toString()}`);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -333,7 +379,8 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entry) => {
       const size = entry[0]?.borderBoxSize
-        ? entry[0]?.borderBoxSize[0]?.blockSize : entry[0]?.contentRect.height;
+        ? entry[0]?.borderBoxSize[0]?.blockSize
+        : entry[0]?.contentRect.height;
       if (size) {
         setHeightDelta(size);
       }
@@ -342,41 +389,57 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     if (commentFormRef.current) {
       resizeObserver.observe(commentFormRef.current!!);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (commentIdFromUrl && !isMobile) {
       const flat: TCommentWithReplies[] = [];
       for (let i = 0; i < comments.length; i++) {
-        if (comments[i].replies && Array.isArray(comments[i].replies) && comments[i].replies!!.length > 0) {
-          flat.push(...[comments[i], ...comments[i].replies!!])
+        if (
+          comments[i].replies &&
+          Array.isArray(comments[i].replies) &&
+          comments[i].replies!!.length > 0
+        ) {
+          flat.push(...[comments[i], ...comments[i].replies!!]);
         }
         flat.push(comments[i]);
       }
 
-      const idx = flat.findIndex((comment) => comment.id === parseInt(commentIdFromUrl, 10))
+      const idx = flat.findIndex(
+        (comment) => comment.id === parseInt(commentIdFromUrl)
+      );
 
       if (idx === -1) {
         // console.log('Looking further');
         scrollRef.current?.scrollBy({
           top: scrollRef.current.scrollHeight,
-        })
+        });
       } else {
         // console.log('Found the comment');
 
         if (!flat[idx].parentId || flat[idx].parentId === 0) {
-          const offset = (scrollRef.current?.childNodes[1].childNodes[idx] as HTMLDivElement).offsetTop
+          const offset = (
+            scrollRef.current?.childNodes[1].childNodes[idx] as HTMLDivElement
+          ).offsetTop;
 
           scrollRef.current?.scrollTo({
             top: offset,
           });
-          document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+          document
+            ?.getElementById(`comment_id_${flat[idx].id}`)
+            ?.classList.add('opened-flash');
         } else if (flat[idx].parentId) {
-          const parentIdx = comments.findIndex((c) => c.id === flat[idx].parentId);
+          const parentIdx = comments.findIndex(
+            (c) => c.id === flat[idx].parentId
+          );
 
           if (parentIdx !== -1) {
-            const offsetTopParent = (scrollRef.current?.childNodes[1].childNodes[parentIdx] as HTMLDivElement).offsetTop
+            const offsetTopParent = (
+              scrollRef.current?.childNodes[1].childNodes[
+                parentIdx
+              ] as HTMLDivElement
+            ).offsetTop;
             setComments((curr) => {
               const working = [...curr];
               working[parentIdx].isOpen = true;
@@ -384,11 +447,15 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             });
 
             setTimeout(() => {
-              document?.getElementById(`comment_id_${flat[idx].id}`)?.scrollIntoView({
-                block: "end",
-                inline: "nearest"
-              })
-              document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+              document
+                ?.getElementById(`comment_id_${flat[idx].id}`)
+                ?.scrollIntoView({
+                  block: 'end',
+                  inline: 'nearest',
+                });
+              document
+                ?.getElementById(`comment_id_${flat[idx].id}`)
+                ?.classList.add('opened-flash');
             }, 100);
           }
         }
@@ -396,7 +463,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         handleResetCommentIdFromUrl?.();
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, comments, isMobile]);
 
   return (
@@ -421,47 +488,50 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
           <SCommentsWrapper>
-          {comments.length === 0 && !commentsLoading ? (
-            <SNoCommentsYet>
-              <SNoCommentsImgContainer>
-                <img
-                  src={NoContentYetImg.src}
-                  alt='No content yet'
-                />
-              </SNoCommentsImgContainer>
-              <SNoCommentsCaption
-                variant={3}
-              >
-                { t('comments.noCommentsCaption') }
-              </SNoCommentsCaption>
-              {!isMobile && (
-                <SMakeBidArrowSvg
-                  svg={MakeFirstBidArrow}
-                  fill={theme.colorsThemed.background.quinary}
-                  width="36px"
-                />
-              )}
-            </SNoCommentsYet>
-          ) : null}
-            {!isMobile && comments && comments.map((item, index) => {
-              return (
-                <Comment
-                  key={(item.id).toString()}
-                  canDeleteComment={canDeleteComments}
-                  lastChild={index === comments.length - 1 || (isMobile && index === 2)}
-                  comment={item}
-                  handleAddComment={(newMsg: string) => handleAddComment(newMsg, item.id as number)}
-                  handleDeleteComment={handleDeleteComment}
-                />
-              );
-            })}
+            {comments.length === 0 && !commentsLoading ? (
+              <SNoCommentsYet>
+                <SNoCommentsImgContainer>
+                  <img src={NoContentYetImg.src} alt="No content yet" />
+                </SNoCommentsImgContainer>
+                <SNoCommentsCaption variant={3}>
+                  {t('comments.noCommentsCaption')}
+                </SNoCommentsCaption>
+                {!isMobile && (
+                  <SMakeBidArrowSvg
+                    svg={MakeFirstBidArrow}
+                    fill={theme.colorsThemed.background.quinary}
+                    width="36px"
+                  />
+                )}
+              </SNoCommentsYet>
+            ) : null}
+            {!isMobile &&
+              comments &&
+              comments.map((item, index) => {
+                return (
+                  <Comment
+                    key={item.id.toString()}
+                    canDeleteComment={canDeleteComments}
+                    lastChild={
+                      index === comments.length - 1 || (isMobile && index === 2)
+                    }
+                    comment={item}
+                    handleAddComment={(newMsg: string) =>
+                      handleAddComment(newMsg, item.id as number)
+                    }
+                    handleDeleteComment={handleDeleteComment}
+                  />
+                );
+              })}
             {!isMobile && (
               <SLoaderDiv
                 ref={loadingRef}
                 style={{
-                  ...(commentsLoading ? {
-                    display: 'none'
-                  } : {}),
+                  ...(commentsLoading
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
                 }}
               />
             )}
@@ -484,7 +554,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             )}
           </SCommentsWrapper>
         </SActionSection>
-        <GradientMask gradientType="secondary" positionTop={heightDelta} active={showTopGradient} />
+        <GradientMask
+          gradientType="secondary"
+          positionTop={heightDelta}
+          active={showTopGradient}
+        />
         <GradientMask gradientType="secondary" active={showBottomGradient} />
       </STabContainer>
     </>
@@ -524,12 +598,12 @@ const SActionSection = styled.div`
   &::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 4px;
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
   &::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 4px;
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
 
   &:hover {
@@ -609,5 +683,4 @@ const SMakeBidArrowSvg = styled(InlineSvg)`
   top: -56px;
 
   transform: scale(1, -1);
-
 `;
