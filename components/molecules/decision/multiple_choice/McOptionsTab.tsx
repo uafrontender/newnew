@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -31,6 +31,7 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import McOptionCardDoubleVote from './McOptionCardDoubleVote';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
+import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -65,6 +66,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
+  const { walletBalance } = useContext(WalletContext);
 
   const hasVotedOptionId = useMemo(() => {
     const supportedOption = options.find((o) => o.isSupportedByMe);
@@ -508,6 +511,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           zIndex={12}
           amount={`$${parseInt(newBidAmount, 10) * 1}`}
           showTocApply={!user?.loggedIn}
+          {...{
+            ...(walletBalance && walletBalance?.usdCents < (parseInt(newBidAmount, 10) * 100) ? {
+              predefinedOption: 'card',
+            } : {}),
+          }}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}

@@ -38,6 +38,7 @@ import FollowingsContextProvider from '../contexts/followingContext';
 import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
+import SyncUserWrapper from '../contexts/syncUserWrapper';
 
 // Hotjar variables
 const HOTJAR_ID = parseInt(process.env.NEXT_PUBLIC_HOTJAR_ID!!, 10);
@@ -102,37 +103,34 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider cookies={cookiesInstance}>
         <SocketContextProvider>
           <ChannelsContextProvider>
-            <PersistGate
-              loading={null}
-              persistor={(store as EnhancedStoreWithPersistor).__persistor}
-            >
-              <BlockedUsersProvider>
-                <FollowingsContextProvider>
-                  <WalletContextProvider>
-                    <SubscriptionsProvider>
-                      <ChatsProvider>
-                        <ResizeMode>
-                          <GlobalTheme>
-                            <div>
-                              <ToastContainer />
-                              {!pageProps.error ? (
-                                getLayout(<Component {...pageProps} />)
-                              ) : (
-                                <Error
-                                  errorMsg={pageProps.error?.message}
-                                  statusCode={
-                                    pageProps.error?.statusCode ?? 500
-                                  }
-                                />
-                              )}
-                            </div>
-                          </GlobalTheme>
-                        </ResizeMode>
-                      </ChatsProvider>
-                    </SubscriptionsProvider>
-                  </WalletContextProvider>
-                </FollowingsContextProvider>
-              </BlockedUsersProvider>
+            <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
+              <SyncUserWrapper>
+                <BlockedUsersProvider>
+                  <FollowingsContextProvider>
+                    <WalletContextProvider>
+                      <SubscriptionsProvider>
+                        <ChatsProvider>
+                          <ResizeMode>
+                            <GlobalTheme>
+                              <div>
+                                <ToastContainer />
+                                {!pageProps.error ? (
+                                  getLayout(<Component {...pageProps} />)
+                                ) : (
+                                  <Error
+                                    errorMsg={pageProps.error?.message}
+                                    statusCode={pageProps.error?.statusCode ?? 500}
+                                  />
+                                )}
+                              </div>
+                            </GlobalTheme>
+                          </ResizeMode>
+                        </ChatsProvider>
+                      </SubscriptionsProvider>
+                    </WalletContextProvider>
+                  </FollowingsContextProvider>
+                </BlockedUsersProvider>
+              </SyncUserWrapper>
             </PersistGate>
           </ChannelsContextProvider>
         </SocketContextProvider>
