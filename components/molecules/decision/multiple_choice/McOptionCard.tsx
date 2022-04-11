@@ -3,9 +3,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback, useMemo, useState,
-} from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -14,7 +12,10 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
+import {
+  createPaymentSession,
+  getTopUpWalletWithPaymentPurposeUrl,
+} from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 
@@ -33,7 +34,7 @@ import McSymbolIcon from '../../../../public/images/decision/mc-option-mock.png'
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
-  creator: newnewapi.IUser,
+  creator: newnewapi.IUser;
   postId: string;
   index: number;
   minAmount: number;
@@ -42,7 +43,9 @@ interface IMcOptionCard {
   optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
   handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
-  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
+  handleAddOrUpdateOptionFromResponse: (
+    newOption: newnewapi.MultipleChoice.Option
+  ) => void;
 }
 
 const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
@@ -63,7 +66,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const isCreatorsBid = useMemo(() => {
     if (!option.creator) return true;
@@ -71,12 +76,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   }, [option.creator]);
   const supporterCountSubstracted = useMemo(() => {
     if (isCreatorsBid) return option.supporterCount;
-    return  option.supporterCount - 1;
+    return option.supporterCount - 1;
   }, [option.supporterCount, isCreatorsBid]);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
-  const disabled = optionBeingSupported !== '' && optionBeingSupported !== option.id.toString();
+  const disabled =
+    optionBeingSupported !== '' &&
+    optionBeingSupported !== option.id.toString();
 
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
@@ -90,11 +97,15 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   // Redirect to user's page
   const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
+    window?.history.replaceState(
+      {
+        fromPost: true,
+      },
+      '',
+      ''
+    );
     router.push(`/${creator?.username}`);
-  }
+  };
 
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -110,64 +121,89 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     try {
       // Check if user is logged in
       if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-          ...(!user.loggedIn ? {
-            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-          } : {}),
-          mcVoteRequest: {
-            votesCount: parseInt(supportBidAmount, 10),
-            optionId: option.id,
-            postUuid: postId,
-          }
-        });
+        const getTopUpWalletWithPaymentPurposeUrlPayload =
+          new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            ...(!user.loggedIn
+              ? {
+                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                }
+              : {}),
+            mcVoteRequest: {
+              votesCount: parseInt(supportBidAmount),
+              optionId: option.id,
+              postUuid: postId,
+            },
+          });
 
-        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(
+          getTopUpWalletWithPaymentPurposeUrlPayload
+        );
 
-        if (!res.data
-          || !res.data.sessionUrl
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         window.location.href = res.data.sessionUrl;
       } else {
         const makeBidPayload = new newnewapi.VoteOnPostRequest({
-          votesCount: parseInt(supportBidAmount, 10),
+          votesCount: parseInt(supportBidAmount),
           optionId: option.id,
           postUuid: postId,
         });
 
         const res = await voteOnPostWithWallet(makeBidPayload);
 
-        if (res.data && res.data.status === newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-            mcVoteRequest: {
-              votesCount: parseInt(supportBidAmount, 10),
-              optionId: option.id,
-              postUuid: postId,
-            }
-          });
+        if (
+          res.data &&
+          res.data.status ===
+            newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
+        ) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload =
+            new newnewapi.TopUpWalletWithPurposeRequest({
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${postId}`,
+              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${postId}`,
+              mcVoteRequest: {
+                votesCount: parseInt(supportBidAmount),
+                optionId: option.id,
+                postUuid: postId,
+              },
+            });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+            getTopUpWalletWithPaymentPurposeUrlPayload
+          );
 
-          if (!resStripeRedirect.data
-            || !resStripeRedirect.data.sessionUrl
-            || resStripeRedirect.error
-          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+          if (
+            !resStripeRedirect.data ||
+            !resStripeRedirect.data.sessionUrl ||
+            resStripeRedirect.error
+          )
+            throw new Error(
+              resStripeRedirect.error?.message ?? 'Request failed'
+            );
 
           window.location.href = resStripeRedirect.data.sessionUrl;
           return;
         }
 
-        if (!res.data
-          || res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
+        if (
+          !res.data ||
+          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+          res.error
+        )
+          throw new Error(res.error?.message ?? 'Request failed');
 
-        const optionFromResponse = (res.data.option as newnewapi.MultipleChoice.Option)!!;
+        const optionFromResponse = (res.data
+          .option as newnewapi.MultipleChoice.Option)!!;
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
@@ -201,25 +237,30 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-        ...(!user.loggedIn ? {
-          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        } : {}),
-        mcVoteRequest: {
-          votesCount: parseInt(supportBidAmount, 10),
-          optionId: option.id,
-          postUuid: postId,
-        }
-      });
+      const createPaymentSessionPayload =
+        new newnewapi.CreatePaymentSessionRequest({
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+            router.locale !== 'en-US' ? `${router.locale}/` : ''
+          }post/${postId}`,
+          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+            router.locale !== 'en-US' ? `${router.locale}/` : ''
+          }post/${postId}`,
+          ...(!user.loggedIn
+            ? {
+                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+              }
+            : {}),
+          mcVoteRequest: {
+            votesCount: parseInt(supportBidAmount),
+            optionId: option.id,
+            postUuid: postId,
+          },
+        });
 
       const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data
-        || !res.data.sessionUrl
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || !res.data.sessionUrl || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       window.location.href = res.data.sessionUrl;
     } catch (err) {
@@ -261,38 +302,23 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       >
         <SBidDetails>
           <SBidAmount>
-            <SOptionSymbolImg
-              src={McSymbolIcon.src}
-            />
+            <SOptionSymbolImg src={McSymbolIcon.src} />
             <div>
-              {
-                option.voteCount && option.voteCount > 0
+              {option.voteCount && option.voteCount > 0
                 ? `${formatNumber(option?.voteCount, true)}`
-                : t('McPost.OptionsTab.OptionCard.noVotes')
-              }
+                : t('McPost.OptionsTab.OptionCard.noVotes')}
             </div>
           </SBidAmount>
-          <SOptionInfo
-            variant={3}
-          >
-            {option.text}
-          </SOptionInfo>
-          <SBiddersInfo
-            variant={3}
-          >
+          <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+          <SBiddersInfo variant={3}>
             {isCreatorsBid ? (
               <>
                 {supporterCountSubstracted > 0 ? (
                   <>
                     <SSpanBiddersHighlighted>
-                      {formatNumber(
-                        supporterCountSubstracted,
-                        true,
-                      )}
-                      { ' ' }
-                      { t('McPost.OptionsTab.OptionCard.voters') }
-                    </SSpanBiddersHighlighted>
-                    {' '}
+                      {formatNumber(supporterCountSubstracted, true)}{' '}
+                      {t('McPost.OptionsTab.OptionCard.voters')}
+                    </SSpanBiddersHighlighted>{' '}
                     <SSpanBiddersRegular>
                       {t('McPost.OptionsTab.OptionCard.voted')}
                     </SSpanBiddersRegular>
@@ -304,44 +330,38 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 <SSpanBiddersHighlighted
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRedirectToOptionCreator()
+                    handleRedirectToOptionCreator();
                   }}
                   style={{
-                    color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
+                    color:
+                      theme.name === 'dark'
+                        ? theme.colorsThemed.accent.yellow
+                        : theme.colors.dark,
                     cursor: 'pointer',
                   }}
                 >
-                  {t('McPost.OptionsTab.OptionCard.subscriber_suggestion',
-                    {
-                      nickname: option.creator?.nickname ?? option.creator?.username
-                    },
-                  )}
+                  {t('McPost.OptionsTab.OptionCard.subscriber_suggestion', {
+                    nickname:
+                      option.creator?.nickname ?? option.creator?.username,
+                  })}
                 </SSpanBiddersHighlighted>
                 {supporterCountSubstracted > 0 ? (
                   <>
-                    { ', ' }
+                    {', '}
                     <SSpanBiddersHighlighted>
-                      {formatNumber(
-                        supporterCountSubstracted,
-                        true,
-                      )}
-                      { ' ' }
+                      {formatNumber(supporterCountSubstracted, true)}{' '}
                       {t('McPost.OptionsTab.OptionCard.voters')}
-                    </SSpanBiddersHighlighted>
-                    {' '}
+                    </SSpanBiddersHighlighted>{' '}
                     <SSpanBiddersRegular>
                       {t('McPost.OptionsTab.OptionCard.voted')}
                     </SSpanBiddersRegular>
                   </>
                 ) : null}
               </>
-            )
-            }
+            )}
           </SBiddersInfo>
         </SBidDetails>
-        {(optionBeingSupported && !disabled) || noAction ? (
-          null
-        ) : (
+        {(optionBeingSupported && !disabled) || noAction ? null : (
           <SSupportButton
             view="quaternary"
             disabled={disabled}
@@ -360,86 +380,94 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   src={SupportOptionIcon.src}
                   alt={t('McPost.OptionsTab.OptionCard.supportBtn')}
                 />
-                <div>
-                  { t('McPost.OptionsTab.OptionCard.supportBtn') }
-                </div>
+                <div>{t('McPost.OptionsTab.OptionCard.supportBtn')}</div>
               </>
             )}
           </SSupportButton>
         )}
       </SContainer>
-      <SSupportBidForm
-        layout
-      >
-      {!isMobile && isSupportFormOpen && (
-        <>
-          <VotesAmountTextInput
-            inputAlign="left"
-            minAmount={minAmount}
-            value={supportBidAmount}
-            widthHardCoded="100%"
-            placeholder={
-              !supportBidAmount || parseInt(supportBidAmount, 10) > 1
-              ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
-              : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
-            }
-            onChange={(newValue: string) => setSupportBidAmount(newValue)}
-          />
-          <Button
-            view="primaryGrad"
-            disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
-            onClick={() => handleTogglePaymentModalOpen()}
-          >
-            { t('McPost.OptionsTab.OptionCard.placeABidBtn') }
-          </Button>
-          <SCancelButton
-            view="secondary"
-            onClick={() => handleCloseSupportForm()}
-          >
-            { t('McPost.OptionsTab.OptionCard.cancelBtn') }
-          </SCancelButton>
-          <SBottomPlaceholder>
-            {
-              !supportBidAmount || parseInt(supportBidAmount, 10) === 1
-              ? `${1} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')} = $ ${1 * votePrice}`
-              : `${supportBidAmount} ${t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')} = $ ${parseInt(supportBidAmount, 10) * votePrice}`
-            }
-          </SBottomPlaceholder>
-        </>
-      )}
-      {isMobile ? (
-        <OptionActionMobileModal
-          isOpen={isSupportFormOpen}
-          onClose={() => handleCloseSupportForm()}
-          zIndex={12}
-        >
-          <SSuggestSupportMobileContainer>
-            <div>
-              { option.text }
-            </div>
+      <SSupportBidForm layout>
+        {!isMobile && isSupportFormOpen && (
+          <>
             <VotesAmountTextInput
               inputAlign="left"
               minAmount={minAmount}
               value={supportBidAmount}
-              autofocus={isSupportFormOpen}
+              widthHardCoded="100%"
               placeholder={
-                !supportBidAmount || parseInt(supportBidAmount, 10) > 1
-                ? t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes')
-                : t('McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote')
+                !supportBidAmount || parseInt(supportBidAmount) > 1
+                  ? t(
+                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                    )
+                  : t(
+                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                    )
               }
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
             />
             <Button
               view="primaryGrad"
-              size="sm"
-              disabled={!supportBidAmount}
+              disabled={
+                !supportBidAmount
+                  ? true
+                  : parseInt(supportBidAmount) < minAmount
+              }
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('McPost.OptionsTab.ActionSection.placeABidBtn') }
+              {t('McPost.OptionsTab.OptionCard.placeABidBtn')}
             </Button>
-          </SSuggestSupportMobileContainer>
-        </OptionActionMobileModal>
-      ) : null}
+            <SCancelButton
+              view="secondary"
+              onClick={() => handleCloseSupportForm()}
+            >
+              {t('McPost.OptionsTab.OptionCard.cancelBtn')}
+            </SCancelButton>
+            <SBottomPlaceholder>
+              {!supportBidAmount || parseInt(supportBidAmount) === 1
+                ? `${1} ${t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                  )} = $ ${1 * votePrice}`
+                : `${supportBidAmount} ${t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                  )} = $ ${parseInt(supportBidAmount) * votePrice}`}
+            </SBottomPlaceholder>
+          </>
+        )}
+        {isMobile ? (
+          <OptionActionMobileModal
+            isOpen={isSupportFormOpen}
+            onClose={() => handleCloseSupportForm()}
+            zIndex={12}
+          >
+            <SSuggestSupportMobileContainer>
+              <div>{option.text}</div>
+              <VotesAmountTextInput
+                inputAlign="left"
+                minAmount={minAmount}
+                value={supportBidAmount}
+                autofocus={isSupportFormOpen}
+                placeholder={
+                  !supportBidAmount || parseInt(supportBidAmount) > 1
+                    ? t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                      )
+                    : t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                      )
+                }
+                onChange={(newValue: string) => setSupportBidAmount(newValue)}
+              />
+              <Button
+                view="primaryGrad"
+                size="sm"
+                disabled={!supportBidAmount}
+                onClick={() => handleTogglePaymentModalOpen()}
+              >
+                {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
+              </Button>
+            </SSuggestSupportMobileContainer>
+          </OptionActionMobileModal>
+        ) : null}
       </SSupportBidForm>
       {/* Payment Modal */}
       {paymentModalOpen ? (
@@ -447,28 +475,21 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           zIndex={12}
           showTocApply={!user?.loggedIn}
           isOpen={paymentModalOpen}
-          amount={`$${parseInt(supportBidAmount, 10) * 1}`}
+          amount={`$${parseInt(supportBidAmount) * 1}`}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
-            <SPaymentModalTitle
-              variant={3}
-            >
-              { t('McPost.paymenModalHeader.subtitle') }
+            <SPaymentModalTitle variant={3}>
+              {t('McPost.paymenModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>
-              { option.text }
-            </SPaymentModalOptionText>
+            <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
-      ) : null }
+      ) : null}
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </motion.div>
   );
 };
@@ -521,11 +542,9 @@ const SBidDetails = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'amount bidders'
-    'optionInfo optionInfo';
+      'amount bidders'
+      'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
-
-
 
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};

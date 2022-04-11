@@ -82,8 +82,8 @@ const MyApp = (props: IMyApp): ReactElement => {
     const hotjarSvVariable = process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION;
 
     if (hotjarIdVariable && hotjarSvVariable) {
-      const hotjarId = parseInt(hotjarIdVariable, 10);
-      const hotjarSv = parseInt(hotjarSvVariable, 10);
+      const hotjarId = parseInt(hotjarIdVariable);
+      const hotjarSv = parseInt(hotjarSvVariable);
       hotjar.initialize(hotjarId, hotjarSv);
     }
   }, []);

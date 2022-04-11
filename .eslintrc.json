@@ -17,8 +17,13 @@
     "react/function-component-definition": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "react/default-props-match-prop-types": "off",
-    // Useful, but ignored so far re-enable later
+
+    // Useful, but ignored so far. TODO: re-enable later
     "no-console": "off",
+
+    // Useless
+    "radix": "off",
+
     "@typescript-eslint/no-unused-vars": [
       2,
       {

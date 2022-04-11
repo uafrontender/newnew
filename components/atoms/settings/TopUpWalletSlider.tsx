@@ -50,7 +50,7 @@ const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
         min={min}
         max={max}
         step={step}
-        onChange={(e) => onChange(parseInt(e.target.value, 10))}
+        onChange={(e) => onChange(parseInt(e.target.value))}
       />
       <Button
         iconOnly
@@ -68,7 +68,7 @@ const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
       </Button>
     </SSliderWrapper>
   );
-}
+};
 
 export default TopUpWalletSlider;
 
@@ -133,11 +133,10 @@ const SSlider = styled.input.attrs({ type: 'range' })`
 
     margin-top: -7px;
 
-    transition: .1s ease-in-out;
+    transition: 0.1s ease-in-out;
   }
 
   &:focus::-webkit-slider-runnable-track {
-
   }
 
   &:hover::-webkit-slider-thumb {
@@ -157,7 +156,7 @@ const SSlider = styled.input.attrs({ type: 'range' })`
     background: ${({ theme }) => theme.colorsThemed.text.primary};
     cursor: pointer;
 
-    transition: .1s ease-in-out;
+    transition: 0.1s ease-in-out;
   }
   &:hover::-moz-range-thumb {
     transform: scale(1.2);
