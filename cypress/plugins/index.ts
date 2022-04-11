@@ -2,8 +2,7 @@
 
 import * as i18nGeneralConfig from '../../next-i18next.config.js';
 
-require('dotenv')
-  .config();
+require('dotenv').config();
 
 /**
  * This function is called when a project is opened or re-opened (e.g. due to
@@ -17,10 +16,7 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
 
   // copy any needed variables from process.env to config.env
-  [
-    'NEXT_PUBLIC_APP_NAME',
-    'NEXT_PUBLIC_APP_URL',
-  ].forEach((envKey) => {
+  ['NEXT_PUBLIC_APP_NAME', 'NEXT_PUBLIC_APP_URL'].forEach((envKey) => {
     config.env[envKey] = process.env[envKey];
   });
 

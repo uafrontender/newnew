@@ -3,7 +3,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -15,7 +21,11 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import { fetchAcOptionById, fetchCurrentBidsForPost, placeBidOnAuction } from '../../../api/endpoints/auction';
+import {
+  fetchAcOptionById,
+  fetchCurrentBidsForPost,
+  placeBidOnAuction,
+} from '../../../api/endpoints/auction';
 
 import Lottie from '../../atoms/Lottie';
 import GoBackButton from '../../molecules/GoBackButton';
@@ -64,18 +74,23 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const showSelectingWinnerOption = useMemo(() => (
-    postStatus === 'wating_for_decision'
-  ), [postStatus]);
+  const showSelectingWinnerOption = useMemo(
+    () => postStatus === 'wating_for_decision',
+    [postStatus]
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Response viewed
-  const [responseViewed, setResponseViewed]= useState(post.isResponseViewedByMe ?? false);
+  const [responseViewed, setResponseViewed] = useState(
+    post.isResponseViewedByMe ?? false
+  );
 
   // Tabs
   const tabs = useMemo(() => {
@@ -89,10 +104,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           label: 'bids',
           value: 'bids',
         },
-        ...(post.isCommentsAllowed ? [{
-          label: 'comments',
-          value: 'comments',
-        }] : []),
+        ...(post.isCommentsAllowed
+          ? [
+              {
+                label: 'comments',
+                value: 'comments',
+              },
+            ]
+          : []),
       ];
     }
     return [
@@ -100,39 +119,54 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         label: 'bids',
         value: 'bids',
       },
-      ...(post.isCommentsAllowed ? [{
-        label: 'comments',
-        value: 'comments',
-      }] : []),
+      ...(post.isCommentsAllowed
+        ? [
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]
+        : []),
     ];
   }, [post.isCommentsAllowed, post.winningOptionId]);
 
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(() => {
-    if (!isBrowser()) {
-      return 'bids'
+  const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(
+    () => {
+      if (!isBrowser()) {
+        return 'bids';
+      }
+      const { hash } = window.location;
+      if (
+        hash &&
+        (hash === '#bids' || hash === '#comments' || hash === '#winner')
+      ) {
+        return hash.substring(1) as 'bids' | 'comments' | 'winner';
+      }
+      if (post.winningOptionId) return 'winner';
+      return 'bids';
     }
-    const { hash } = window.location;
-    if (hash && (hash === '#bids' || hash === '#comments' || hash === '#winner')) {
-      return hash.substring(1) as 'bids' | 'comments' | 'winner';
-    }
-    if (
-      post.winningOptionId
-    ) return 'winner';
-    return 'bids';
-  });
+  );
 
   const handleChangeTab = (tab: string) => {
     if (tab === 'comments' && isMobile) {
-      window.history.pushState(        {
-        postId: post.postUuid,
-      }, 'Post', `/post/${post.postUuid}#${tab}`);
+      window.history.pushState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     } else {
-      window.history.replaceState(        {
-        postId: post.postUuid,
-      }, 'Post', `/post/${post.postUuid}#${tab}`);
+      window.history.replaceState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-  }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -142,16 +176,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'bids' || parsedHash === 'comments' || parsedHash === 'winner') {
+      if (
+        parsedHash === 'bids' ||
+        parsedHash === 'comments' ||
+        parsedHash === 'winner'
+      ) {
         setCurrentTab(parsedHash);
       }
-    }
+    };
 
     window.addEventListener('hashchange', handleHashChange, false);
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange, false);
-    }
+    };
   }, []);
 
   // Vote from sessionId
@@ -159,17 +197,23 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Total amount
-  const [totalAmount, setTotalAmount] = useState(post.totalAmount?.usdCents ?? 0);
+  const [totalAmount, setTotalAmount] = useState(
+    post.totalAmount?.usdCents ?? 0
+  );
 
   // Options
   const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(post.optionCount ?? '');
-  const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
+  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
+    post.optionCount ?? ''
+  );
+  const [optionsNextPageToken, setOptionsNextPageToken] =
+    useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
   // Winning option
-  const [winningOption, setWinningOption] = useState<newnewapi.Auction.Option | undefined>();
+  const [winningOption, setWinningOption] =
+    useState<newnewapi.Auction.Option | undefined>();
 
   // Animating options
   const [optionToAnimate, setOptionToAnimate] = useState('');
@@ -189,7 +233,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       }
 
       const highestOption = unsortedArr.sort(
-        (a, b) => (b?.totalAmount?.usdCents as number) - (a?.totalAmount?.usdCents as number)
+        (a, b) =>
+          (b?.totalAmount?.usdCents as number) -
+          (a?.totalAmount?.usdCents as number)
       )[0];
 
       unsortedArr.forEach((option, i) => {
@@ -227,24 +273,32 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       });
 
       const joinedArr = [
-        ...(highestOption && (highestOption.creator?.uuid === user.userData?.userUuid || highestOption.isSupportedByMe)
+        ...(highestOption &&
+        (highestOption.creator?.uuid === user.userData?.userUuid ||
+          highestOption.isSupportedByMe)
           ? [highestOption]
           : []),
         ...optionsByUser,
         ...optionsSupportedByUser,
         ...optionsByVipUsers,
-        ...(highestOption && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),
+        ...(highestOption &&
+        highestOption.creator?.uuid !== user.userData?.userUuid
+          ? [highestOption]
+          : []),
         ...workingArrSorted,
       ];
 
-      const workingSortedUnique = joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+      const workingSortedUnique =
+        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
 
-      const highestOptionIdx = (workingSortedUnique as TAcOptionWithHighestField[]).findIndex(
-        (o) => o.id === highestOption.id
-      );
+      const highestOptionIdx = (
+        workingSortedUnique as TAcOptionWithHighestField[]
+      ).findIndex((o) => o.id === highestOption.id);
 
       if (workingSortedUnique[highestOptionIdx]) {
-        (workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField).isHighest = true;
+        (
+          workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
+        ).isHighest = true;
       }
 
       return workingSortedUnique;
@@ -272,11 +326,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
         const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data && res.data.options) {
           setOptions((curr) => {
-            const workingArr = [...curr, ...(res.data?.options as TAcOptionWithHighestField[])];
+            const workingArr = [
+              ...curr,
+              ...(res.data?.options as TAcOptionWithHighestField[]),
+            ];
 
             return sortOptions(workingArr);
           });
@@ -301,7 +359,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
       const res = await fetchPostByUUID(fetchPostPayload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
@@ -319,10 +378,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         let workingArrUnsorted;
         const idx = workingArr.findIndex((op) => op.id === newOption?.id);
         if (idx === -1) {
-          workingArrUnsorted = [...workingArr, newOption as TAcOptionWithHighestField];
+          workingArrUnsorted = [
+            ...workingArr,
+            newOption as TAcOptionWithHighestField,
+          ];
         } else {
           workingArr[idx].supporterCount = newOption?.supporterCount as number;
-          workingArr[idx].totalAmount = newOption?.totalAmount as newnewapi.IMoneyAmount;
+          workingArr[idx].totalAmount =
+            newOption?.totalAmount as newnewapi.IMoneyAmount;
           workingArrUnsorted = workingArr;
         }
 
@@ -354,7 +417,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid) return;
+      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
+        return;
       try {
         const markAsViewedPayload = new newnewapi.MarkPostRequest({
           markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
@@ -413,10 +477,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
         const res = await placeBidOnAuction(payload);
 
-        if (!res.data || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS || res.error)
+        if (
+          !res.data ||
+          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
+          res.error
+        )
           throw new Error(res.error?.message ?? 'Request failed');
 
-        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+        const optionFromResponse = (res.data
+          .option as newnewapi.Auction.Option)!!;
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
@@ -441,12 +510,19 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         setOptions((curr) => {
           const workingArr = [...curr];
           let workingArrUnsorted;
-          const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
+          const idx = workingArr.findIndex(
+            (op) => op.id === decoded.option?.id
+          );
           if (idx === -1) {
-            workingArrUnsorted = [...workingArr, decoded.option as TAcOptionWithHighestField];
+            workingArrUnsorted = [
+              ...workingArr,
+              decoded.option as TAcOptionWithHighestField,
+            ];
           } else {
-            workingArr[idx].supporterCount = decoded.option?.supporterCount as number;
-            workingArr[idx].totalAmount = decoded.option?.totalAmount as newnewapi.IMoneyAmount;
+            workingArr[idx].supporterCount = decoded.option
+              ?.supporterCount as number;
+            workingArr[idx].totalAmount = decoded.option
+              ?.totalAmount as newnewapi.IMoneyAmount;
             workingArrUnsorted = workingArr;
           }
 
@@ -490,7 +566,10 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on(
+        'AcOptionCreatedOrUpdated',
+        socketHandlerOptionCreatedOrUpdated
+      );
       socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
       socketConnection.on('PostUpdated', socketHandlerPostData);
       socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
@@ -498,14 +577,23 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        socketConnection.off('AcOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off(
+          'AcOptionCreatedOrUpdated',
+          socketHandlerOptionCreatedOrUpdated
+        );
         socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
         socketConnection.off('PostUpdated', socketHandlerPostData);
         socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid, setOptions, sortOptions]);
+  }, [
+    socketConnection,
+    post,
+    user.userData?.userUuid,
+    setOptions,
+    sortOptions,
+  ]);
 
   useEffect(() => {
     if (loadingOptionsError) {
@@ -525,7 +613,9 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           />
         )}
         <PostTimer
-          timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+          timestampSeconds={new Date(
+            (post.expiresAt?.seconds as number) * 1000
+          ).getTime()}
           postType="ac"
         />
       </SExpiresSection>
@@ -561,45 +651,51 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           <AcOptionsTab
             postId={post.postUuid}
             postStatus={postStatus}
-            postCreator={post.creator?.nickname as string ?? post.creator?.username}
-            postDeadline={
-              moment(post.responseUploadDeadline?.seconds as number * 1000)
-                .subtract(3, 'days').calendar()
+            postCreator={
+              (post.creator?.nickname as string) ?? post.creator?.username
             }
+            postDeadline={moment(
+              (post.responseUploadDeadline?.seconds as number) * 1000
+            )
+              .subtract(3, 'days')
+              .calendar()}
             options={options}
             // optionToAnimate={optionToAnimate}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={post.minimalBid?.usdCents ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0), 10) : 5}
+            minAmount={
+              post.minimalBid?.usdCents
+                ? parseInt((post.minimalBid?.usdCents / 100).toFixed(0))
+                : 5
+            }
             handleLoadBids={fetchBids}
-            handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
+            handleAddOrUpdateOptionFromResponse={
+              handleAddOrUpdateOptionFromResponse
+            }
+          />
+        ) : currentTab === 'comments' && post.isCommentsAllowed ? (
+          <CommentsTab
+            commentsRoomId={post.commentsRoomId as number}
+            handleGoBack={() => handleChangeTab('bids')}
+          />
+        ) : winningOption ? (
+          <AcWinnerTab
+            postId={post.postUuid}
+            option={winningOption}
+            postStatus={postStatus}
           />
         ) : (
-          currentTab === 'comments' && post.isCommentsAllowed
-          ? (
-            <CommentsTab
-              commentsRoomId={post.commentsRoomId as number}
-              handleGoBack={() => handleChangeTab('bids')}
+          <SAnimationContainer>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
             />
-          ) : winningOption ? (
-            <AcWinnerTab
-              postId={post.postUuid}
-              option={winningOption}
-              postStatus={postStatus}
-            />
-          ) : (
-            <SAnimationContainer>
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            </SAnimationContainer>
-          )
+          </SAnimationContainer>
         )}
       </SActivitesContainer>
       {/* Loading Modal */}
@@ -609,15 +705,15 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         isVisible={paymentSuccesModalOpen}
         closeModal={() => setPaymentSuccesModalOpen(false)}
       >
-        {t(
-          'PaymentSuccessModal.ac',
-          {
-            postCreator: post.creator?.nickname as string ?? post.creator?.username,
-            postDeadline:
-              moment(post.responseUploadDeadline?.seconds as number * 1000)
-                .subtract(3, 'days').calendar(),
-          }
-        )}
+        {t('PaymentSuccessModal.ac', {
+          postCreator:
+            (post.creator?.nickname as string) ?? post.creator?.username,
+          postDeadline: moment(
+            (post.responseUploadDeadline?.seconds as number) * 1000
+          )
+            .subtract(3, 'days')
+            .calendar(),
+        })}
       </PaymentSuccessModal>
     </SWrapper>
   );
@@ -706,20 +802,18 @@ const SActivitesContainer = styled.div<{
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectingWinnerOption, decisionFailed }) => (
+    ${({ showSelectingWinnerOption, decisionFailed }) =>
       showSelectingWinnerOption
-      ? css`
-        max-height: calc(580px - 130px);
-      `
-      : (
-        !decisionFailed
         ? css`
-          max-height: 580px;
-        ` : css`
-          max-height: calc(580px - 120px);
-        `
-      )
-    )}
+            max-height: calc(580px - 130px);
+          `
+        : !decisionFailed
+        ? css`
+            max-height: 580px;
+          `
+        : css`
+            max-height: calc(580px - 120px);
+          `}
   }
 `;
 
