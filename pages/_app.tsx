@@ -40,10 +40,6 @@ import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
 
-// Hotjar variables
-const HOTJAR_ID = parseInt(process.env.NEXT_PUBLIC_HOTJAR_ID!!, 10);
-const HOTJAR_SV = parseInt(process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION!!, 10);
-
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -82,7 +78,14 @@ const MyApp = (props: IMyApp): ReactElement => {
   };
 
   useEffect(() => {
-    hotjar.initialize(HOTJAR_ID, HOTJAR_SV);
+    const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
+    const hotjarSvVariable = process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION;
+
+    if (hotjarIdVariable && hotjarSvVariable) {
+      const hotjarId = parseInt(hotjarIdVariable, 10);
+      const hotjarSv = parseInt(hotjarSvVariable, 10);
+      hotjar.initialize(hotjarId, hotjarSv);
+    }
   }, []);
 
   store.dispatch(setResizeMode(getInitialResizeMode()));
@@ -103,7 +106,10 @@ const MyApp = (props: IMyApp): ReactElement => {
       <CookiesProvider cookies={cookiesInstance}>
         <SocketContextProvider>
           <ChannelsContextProvider>
-            <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
+            <PersistGate
+              loading={null}
+              persistor={(store as EnhancedStoreWithPersistor).__persistor}
+            >
               <SyncUserWrapper>
                 <BlockedUsersProvider>
                   <FollowingsContextProvider>
@@ -119,7 +125,9 @@ const MyApp = (props: IMyApp): ReactElement => {
                                 ) : (
                                   <Error
                                     errorMsg={pageProps.error?.message}
-                                    statusCode={pageProps.error?.statusCode ?? 500}
+                                    statusCode={
+                                      pageProps.error?.statusCode ?? 500
+                                    }
                                   />
                                 )}
                               </div>
