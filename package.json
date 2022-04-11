@@ -4,7 +4,7 @@
   "description": "NewNew FE",
   "private": true,
   "scripts": {
-    "postshrinkwrap": "npx --quiet npm-force-resolutions && npm install --no-package-lock --no-audit --no-fund --no-progress --silent",
+    "preinstall": "npx force-resolutions",
     "dev": "next dev -p 4000",
     "build": "next build",
     "start": "next start -p 4000",
