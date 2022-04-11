@@ -5,9 +5,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback, useMemo, useState,
-} from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -16,7 +14,10 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
+import {
+  createPaymentSession,
+  getTopUpWalletWithPaymentPurposeUrl,
+} from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
 
@@ -34,250 +35,233 @@ import McSymbolIcon from '../../../../public/images/decision/mc-option-mock.png'
 
 interface IMcOptionCardDoubleVote {
   option: TMcOptionWithHighestField;
-  creator: newnewapi.IUser,
+  creator: newnewapi.IUser;
   postId: string;
   index: number;
   hasAlreadyVoted: boolean;
   noAction: boolean;
   optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
-  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.MultipleChoice.Option) => void;
+  handleAddOrUpdateOptionFromResponse: (
+    newOption: newnewapi.MultipleChoice.Option
+  ) => void;
 }
 
-const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> = ({
-  option,
-  creator,
-  postId,
-  index,
-  hasAlreadyVoted,
-  noAction,
-  optionBeingSupported,
-  handleSetSupportedBid,
-  handleAddOrUpdateOptionFromResponse,
-}) => {
-  const router = useRouter();
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
-  const user = useAppSelector((state) => state.user);
+const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
+  ({
+    option,
+    creator,
+    postId,
+    index,
+    hasAlreadyVoted,
+    noAction,
+    optionBeingSupported,
+    handleSetSupportedBid,
+    handleAddOrUpdateOptionFromResponse,
+  }) => {
+    const router = useRouter();
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const user = useAppSelector((state) => state.user);
 
-  const isSupportedByMe = useMemo(() => option.isSupportedByMe, [option.isSupportedByMe]);
-  const isSuggestedByMe = useMemo(
-    () => option.creator?.uuid === user.userData?.userUuid,
-    [option.creator?.uuid, user.userData?.userUuid]
-  );
-  const isCreatorsBid = useMemo(() => {
-    if (!option.creator) return true;
-    return false;
-  }, [option.creator]);
-  const supporterCountSubsctracted = useMemo(() => {
-    if (!isSupportedByMe) return option.supporterCount;
-    return  option.supporterCount - 1;
-  }, [option.supporterCount, isSupportedByMe]);
+    const isSupportedByMe = useMemo(
+      () => option.isSupportedByMe,
+      [option.isSupportedByMe]
+    );
+    const isSuggestedByMe = useMemo(
+      () => option.creator?.uuid === user.userData?.userUuid,
+      [option.creator?.uuid, user.userData?.userUuid]
+    );
+    const isCreatorsBid = useMemo(() => {
+      if (!option.creator) return true;
+      return false;
+    }, [option.creator]);
+    const supporterCountSubsctracted = useMemo(() => {
+      if (!isSupportedByMe) return option.supporterCount;
+      return option.supporterCount - 1;
+    }, [option.supporterCount, isSupportedByMe]);
 
-  const [doubleVoteAmount, setDoubleVoteAmount] = useState('');
+    const [doubleVoteAmount, setDoubleVoteAmount] = useState('');
 
-  // Redirect to user's page
-  const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
-    router.push(`/${creator?.username}`);
-  }
+    // Redirect to user's page
+    const handleRedirectToOptionCreator = () => {
+      window?.history.replaceState(
+        {
+          fromPost: true,
+        },
+        '',
+        ''
+      );
+      router.push(`/${creator?.username}`);
+    };
 
-  // Payment and Loading modals
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  // Handlers
-  const handleTogglePaymentModalOpen = () => {
-    setPaymentModalOpen(true);
-  };
+    // Payment and Loading modals
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+    // Handlers
+    const handleTogglePaymentModalOpen = () => {
+      setPaymentModalOpen(true);
+    };
 
-  const handleDoubleVoteWithWallet = useCallback(() => {
+    const handleDoubleVoteWithWallet = useCallback(() => {}, []);
 
-  }, []);
+    const handleDoubleVoteWithCardStripeRedirect = useCallback(() => {}, []);
 
-  const handleDoubleVoteWithCardStripeRedirect = useCallback(() => {
-
-  }, []);
-
-  return (
-    <motion.div
-      key={index}
-      layout="position"
-      transition={{
-        type: 'spring',
-        damping: 20,
-        stiffness: 300,
-      }}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        marginBottom: '16px',
-      }}
-    >
-      <SContainerDoubleVote
+    return (
+      <motion.div
+        key={index}
         layout="position"
         transition={{
           type: 'spring',
           damping: 20,
           stiffness: 300,
         }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+          marginBottom: '16px',
+        }}
       >
-        <SBidDetailsDoubleVote>
-          <SBidAmount>
-            <SOptionSymbolImg
-              src={McSymbolIcon.src}
-            />
-            <div>
-              {
-                option.voteCount && option.voteCount > 0
-                ? `${formatNumber(option?.voteCount, true)}`
-                : t('McPost.OptionsTab.OptionCard.noVotes')
-              }
-            </div>
-          </SBidAmount>
-          <SOptionInfo
-            variant={3}
-          >
-            {option.text}
-          </SOptionInfo>
-          <SBiddersInfo
-            variant={3}
-          >
-            {isCreatorsBid ? (
-              <>
-                <SSpanBiddersHighlightedDoubleVote>
-                  {`${t('me')}`}
-                </SSpanBiddersHighlightedDoubleVote>
-                {supporterCountSubsctracted > 0 ? (
-                  <>
-                    <SSpanBiddersRegularDoubleVote>
-                      {option.isSupportedByMe || option.isCreatedBySubscriber ? ` & ` : ''}
-                    </SSpanBiddersRegularDoubleVote>
-                    <SSpanBiddersHighlightedDoubleVote>
-                      {formatNumber(
-                        supporterCountSubsctracted,
-                        true,
-                      )}
-                      { ' ' }
-                      {t('McPost.OptionsTab.OptionCard.others')}
-                    </SSpanBiddersHighlightedDoubleVote>
-                    {' '}
-                    <SSpanBiddersRegularDoubleVote>
-                      {t('McPost.OptionsTab.OptionCard.voted')}
-                    </SSpanBiddersRegularDoubleVote>
-                  </>
-                ) : null}
-              </>
-            ) : (
-              <>
-                <SSpanBiddersHighlightedDoubleVote
-                  onClick={() => {
-                    if (!isSuggestedByMe) {
-                      handleRedirectToOptionCreator()
-                    }
-                  }}
-                  style={{
-                    ...(!isSuggestedByMe && option.isCreatedBySubscriber ? {
-                      color: theme.colorsThemed.accent.yellow,
-                    } : {}),
-                    ...(!isSuggestedByMe ? {
-                      cursor: 'pointer',
-                    } : {}),
-                  }}
-                >
-                  {isSuggestedByMe
-                    ? t('McPost.OptionsTab.OptionCard.my_suggestion')
-                    : t(
-                      'McPost.OptionsTab.OptionCard.subscriber_suggestion',
-                      {
-                        nickname: option.creator?.nickname ?? option.creator?.username
-                      }
-                    )
-                  }
-                </SSpanBiddersHighlightedDoubleVote>
-                {isSupportedByMe && !isSuggestedByMe ? (
-                  <SSpanBiddersHighlightedDoubleVote>
-                    {`, ${t('me')}`}
-                  </SSpanBiddersHighlightedDoubleVote>
-                ) : null}
-                {supporterCountSubsctracted > 0 ? (
-                  <>
-                    <SSpanBiddersRegularDoubleVote>
-                      {isSupportedByMe && !isSuggestedByMe ? (
-                        ` & `
-                        ) : (
-                          `, `
-                      )}
-                    </SSpanBiddersRegularDoubleVote>
-                    <SSpanBiddersHighlightedDoubleVote>
-                      {formatNumber(
-                        option.supporterCount - (isSupportedByMe && !isSuggestedByMe ? 2 : 1),
-                        true,
-                      )}
-                      { ' ' }
-                      {
-                        option.isCreatedBySubscriber || option.isSupportedByMe ? (
-                          t('McPost.OptionsTab.OptionCard.others')
-                        ) : (
-                          t('McPost.OptionsTab.OptionCard.voters')
-                        )
-                      }
-                    </SSpanBiddersHighlightedDoubleVote>
-                  </>
-                ) : null}
-                {' '}
-                <SSpanBiddersRegularDoubleVote>
-                  {t('McPost.OptionsTab.OptionCard.voted')}
-                </SSpanBiddersRegularDoubleVote>
-              </>
-            )
-            }
-          </SBiddersInfo>
-          <SDoubleMyVote>
-            <SDoubleMyVoteCaption>
-              { t('McPost.OptionsTab.OptionCard.doubleMyVoteCaption') }
-            </SDoubleMyVoteCaption>
-            <SDoubleMyVoteButton
-              onClick={() => handleTogglePaymentModalOpen()}
-            >
-            { t('McPost.OptionsTab.OptionCard.doubleMyVoteButton') }
-            </SDoubleMyVoteButton>
-          </SDoubleMyVote>
-        </SBidDetailsDoubleVote>
-      </SContainerDoubleVote>
-      {/* Double my vote */}
-      {paymentModalOpen ? (
-        <PaymentModal
-          zIndex={12}
-          showTocApply={!user?.loggedIn}
-          isOpen={paymentModalOpen}
-          amount={`$${parseInt(doubleVoteAmount, 10) * 5}`}
-          onClose={() => setPaymentModalOpen(false)}
-          handlePayWithWallet={handleDoubleVoteWithWallet}
-          handlePayWithCardStripeRedirect={handleDoubleVoteWithCardStripeRedirect}
+        <SContainerDoubleVote
+          layout="position"
+          transition={{
+            type: 'spring',
+            damping: 20,
+            stiffness: 300,
+          }}
         >
-          <SPaymentModalHeader>
-            <SPaymentModalTitle
-              variant={3}
-            >
-              { t('McPost.paymenModalHeader.subtitle') }
-            </SPaymentModalTitle>
-            <SPaymentModalOptionText>
-              { option.text }
-            </SPaymentModalOptionText>
-          </SPaymentModalHeader>
-        </PaymentModal>
-      ) : null }
-      {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
-    </motion.div>
-  );
-};
+          <SBidDetailsDoubleVote>
+            <SBidAmount>
+              <SOptionSymbolImg src={McSymbolIcon.src} />
+              <div>
+                {option.voteCount && option.voteCount > 0
+                  ? `${formatNumber(option?.voteCount, true)}`
+                  : t('McPost.OptionsTab.OptionCard.noVotes')}
+              </div>
+            </SBidAmount>
+            <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+            <SBiddersInfo variant={3}>
+              {isCreatorsBid ? (
+                <>
+                  <SSpanBiddersHighlightedDoubleVote>
+                    {`${t('me')}`}
+                  </SSpanBiddersHighlightedDoubleVote>
+                  {supporterCountSubsctracted > 0 ? (
+                    <>
+                      <SSpanBiddersRegularDoubleVote>
+                        {option.isSupportedByMe || option.isCreatedBySubscriber
+                          ? ` & `
+                          : ''}
+                      </SSpanBiddersRegularDoubleVote>
+                      <SSpanBiddersHighlightedDoubleVote>
+                        {formatNumber(supporterCountSubsctracted, true)}{' '}
+                        {t('McPost.OptionsTab.OptionCard.others')}
+                      </SSpanBiddersHighlightedDoubleVote>{' '}
+                      <SSpanBiddersRegularDoubleVote>
+                        {t('McPost.OptionsTab.OptionCard.voted')}
+                      </SSpanBiddersRegularDoubleVote>
+                    </>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <SSpanBiddersHighlightedDoubleVote
+                    onClick={() => {
+                      if (!isSuggestedByMe) {
+                        handleRedirectToOptionCreator();
+                      }
+                    }}
+                    style={{
+                      ...(!isSuggestedByMe && option.isCreatedBySubscriber
+                        ? {
+                            color: theme.colorsThemed.accent.yellow,
+                          }
+                        : {}),
+                      ...(!isSuggestedByMe
+                        ? {
+                            cursor: 'pointer',
+                          }
+                        : {}),
+                    }}
+                  >
+                    {isSuggestedByMe
+                      ? t('McPost.OptionsTab.OptionCard.my_suggestion')
+                      : t(
+                          'McPost.OptionsTab.OptionCard.subscriber_suggestion',
+                          {
+                            nickname:
+                              option.creator?.nickname ??
+                              option.creator?.username,
+                          }
+                        )}
+                  </SSpanBiddersHighlightedDoubleVote>
+                  {isSupportedByMe && !isSuggestedByMe ? (
+                    <SSpanBiddersHighlightedDoubleVote>
+                      {`, ${t('me')}`}
+                    </SSpanBiddersHighlightedDoubleVote>
+                  ) : null}
+                  {supporterCountSubsctracted > 0 ? (
+                    <>
+                      <SSpanBiddersRegularDoubleVote>
+                        {isSupportedByMe && !isSuggestedByMe ? ` & ` : `, `}
+                      </SSpanBiddersRegularDoubleVote>
+                      <SSpanBiddersHighlightedDoubleVote>
+                        {formatNumber(
+                          option.supporterCount -
+                            (isSupportedByMe && !isSuggestedByMe ? 2 : 1),
+                          true
+                        )}{' '}
+                        {option.isCreatedBySubscriber || option.isSupportedByMe
+                          ? t('McPost.OptionsTab.OptionCard.others')
+                          : t('McPost.OptionsTab.OptionCard.voters')}
+                      </SSpanBiddersHighlightedDoubleVote>
+                    </>
+                  ) : null}{' '}
+                  <SSpanBiddersRegularDoubleVote>
+                    {t('McPost.OptionsTab.OptionCard.voted')}
+                  </SSpanBiddersRegularDoubleVote>
+                </>
+              )}
+            </SBiddersInfo>
+            <SDoubleMyVote>
+              <SDoubleMyVoteCaption>
+                {t('McPost.OptionsTab.OptionCard.doubleMyVoteCaption')}
+              </SDoubleMyVoteCaption>
+              <SDoubleMyVoteButton
+                onClick={() => handleTogglePaymentModalOpen()}
+              >
+                {t('McPost.OptionsTab.OptionCard.doubleMyVoteButton')}
+              </SDoubleMyVoteButton>
+            </SDoubleMyVote>
+          </SBidDetailsDoubleVote>
+        </SContainerDoubleVote>
+        {/* Double my vote */}
+        {paymentModalOpen ? (
+          <PaymentModal
+            zIndex={12}
+            showTocApply={!user?.loggedIn}
+            isOpen={paymentModalOpen}
+            amount={`$${parseInt(doubleVoteAmount) * 5}`}
+            onClose={() => setPaymentModalOpen(false)}
+            handlePayWithWallet={handleDoubleVoteWithWallet}
+            handlePayWithCardStripeRedirect={
+              handleDoubleVoteWithCardStripeRedirect
+            }
+          >
+            <SPaymentModalHeader>
+              <SPaymentModalTitle variant={3}>
+                {t('McPost.paymenModalHeader.subtitle')}
+              </SPaymentModalTitle>
+              <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
+            </SPaymentModalHeader>
+          </PaymentModal>
+        ) : null}
+        {/* Loading Modal */}
+        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      </motion.div>
+    );
+  };
 
 McOptionCardDoubleVote.defaultProps = {
   optionBeingSupported: undefined,
@@ -303,7 +287,7 @@ const SOptionSymbolImg = styled.img`
 const SOptionInfo = styled(Text)`
   grid-area: optionInfo;
 
-  color: #FFFFFF;
+  color: #ffffff;
 
   margin-bottom: 8px;
 
@@ -367,15 +351,15 @@ const SBidDetailsDoubleVote = styled.div`
 
   width: 100%;
 
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 
   padding: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'amount bidders'
-    'optionInfo optionInfo'
-    'doubleVote doubleVote';
+      'amount bidders'
+      'optionInfo optionInfo'
+      'doubleVote doubleVote';
     grid-template-columns: 3fr 7fr;
 
     padding: initial;
@@ -383,11 +367,11 @@ const SBidDetailsDoubleVote = styled.div`
 `;
 
 const SSpanBiddersHighlightedDoubleVote = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanBiddersRegularDoubleVote = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.6;
 `;
 
@@ -426,18 +410,18 @@ const SDoubleMyVoteCaption = styled.div`
   font-size: 14px;
   line-height: 20px;
 
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SDoubleMyVoteButton = styled(Button)`
-  background: #FFFFFF;
-  color: #2C2C33;
+  background: #ffffff;
+  color: #2c2c33;
   width: 100%;
   height: 48px;
 
   &:focus:enabled,
-  &:hover:enabled  {
-    background: #FFFFFF;
+  &:hover:enabled {
+    background: #ffffff;
   }
 
   ${({ theme }) => theme.media.tablet} {

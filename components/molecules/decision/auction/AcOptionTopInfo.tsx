@@ -3,16 +3,17 @@
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import React, {
-  useCallback, useContext, useState,
-} from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import styled, { useTheme } from 'styled-components';
 
 import { useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
 import { placeBidWithWallet } from '../../../../api/endpoints/auction';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
+import {
+  createPaymentSession,
+  getTopUpWalletWithPaymentPurposeUrl,
+} from '../../../../api/endpoints/payments';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -31,7 +32,9 @@ interface IAcOptionTopInfo {
   postId: string;
   minAmount: number;
   amountInBids?: number;
-  handleAddOrUpdateOptionFromResponse: (newOption: newnewapi.Auction.Option) => void;
+  handleAddOrUpdateOptionFromResponse: (
+    newOption: newnewapi.Auction.Option
+  ) => void;
 }
 
 const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
@@ -49,7 +52,9 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   const createdAtParsed = new Date(createdAtSeconds * 1000);
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const { walletBalance } = useContext(WalletContext);
 
@@ -76,34 +81,45 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
     setLoadingModalOpen(true);
     try {
       // Check if user is logged and if the wallet balance is sufficient
-      if (!user.loggedIn || (walletBalance && walletBalance?.usdCents < parseInt(supportBidAmount, 10) * 100)) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-          ...(!user.loggedIn ? {
-            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-          } : {}),
-          acBidRequest: {
-            amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(supportBidAmount, 10) * 100,
-            }),
-            optionId: option.id,
-            postUuid: postId,
-          }
-        });
+      if (
+        !user.loggedIn ||
+        (walletBalance &&
+          walletBalance?.usdCents < parseInt(supportBidAmount) * 100)
+      ) {
+        const getTopUpWalletWithPaymentPurposeUrlPayload =
+          new newnewapi.TopUpWalletWithPurposeRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${postId}`,
+            ...(!user.loggedIn
+              ? {
+                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                }
+              : {}),
+            acBidRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(supportBidAmount) * 100,
+              }),
+              optionId: option.id,
+              postUuid: postId,
+            },
+          });
 
-        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+        const res = await getTopUpWalletWithPaymentPurposeUrl(
+          getTopUpWalletWithPaymentPurposeUrlPayload
+        );
 
-        if (!res.data
-          || !res.data.sessionUrl
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         window.location.href = res.data.sessionUrl;
       } else {
         const makeBidPayload = new newnewapi.PlaceBidRequest({
           amount: new newnewapi.MoneyAmount({
-            usdCents: parseInt(supportBidAmount, 10) * 100,
+            usdCents: parseInt(supportBidAmount) * 100,
           }),
           optionId: option.id,
           postUuid: postId,
@@ -111,36 +127,54 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
 
         const res = await placeBidWithWallet(makeBidPayload);
 
-        if (res.data && res.data.status === newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-            acBidRequest: {
-              amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(supportBidAmount, 10) * 100,
-              }),
-              optionId: option.id,
-              postUuid: postId,
-            }
-          });
+        if (
+          res.data &&
+          res.data.status ===
+            newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE
+        ) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload =
+            new newnewapi.TopUpWalletWithPurposeRequest({
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${postId}`,
+              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${postId}`,
+              acBidRequest: {
+                amount: new newnewapi.MoneyAmount({
+                  usdCents: parseInt(supportBidAmount) * 100,
+                }),
+                optionId: option.id,
+                postUuid: postId,
+              },
+            });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+            getTopUpWalletWithPaymentPurposeUrlPayload
+          );
 
-          if (!resStripeRedirect.data
-            || !resStripeRedirect.data.sessionUrl
-            || resStripeRedirect.error
-          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+          if (
+            !resStripeRedirect.data ||
+            !resStripeRedirect.data.sessionUrl ||
+            resStripeRedirect.error
+          )
+            throw new Error(
+              resStripeRedirect.error?.message ?? 'Request failed'
+            );
 
           window.location.href = resStripeRedirect.data.sessionUrl;
           return;
         }
 
-        if (!res.data
-          || res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
+        if (
+          !res.data ||
+          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
+          res.error
+        )
+          throw new Error(res.error?.message ?? 'Request failed');
 
-        const optionFromResponse = (res.data.option as newnewapi.Auction.Option)!!;
+        const optionFromResponse = (res.data
+          .option as newnewapi.Auction.Option)!!;
         optionFromResponse.isSupportedByMe = true;
         handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
@@ -149,7 +183,6 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
       }
-
     } catch (err) {
       setPaymentModalOpen(false);
       setLoadingModalOpen(false);
@@ -172,27 +205,32 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
     try {
-      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${router.locale !== 'en-US' ? `${router.locale}/` : ''}post/${postId}`,
-        ...(!user.loggedIn ? {
-          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        } : {}),
-        acBidRequest: {
-          amount: new newnewapi.MoneyAmount({
-            usdCents: parseInt(supportBidAmount, 10) * 100,
-          }),
-          optionId: option.id,
-          postUuid: postId,
-        }
-      });
+      const createPaymentSessionPayload =
+        new newnewapi.CreatePaymentSessionRequest({
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+            router.locale !== 'en-US' ? `${router.locale}/` : ''
+          }post/${postId}`,
+          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+            router.locale !== 'en-US' ? `${router.locale}/` : ''
+          }post/${postId}`,
+          ...(!user.loggedIn
+            ? {
+                nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+              }
+            : {}),
+          acBidRequest: {
+            amount: new newnewapi.MoneyAmount({
+              usdCents: parseInt(supportBidAmount) * 100,
+            }),
+            optionId: option.id,
+            postUuid: postId,
+          },
+        });
 
       const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data
-        || !res.data.sessionUrl
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || !res.data.sessionUrl || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       window.location.href = res.data.sessionUrl;
     } catch (err) {
@@ -205,31 +243,22 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
   return (
     <SWrapper>
       <SBidsAmount>
-        <span>
-          $
-          {((amountInBids ?? 0) / 100).toFixed(2)}
-        </span>
-        {' '}
-        { t('AcPost.PostTopInfo.in_bids') }
+        <span>${((amountInBids ?? 0) / 100).toFixed(2)}</span>{' '}
+        {t('AcPost.PostTopInfo.in_bids')}
       </SBidsAmount>
       <CreatorCard>
         <SAvatarArea>
-          <img
-            src={creator.avatarUrl!! as string}
-            alt={creator.username!!}
-          />
+          <img src={creator.avatarUrl!! as string} alt={creator.username!!} />
         </SAvatarArea>
         <SUsername>
-          { creator.uuid !== user.userData?.userUuid
-            ? creator.username : t('AcPost.OptionsTab.me') }
+          {creator.uuid !== user.userData?.userUuid
+            ? creator.username
+            : t('AcPost.OptionsTab.me')}
         </SUsername>
         <SStartsAt>
-          { createdAtParsed.getDate() }
-          {' '}
-          { createdAtParsed.toLocaleString('default', { month: 'short' }) }
-          {' '}
-          { createdAtParsed.getFullYear() }
-          {' '}
+          {createdAtParsed.getDate()}{' '}
+          {createdAtParsed.toLocaleString('default', { month: 'short' })}{' '}
+          {createdAtParsed.getFullYear()}{' '}
         </SStartsAt>
       </CreatorCard>
       <SActionsDiv>
@@ -241,8 +270,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           style={{
             padding: '8px',
           }}
-          onClick={() => {
-          }}
+          onClick={() => {}}
         >
           <InlineSvg
             svg={ShareIconFilled}
@@ -262,7 +290,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             view="secondary"
             onClick={() => handleOpenSupportForm()}
           >
-            { t('AcPost.OptionsTab.OptionCard.supportBtn') }
+            {t('AcPost.OptionsTab.OptionCard.supportBtn')}
           </SSupportButton>
         )}
       </SActionsDiv>
@@ -276,16 +304,18 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           />
           <Button
             view="primaryGrad"
-            disabled={!supportBidAmount ? true : parseInt(supportBidAmount, 10) < minAmount}
+            disabled={
+              !supportBidAmount ? true : parseInt(supportBidAmount) < minAmount
+            }
             onClick={() => handleTogglePaymentModalOpen()}
           >
-            { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
+            {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
           </Button>
           <SCancelButton
             view="secondary"
             onClick={() => handleCloseSupportForm()}
           >
-            { t('AcPost.OptionsTab.OptionCard.cancelBtn') }
+            {t('AcPost.OptionsTab.OptionCard.cancelBtn')}
           </SCancelButton>
         </SSupportBidForm>
       )}
@@ -296,9 +326,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           zIndex={12}
         >
           <SSuggestSupportMobileContainer>
-            <div>
-              { option.title }
-            </div>
+            <div>{option.title}</div>
             <BidAmountTextInput
               value={supportBidAmount}
               inputAlign="center"
@@ -311,7 +339,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              { t('AcPost.OptionsTab.OptionCard.placeABidBtn') }
+              {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
             </Button>
           </SSuggestSupportMobileContainer>
         </SuggestionActionMobileModal>
@@ -328,22 +356,15 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
-            <SPaymentModalTitle
-              variant={3}
-            >
-              { t('AcPost.paymenModalHeader.subtitle') }
+            <SPaymentModalTitle variant={3}>
+              {t('AcPost.paymenModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>
-              { option.title }
-            </SPaymentModalOptionText>
+            <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
-      ) : null }
+      ) : null}
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
     </SWrapper>
   );
 };
@@ -360,8 +381,7 @@ const SWrapper = styled.div`
 
   grid-template-areas:
     'stats stats stats'
-    'userCard userCard actions'
-  ;
+    'userCard userCard actions';
 
   height: fit-content;
 
@@ -369,9 +389,7 @@ const SWrapper = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
-    grid-template-areas:
-      'userCard stats actions'
-    ;
+    grid-template-areas: 'userCard stats actions';
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 120px;
     align-items: center;
@@ -385,8 +403,7 @@ const CreatorCard = styled.div`
   display: grid;
   grid-template-areas:
     'avatar username'
-    'avatar startsAt'
-  ;
+    'avatar startsAt';
   grid-template-columns: 44px 1fr;
 
   height: 36px;
@@ -445,10 +462,8 @@ const SShareButton = styled(Button)`
 
   padding: 0px;
   &:focus:enabled {
-    background: ${({
-    theme,
-    view,
-  }) => theme.colorsThemed.button.background[view!!]};
+    background: ${({ theme, view }) =>
+      theme.colorsThemed.button.background[view!!]};
   }
 `;
 
@@ -487,7 +502,8 @@ const SSupportButton = styled(Button)`
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-    &:hover:enabled, &:focus:enabled {
+    &:hover:enabled,
+    &:focus:enabled {
       background: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
     }
@@ -521,7 +537,8 @@ const SCancelButton = styled(Button)`
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-  &:hover:enabled, &:focus:enabled {
+  &:hover:enabled,
+  &:focus:enabled {
     background: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -533,13 +550,10 @@ const SSuggestSupportMobileContainer = styled.div`
   gap: 24px;
 
   padding: 16px;
-
 `;
 
 // Payment modal header
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};

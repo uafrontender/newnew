@@ -41,7 +41,9 @@ export const Tablet: React.FC<ITablet> = () => {
     }
   };
   const handleUserClick = () => {
-    router.push(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
+    router.push(
+      user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile'
+    );
   };
   const handleSignInClick = () => {
     router.push('/sign-up');
@@ -95,7 +97,8 @@ export const Tablet: React.FC<ITablet> = () => {
                     key: 'my-balance',
                     value:
                       !isBalanceLoading && walletBalance?.usdCents
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined
+                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
+                          undefined
                         : undefined,
                   }}
                 />
@@ -111,17 +114,22 @@ export const Tablet: React.FC<ITablet> = () => {
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button view="primaryGrad" onClick={handleCreateClick} withShadow={!globalSearchActive}>
+                  <Button
+                    view="primaryGrad"
+                    onClick={handleCreateClick}
+                    withShadow={!globalSearchActive}
+                  >
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    iconOnly
-                    view="quaternary"
-                    onClick={handleMenuClick}
-                  >
-                    <InlineSVG svg={menuIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+                  <Button iconOnly view="quaternary" onClick={handleMenuClick}>
+                    <InlineSVG
+                      svg={menuIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width="24px"
+                      height="24px"
+                    />
                   </Button>
                   <MoreMenuTablet
                     isVisible={moreMenuOpen}
@@ -132,12 +140,20 @@ export const Tablet: React.FC<ITablet> = () => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button view="primaryGrad" onClick={handleCreateClick} withShadow={!globalSearchActive}>
+                  <Button
+                    view="primaryGrad"
+                    onClick={handleCreateClick}
+                    withShadow={!globalSearchActive}
+                  >
                     {t('button-create')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar withClick avatarUrl={user.userData?.avatarUrl} onClick={handleUserClick} />
+                  <UserAvatar
+                    withClick
+                    avatarUrl={user.userData?.avatarUrl}
+                    onClick={handleUserClick}
+                  />
                 </SItemWithMargin>
               </>
             )}
