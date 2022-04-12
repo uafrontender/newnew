@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
+import { useRouter } from 'next/router';
 
 import InlineSVG from './InlineSVG';
 
@@ -25,6 +26,7 @@ export const SearchInput: React.FC = () => {
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
   const { resizeMode, globalSearchActive } = useAppSelector((state) => state.ui);
+  const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -131,7 +133,14 @@ export const SearchInput: React.FC = () => {
         <SResultsDrop>
           <TopDecisionsResults keyword={searchValue} />
           <PopularCreatorsResults keyword={searchValue} />
-          <SButton view="quaternary">All results</SButton>
+          <SButton
+            onClick={() => {
+              router.push(`/search?query=${searchValue}`);
+            }}
+            view="quaternary"
+          >
+            All results
+          </SButton>
         </SResultsDrop>
       )}
     </SContainer>
@@ -156,13 +165,13 @@ const SContainer = styled.div`
 `;
 
 const SResultsDrop = styled.div`
-  border-radius: 16px;
-  padding: 16px;
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
-  position: absolute;
-  right: 0;
-  width: 420px;
-  margin-top: 0;
+  position: fixed;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  top: 56px;
+  padding: 16px;
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 16px;
@@ -171,12 +180,16 @@ const SResultsDrop = styled.div`
   }
 
   ${({ theme }) => theme.media.mobile} {
-    position: fixed;
-    border-radius: 0;
-    width: 100vw;
-    height: 100vh;
-    top: 56px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    position: absolute;
     padding: 16px;
+    right: 0;
+    width: 420px;
+    margin-top: 0;
+    border-radius: 16px;
+    height: auto;
   }
 `;
 
