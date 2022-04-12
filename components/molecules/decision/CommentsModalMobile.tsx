@@ -6,7 +6,6 @@ import styled from 'styled-components';
 
 import preventParentClick from '../../../utils/preventParentClick';
 
-
 import Modal from '../../organisms/Modal';
 import GoBackButton from '../GoBackButton';
 import Comment from '../../atoms/decision/Comment';
@@ -24,7 +23,9 @@ interface ICommentsModalMobile {
   canDeleteComment?: boolean;
   commentIdFromUrl?: string;
   handleResetCommentIdFromUrl: () => any;
-  handleSetComments: React.Dispatch<React.SetStateAction<TCommentWithReplies[]>>;
+  handleSetComments: React.Dispatch<
+    React.SetStateAction<TCommentWithReplies[]>
+  >;
   handleFetchComments: (token?: string) => void;
   handleAddComment: (newMsg: string, parentId?: number) => void;
   handleDeleteComment: (commentToDelete: TCommentWithReplies) => void;
@@ -50,48 +51,57 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
   const commentsWrapper = useRef<HTMLDivElement>();
 
   // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
     if (inView && !commentsLoading && commentsNextPageToken) {
       // console.log(`fetching comments from in view with token ${commentsNextPageToken}`);
       handleFetchComments(commentsNextPageToken);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, commentsNextPageToken, commentsLoading]);
 
   useEffect(() => {
     if (commentIdFromUrl) {
       const flat: TCommentWithReplies[] = [];
       for (let i = 0; i < comments.length; i++) {
-        if (comments[i].replies && Array.isArray(comments[i].replies) && comments[i].replies!!.length > 0) {
-          flat.push(...[comments[i], ...comments[i].replies!!])
+        if (
+          comments[i].replies &&
+          Array.isArray(comments[i].replies) &&
+          comments[i].replies!!.length > 0
+        ) {
+          flat.push(...[comments[i], ...comments[i].replies!!]);
         }
         flat.push(comments[i]);
       }
 
-      const idx = flat.findIndex((comment) => comment.id === parseInt(commentIdFromUrl, 10))
+      const idx = flat.findIndex(
+        (comment) => comment.id === parseInt(commentIdFromUrl)
+      );
 
       if (idx === -1) {
         // console.log('Looking further');
         scrollRef.current?.scrollBy({
           top: scrollRef.current.scrollHeight,
-        })
+        });
       } else {
         // console.log('Found the comment');
 
         if (!flat[idx].parentId || flat[idx].parentId === 0) {
-          const offset = (commentsWrapper?.current?.childNodes[idx] as HTMLDivElement).offsetTop
+          const offset = (
+            commentsWrapper?.current?.childNodes[idx] as HTMLDivElement
+          ).offsetTop;
 
           scrollRef.current?.scrollTo({
             top: offset,
           });
-          document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+          document
+            ?.getElementById(`comment_id_${flat[idx].id}`)
+            ?.classList.add('opened-flash');
         } else if (flat[idx].parentId) {
-          const parentIdx = comments.findIndex((c) => c.id === flat[idx].parentId);
+          const parentIdx = comments.findIndex(
+            (c) => c.id === flat[idx].parentId
+          );
 
           if (parentIdx !== -1) {
             handleSetComments((curr) => {
@@ -101,8 +111,12 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
             });
 
             setTimeout(() => {
-              document?.getElementById(`comment_id_${flat[idx].id}`)?.scrollIntoView();
-              document?.getElementById(`comment_id_${flat[idx].id}`)?.classList.add('opened-flash');
+              document
+                ?.getElementById(`comment_id_${flat[idx].id}`)
+                ?.scrollIntoView();
+              document
+                ?.getElementById(`comment_id_${flat[idx].id}`)
+                ?.classList.add('opened-flash');
             }, 100);
           }
         }
@@ -110,7 +124,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
         handleResetCommentIdFromUrl?.();
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [commentIdFromUrl, comments]);
 
   return (
@@ -123,9 +137,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
           onClick={preventParentClick()}
         >
           <SModalHeader>
-            <GoBackButton
-              onClick={closeCommentsModalMobile}
-            >
+            <GoBackButton onClick={closeCommentsModalMobile}>
               <SModalTitle>{t('comments.comments')}</SModalTitle>
             </GoBackButton>
           </SModalHeader>
@@ -139,33 +151,34 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
                 {comments.length === 0 && !commentsLoading ? (
                   <SNoCommentsYet>
                     <SNoCommentsImgContainer>
-                      <img
-                        src={NoContentYetImg.src}
-                        alt='No content yet'
-                      />
+                      <img src={NoContentYetImg.src} alt="No content yet" />
                     </SNoCommentsImgContainer>
-                    <SNoCommentsCaption
-                      variant={3}
-                    >
-                      { t('comments.noCommentsCaption') }
+                    <SNoCommentsCaption variant={3}>
+                      {t('comments.noCommentsCaption')}
                     </SNoCommentsCaption>
                   </SNoCommentsYet>
                 ) : null}
-                {comments && comments.map((item, index) => (
-                  <Comment
-                    key={(item.id).toString()}
-                    canDeleteComment={canDeleteComment}
-                    lastChild={index === comments.length - 1} comment={item}
-                    handleAddComment={(newMsg: string) => handleAddComment(newMsg, item.id as number)}
-                    handleDeleteComment={() => handleDeleteComment(item)}
-                  />
-                ))}
+                {comments &&
+                  comments.map((item, index) => (
+                    <Comment
+                      key={item.id.toString()}
+                      canDeleteComment={canDeleteComment}
+                      lastChild={index === comments.length - 1}
+                      comment={item}
+                      handleAddComment={(newMsg: string) =>
+                        handleAddComment(newMsg, item.id as number)
+                      }
+                      handleDeleteComment={() => handleDeleteComment(item)}
+                    />
+                  ))}
                 <SLoaderDiv
                   ref={loadingRef}
                   style={{
-                    ...(commentsLoading ? {
-                      display: 'none'
-                    } : {}),
+                    ...(commentsLoading
+                      ? {
+                          display: 'none',
+                        }
+                      : {}),
                   }}
                 />
               </SCommentsWrapper>
@@ -185,7 +198,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
 CommentsModalMobile.defaultProps = {
   canDeleteComment: false,
   commentIdFromUrl: undefined,
-}
+};
 
 export default CommentsModalMobile;
 
@@ -199,9 +212,13 @@ const SContainer = styled.div`
 const SModal = styled.div`
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.primary};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 0 16px 16px;
   box-sizing: border-box;
   display: flex;
