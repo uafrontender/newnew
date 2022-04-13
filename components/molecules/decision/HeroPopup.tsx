@@ -15,8 +15,8 @@ import Button from '../../atoms/Button';
 
 const IMAGES: any = {
   AC: acImage,
-  CF: cfImage,
-  MC: mcImage,
+  CF: mcImage,
+  MC: cfImage,
 };
 
 interface IHeroPopup {
@@ -25,19 +25,33 @@ interface IHeroPopup {
   closeModal: () => void;
 }
 
-const HeroPopup: React.FC<IHeroPopup> = ({ isPopupVisible, postType, closeModal }) => {
+const HeroPopup: React.FC<IHeroPopup> = ({
+  isPopupVisible,
+  postType,
+  closeModal,
+}) => {
   const { t } = useTranslation('decision');
+
   return (
     <Modal show={isPopupVisible} onClose={closeModal} additionalZ={99999}>
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SImageWrapper>
-            <Image src={IMAGES[postType]} alt="Post type image" width={150} height={130} objectFit="contain" priority />
+            <Image
+              src={IMAGES[postType]}
+              alt="Post type image"
+              width={150}
+              height={130}
+              objectFit="contain"
+              priority
+            />
           </SImageWrapper>
           <STitle variant={4}>{t(`heroPopup${postType}.title`)}</STitle>
-          <SText variant={2}>{t(`heroPopup${postType}.description`)}</SText>
+          <SText variant={2}>{t(`heroPopup${postType}.line1`)}</SText>
+          <SText variant={2}>{t(`heroPopup${postType}.line2`)}</SText>
+          <SText variant={2}>{t(`heroPopup${postType}.line3`)}</SText>
           <SButton view="primary" onClick={closeModal}>
-            {t('heroPopupCommon.btnText')}
+            {t('heroPopupCommon.heroBtnText')}
           </SButton>
         </SModal>
       </SContainer>
@@ -53,15 +67,20 @@ const SContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
-  border-top: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-top: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   text-align: center;
 `;
 
 const SModal = styled.div`
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   display: flex;
   flex-direction: column;
   height: auto;

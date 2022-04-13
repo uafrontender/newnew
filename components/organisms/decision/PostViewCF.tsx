@@ -15,7 +15,11 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import { doPledgeCrowdfunding, fetchPledgeLevels, fetchPledges } from '../../../api/endpoints/crowdfunding';
+import {
+  doPledgeCrowdfunding,
+  fetchPledgeLevels,
+  fetchPledges,
+} from '../../../api/endpoints/crowdfunding';
 
 import Button from '../../atoms/Button';
 import GoBackButton from '../../molecules/GoBackButton';
@@ -38,6 +42,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -65,14 +70,18 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Response viewed
-  const [responseViewed, setResponseViewed] = useState(post.isResponseViewedByMe ?? false);
+  const [responseViewed, setResponseViewed] = useState(
+    post.isResponseViewedByMe ?? false
+  );
 
   // Tabs
   const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
@@ -88,13 +97,21 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
   const handleChangeTab = (tab: string) => {
     if (tab === 'comments' && isMobile) {
-      window.history.pushState(        {
-        postId: post.postUuid,
-      }, 'Post', `/post/${post.postUuid}#${tab}`);
+      window.history.pushState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     } else {
-      window.history.replaceState(        {
-        postId: post.postUuid,
-      }, 'Post', `/post/${post.postUuid}#${tab}`);
+      window.history.replaceState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   };
@@ -124,24 +141,28 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Current backers
-  const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
+  const [currentBackers, setCurrentBackers] = useState(
+    post.currentBackerCount ?? 0
+  );
 
   // Pledge levels
-  const [pledgeLevels, setPledgeLevels] = useState<newnewapi.IMoneyAmount[]>([]);
+  const [pledgeLevels, setPledgeLevels] = useState<newnewapi.IMoneyAmount[]>(
+    []
+  );
   const [pledgeLevelsLoading, setPledgeLevelsLoading] = useState(false);
   const [loadingPledgeLevelsError, setLoadingPledgeLevelsError] = useState('');
 
   // Pledges
   const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
-  const [myPledgeAmount, setMyPledgeAmount] = useState<newnewapi.MoneyAmount | undefined>(undefined);
-  const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
+  const [myPledgeAmount, setMyPledgeAmount] =
+    useState<newnewapi.MoneyAmount | undefined>(undefined);
+  const [pledgesNextPageToken, setPledgesNextPageToken] =
+    useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
   // Mobile choose pledge modal
   const [choosePledgeModalOpen, setChoosePledgeModalOpen] = useState(false);
-
-  const [isPopupVisible, setIsPopupVisible] = useState(true);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -156,7 +177,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       }
 
       const highestPledge = unsortedArr.sort(
-        (a, b) => (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
+        (a, b) =>
+          (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
       )[0];
 
       const pledgesByUser = user.userData?.userUuid
@@ -176,18 +198,25 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       });
 
       const joinedArr = [
-        ...(highestPledge && highestPledge.creator?.uuid === user.userData?.userUuid ? [highestPledge] : []),
+        ...(highestPledge &&
+        highestPledge.creator?.uuid === user.userData?.userUuid
+          ? [highestPledge]
+          : []),
         ...pledgesByUser,
         // ...pledgesByVipUsers,
-        ...(highestPledge && highestPledge.creator?.uuid !== user.userData?.userUuid ? [highestPledge] : []),
+        ...(highestPledge &&
+        highestPledge.creator?.uuid !== user.userData?.userUuid
+          ? [highestPledge]
+          : []),
         ...workingArrSorted,
       ];
 
-      const workingSortedUnique = joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+      const workingSortedUnique =
+        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
 
-      const highestPledgeIdx = (workingSortedUnique as TCfPledgeWithHighestField[]).findIndex(
-        (o) => o.id === highestPledge.id
-      );
+      const highestPledgeIdx = (
+        workingSortedUnique as TCfPledgeWithHighestField[]
+      ).findIndex((o) => o.id === highestPledge.id);
 
       if (workingSortedUnique[highestPledgeIdx]) {
         workingSortedUnique[highestPledgeIdx].isHighest = true;
@@ -207,7 +236,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
       const res = await fetchPledgeLevels(fetchPledgeLevelsPayload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       setPledgeLevels(res.data.amounts);
 
@@ -239,11 +269,15 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
         const res = await fetchPledges(getCurrentPledgesPayload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
         if (res.data && res.data.pledges) {
           setPledges((curr) => {
-            const workingArr = [...curr, ...(res.data?.pledges as TCfPledgeWithHighestField[])];
+            const workingArr = [
+              ...curr,
+              ...(res.data?.pledges as TCfPledgeWithHighestField[]),
+            ];
             const workingArrUnsorted = [...workingArr];
 
             return sortPleges(workingArrUnsorted);
@@ -264,7 +298,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   const handleAddPledgeFromResponse = useCallback(
     (newPledge: newnewapi.Crowdfunding.Pledge) => {
       setPledges((curr) => {
-        const workingArrUnsorted = [...curr, newPledge as TCfPledgeWithHighestField];
+        const workingArrUnsorted = [
+          ...curr,
+          newPledge as TCfPledgeWithHighestField,
+        ];
         return sortPleges(workingArrUnsorted);
       });
     },
@@ -279,7 +316,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
       const res = await fetchPostByUUID(fetchPostPayload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
       handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
@@ -299,7 +337,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           '',
           ''
         );
-        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
+        router.push(
+          `/sign-up?reason=follow-decision&redirect=${window.location.href}`
+        );
       }
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -330,7 +370,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
                 post={post}
                 pledgeLevels={pledgeLevels}
                 handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-                handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
+                handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+                  setPaymentSuccesModalOpen(newValue)
+                }
               />
             ) : null}
           </>
@@ -339,7 +381,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       case 'waiting_for_response': {
         return (
           <>
-            <CfCrowdfundingSuccess post={post} currentNumBackers={currentBackers} />
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
             <PostWaitingForResponseBox
               title={t('PostWaitingForResponse.title')}
               body={t('PostWaitingForResponse.body')}
@@ -357,7 +402,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       case 'succeeded': {
         return (
           <>
-            <CfCrowdfundingSuccess post={post} currentNumBackers={currentBackers} />
+            <CfCrowdfundingSuccess
+              post={post}
+              currentNumBackers={currentBackers}
+            />
             <PostSuccessBox
               title={t('PostSuccess.title')}
               body={t('PostSuccess.body')}
@@ -367,7 +415,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
               }}
               handleButtonClick={() => {
                 document.getElementById('post-modal-container')?.scrollTo({
-                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  top: document.getElementById(
+                    'recommendations-section-heading'
+                  )?.offsetTop,
                   behavior: 'smooth',
                 });
               }}
@@ -377,7 +427,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       }
       default: {
         <>
-          <CfCrowdfundingSuccess post={post} currentNumBackers={currentBackers} />
+          <CfCrowdfundingSuccess
+            post={post}
+            currentNumBackers={currentBackers}
+          />
         </>;
       }
     }
@@ -413,7 +466,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   // Mark post as viewed if logged in
   useEffect(() => {
     async function markAsViewed() {
-      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid) return;
+      if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
+        return;
       try {
         const markAsViewedPayload = new newnewapi.MarkPostRequest({
           markAs: newnewapi.MarkPostRequest.Kind.VIEWED,
@@ -451,10 +505,16 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
         const res = await doPledgeCrowdfunding(payload);
 
-        if (!res.data || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS || res.error)
+        if (
+          !res.data ||
+          res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
+          res.error
+        )
           throw new Error(res.error?.message ?? 'Request failed');
 
-        handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
+        handleAddPledgeFromResponse(
+          res.data.pledge as newnewapi.Crowdfunding.Pledge
+        );
         setLoadingModalOpen(false);
         setPaymentSuccesModalOpen(true);
       } catch (err) {
@@ -477,11 +537,17 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         setPledges((curr) => {
           const workingArr = [...curr];
           let workingArrUnsorted;
-          const idx = workingArr.findIndex((op) => op.id === decoded.pledge?.id);
+          const idx = workingArr.findIndex(
+            (op) => op.id === decoded.pledge?.id
+          );
           if (idx === -1) {
-            workingArrUnsorted = [...workingArr, decoded.pledge as TCfPledgeWithHighestField];
+            workingArrUnsorted = [
+              ...workingArr,
+              decoded.pledge as TCfPledgeWithHighestField,
+            ];
           } else {
-            workingArr[idx].amount!!.usdCents = decoded.pledge?.amount?.usdCents as number;
+            workingArr[idx].amount!!.usdCents = decoded.pledge?.amount
+              ?.usdCents as number;
             workingArrUnsorted = workingArr;
           }
 
@@ -530,7 +596,11 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   useEffect(() => {
     const workingAmount = pledges
       .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
-      .reduce((acc, myPledge) => (myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc), 0);
+      .reduce(
+        (acc, myPledge) =>
+          myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc,
+        0
+      );
 
     if (workingAmount !== 0 && workingAmount !== undefined) {
       setMyPledgeAmount(
@@ -540,6 +610,14 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       );
     }
   }, [pledges, user.userData?.userUuid]);
+
+  const goToNextStep = () => {
+    dispatch(
+      setUserTutorialsProgress({
+        goalStep: 1,
+      })
+    );
+  };
 
   return (
     <SWrapper>
@@ -552,7 +630,12 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
             onClick={handleGoBack}
           />
         )}
-        <PostTimer timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()} postType="cf" />
+        <PostTimer
+          timestampSeconds={new Date(
+            (post.expiresAt?.seconds as number) * 1000
+          ).getTime()}
+          postType="cf"
+        />
       </SExpiresSection>
       <PostVideo
         postId={post.postUuid}
@@ -594,16 +677,25 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         {currentTab === 'backers' ? (
           renderBackersSection()
         ) : post.isCommentsAllowed ? (
-          <CommentsTab commentsRoomId={post.commentsRoomId as number} handleGoBack={() => handleChangeTab('backers')} />
+          <CommentsTab
+            commentsRoomId={post.commentsRoomId as number}
+            handleGoBack={() => handleChangeTab('backers')}
+          />
         ) : null}
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
-      <PaymentSuccessModal isVisible={paymentSuccesModalOpen} closeModal={() => setPaymentSuccesModalOpen(false)}>
+      <PaymentSuccessModal
+        isVisible={paymentSuccesModalOpen}
+        closeModal={() => setPaymentSuccesModalOpen(false)}
+      >
         {t('PaymentSuccessModal.cf', {
-          postCreator: (post.creator?.nickname as string) ?? post.creator?.username,
-          postDeadline: moment((post.responseUploadDeadline?.seconds as number) * 1000)
+          postCreator:
+            (post.creator?.nickname as string) ?? post.creator?.username,
+          postDeadline: moment(
+            (post.responseUploadDeadline?.seconds as number) * 1000
+          )
             .subtract(3, 'days')
             .calendar(),
         })}
@@ -617,16 +709,28 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           isOpen={choosePledgeModalOpen}
           onClose={() => setChoosePledgeModalOpen(false)}
           handleAddPledgeFromResponse={handleAddPledgeFromResponse}
-          handleSetPaymentSuccesModalOpen={(newValue: boolean) => setPaymentSuccesModalOpen(newValue)}
+          handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+            setPaymentSuccesModalOpen(newValue)
+          }
         />
       ) : null}
       {/* Mobile floating button */}
       {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
-        <SActionButton view="primaryGrad" onClick={() => setChoosePledgeModalOpen(true)}>
+        <SActionButton
+          view="primaryGrad"
+          onClick={() => setChoosePledgeModalOpen(true)}
+        >
           {t('CfPost.FloatingActionButton.choosePledgeBtn')}
         </SActionButton>
       ) : null}
-      <HeroPopup isPopupVisible={isPopupVisible} postType="CF" closeModal={() => setIsPopupVisible(false)} />
+      <HeroPopup
+        isPopupVisible={
+          user.userTutorialsProgress &&
+          user.userTutorialsProgress.goalStep === 0
+        }
+        postType="CF"
+        closeModal={goToNextStep}
+      />
     </SWrapper>
   );
 };

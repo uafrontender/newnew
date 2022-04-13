@@ -46,8 +46,8 @@ TutorialTooltip.defaultProps = {
 
 const SContainer = styled.div`
   position: relative;
-  background: ${(props) => props.theme.colorsThemed.background.primary};
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  background: ${(props) => props.theme.colorsThemed.accent.blue};
+  color: ${(props) => props.theme.colors.white};
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
@@ -69,18 +69,20 @@ const STitle = styled.h3`
 `;
 
 const SText = styled.p`
-  margin: 5px 0;
+  margin: 5px 0 10px;
 `;
 
 const SButton = styled.button`
   padding: 0;
   background: none;
   border: none;
-  color: ${(props) => props.theme.colorsThemed.accent.blue};
-  margin-right: auto;
+  color: ${(props) => props.theme.colors.white};
+  margin-left: auto;
   font-size: 14px;
   line-height: 24px;
   cursor: pointer;
+  font-weight: 600;
+  width: auto !important;
 `;
 
 interface ISDot {
@@ -95,7 +97,10 @@ const SDotWrapper = styled.span<ISDot>`
   align-items: center;
   justify-content: center;
   position: absolute;
-  background: ${(props) => (props.theme.name === 'light' ? 'rgba(29,106,255,.1)' : 'rgba(255,255,255,.1)')};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? 'rgba(29,106,255,.1)'
+      : 'rgba(255,255,255,.1)'};
   ${(props) => {
     if (props.position === 'top-right') {
       return css`
@@ -126,5 +131,6 @@ const SDot = styled.span`
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.blue : props.theme.colors.white)};
+  background: ${(props) =>
+    props.theme.name === 'light' ? '#0B0A13' : props.theme.colors.white};
 `;

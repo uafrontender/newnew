@@ -47,6 +47,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -220,8 +221,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   const [optionToAnimate, setOptionToAnimate] = useState('');
 
   // const currLocation = `/post/${post.postUuid}`;
-
-  const [isPopupVisible, setIsPopupVisible] = useState(true);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -598,6 +597,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     sortOptions,
   ]);
 
+  const goToNextStep = () => {
+    dispatch(
+      setUserTutorialsProgress({
+        eventsStep: 1,
+      })
+    );
+  };
+
   useEffect(() => {
     if (loadingOptionsError) {
       toast.error(loadingOptionsError);
@@ -731,9 +738,12 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         })}
       </PaymentSuccessModal>
       <HeroPopup
-        isPopupVisible={isPopupVisible}
+        isPopupVisible={
+          user.userTutorialsProgress &&
+          user.userTutorialsProgress.eventsStep === 0
+        }
         postType="AC"
-        closeModal={() => setIsPopupVisible(false)}
+        closeModal={goToNextStep}
       />
     </SWrapper>
   );

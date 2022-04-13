@@ -1,31 +1,47 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
+/* eslint-disable no-unused-expressions */
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import { TPostType } from '../../../utils/switchPostType';
-import { DotPositionEnum, TutorialTooltip } from '../../atoms/decision/TutorialTooltip';
+import {
+  DotPositionEnum,
+  TutorialTooltip,
+} from '../../atoms/decision/TutorialTooltip';
 
 interface IPostTimer {
   timestampSeconds: number;
   postType: TPostType;
 }
 
-const PostTimer: React.FunctionComponent<IPostTimer> = ({ timestampSeconds, postType }) => {
+const PostTimer: React.FunctionComponent<IPostTimer> = ({
+  timestampSeconds,
+  postType,
+}) => {
   const { t } = useTranslation('decision');
+  const { user } = useAppSelector((state) => state);
+  const dispatch = useAppDispatch();
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
   const expirationDate = new Date(timestampSeconds);
 
-  const [parsedSeconds, setParsedSeconds] = useState<DHMS>(secondsToDHMS(parsed));
+  const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
+    secondsToDHMS(parsed)
+  );
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
 
-  const shouldTurnRed = useMemo(() => !hasEnded && seconds <= 60 * 60, [hasEnded, seconds]);
+  const shouldTurnRed = useMemo(
+    () => !hasEnded && seconds <= 60 * 60,
+    [hasEnded, seconds]
+  );
 
-  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   useEffect(() => {
     if (isBrowser()) {
@@ -35,6 +51,50 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({ timestampSeconds, post
     }
     return () => clearInterval(interval.current);
   }, []);
+
+  useEffect(() => {
+    switch (postType) {
+      case 'ac':
+        user.userTutorialsProgress.eventsStep === 1 &&
+          setIsTooltipVisible(true);
+        break;
+      case 'cf':
+        user.userTutorialsProgress.goalStep === 1 && setIsTooltipVisible(true);
+        break;
+      case 'mc':
+        user.userTutorialsProgress.superPollStep === 1 &&
+          setIsTooltipVisible(true);
+        break;
+      default:
+        setIsTooltipVisible(false);
+    }
+  }, [postType, user.userTutorialsProgress]);
+
+  const goToNextStep = () => {
+    setIsTooltipVisible(false);
+    switch (postType) {
+      case 'ac':
+        dispatch(
+          setUserTutorialsProgress({
+            eventsStep: 2,
+          })
+        );
+        break;
+      case 'cf':
+        dispatch(
+          setUserTutorialsProgress({
+            goalStep: 2,
+          })
+        );
+        break;
+      default:
+        dispatch(
+          setUserTutorialsProgress({
+            superPollStep: 2,
+          })
+        );
+    }
+  };
 
   useEffect(() => {
     setParsedSeconds(secondsToDHMS(seconds));
@@ -52,7 +112,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({ timestampSeconds, post
                 <STutorialTooltipHolder>
                   <TutorialTooltip
                     isTooltipVisible={isTooltipVisible}
-                    closeTooltip={() => setIsTooltipVisible(false)}
+                    closeTooltip={goToNextStep}
                     title={t('tutorials.timer.title')}
                     text={t('tutorials.timer.text')}
                     dotPosition={DotPositionEnum.TopRight}
@@ -69,7 +129,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({ timestampSeconds, post
               <STutorialTooltipHolder>
                 <TutorialTooltip
                   isTooltipVisible={isTooltipVisible}
-                  closeTooltip={() => setIsTooltipVisible(false)}
+                  closeTooltip={goToNextStep}
                   title={t('tutorials.timer.title')}
                   text={t('tutorials.timer.text')}
                   dotPosition={DotPositionEnum.TopRight}
@@ -94,14 +154,16 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({ timestampSeconds, post
         </>
       ) : (
         <STimerItemEnded>
-          {t(`postType.${postType}`)} {t('expires.ended_on')} {expirationDate.getDate()}{' '}
-          {expirationDate.toLocaleString('default', { month: 'short' })} {expirationDate.getFullYear()}{' '}
-          {t('expires.at_time')} {('0' + expirationDate.getHours()).slice(-2)}:
+          {t(`postType.${postType}`)} {t('expires.ended_on')}{' '}
+          {expirationDate.getDate()}{' '}
+          {expirationDate.toLocaleString('default', { month: 'short' })}{' '}
+          {expirationDate.getFullYear()} {t('expires.at_time')}{' '}
+          {('0' + expirationDate.getHours()).slice(-2)}:
           {('0' + expirationDate.getMinutes()).slice(-2)}
           <STutorialTooltipHolder>
             <TutorialTooltip
               isTooltipVisible={isTooltipVisible}
-              closeTooltip={() => setIsTooltipVisible(false)}
+              closeTooltip={goToNextStep}
               title={t('tutorials.timer.title')}
               text={t('tutorials.timer.text')}
               dotPosition={DotPositionEnum.TopRight}
@@ -140,7 +202,8 @@ const SWrapper = styled.div<{
     shouldTurnRed
       ? css`
           .timerItem {
-            background-color: ${({ theme }) => theme.colorsThemed.accent.pink} !important;
+            background-color: ${({ theme }) =>
+              theme.colorsThemed.accent.pink} !important;
             color: #ffffff;
           }
         `

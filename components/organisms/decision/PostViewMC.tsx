@@ -48,6 +48,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -208,8 +209,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   // Winning option
   const [winningOption, setWinningOption] =
     useState<newnewapi.MultipleChoice.Option | undefined>();
-
-  const [isPopupVisible, setIsPopupVisible] = useState(true);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
@@ -566,6 +565,14 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     sortOptions,
   ]);
 
+  const goToNextStep = () => {
+    dispatch(
+      setUserTutorialsProgress({
+        superPollStep: 1,
+      })
+    );
+  };
+
   useEffect(() => {
     if (loadingOptionsError) {
       toast.error(loadingOptionsError);
@@ -684,9 +691,12 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         })}
       </PaymentSuccessModal>
       <HeroPopup
-        isPopupVisible={isPopupVisible}
+        isPopupVisible={
+          user.userTutorialsProgress &&
+          user.userTutorialsProgress.superPollStep === 0
+        }
         postType="MC"
-        closeModal={() => setIsPopupVisible(false)}
+        closeModal={goToNextStep}
       />
     </SWrapper>
   );
