@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable quotes */
 /* eslint-disable react/jsx-indent */
@@ -32,6 +33,7 @@ import McSymbolIcon from '../../../../public/images/decision/mc-option.png';
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -63,7 +65,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const router = useRouter();
-  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
@@ -82,10 +83,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     return false;
   }, [option.creator]);
 
+  const isSuggestedByMe = useMemo(() => (
+    !isCreatorsBid && option.creator?.uuid === user.userData?.userUuid
+  ), [option.creator?.uuid, user.userData?.userUuid, isCreatorsBid]);
+
   const supporterCountSubstracted = useMemo(() => {
-    if (isCreatorsBid) return option.supporterCount;
-    return option.supporterCount - 1;
-  }, [option.supporterCount, isCreatorsBid]);
+    // if (option.supporterCount) return option.supporterCount;
+    if (option.supporterCount > 0) {
+      return option.supporterCount - 1;
+    }
+    return option.supporterCount;
+  }, [option.supporterCount]);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
   const [selectVotesMenuTop, setSelectVotesMenuTop] = useState<number | undefined>(undefined);
@@ -327,10 +335,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             stiffness: 300,
           }}
           $isDisabled={disabled}
+          $isBlue={isBlue}
           onClick={() => {
-            if (isSupportMenuOpen) {
-              console.log('hey')
-            }
             if (!isMobile && !disabled && !noAction && !isSupportMenuOpen) {
               handleOpenSupportForm();
             }
@@ -344,60 +350,22 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               <SOptionSymbolImg src={McSymbolIcon.src} />
               <div>
                 {option.voteCount && option.voteCount > 0
-                  ? `${formatNumber(option?.voteCount, true)}`
+                  ? `${formatNumber(option?.voteCount, true)} ${t('McPost.OptionsTab.OptionCard.votes')}`
                   : t('McPost.OptionsTab.OptionCard.noVotes')}
               </div>
             </SBidAmount>
             <SOptionInfo variant={3}>{option.text}</SOptionInfo>
             <SBiddersInfo variant={3}>
-              {isCreatorsBid ? (
-                <>
-                  {supporterCountSubstracted > 0 ? (
-                    <>
-                      <SSpanBiddersHighlighted>
-                        {formatNumber(supporterCountSubstracted, true)}{' '}
-                        {t('McPost.OptionsTab.OptionCard.voters')}
-                      </SSpanBiddersHighlighted>{' '}
-                      <SSpanBiddersRegular>
-                        {t('McPost.OptionsTab.OptionCard.voted')}
-                      </SSpanBiddersRegular>
-                    </>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <SSpanBiddersHighlighted
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRedirectToOptionCreator();
-                    }}
-                    style={{
-                      color:
-                        theme.name === 'dark'
-                          ? theme.colorsThemed.accent.yellow
-                          : theme.colors.dark,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {t('McPost.OptionsTab.OptionCard.subscriber_suggestion', {
-                      nickname:
-                        option.creator?.nickname ?? option.creator?.username,
-                    })}
-                  </SSpanBiddersHighlighted>
-                  {supporterCountSubstracted > 0 ? (
-                    <>
-                      {', '}
-                      <SSpanBiddersHighlighted>
-                        {formatNumber(supporterCountSubstracted, true)}{' '}
-                        {t('McPost.OptionsTab.OptionCard.voters')}
-                      </SSpanBiddersHighlighted>{' '}
-                      <SSpanBiddersRegular>
-                        {t('McPost.OptionsTab.OptionCard.voted')}
-                      </SSpanBiddersRegular>
-                    </>
-                  ) : null}
-                </>
-              )}
+              <RenderSupportersInfo
+                isCreatorsBid={isCreatorsBid}
+                isSuggestedByMe={isSuggestedByMe}
+                isSupportedByMe={!!option.isSupportedByMe}
+                optionCreator={option.creator ? getDisplayname(option.creator) : undefined}
+                firstVoter={option.firstVoter ? getDisplayname(option.firstVoter) : undefined}
+                supporterCount={option.supporterCount}
+                supporterCountSubstracted={supporterCountSubstracted}
+                handleRedirectToOptionCreator={handleRedirectToOptionCreator}
+              />
             </SBiddersInfo>
           </SBidDetails>
           {noAction ? null : (
@@ -489,7 +457,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           handleOpenCustomAmountModal={handleOpenCustomAmountModal}
           handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
         >
-          <SSelectVotesModalCard>
+          <SSelectVotesModalCard
+            isBlue={isBlue}
+          >
             <SBidDetails
               isBlue={isBlue}
               noAction={noAction}
@@ -504,54 +474,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               </SBidAmount>
               <SOptionInfo variant={3}>{option.text}</SOptionInfo>
               <SBiddersInfo variant={3}>
-                {isCreatorsBid ? (
-                  <>
-                    {supporterCountSubstracted > 0 ? (
-                      <>
-                        <SSpanBiddersHighlighted>
-                          {formatNumber(supporterCountSubstracted, true)}{' '}
-                          {t('McPost.OptionsTab.OptionCard.voters')}
-                        </SSpanBiddersHighlighted>{' '}
-                        <SSpanBiddersRegular>
-                          {t('McPost.OptionsTab.OptionCard.voted')}
-                        </SSpanBiddersRegular>
-                      </>
-                    ) : null}
-                  </>
-                ) : (
-                  <>
-                    <SSpanBiddersHighlighted
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRedirectToOptionCreator();
-                      }}
-                      style={{
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {t('McPost.OptionsTab.OptionCard.subscriber_suggestion', {
-                        nickname:
-                          option.creator?.nickname ?? option.creator?.username,
-                      })}
-                    </SSpanBiddersHighlighted>
-                    {supporterCountSubstracted > 0 ? (
-                      <>
-                        {', '}
-                        <SSpanBiddersHighlighted>
-                          {formatNumber(supporterCountSubstracted, true)}{' '}
-                          {t('McPost.OptionsTab.OptionCard.voters')}
-                        </SSpanBiddersHighlighted>{' '}
-                        <SSpanBiddersRegular>
-                          {t('McPost.OptionsTab.OptionCard.voted')}
-                        </SSpanBiddersRegular>
-                      </>
-                    ) : null}
-                  </>
-                )}
+                <RenderSupportersInfo
+                  isCreatorsBid={isCreatorsBid}
+                  isSuggestedByMe={isSuggestedByMe}
+                  isSupportedByMe={!!option.isSupportedByMe}
+                  optionCreator={option.creator ? getDisplayname(option.creator) : undefined}
+                  firstVoter={option.firstVoter ? getDisplayname(option.firstVoter) : undefined}
+                  supporterCount={option.supporterCount}
+                  supporterCountSubstracted={supporterCountSubstracted}
+                  handleRedirectToOptionCreator={handleRedirectToOptionCreator}
+                />
               </SBiddersInfo>
             </SBidDetails>
           </SSelectVotesModalCard>
@@ -582,8 +514,212 @@ McOptionCard.defaultProps = {
 
 export default McOptionCard;
 
+const RenderSupportersInfo:React.FunctionComponent<{
+  isCreatorsBid: boolean;
+  isSuggestedByMe: boolean;
+  isSupportedByMe: boolean;
+  supporterCount: number;
+  supporterCountSubstracted: number;
+  optionCreator?: string;
+  firstVoter?: string;
+  handleRedirectToOptionCreator: () => void;
+}> = ({
+  isCreatorsBid,
+  isSupportedByMe,
+  isSuggestedByMe,
+  supporterCount,
+  supporterCountSubstracted,
+  optionCreator,
+  firstVoter,
+  handleRedirectToOptionCreator,
+}) => {
+  const theme = useTheme();
+  const { t } = useTranslation('decision');
+
+  if (isCreatorsBid && !isSupportedByMe) {
+    return (
+      <>
+        {supporterCount > 0 ? (
+          <>
+            {firstVoter && (
+              <SSpanBiddersHighlighted className="spanHighlighted">
+                {firstVoter}
+              </SSpanBiddersHighlighted>
+            )}
+            <SSpanBiddersRegular className="spanRegular">
+              {supporterCountSubstracted > 0
+                ? ` & `
+                : ''}
+            </SSpanBiddersRegular>
+            {supporterCountSubstracted > 0 ? (
+              <SSpanBiddersHighlighted className="spanHighlighted">
+                {formatNumber(supporterCountSubstracted, true)}{' '}
+                {t('McPost.OptionsTab.OptionCard.others')}
+              </SSpanBiddersHighlighted>
+            ) : null}
+            {' '}
+            <SSpanBiddersRegular className="spanRegular">
+              {t('McPost.OptionsTab.OptionCard.voted')}
+            </SSpanBiddersRegular>
+          </>
+        ) : null}
+      </>
+    );
+  }
+  if (isCreatorsBid && isSupportedByMe) {
+    return (
+      <>
+        {supporterCount > 0 ? (
+          <>
+            <SSpanBiddersHighlighted className="spanHighlighted">
+              {t('me')}
+            </SSpanBiddersHighlighted>
+            <SSpanBiddersRegular className="spanRegular">
+              {
+                supporterCountSubstracted > 0
+                ? ` & `
+                : ''
+              }
+            </SSpanBiddersRegular>
+            {supporterCountSubstracted > 0 ? (
+              <SSpanBiddersHighlighted className="spanHighlighted">
+                {formatNumber(supporterCountSubstracted, true)}{' '}
+                {t('McPost.OptionsTab.OptionCard.others')}
+              </SSpanBiddersHighlighted>
+            ) : null}
+            {' '}
+            <SSpanBiddersRegular className="spanRegular">
+              {t('McPost.OptionsTab.OptionCard.voted')}
+            </SSpanBiddersRegular>
+          </>
+        ) : null}
+      </>
+    );
+  }
+
+  if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
+    return (
+      <>
+        <SSpanBiddersHighlighted
+          className="spanHighlighted"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRedirectToOptionCreator();
+          }}
+          style={{
+            color:
+              theme.name === 'dark'
+                ? theme.colorsThemed.accent.yellow
+                : theme.colors.dark,
+            cursor: 'pointer',
+          }}
+        >
+          {optionCreator}
+        </SSpanBiddersHighlighted>
+        <SSpanBiddersRegular className="spanRegular">
+          {supporterCountSubstracted > 0
+            ? ` & `
+            : ''}
+        </SSpanBiddersRegular>
+        {supporterCountSubstracted > 0 ? (
+          <>
+            <SSpanBiddersHighlighted className="spanHighlighted">
+              {formatNumber(supporterCountSubstracted, true)}{' '}
+              {t('McPost.OptionsTab.OptionCard.others')}
+            </SSpanBiddersHighlighted>{' '}
+          </>
+        ) : null}
+        <SSpanBiddersRegular className="spanRegular">
+          {t('McPost.OptionsTab.OptionCard.voted')}
+        </SSpanBiddersRegular>
+      </>
+    );
+  }
+
+  if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
+    return (
+      <>
+        <SSpanBiddersHighlighted
+          className="spanHighlighted"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRedirectToOptionCreator();
+          }}
+          style={{
+            color: theme.colorsThemed.accent.yellow,
+            cursor: 'pointer',
+          }}
+        >
+          {optionCreator}
+        </SSpanBiddersHighlighted>
+        <SSpanBiddersHighlighted className="spanHighlighted">
+          {', '}
+          {`${t('me')}`}
+        </SSpanBiddersHighlighted>
+        <SSpanBiddersRegular className="spanRegular">
+          {supporterCountSubstracted - 1 > 0
+            ? ` & `
+            : ''}
+        </SSpanBiddersRegular>
+        {supporterCountSubstracted - 1 > 0 ? (
+          <>
+            <SSpanBiddersHighlighted className="spanHighlighted">
+              {formatNumber(supporterCountSubstracted - 1, true)}{' '}
+              {t('McPost.OptionsTab.OptionCard.others')}
+            </SSpanBiddersHighlighted>
+          </>
+        ) : null}
+        {' '}
+        <SSpanBiddersRegular className="spanRegular">
+          {t('McPost.OptionsTab.OptionCard.voted')}
+        </SSpanBiddersRegular>
+      </>
+    );
+  }
+
+  if (!isCreatorsBid && isSuggestedByMe) {
+    return (
+      <>
+        <SSpanBiddersHighlighted
+          className="spanHighlighted"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRedirectToOptionCreator();
+          }}
+          style={{
+            color: theme.colorsThemed.accent.yellow,
+            cursor: 'pointer',
+          }}
+        >
+          {`${t('me')}`}
+        </SSpanBiddersHighlighted>
+        <SSpanBiddersRegular className="spanRegular">
+          {supporterCountSubstracted > 0
+            ? ` & `
+            : ''}
+        </SSpanBiddersRegular>
+        {supporterCountSubstracted > 0 ? (
+          <>
+            <SSpanBiddersHighlighted className="spanHighlighted">
+              {formatNumber(supporterCountSubstracted, true)}{' '}
+              {t('McPost.OptionsTab.OptionCard.others')}
+            </SSpanBiddersHighlighted>
+          </>
+        ) : null}
+        {' '}
+        <SSpanBiddersRegular className="spanRegular">
+          {t('McPost.OptionsTab.OptionCard.voted')}
+        </SSpanBiddersRegular>
+      </>
+    );
+  }
+
+  return null;
+}
+
 const SContainer = styled(motion.div)<{
   $isDisabled: boolean;
+  $isBlue: boolean;
 }>`
   display: flex;
   flex-direction: column;
@@ -593,7 +729,10 @@ const SContainer = styled(motion.div)<{
 
   padding: 16px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: ${({ theme, $isBlue }) =>
+    $isBlue
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   opacity: ${({ $isDisabled }) => ($isDisabled ? 0.5 : 1)};
@@ -628,6 +767,10 @@ const SBidDetails = styled.div<{
   ${({ isBlue }) =>
     isBlue
       ? css`
+          div {
+            color: #ffffff;
+          }
+
           .spanRegular {
             color: #ffffff;
             opacity: 0.6;
@@ -790,13 +933,34 @@ const SSupportButtonDesktop = styled(Button)<{
 `;
 
 // Select votes mobile card
-const SSelectVotesModalCard = styled.div`
+const SSelectVotesModalCard = styled.div<{
+  isBlue: boolean;
+}>`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   margin-bottom: 24px;
   padding: 16px;
+
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          background: ${({ theme }) => theme.colorsThemed.accent.blue};
+
+          div {
+            color: #ffffff;
+          }
+
+          .spanRegular {
+            color: #ffffff;
+            opacity: 0.6;
+          }
+          .spanHighlighted {
+            color: #ffffff;
+          }
+        `
+      : null}
 `;
 
 // Payment modal header
