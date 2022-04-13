@@ -38,6 +38,7 @@ import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -65,6 +66,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const { appConstants } = useGetAppConstants();
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -157,6 +160,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
+
+  // Free votes
+  // const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree);
+  // test
+  const [hasFreeVote, setHasFreeVote] = useState(true);
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -573,10 +581,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
               options={options}
               optionsLoading={optionsLoading}
               pagingToken={optionsNextPageToken}
-              minAmount={2}
-              votePrice={post.votePrice?.usdCents
+              minAmount={appConstants?.minMcVotes ?? 2}
+              votePrice={appConstants?.mcVotePrice
                 ? (
-                  Math.floor(post.votePrice?.usdCents / 100)
+                  Math.floor(appConstants?.mcVotePrice / 100)
                 ) : 1}
               handleLoadOptions={fetchOptions}
               handleAddOrUpdateOptionFromResponse={handleAddOrUpdateOptionFromResponse}
