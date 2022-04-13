@@ -16,3 +16,14 @@ newnewapi.ValidateTextRequest, newnewapi.ValidateTextResponse>(
   'post',
   payload,
 );
+
+export const getAppConstants = (
+  payload: newnewapi.EmptyRequest,
+) => fetchProtobuf<
+newnewapi.EmptyRequest, newnewapi.GetAppConstantsResponse>(
+  newnewapi.EmptyRequest,
+  newnewapi.GetAppConstantsResponse,
+  `${BASE_URL_INFRASTRUCTURE}/get_app_constants`,
+  'post',
+  payload,
+);

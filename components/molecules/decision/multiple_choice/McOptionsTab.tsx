@@ -36,7 +36,6 @@ import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import McOptionCardDoubleVote from './McOptionCardDoubleVote';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import { WalletContext } from '../../../../contexts/walletContext';
@@ -387,54 +386,32 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
             </>
           ) : null}
-          {options.map((option, i) =>
-            hasVotedOptionId === option.id ? (
-              <McOptionCardDoubleVote
-                key={option.id.toString()}
-                option={option as TMcOptionWithHighestField}
-                creator={option.creator ?? post.creator!!}
-                postId={post.postUuid}
-                index={i}
-                hasAlreadyVoted={hasVotedOptionId === option.id}
-                noAction={
-                  (hasVotedOptionId !== undefined &&
-                    hasVotedOptionId !== option.id) ||
-                  postStatus === 'failed'
-                }
-                handleSetSupportedBid={(id: string) =>
-                  setOptionBeingSupported(id)
-                }
-                handleAddOrUpdateOptionFromResponse={
-                  handleAddOrUpdateOptionFromResponse
-                }
-              />
-            ) : (
-              <McOptionCard
-                key={option.id.toString()}
-                option={option as TMcOptionWithHighestField}
-                creator={option.creator ?? post.creator!!}
-                postId={post.postUuid}
-                index={i}
-                minAmount={minAmount}
-                votePrice={votePrice}
-                optionBeingSupported={optionBeingSupported}
-                noAction={
-                  (hasVotedOptionId !== undefined &&
-                    hasVotedOptionId !== option.id) ||
-                  postStatus === 'failed'
-                }
-                handleSetSupportedBid={(id: string) =>
-                  setOptionBeingSupported(id)
-                }
-                handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
-                  setPaymentSuccesModalOpen(newValue)
-                }
-                handleAddOrUpdateOptionFromResponse={
-                  handleAddOrUpdateOptionFromResponse
-                }
-              />
-            )
-          )}
+          {options.map((option, i) => (
+            <McOptionCard
+              key={option.id.toString()}
+              option={option as TMcOptionWithHighestField}
+              creator={option.creator ?? post.creator!!}
+              postId={post.postUuid}
+              index={i}
+              minAmount={minAmount}
+              votePrice={votePrice}
+              optionBeingSupported={optionBeingSupported}
+              noAction={
+                (hasVotedOptionId !== undefined &&
+                  hasVotedOptionId !== option.id) ||
+                postStatus === 'failed'
+              }
+              handleSetSupportedBid={(id: string) =>
+                setOptionBeingSupported(id)
+              }
+              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+                setPaymentSuccesModalOpen(newValue)
+              }
+              handleAddOrUpdateOptionFromResponse={
+                handleAddOrUpdateOptionFromResponse
+              }
+            />
+          ))}
           {!isMobile ? (
             <SLoaderDiv ref={loadingRef} />
           ) : pagingToken ? (
@@ -589,11 +566,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${parseInt(newBidAmount) * 1}`}
+          amount={`$${parseInt(newBidAmount) * votePrice}`}
           showTocApply={!user?.loggedIn}
           {...{
             ...(walletBalance &&
-            walletBalance?.usdCents < parseInt(newBidAmount) * 100
+            walletBalance?.usdCents < parseInt(newBidAmount) * votePrice
               ? {
                   predefinedOption: 'card',
                 }
