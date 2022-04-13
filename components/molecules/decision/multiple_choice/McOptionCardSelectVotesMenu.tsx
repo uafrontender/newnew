@@ -15,12 +15,14 @@ interface IMcOptionCardSelectVotesMenu {
   isVisible: boolean;
   isSupportedByMe: boolean;
   availableVotes: number[];
+  top?: number;
   handleClose: () => void;
   handleOpenCustomAmountModal: () => void;
   handleSetAmountAndOpenModal: (votesAmount: string) => void;
 }
 
 const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVotesMenu> = ({
+  top,
   isVisible,
   isSupportedByMe,
   availableVotes,
@@ -50,51 +52,58 @@ const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVo
 
   if (isBrowser()) {
     return ReactDOM.createPortal(
-      <AnimatePresence>
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <STitleText
-            variant={3}
+      <StyledModalOverlay>
+        <AnimatePresence>
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              ...(top ? {
+                top: `${top}px`,
+              } : {}),
+            }}
           >
-            {!isSupportedByMe ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes')}
-          </STitleText>
-          {availableVotes.map((amount) => (
+            <STitleText
+              variant={3}
+            >
+              {!isSupportedByMe ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes')}
+            </STitleText>
+            {availableVotes.map((amount) => (
+              <SButton
+                key={amount}
+                onClick={() => handleSetAmountAndOpenModal(amount.toString())}
+              >
+                <Text
+                  variant={3}
+                >
+                  <SBoldSpan>
+                    {amount}
+                    {' '}
+                    {amount === 1 ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.votes')}
+                  </SBoldSpan>
+                  {' '}
+                  <SOpaqueSpan>
+                    {`($${amount * Math.round(appConstants.mcVotePrice / 100)})`}
+                  </SOpaqueSpan>
+                </Text>
+              </SButton>
+            ))}
             <SButton
-              key={amount}
-              onClick={() => handleSetAmountAndOpenModal(amount.toString())}
+              onClick={() => handleOpenCustomAmountModal()}
             >
               <Text
                 variant={3}
               >
-                <SBoldSpan>
-                  {amount}
-                  {' '}
-                  {amount === 1 ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.votes')}
-                </SBoldSpan>
-                {' '}
-                <SOpaqueSpan>
-                  {`($${amount * Math.round(appConstants.mcVotePrice / 100)})`}
-                </SOpaqueSpan>
+                {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
               </Text>
             </SButton>
-          ))}
-          <SButton
-            onClick={() => handleOpenCustomAmountModal()}
-          >
-            <Text
-              variant={3}
-            >
-              {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
-            </Text>
-          </SButton>
-        </SContainer>
-      </AnimatePresence>,
+          </SContainer>
+        </AnimatePresence>
+      </StyledModalOverlay>,
       document.getElementById('modal-root') as HTMLElement
     );
   }
@@ -164,4 +173,16 @@ const SBoldSpan = styled.span`
 
 const SOpaqueSpan = styled.span`
   opacity: 0.8;
+`;
+
+const StyledModalOverlay = styled(motion.div)`
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  bottom: 0;
+  z-index: 10;
+  overflow: hidden;
+  position: fixed;
+
+  background-color: transparent;
 `;

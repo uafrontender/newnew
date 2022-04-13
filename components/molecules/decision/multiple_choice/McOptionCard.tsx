@@ -87,6 +87,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   }, [option.supporterCount, isCreatorsBid]);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
+  const [selectVotesMenuTop, setSelectVotesMenuTop] = useState<number | undefined>(undefined);
 
   const [isConfirmVoteModalOpen, setIsConfirmVoteModalOpen] = useState(false);
   const [isAmountPredefined, setIsAmountPredefined] = useState(false);
@@ -420,8 +421,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view="secondary"
                 disabled={disabled}
                 isBlue={isBlue}
-                onClick={() => {
+                onClick={(e) => {
                   if (!isSupportMenuOpen) {
+                    setSelectVotesMenuTop(e.clientY)
                     handleOpenSupportForm();
                   }
                 }}
@@ -475,10 +477,14 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       </motion.div>
       {!isMobile && (
         <McOptionCardSelectVotesMenu
+          top={selectVotesMenuTop}
           isVisible={isSupportMenuOpen}
           isSupportedByMe={!!option.isSupportedByMe}
           availableVotes={appConstants.availableMcVoteAmountOptions}
-          handleClose={() => handleCloseSupportForm()}
+          handleClose={() => {
+            handleCloseSupportForm();
+            setSelectVotesMenuTop(undefined);
+          }}
           handleOpenCustomAmountModal={handleOpenCustomAmountModal}
           handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
         />
