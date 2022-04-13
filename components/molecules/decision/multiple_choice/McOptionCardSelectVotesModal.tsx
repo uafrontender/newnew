@@ -1,15 +1,17 @@
-import React, { useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
-import styled from 'styled-components';
+import React from 'react';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-import isBrowser from '../../../../utils/isBrowser';
-import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 
 import Text from '../../../atoms/Text';
-import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import Button from '../../../atoms/Button';
+import Modal from '../../../organisms/Modal';
+import Headline from '../../../atoms/Headline';
+import InlineSvg from '../../../atoms/InlineSVG';
+
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 
 interface IMcOptionCardSelectVotesModal {
   isVisible: boolean;
@@ -27,43 +29,37 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
   handleClose,
   handleOpenCustomAmountModal,
   handleSetAmountAndOpenModal,
+  children,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
 
   const { appConstants } = useGetAppConstants();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
-
-  useEffect(() => {
-    if (isBrowser() && !!document.getElementById('post-modal-container')) {
-      if (isVisible) {
-        document.getElementById('post-modal-container')!!.style.overflowY = 'hidden';
-      } else {
-        document.getElementById('post-modal-container')!!.style.overflowY = '';
-      }
-    }
-  }, [isVisible]);
-
-  if (!isVisible) return null;
-
-  if (isBrowser()) {
-    return ReactDOM.createPortal(
-      <AnimatePresence>
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
+  return (
+    <Modal show={isVisible} overlayDim additionalZ={10} onClose={handleClose}>
+      <SContainer>
+        <STitleContainer>
           <STitleText
-            variant={3}
+            variant={6}
           >
             {!isSupportedByMe ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes')}
           </STitleText>
+          <SCancelButton
+              view="transparent"
+              iconOnly
+              onClick={() => handleClose()}
+            >
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
+            </SCancelButton>
+        </STitleContainer>
+        { children }
+        <SButtonsContainer>
           {availableVotes.map((amount) => (
             <SButton
               key={amount}
@@ -93,43 +89,48 @@ const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectV
               {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
             </Text>
           </SButton>
-        </SContainer>
-      </AnimatePresence>,
-      document.getElementById('modal-root') as HTMLElement
-    );
-  }
-
-  return null;
+        </SButtonsContainer>
+      </SContainer>
+    </Modal>
+  );
 };
 
 export default McOptionCardSelectVotesModal;
 
 const SContainer = styled(motion.div)`
   position: absolute;
-  top: 340px;
-  z-index: 10;
-  right: 86px;
-  width: 174px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  bottom: 0;
+  width: 100%;
 
   padding: 16px;
+  padding-bottom: 32px;
+
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.primary};
-
-  ${({ theme }) => theme.media.laptopL} {
-    right: initial;
-    left: calc(50% + 512px);
-  }
 `;
 
-const STitleText = styled(Text)`
-  text-align: center;
-  width: 100%;
+const STitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 24px;
+`;
+
+const SCancelButton = styled(Button)`
+
+`;
+
+const STitleText = styled(Headline)`
+  text-align: left;
+`;
+
+const SButtonsContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-row-gap: 8px;
+  grid-column-gap: 16px;
 `;
 
 const SButton = styled.button`

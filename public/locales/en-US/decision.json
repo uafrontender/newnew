@@ -274,6 +274,7 @@
         "voted": "voted",
         "supportBtn": "Vote",
         "supportAgainBtn": "Vote \nagain",
+        "raiseBidBtn": "Place a vote",
         "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
         "doubleMyVoteButton": "Double my vote",
         "placeABidBtn": "Place a vote",

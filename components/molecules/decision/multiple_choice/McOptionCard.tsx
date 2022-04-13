@@ -31,6 +31,7 @@ import { formatNumber } from '../../../../utils/format';
 import McSymbolIcon from '../../../../public/images/decision/mc-option.png';
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -475,6 +476,88 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         {/* Loading Modal */}
         <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       </motion.div>
+      {/* Select votes */}
+      {/* Mobile */}
+      {isMobile && (
+        <McOptionCardSelectVotesModal
+          isVisible={isSupportMenuOpen}
+          isSupportedByMe={!!option.isSupportedByMe}
+          availableVotes={appConstants.availableMcVoteAmountOptions}
+          handleClose={() => {
+            handleCloseSupportForm();
+          }}
+          handleOpenCustomAmountModal={handleOpenCustomAmountModal}
+          handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
+        >
+          <SSelectVotesModalCard>
+            <SBidDetails
+              isBlue={isBlue}
+              noAction={noAction}
+            >
+              <SBidAmount>
+                <SOptionSymbolImg src={McSymbolIcon.src} />
+                <div>
+                  {option.voteCount && option.voteCount > 0
+                    ? `${formatNumber(option?.voteCount, true)}`
+                    : t('McPost.OptionsTab.OptionCard.noVotes')}
+                </div>
+              </SBidAmount>
+              <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+              <SBiddersInfo variant={3}>
+                {isCreatorsBid ? (
+                  <>
+                    {supporterCountSubstracted > 0 ? (
+                      <>
+                        <SSpanBiddersHighlighted>
+                          {formatNumber(supporterCountSubstracted, true)}{' '}
+                          {t('McPost.OptionsTab.OptionCard.voters')}
+                        </SSpanBiddersHighlighted>{' '}
+                        <SSpanBiddersRegular>
+                          {t('McPost.OptionsTab.OptionCard.voted')}
+                        </SSpanBiddersRegular>
+                      </>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    <SSpanBiddersHighlighted
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRedirectToOptionCreator();
+                      }}
+                      style={{
+                        color:
+                          theme.name === 'dark'
+                            ? theme.colorsThemed.accent.yellow
+                            : theme.colors.dark,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {t('McPost.OptionsTab.OptionCard.subscriber_suggestion', {
+                        nickname:
+                          option.creator?.nickname ?? option.creator?.username,
+                      })}
+                    </SSpanBiddersHighlighted>
+                    {supporterCountSubstracted > 0 ? (
+                      <>
+                        {', '}
+                        <SSpanBiddersHighlighted>
+                          {formatNumber(supporterCountSubstracted, true)}{' '}
+                          {t('McPost.OptionsTab.OptionCard.voters')}
+                        </SSpanBiddersHighlighted>{' '}
+                        <SSpanBiddersRegular>
+                          {t('McPost.OptionsTab.OptionCard.voted')}
+                        </SSpanBiddersRegular>
+                      </>
+                    ) : null}
+                  </>
+                )}
+              </SBiddersInfo>
+            </SBidDetails>
+          </SSelectVotesModalCard>
+        </McOptionCardSelectVotesModal>
+      )}
+      {/* Desktop */}
       {!isMobile && (
         <McOptionCardSelectVotesMenu
           top={selectVotesMenuTop}
@@ -638,7 +721,7 @@ const SSupportButton = styled(Button)<{
     gap: 8px;
   }
 
-  background: ${({ theme }) => theme.colorsThemed.accent.blue};
+  background: ${({ theme }) => theme.colorsThemed.background.quinary};
   color: #FFFFFF;
 
   &:hover:enabled,
@@ -704,6 +787,16 @@ const SSupportButtonDesktop = styled(Button)<{
       background: #FFFFFF;
     ` : null
   )}
+`;
+
+// Select votes mobile card
+const SSelectVotesModalCard = styled.div`
+
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+
+  margin-bottom: 24px;
+  padding: 16px;
 `;
 
 // Payment modal header
