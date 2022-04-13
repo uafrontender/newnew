@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement, ReactNode, useEffect } from 'react';
 import App from 'next/app';
 import Head from 'next/head';
 import { useStore } from 'react-redux';
@@ -10,6 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import { CookiesProvider } from 'react-cookie';
 import { parse, UserAgent } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
+import { hotjar } from 'react-hotjar';
 
 // Custom error page
 import Error from './_error';
@@ -37,6 +38,7 @@ import FollowingsContextProvider from '../contexts/followingContext';
 import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
+import SyncUserWrapper from '../contexts/syncUserWrapper';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -50,7 +52,9 @@ interface IMyApp extends AppProps {
 
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString } = props;
-  const ua: UserAgent = parse(uaString || (isBrowser() ? window?.navigator?.userAgent : ''));
+  const ua: UserAgent = parse(
+    uaString || (isBrowser() ? window?.navigator?.userAgent : '')
+  );
   const store = useStore();
   const currentResizeMode = store.getState()?.ui?.resizeMode;
   const getInitialResizeMode = () => {
@@ -73,6 +77,17 @@ const MyApp = (props: IMyApp): ReactElement => {
     return resizeMode;
   };
 
+  useEffect(() => {
+    const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
+    const hotjarSvVariable = process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION;
+
+    if (hotjarIdVariable && hotjarSvVariable) {
+      const hotjarId = parseInt(hotjarIdVariable);
+      const hotjarSv = parseInt(hotjarSvVariable);
+      hotjar.initialize(hotjarId, hotjarSv);
+    }
+  }, []);
+
   store.dispatch(setResizeMode(getInitialResizeMode()));
 
   // Shared layouts
@@ -83,37 +98,47 @@ const MyApp = (props: IMyApp): ReactElement => {
       <Head>
         <meta charSet="utf-8" />
         <meta name="robots" content="noindex" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no"
+        />
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
         <SocketContextProvider>
           <ChannelsContextProvider>
-            <PersistGate loading={null} persistor={(store as EnhancedStoreWithPersistor).__persistor}>
-              <BlockedUsersProvider>
-                <FollowingsContextProvider>
-                  <WalletContextProvider>
-                    <SubscriptionsProvider>
-                      <ChatsProvider>
-                        <ResizeMode>
-                          <GlobalTheme>
-                            <div>
-                              <ToastContainer />
-                              {!pageProps.error ? (
-                                getLayout(<Component {...pageProps} />)
-                              ) : (
-                                <Error
-                                  errorMsg={pageProps.error?.message}
-                                  statusCode={pageProps.error?.statusCode ?? 500}
-                                />
-                              )}
-                            </div>
-                          </GlobalTheme>
-                        </ResizeMode>
-                      </ChatsProvider>
-                    </SubscriptionsProvider>
-                  </WalletContextProvider>
-                </FollowingsContextProvider>
-              </BlockedUsersProvider>
+            <PersistGate
+              loading={null}
+              persistor={(store as EnhancedStoreWithPersistor).__persistor}
+            >
+              <SyncUserWrapper>
+                <BlockedUsersProvider>
+                  <FollowingsContextProvider>
+                    <WalletContextProvider>
+                      <SubscriptionsProvider>
+                        <ChatsProvider>
+                          <ResizeMode>
+                            <GlobalTheme>
+                              <div>
+                                <ToastContainer />
+                                {!pageProps.error ? (
+                                  getLayout(<Component {...pageProps} />)
+                                ) : (
+                                  <Error
+                                    errorMsg={pageProps.error?.message}
+                                    statusCode={
+                                      pageProps.error?.statusCode ?? 500
+                                    }
+                                  />
+                                )}
+                              </div>
+                            </GlobalTheme>
+                          </ResizeMode>
+                        </ChatsProvider>
+                      </SubscriptionsProvider>
+                    </WalletContextProvider>
+                  </FollowingsContextProvider>
+                </BlockedUsersProvider>
+              </SyncUserWrapper>
             </PersistGate>
           </ChannelsContextProvider>
         </SocketContextProvider>

@@ -77,7 +77,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
   // Display post
-  const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>(postFromQuery ?? undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {

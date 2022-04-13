@@ -117,9 +117,13 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
 
   const handleChangeTab = (tab: string) => {
     if (tab === 'comments' && isMobile) {
-      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+      window.history.pushState(        {
+        postId: post.postUuid,
+      }, 'Post', `/post/${post.postUuid}#${tab}`);
     } else {
-      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+      window.history.replaceState(        {
+        postId: post.postUuid,
+      }, 'Post', `/post/${post.postUuid}#${tab}`);
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   };
@@ -490,6 +494,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer
+        decisionFailed={postStatus === 'failed'}
         showSelectWinnerOption={showSelectWinnerOption}
       >
         <DecisionTabs
@@ -552,13 +557,15 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    display: grid;
+    height: 648px;
+
+    display: inline-grid;
     grid-template-areas:
       'expires expires'
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content 1fr;
+    grid-template-rows: max-content max-content minmax(0, 1fr);
 
     grid-column-gap: 16px;
 
@@ -568,6 +575,8 @@ const SWrapper = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
+    height: 728px;
+
     grid-template-areas:
       'video expires'
       'video title'
@@ -604,6 +613,7 @@ const SGoBackButton = styled(GoBackButton)`
 
 const SActivitesContainer = styled.div<{
   showSelectWinnerOption: boolean;
+  decisionFailed: boolean;
 }>`
   grid-area: activities;
 
@@ -620,14 +630,19 @@ const SActivitesContainer = styled.div<{
   }
 
   ${({ theme }) => theme.media.laptop} {
-    ${({ showSelectWinnerOption }) => (
+    ${({ showSelectWinnerOption, decisionFailed }) => (
       showSelectWinnerOption
       ? css`
         max-height: calc(580px - 130px);
       `
-      : css`
-        max-height: calc(580px);
-      `
+      : (
+        !decisionFailed
+        ? css`
+          max-height: 580px;
+        ` : css`
+          max-height: calc(580px - 120px);
+        `
+      )
     )}
   }
 `;

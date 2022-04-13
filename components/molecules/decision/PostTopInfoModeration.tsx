@@ -35,7 +35,7 @@ import PostFailedBox from './PostFailedBox';
 interface IPostTopInfoModeration {
   title: string;
   postId: string;
-  postStatus?: TPostStatusStringified;
+  postStatus: TPostStatusStringified;
   totalVotes?: number;
   postType?: TPostType;
   amountInBids?: number;
@@ -65,6 +65,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [deletePostOpen, setDeletePostOpen] = useState(false);
 
+  console.log(postStatus)
 
   const handleOpenShareMenu = () => setShareMenuOpen(true);
   const handleCloseShareMenu = () => setShareMenuOpen(false);
@@ -150,6 +151,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
           {/* Share menu */}
           {!isMobile && (
             <PostShareMenu
+              postId={postId}
               isVisible={shareMenuOpen}
               handleClose={handleCloseShareMenu}
             />
@@ -158,6 +160,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
             <PostShareModal
               isOpen={shareMenuOpen}
               zIndex={11}
+              postId={postId}
               onClose={handleCloseShareMenu}
             />
           ) : null}
@@ -223,7 +226,6 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
 
 PostTopInfoModeration.defaultProps = {
   postType: undefined,
-  postStatus: undefined,
   totalVotes: undefined,
   amountInBids: undefined,
 };

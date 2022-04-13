@@ -74,6 +74,34 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [ellipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
+  // Share
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handleCopyLink = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/${user.username}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [user.username]);
+
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const { usersIBlocked, unblockUser } = useGetBlockedUsers();
@@ -315,14 +343,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   useEffect(() => {
     const handlerHistory = () => {
-      console.log('Popstate')
+      console.log('Popstate');
 
-      const postId = new URL(window?.location?.href).searchParams.get('post');
-
+      const postId = window?.history?.state?.postId;
       if (postId && window?.history?.state?.fromPost) {
-        // router.back();
-        // window.history.back()
-        router.push(`/?post=${postId}`);
+        router.push(`/post/${postId}`);
       }
     }
 
@@ -445,16 +470,22 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     : user.username}
                 </SUsernameButtonText>
               </SUsernameButton>
-              <Button
+              <SShareButton
                 view="tertiary"
                 iconOnly
+                withDim
+                withShrink
                 style={{
                   padding: '8px',
                 }}
-                onClick={() => {}}
+                onClick={() => handleCopyLink()}
               >
-                <InlineSvg svg={ShareIconFilled} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
-              </Button>
+                {isCopiedUrl ? (
+                  t('ProfileLayout.buttons.copied')
+                ): (
+                  <InlineSvg svg={ShareIconFilled} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                )}
+              </SShareButton>
             </SShareDiv>
             {user.options?.isCreator ? (
               <Button
@@ -575,6 +606,15 @@ const SUsernameButtonText = styled(Text)`
   user-select: text;
 `;
 
+const SShareButton = styled(Button)`
+  span {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
+`;
+
 const SBioText = styled(Text)`
   text-align: center;
   overflow-wrap: break-word;
@@ -673,7 +713,7 @@ const SMoreButton = styled(Button)`
 
 const SProfileLayout = styled.div`
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 
   margin-top: -28px;
   margin-bottom: 24px;
@@ -708,7 +748,7 @@ const SSubcribedTag = styled.div`
   font-size: 10px;
   line-height: 12px;
 
-  z-index: 10;
+  z-index: 5;
 
   ${({ theme }) => theme.media.tablet} {
     top: 235px;

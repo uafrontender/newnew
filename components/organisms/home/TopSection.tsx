@@ -243,9 +243,8 @@ const SWrapper = styled(motion.section)<ISWrapper>`
 const SHeadline = styled(Headline)`
   ${(props) => props.theme.media.tablet} {
     margin: 0 auto;
-    max-width: 702px;
-
-    padding: 0px 32px;
+    max-width: 696px;
+    padding: 0 32px;
   }
   ${(props) => props.theme.media.laptopM} {
     max-width: 1248px;
@@ -283,8 +282,8 @@ const SListWrapper = styled.div`
   ${(props) => props.theme.media.laptop} {
     left: -16px;
     width: calc(100% + 32px);
-    padding: 0;
-    margin-top: 32px;
+    margin-top: 16px;
+    padding-top: 16px;
   }
 `;
 

@@ -77,6 +77,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const handleRedirectToUser = () => {
     window?.history.replaceState({
+      ...{...window.history.state},
       fromPost: true,
     }, '', '');
     router.push(`/${creator.username}`);
@@ -209,6 +210,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Share menu */}
           {!isMobile && (
             <PostShareMenu
+              postId={postId}
               isVisible={shareMenuOpen}
               handleClose={handleCloseShareMenu}
             />
@@ -217,6 +219,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareModal
               isOpen={shareMenuOpen}
               zIndex={11}
+              postId={postId}
               onClose={handleCloseShareMenu}
             />
           ) : null}

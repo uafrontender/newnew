@@ -1,7 +1,14 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
@@ -15,7 +22,7 @@ import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import ListPostModal from '../search/ListPostModal';
+import ListPostModal from '../see-more/ListPostModal';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostFailedBox from '../../molecules/decision/PostFailedBox';
@@ -35,9 +42,14 @@ import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
 import Button from '../../atoms/Button';
+import CommentFromUrlContextProvider, {
+  CommentFromUrlContext,
+} from '../../../contexts/commentFromUrlContext';
 
 interface IPostModal {
   isOpen: boolean;
@@ -60,9 +72,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
+  const [postParsed, typeOfPost] = post
+    ? switchPostType(post)
+    : [undefined, undefined];
   const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
@@ -87,13 +103,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const isMyPost = useMemo(
-    () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
+    () =>
+      user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
 
-  const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
-  const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
-  const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
+  const [currLocation] = useState(
+    manualCurrLocation ?? (isBrowser() ? window.location.href : '')
+  );
+  const [acSuggestionFromUrl, setAcSuggestionFromUrl] =
+    useState<newnewapi.Auction.Option | undefined>(undefined);
+  const acSuggestionIDFromUrl = isBrowser()
+    ? new URL(window.location.href).searchParams.get('suggestion')
+    : undefined;
 
   const [sessionId, setSessionId] = useState(() =>
     isBrowser()
@@ -101,6 +123,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         new URL(window.location.href).searchParams.get('session_id')
       : undefined
   );
+
+  const { handleSetCommentIdFromUrl } = useContext(CommentFromUrlContext);
+
+  useEffect(() => {
+    const commentId = isBrowser()
+      ? new URL(window.location.href).searchParams.get('?comment_id') ||
+        new URL(window.location.href).searchParams.get('comment_id')
+      : undefined;
+
+    handleSetCommentIdFromUrl?.(commentId ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const resetSessionId = () => setSessionId(undefined);
 
@@ -111,7 +145,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Recommendations (with infinite scroll)
   const innerHistoryStack = useRef<newnewapi.Post[]>([]);
   const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
-  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] =
+    useState<string | null | undefined>('');
   const [recommenedPostsLoading, setRecommenedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
@@ -134,12 +169,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
     const newPostParsed = switchPostType(newPost)[0];
     handleOpenAnotherPost?.(newPost);
-    if (post !== undefined) innerHistoryStack.current.push(post as newnewapi.Post);
+    if (post !== undefined)
+      innerHistoryStack.current.push(post as newnewapi.Post);
     modalContainerRef.current?.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
-    window.history.pushState(newPostParsed.postUuid, 'Post', `/?post=${newPostParsed.postUuid}`);
+    window.history.pushState(
+      {
+        postId: newPostParsed.postUuid,
+      },
+      'Post',
+      `/post/${newPostParsed.postUuid}`
+    );
     setRecommenedPosts([]);
     setNextPageToken('');
   };
@@ -151,20 +193,26 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         setRecommenedPostsLoading(true);
         setTriedLoading(true);
 
-        const fetchRecommenedPostsPayload = new newnewapi.GetSimilarPostsRequest({
-          postUuid: postParsed?.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-        const postsResponse = await fetchMoreLikePosts(fetchRecommenedPostsPayload);
+        const fetchRecommenedPostsPayload =
+          new newnewapi.GetSimilarPostsRequest({
+            postUuid: postParsed?.postUuid,
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
+          });
+        const postsResponse = await fetchMoreLikePosts(
+          fetchRecommenedPostsPayload
+        );
 
         if (postsResponse.data && postsResponse.data.posts) {
-          setRecommenedPosts((curr) => [...curr, ...(postsResponse.data?.posts as newnewapi.Post[])]);
+          setRecommenedPosts((curr) => [
+            ...curr,
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
           setNextPageToken(postsResponse.data.paging?.nextPageToken);
         }
         setRecommenedPostsLoading(false);
@@ -302,7 +350,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         additionalHash = '#winner';
       }
       setOpen(true);
-      window.history.pushState(postParsed.postUuid, 'Post', `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
+      window.history.pushState(
+        {
+          postId: postParsed.postUuid,
+        },
+        'Post',
+        `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+      );
     }
 
     return () => {
@@ -320,7 +374,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       if (!acSuggestionIDFromUrl) return;
       try {
         const payload = new newnewapi.GetAcOptionRequest({
-          optionId: parseInt(acSuggestionIDFromUrl, 10),
+          optionId: parseInt(acSuggestionIDFromUrl),
         });
 
         const res = await fetchAcOptionById(payload);
@@ -345,15 +399,25 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     const verify = () => {
       if (!isBrowser()) return;
 
-      const postId = new URL(window.location.href).searchParams.get('post');
+      const postId =
+        new URL(window.location.href).searchParams.get('post') ||
+        window?.history?.state?.postId;
 
-      if (innerHistoryStack.current && innerHistoryStack.current[innerHistoryStack.current.length - 1]) {
-        handleOpenAnotherPost?.(innerHistoryStack.current[innerHistoryStack.current.length - 1]);
+      if (
+        innerHistoryStack.current &&
+        innerHistoryStack.current[innerHistoryStack.current.length - 1]
+      ) {
+        handleOpenAnotherPost?.(
+          innerHistoryStack.current[innerHistoryStack.current.length - 1]
+        );
         modalContainerRef.current?.scrollTo({
           top: 0,
           behavior: 'smooth',
         });
-        innerHistoryStack.current = innerHistoryStack.current.slice(0, innerHistoryStack.current.length - 1);
+        innerHistoryStack.current = innerHistoryStack.current.slice(
+          0,
+          innerHistoryStack.current.length - 1
+        );
         setRecommenedPosts([]);
         setNextPageToken('');
       }
@@ -373,7 +437,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (inView && !recommenedPostsLoading) {
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
-      } else if (!triedLoading && !nextPageToken && recommenedPosts?.length === 0) {
+      } else if (
+        !triedLoading &&
+        !nextPageToken &&
+        recommenedPosts?.length === 0
+      ) {
         loadRecommendedPosts();
       }
     }
@@ -405,8 +473,17 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <title>{postParsed?.title}</title>
       </Head>
       {!isMobile && (
-        <SGoBackButtonDesktop view="secondary" iconOnly onClick={handleCloseAndGoBack}>
-          <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+        <SGoBackButtonDesktop
+          view="secondary"
+          iconOnly
+          onClick={handleCloseAndGoBack}
+        >
+          <InlineSvg
+            svg={CancelIcon}
+            fill={theme.colorsThemed.text.primary}
+            width="24px"
+            height="24px"
+          />
         </SGoBackButtonDesktop>
       )}
       {postParsed && typeOfPost ? (
@@ -443,7 +520,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               }}
               handleButtonClick={() => {
                 document.getElementById('post-modal-container')?.scrollTo({
-                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  top: document.getElementById(
+                    'recommendations-section-heading'
+                  )?.offsetTop,
                   behavior: 'smooth',
                 });
               }}
@@ -451,7 +530,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           )}
           {!isMyPost && (
             <SRecommendationsSection id="recommendations-section-heading">
-              <Headline variant={4}>{recommenedPosts.length > 0 ? t('RecommendationsSection.heading') : null}</Headline>
+              <Headline variant={4}>
+                {recommenedPosts.length > 0
+                  ? t('RecommendationsSection.heading')
+                  : null}
+              </Headline>
               {recommenedPosts && (
                 <ListPostModal
                   category=""
@@ -461,7 +544,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                     left: '-16px',
                   }}
                   skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={theme.colorsThemed.background.secondary}
+                  skeletonsHighlightColor={
+                    theme.colorsThemed.background.secondary
+                  }
                   handlePostClicked={handleOpenRecommendedPost}
                 />
               )}
@@ -491,7 +576,11 @@ PostModal.defaultProps = {
   manualCurrLocation: undefined,
 };
 
-export default PostModal;
+export default (props: any) => (
+  <CommentFromUrlContextProvider>
+    <PostModal {...props} />
+  </CommentFromUrlContextProvider>
+);
 
 const SPostModalContainer = styled.div<{
   isMyPost: boolean;
