@@ -134,7 +134,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       try {
         setCollectionACInitialLoading(true);
 
-        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({});
+        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
@@ -158,7 +160,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     async function fetchMultipleChoices() {
       try {
         setCollectionMCInitialLoading(true);
-        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({});
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
 
@@ -182,7 +186,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     async function fetchCrowdfundings() {
       try {
         setCollectionCFInitialLoading(true);
-        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({});
+        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resCF = await fetchTopCrowdfundings(cfPayload);
 
