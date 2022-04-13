@@ -21,7 +21,7 @@ import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewA
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
-// import Lottie from '../../../atoms/Lottie';
+import InlineSvg from '../../../atoms/InlineSVG';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
@@ -30,16 +30,13 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 
 import { formatNumber } from '../../../../utils/format';
 
-// NB! temp sample
-// import HeartsSampleAnimation from '../../../../public/animations/hearts-sample.json';
-// import CoinsSampleAnimation from '../../../../public/animations/coins-sample.json';
-
 // Icons
 // import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import AcIcon from '../../../../public/images/creation/AC-static.png';
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -89,6 +86,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const isMyBid = useMemo(
     () => option.creator?.uuid === user.userData?.userUuid,
     [option.creator?.uuid, user.userData?.userUuid]
+  );
+  const isBlue = useMemo(
+    () => isSupportedByMe || isMyBid,
+    [isSupportedByMe, isMyBid]
   );
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
@@ -313,14 +314,17 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     >
       <SContainer
         $isDisabled={disabled}
-        $isBlue={isSupportedByMe || isMyBid}
+        $isBlue={isBlue}
         onClick={() => {
           if (!isMobile && !disabled && votingAllowed) {
             handleOpenSupportForm();
           }
         }}
       >
-        <SBidDetails isBlue={isSupportedByMe || isMyBid}>
+        <SBidDetails
+          isBlue={isBlue}
+          active={!!optionBeingSupported && !disabled}
+        >
           <SLottieAnimationContainer>
             {/* {shouldAnimate ? (
               <Lottie
@@ -406,6 +410,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               <SSupportButton
                 view="quaternary"
                 disabled={disabled}
+                isBlue={isBlue}
                 onClick={() => handleOpenSupportForm()}
               >
                 <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
@@ -414,6 +419,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               <SSupportButtonDesktop
                 view="secondary"
                 disabled={disabled}
+                isBlue={isBlue}
                 onClick={() => handleOpenSupportForm()}
               >
                 {t('AcPost.OptionsTab.OptionCard.supportBtn')}
@@ -469,10 +475,16 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
             </Button>
             <SCancelButton
-              view="secondary"
+              view="transparent"
+              iconOnly
               onClick={() => handleCloseSupportForm()}
             >
-              {t('AcPost.OptionsTab.OptionCard.cancelBtn')}
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
             </SCancelButton>
           </>
         )}
@@ -573,7 +585,7 @@ const SContainer = styled(motion.div)<{
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 0px;
 
     padding: initial;
     background-color: initial;
@@ -583,6 +595,7 @@ const SContainer = styled(motion.div)<{
 
 const SBidDetails = styled.div<{
   isBlue: boolean;
+  active: boolean;
 }>`
   position: relative;
 
@@ -614,13 +627,25 @@ const SBidDetails = styled.div<{
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
+    padding: 14px;
+
     background-color: ${({ theme, isBlue }) =>
       isBlue
         ? theme.colorsThemed.accent.blue
         : theme.colorsThemed.background.tertiary};
-    border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-    padding: 14px;
+    border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-bottom-left-radius: ${({ theme }) => theme.borderRadius.medium};
+
+    ${({ active }) =>
+      active
+        ? css`
+            border-top-right-radius: ${({ theme }) =>
+              theme.borderRadius.medium};
+            border-bottom-right-radius: ${({ theme }) =>
+              theme.borderRadius.medium};
+          `
+        : null}
   }
 `;
 
@@ -691,8 +716,12 @@ const SLottieAnimationContainer = styled.div`
   z-index: 100;
 `;
 
-const SSupportButton = styled(Button)`
+const SSupportButton = styled(Button)<{
+  isBlue: boolean;
+}>`
   width: 100%;
+
+  border-radius: 12px;
 
   span {
     display: flex;
@@ -702,26 +731,63 @@ const SSupportButton = styled(Button)`
     gap: 8px;
   }
 
-  ${({ theme }) => theme.media.tablet} {
-    width: auto;
+  background: ${({ theme }) => theme.colorsThemed.accent.blue};
+  color: #ffffff;
 
-    padding: 0px 12px;
-
-    color: ${({ theme }) => theme.colorsThemed.text.secondary};
-    background: none;
-
-    &:hover:enabled,
-    &:focus:enabled {
-      background: none;
-      color: ${({ theme }) => theme.colorsThemed.text.primary};
-    }
+  &:hover:enabled,
+  &:active:enabled,
+  &:focus:enabled {
+    color: ${({ theme }) => theme.colors.dark};
+    background: #ffffff;
   }
+
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          color: ${({ theme }) => theme.colors.dark};
+          background: #ffffff;
+        `
+      : null}
 `;
 
-const SSupportButtonDesktop = styled(Button)`
-  height: 48px;
+const SSupportButtonDesktop = styled(Button)<{
+  isBlue: boolean;
+}>`
+  height: 100%;
+  width: 60px;
 
-  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  color: #ffffff;
+  background: ${({ theme }) => theme.colorsThemed.accent.blue};
+
+  padding: initial;
+
+  border-radius: initial;
+  border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
+  border-bottom-right-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  span {
+    width: 100%;
+
+    text-align: center;
+    white-space: pre;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 12px;
+  }
+
+  &:hover:enabled,
+  &:active:enabled,
+  &:focus:enabled {
+    color: ${({ theme }) => theme.colors.dark};
+    background: #ffffff;
+  }
+
+  ${({ isBlue }) =>
+    isBlue
+      ? css`
+          border-left: ${({ theme }) => theme.colors.dark} 1.5px solid;
+        `
+      : null}
 `;
 
 const SSupportBidForm = styled(motion.div)`
@@ -742,16 +808,19 @@ const SSupportBidForm = styled(motion.div)`
 `;
 
 const SCancelButton = styled(Button)`
-  width: auto;
+  width: 48px;
+  height: 48px;
 
-  padding: 0px 12px;
+  padding: 0px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  flex-shrink: 0;
+
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   &:hover:enabled,
+  &:active:enabled,
   &:focus:enabled {
-    background: none;
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
+    background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
 `;
 

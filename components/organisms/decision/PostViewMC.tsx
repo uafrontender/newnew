@@ -196,6 +196,11 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   // Total votes
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
 
+  // Free votes
+  // const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree);
+  // test
+  const [hasFreeVote, setHasFreeVote] = useState(true);
+
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
   const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(

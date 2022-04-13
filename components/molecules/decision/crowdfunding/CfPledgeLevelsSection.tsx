@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -21,6 +21,10 @@ import PaymentModal from '../../checkout/PaymentModal';
 import useScrollGradientsHorizontal from '../../../../utils/hooks/useScrollGradientsHorizontal';
 import GradientMaskHorizontal from '../../../atoms/GradientMaskHorizontal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import InlineSvg from '../../../atoms/InlineSVG';
+
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
@@ -39,8 +43,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     handleAddPledgeFromResponse,
   }) => {
     const router = useRouter();
+    const theme = useTheme();
     const { t } = useTranslation('decision');
     const user = useAppSelector((state) => state.user);
+
+    const { appConstants } = useGetAppConstants();
 
     const containerRef = useRef<HTMLDivElement>();
 
@@ -246,17 +253,14 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
         >
           <SInfoSubsection>
             <STitle variant={2} weight={600}>
-              {t('CfPost.BackersTab.info.title')}
+              {t('CfPost.BackersTab.info.title', { creator: post.creator?.nickname })}
             </STitle>
-            <SCaption variant={3}>
-              {t('CfPost.BackersTab.info.caption')}
-            </SCaption>
           </SInfoSubsection>
           {isFormOpen ? (
             <SNewPledgeForm>
               <BidAmountTextInput
                 value={customPledgeAmount}
-                minAmount={1}
+                minAmount={Math.round(appConstants.minCfPledge / 100)}
                 inputAlign="left"
                 style={{
                   padding: '12.5px 16px',
@@ -267,16 +271,22 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               <Button
                 size="sm"
                 view="primaryGrad"
-                disabled={customPledgeAmount === ''}
+                disabled={customPledgeAmount === '' || parseInt(customPledgeAmount) < Math.round(appConstants.minCfPledge / 100)}
                 onClick={() => handleCustomPledgePaymentModal()}
               >
                 {t('CfPost.BackersTab.CustomPledge.pledgeBtn')}
               </Button>
               <SCancelButton
-                view="secondary"
+                view="transparent"
+                iconOnly
                 onClick={() => handleCloseCustomPledgeForm()}
               >
-                {t('CfPost.BackersTab.CustomPledge.cancelBtn')}
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width="24px"
+                  height="24px"
+                />
               </SCancelButton>
             </SNewPledgeForm>
           ) : (
@@ -371,10 +381,9 @@ const SInfoSubsection = styled.div`
   margin-bottom: 12px;
 `;
 
-const STitle = styled(Text)``;
-
-const SCaption = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+const STitle = styled(Text)`
+  text-align: center;
+  width: 100%;
 `;
 
 const SButtonsContainer = styled.div<{
@@ -424,10 +433,10 @@ const SNewPledgeForm = styled.div`
   width: 100%;
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
 
-  /* height: 108px; */
+  height: 96px;
 
   div:first-child {
     width: 100%;
@@ -435,16 +444,19 @@ const SNewPledgeForm = styled.div`
 `;
 
 const SCancelButton = styled(Button)`
-  width: auto;
+  width: 48px;
+  height: 48px;
 
-  padding: 0px 12px;
+  padding: 0px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  flex-shrink: 0;
+
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   &:hover:enabled,
+  &:active:enabled,
   &:focus:enabled {
-    background: none;
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
+    background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
 `;
 
