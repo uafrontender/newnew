@@ -2,12 +2,14 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
 
 import InlineSVG from './InlineSVG';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
+import { quickSearchPostsAndCreators } from '../../api/endpoints/search';
 import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 
@@ -25,12 +27,22 @@ export const SearchInput: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
-  const { resizeMode, globalSearchActive } = useAppSelector((state) => state.ui);
+  const { resizeMode, globalSearchActive } = useAppSelector(
+    (state) => state.ui
+  );
   const router = useRouter();
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const handleSearchClick = useCallback(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
@@ -81,7 +93,11 @@ export const SearchInput: React.FC = () => {
     const resizeObserver = new ResizeObserver(() => {
       // eslint-disable-next-line max-len
       setInputRightPosition(
-        -(window.innerWidth - (inputContainerRef.current?.getBoundingClientRect()?.right || 0) - (isMobile ? 16 : 32))
+        -(
+          window.innerWidth -
+          (inputContainerRef.current?.getBoundingClientRect()?.right || 0) -
+          (isMobile ? 16 : 32)
+        )
       );
     });
 
@@ -92,8 +108,23 @@ export const SearchInput: React.FC = () => {
     };
   }, [isMobile]);
 
+  async function getQuickSearchResult(query: string) {
+    try {
+      const payload = new newnewapi.QuickSearchPostsAndCreatorsRequest({
+        query,
+      });
+      const res = await quickSearchPostsAndCreators(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      console.log(res.data.toJSON());
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   useEffect(() => {
     if (searchValue) {
+      getQuickSearchResult(searchValue);
       setIsResultsDropVisible(true);
     } else if (!searchValue && !isMobileOrTablet) {
       setIsResultsDropVisible(false);
@@ -119,7 +150,10 @@ export const SearchInput: React.FC = () => {
           />
         </SCloseButtonMobile>
       ) : null}
-      <SContainer ref={inputContainerRef} active={isMobileOrTablet && globalSearchActive}>
+      <SContainer
+        ref={inputContainerRef}
+        active={isMobileOrTablet && globalSearchActive}
+      >
         <SInputWrapper
           active={globalSearchActive}
           onClick={globalSearchActive ? () => {} : handleSearchClick}
@@ -195,26 +229,25 @@ const SContainer = styled.div<{
   height: 36px;
   position: relative;
 
-  ${({ active }) => (
-    active ?
-    css`
-      &:before {
-        position: absolute;
-        left: -100vw;
+  ${({ active }) =>
+    active
+      ? css`
+          &:before {
+            position: absolute;
+            left: -100vw;
 
-        width: 100vw;
-        height: 36px;
+            width: 100vw;
+            height: 36px;
 
-        content: '';
-        background: ${({ theme }) => theme.colorsThemed.background.primary};
+            content: '';
+            background: ${({ theme }) => theme.colorsThemed.background.primary};
 
-        ${({ theme }) => theme.media.tablet} {
-          height: 48px;
-        }
-      }
-
-    ` : null
-  )}
+            ${({ theme }) => theme.media.tablet} {
+              height: 48px;
+            }
+          }
+        `
+      : null}
 
   ${({ theme }) => theme.media.tablet} {
     width: 48px;
@@ -291,7 +324,11 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   top: 50%;
   width: ${(props) => (props.active ? 'calc(100vw - 32px - 50px)' : '36px')};
   right: ${(props) => (props.active ? props.rightPosition : 0)}px;
-  border: 1.5px solid ${(props) => (props.active ? props.theme.colorsThemed.background.outlines2 : 'transparent')};
+  border: 1.5px solid
+    ${(props) =>
+      props.active
+        ? props.theme.colorsThemed.background.outlines2
+        : 'transparent'};
   z-index: 3;
   padding: 6.5px;
   display: flex;
@@ -300,7 +337,10 @@ const SInputWrapper = styled.div<ISInputWrapper>`
   transform: translateY(-50%);
   max-height: 100%;
   transition: all ease 0.5s;
-  background: ${(props) => props.theme.colorsThemed.background[props.active ? 'primary' : 'secondary']};
+  background: ${(props) =>
+    props.theme.colorsThemed.background[
+      props.active ? 'primary' : 'secondary'
+    ]};
   border-radius: 12px;
   flex-direction: row;
   justify-content: space-between;
@@ -310,10 +350,14 @@ const SInputWrapper = styled.div<ISInputWrapper>`
     !props.active &&
     css`
       cursor: pointer;
-      background: ${props.active ? 'transparent' : props.theme.colorsThemed.button.background.quaternary};
+      background: ${props.active
+        ? 'transparent'
+        : props.theme.colorsThemed.button.background.quaternary};
 
       /* :hover {
-        background: ${props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary};
+        background: ${props.active
+        ? 'transparent'
+        : props.theme.colorsThemed.button.hover.quaternary};
       } */
     `}
 
@@ -330,7 +374,10 @@ const SInputWrapper = styled.div<ISInputWrapper>`
     background: '#E5E5E5';
 
     /* :hover {
-      background: ${(props) => (props.active ? 'transparent' : props.theme.colorsThemed.button.hover.quaternary)};
+      background: ${(props) =>
+      props.active
+        ? 'transparent'
+        : props.theme.colorsThemed.button.hover.quaternary};
     } */
   }
 `;

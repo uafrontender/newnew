@@ -12,17 +12,17 @@ export const PopularCreatorsResults: React.FC<IFunction> = ({ keyword }) => {
   const creators = useMemo(
     () => [
       {
-        uuid: 'Event',
+        uuid: 'Event0',
         username: 'CreatorDisplayName',
         avatar: '/images/mock/test_user_1.jpg',
       },
       {
-        uuid: 'Event',
+        uuid: 'Event1',
         username: 'CreatorDisplayName',
         avatar: '/images/mock/test_user_1.jpg',
       },
       {
-        uuid: 'Event',
+        uuid: 'Event2',
         username: 'CreatorDisplayName',
         avatar: '/images/mock/test_user_1.jpg',
       },

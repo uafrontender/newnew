@@ -102,9 +102,11 @@ export const Desktop: React.FC<IDesktop> = () => {
             )}
           </>
         )}
-        <SItemWithMargin>
-          <SearchInput />
-        </SItemWithMargin>
+        {user.loggedIn && user.userData?.options?.isCreator && (
+          <SItemWithMargin>
+            <SearchInput />
+          </SItemWithMargin>
+        )}
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (

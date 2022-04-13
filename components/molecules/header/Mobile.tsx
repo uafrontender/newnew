@@ -11,8 +11,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_TO_TOP } from '../../../constants/timings';
 
-interface IMobile {
-}
+interface IMobile {}
 
 export const Mobile: React.FC<IMobile> = () => {
   const router = useRouter();
@@ -20,7 +19,9 @@ export const Mobile: React.FC<IMobile> = () => {
 
   const handleUserClick = () => {
     if (user.loggedIn) {
-      router.push(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
+      router.push(
+        user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile'
+      );
     } else {
       router.push('/sign-up');
     }
@@ -43,9 +44,11 @@ export const Mobile: React.FC<IMobile> = () => {
         <Logo />
       </LogoHolder>
       <SRightBlock>
-        <SItemWithMargin>
-          <SearchInput />
-        </SItemWithMargin>
+        {user.loggedIn && user.userData?.options?.isCreator && (
+          <SItemWithMargin>
+            <SearchInput />
+          </SItemWithMargin>
+        )}
         <SItemWithMargin>
           <UserAvatar
             withClick
