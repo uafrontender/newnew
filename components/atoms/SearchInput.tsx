@@ -29,6 +29,8 @@ export const SearchInput: React.FC = () => {
   const router = useRouter();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const handleSearchClick = useCallback(() => {
     dispatch(setGlobalSearchActive(!globalSearchActive));
@@ -55,12 +57,12 @@ export const SearchInput: React.FC = () => {
   };
 
   useOnClickEsc(inputContainerRef, () => {
-    if (globalSearchActive) {
+    if (globalSearchActive && !isMobileOrTablet) {
       handleSearchClose();
     }
   });
   useOnClickOutside(inputContainerRef, () => {
-    if (globalSearchActive) {
+    if (globalSearchActive && !isMobileOrTablet) {
       handleSearchClose();
     }
   });
@@ -93,44 +95,77 @@ export const SearchInput: React.FC = () => {
   useEffect(() => {
     if (searchValue) {
       setIsResultsDropVisible(true);
-    } else {
+    } else if (!searchValue && !isMobileOrTablet) {
       setIsResultsDropVisible(false);
     }
-  }, [searchValue]);
+  }, [searchValue, isMobileOrTablet]);
 
   return (
-    <SContainer ref={inputContainerRef}>
-      <SInputWrapper
-        active={globalSearchActive}
-        onClick={globalSearchActive ? () => {} : handleSearchClick}
-        rightPosition={inputRightPosition}
-      >
-        <SLeftInlineSVG
-          clickable
-          svg={searchIcon}
-          fill={theme.colorsThemed.text.primary}
-          width={isMobile ? '20px' : '24px'}
-          height={isMobile ? '20px' : '24px'}
-          onClick={globalSearchActive ? handleSubmit : handleSearchClick}
-        />
-        <SInput
-          ref={inputRef}
-          value={searchValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Titles, genres, people"
-        />
-        <SRightInlineSVG
-          clickable
-          svg={closeIcon}
-          fill={theme.colorsThemed.text.primary}
-          width={isMobile ? '20px' : '24px'}
-          height={isMobile ? '20px' : '24px'}
-          onClick={handleCloseIconClick}
-        />
-      </SInputWrapper>
-      {isResultsDropVisible && (
-        <SResultsDrop>
+    <>
+      {isMobileOrTablet && globalSearchActive ? (
+        <SCloseButtonMobile
+          view="tertiary"
+          iconOnly
+          onClick={() => {
+            handleSearchClose();
+            setSearchValue('');
+            setIsResultsDropVisible(false);
+          }}
+        >
+          <InlineSVG
+            svg={closeIcon}
+            width={isTablet ? '24px' : '20px'}
+            height={isTablet ? '24px' : '20px'}
+          />
+        </SCloseButtonMobile>
+      ) : null}
+      <SContainer ref={inputContainerRef} active={isMobileOrTablet && globalSearchActive}>
+        <SInputWrapper
+          active={globalSearchActive}
+          onClick={globalSearchActive ? () => {} : handleSearchClick}
+          rightPosition={inputRightPosition}
+        >
+          <SLeftInlineSVG
+            clickable
+            svg={searchIcon}
+            fill={theme.colorsThemed.text.primary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+            onClick={globalSearchActive ? handleSubmit : handleSearchClick}
+          />
+          <SInput
+            ref={inputRef}
+            value={searchValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Titles, genres, people"
+          />
+          <SRightInlineSVG
+            clickable
+            svg={closeIcon}
+            fill={theme.colorsThemed.text.primary}
+            width={isMobile ? '20px' : '24px'}
+            height={isMobile ? '20px' : '24px'}
+            onClick={handleCloseIconClick}
+          />
+        </SInputWrapper>
+        {!isMobileOrTablet && isResultsDropVisible && (
+          <SResultsDrop>
+            <TopDecisionsResults keyword={searchValue} />
+            <PopularCreatorsResults keyword={searchValue} />
+            <SButton
+              onClick={() => {
+                router.push(`/search?query=${searchValue}`);
+              }}
+              view="quaternary"
+            >
+              All results
+            </SButton>
+          </SResultsDrop>
+        )}
+      </SContainer>
+      {isMobileOrTablet && isResultsDropVisible && (
+        <SResultsDropMobile>
           <TopDecisionsResults keyword={searchValue} />
           <PopularCreatorsResults keyword={searchValue} />
           <SButton
@@ -141,9 +176,9 @@ export const SearchInput: React.FC = () => {
           >
             All results
           </SButton>
-        </SResultsDrop>
+        </SResultsDropMobile>
       )}
-    </SContainer>
+    </>
   );
 };
 
@@ -153,10 +188,33 @@ SearchInput.defaultProps = {
 
 export default SearchInput;
 
-const SContainer = styled.div`
+const SContainer = styled.div<{
+  active: boolean;
+}>`
   width: 36px;
   height: 36px;
   position: relative;
+
+  ${({ active }) => (
+    active ?
+    css`
+      &:before {
+        position: absolute;
+        left: -100vw;
+
+        width: 100vw;
+        height: 36px;
+
+        content: '';
+        background: ${({ theme }) => theme.colorsThemed.background.primary};
+
+        ${({ theme }) => theme.media.tablet} {
+          height: 48px;
+        }
+      }
+
+    ` : null
+  )}
 
   ${({ theme }) => theme.media.tablet} {
     width: 48px;
@@ -164,6 +222,7 @@ const SContainer = styled.div`
   }
 `;
 
+// Desktop
 const SResultsDrop = styled.div`
   background: ${(props) => props.theme.colorsThemed.background.tertiary};
   position: fixed;
@@ -172,15 +231,6 @@ const SResultsDrop = styled.div`
   height: 100vh;
   top: 56px;
   padding: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    margin-top: 16px;
-    padding: 16px 48px;
-    top: 64px;
-  }
-
-  ${({ theme }) => theme.media.mobile} {
-  }
 
   ${({ theme }) => theme.media.laptop} {
     position: absolute;
@@ -193,6 +243,44 @@ const SResultsDrop = styled.div`
   }
 `;
 
+// Mobile
+const SCloseButtonMobile = styled(Button)`
+  position: absolute;
+  left: 0;
+  top: 10px;
+  z-index: 1;
+
+  padding: 8px;
+
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+
+  ${({ theme }) => theme.media.tablet} {
+    width: 48px;
+    height: 48px;
+
+    top: 12px;
+    left: 2vw;
+  }
+`;
+
+const SResultsDropMobile = styled.div`
+  background: ${(props) => props.theme.colorsThemed.background.tertiary};
+  position: fixed;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  top: 56px;
+  left: 0;
+  padding: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+    padding: 16px 48px;
+    top: 64px;
+  }
+`;
+
 interface ISInputWrapper {
   active: boolean;
   onClick: () => void;
@@ -201,7 +289,7 @@ interface ISInputWrapper {
 
 const SInputWrapper = styled.div<ISInputWrapper>`
   top: 50%;
-  width: ${(props) => (props.active ? 'calc(100vw - 32px)' : '36px')};
+  width: ${(props) => (props.active ? 'calc(100vw - 32px - 50px)' : '36px')};
   right: ${(props) => (props.active ? props.rightPosition : 0)}px;
   border: 1.5px solid ${(props) => (props.active ? props.theme.colorsThemed.background.outlines2 : 'transparent')};
   z-index: 3;
@@ -230,7 +318,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
     `}
 
   ${({ theme }) => theme.media.tablet} {
-    width: ${(props) => (props.active ? 'calc(100vw - 60px)' : '48px')};
+    width: ${(props) => (props.active ? 'calc(100vw - 60px - 50px)' : '48px')};
     padding: 10.5px;
     border-radius: 16px;
   }

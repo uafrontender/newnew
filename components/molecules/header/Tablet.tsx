@@ -106,7 +106,11 @@ export const Tablet: React.FC<ITablet> = () => {
             )}
           </>
         )}
-        <SItemWithMargin>
+        <SItemWithMargin
+          style={{
+            position: 'static'
+          }}
+        >
           <SearchInput />
         </SItemWithMargin>
         {user.loggedIn ? (
