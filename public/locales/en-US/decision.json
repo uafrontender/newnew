@@ -324,7 +324,7 @@
     },
     "BackersTab": {
       "info": {
-        "title": "Back the decision",
+        "title": "Back {{creator}}'s Goal",
         "caption": "You won't get charged until a decision has been made."
       },
       "CustomPledge": {
