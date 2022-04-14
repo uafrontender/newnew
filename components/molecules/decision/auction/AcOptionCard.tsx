@@ -7,10 +7,10 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
 import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
@@ -27,12 +27,16 @@ import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
 
 import { formatNumber } from '../../../../utils/format';
 
 // Icons
 import AcIcon from '../../../../public/images/creation/AC-static.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -68,6 +72,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -86,6 +91,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const isBlue = useMemo(() => (
     isSupportedByMe || isMyBid
   ), [isSupportedByMe, isMyBid]);
+
+  // Tutorials
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -291,6 +299,29 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     }
   }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
 
+  // eslint-disable-next-line consistent-return
+  const goToNextStep = () => {
+    switch (user.userTutorialsProgress.eventsStep) {
+      case 4:
+        dispatch(
+          setUserTutorialsProgress({
+            eventsStep: 5,
+          })
+        );
+        break;
+      default:
+        return null;
+    }
+  };
+
+  useEffect(() => {
+    if (user?.userTutorialsProgress?.eventsStep === 4) {
+      setIsTooltipVisible(true);
+    } else {
+      setIsTooltipVisible(false);
+    }
+  }, [user?.userTutorialsProgress]);
+
   return (
     <div
       key={index}
@@ -429,6 +460,17 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </SSupportButtonDesktop>
           )
         }
+        {index === 0 && !isMyBid && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={isTooltipVisible}
+              closeTooltip={goToNextStep}
+              title={t('tutorials.ac.supportPeopleBids.title')}
+              text={t('tutorials.ac.supportPeopleBids.text')}
+              dotPosition={DotPositionEnum.TopRight}
+            />
+          </STutorialTooltipHolder>
+        )}
       </SContainer>
       <SSupportBidForm
         // layout
@@ -833,4 +875,12 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+// Tutorial
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  right: 35px;
+  top: 25px;
+  text-align: left;
 `;
