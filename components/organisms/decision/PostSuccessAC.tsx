@@ -54,6 +54,9 @@ import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox'
 
 import BoxIcon from '../../../public/images/creation/AC.webp';
 import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
+import { formatNumber } from '../../../utils/format';
+import getDisplayname from '../../../utils/getDisplayname';
+import AcSuccessOptionsTab from '../../molecules/decision/auction/success/AcSuccessOptionsTab';
 
 interface IPostSuccessAC {
   post: newnewapi.Auction;
@@ -61,18 +64,6 @@ interface IPostSuccessAC {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
-
-// Copy
-// AcPostSuccess
-// wants_to_know
-// in_total_bids
-// others
-// bid
-// bid_chosen
-// see_all
-// watch_reponse_first_time
-// watch_reponse_announcement
-// watch_reponse_reponse
 
 const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
   post,
@@ -84,6 +75,11 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+    // Winninfg option
+  const [winningOption, setWinningOption] =
+    useState<newnewapi.Auction.Option | undefined>();
 
     // Video
   // Open video tab
@@ -125,6 +121,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
     handleCommentsInitialHash();
   }, []);
 
+  // Replace hash once scrolled to comments
   useEffect(() => {
     if (inView) {
       window.history.replaceState(
@@ -145,6 +142,29 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
     }
   }, [inView, post.postUuid]);
 
+  // Load winning option
+  useEffect(() => {
+    async function fetchAndSetWinningOption(id: number) {
+      try {
+        const payload = new newnewapi.GetAcOptionRequest({
+          optionId: id,
+        });
+
+        const res = await fetchAcOptionById(payload);
+
+        if (res.data?.option) {
+          setWinningOption(res.data.option as newnewapi.Auction.Option);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (post.winningOptionId) {
+      fetchAndSetWinningOption(post.winningOptionId as number);
+    }
+  }, [post.winningOptionId]);
+
   return (
     <>
       <SWrapper>
@@ -160,11 +180,119 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
           handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
         />
         <SActivitesContainer>
-          <DecisionEndedBox
-            imgSrc={BoxIcon.src}
-          >
-            {t('AcPostSuccess.hero_text')}
-          </DecisionEndedBox>
+          {openedMainSection === 'main' ? (
+            <>
+              <DecisionEndedBox
+                imgSrc={BoxIcon.src}
+              >
+                {t('AcPostSuccess.hero_text')}
+              </DecisionEndedBox>
+              <SMainSectionWrapper>
+                <SCreatorInfoDiv>
+                  <SCreator>
+                    <SCreatorImage
+                      src={post.creator?.avatarUrl!!}
+                    />
+                    <SWantsToKnow>
+                      {t('AcPostSuccess.wants_to_know', { creator: post.creator?.nickname })}
+                    </SWantsToKnow>
+                  </SCreator>
+                  <STotal>
+                    {`$${formatNumber(post.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
+                    {' '}
+                    <span>
+                      {t('AcPostSuccess.in_total_bids')}
+                    </span>
+                  </STotal>
+                </SCreatorInfoDiv>
+                <SPostTitle
+                  variant={4}
+                >
+                  {post.title}
+                </SPostTitle>
+                <SSeparator />
+                {winningOption && (
+                <>
+                  <SWinningBidCreator>
+                    <SCreator>
+                      <SCreatorImage
+                        src={winningOption.creator?.avatarUrl!!}
+                      />
+                      <SWinningBidCreatorText>
+                        { getDisplayname(winningOption.creator!!) }
+                        {winningOption.supporterCount > 1 ? (
+                          <>
+                            {formatNumber(winningOption.supporterCount, true)}
+                            {' & '}
+                            {t('AcPostSuccess.others')}
+                          </>
+                        ) : null}
+                        {' '}
+                        {t('AcPostSuccess.bid')}
+                      </SWinningBidCreatorText>
+                    </SCreator>
+                  </SWinningBidCreator>
+                  <SWinningOptionAmount
+                    variant={4}
+                  >
+                    {`$${formatNumber(winningOption.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
+                  </SWinningOptionAmount>
+                  <SSeparator />
+                  <SWinningOptionDetails>
+                    <SWinningOptionDetailsBidChosen>
+                      {t('AcPostSuccess.bid_chosen')}
+                    </SWinningOptionDetailsBidChosen>
+                    <SWinningOptionDetailsSeeAll
+                      onClick={() => setOpenedMainSection('bids')}
+                    >
+                      {t('AcPostSuccess.see_all')}
+                    </SWinningOptionDetailsSeeAll>
+                    <SWinningOptionDetailsTitle
+                      variant={4}
+                    >
+                      {winningOption.title}
+                    </SWinningOptionDetailsTitle>
+                  </SWinningOptionDetails>
+                </>
+                )}
+              </SMainSectionWrapper>
+              {!isMobile ? (
+                <>
+                  {!responseViewed && videoTab === 'announcement' ? (
+                    <SWatchResponseWrapper>
+                      <SWatchResponseBtn
+                        shouldView={!responseViewed}
+                        onClick={() => setVideoTab('response')}
+                      >
+                        { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
+                      </SWatchResponseBtn>
+                    </SWatchResponseWrapper>
+                  ) : null}
+                  {responseViewed ? (
+                    <SToggleVideoWidget>
+                      <SChangeTabBtn
+                        shouldView={videoTab === 'announcement'}
+                        onClick={() => setVideoTab('announcement')}
+                      >
+                        { t('PostVideoSuccess.tabs.watch_original') }
+                      </SChangeTabBtn>
+                      <SChangeTabBtn
+                        shouldView={videoTab === 'response'}
+                        onClick={() => setVideoTab('response')}
+                      >
+                        { t('PostVideoSuccess.tabs.watch_response')}
+                      </SChangeTabBtn>
+                    </SToggleVideoWidget>
+                  ) : null}
+                </>
+              ) : null}
+            </>
+          ) : (
+            <AcSuccessOptionsTab
+              post={post}
+              handleGoBack={() => setOpenedMainSection('main')}
+            />
+          )}
         </SActivitesContainer>
       </SWrapper>
       {post.isCommentsAllowed && (
@@ -227,13 +355,338 @@ const SActivitesContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     margin-top: 0px;
-    height: 506px;
+    min-height: 506px;
   }
 
   ${({ theme }) => theme.media.laptop} {
+    min-height: unset;
     height: 728px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 `;
+
+const SMainSectionWrapper = styled.div`
+  padding-left: 16px;
+  padding-right: 16px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-left: 16px;
+    padding-right: 16px;
+
+    height: calc(100% - 260px);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start\;
+  }
+`;
+
+const SSeparator = styled.div`
+  margin: 24px auto;
+
+  height: 1.5px;
+  width: 64px;
+
+  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+`;
+
+// Creator info
+const SCreatorInfoDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+`;
+
+const SCreator = styled.div`
+  line-height: 24px;
+
+  vertical-align: middle;
+`;
+
+const SCreatorImage = styled.img`
+  display: inline-block;
+
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  margin-right: 4px;
+`;
+
+const SWantsToKnow = styled.span`
+  position: relative;
+  top: -6px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
+  ${({ theme }) => theme.media.laptop} {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;
+  }
+`;
+
+const STotal = styled.div`
+  position: relative;
+  top: -6px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+
+  span {
+    color: ${({ theme }) => theme.colorsThemed.text.secondary};
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 16px;
+
+  }
+  ${({ theme }) => theme.media.laptop} {
+    position: relative;
+    top: -3px;
+
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 20px;
+
+    span {
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 20px;
+    }
+  }
+`;
+
+// Post title
+const SPostTitle = styled(Headline)`
+  text-align: center;
+
+  margin-top: 8px;
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
+`;
+
+// Winning option info
+const SWinningBidCreator = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 16px;
+
+    flex-direction: row;
+    justify-content: space-between;
+  }
+`;
+
+const SWinningBidCreatorText = styled.span`
+  position: relative;
+  top: -6px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
+  ${({ theme }) => theme.media.laptop} {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;
+  }
+`;
+
+
+// Winning option
+const SWinningOptionAmount = styled(Headline)`
+  text-align: center;
+
+  margin-top: 8px;
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
+`;
+
+const SWinningOptionDetails = styled.div`
+  display: grid;
+
+  grid-template-areas:
+    'bidchosen'
+    'title'
+    'see_all'
+  ;
+
+  margin-bottom: 32px;
+
+  ${({ theme }) => theme.media.tablet} {
+    grid-template-areas:
+      'bidchosen see_all'
+      'title title'
+    ;
+    grid-template-columns: 1fr 1fr;
+
+    margin-bottom: initial;
+  }
+`;
+
+const SWinningOptionDetailsBidChosen = styled.div`
+  grid-area: bidchosen;
+
+  text-align: center;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;
+  }
+`;
+
+const SWinningOptionDetailsSeeAll = styled.button`
+  grid-area: see_all;
+
+  text-align: center;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  background: transparent;
+  border: none;
+
+  margin-top: 8px;
+
+  cursor: pointer;
+
+  &:focus, &:hover, &:active {
+    outline: none;
+    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 0px;
+    text-align: right;
+    justify-self: right;
+    width: fit-content;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;
+  }
+`;
+
+const SWinningOptionDetailsTitle = styled(Headline)`
+  grid-area: title;
+
+
+  text-align: center;
+  ${({ theme }) => theme.media.tablet} {
+    text-align: left;
+  }
+`;
+
+
+// Watch response for the first time
+const SWatchResponseWrapper = styled.div`
+  width: 100%;
+  height: 60px;
+
+  overflow: hidden;
+  border-radius: 16px;
+`;
+
+const SWatchResponseBtn = styled.button<{
+  shouldView?: boolean;
+}>`
+  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  border: transparent;
+  border-radius: 16px;
+
+  padding: 17px 24px;
+
+  width: 100%;
+  height: 100%;
+
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+
+  cursor: pointer;
+
+  &:active, &:focus {
+    outline: none;
+  }
+`;
+
+const SToggleVideoWidget = styled.div`
+  display: flex;
+
+  height: 60px;
+  width: 100%;
+
+  overflow: hidden;
+  border-radius: 16px;
+`;
+
+const SChangeTabBtn = styled.button<{
+  shouldView?: boolean;
+}>`
+  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  border: transparent;
+
+  padding: 17px 24px;
+
+  width: 50%;
+  height: 100%;
+
+  text-align: center;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+
+  cursor: pointer;
+
+  &:active, &:focus {
+    outline: none;
+  }
+`;
+
 
 // Comments
 const SCommentsHeadline = styled(Headline)`

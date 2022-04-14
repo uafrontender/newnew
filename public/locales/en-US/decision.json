@@ -163,8 +163,8 @@
     "tabs": {
       "announcement": "Original",
       "response": "Response",
-      "back_to_original": "Watch original",
-      "back_to_response": "Watch response",
+      "watch_original": "Watch original",
+      "watch_response": "Watch response",
       "watch_reponse_first_time": "Watch it happen!"
     }
   },
@@ -448,7 +448,10 @@
     "others": "others",
     "bid": "bid",
     "bid_chosen": "Bid chosen",
-    "see_all": "see all bids"
+    "see_all": "see all bids",
+    "OptionsTab": {
+      "backBtn": "Back"
+    }
   },
   "RecommendationsSection": {
     "heading": "More like this"
