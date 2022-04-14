@@ -1,5 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
+/* eslint-disable consistent-return */
 import React, {
   useCallback,
   useContext,
@@ -16,7 +17,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
 import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
@@ -43,6 +44,10 @@ import NoContentYetImg from '../../../../public/images/decision/no-content-yet-m
 import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 import PaymentSuccessModal from '../PaymentSuccessModal';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 interface IAcOptionsTab {
   postId: string;
@@ -77,6 +82,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isTablet = ['tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -117,6 +123,28 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+
+  const goToNextStep = () => {
+    switch (user.userTutorialsProgress.eventsStep) {
+      case 2:
+        dispatch(
+          setUserTutorialsProgress({
+            eventsStep: 3,
+          })
+        );
+        break;
+      case 3:
+        dispatch(
+          setUserTutorialsProgress({
+            eventsStep: 4,
+          })
+        );
+        break;
+      default:
+        return null;
+    }
+  };
+
   // Handlers
   const handleTogglePaymentModalOpen = () => {
     if (isAPIValidateLoading) return;
@@ -357,7 +385,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   }, [options, optionBeingSupported, isMobile]);
 
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry) => {
+    const resizeObserver = new ResizeObserver((entry: any) => {
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
@@ -500,8 +528,26 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             >
               {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
             </Button>
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={user.userTutorialsProgress.eventsStep === 3}
+                closeTooltip={goToNextStep}
+                title={t('tutorials.ac.createYourBid.title')}
+                text={t('tutorials.ac.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomLeft}
+              />
+            </STutorialTooltipHolder>
           </SActionSection>
         )}
+        <STutorialTooltipHolder>
+          <TutorialTooltip
+            isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
+            closeTooltip={goToNextStep}
+            title={t('tutorials.ac.peopleBids.title')}
+            text={t('tutorials.ac.peopleBids.text')}
+            dotPosition={DotPositionEnum.BottomLeft}
+          />
+        </STutorialTooltipHolder>
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && postStatus === 'voting' ? (
@@ -584,12 +630,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
+        <>
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}
         >
           {t('AcPost.FloatingActionButton.suggestNewBtn')}
         </SActionButton>
+        <STutorialTooltipHolderMobile>
+          <TutorialTooltip
+            isTooltipVisible={user.userTutorialsProgress.eventsStep === 3}
+            closeTooltip={goToNextStep}
+            title={t('tutorials.ac.createYourBid.title')}
+            text={t('tutorials.ac.createYourBid.text')}
+            dotPosition={DotPositionEnum.BottomLeft}
+          />
+        </STutorialTooltipHolderMobile>
+        </>
       ) : null}
     </>
   );
@@ -687,6 +744,7 @@ const SSuggestNewContainer = styled.div`
 
 const SActionSection = styled.div`
   display: none;
+  position: relative;
 
   ${({ theme }) => theme.media.tablet} {
     display: flex;
@@ -802,4 +860,24 @@ const SMakeBidArrowSvg = styled(InlineSvg)`
   position: absolute;
   left: 26%;
   bottom: -58px;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: 60px;
+  bottom: 97%;
+  text-align: left;
+  div {
+    width: 190px;
+  }
+`;
+
+const STutorialTooltipHolderMobile = styled.div`
+  position: fixed;
+  left: 20%;
+  bottom: 82px;
+  text-align: left;
+  div {
+    width: 190px;
+  }
 `;
