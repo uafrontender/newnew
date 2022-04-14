@@ -113,7 +113,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const { post_uuid } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'profile', 'decision', 'home', 'payment-modal'],
+    ['common', 'profile', 'decision', 'home', 'payment-modal', 'chat'],
   );
 
   if (!post_uuid || Array.isArray(post_uuid)) {

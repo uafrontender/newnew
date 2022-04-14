@@ -78,6 +78,11 @@
     "body": "Don't miss the update. Stay tuned!",
     "ctaButton": "Notify me"
   },
+  "SuccessCommon": {
+    "Comments": {
+      "heading": "Comments"
+    }
+  },
   "PostSuccess": {
     "title": "This decision is finished!",
     "body": "Checkout more like it.",
@@ -152,6 +157,15 @@
           "process": "{{progress}}% • {{time}} left"
         }
       }
+    }
+  },
+  "PostVideoSuccess": {
+    "tabs": {
+      "announcement": "Original",
+      "response": "Response",
+      "back_to_original": "Watch original",
+      "back_to_response": "Watch response",
+      "watch_reponse_first_time": "Watch it happen!"
     }
   },
   "DeletePostModal": {
@@ -427,6 +441,15 @@
       }
     }
   },
+  "AcPostSuccess": {
+    "hero_text": "This Event has ended!",
+    "wants_to_know": "{{ creator }} wants to know...",
+    "in_total_bids": "in total bids",
+    "others": "others",
+    "bid": "bid",
+    "bid_chosen": "Bid chosen",
+    "see_all": "see all bids"
+  },
   "RecommendationsSection": {
     "heading": "More like this"
   },
@@ -455,7 +478,7 @@
     }
   },
   "heroPopupCommon": {
-    "heroBtnText": "Let’s go",
+    "heroBtnText": "Let's go",
     "btnText": "Got it"
   },
   "heroPopupAC": {
