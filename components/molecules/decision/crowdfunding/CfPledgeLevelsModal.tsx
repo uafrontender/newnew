@@ -249,7 +249,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               e.stopPropagation();
             }}
           >
-            {pledgeLevels.map((p, i, arr) => (
+            {pledgeLevels.map((p, i) => (
               <React.Fragment key={p.usdCents}>
                 <SItem
                   key={i}
@@ -258,11 +258,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                   }}
                 >
                   <SText>{`$${(p.usdCents!! / 100).toFixed(0)}`}</SText>
-                  {i === arr.length - 1 ? (
+                  {/* {i === arr.length - 1 ? (
                     <SAdditionalLabel>
                       {t('CfPost.BackersTab.free_sub')}
                     </SAdditionalLabel>
-                  ) : null}
+                  ) : null} */}
                 </SItem>
                 <SSeparator />
               </React.Fragment>
@@ -423,25 +423,25 @@ const SCaption = styled(Text)`
   text-align: center;
 `;
 
-const SAdditionalLabel = styled.div`
-  position: absolute;
-  top: calc(50% - 12px);
-  right: 8px;
+// const SAdditionalLabel = styled.div`
+//   position: absolute;
+//   top: calc(50% - 12px);
+//   right: 8px;
 
-  font-weight: bold;
-  font-size: 10px;
-  line-height: 24px;
-  color: #2c2c33;
-  text-align: center;
+//   font-weight: bold;
+//   font-size: 10px;
+//   line-height: 24px;
+//   color: #2c2c33;
+//   text-align: center;
 
-  background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
+//   background-color: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
-  height: 24px;
-  padding-left: 8px;
-  padding-right: 8px;
+//   height: 24px;
+//   padding-left: 8px;
+//   padding-right: 8px;
 
-  border-radius: 50px;
-`;
+//   border-radius: 50px;
+// `;
 
 const SSeparator = styled.div`
   width: 100%;

@@ -4,10 +4,15 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useMemo, useState,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -30,6 +35,8 @@ import switchPostType from '../../../utils/switchPostType';
 import isBrowser from '../../../utils/isBrowser';
 
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import HeroPopup from '../../molecules/decision/HeroPopup';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -48,22 +55,22 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const {
-    addChannel,
-    removeChannel,
-  } = useContext(ChannelsContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
   const [currentTab, setCurrentTab] = useState<'backers' | 'comments'>(() => {
     if (!isBrowser()) {
-      return 'backers'
+      return 'backers';
     }
     const { hash } = window.location;
     if (hash && (hash === '#backers' || hash === '#comments')) {
@@ -74,16 +81,24 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
 
   const handleChangeTab = (tab: string) => {
     if (tab === 'comments' && isMobile) {
-      window.history.pushState(        {
-        postId: post.postUuid,
-      }, 'Post', `/post/${post.postUuid}#${tab}`);
+      window.history.pushState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     } else {
-      window.history.replaceState(        {
-        postId: post.postUuid,
-      }, 'Post', `/post/${post.postUuid}#${tab}`);
+      window.history.replaceState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-  }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -96,130 +111,142 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       if (parsedHash === 'backers' || parsedHash === 'comments') {
         setCurrentTab(parsedHash);
       }
-    }
+    };
 
     window.addEventListener('hashchange', handleHashChange, false);
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange, false);
-    }
+    };
   }, []);
 
   // Current backers
-  const [currentBackers, setCurrentBackers] = useState(post.currentBackerCount ?? 0);
+  const [currentBackers, setCurrentBackers] = useState(
+    post.currentBackerCount ?? 0
+  );
   const crowdfundingSuccess = useMemo(() => {
-    return currentBackers >= post.targetBackerCount
+    return currentBackers >= post.targetBackerCount;
   }, [post, currentBackers]);
 
   // Pledges
   const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
-  const [pledgesNextPageToken, setPledgesNextPageToken] = useState<string | undefined | null>('');
+  const [pledgesNextPageToken, setPledgesNextPageToken] =
+    useState<string | undefined | null>('');
   const [pledgesLoading, setPledgesLoading] = useState(false);
   const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
   // Respone upload
-  const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<newnewapi.IVideoUrls | undefined>(undefined);
+  const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
+    useState<newnewapi.IVideoUrls | undefined>(undefined);
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-  const sortPleges = useCallback((unsortedArr: TCfPledgeWithHighestField[]) => {
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < unsortedArr.length; i++) {
-      // eslint-disable-next-line no-param-reassign
-      unsortedArr[i].isHighest = false;
-    }
-
-    const highestPledge = unsortedArr.sort((a, b) => (
-      (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
-    ))[0];
-
-    const pledgesByUser = user.userData?.userUuid
-      ? unsortedArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-        .sort((a, b) => {
-          // Sort by newest first
-          return (b.id as number) - (a.id as number);
-        })
-      : [];
-
-    // const pledgesByVipUsers = [];
-
-    const workingArrSorted = unsortedArr.sort((a, b) => {
-      // Sort the rest by newest first
-      return (b.id as number) - (a.id as number);
-    });
-
-    const joinedArr = [
-      ...(
-        highestPledge
-        && highestPledge.creator?.uuid === user.userData?.userUuid ? [highestPledge] : []),
-      ...pledgesByUser,
-      // ...pledgesByVipUsers,
-      ...(
-        highestPledge
-        && highestPledge.creator?.uuid !== user.userData?.userUuid ? [highestPledge] : []),
-      ...workingArrSorted,
-    ];
-
-    const workingSortedUnique = joinedArr.length > 0
-      ? [...new Set(joinedArr)] : [];
-
-    const highestPledgeIdx = (
-      workingSortedUnique as TCfPledgeWithHighestField[]
-    ).findIndex((o) => o.id === highestPledge.id);
-
-    if (workingSortedUnique[highestPledgeIdx]) {
-      workingSortedUnique[highestPledgeIdx].isHighest = true;
-    }
-
-    return workingSortedUnique;
-  }, [user.userData?.userUuid]);
-
-  const fetchPledgesForPost = useCallback(async (
-    pageToken?: string,
-  ) => {
-    if (pledgesLoading) return;
-    try {
-      setPledgesLoading(true);
-      setLoadingPledgesError('');
-
-      const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
-        postUuid: post.postUuid,
-        ...(pageToken ? {
-          paging: {
-            pageToken,
-          },
-        } : {}),
-      });
-
-      const res = await fetchPledges(getCurrentPledgesPayload);
-
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (res.data && res.data.pledges) {
-        setPledges((curr) => {
-          const workingArr = [...curr, ...res.data?.pledges as TCfPledgeWithHighestField[]];
-          const workingArrUnsorted = [...workingArr];
-
-          return sortPleges(workingArrUnsorted);
-        });
-        setPledgesNextPageToken(res.data.paging?.nextPageToken);
+  const sortPleges = useCallback(
+    (unsortedArr: TCfPledgeWithHighestField[]) => {
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < unsortedArr.length; i++) {
+        // eslint-disable-next-line no-param-reassign
+        unsortedArr[i].isHighest = false;
       }
 
-      setPledgesLoading(false);
-    } catch (err) {
-      setPledgesLoading(false);
-      setLoadingPledgesError((err as Error).message);
-      console.error(err);
-    }
-  }, [
-    pledgesLoading,
-    setPledges,
-    sortPleges,
-    post,
-  ]);
+      const highestPledge = unsortedArr.sort(
+        (a, b) =>
+          (b?.amount?.usdCents as number) - (a?.amount?.usdCents as number)
+      )[0];
 
+      const pledgesByUser = user.userData?.userUuid
+        ? unsortedArr
+            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
+            .sort((a, b) => {
+              // Sort by newest first
+              return (b.id as number) - (a.id as number);
+            })
+        : [];
+
+      // const pledgesByVipUsers = [];
+
+      const workingArrSorted = unsortedArr.sort((a, b) => {
+        // Sort the rest by newest first
+        return (b.id as number) - (a.id as number);
+      });
+
+      const joinedArr = [
+        ...(highestPledge &&
+        highestPledge.creator?.uuid === user.userData?.userUuid
+          ? [highestPledge]
+          : []),
+        ...pledgesByUser,
+        // ...pledgesByVipUsers,
+        ...(highestPledge &&
+        highestPledge.creator?.uuid !== user.userData?.userUuid
+          ? [highestPledge]
+          : []),
+        ...workingArrSorted,
+      ];
+
+      const workingSortedUnique =
+        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+
+      const highestPledgeIdx = (
+        workingSortedUnique as TCfPledgeWithHighestField[]
+      ).findIndex((o) => o.id === highestPledge.id);
+
+      if (workingSortedUnique[highestPledgeIdx]) {
+        workingSortedUnique[highestPledgeIdx].isHighest = true;
+      }
+
+      return workingSortedUnique;
+    },
+    [user.userData?.userUuid]
+  );
+
+  const fetchPledgesForPost = useCallback(
+    async (pageToken?: string) => {
+      if (pledgesLoading) return;
+      try {
+        setPledgesLoading(true);
+        setLoadingPledgesError('');
+
+        const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
+          postUuid: post.postUuid,
+          ...(pageToken
+            ? {
+                paging: {
+                  pageToken,
+                },
+              }
+            : {}),
+        });
+
+        const res = await fetchPledges(getCurrentPledgesPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data && res.data.pledges) {
+          setPledges((curr) => {
+            const workingArr = [
+              ...curr,
+              ...(res.data?.pledges as TCfPledgeWithHighestField[]),
+            ];
+            const workingArrUnsorted = [...workingArr];
+
+            return sortPleges(workingArrUnsorted);
+          });
+          setPledgesNextPageToken(res.data.paging?.nextPageToken);
+        }
+
+        setPledgesLoading(false);
+      } catch (err) {
+        setPledgesLoading(false);
+        setLoadingPledgesError((err as Error).message);
+        console.error(err);
+      }
+    },
+    [pledgesLoading, setPledges, sortPleges, post]
+  );
 
   const fetchPostLatestData = useCallback(async () => {
     try {
@@ -229,32 +256,30 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
 
       const res = await fetchPostByUUID(fetchPostPayload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
       handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
     } catch (err) {
       console.error(err);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
-    addChannel(
-      post.postUuid,
-      {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
+    addChannel(post.postUuid, {
+      postUpdates: {
+        postUuid: post.postUuid,
       },
-    );
+    });
 
     return () => {
       removeChannel(post.postUuid);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -262,7 +287,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     setPledgesNextPageToken('');
     fetchPledgesForPost();
     fetchPostLatestData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
 
   useEffect(() => {
@@ -274,12 +299,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         setPledges((curr) => {
           const workingArr = [...curr];
           let workingArrUnsorted;
-          const idx = workingArr.findIndex((op) => op.id === decoded.pledge?.id);
+          const idx = workingArr.findIndex(
+            (op) => op.id === decoded.pledge?.id
+          );
           if (idx === -1) {
-            workingArrUnsorted = [...workingArr, decoded.pledge as TCfPledgeWithHighestField];
+            workingArrUnsorted = [
+              ...workingArr,
+              decoded.pledge as TCfPledgeWithHighestField,
+            ];
           } else {
-            workingArr[idx]
-              .amount!!.usdCents = (decoded.pledge?.amount?.usdCents as number);
+            workingArr[idx].amount!!.usdCents = decoded.pledge?.amount
+              ?.usdCents as number;
             workingArrUnsorted = workingArr;
           }
 
@@ -293,8 +323,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       const decoded = newnewapi.PostUpdated.decode(arr);
 
       if (!decoded) return;
-      const [decodedParsed] = switchPostType(
-        decoded.post as newnewapi.IPost);
+      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
       }
@@ -323,13 +352,16 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    socketConnection,
-    post,
-    setPledges,
-    sortPleges,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection, post, setPledges, sortPleges]);
+
+  const goToNextStep = () => {
+    dispatch(
+      setUserTutorialsProgress({
+        goalStep: 1,
+      })
+    );
+  };
 
   return (
     <SWrapper>
@@ -344,11 +376,15 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         )}
         {postStatus === 'waiting_for_response' ? (
           <ResponseTimer
-            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+            timestampSeconds={new Date(
+              (post.responseUploadDeadline?.seconds as number) * 1000
+            ).getTime()}
           />
         ) : (
           <PostTimer
-            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            timestampSeconds={new Date(
+              (post.expiresAt?.seconds as number) * 1000
+            ).getTime()}
             postType="cf"
           />
         )}
@@ -360,7 +396,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
-        handleUpdateResponseVideo={(newValue) => setResponseFreshlyUploaded(newValue)}
+        handleUpdateResponseVideo={(newValue) =>
+          setResponseFreshlyUploaded(newValue)
+        }
       />
       <PostTopInfoModeration
         postType="cf"
@@ -376,10 +414,14 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
               label: 'backers',
               value: 'backers',
             },
-            ...(post.isCommentsAllowed ? [{
-              label: 'comments',
-              value: 'comments',
-            }] : []),
+            ...(post.isCommentsAllowed
+              ? [
+                  {
+                    label: 'comments',
+                    value: 'comments',
+                  },
+                ]
+              : []),
           ]}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
@@ -403,15 +445,21 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
             commentsRoomId={post.commentsRoomId as number}
             handleGoBack={() => handleChangeTab('backers')}
           />
-        ) : null
-      }
+        ) : null}
       </SActivitesContainer>
+      <HeroPopup
+        isPopupVisible={
+          user.userTutorialsProgress &&
+          user.userTutorialsProgress.goalStep === 0
+        }
+        postType="CF"
+        closeModal={goToNextStep}
+      />
     </SWrapper>
   );
 };
 
-PostModerationCF.defaultProps = {
-};
+PostModerationCF.defaultProps = {};
 
 export default PostModerationCF;
 

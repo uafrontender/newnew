@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable consistent-return */
 import React, {
   useCallback,
   useContext,
@@ -15,7 +16,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
@@ -36,10 +37,13 @@ import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
-import McOptionCardDoubleVote from './McOptionCardDoubleVote';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import { WalletContext } from '../../../../contexts/walletContext';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -74,6 +78,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -339,7 +344,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   }, [inView, pagingToken, optionsLoading]);
 
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry) => {
+    const resizeObserver = new ResizeObserver((entry: any) => {
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
@@ -355,6 +360,27 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasVotedOptionId, post.isSuggestionsAllowed, isMobileOrTablet]);
+
+  const goToNextStep = () => {
+    switch (user.userTutorialsProgress.superPollStep) {
+      case 2:
+        dispatch(
+          setUserTutorialsProgress({
+            superPollStep: 3,
+          })
+        );
+        break;
+      case 3:
+        dispatch(
+          setUserTutorialsProgress({
+            superPollStep: 4,
+          })
+        );
+        break;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -387,54 +413,32 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               />
             </>
           ) : null}
-          {options.map((option, i) =>
-            hasVotedOptionId === option.id ? (
-              <McOptionCardDoubleVote
-                key={option.id.toString()}
-                option={option as TMcOptionWithHighestField}
-                creator={option.creator ?? post.creator!!}
-                postId={post.postUuid}
-                index={i}
-                hasAlreadyVoted={hasVotedOptionId === option.id}
-                noAction={
-                  (hasVotedOptionId !== undefined &&
-                    hasVotedOptionId !== option.id) ||
-                  postStatus === 'failed'
-                }
-                handleSetSupportedBid={(id: string) =>
-                  setOptionBeingSupported(id)
-                }
-                handleAddOrUpdateOptionFromResponse={
-                  handleAddOrUpdateOptionFromResponse
-                }
-              />
-            ) : (
-              <McOptionCard
-                key={option.id.toString()}
-                option={option as TMcOptionWithHighestField}
-                creator={option.creator ?? post.creator!!}
-                postId={post.postUuid}
-                index={i}
-                minAmount={minAmount}
-                votePrice={votePrice}
-                optionBeingSupported={optionBeingSupported}
-                noAction={
-                  (hasVotedOptionId !== undefined &&
-                    hasVotedOptionId !== option.id) ||
-                  postStatus === 'failed'
-                }
-                handleSetSupportedBid={(id: string) =>
-                  setOptionBeingSupported(id)
-                }
-                handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
-                  setPaymentSuccesModalOpen(newValue)
-                }
-                handleAddOrUpdateOptionFromResponse={
-                  handleAddOrUpdateOptionFromResponse
-                }
-              />
-            )
-          )}
+          {options.map((option, i) => (
+            <McOptionCard
+              key={option.id.toString()}
+              option={option as TMcOptionWithHighestField}
+              creator={option.creator ?? post.creator!!}
+              postId={post.postUuid}
+              index={i}
+              minAmount={minAmount}
+              votePrice={votePrice}
+              optionBeingSupported={optionBeingSupported}
+              noAction={
+                (hasVotedOptionId !== undefined &&
+                  hasVotedOptionId !== option.id) ||
+                postStatus === 'failed'
+              }
+              handleSetSupportedBid={(id: string) =>
+                setOptionBeingSupported(id)
+              }
+              handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
+                setPaymentSuccesModalOpen(newValue)
+              }
+              handleAddOrUpdateOptionFromResponse={
+                handleAddOrUpdateOptionFromResponse
+              }
+            />
+          ))}
           {!isMobile ? (
             <SLoaderDiv ref={loadingRef} />
           ) : pagingToken ? (
@@ -523,6 +527,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             }}
           />
         )}
+        <STutorialTooltipHolder>
+          <TutorialTooltip
+            isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
+            closeTooltip={goToNextStep}
+            title={t('tutorials.mc.peopleBids.title')}
+            text={t('tutorials.mc.peopleBids.text')}
+            dotPosition={DotPositionEnum.BottomLeft}
+          />
+        </STutorialTooltipHolder>
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && !hasVotedOptionId ? (
@@ -589,11 +602,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
-          amount={`$${parseInt(newBidAmount) * 1}`}
+          amount={`$${parseInt(newBidAmount) * votePrice}`}
           showTocApply={!user?.loggedIn}
           {...{
             ...(walletBalance &&
-            walletBalance?.usdCents < parseInt(newBidAmount) * 100
+            walletBalance?.usdCents < parseInt(newBidAmount) * votePrice
               ? {
                   predefinedOption: 'card',
                 }
@@ -797,4 +810,14 @@ const SPaymentModalOptionText = styled.div`
 
 const SPlaceABidButton = styled(Button)`
   min-width: 123px;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: 40%;
+  bottom: 90%;
+  text-align: left;
+  div {
+    width: 190px;
+  }
 `;
