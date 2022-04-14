@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable consistent-return */
 import React, {
   useCallback,
   useContext,
@@ -15,7 +16,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
 import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
@@ -39,6 +40,10 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import { WalletContext } from '../../../../contexts/walletContext';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -73,6 +78,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -338,7 +344,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   }, [inView, pagingToken, optionsLoading]);
 
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry) => {
+    const resizeObserver = new ResizeObserver((entry: any) => {
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
@@ -354,6 +360,27 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasVotedOptionId, post.isSuggestionsAllowed, isMobileOrTablet]);
+
+  const goToNextStep = () => {
+    switch (user.userTutorialsProgress.superPollStep) {
+      case 2:
+        dispatch(
+          setUserTutorialsProgress({
+            superPollStep: 3,
+          })
+        );
+        break;
+      case 3:
+        dispatch(
+          setUserTutorialsProgress({
+            superPollStep: 4,
+          })
+        );
+        break;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -500,6 +527,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             }}
           />
         )}
+        <STutorialTooltipHolder>
+          <TutorialTooltip
+            isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
+            closeTooltip={goToNextStep}
+            title={t('tutorials.mc.peopleBids.title')}
+            text={t('tutorials.mc.peopleBids.text')}
+            dotPosition={DotPositionEnum.BottomLeft}
+          />
+        </STutorialTooltipHolder>
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && !hasVotedOptionId ? (
@@ -774,4 +810,14 @@ const SPaymentModalOptionText = styled.div`
 
 const SPlaceABidButton = styled(Button)`
   min-width: 123px;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: 40%;
+  bottom: 90%;
+  text-align: left;
+  div {
+    width: 190px;
+  }
 `;
