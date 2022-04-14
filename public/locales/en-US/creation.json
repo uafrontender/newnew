@@ -228,5 +228,12 @@
       "copy": "Copy Link",
       "copied": "Link Copied!"
     }
+  },
+  "heroPopupDC": {
+    "title": "Decision Creation",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+  },
+  "heroPopupCommon": {
+    "btnText": "Got it"
   }
 }

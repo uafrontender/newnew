@@ -1,22 +1,31 @@
 import { newnewapi } from 'newnew-api';
 import React, {
-  createContext, useState, useMemo, useEffect, useContext,
+  createContext,
+  useState,
+  useMemo,
+  useEffect,
+  useContext,
 } from 'react';
 import { getAppConstants } from '../api/endpoints/infrastructure';
 
 export const AppConstantsContext = createContext<{
-  appConstants: Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>
+  appConstants: Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>;
 }>({
   appConstants: {} as any,
 });
 
 const AppConstantsContextProvider: React.FC = ({ children }) => {
-  const [appConstants, setAppConstants] = useState<Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>>({} as any)
+  const [appConstants, setAppConstants] = useState<
+    Omit<newnewapi.GetAppConstantsResponse, 'toJSON'>
+  >({} as any);
 
-  const contextValue = useMemo(() => ({
-    appConstants,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [appConstants]);
+  const contextValue = useMemo(
+    () => ({
+      appConstants,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }),
+    [appConstants]
+  );
 
   useEffect(() => {
     async function fetchAppConstants() {
@@ -37,18 +46,19 @@ const AppConstantsContextProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AppConstantsContext.Provider
-      value={contextValue}
-    >
+    <AppConstantsContext.Provider value={contextValue}>
       {children}
     </AppConstantsContext.Provider>
   );
-}
+};
 
 export default AppConstantsContextProvider;
 
 export function useGetAppConstants() {
   const context = useContext(AppConstantsContext);
-  if (!context) throw new Error('useGetAppConstants must be used inside a `AppConstantsContext.Provider`');
+  if (!context)
+    throw new Error(
+      'useGetAppConstants must be used inside a `AppConstantsContext.Provider`'
+    );
   return context;
 }
