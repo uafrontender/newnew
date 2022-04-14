@@ -21,6 +21,7 @@ export interface IUserTutorialsProgress {
 export interface IUserStateInterface {
   loggedIn: boolean;
   signupEmailInput: string;
+  // TODO: remove notificationsCount & directMessagesCount from Redux, as they will be stored in Context
   notificationsCount: number;
   directMessagesCount: number;
   userData?: TUserData;
@@ -30,12 +31,16 @@ export interface IUserStateInterface {
 const defaultUIState: IUserStateInterface = {
   loggedIn: false,
   signupEmailInput: '',
+  // TODO: remove notificationsCount & directMessagesCount from Redux, as they will be stored in Context
   notificationsCount: 150,
   directMessagesCount: 12,
   userTutorialsProgress: {
-    eventsStep: 0, //AC
-    superPollStep: 0, //MC
-    goalStep: 0, //CF
+    // AC
+    eventsStep: 0,
+    // MC
+    superPollStep: 0,
+    // CF
+    goalStep: 0,
   },
 };
 
@@ -52,7 +57,7 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setUserData(state, { payload }: PayloadAction<TUserData>) {
       state.userData = { ...state.userData, ...payload };
     },
-    setUserTutorialsProgress(
+    setUserTutorialsProgressInner(
       state,
       { payload }: PayloadAction<IUserTutorialsProgress>
     ) {
@@ -60,14 +65,6 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
         ...state.userTutorialsProgress,
         ...payload,
       };
-
-      const localUserTutorialsProgress = loadStateLS(
-        'userTutorialsProgress'
-      ) as JSON;
-      saveStateLS('userTutorialsProgress', {
-        ...localUserTutorialsProgress,
-        ...payload,
-      });
     },
     logoutUser(state) {
       state.loggedIn = false;
@@ -89,7 +86,7 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
 export const {
   setUserLoggedIn,
   setSignupEmailInput,
-  setUserTutorialsProgress,
+  setUserTutorialsProgressInner,
   setUserData,
   logoutUser,
 } = userSlice.actions;
@@ -104,4 +101,17 @@ export const logoutUserClearCookiesAndRedirect =
     cookiesInstance.remove('accessToken');
     cookiesInstance.remove('refreshToken');
     router.push(redirectUrl ?? '/');
+  };
+
+export const setUserTutorialsProgress =
+  (payload: any): AppThunk => (dispatch) => {
+    dispatch(setUserTutorialsProgressInner(payload));
+
+    const localUserTutorialsProgress = loadStateLS(
+      'userTutorialsProgress'
+    ) as JSON;
+    saveStateLS('userTutorialsProgress', {
+      ...localUserTutorialsProgress,
+      ...payload,
+    });
   };

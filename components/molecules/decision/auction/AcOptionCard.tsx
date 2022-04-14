@@ -7,10 +7,10 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
 import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
@@ -27,16 +27,16 @@ import LoadingModal from '../../LoadingModal';
 import PaymentModal from '../../checkout/PaymentModal';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import OptionActionMobileModal from '../OptionActionMobileModal';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
 
 import { formatNumber } from '../../../../utils/format';
 
 // Icons
-// import SupportOptionIcon from '../../../../public/images/decision/support-option-mock.png';
-import TutorialTooltip, {
-  DotPositionEnum,
-} from '../../../atoms/decision/TutorialTooltip';
 import AcIcon from '../../../../public/images/creation/AC-static.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -72,6 +72,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -87,18 +88,18 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     () => option.creator?.uuid === user.userData?.userUuid,
     [option.creator?.uuid, user.userData?.userUuid]
   );
-  const isBlue = useMemo(
-    () => isSupportedByMe || isMyBid,
-    [isSupportedByMe, isMyBid]
-  );
+  const isBlue = useMemo(() => (
+    isSupportedByMe || isMyBid
+  ), [isSupportedByMe, isMyBid]);
+
+  // Tutorials
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
   const disabled =
     optionBeingSupported !== '' &&
     optionBeingSupported !== option.id.toString();
-
-  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
 
   const handleOpenSupportForm = () => {
     setIsSupportFormOpen(true);
@@ -298,6 +299,29 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     }
   }, [router.locale, user.loggedIn, supportBidAmount, option.id, postId]);
 
+  // eslint-disable-next-line consistent-return
+  const goToNextStep = () => {
+    switch (user.userTutorialsProgress.eventsStep) {
+      case 4:
+        dispatch(
+          setUserTutorialsProgress({
+            eventsStep: 5,
+          })
+        );
+        break;
+      default:
+        return null;
+    }
+  };
+
+  useEffect(() => {
+    if (user?.userTutorialsProgress?.eventsStep === 4) {
+      setIsTooltipVisible(true);
+    } else {
+      setIsTooltipVisible(false);
+    }
+  }, [user?.userTutorialsProgress]);
+
   return (
     <div
       key={index}
@@ -404,39 +428,48 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             </SSpanBiddersRegular>
           </SBiddersInfo>
         </SBidDetails>
-        {(optionBeingSupported && !disabled) || !votingAllowed ? null : (
-          <SSupportButtonHolder>
-            {!isMobile ? (
-              <SSupportButton
-                view="quaternary"
-                disabled={disabled}
-                isBlue={isBlue}
-                onClick={() => handleOpenSupportForm()}
-              >
-                <div>{t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}</div>
-              </SSupportButton>
-            ) : (
-              <SSupportButtonDesktop
-                view="secondary"
-                disabled={disabled}
-                isBlue={isBlue}
-                onClick={() => handleOpenSupportForm()}
-              >
-                {t('AcPost.OptionsTab.OptionCard.supportBtn')}
-              </SSupportButtonDesktop>
-            )}
-            {index === 0 && (
-              <STutorialTooltipHolder>
-                <TutorialTooltip
-                  isTooltipVisible={isTooltipVisible}
-                  closeTooltip={() => setIsTooltipVisible(false)}
-                  title={t('tutorials.ac.supportPeopleBids.title')}
-                  text={t('tutorials.ac.supportPeopleBids.text')}
-                  dotPosition={DotPositionEnum.TopRight}
-                />
-              </STutorialTooltipHolder>
-            )}
-          </SSupportButtonHolder>
+        {(optionBeingSupported && !disabled) || !votingAllowed
+          ? null
+          : isMobile ? (
+            <SSupportButton
+              view="quaternary"
+              disabled={disabled}
+              isBlue={isBlue}
+              onClick={() => handleOpenSupportForm()}
+            >
+              <div>
+                {
+                  !isSupportedByMe
+                  ? t('AcPost.OptionsTab.OptionCard.raiseBidBtn')
+                  : t('AcPost.OptionsTab.OptionCard.supportAgainBtn')
+                }
+              </div>
+            </SSupportButton>
+          ) : (
+            <SSupportButtonDesktop
+              view="secondary"
+              disabled={disabled}
+              isBlue={isBlue}
+              onClick={() => handleOpenSupportForm()}
+            >
+                {
+                  !isSupportedByMe
+                  ? t('AcPost.OptionsTab.OptionCard.supportBtn')
+                  : t('AcPost.OptionsTab.OptionCard.supportAgainBtn')
+                }
+            </SSupportButtonDesktop>
+          )
+        }
+        {index === 0 && !isMyBid && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={isTooltipVisible}
+              closeTooltip={goToNextStep}
+              title={t('tutorials.ac.supportPeopleBids.title')}
+              text={t('tutorials.ac.supportPeopleBids.text')}
+              dotPosition={DotPositionEnum.TopRight}
+            />
+          </STutorialTooltipHolder>
         )}
       </SContainer>
       <SSupportBidForm
@@ -637,15 +670,13 @@ const SBidDetails = styled.div<{
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
     border-bottom-left-radius: ${({ theme }) => theme.borderRadius.medium};
 
-    ${({ active }) =>
+    ${({ active }) => (
       active
-        ? css`
-            border-top-right-radius: ${({ theme }) =>
-              theme.borderRadius.medium};
-            border-bottom-right-radius: ${({ theme }) =>
-              theme.borderRadius.medium};
-          `
-        : null}
+      ? css`
+          border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
+          border-bottom-right-radius: ${({ theme }) => theme.borderRadius.medium};
+      ` : null
+    )}
   }
 `;
 
@@ -732,22 +763,22 @@ const SSupportButton = styled(Button)<{
   }
 
   background: ${({ theme }) => theme.colorsThemed.accent.blue};
-  color: #ffffff;
+  color: #FFFFFF;
 
   &:hover:enabled,
   &:active:enabled,
   &:focus:enabled {
     color: ${({ theme }) => theme.colors.dark};
-    background: #ffffff;
+    background: #FFFFFF;
   }
 
-  ${({ isBlue }) =>
+  ${({ isBlue }) => (
     isBlue
-      ? css`
-          color: ${({ theme }) => theme.colors.dark};
-          background: #ffffff;
-        `
-      : null}
+    ? css`
+      color: ${({ theme }) => theme.colors.dark};
+      background: #FFFFFF;
+    ` : null
+  )}
 `;
 
 const SSupportButtonDesktop = styled(Button)<{
@@ -756,7 +787,7 @@ const SSupportButtonDesktop = styled(Button)<{
   height: 100%;
   width: 60px;
 
-  color: #ffffff;
+  color: #FFFFFF;
   background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
   padding: initial;
@@ -779,15 +810,15 @@ const SSupportButtonDesktop = styled(Button)<{
   &:active:enabled,
   &:focus:enabled {
     color: ${({ theme }) => theme.colors.dark};
-    background: #ffffff;
+    background: #FFFFFF;
   }
 
-  ${({ isBlue }) =>
+  ${({ isBlue }) => (
     isBlue
-      ? css`
-          border-left: ${({ theme }) => theme.colors.dark} 1.5px solid;
-        `
-      : null}
+    ? css`
+      border-left: ${({ theme }) => theme.colors.dark} 1.5px solid;
+    ` : null
+  )}
 `;
 
 const SSupportBidForm = styled(motion.div)`
@@ -846,11 +877,7 @@ const SPaymentModalOptionText = styled.div`
   gap: 8px;
 `;
 
-const SSupportButtonHolder = styled.div`
-  margin: auto 0;
-  position: relative;
-`;
-
+// Tutorial
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   right: 35px;

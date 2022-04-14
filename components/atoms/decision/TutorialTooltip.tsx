@@ -30,7 +30,14 @@ export const TutorialTooltip: React.FC<ITutorialTooltip> = ({
     <SContainer>
       <STitle>{title}</STitle>
       {text && <SText>{text}</SText>}
-      <SButton onClick={closeTooltip}>{t('heroPopupCommon.btnText')}</SButton>
+      <SButton
+        onClick={(e) => {
+          e.stopPropagation();
+          closeTooltip();
+        }}
+      >
+        {t('heroPopupCommon.btnText')}
+      </SButton>
       <SDotWrapper position={dotPosition}>
         <SDot />
       </SDotWrapper>
@@ -65,7 +72,7 @@ const STitle = styled.h3`
   line-height: 24px;
   font-weight: 600;
   margin: 0;
-  color: ${(props) => props.theme.colorsThemed.text.primary};
+  color: #FFFFFF;
 `;
 
 const SText = styled.p`

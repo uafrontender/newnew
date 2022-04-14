@@ -630,12 +630,23 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       </PaymentSuccessModal>
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
+        <>
         <SActionButton
           view="primaryGrad"
           onClick={() => setSuggestNewMobileOpen(true)}
         >
           {t('AcPost.FloatingActionButton.suggestNewBtn')}
         </SActionButton>
+        <STutorialTooltipHolderMobile>
+          <TutorialTooltip
+            isTooltipVisible={user.userTutorialsProgress.eventsStep === 3}
+            closeTooltip={goToNextStep}
+            title={t('tutorials.ac.createYourBid.title')}
+            text={t('tutorials.ac.createYourBid.text')}
+            dotPosition={DotPositionEnum.BottomLeft}
+          />
+        </STutorialTooltipHolderMobile>
+        </>
       ) : null}
     </>
   );
@@ -855,6 +866,16 @@ const STutorialTooltipHolder = styled.div`
   position: absolute;
   left: 60px;
   bottom: 97%;
+  text-align: left;
+  div {
+    width: 190px;
+  }
+`;
+
+const STutorialTooltipHolderMobile = styled.div`
+  position: fixed;
+  left: 20%;
+  bottom: 82px;
   text-align: left;
   div {
     width: 190px;

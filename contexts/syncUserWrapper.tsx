@@ -3,6 +3,7 @@ import { newnewapi } from 'newnew-api';
 import React, { useEffect } from 'react';
 import { getMe } from '../api/endpoints/user';
 import {
+  IUserTutorialsProgress,
   logoutUserClearCookiesAndRedirect,
   setUserData,
   setUserTutorialsProgress,
@@ -74,7 +75,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
       saveStateLS('userTutorialsProgress', user.userTutorialsProgress);
     }
     if (!_.isEqual(user.userTutorialsProgress, localUserTutorialsProgress)) {
-      dispatch(setUserTutorialsProgress(localUserTutorialsProgress));
+      dispatch(setUserTutorialsProgress(localUserTutorialsProgress as IUserTutorialsProgress));
     }
     if (user.loggedIn) {
       syncUserData();

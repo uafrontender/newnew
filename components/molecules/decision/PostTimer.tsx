@@ -26,6 +26,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const { t } = useTranslation('decision');
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
   const expirationDate = new Date(timestampSeconds);
@@ -115,7 +118,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
                     closeTooltip={goToNextStep}
                     title={t('tutorials.timer.title')}
                     text={t('tutorials.timer.text')}
-                    dotPosition={DotPositionEnum.TopRight}
+                    dotPosition={isMobileOrTablet ? DotPositionEnum.TopLeft : DotPositionEnum.TopRight}
                   />
                 </STutorialTooltipHolder>
               </STimerItem>
@@ -132,7 +135,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
                   closeTooltip={goToNextStep}
                   title={t('tutorials.timer.title')}
                   text={t('tutorials.timer.text')}
-                  dotPosition={DotPositionEnum.TopRight}
+                  dotPosition={isMobileOrTablet ? DotPositionEnum.TopLeft : DotPositionEnum.TopRight}
                 />
               </STutorialTooltipHolder>
             )}
@@ -166,7 +169,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               closeTooltip={goToNextStep}
               title={t('tutorials.timer.title')}
               text={t('tutorials.timer.text')}
-              dotPosition={DotPositionEnum.TopRight}
+              dotPosition={isMobileOrTablet ? DotPositionEnum.TopLeft : DotPositionEnum.TopRight}
             />
           </STutorialTooltipHolder>
         </STimerItemEnded>
@@ -246,7 +249,13 @@ const STimerItemEnded = styled.div`
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
-  right: 100%;
-  top: 5px;
+  left: 0;
+  top: 42px;
   text-align: left;
+
+  ${({ theme }) => theme.media.laptop} {
+    left: initial;
+    right: 100%;
+    top: 5px;
+  }
 `;
