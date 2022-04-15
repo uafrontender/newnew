@@ -1,23 +1,27 @@
+/* eslint-disable no-nested-ternary */
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import styled, { css, useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 
-import InlineSVG from './InlineSVG';
+import InlineSVG from '../InlineSVG';
 
-import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
-import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
+import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
+import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
-import { quickSearchPostsAndCreators } from '../../api/endpoints/search';
-import { setGlobalSearchActive } from '../../redux-store/slices/uiStateSlice';
-import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { quickSearchPostsAndCreators } from '../../../api/endpoints/search';
+import { setGlobalSearchActive } from '../../../redux-store/slices/uiStateSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
-import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
-import searchIcon from '../../public/images/svg/icons/outlined/Search.svg';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import closeIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import searchIcon from '../../../public/images/svg/icons/outlined/Search.svg';
 import TopDecisionsResults from './TopDecisionsResults';
 import PopularCreatorsResults from './PopularCreatorsResults';
-import Button from './Button';
+import Button from '../Button';
+import Lottie from '../Lottie';
+import NoResults from './NoResults';
 
 export const SearchInput: React.FC = () => {
   const theme = useTheme();
@@ -27,6 +31,12 @@ export const SearchInput: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
+
+  const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
+  const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
   );
@@ -108,16 +118,26 @@ export const SearchInput: React.FC = () => {
     };
   }, [isMobile]);
 
+  const resetResults = () => {
+    setResultsCreators([]);
+    setResultsPosts([]);
+  };
+
   async function getQuickSearchResult(query: string) {
     try {
+      setIsLoading(true);
       const payload = new newnewapi.QuickSearchPostsAndCreatorsRequest({
         query,
       });
       const res = await quickSearchPostsAndCreators(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      console.log(res.data.toJSON());
+
+      if (res.data.creators) setResultsCreators(res.data.creators);
+      if (res.data.posts) setResultsPosts(res.data.posts);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       console.error(err);
     }
   }
@@ -128,6 +148,7 @@ export const SearchInput: React.FC = () => {
       setIsResultsDropVisible(true);
     } else if (!searchValue && !isMobileOrTablet) {
       setIsResultsDropVisible(false);
+      resetResults();
     }
   }, [searchValue, isMobileOrTablet]);
 
@@ -141,6 +162,7 @@ export const SearchInput: React.FC = () => {
             handleSearchClose();
             setSearchValue('');
             setIsResultsDropVisible(false);
+            resetResults();
           }}
         >
           <InlineSVG
@@ -185,23 +207,53 @@ export const SearchInput: React.FC = () => {
         </SInputWrapper>
         {!isMobileOrTablet && isResultsDropVisible && (
           <SResultsDrop>
-            <TopDecisionsResults keyword={searchValue} />
-            <PopularCreatorsResults keyword={searchValue} />
-            <SButton
-              onClick={() => {
-                router.push(`/search?query=${searchValue}`);
-              }}
-              view="quaternary"
-            >
-              All results
-            </SButton>
+            {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+              !isLoading ? (
+                <SNoResults>
+                  <NoResults closeDrop={handleCloseIconClick} />
+                </SNoResults>
+              ) : (
+                <SBlock>
+                  <Lottie
+                    width={64}
+                    height={64}
+                    options={{
+                      loop: true,
+                      autoplay: true,
+                      animationData: loadingAnimation,
+                    }}
+                  />
+                </SBlock>
+              )
+            ) : (
+              <>
+                {resultsPosts.length > 0 && (
+                  <TopDecisionsResults posts={resultsPosts} />
+                )}
+                {resultsCreators.length > 0 && (
+                  <PopularCreatorsResults creators={resultsCreators} />
+                )}
+                <SButton
+                  onClick={() => {
+                    router.push(`/search?query=${searchValue}`);
+                  }}
+                  view="quaternary"
+                >
+                  All results
+                </SButton>
+              </>
+            )}
           </SResultsDrop>
         )}
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
         <SResultsDropMobile>
-          <TopDecisionsResults keyword={searchValue} />
-          <PopularCreatorsResults keyword={searchValue} />
+          {resultsPosts.length > 0 && (
+            <TopDecisionsResults posts={resultsPosts} />
+          )}
+          {resultsCreators.length > 0 && (
+            <PopularCreatorsResults creators={resultsCreators} />
+          )}
           <SButton
             onClick={() => {
               router.push(`/search?query=${searchValue}`);
@@ -421,4 +473,17 @@ const SRightInlineSVG = styled(InlineSVG)`
 const SButton = styled(Button)`
   display: block;
   width: 100%;
+`;
+
+const SBlock = styled.section`
+  height: 200px;
+  display: flex;
+  align-items: center;
+`;
+
+const SNoResults = styled.section`
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

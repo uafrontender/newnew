@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 
 import Logo from '../Logo';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/SearchInput';
+import SearchInput from '../../atoms/search/SearchInput';
 
 import { useAppSelector } from '../../../redux-store/store';
 

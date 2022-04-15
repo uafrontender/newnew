@@ -1,46 +1,33 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useMemo } from 'react';
+import { newnewapi } from 'newnew-api';
+import React from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import UserAvatar from '../molecules/UserAvatar';
+import UserAvatar from '../../molecules/UserAvatar';
 
 interface IFunction {
-  keyword: string;
+  creators: newnewapi.IUser[];
 }
 
-export const PopularCreatorsResults: React.FC<IFunction> = ({ keyword }) => {
-  const creators = useMemo(
-    () => [
-      {
-        uuid: 'Event0',
-        username: 'CreatorDisplayName',
-        avatar: '/images/mock/test_user_1.jpg',
-      },
-      {
-        uuid: 'Event1',
-        username: 'CreatorDisplayName',
-        avatar: '/images/mock/test_user_1.jpg',
-      },
-      {
-        uuid: 'Event2',
-        username: 'CreatorDisplayName',
-        avatar: '/images/mock/test_user_1.jpg',
-      },
-    ],
-    []
-  );
-
+export const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
+  const router = useRouter();
   return (
     <SContainer>
       <SBlockTitle>Popular Creators</SBlockTitle>
       {creators.map((creator) => (
-        <SPost key={creator.uuid}>
+        <SPost
+          key={creator.uuid}
+          onClick={() => router.push(`/${creator.username}`)}
+        >
           <SLeftSide>
             <SUserAvatar>
-              <UserAvatar avatarUrl={creator.avatar} />
+              <UserAvatar
+                avatarUrl={creator.avatarUrl ? creator.avatarUrl : ''}
+              />
             </SUserAvatar>
             <SPostData>
-              <SCreatorUsername>{creator.username}</SCreatorUsername>
+              <SCreatorUsername>{creator.nickname}</SCreatorUsername>
               <SLink>See decisions</SLink>
             </SPostData>
           </SLeftSide>
@@ -66,11 +53,17 @@ const SBlockTitle = styled.strong`
 `;
 
 const SPost = styled.div`
-  margin-bottom: 16px;
+  /* margin-bottom: 16px; */
   display: flex;
   font-size: 14px;
   line-height: 20px;
   font-weight: 600;
+  padding: 8px 16px;
+  margin: 0 -16px;
+  cursor: pointer;
+  &:hover {
+    background: ${({ theme }) => theme.colorsThemed.background.secondary};
+  }
 `;
 
 const SLeftSide = styled.div`

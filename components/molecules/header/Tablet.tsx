@@ -7,7 +7,7 @@ import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/SearchInput';
+import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 import { useGetChats } from '../../../contexts/chatContext';
 
