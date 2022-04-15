@@ -12,6 +12,7 @@ import React, {
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -47,6 +48,8 @@ import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeratio
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import ResponseTimer from '../../molecules/decision/ResponseTimer';
+import HeroPopup from '../../molecules/decision/HeroPopup';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -66,6 +69,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -481,6 +485,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     sortOptions,
   ]);
 
+  const goToNextStep = () => {
+    dispatch(
+      setUserTutorialsProgress({
+        superPollStep: 1,
+      })
+    );
+  };
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -573,6 +585,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       </SActivitesContainer>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      <HeroPopup
+        isPopupVisible={
+          user.userTutorialsProgress &&
+          user.userTutorialsProgress.superPollStep === 0
+        }
+        postType="MC"
+        closeModal={goToNextStep}
+      />
     </SWrapper>
   );
 };

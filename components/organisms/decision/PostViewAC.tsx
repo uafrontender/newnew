@@ -46,6 +46,8 @@ import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
+import HeroPopup from '../../molecules/decision/HeroPopup';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -595,6 +597,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     sortOptions,
   ]);
 
+  const goToNextStep = () => {
+    dispatch(
+      setUserTutorialsProgress({
+        eventsStep: 1,
+      })
+    );
+  };
+
   useEffect(() => {
     if (loadingOptionsError) {
       toast.error(loadingOptionsError);
@@ -684,6 +694,17 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             option={winningOption}
             postStatus={postStatus}
           />
+        ) : currentTab === 'comments' && post.isCommentsAllowed ? (
+          <CommentsTab
+            commentsRoomId={post.commentsRoomId as number}
+            handleGoBack={() => handleChangeTab('bids')}
+          />
+        ) : winningOption ? (
+          <AcWinnerTab
+            postId={post.postUuid}
+            option={winningOption}
+            postStatus={postStatus}
+          />
         ) : (
           <SAnimationContainer>
             <Lottie
@@ -698,6 +719,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           </SAnimationContainer>
         )}
       </SActivitesContainer>
+
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
@@ -715,6 +737,14 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
             .calendar(),
         })}
       </PaymentSuccessModal>
+      <HeroPopup
+        isPopupVisible={
+          user.userTutorialsProgress &&
+          user.userTutorialsProgress.eventsStep === 0
+        }
+        postType="AC"
+        closeModal={goToNextStep}
+      />
     </SWrapper>
   );
 };
