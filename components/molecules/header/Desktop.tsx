@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/SearchInput';
+import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -102,9 +102,11 @@ export const Desktop: React.FC<IDesktop> = () => {
             )}
           </>
         )}
-        <SItemWithMargin>
-          <SearchInput />
-        </SItemWithMargin>
+        {user.loggedIn && user.userData?.options?.isCreator && (
+          <SItemWithMargin>
+            <SearchInput />
+          </SItemWithMargin>
+        )}
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (
