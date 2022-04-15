@@ -29,25 +29,11 @@ import {
   placeBidOnAuction,
 } from '../../../api/endpoints/auction';
 
-import Lottie from '../../atoms/Lottie';
-import GoBackButton from '../../molecules/GoBackButton';
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTimer from '../../molecules/decision/PostTimer';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import DecisionTabs from '../../molecules/decision/PostTabs';
-import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
-import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import LoadingModal from '../../molecules/LoadingModal';
-
-// Assets
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+// test post
+// http://localhost:4000/post/421e53e4-8297-4ac6-ac74-47366bc1c43b
 
 // Utils
-import isBrowser from '../../../utils/isBrowser';
-import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
