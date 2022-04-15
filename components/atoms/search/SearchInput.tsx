@@ -166,6 +166,7 @@ export const SearchInput: React.FC = () => {
           }}
         >
           <InlineSVG
+            fill={theme.colorsThemed.text.primary}
             svg={closeIcon}
             width={isTablet ? '24px' : '20px'}
             height={isTablet ? '24px' : '20px'}
@@ -248,20 +249,42 @@ export const SearchInput: React.FC = () => {
       </SContainer>
       {isMobileOrTablet && isResultsDropVisible && (
         <SResultsDropMobile>
-          {resultsPosts.length > 0 && (
-            <TopDecisionsResults posts={resultsPosts} />
+          {resultsPosts.length === 0 && resultsCreators.length === 0 ? (
+            !isLoading ? (
+              <SNoResults>
+                <NoResults closeDrop={handleCloseIconClick} />
+              </SNoResults>
+            ) : (
+              <SBlock>
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
+              </SBlock>
+            )
+          ) : (
+            <>
+              {resultsPosts.length > 0 && (
+                <TopDecisionsResults posts={resultsPosts} />
+              )}
+              {resultsCreators.length > 0 && (
+                <PopularCreatorsResults creators={resultsCreators} />
+              )}
+              <SButton
+                onClick={() => {
+                  router.push(`/search?query=${searchValue}`);
+                }}
+                view="quaternary"
+              >
+                All results
+              </SButton>
+            </>
           )}
-          {resultsCreators.length > 0 && (
-            <PopularCreatorsResults creators={resultsCreators} />
-          )}
-          <SButton
-            onClick={() => {
-              router.push(`/search?query=${searchValue}`);
-            }}
-            view="quaternary"
-          >
-            All results
-          </SButton>
         </SResultsDropMobile>
       )}
     </>
