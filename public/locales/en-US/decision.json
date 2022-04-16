@@ -469,6 +469,13 @@
       "backBtn": "Back"
     }
   },
+  "CfPostSuccess": {
+    "hero_text": "This Goal has ended!",
+    "wants_to_know": "{{ creator }}'s Goal",
+    "creators_backers": "{{ creator }}'s backers",
+    "of_target_backers": "of {{ target_count }} backers",
+    "you_backed_for": "You backed it for"
+  },
   "RecommendationsSection": {
     "heading": "More like this"
   },

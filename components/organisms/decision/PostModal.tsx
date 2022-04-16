@@ -53,6 +53,7 @@ import CommentFromUrlContextProvider, {
 import PostSuccessAC from './PostSuccessAC';
 import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
 import PostSuccessMC from './PostSuccessMC';
+import PostSuccessCF from './PostSuccessCF';
 
 interface IPostModal {
   isOpen: boolean;
@@ -318,9 +319,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
     if (postToRender === 'cf') {
       return (
-        <PostSuccessAC
+        <PostSuccessCF
           key={postParsed?.postUuid}
-          post={postParsed as newnewapi.Auction}
+          post={postParsed as newnewapi.Crowdfunding}
         />
       );
     }

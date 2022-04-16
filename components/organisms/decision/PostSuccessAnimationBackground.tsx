@@ -5,15 +5,13 @@ import styled, { keyframes } from 'styled-components';
 import GoldImage from '../../../public/images/decision/Gold.png';
 
 const PostSuccessAnimationBackground: React.FunctionComponent = () => {
-  const elements = useMemo(() => (
-    new Array(3).fill('')
-  ), []);
+  const elements = useMemo(() => [1, 2, 3], []);
 
   return (
     <SContainer>
       {elements.map((el, i) => (
         <GoldCoin
-          key={el}
+          key={el + 1}
           index={i}
           delay={0}
           top={-200 - i * 60}
@@ -28,7 +26,7 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
       ))}
       {elements.map((el, i) => (
         <GoldCoin
-          key={el}
+          key={el + 2}
           index={i}
           delay={2}
           top={-200 - i * 50}
@@ -43,7 +41,7 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
       ))}
       {elements.map((el, i) => (
         <GoldCoin
-          key={el}
+          key={el + 3}
           index={i}
           delay={3}
           top={-200 - i * 50}
@@ -58,7 +56,7 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
       ))}
       {elements.map((el, i) => (
         <GoldCoin
-          key={el}
+          key={el + 4}
           index={i}
           delay={5}
           top={-200 - i * 50}
@@ -73,7 +71,7 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
       ))}
       {elements.map((el, i) => (
         <GoldCoin
-          key={el}
+          key={el + 5}
           index={i}
           delay={8}
           top={-200 - i * 50}
