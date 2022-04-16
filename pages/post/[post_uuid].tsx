@@ -72,7 +72,8 @@ const PostPage: NextPage<IPostPage> = ({
   }, [router]);
 
   useEffect(() => {
-    if (isSafari() && !mutedMode) {
+    // if (isSafari() && !mutedMode) {
+    if (!mutedMode) {
       dispatch(toggleMutedMode(false));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

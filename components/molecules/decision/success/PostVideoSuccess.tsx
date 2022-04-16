@@ -86,7 +86,8 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       {openedTab === 'response' && response ? (
         <>
           <PostBitmovinPlayer
-            key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
+            // key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
+            key={postId}
             id={`video-${postId}`}
             resources={response}
             muted={isMuted}

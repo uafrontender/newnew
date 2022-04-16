@@ -51,6 +51,7 @@ import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../../contexts/commentFromUrlContext';
 import PostSuccessAC from './PostSuccessAC';
+import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
 
 interface IPostModal {
   isOpen: boolean;
@@ -512,6 +513,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
       <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+        {postStatus === 'succeeded' && !isMobile && (
+          <PostSuccessAnimationBackground />
+        )}
         <Head>
           <title>{postParsed?.title}</title>
         </Head>
