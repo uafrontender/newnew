@@ -52,6 +52,7 @@ import CommentFromUrlContextProvider, {
 } from '../../../contexts/commentFromUrlContext';
 import PostSuccessAC from './PostSuccessAC';
 import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
+import PostSuccessMC from './PostSuccessMC';
 
 interface IPostModal {
   isOpen: boolean;
@@ -301,12 +302,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const renderPostSuccess = (postToRender: TPostType) => {
     if (postToRender === 'mc') {
       return (
-        <PostSuccessAC
+        <PostSuccessMC
           key={postParsed?.postUuid}
-          post={postParsed as newnewapi.Auction}
-          postStatus={postStatus}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-          handleGoBack={handleGoBackInsidePost}
+          post={postParsed as newnewapi.MultipleChoice}
         />
       );
     }
@@ -315,9 +313,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostSuccessAC
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
-          postStatus={postStatus}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -326,9 +321,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <PostSuccessAC
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
-          postStatus={postStatus}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-          handleGoBack={handleGoBackInsidePost}
         />
       );
     }

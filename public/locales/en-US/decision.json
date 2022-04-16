@@ -1,5 +1,7 @@
 {
   "my": "my",
+  "me": "me",
+  "I": "I",
   "postType": {
     "ac": "Auction",
     "mc": "Multiple Choice",
@@ -449,6 +451,20 @@
     "bid": "bid",
     "bid_chosen": "Bid chosen",
     "see_all": "see all bids",
+    "OptionsTab": {
+      "backBtn": "Back"
+    }
+  },
+  "McPostSuccess": {
+    "hero_text": "This Superpoll has ended!",
+    "wants_to_know": "{{ creator }} wants to know...",
+    "in_total_votes": "total votes",
+    "others": "others",
+    "voted": "voted",
+    "votes": "votes",
+    "vote": "vote",
+    "option_chosen": "Highest voted option",
+    "see_all": "see all options",
     "OptionsTab": {
       "backBtn": "Back"
     }

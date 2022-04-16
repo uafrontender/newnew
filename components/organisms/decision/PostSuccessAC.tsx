@@ -5,28 +5,18 @@
 /* eslint-disable arrow-body-style */
 import React, {
   useCallback,
-  useContext,
   useEffect,
-  useMemo,
-  useRef,
   useState,
 } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { toast } from 'react-toastify';
-import moment from 'moment';
 
-import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import {
   fetchAcOptionById,
-  fetchCurrentBidsForPost,
-  placeBidOnAuction,
 } from '../../../api/endpoints/auction';
 
 // test post
@@ -34,7 +24,6 @@ import {
 // http://localhost:4000/post/24d54ea4-a110-43da-99a2-3712c394e2ef
 
 // Utils
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
@@ -47,16 +36,10 @@ import AcSuccessOptionsTab from '../../molecules/decision/auction/success/AcSucc
 
 interface IPostSuccessAC {
   post: newnewapi.Auction;
-  postStatus: TPostStatusStringified;
-  handleGoBack: () => void;
-  handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
 const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
   post,
-  postStatus,
-  handleGoBack,
-  handleUpdatePostStatus,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -206,7 +189,13 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
                         src={winningOption.creator?.avatarUrl!!}
                       />
                       <SWinningBidCreatorText>
-                        { getDisplayname(winningOption.creator!!) }
+                        { winningOption.creator?.uuid === user.userData?.userUuid ? (
+                            winningOption.supporterCount > 1 ? (
+                              t('me')
+                            ) : t('my')
+                          ) : (
+                            getDisplayname(winningOption.creator!!)
+                        ) }
                         {winningOption.supporterCount > 1 ? (
                           <>
                             {formatNumber(winningOption.supporterCount, true)}

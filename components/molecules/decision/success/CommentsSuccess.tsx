@@ -625,7 +625,7 @@ const SNoCommentsYet = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    min-height: 300px;
+    min-height: 500px;
   }
 `;
 
