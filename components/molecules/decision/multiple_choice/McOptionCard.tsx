@@ -43,6 +43,7 @@ interface IMcOptionCard {
   minAmount: number;
   votePrice: number;
   noAction: boolean;
+  votingAllowed: boolean;
   optionBeingSupported?: string;
   handleSetSupportedBid: (id: string) => void;
   handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
@@ -59,6 +60,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   minAmount,
   votePrice,
   noAction,
+  votingAllowed,
   optionBeingSupported,
   handleSetSupportedBid,
   handleSetPaymentSuccesModalOpen,
@@ -334,7 +336,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             damping: 20,
             stiffness: 300,
           }}
-          $isDisabled={disabled}
+          $isDisabled={disabled && votingAllowed}
           $isBlue={isBlue}
           onClick={() => {
             if (!isMobile && !disabled && !noAction && !isSupportMenuOpen) {
