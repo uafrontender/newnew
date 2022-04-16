@@ -50,6 +50,10 @@ import Button from '../../atoms/Button';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../../contexts/commentFromUrlContext';
+import PostSuccessAC from './PostSuccessAC';
+import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
+import PostSuccessMC from './PostSuccessMC';
+import PostSuccessCF from './PostSuccessCF';
 
 interface IPostModal {
   isOpen: boolean;
@@ -88,6 +92,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
     return 'processing';
   });
+
+  const shouldRenderVotingFinishedModal = useMemo(() => (
+    postStatus === 'succeeded' || postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision'
+  ), [postStatus]);
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
@@ -292,6 +300,34 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
+  const renderPostSuccess = (postToRender: TPostType) => {
+    if (postToRender === 'mc') {
+      return (
+        <PostSuccessMC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.MultipleChoice}
+        />
+      );
+    }
+    if (postToRender === 'ac') {
+      return (
+        <PostSuccessAC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Auction}
+        />
+      );
+    }
+    if (postToRender === 'cf') {
+      return (
+        <PostSuccessCF
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Crowdfunding}
+        />
+      );
+    }
+    return <div />;
+  }
+
   const renderPostModeration = (postToRender: TPostType) => {
     if (postStatus === 'processing') {
       return (
@@ -466,6 +502,47 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     router.prefetch('/creation');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (shouldRenderVotingFinishedModal && !isMyPost) {
+    return (
+      <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+        {postStatus === 'succeeded' && !isMobile && (
+          <PostSuccessAnimationBackground />
+        )}
+        <Head>
+          <title>{postParsed?.title}</title>
+        </Head>
+        {!isMobile && (
+          <SGoBackButtonDesktop
+            view="secondary"
+            iconOnly
+            onClick={handleCloseAndGoBack}
+          >
+            <InlineSvg
+              svg={CancelIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SGoBackButtonDesktop>
+        )}
+        {postParsed && typeOfPost ? (
+          <SPostModalContainer
+            id="post-modal-container"
+            isMyPost={isMyPost}
+            onClick={(e) => e.stopPropagation()}
+            ref={(el) => {
+              modalContainerRef.current = el!!;
+            }}
+          >
+            {postStatus === 'succeeded' ? (
+              renderPostSuccess(typeOfPost)
+            ) : null}
+          </SPostModalContainer>
+        ) : null}
+      </Modal>
+    );
+  }
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>

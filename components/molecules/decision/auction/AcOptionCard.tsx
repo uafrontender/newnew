@@ -337,7 +337,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       }}
     >
       <SContainer
-        $isDisabled={disabled}
+        $isDisabled={disabled && votingAllowed}
         $isBlue={isBlue}
         onClick={() => {
           if (!isMobile && !disabled && votingAllowed) {

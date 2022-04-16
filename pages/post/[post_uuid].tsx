@@ -72,7 +72,8 @@ const PostPage: NextPage<IPostPage> = ({
   }, [router]);
 
   useEffect(() => {
-    if (isSafari() && !mutedMode) {
+    // if (isSafari() && !mutedMode) {
+    if (!mutedMode) {
       dispatch(toggleMutedMode(false));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,7 +114,7 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
   const { post_uuid } = context.query;
   const translationContext = await serverSideTranslations(
     context.locale!!,
-    ['common', 'profile', 'decision', 'home', 'payment-modal'],
+    ['common', 'profile', 'decision', 'home', 'payment-modal', 'chat'],
   );
 
   if (!post_uuid || Array.isArray(post_uuid)) {
