@@ -56,8 +56,9 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
           setHasNoResults(true);
         }
 
-        if (!res.data.paging?.nextPageToken && postsNextPageToken)
+        if (!res.data.paging?.nextPageToken && postsNextPageToken) {
           setPostsRoomsNextPageToken(null);
+        }
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);

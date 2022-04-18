@@ -97,8 +97,9 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           setHasNoResults(true);
         }
 
-        if (!res.data.paging?.nextPageToken && postsNextPageToken)
+        if (!res.data.paging?.nextPageToken && postsNextPageToken) {
           setPostsRoomsNextPageToken(null);
+        }
         setLoadingPosts(false);
       } catch (err) {
         setLoadingPosts(false);
@@ -380,7 +381,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             <PostModal
               isOpen={postModalOpen}
               post={displayedPost}
-              manualCurrLocation={isBrowser() ? window.location.pathname : ''}
+              manualCurrLocation={isBrowser() ? window.location.href : ''}
               handleClose={() => handleClosePostModal()}
               handleOpenAnotherPost={handleSetDisplayedPost}
             />

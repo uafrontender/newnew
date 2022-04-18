@@ -137,9 +137,6 @@ const SInput = styled.input<ISInput>`
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
   }
-  ::focus {
-    border-color: ;
-  }
 `;
 
 const SLeftInlineSVG = styled(InlineSVG)`
