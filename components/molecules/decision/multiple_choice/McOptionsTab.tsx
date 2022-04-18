@@ -423,6 +423,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               minAmount={minAmount}
               votePrice={votePrice}
               optionBeingSupported={optionBeingSupported}
+              votingAllowed={postStatus === 'voting'}
               noAction={
                 (hasVotedOptionId !== undefined &&
                   hasVotedOptionId !== option.id) ||
