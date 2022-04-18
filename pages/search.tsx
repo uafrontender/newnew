@@ -31,12 +31,19 @@ export const Search = () => {
   );
 };
 
-(Search as NextPageWithLayout).getLayout = (page: ReactElement) => <SGeneral>{page}</SGeneral>;
+(Search as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <SGeneral>{page}</SGeneral>
+);
 
 export default Search;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'search']);
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'search',
+    'home',
+    'decision',
+  ]);
 
   return {
     props: {
@@ -53,6 +60,8 @@ const SGeneral = styled(General)`
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;

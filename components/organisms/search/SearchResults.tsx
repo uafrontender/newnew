@@ -8,7 +8,8 @@ import { useRouter } from 'next/router';
 import StatisticsIcon from '../../../public/images/svg/icons/outlined/Statistics.svg';
 import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
 import InlineSvg from '../../atoms/InlineSVG';
-import SeachDecisions from './SeachDecisions';
+import SearchDecisions from './SearchDecisions';
+import SearchCreators from './SearchCreators';
 
 export const SearchResults = () => {
   const router = useRouter();
@@ -18,7 +19,8 @@ export const SearchResults = () => {
   const [activeTab, setActiveTab] = useState<string>('decisionsTab');
 
   useEffect(() => {
-    if (router && router.query.query) setSearchValue(router.query.query as string);
+    if (router && router.query.query)
+      setSearchValue(router.query.query as string);
   }, [router]);
 
   const tabTypes = useMemo(
@@ -39,11 +41,19 @@ export const SearchResults = () => {
     () => (
       <STabs>
         {tabTypes.map((tab) => (
-          <STab active={activeTab === tab.id} key={tab.id} onClick={() => setActiveTab(tab.id)}>
+          <STab
+            active={activeTab === tab.id}
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
             <InlineSvg
               // @ts-ignore
               svg={tab.id === activeTab ? StatisticsIconFilled : StatisticsIcon}
-              fill={tab.id === activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary}
+              fill={
+                tab.id === activeTab
+                  ? theme.colorsThemed.text.primary
+                  : theme.colorsThemed.text.secondary
+              }
               width="24px"
               height="24px"
             />
@@ -52,23 +62,49 @@ export const SearchResults = () => {
         ))}
       </STabs>
     ),
-    [activeTab, tabTypes, theme.colorsThemed.text.primary, theme.colorsThemed.text.secondary]
+    [
+      activeTab,
+      tabTypes,
+      theme.colorsThemed.text.primary,
+      theme.colorsThemed.text.secondary,
+    ]
   );
 
   return (
-    <div>
+    <SContainer>
       <SHeader>
         <SPageTitle>
           {t('mainContent.title')} <span>{searchValue}</span>
         </SPageTitle>
       </SHeader>
       <Tabs />
-      {activeTab === 'decisionsTab' ? <SeachDecisions /> : <SeachDecisions />}
-    </div>
+      {activeTab === 'decisionsTab' ? (
+        <SearchDecisions query={searchValue} />
+      ) : (
+        <SearchCreators query={searchValue} />
+      )}
+    </SContainer>
   );
 };
 
 export default SearchResults;
+
+const SContainer = styled.div`
+  width: 100%;
+  margin: 0 auto;
+
+  ${(props) => props.theme.media.tablet} {
+    max-width: 768px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    max-width: 1248px;
+  }
+
+  ${(props) => props.theme.media.laptopL} {
+    max-width: 1248px;
+  }
+`;
 
 const SHeader = styled.div`
   padding: 0 0 35px;
@@ -86,7 +122,8 @@ const SPageTitle = styled.h1`
 `;
 
 const STabs = styled.div`
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;
   margin-bottom: 24px;
   font-size: 14px;

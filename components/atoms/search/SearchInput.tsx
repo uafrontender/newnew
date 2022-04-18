@@ -32,10 +32,9 @@ export const SearchInput: React.FC = () => {
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
