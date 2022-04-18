@@ -235,7 +235,7 @@ export const SearchInput: React.FC = () => {
                 )}
                 <SButton
                   onClick={() => {
-                    router.push(`/search?query=${searchValue}`);
+                    router.push(`/search?query=${searchValue}&tab=decisions`);
                   }}
                   view="quaternary"
                 >
@@ -276,7 +276,7 @@ export const SearchInput: React.FC = () => {
               )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}`);
+                  router.push(`/search?query=${searchValue}&tab=decisions`);
                 }}
                 view="quaternary"
               >

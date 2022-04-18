@@ -30,8 +30,6 @@ export const CreatorsList: React.FC<IList> = ({
       router.push(`/${item.username}`);
     };
 
-    console.log(item);
-
     return (
       <SItemWrapper key={item.uuid} onClick={handleItemClick}>
         <CreatorCard creator={item} />

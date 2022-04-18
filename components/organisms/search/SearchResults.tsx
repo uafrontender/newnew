@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -16,21 +17,27 @@ export const SearchResults = () => {
   const { t } = useTranslation('search');
   const theme = useTheme();
   const [searchValue, setSearchValue] = useState('');
-  const [activeTab, setActiveTab] = useState<string>('decisionsTab');
+  const [activeTab, setActiveTab] = useState<string>('decisions');
 
   useEffect(() => {
-    if (router && router.query.query)
-      setSearchValue(router.query.query as string);
+    if (router) {
+      if (router.query.query) setSearchValue(router.query.query as string);
+      if (router.query.tab) {
+        router.query.tab === 'creators'
+          ? setActiveTab('creators')
+          : setActiveTab('decisions');
+      }
+    }
   }, [router]);
 
   const tabTypes = useMemo(
     () => [
       {
-        id: 'decisionsTab',
+        id: 'decisions',
         title: t('mainContent.tabs.decisions'),
       },
       {
-        id: 'creatorsTab',
+        id: 'creators',
         title: t('mainContent.tabs.creators'),
       },
     ],
@@ -44,7 +51,9 @@ export const SearchResults = () => {
           <STab
             active={activeTab === tab.id}
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() =>
+              router.push(`/search?query=${searchValue}&tab=${tab.id}`)
+            }
           >
             <InlineSvg
               // @ts-ignore
@@ -62,6 +71,7 @@ export const SearchResults = () => {
         ))}
       </STabs>
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       activeTab,
       tabTypes,
@@ -78,7 +88,7 @@ export const SearchResults = () => {
         </SPageTitle>
       </SHeader>
       <Tabs />
-      {activeTab === 'decisionsTab' ? (
+      {activeTab === 'decisions' ? (
         <SearchDecisions query={searchValue} />
       ) : (
         <SearchCreators query={searchValue} />

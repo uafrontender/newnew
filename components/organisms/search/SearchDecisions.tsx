@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable default-case */
 import React, {
   useCallback,
   useEffect,
@@ -10,6 +11,7 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
+import { useRouter } from 'next/router';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Button from '../../atoms/Button';
@@ -33,6 +35,7 @@ interface IFunction {
 export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const { t } = useTranslation('search');
   const theme = useTheme();
+  const router = useRouter();
   const filterContainerRef: any = useRef();
 
   // Display post
@@ -44,7 +47,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const { ref: loadingRef, inView } = useInView();
 
   const [activeTabs, setActiveTabs] = useState<string[]>([]);
-  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('mostFunded');
   const [postSorting, setPostSorting] = useState<newnewapi.PostSorting>(
     newnewapi.PostSorting.MOST_FUNDED_FIRST
   );
@@ -71,7 +74,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         const payload = new newnewapi.SearchPostsRequest({
           query,
           paging: {
-            limit: 10,
+            limit: 20,
             pageToken,
           },
           sorting: postSorting,
@@ -107,6 +110,48 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   );
 
   useEffect(() => {
+    if (!initialLoad) {
+      if (
+        router.query.sorting &&
+        postSorting !== newnewapi.PostSorting.MOST_FUNDED_FIRST
+      ) {
+        switch (router.query.sorting) {
+          case 'numberOfParticipants':
+            setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
+            break;
+          case 'mostFunded':
+            setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
+            break;
+          case 'newest':
+            setPostSorting(newnewapi.PostSorting.NEWEST_FIRST);
+            break;
+          default:
+            setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
+        }
+      }
+    }
+    if (router.query.filter) {
+      const filters = (router.query.filter as string).split('-');
+      const arr: string[] = [];
+      filters.forEach((filter) => {
+        switch (filter) {
+          case 'ac':
+            arr.push('auction');
+            break;
+          case 'mc':
+            arr.push('multipleChoice');
+            break;
+          case 'cf':
+            arr.push('crowdfunding');
+            break;
+        }
+        setActiveTabs(arr);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLoad]);
+
+  useEffect(() => {
     if (query.length > 0) {
       setResultsPosts([]);
       getSearchResult();
@@ -119,19 +164,31 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       switch (activeFilter) {
         case 'numberOfParticipants':
           setPostSorting(newnewapi.PostSorting.MOST_VOTED_FIRST);
+          router.push({
+            pathname: '/search',
+            query: { ...router.query, sorting: 'numberOfParticipants' },
+          });
           break;
         case 'mostFunded':
           setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
+          router.push({
+            pathname: '/search',
+            query: { ...router.query, sorting: 'mostFunded' },
+          });
           break;
         case 'newest':
           setPostSorting(newnewapi.PostSorting.NEWEST_FIRST);
+          router.push({
+            pathname: '/search',
+            query: { ...router.query, sorting: 'newest' },
+          });
           break;
         default:
           setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFilter]);
+  }, [activeFilter, initialLoad]);
 
   useEffect(() => {
     if (initialLoad) {
@@ -148,6 +205,35 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, loadingPosts, postsNextPageToken]);
+
+  useEffect(() => {
+    if (initialLoad) {
+      const routerArr: string[] = [];
+      activeTabs.forEach((filter) => {
+        switch (filter) {
+          case 'auction':
+            routerArr.push('ac');
+            break;
+          case 'multipleChoice':
+            routerArr.push('mc');
+            break;
+          case 'crowdfunding':
+            routerArr.push('cf');
+            break;
+        }
+      });
+      router.push({
+        pathname: '/search',
+        query: {
+          query,
+          tab: 'decision',
+          filter: routerArr.length > 0 ? routerArr.join('-') : '',
+          sorting: activeFilter,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postSorting, activeTabs]);
 
   const tabTypes = useMemo(
     () => [
@@ -170,16 +256,12 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const filterTypes = useMemo(
     () => [
       {
-        id: 'all',
+        id: 'mostFunded',
         title: t('decisions.sort.all'),
       },
       {
         id: 'numberOfParticipants',
         title: t('decisions.sort.numberOfParticipants'),
-      },
-      {
-        id: 'mostFunded',
-        title: t('decisions.sort.mostFunded'),
       },
       {
         id: 'newest',
