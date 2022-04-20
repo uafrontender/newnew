@@ -3,7 +3,14 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
-import React, { createContext, useState, useMemo, useEffect, useContext, useCallback } from 'react';
+import React, {
+  createContext,
+  useState,
+  useMemo,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import { SocketContext } from './socketContext';
 
 interface IChannels {
@@ -36,7 +43,8 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
           channels: [channel],
         });
 
-        const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+        const subscribeMsgEncoded =
+          newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
         socketConnection.emit('SubscribeToChannels', subscribeMsgEncoded);
       }
       workingObj[id] = shouldSubscribe ? 1 : workingObj[id] + 1;
@@ -72,10 +80,14 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
             setChannelsWithSubs((curr) => {
               const workingObj = { ...curr };
               const shouldSubscribe = !workingObj[val] || workingObj[val] === 0;
-              if (shouldSubscribe && socketConnection && socketConnection.connected) {
+              if (
+                shouldSubscribe &&
+                socketConnection &&
+                socketConnection.connected
+              ) {
                 let subscribeMsg;
                 if (val.startsWith('chat_')) {
-                  const chatId = parseInt(val.split('_')[1], 10);
+                  const chatId = parseInt(val.split('_')[1]);
                   subscribeMsg = new newnewapi.SubscribeToChannels({
                     channels: [
                       {
@@ -96,8 +108,12 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
                     ],
                   });
                 }
-                const subscribeMsgEncoded = newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
-                socketConnection.emit('SubscribeToChannels', subscribeMsgEncoded);
+                const subscribeMsgEncoded =
+                  newnewapi.SubscribeToChannels.encode(subscribeMsg).finish();
+                socketConnection.emit(
+                  'SubscribeToChannels',
+                  subscribeMsgEncoded
+                );
               }
               workingObj[val] = shouldSubscribe ? 1 : workingObj[val] + 1;
 
@@ -115,7 +131,9 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
     for (let i = 0; i < Object.values(channelsWithSubs).length; i++) {
       if (Object.values(channelsWithSubs)[i] < 1) {
         if (Object.keys(channelsWithSubs)[i].startsWith('chat_')) {
-          const chatId = parseInt(Object.keys(channelsWithSubs)[i].split('_')[1], 10);
+          const chatId = parseInt(
+            Object.keys(channelsWithSubs)[i].split('_')[1]
+          );
           shouldUnsubArray.push({
             chatRoomUpdates: {
               chatRoomId: chatId,
@@ -134,11 +152,18 @@ const ChannelsContextProvider: React.FC = ({ children }) => {
       const unsubMsg = new newnewapi.UnsubscribeFromChannels({
         channels: shouldUnsubArray,
       });
-      socketConnection.emit('UnsubscribeFromChannels', newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish());
+      socketConnection.emit(
+        'UnsubscribeFromChannels',
+        newnewapi.UnsubscribeFromChannels.encode(unsubMsg).finish()
+      );
     }
   }, [socketConnection, channelsWithSubs]);
 
-  return <ChannelsContext.Provider value={contextValue}>{children}</ChannelsContext.Provider>;
+  return (
+    <ChannelsContext.Provider value={contextValue}>
+      {children}
+    </ChannelsContext.Provider>
+  );
 };
 
 export default ChannelsContextProvider;

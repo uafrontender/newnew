@@ -90,6 +90,11 @@ export default CfCrowdfundingSuccess;
 const SSectionContainer = styled(motion.div)`
   position: relative;
   width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const SProgressRingContainer = styled.div`
@@ -116,7 +121,7 @@ const STrophyImg = styled.img`
 
   ${({ theme }) => theme.media.laptop} {
     left: calc(50% - 65px);
-    top: calc(50% - 65px);
+    top: calc(30% - 65px);
 
     width: 130px;
   }
@@ -125,7 +130,7 @@ const STrophyImg = styled.img`
 const STrophyGlow = styled.div`
   position: absolute;
   left: calc(50% - 38px);
-  top: calc(50% - 38px);
+  top: calc(30% - 38px);
 
   width: 76px;
   height: 76px;
@@ -147,16 +152,20 @@ const SCaptionSection = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     padding-left: 55%;
-
-    padding-top: 80px;
-    margin-bottom: 80px;
+    margin-bottom: 0;
 
     text-align: left;
+
+    height: 50%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    padding-top: 124px;
-    margin-bottom: 60px;
+    /* padding-top: 124px; */
+    /* margin-bottom: 60px; */
   }
 `;
 
@@ -195,7 +204,7 @@ const SWinnerCard = styled.div`
   ${({ theme }) => theme.media.tablet} {
     position: relative;
 
-    height: fit-content;
+    height: 188px;
 
     padding: 24px;
   }

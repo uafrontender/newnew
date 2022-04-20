@@ -1,27 +1,26 @@
 /* eslint-disable no-nested-ternary */
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, ReactElement } from 'react';
 import styled from 'styled-components';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import Tag from '../../atoms/Tag';
 import Card from '../../molecules/Card';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
 import UserAvatar from '../../molecules/UserAvatar';
-import ScrollArrow from '../../atoms/ScrollArrow';
+import ScrollArrowPermanent from '../../atoms/ScrollArrowPermanent';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-import useHoverArrows from '../../../utils/hooks/useHoverArrows';
 import { formatString } from '../../../utils/format';
 import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_CARDS_SECTIONS } from '../../../constants/timings';
 import switchPostType from '../../../utils/switchPostType';
 import { CardSkeletonSection } from '../../molecules/CardSkeleton';
+import TutorialCard from '../../molecules/TutorialCard';
 
 const SCROLL_STEP = {
   tablet: 3,
@@ -38,6 +37,7 @@ interface ICardSection {
   category: string;
   collection: newnewapi.Post[];
   loading?: boolean;
+  tutorialCard?: ReactElement;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -48,6 +48,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   category,
   collection,
   loading,
+  tutorialCard,
   handlePostClicked,
 }) => {
   const { t } = useTranslation('home');
@@ -55,7 +56,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   const ref: any = useRef();
   const scrollContainerRef: any = useRef();
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const [visibleListItem, setVisibleListItem] = useState(0);
 
   // Dragging state
@@ -67,8 +68,8 @@ export const CardsSection: React.FC<ICardSection> = ({
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
-  const isLaptop = ['laptop'].includes(resizeMode);
-  const isDesktop = ['laptopL'].includes(resizeMode);
+  // const isLaptop = ['laptop'].includes(resizeMode);
+  // const isDesktop = ['laptopL'].includes(resizeMode);
 
   let collectionToRender = collection;
   let renderShowMore = false;
@@ -79,12 +80,12 @@ export const CardsSection: React.FC<ICardSection> = ({
     collectionToRender = collection.slice(0, 3);
   }
 
-  if (resizeMode === 'tablet') {
+  if (resizeMode === 'tablet' || resizeMode === 'laptop') {
     scrollStep = SCROLL_STEP.tablet;
   }
 
-  const handleUserClick = () => {
-    router.push(`/${category}`);
+  const handleUserClick = (username: string) => {
+    router.push(`/${username}`);
   };
   const handleLeftClick = () => {
     scrollListTo(visibleListItem - scrollStep - 1);
@@ -97,13 +98,13 @@ export const CardsSection: React.FC<ICardSection> = ({
 
     if (to < 0) {
       scrollTo = 0;
-    } else if (scrollTo > (collection?.length || 0) - 1) {
-      scrollTo = (collection?.length || 0) - 1;
+    } else if (scrollTo > (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1) {
+      scrollTo = (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
     }
 
     scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
       offset: -32,
-      smooth: 'easeInOutQuart',
+      smooth: 'easeOutQuad',
       duration: SCROLL_CARDS_SECTIONS,
       horizontal: true,
       containerId: `${category}-scrollContainer`,
@@ -141,37 +142,56 @@ export const CardsSection: React.FC<ICardSection> = ({
       }
     };
 
+    if (tutorialCard !== undefined && index === 0) {
+      return (
+        <>
+          <SItemWrapper
+            key="tutorial-card"
+            name={`cards-section-${category}-${0}`}
+          >
+            {tutorialCard}
+          </SItemWrapper>
+          <SItemWrapper
+            key={switchPostType(item)[0].postUuid}
+            name={`cards-section-${category}-${tutorialCard !== undefined ? index + 1 : index}`}
+            onClick={handleItemClick}
+          >
+            <Card
+              item={item}
+              index={tutorialCard !== undefined ? index + 1 : index}
+              width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
+              height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+            />
+          </SItemWrapper>
+        </>
+      )
+    }
+
     return (
       <SItemWrapper
         key={switchPostType(item)[0].postUuid}
-        name={`cards-section-${category}-${index}`}
+        name={`cards-section-${category}-${tutorialCard !== undefined ? index + 1 : index}`}
         onClick={handleItemClick}
       >
         <Card
           item={item}
-          index={index + 1}
-          width={isMobile ? '100vw' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
+          index={tutorialCard !== undefined ? index + 1 : index}
+          width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
           height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
         />
       </SItemWrapper>
     );
   };
 
-  const {
-    renderLeftArrow,
-    renderRightArrow,
-  } = useHoverArrows(ref);
   const handleSeeMoreCLick = () => {
     if (type === 'default') {
-      router.push(`/search?category=${category}`);
-    } else {
-      handleUserClick();
+      router.push(`/see-more?category=${category}`);
     }
   };
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch(`/search?category=${category}`);
+    router.prefetch(`/see-more?category=${category}`);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -185,7 +205,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem <= (collection?.length || 0) - scrollStep);
+    setCanScrollRight(visibleListItem + 1 <= (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - scrollStep);
   }, [visibleListItem, collection, scrollStep]);
 
   return (
@@ -202,20 +222,33 @@ export const CardsSection: React.FC<ICardSection> = ({
           <AnimatedPresence
             animation="t-01"
           >
-            <SCreatorHeadline onClick={handleUserClick}>
-              <UserAvatar
-                avatarUrl={user?.avatarUrl!!}
-              />
-              <SHeadline variant={4}>
-                {user?.username!!}
-              </SHeadline>
-              <Tag>
-                {t('button-creator-on-the-rise')}
-              </Tag>
-            </SCreatorHeadline>
+            <SHeadline
+              variant={4}
+              animation="t-01"
+            >
+              <SHeadlineInner>
+                <div>
+                  {t('button-creator-on-the-rise')}
+                </div>
+                <SCreatorsAvatars>
+                  { collection
+                      .map((post) => switchPostType(post)[0].creator)
+                      .filter((value, index, arr) => arr.indexOf(value) === index)
+                      .map((creator, i) => (
+                        <SUserAvatar
+                          key={creator?.uuid}
+                          index={i}
+                          avatarUrl={creator?.avatarUrl!!}
+                          onClick={() => handleUserClick(creator?.username as string)}
+                        />
+                      ))
+                  }
+                </SCreatorsAvatars>
+              </SHeadlineInner>
+            </SHeadline>
           </AnimatedPresence>
         )}
-        {!isMobile && (
+        {!isMobile && type === 'default' && (
           <SCaption
             weight={700}
             onClick={handleSeeMoreCLick}
@@ -244,15 +277,15 @@ export const CardsSection: React.FC<ICardSection> = ({
         {!isMobile && (
           <>
             {!isDragging && canScrollLeft && (
-              <ScrollArrow
-                active={renderLeftArrow}
+              <ScrollArrowPermanent
+                active
                 position="left"
                 handleClick={handleLeftClick}
               />
             )}
             {!isDragging && canScrollRight && (
-              <ScrollArrow
-                active={renderRightArrow}
+              <ScrollArrowPermanent
+                active
                 position="right"
                 handleClick={handleRightClick}
               />
@@ -260,7 +293,7 @@ export const CardsSection: React.FC<ICardSection> = ({
           </>
         )}
       </SListContainer>
-      {renderShowMore && (
+      {renderShowMore && type === 'default' && (
         <SButtonHolder>
           <Button
             size="lg"
@@ -285,6 +318,7 @@ CardsSection.defaultProps = {
   },
   title: '',
   loading: undefined,
+  tutorialCard: undefined,
 };
 
 interface ISWrapper {
@@ -304,10 +338,17 @@ const SWrapper = styled.div<ISWrapper>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 32px 0;
+
+    margin: 0 auto;
+    max-width: 696px;
   }
 
   ${(props) => props.theme.media.laptop} {
     padding: 40px 0;
+  }
+
+  ${(props) => props.theme.media.laptopM} {
+    max-width: 1248px;
   }
 `;
 
@@ -316,11 +357,13 @@ const SListContainer = styled.div`
 `;
 
 const SListWrapper = styled.div`
-  left: -16px;
-  width: 100vw;
+
+  width: 100%;
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
+
+
   position: relative;
   overflow-x: auto;
   flex-direction: column;
@@ -333,8 +376,12 @@ const SListWrapper = styled.div`
   -ms-overflow-style: none;
 
   ${(props) => props.theme.media.tablet} {
-    left: -32px;
-    padding: 24px 24px 0 24px;
+    left: 32px;
+    /* padding: 24px 24px 0 24px; */
+    /* padding: 32px 56px 0 64px; */
+    width: calc(100% - 64px);
+
+
     flex-direction: row;
   }
 
@@ -377,6 +424,17 @@ const STopWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  margin-bottom: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 0px 32px;
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    padding: initial;
+    margin-bottom: initial;
+  }
 `;
 
 const SCaption = styled(Caption)`
@@ -389,17 +447,53 @@ const SCaption = styled(Caption)`
   }
 `;
 
-const SCreatorHeadline = styled.div`
-  cursor: pointer;
+const SHeadline = styled(Headline)`
   display: flex;
-  align-items: center;
-  flex-direction: row;
 `;
 
-const SHeadline = styled(Headline)`
-  margin: 0 8px;
+const SCreatorsAvatars = styled.div`
+  position: relative;
+  top: -2px;
 
-  ${(props) => props.theme.media.tablet} {
-    margin: 0 16px;
+  ${({ theme }) => theme.media.tablet} {
+    top: -8px;
   }
+
+  ${({ theme }) => theme.media.laptop} {
+    top: -4px;
+  }
+`;
+
+const SUserAvatar = styled(UserAvatar)<{
+  index: number;
+}>`
+  position: absolute;
+  left: ${({ index }) => index * 24}px;
+
+  width: 36px;
+  height: 36px;
+
+  border: 4px solid ${({ theme }) => theme.colorsThemed.background.primary};
+  background:${({ theme }) => theme.colorsThemed.background.primary};
+
+  cursor: pointer;
+
+  transition: 0.2s linear;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 48px;
+    height: 48px;
+    left: ${({ index }) => index * 36}px;
+  }
+
+  &:hover {
+    z-index: 10;
+    transform: translateY(-10px);
+  }
+`;
+
+const SHeadlineInner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 `;

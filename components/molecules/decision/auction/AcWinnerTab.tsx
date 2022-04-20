@@ -46,13 +46,16 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${option.creator?.username!!}`);
+    router.push(`/${option.creator?.username!!}`);
   };
 
   const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-decision');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,

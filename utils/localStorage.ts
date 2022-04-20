@@ -11,7 +11,6 @@ export const loadStateLS = <Type>(stateKey: string): Type | null => {
     if (serializedState === null) {
       return null;
     }
-
     return JSON.parse(serializedState) as Type;
   } catch (err) {
     return null;
@@ -25,7 +24,6 @@ export const saveStateLS = (stateKey: string, stateValue: any): boolean => {
     }
 
     const serializedState = JSON.stringify(stateValue);
-
     localStorage.setItem(stateKey, serializedState);
     return true;
   } catch (err) {

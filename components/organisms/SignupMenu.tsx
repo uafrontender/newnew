@@ -46,9 +46,10 @@ import { AuthLayoutContext } from '../templates/AuthLayout';
 
 export interface ISignupMenu {
   reason?: SignupReason;
+  redirectURL?: string;
 }
 
-const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
+const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason, redirectURL }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('sign-up');
@@ -57,7 +58,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
 
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  // const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const { signupEmailInput } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -80,6 +81,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
       const payload = new newnewapi.SendVerificationEmailRequest({
         emailAddress: emailInput,
         useCase: newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
+        ...(redirectURL ? {
+          redirectURL
+        } : {}),
       });
 
       const { data, error } = await sendVerificationEmail(payload);
@@ -118,12 +122,12 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({ reason }) => {
   return (
     <SSignupMenu
       isLoading={isSubmitLoading}
-      style={{
-        ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-          transform: 'translateX(-200px)',
-          transition: '0.6s linear'
-        } : {})
-      }}
+      // style={{
+      //   ...(!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
+      //     transform: 'translateX(-1000px)',
+      //     transition: '0.6s linear'
+      //   } : {})
+      // }}
     >
       <SMenuWrapper>
         <SSignInBackButton

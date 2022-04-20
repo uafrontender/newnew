@@ -1,34 +1,22 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-
 import InlineSVG from '../../../atoms/InlineSVG';
 import Indicator from '../../../atoms/Indicator';
 
 import chatIcon from '../../../../public/images/svg/icons/filled/Chat.svg';
+import { useGetChats } from '../../../../contexts/chatContext';
 
 interface IFloatingMessages {
   withCounter?: boolean;
+  openChat: () => void;
 }
 
-export const FloatingMessages: React.FC<IFloatingMessages> = (props) => {
-  const { withCounter } = props;
-
-  const handleClick = useCallback(() => {
-    console.log('message click');
-  }, []);
-
+export const FloatingMessages: React.FC<IFloatingMessages> = ({ withCounter, openChat }) => {
+  const { unreadCountForCreator } = useGetChats();
   return (
-    <SContainer onClick={handleClick}>
-      <InlineSVG
-        svg={chatIcon}
-        width="24px"
-        height="24px"
-      />
-      {withCounter && (
-        <SIndicatorContainer>
-          <SIndicator minified />
-        </SIndicatorContainer>
-      )}
+    <SContainer onClick={openChat}>
+      <InlineSVG svg={chatIcon} width="24px" height="24px" />
+      {withCounter && <SIndicatorContainer>{unreadCountForCreator > 0 && <SIndicator minified />}</SIndicatorContainer>}
     </SContainer>
   );
 };
@@ -41,10 +29,14 @@ FloatingMessages.defaultProps = {
 
 const SContainer = styled.div`
   cursor: pointer;
-  padding: 16px;
   position: relative;
   background: ${(props) => props.theme.colorsThemed.accent.blue};
   border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const SIndicatorContainer = styled.div`

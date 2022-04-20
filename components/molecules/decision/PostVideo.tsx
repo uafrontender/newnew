@@ -5,6 +5,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 
+import { markPost } from '../../../api/endpoints/post';
 import { useAppSelector } from '../../../redux-store/store';
 
 import Button from '../../atoms/Button';
@@ -12,7 +13,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
-import { markPost } from '../../../api/endpoints/post';
+import isSafari from '../../../utils/isSafari';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -79,14 +80,21 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
       {openedTab === 'response' && response ? (
         <>
           <PostBitmovinPlayer
-            id={postId}
+            key={`${postId}--${isMuted ? 'muted' : 'sound'}`}
+            id={`video-${postId}`}
             resources={response}
             muted={isMuted}
           />
           <SSoundButton
             iconOnly
             view="transparent"
-            onClick={() => handleToggleMuted()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleMuted();
+              if (isSafari()) {
+                (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+              }
+            }}
           >
             <InlineSvg
               svg={isMuted ? VolumeOff : VolumeOn}
@@ -106,7 +114,13 @@ const PostVideo: React.FunctionComponent<IPostVideo> = ({
           <SSoundButton
             iconOnly
             view="transparent"
-            onClick={() => handleToggleMuted()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleMuted();
+              if (isSafari()) {
+                (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+              }
+            }}
           >
             <InlineSvg
               svg={isMuted ? VolumeOff : VolumeOn}

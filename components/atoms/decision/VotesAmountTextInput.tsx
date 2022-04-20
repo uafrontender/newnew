@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { useAppSelector } from '../../../redux-store/store';
+import { formatNumber } from '../../../utils/format';
 
 interface IVotesAmountTextInput {
   value: string;
@@ -15,7 +16,7 @@ interface IVotesAmountTextInput {
   onChange: (newValue: string) => void;
 }
 
-const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
+const VotesAmountTextInput: React.FunctionComponent<IVotesAmountTextInput> = ({
   value,
   minAmount,
   disabled,
@@ -27,15 +28,22 @@ const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
   onChange,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const inputRef = useRef<HTMLInputElement>();
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+    const newValue =
+      value.length > 0
+        ? e.target.value
+            .split(',')
+            .filter((v) => v !== ',')
+            .join('')
+        : e.target.value;
     if (/[^0-9]/.test(newValue)) return;
 
-    if (newValue.length > 8) return;
+    if (newValue.length > 5) return;
 
     // @ts-ignore
     onChange(newValue ? (newValue as number) : '');
@@ -51,19 +59,23 @@ const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        value={value}
+        value={value ? `${formatNumber(parseInt(value), true)}` : value}
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode="numeric"
         placeholder={`${minAmount.toString()} ${placeholder}`}
         onChange={handleOnChange}
         style={{
-          ...(!isMobile ? {
-            width: `calc(86px + ${Math.floor(value.length / 1.4)}em)`,
-          } : {}),
-          ...(widthHardCoded ? {
-            width: widthHardCoded,
-          } : {}),
+          ...(!isMobile
+            ? {
+                width: `calc(86px + ${Math.floor(value.length / 1.4)}em)`,
+              }
+            : {}),
+          ...(widthHardCoded
+            ? {
+                width: widthHardCoded,
+              }
+            : {}),
         }}
       />
       <SPseudoPlaceholder
@@ -71,15 +83,15 @@ const VotesAmountTextInput:React.FunctionComponent<IVotesAmountTextInput> = ({
           inputRef.current?.focus();
         }}
         style={{
-          left: `calc(${Math.floor(value.length / 2)}em + 1.2em + ${isMobile ? '8px' : '16px'})`
+          left: `calc(${Math.floor(value.length / 2)}em + 1.2em + ${
+            isMobile ? '8px' : '16px'
+          })`,
         }}
       >
-        { value ? placeholder : '' }
+        {value ? placeholder : ''}
       </SPseudoPlaceholder>
       {bottomPlaceholder && (
-        <SBottomPlaceholder>
-          { bottomPlaceholder }
-        </SBottomPlaceholder>
+        <SBottomPlaceholder>{bottomPlaceholder}</SBottomPlaceholder>
       )}
     </SWrapper>
   );
@@ -135,7 +147,6 @@ const SInput = styled.input<{
   }
 
   ${({ theme }) => theme.media.tablet} {
-
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;

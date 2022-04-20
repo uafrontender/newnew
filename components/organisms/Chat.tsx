@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -51,13 +51,7 @@ export const Chat = () => {
     setChatListHidden(false);
   };
 
-  const passInputValue = (str: string) => {
-    setSearchText(str);
-  };
-
-  const gotNewMessage = (msg: newnewapi.IChatMessage | null | undefined) => {
-    setNewMessage(msg);
-  };
+  const passInputValue = useCallback((str: string) => setSearchText(str), []);
 
   return (
     <SContainer>
@@ -77,10 +71,10 @@ export const Chat = () => {
           />
           <NewMessage openChat={openChat} />
         </SToolbar>
-        <ChatList searchText={searchText} openChat={openChat} gotNewMessage={gotNewMessage} />
+        <ChatList searchText={searchText} openChat={openChat} />
       </SSidebar>
       <SContent>
-        <ChatArea {...chatData} showChatList={showChatList} newMessage={newMessage} />
+        <ChatArea {...chatData} showChatList={showChatList} />
       </SContent>
     </SContainer>
   );

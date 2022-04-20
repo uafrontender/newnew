@@ -10,10 +10,11 @@ interface IBidAmountTextInput {
   onChange: (newValue: string) => void;
   inputAlign: 'left' | 'center';
   bottomPlaceholder?: string;
+  placeholder?: string;
   style?: React.CSSProperties;
 }
 
-const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
+const BidAmountTextInput: React.FunctionComponent<IBidAmountTextInput> = ({
   value,
   minAmount,
   disabled,
@@ -21,18 +22,42 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
   inputAlign,
   onChange,
   bottomPlaceholder,
+  placeholder,
   style,
 }) => {
   const inputRef = useRef<HTMLInputElement>();
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = value.length > 0
-      ? e.target.value
-        .slice(1).split(',').filter((v) => v !== ',').join('')
-      : e.target.value;
+    const newValue =
+      value.length > 0
+        ? e.target.value
+            .slice(1)
+            .split(',')
+            .filter((v) => v !== ',')
+            .join('')
+        : e.target.value;
     if (/[^0-9]/.test(newValue)) return;
+    if (newValue.length > 5) return;
 
     // @ts-ignore
     onChange(newValue ? (newValue as number) : '');
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue =
+      value.length > 0
+        ? e.target.value
+            .slice(1)
+            .split(',')
+            .filter((v) => v !== ',')
+            .join('')
+        : e.target.value;
+    if (/[^0-9]/.test(currentValue)) return;
+
+    // @ts-ignore
+    if (currentValue.length > 0 && (currentValue as number) < minAmount) {
+      // @ts-ignore
+      onChange(minAmount.toString());
+    }
   };
 
   useEffect(() => {
@@ -45,20 +70,17 @@ const BidAmountTextInput:React.FunctionComponent<IBidAmountTextInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        value={
-          value ? `$${formatNumber(parseInt(value, 10), true)}` : value
-        }
+        value={value ? `$${formatNumber(parseInt(value), true)}` : value}
         disabled={disabled ?? false}
         align={inputAlign}
         inputMode="numeric"
-        placeholder={`$${minAmount.toString()}`}
+        placeholder={placeholder ?? `$${minAmount.toString()}`}
         onChange={handleOnChange}
+        onBlur={handleBlur}
         style={style ?? {}}
       />
       {bottomPlaceholder && (
-        <SBottomPlaceholder>
-          { bottomPlaceholder }
-        </SBottomPlaceholder>
+        <SBottomPlaceholder>{bottomPlaceholder}</SBottomPlaceholder>
       )}
     </SWrapper>
   );
@@ -68,6 +90,7 @@ BidAmountTextInput.defaultProps = {
   disabled: undefined,
   autofocus: undefined,
   bottomPlaceholder: undefined,
+  placeholder: undefined,
   style: {},
 };
 
@@ -91,10 +114,12 @@ const SInput = styled.input<{
   font-size: 32px;
   line-height: 40px;
 
+  height: 48px;
+
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   text-align: left;
 
-  padding-left: calc(50% - .2em);
+  padding-left: calc(50% - 0.2em);
   width: 100%;
 
   background-color: transparent;
@@ -111,7 +136,6 @@ const SInput = styled.input<{
   }
 
   ${({ theme }) => theme.media.tablet} {
-
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
@@ -125,6 +149,4 @@ const SInput = styled.input<{
   }
 `;
 
-const SBottomPlaceholder = styled.div`
-
-`;
+const SBottomPlaceholder = styled.div``;

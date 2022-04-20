@@ -1,12 +1,28 @@
 {
+  "subscribed-tag": "SUBSCRIBED",
+  "ellipse": {
+    "unsub": "Unsubscribe",
+    "report": "Report",
+    "block": "Block",
+    "unblock": "Unblock"
+  },
+  "modal": {
+    "block-user": {
+      "title": "Block user",
+      "message-first-part": "Do you really want to block",
+      "message-second-part": "?",
+      "button-cancel": "Cancel",
+      "button-confirm": "Block user"
+    }
+  },
   "tabs": {
-    "activelyBidding": "Actively bidding on",
-    "purchases": "My purchases",
-    "viewHistory": "My view history",
-    "subscriptions": "My subscriptions",
+    "activelyBidding": "Active",
+    "purchases": "Purchases",
+    "viewHistory": "Viewing history",
+    "subscriptions": "Subscriptions",
     "myposts": "My posts",
-    "favorites": "My favorites",
-    "userInitial": "Creator’s decisions",
+    "favorites": "Favorites",
+    "userInitial": "Creator's decisions",
     "activity": "Activity"
   },
   "posts-filter": {
@@ -17,7 +33,7 @@
     "filter-2": "Crowdfunding",
     "filter-3": "Multiple choices"
   },
-  "AccountPrivate": "User preferred to hide their activity",
+  "AccountPrivate": "{{username}}'s activity is private",
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",
@@ -26,7 +42,8 @@
     "buttons": {
       "favorites": "Favorites",
       "more": "More",
-      "sendMessage": "Send message"
+      "sendMessage": "Send message",
+      "copied": "Link copied!"
     }
   },
   "EditProfileMenu": {
@@ -43,25 +60,28 @@
         "changeCoverImage": "Change cover image"
       },
       "nickname": {
-        "placeholder": "Nickname",
+        "placeholder": "Display name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Name is too long",
           "tooShort": "Name is too short",
           "invalidChar": "Name has invalid characters",
-          "innappropriate": "Offensive words are forbidden"
+          "innappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
         }
       },
       "username": {
         "placeholder": "@username",
-        "frequencyCaption": "Username can be changed once a month.",
+        "frequencyCaption": "{{domain}}{{username}}",
+        "cannotBeChangedCaption": "Username can be changed once a month.",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Username is too long",
           "tooShort": "Username is too short",
           "invalidChar": "Username has invalid characters",
           "innappropriate": "Offensive words are forbidden",
-          "taken": "Username is taken"
+          "taken": "Username is taken",
+          "linksForbidden": "Links not allowed"
         },
         "points": {
           "1": "8-15 characters length",
@@ -75,7 +95,8 @@
           "generic": "Please check input",
           "tooLong": "Bio is too long",
           "tooShort": "Bio is too short",
-          "innappropriate": "Offensive words are forbidden"
+          "innappropriate": "Offensive words are forbidden",
+          "linksForbidden": "No links allowed in bio"
         }
       }
     }
@@ -125,7 +146,7 @@
           },
           "captions": {
             "twoTimesOnly": "Birthdate can be changed 2 times only.",
-            "cannotChange": "You can’t change birthdate."
+            "cannotChange": "You can only change this once"
           },
           "saveBtn": "Save",
           "cancelBtn": "Cancel"
@@ -161,7 +182,8 @@
         },
         "blockedusers": {
           "title": "Blocked uses",
-          "unblockBtn": "Unblock"
+          "unblockBtn": "Unblock",
+          "no_blocked_users": "No blocked users"
         },
         "closeAccount": {
           "title": "Close account",

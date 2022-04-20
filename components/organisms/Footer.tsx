@@ -70,10 +70,6 @@ export const Footer: React.FC<IFooter> = () => {
       key: 'accessibility',
       url: '/accessibility',
     },
-    {
-      key: 'suggest-a-feature',
-      url: '/suggest-a-feature',
-    },
   ];
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 

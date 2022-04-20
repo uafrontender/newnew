@@ -4,17 +4,16 @@ import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import arrowDown from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
-import ChevronFirstPage from '../../../../public/images/svg/icons/outlined/ChevronFirstPage.svg';
-import ChevronDown from '../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import Button from '../../../atoms/Button';
-import InlineSVG from '../../../atoms/InlineSVG';
-import { getMySubscribers } from '../../../../api/endpoints/subscription';
-import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
-import randomID from '../../../../utils/randomIdGenerator';
-import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import Lottie from '../../../atoms/Lottie';
+import InlineSVG from '../../../atoms/InlineSVG';
+import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
+import { getMySubscribers } from '../../../../api/endpoints/subscription';
+import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
+import arrowDown from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import ChevronDown from '../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+import ChevronFirstPage from '../../../../public/images/svg/icons/outlined/ChevronFirstPage.svg';
 
 export const SubscribersTable = () => {
   const { t } = useTranslation('creator');
@@ -73,7 +72,10 @@ export const SubscribersTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, changeSortDirection]);
 
-  const renderItem = useCallback((subscriber) => <SubscriberRow key={randomID()} subscriber={subscriber} />, []);
+  const renderItem = useCallback(
+    (subscriber: newnewapi.ISubscriber) => <SubscriberRow key={subscriber.user?.uuid} subscriber={subscriber} />,
+    []
+  );
 
   return (
     <>

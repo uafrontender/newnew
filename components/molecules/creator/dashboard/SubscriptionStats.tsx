@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import { google, newnewapi } from 'newnew-api';
+import { toNumber } from 'lodash';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -12,27 +13,24 @@ import Headline from '../../../atoms/Headline';
 import DropDown from '../../../atoms/creator/DropDown';
 import InlineSVG from '../../../atoms/InlineSVG';
 import UserAvatar from '../../UserAvatar';
-
 import handIcon from '../../../../public/images/svg/icons/filled/Hand.svg';
-// import arrowUpIcon from '../../../../public/images/svg/icons/filled/ArrowUp.svg';
-// import arrowDownIcon from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
+import { getMyRooms } from '../../../../api/endpoints/chat';
 
 export const SubscriptionStats = () => {
   const { t } = useTranslation('creator');
-  // const theme = useTheme();
-  // const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
   const [filter, setFilter] = useState('7_days');
-  const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
+  const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState(true);
   const [newSubs, setNewSubs] = useState<newnewapi.ISubscriber[]>([]);
-  // const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const [myAnnouncementRoomId, setMyAnnouncementRoomId] = useState<number | undefined>();
+  const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
 
   async function fetchMySubscribers(startDate: google.protobuf.ITimestamp, endDate: google.protobuf.ITimestamp) {
     try {
-      if (!mySubscribersIsLoading) {
-        setMySubscribersIsLoading(true);
+      if (mySubscribersIsLoading) {
+        setMySubscribersIsLoading(false);
         const payload = new newnewapi.GetMySubscribersRequest({
           paging: null,
           order: 2,
@@ -44,11 +42,10 @@ export const SubscriptionStats = () => {
         const res = await getMySubscribers(payload);
         if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
         setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
-        setMySubscribersIsLoading(false);
       }
     } catch (err) {
       console.error(err);
-      setMySubscribersIsLoading(false);
+      setMySubscribersIsLoading(true);
     }
   }
 
@@ -63,70 +60,41 @@ export const SubscriptionStats = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
+  const fetchMyRoom = async () => {
+    if (loadingRoom) return;
+    try {
+      setLoadingRoom(true);
+      const payload = new newnewapi.GetMyRoomsRequest({
+        myRole: 2,
+        roomKind: 4,
+        paging: {
+          limit: 1,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.rooms[0].id) {
+        setMyAnnouncementRoomId(toNumber(res.data.rooms[0].id));
+      }
+      setLoadingRoom(false);
+    } catch (err) {
+      console.error(err);
+      setLoadingRoom(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!myAnnouncementRoomId) fetchMyRoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myAnnouncementRoomId]);
+
   const handleChangeFilter = (e: any) => {
     if (filter !== e) {
       setFilter(e);
     }
   };
 
-  // const collection = useMemo(
-  //   () => [
-  //     {
-  //       id: 'subscribers',
-  //       value: '1,000',
-  //       direction: 'up',
-  //       score: 20,
-  //     },
-  //     {
-  //       id: 'activeSubs',
-  //       value: '530',
-  //       direction: 'down',
-  //       score: '5%',
-  //     },
-  //     {
-  //       id: 'views',
-  //       value: '2,345',
-  //       direction: 'up',
-  //       score: '5%',
-  //     },
-  //   ],
-  //   []
-  // );
-  // const newSubscribersCollection = useMemo(
-  //   () => [
-  //     {
-  //       id: '1',
-  //       name: 'Bugaboo👻😈',
-  //       nickName: '@markwilson1995',
-  //     },
-  //     {
-  //       id: '2',
-  //       name: 'Bugaboo👻😈',
-  //       nickName: '@markwilson1995',
-  //     },
-  //     {
-  //       id: '3',
-  //       name: 'SandyCandy',
-  //       nickName: '@markwilson1995',
-  //     },
-  //     {
-  //       id: '4',
-  //       name: 'SandyCandy',
-  //       nickName: '@markwilson1995',
-  //     },
-  //     {
-  //       id: '5',
-  //       name: 'CaptainCyborg',
-  //       nickName: '@marcus0lson13',
-  //     },
-  //     {
-  //       id: '6',
-  //       name: 'CaptainCyborg',
-  //       nickName: '@marcus0lson13',
-  //     },
-  //   ],
-  //   []
-  // );
   const filterOptions = useMemo(
     () => [
       {
@@ -207,8 +175,8 @@ export const SubscriptionStats = () => {
     return null;
   }, []);
   const handleSubmit = useCallback(() => {
-    router.push('/creator/subscribers');
-  }, [router]);
+    if (myAnnouncementRoomId) router.push(`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`);
+  }, [router, myAnnouncementRoomId]);
 
   return (
     <SContainer>
@@ -218,7 +186,6 @@ export const SubscriptionStats = () => {
           <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
         </STotalInsights>
       </SHeaderLine>
-      {/* <SListHolder>{collection.map(renderListItem)}</SListHolder> */}
       <STotalLine>
         <STotalTextWrapper>
           <STotalText variant={2} weight={600}>
@@ -226,21 +193,23 @@ export const SubscriptionStats = () => {
           </STotalText>
         </STotalTextWrapper>
       </STotalLine>
-      <SSubscribersList>{newSubs.map(renderSubscriber)}</SSubscribersList>
+      {!mySubscribersIsLoading && <SSubscribersList>{newSubs.map(renderSubscriber)}</SSubscribersList>}
       <SButtonSubmit view="secondary" onClick={handleSubmit}>
         {t('dashboard.subscriptionStats.seeAll')}
       </SButtonSubmit>
-      <SBannerContainer>
-        <SBannerTopBlock>
-          <SInlineSVG svg={handIcon} width="24px" height="24px" />
-          <SDescription variant={3} weight={600}>
-            {t('dashboard.subscriptionStats.banner.description')}
-          </SDescription>
-        </SBannerTopBlock>
-        <SButton view="primaryGrad" onClick={handleSubmit}>
-          {t('dashboard.subscriptionStats.banner.submit')}
-        </SButton>
-      </SBannerContainer>
+      {myAnnouncementRoomId && (
+        <SBannerContainer>
+          <SBannerTopBlock>
+            <SInlineSVG svg={handIcon} width="24px" height="24px" />
+            <SDescription variant={3} weight={600}>
+              {t('dashboard.subscriptionStats.banner.description')}
+            </SDescription>
+          </SBannerTopBlock>
+          <SButton view="primaryGrad" onClick={handleSubmit}>
+            {t('dashboard.subscriptionStats.banner.submit')}
+          </SButton>
+        </SBannerContainer>
+      )}
     </SContainer>
   );
 };

@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, {
-  useContext, useEffect, useRef, useState,
+  useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -124,15 +124,15 @@ export const Card: React.FC<ICard> = ({
     ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
     : 0));
 
+  const timestampSeconds = useMemo(() => (
+    new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()
+  ), [postParsed.expiresAt?.seconds])
+
   const handleUserClick = (username: string) => {
-    router.push(`/u/${username}`);
+    router.push(`/${username}`);
   };
-  const handleMoreClick = () => {
-    router.push('/post-detailed');
-  };
-  const handleBidClick = () => {
-    router.push('/post-detailed');
-  };
+  const handleMoreClick = () => {};
+  const handleBidClick = () => {};
 
   useEffect(() => {
     const handleCanplay = () => {
@@ -254,7 +254,6 @@ export const Card: React.FC<ICard> = ({
                 iconOnly
                 id="showMore"
                 view="transparent"
-                onClick={handleMoreClick}
               >
                 <InlineSVG
                   svg={moreIcon}
@@ -294,15 +293,9 @@ export const Card: React.FC<ICard> = ({
       >
         <SImageHolderOutside id="animatedPart">
           <video
-            // src={postParsed.announcement?.thumbnailUrl as string}
-            // src="/video/mock/mock_video_1.mp4"
-            // Temp
-            // src={postParsed.announcement?.thumbnailUrl ?? ''}
             ref={(el) => {
               videoRef.current = el!!;
             }}
-            // NB! Might use this one to avoid waisting user's resources
-            // and use a poster here NB!
             // preload="none"
             loop
             muted
@@ -331,8 +324,10 @@ export const Card: React.FC<ICard> = ({
         </SImageHolderOutside>
       </SImageBG>
       <SBottomContentOutside>
-        <SBottomStart>
-          <SUserAvatar
+        <SBottomStart
+          hasEnded={Date.now() > timestampSeconds}
+        >
+          <SUserAvatarOutside
             avatarUrl={postParsed?.creator?.avatarUrl!!}
             withClick
             onClick={(e) => {
@@ -340,41 +335,69 @@ export const Card: React.FC<ICard> = ({
               handleUserClick(postParsed.creator?.username!!);
             }}
           />
-          <STextOutside variant={3} weight={600}>
-            {postParsed.title}
-          </STextOutside>
+          <SUsername
+            variant={2}
+          >
+          {
+            (Date.now() > timestampSeconds)
+            ? (
+              postParsed.creator?.nickname && postParsed.creator?.nickname?.length > 5
+              ? `${postParsed.creator?.nickname?.substring(0, 3)}...`
+              : postParsed.creator?.nickname
+            ) : (
+              postParsed.creator?.nickname && postParsed.creator?.nickname?.length > 7
+              ? `${postParsed.creator?.nickname?.substring(0, 6)}...`
+              : postParsed.creator?.nickname
+            )
+          }
+          </SUsername>
+          <CardTimer
+            timestampSeconds={timestampSeconds}
+          />
         </SBottomStart>
+        <STextOutside variant={3} weight={600}>
+          {postParsed.title}
+        </STextOutside>
         <SBottomEnd
           type={typeOfPost}
         >
-          <SButton
-            withDim
-            withShrink
-            view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-            onClick={handleBidClick}
-            cardType={typeOfPost}
-            progress={typeOfPost === 'cf' ? (
-              Math.floor((currentBackerCount * 100)
-              / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
-            ) : 0}
-            withProgress={typeOfPost === 'cf'}
-          >
-            {t(`button-card-${typeOfPost}`, {
-              votes: totalVotes,
-              total: formatNumber(
-                (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
-                true,
-              ),
-              backed: formatNumber(
-                currentBackerCount ?? 0,
-                true,
-              ),
-              amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
-            })}
-          </SButton>
-          <CardTimer
-            timestampSeconds={new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime()}
-          />
+          {
+            totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
+              <SButton
+                withDim
+                withShrink
+                view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                onClick={handleBidClick}
+                cardType={typeOfPost}
+                progress={typeOfPost === 'cf' ? (
+                  Math.floor((currentBackerCount * 100)
+                  / (postParsed as newnewapi.Crowdfunding).targetBackerCount)
+                ) : 0}
+                withProgress={typeOfPost === 'cf'}
+              >
+                {t(`button-card-${typeOfPost}`, {
+                  votes: totalVotes,
+                  total: formatNumber(
+                    (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
+                    true,
+                  ),
+                  backed: formatNumber(
+                    currentBackerCount ?? 0,
+                    true,
+                  ),
+                  amount: `$${formatNumber((totalAmount / 100) ?? 0, true)}`,
+                })}
+              </SButton>
+
+            ) : (
+              <SButtonFirst
+                withShrink
+                onClick={handleBidClick}
+              >
+                {t(`button-card-first-${typeOfPost}`)}
+              </SButtonFirst>
+            )
+          }
         </SBottomEnd>
       </SBottomContentOutside>
     </SWrapperOutside>
@@ -442,18 +465,11 @@ const SWrapper = styled.div<ISWrapper>`
   }
 
   ${(props) => props.theme.media.laptopL} {
-    width: 25vw;
-    height: unset;
-
     :hover {
       #showMore {
         opacity: 1;
       }
     }
-  }
-
-  ${(props) => props.theme.media.desktop} {
-    width: 20vw;
   }
 `;
 
@@ -491,14 +507,14 @@ const SNumberImageHolder = styled.div<ISWrapper>`
     height: 280px;
   }
 
-  ${(props) => props.theme.media.laptopL} {
-    left: 0;
-    bottom: 0;
+  ${(props) => props.theme.media.tablet} {
+    left: 10px;
+    bottom: 30px;
     height: 70%;
     position: absolute;
     width: ${(props) => {
     if (props.index === 10) {
-      return '90%';
+      return '74%';
     }
 
     return '55%';
@@ -520,13 +536,43 @@ const SImageHolder = styled.div<ISWrapper>`
   justify-content: space-between;
   border-radius: ${(props) => props.theme.borderRadius.medium};
 
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: 212px;
     padding: 12px;
+
+    border: 1.5px solid;
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    padding: 18px;
+
+    video {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      object-fit: cover;
+      width: calc(100% - 20px);
+      height: calc(100% - 20px);
+      border-radius: 10px;
+    }
   }
 
   ${(props) => props.theme.media.laptop} {
     width: 256px;
+
+    transition: 0.2s linear;
+    :hover {
+      transform: translateY(-8px);
+    }
   }
 
   ${(props) => props.theme.media.laptopL} {
@@ -542,31 +588,27 @@ const SImageHolder = styled.div<ISWrapper>`
     return '65%';
   }};
   }
-
-  video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-  }
 `;
 
 const SImageMask = styled.div`
-  width: calc(100% + 10px);
+  width: 100%;
 
   top: 0;
-  left: -5px;
+  left: 0px;
   right: 0;
-  bottom: 0;
+  bottom: 0px;
   z-index: 1;
   overflow: hidden;
   position: absolute;
   background: linear-gradient(180deg, rgba(11, 10, 19, 0) 49.87%, rgba(11, 10, 19, 0.8) 100%);
-  border-radius: ${(props) => props.theme.borderRadius.medium};
+  border-radius: 10px;
   pointer-events: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    width: calc(100% - 20px);
+    left: 10px;
+    bottom: 10px;
+  }
 `;
 
 const STopContent = styled.div`
@@ -599,6 +641,15 @@ const SWrapperOutside = styled.div<ISWrapper>`
   position: relative;
   flex-direction: column;
 
+  /* padding: 10px; */
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+
+  border: 1.5px solid;
+  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
+
   /* No select */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -608,14 +659,18 @@ const SWrapperOutside = styled.div<ISWrapper>`
   user-select: none;
 
   ${(props) => props.theme.media.tablet} {
+    max-width: 200px;
+
+    transition: transform ease 0.5s;
+
     :hover {
-      #animatedPart {
-        transform: translateY(-10px);
-      }
+      transform: translateY(-8px);
     }
   }
 
   ${(props) => props.theme.media.laptop} {
+    max-width: 224px;
+
     :hover {
       #showMore {
         opacity: 1;
@@ -630,11 +685,11 @@ interface ISImageBG {
 
 const SImageBG = styled.div<ISImageBG>`
   width: 100%;
-  padding: 75% 0;
+  padding: 70% 0px;
   position: relative;
 
   ${(props) => props.theme.media.tablet} {
-    border-radius: ${(props) => props.theme.borderRadius.medium};
+    border-radius: 10px;
   }
 `;
 
@@ -648,10 +703,16 @@ const SImageHolderOutside = styled.div`
   position: absolute;
   transition: all ease 0.5s;
 
+  width: calc(100% - 20px);
+  left: 10px;
+  padding: 10px;
+  overflow: hidden;
+  border-radius: 10px;
+
   ${(props) => props.theme.media.tablet} {
     padding: 12px;
     overflow: hidden;
-    border-radius: ${(props) => props.theme.borderRadius.medium};
+    border-radius: 10px;
   }
 
   video {
@@ -666,12 +727,12 @@ const SImageHolderOutside = styled.div`
 `;
 
 const SBottomContentOutside = styled.div`
-  padding: 16px 16px 0;
+  padding: 16px 10px 0;
   display: flex;
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 14px 0 0;
+    padding: 8px 10px 0 10px;
   }
 `;
 
@@ -680,21 +741,52 @@ const STextOutside = styled(Text)`
   display: -webkit-box;
   overflow: hidden;
   position: relative;
-  margin-left: 12px;
+
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+
+  margin-bottom: 10px;
+
+  height: 40px;
 `;
 
-const SBottomStart = styled.div`
-  display: flex;
+const SBottomStart = styled.div<{
+  hasEnded: boolean;
+}>`
+  display: grid;
+  grid-template-areas: 'avatar nickname timer';
+  grid-template-columns: ${({ hasEnded }) => hasEnded ? '24px 3fr 8fr' : '24px 4fr 8fr'};
   align-items: center;
-  margin-bottom: 16px;
-  flex-direction: row;
 
-  ${(props) => props.theme.media.tablet} {
-    margin-bottom: 14px;
-  }
+  height: 32px;
+
+  margin-bottom: 4px;
 `;
+
+const SUserAvatarOutside = styled(UserAvatar)`
+  grid-area: avatar;
+
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+`;
+
+const SUsername = styled(Text)`
+  grid-area: nickname;
+
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+
+  margin-left: 6px;
+`;
+
 
 interface ISBottomEnd {
   type: 'ac' | 'mc' | 'cf',
@@ -731,10 +823,13 @@ const SButton = styled(Button)<ISButtonSpan>`
   padding: 12px;
   border-radius: 12px;
 
+  width: 100%;
+  height: 36px;
+
   span {
-    font-size: 12px;
     font-weight: 700;
-    line-height: 16px;
+    font-size: 16px;
+    line-height: 20px;
 
     ${(props) => (props.cardType === 'cf' ? css`
       width: 100%;
@@ -744,6 +839,54 @@ const SButton = styled(Button)<ISButtonSpan>`
 
   ${(props) => props.theme.media.tablet} {
     padding: 8px 12px;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    span {
+      font-size: 16px;
+    }
+  }
+`;
+
+const SButtonFirst = styled(Button)`
+  padding: 12px;
+  border-radius: 12px;
+
+  width: 100%;
+  height: 36px;
+
+  background: #FFFFFF;
+
+  span {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+
+    color: ${({ theme }) => theme.colorsThemed.accent.blue};
+  }
+
+  ${(props) => props.theme.media.tablet} {
+    padding: 8px 12px;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  ${(props) => props.theme.media.laptop} {
+    span {
+      font-size: 16px;
+    }
+  }
+
+  &:hover, &:active {
+    span {
+      color: #FFFFFF;
+    }
   }
 `;
 

@@ -33,6 +33,7 @@ import ZoomInIcon from '../../public/images/svg/icons/outlined/Plus.svg';
 
 // Utils
 import isImage from '../../utils/isImage';
+import urlToFile from '../../utils/urlToFile';
 import getCroppedImg from '../../utils/cropImage';
 import ProfileImageCropper from '../molecules/profile/ProfileImageCropper';
 import ProfileImageZoomSlider from '../atoms/profile/ProfileImageZoomSlider';
@@ -41,7 +42,7 @@ import { validateText } from '../../api/endpoints/infrastructure';
 import { getImageUploadUrl } from '../../api/endpoints/upload';
 import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper';
 import isBrowser from '../../utils/isBrowser';
-import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
+import isAnimatedImage from '../../utils/isAnimatedImage';
 
 export type TEditingStage = 'edit-general' | 'edit-profile-picture'
 
@@ -82,6 +83,10 @@ const errorSwitch = (
     }
     case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
       errorMsg = 'innappropriate';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
+      errorMsg = 'linksForbidden';
       break;
     }
     default: {
@@ -314,6 +319,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
+  const [coverUrlInEditAnimated, setCoverUrlInEditAinmated] = useState(false);
   const [
     coverImageInitialObjectFit, setCoverImageInitialObjectFit,
   ] = useState<CropperObjectFit>('horizontal-cover');
@@ -349,6 +355,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             setCropCoverImage({ x: 0, y: 0 });
             setZoomCoverImage(1);
             setCoverUrlInEdit(reader.result as string);
+            setCoverUrlInEditAinmated(isAnimatedImage(file.name));
           });
         }
       });
@@ -378,12 +385,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       let newCoverImgURL;
 
       if (coverUrlInEdit && (coverUrlInEdit !== user.userData?.coverUrl)) {
-        croppedCoverImage = await getCroppedImg(
-          coverUrlInEdit,
-          croppedAreaCoverImage!!,
-          0,
-          'coverImage.jpeg',
-        );
+        croppedCoverImage = !coverUrlInEditAnimated
+          ? await getCroppedImg(
+            coverUrlInEdit,
+            croppedAreaCoverImage!!,
+            0,
+            'coverImage.jpeg',
+          )
+          : await urlToFile(
+            coverUrlInEdit,
+            'coverImage.webp',
+            'image/webp',
+          )
 
         // API request would be here
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
@@ -435,6 +448,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         nickname: res.data.me?.nickname,
         bio: res.data.me?.bio,
         coverUrl: res.data.me?.coverUrl,
+        options: {
+          ...user.userData?.options,
+          canChangeUsername: res.data.me?.options?.canChangeUsername
+        }
       }));
 
       setIsLoading(false);
@@ -453,8 +470,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     }
   }, [
     setIsLoading, handleClose, dispatch,
-    dataInEdit, coverUrlInEdit, croppedAreaCoverImage,
+    dataInEdit, coverUrlInEdit, coverUrlInEditAnimated, croppedAreaCoverImage,
     user.userData?.username, user.userData?.coverUrl,
+    user.userData?.options,
     isAPIValidateLoading,
   ]);
 
@@ -721,6 +739,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 <ProfileBackgroundInput
                   originalPictureUrl={user?.userData?.coverUrl ?? ''}
                   pictureInEditUrl={coverUrlInEdit ?? ''}
+                  coverUrlInEditAnimated={coverUrlInEditAnimated}
                   crop={cropCoverImage}
                   zoom={zoomCoverImage}
                   initialObjectFit={coverImageInitialObjectFit}
@@ -750,7 +769,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 <UsernameInput
                   type="text"
                   value={dataInEdit.username}
-                  disabled={isLoading}
+                  disabled={isLoading || !user.userData?.options?.canChangeUsername}
                   popupCaption={(
                     <UsernamePopupList
                       points={[
@@ -775,18 +794,35 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                       ]}
                     />
                   )}
-                  frequencyCaption={t('EditProfileMenu.inputs.username.frequencyCaption')}
+                  frequencyCaption={
+                    user.userData?.options?.canChangeUsername
+                    ? (
+                      t('EditProfileMenu.inputs.username.frequencyCaption',
+                      {
+                        domain: (
+                          process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL[(process.env.NEXT_PUBLIC_APP_URL?.length ?? 1) - 1] === '/'
+                          ? process.env.NEXT_PUBLIC_APP_URL
+                          : `${process.env.NEXT_PUBLIC_APP_URL}/`
+                        ),
+                        username: dataInEdit.username,
+                      })
+                    ) : (
+                      t('EditProfileMenu.inputs.username.cannotBeChangedCaption')
+                    )
+                  }
                   errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`)}
                   placeholder={t('EditProfileMenu.inputs.username.placeholder')}
                   isValid={!formErrors.usernameError}
-                  onChange={(e) => handleUpdateDataInEdit('username', e.target.value)}
+                  onChange={(value) => {
+                    handleUpdateDataInEdit('username', value);
+                  }}
                 />
                 <BioTextarea
                   maxChars={150}
                   value={dataInEdit.bio}
                   disabled={isLoading}
                   placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
-                  errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.bioError}`)}
+                  errorCaption={t(`EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`)}
                   isValid={!formErrors.bioError}
                   onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
                 />

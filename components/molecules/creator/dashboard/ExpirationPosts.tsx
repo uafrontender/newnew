@@ -1,6 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+/* eslint-disable no-unused-expressions */
+/* eslint-disable prefer-template */
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -13,221 +17,234 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import infoIcon from '../../../../public/images/svg/icons/filled/Info.svg';
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
+import { formatNumber } from '../../../../utils/format';
+import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
+import InfoTooltipItem from '../../../atoms/dashboard/InfoTooltipItem';
+import secondsToDHMS from '../../../../utils/secondsToDHMS';
 
-export const ExpirationPosts = () => {
+interface IExpirationPosts {
+  expirationPosts: newnewapi.IPost[];
+}
+
+export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
-  const user = useAppSelector((state) => state.user);
+  const ref: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
-  const collection = useMemo(() => ([
-    {
-      id: 1,
-      title: 'Should I get a forehead',
-      date: '15m 10s left',
-      total: '$45.00',
-      contributions: '120 bids',
-    },
-    {
-      id: 2,
-      title: 'Should I get a forehead',
-      date: '15m 10s left',
-      total: '$45.00',
-      contributions: '120 bids',
-    },
-    {
-      id: 3,
-      title: 'Should I get a forehead',
-      date: '15m 10s left',
-      total: '$45.00',
-      contributions: '120 bids',
-    },
-  ]), []);
-  const renderItem = useCallback((item, index) => {
-    const handleUserClick = () => {
-    };
-    const handleInfoClick = () => {
-    };
-    const handleDecideClick = () => {
-    };
+  const router = useRouter();
 
-    return (
-      <SListItemWrapper key={`item-expiration-${item.id}`}>
-        <SListItem>
-          {isDesktop ? (
-            <>
-              <SListBodyItem
-                width="calc(100% - 300px)"
-                align="flex-start"
-              >
-                <SAvatar
-                  withClick
-                  onClick={handleUserClick}
-                  avatarUrl={user.userData?.avatarUrl}
-                />
+  const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
+  const [showInfoTooltip, setShowInfoTooltip] = useState<number | undefined>();
+
+  useEffect(() => {
+    if (expirationPosts) {
+      // eslint-disable-next-line no-param-reassign
+      if (expirationPosts.length > 3) expirationPosts.length = 3;
+      setPosts(expirationPosts);
+    }
+  }, [expirationPosts]);
+
+  const getCountdown = (data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice) => {
+    const end = (data.responseUploadDeadline?.seconds as number) * 1000;
+    const parsed = (end - Date.now()) / 1000;
+    const dhms = secondsToDHMS(parsed, 'noTrim');
+
+    let countdownsrt = `${dhms.days}${t('dashboard.expirationPosts.expiresTime.days')} ${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')}`;
+
+    if (dhms.days === '0') {
+      countdownsrt = `${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')} ${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')}`;
+      if (dhms.hours === '0') {
+        countdownsrt = `${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')} ${dhms.seconds}${t('dashboard.expirationPosts.expiresTime.seconds')}`;
+        if (dhms.minutes === '0') {
+          countdownsrt = `${dhms.seconds}${t('dashboard.expirationPosts.expiresTime.seconds')}`;
+        }
+      }
+    }
+    countdownsrt = `${countdownsrt} ${t('dashboard.expirationPosts.expiresTime.left_to_respond')}`;
+    return countdownsrt;
+  };
+
+  const getAmountValue = (
+    postType: string,
+    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
+  ) => {
+    let centsQty = 0;
+
+    postType === 'multipleChoice'
+      ? (centsQty =
+          (data as newnewapi.MultipleChoice).totalVotes * (data as newnewapi.MultipleChoice).votePrice!!.usdCents!!)
+      : (centsQty = (data as newnewapi.Crowdfunding | newnewapi.Auction).totalAmount?.usdCents!!);
+
+    return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
+  };
+
+  const getContributorsValue = (
+    postType: string,
+    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
+  ) => {
+    let amount = 0;
+
+    switch (postType) {
+      case 'multipleChoice':
+        amount = (data as newnewapi.MultipleChoice).totalVotes;
+        break;
+      case 'crowdfunding':
+        amount = (data as newnewapi.Crowdfunding).currentBackerCount;
+        break;
+      default:
+        amount = (data as newnewapi.Auction).bidCount as number;
+    }
+
+    return amount;
+  };
+
+  useOnClickOutside(ref, () => {
+    if (showInfoTooltip) setShowInfoTooltip(undefined);
+  });
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const renderItem = useCallback(
+    (item, index) => {
+      const postType = Object.keys(item)[0];
+      const data = Object.values(item)[0] as newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
+
+      const handleDecideClick = () => {
+        router.push(`/post/${data.postUuid}`);
+      };
+
+      const handleShareClick = () => {
+        let url;
+        if (window) {
+          url = `${window.location.origin}/post/${data.postUuid}`;
+          copyPostUrlToClipboard(url);
+        }
+      };
+
+      const countdownsrt = getCountdown(data);
+      const money = getAmountValue(postType, data);
+      const contributors = getContributorsValue(postType, data);
+
+      return (
+        <SListItemWrapper key={data.postUuid}>
+          <SListItem>
+            {isDesktop ? (
+              <>
+                <SListBodyItem width="calc(100% - 300px)" align="flex-start">
+                  {!data.announcement?.thumbnailImageUrl ? (
+                    <SAvatar />
+                  ) : (
+                    <SImg
+                      src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''}
+                      alt=""
+                    />
+                  )}
+                  <SListItemTitleWrapper>
+                    <SListItemTitle variant={3} weight={600}>
+                      {data.title}
+                    </SListItemTitle>
+                    <SListItemDate variant={2} weight={600}>
+                      {countdownsrt}
+                    </SListItemDate>
+                  </SListItemTitleWrapper>
+                </SListBodyItem>
+                <SListBodyItem width="100px" align="flex-start">
+                  <SListBodyItemText variant={3} weight={600}>
+                    {money}
+                  </SListBodyItemText>
+                </SListBodyItem>
+                <SListBodyItem width="100px" align="flex-start">
+                  <SListBodyItemText variant={3} weight={600}>
+                    {contributors}
+                  </SListBodyItemText>
+                </SListBodyItem>
+                <SListBodyItem width="100px" align="center">
+                  <SListDecideButton view="primary" onClick={handleDecideClick}>
+                    {t('dashboard.expirationPosts.decide')}
+                  </SListDecideButton>
+                </SListBodyItem>
+              </>
+            ) : (
+              <>
+                {!data.announcement?.thumbnailImageUrl ? (
+                  <SAvatar />
+                ) : (
+                  <SImg src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''} alt="" />
+                )}
                 <SListItemTitleWrapper>
                   <SListItemTitle variant={3} weight={600}>
-                    {item.title}
+                    {data.title}
                   </SListItemTitle>
                   <SListItemDate variant={2} weight={600}>
-                    {item.date}
+                    {countdownsrt}
                   </SListItemDate>
                 </SListItemTitleWrapper>
-              </SListBodyItem>
-              <SListBodyItem
-                width="100px"
-                align="flex-start"
-              >
-                <SListBodyItemText variant={3} weight={600}>
-                  {item.total}
-                </SListBodyItemText>
-              </SListBodyItem>
-              <SListBodyItem
-                width="100px"
-                align="flex-start"
-              >
-                <SListBodyItemText variant={3} weight={600}>
-                  {item.contributions}
-                </SListBodyItemText>
-              </SListBodyItem>
-              <SListBodyItem
-                width="100px"
-                align="center"
-              >
-                <SListDecideButton
-                  view="secondary"
-                  onClick={handleDecideClick}
-                >
+                <SListShareButton view="secondary" onClick={handleShareClick}>
+                  <InlineSVG svg={shareIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                </SListShareButton>
+                {!isMobile && (
+                  <SListShareButton view="secondary" onClick={() => setShowInfoTooltip(index)}>
+                    <InlineSVG svg={infoIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                    {showInfoTooltip === index && (
+                      <InfoTooltipItem
+                        money={money}
+                        contributions={contributors.toString()}
+                        closeTooltip={() => setShowInfoTooltip(undefined)}
+                      />
+                    )}
+                  </SListShareButton>
+                )}
+                <SListDecideButton view="secondary" onClick={handleDecideClick}>
                   {t('dashboard.expirationPosts.decide')}
                 </SListDecideButton>
-              </SListBodyItem>
-            </>
-          ) : (
-            <>
-              <SAvatar
-                withClick
-                onClick={handleUserClick}
-                avatarUrl={user.userData?.avatarUrl}
-              />
-              <SListItemTitleWrapper>
-                <SListItemTitle variant={3} weight={600}>
-                  {item.title}
-                </SListItemTitle>
-                <SListItemDate variant={2} weight={600}>
-                  {item.date}
-                </SListItemDate>
-              </SListItemTitleWrapper>
-              <SListShareButton
-                view="secondary"
-                onClick={handleDecideClick}
-              >
-                <InlineSVG
-                  svg={shareIcon}
-                  fill={theme.colorsThemed.text.primary}
-                  width="20px"
-                  height="20px"
-                />
-              </SListShareButton>
-              {!isMobile && (
-                <SListShareButton
-                  view="secondary"
-                  onClick={handleInfoClick}
-                >
-                  <InlineSVG
-                    svg={infoIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SListShareButton>
-              )}
-              <SListDecideButton
-                view="secondary"
-                onClick={handleDecideClick}
-              >
-                {t('dashboard.expirationPosts.decide')}
-              </SListDecideButton>
-            </>
-          )}
-        </SListItem>
-        {index !== collection.length - 1 && (
-          <SListItemSeparator />
-        )}
-      </SListItemWrapper>
-    );
-  }, [
-    t,
-    isMobile,
-    isDesktop,
-    collection.length,
-    user.userData?.avatarUrl,
-    theme.colorsThemed.text.primary,
-  ]);
-
-  const handleSubmit = useCallback(() => {
-    console.log('load more 10');
-  }, []);
+              </>
+            )}
+          </SListItem>
+          {index !== posts.length - 1 && <SListItemSeparator />}
+        </SListItemWrapper>
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t, isMobile, isDesktop, posts.length, theme.colorsThemed.text.primary, router, showInfoTooltip]
+  );
 
   return (
     <SContainer>
       <SHeaderLine>
-        <STitle variant={6}>
-          {t('dashboard.expirationPosts.title')}
-        </STitle>
+        <STitle variant={6}>{t('dashboard.expirationPosts.title')}</STitle>
       </SHeaderLine>
       <SListWrapper>
         {isDesktop && (
           <>
             <SListHeader>
-              <SListHeaderItem
-                width="calc(100% - 300px)"
-                align="start"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="calc(100% - 300px)" align="start" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.post')}
               </SListHeaderItem>
-              <SListHeaderItem
-                width="100px"
-                align="start"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="100px" align="start" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.total')}
               </SListHeaderItem>
-              <SListHeaderItem
-                width="100px"
-                align="start"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="100px" align="start" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.contributions')}
               </SListHeaderItem>
-              <SListHeaderItem
-                width="100px"
-                align="center"
-                weight={600}
-                variant={2}
-              >
+              <SListHeaderItem width="100px" align="center" weight={600} variant={2}>
                 {t('dashboard.expirationPosts.table.header.actions')}
               </SListHeaderItem>
             </SListHeader>
             <SListItemSeparator />
           </>
         )}
-        {collection.map(renderItem)}
+        {posts.map(renderItem)}
       </SListWrapper>
-      {isMobile && (
-        <SButton
-          view="secondary"
-          onClick={handleSubmit}
-        >
-          {t('dashboard.expirationPosts.submit')}
-        </SButton>
-      )}
     </SContainer>
   );
 };
@@ -240,7 +257,10 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.primary
+      : props.theme.colorsThemed.background.secondary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
@@ -251,7 +271,8 @@ const SContainer = styled.div`
   }
 
   ${(props) => props.theme.media.laptop} {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
   }
 `;
 
@@ -270,16 +291,6 @@ const SHeaderLine = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     margin-bottom: 14px;
-  }
-`;
-
-const SButton = styled(Button)`
-  width: 100%;
-  padding: 16px 20px;
-  margin-top: 16px;
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 12px 24px;
   }
 `;
 
@@ -323,6 +334,25 @@ const SListItem = styled.div`
   flex-direction: row;
 `;
 
+const SImg = styled.img`
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 12px;
+
+  object-fit: cover;
+  object-position: top;
+
+  ${(props) => props.theme.media.laptop} {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 16px;
+  }
+`;
+
 const SAvatar = styled(UserAvatar)`
   width: 36px;
   height: 36px;
@@ -359,7 +389,7 @@ const SListItemTitle = styled(Text)`
 `;
 
 const SListItemDate = styled(Caption)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${(props) => props.theme.colorsThemed.accent.pink};
 `;
 
 const SListShareButton = styled(Button)`
@@ -367,6 +397,7 @@ const SListShareButton = styled(Button)`
   min-width: 36px;
   margin-right: 12px;
   border-radius: 12px;
+  overflow: visible;
 `;
 
 const SListDecideButton = styled(Button)`
