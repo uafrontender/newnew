@@ -13,6 +13,7 @@ import StatisticsIcon from '../../../public/images/svg/icons/outlined/Statistics
 import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
 import CommentsIcon from '../../../public/images/svg/icons/outlined/Comments.svg';
 import CommentsIconFilled from '../../../public/images/svg/icons/filled/Comments.svg';
+import { useAppSelector } from '../../../redux-store/store';
 
 type TDecisonTab = {
   label: string;
@@ -46,6 +47,9 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
   const [activeTabIndicator, setActiveTabIndicator] = useState<{
     width: number;
     left: number;
@@ -80,6 +84,13 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
       <STabsContainer
         ref={(el) => {
           tabsContainerRef.current = el!!;
+        }}
+        style={{
+          ...(tabs.length === 1 ? {
+            justifyContent: 'center',
+            visibility: 'hidden',
+            display: isMobile ? 'none' : 'flex'
+          }: {}),
         }}
       >
         {tabs && tabs.map((tab, i) => (
@@ -120,12 +131,12 @@ export default DecisionTabs;
 
 const STabs = styled.div`
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
 
-  margin-bottom: 12px;
+  padding-bottom: 12px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 16px;
+    padding-bottom: 16px;
   }
 `;
 

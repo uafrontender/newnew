@@ -47,22 +47,18 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
         <meta name="description" content={t('meta.description')} />
       </Head>
       <motion.div
-        // initial={!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-        //   x: 200,
-        //   opacity: 0,
-        // } : {}}
-        // animate={!isMobileOrTablet && authLayoutContext.shouldHeroUnmount ? {
-        //   x: 0,
-        //   opacity: 1,
-        // } : {}}
         initial={{
-          x: 100,
-          y: 500,
+          x: 500,
+          y: 0,
           opacity: 0,
         }}
         animate={{
           x: 0,
+          y: 0,
           opacity: 1,
+          transition: {
+            duration: 1
+          }
         }}
         >
         <CodeVerificationMenu
@@ -86,7 +82,7 @@ export default VerifyEmail;
 export async function getStaticProps(context: { locale: string }): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale,
-    ['verify-email'],
+    ['sign-up', 'verify-email'],
   );
 
   return {

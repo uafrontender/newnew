@@ -17,7 +17,7 @@ import Button from '../../atoms/Button';
 import SettingsBirthDateInput from '../../molecules/profile/SettingsBirthDateInput';
 import SettingsEmailInput from '../../molecules/profile/SettingsEmailInput';
 import { sendVerificationNewEmail, updateMe } from '../../../api/endpoints/user';
-import { useAppDispatch } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { setUserData } from '../../../redux-store/slices/userStateSlice';
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
 
@@ -40,6 +40,8 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { t } = useTranslation('profile');
+  const user = useAppSelector((state) => state.user);
+
   const [wasModifed, setWasModified] = useState(false);
 
   const [emailInEdit, setEmailInEdit] = useState(currentEmail ?? '');
@@ -88,7 +90,15 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
         }
 
         dispatch(setUserData({
-          dateOfBirth: updateDateResponse.data.me?.dateOfBirth,
+          options: {
+            ...user.userData?.options,
+            birthDateUpdatesLeft: updateDateResponse.data.me?.options?.birthDateUpdatesLeft
+          },
+          dateOfBirth: {
+            day: updateDateResponse.data.me?.dateOfBirth?.day,
+            month: updateDateResponse.data.me?.dateOfBirth?.month,
+            year: updateDateResponse.data.me?.dateOfBirth?.year,
+          },
         }));
       }
 
@@ -184,13 +194,13 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
           value={dateInEdit}
           maxDate={maxDate}
           locale={router.locale}
-          disabled={false}
+          disabled={user.userData?.options?.birthDateUpdatesLeft!! <= 0 || !user.userData?.options?.birthDateUpdatesLeft}
           submitError={dateError ? (
             t(`Settings.sections.PersonalInformation.birthDateInput.errors.${dateError}`)
           ) : undefined}
           handleResetSubmitError={() => setDateError('')}
           labelCaption={t('Settings.sections.PersonalInformation.birthDateInput.label')}
-          bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly')}
+          bottomCaption={t('Settings.sections.PersonalInformation.birthDateInput.captions.cannotChange')}
           onChange={handleDateInput}
           handleSetActive={() => handleSetActive()}
         />

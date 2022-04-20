@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -7,13 +7,15 @@ import Logo from '../Logo';
 import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
-import SearchInput from '../../atoms/SearchInput';
+import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
+import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
 import { WalletContext } from '../../../contexts/walletContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
+import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 
 interface ITablet {}
 
@@ -21,12 +23,16 @@ export const Tablet: React.FC<ITablet> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
+  const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
-  const handleMenuClick = () => {};
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+
+  const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
+
   const handleCreateClick = () => {
     if (!user.userData?.options?.isCreator) {
       router.push('/creator-onboarding-stage-1');
@@ -35,7 +41,9 @@ export const Tablet: React.FC<ITablet> = () => {
     }
   };
   const handleUserClick = () => {
-    router.push('/profile');
+    router.push(
+      user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile'
+    );
   };
   const handleSignInClick = () => {
     router.push('/sign-up');
@@ -65,6 +73,7 @@ export const Tablet: React.FC<ITablet> = () => {
                   item={{
                     url: '/direct-messages',
                     key: 'direct-messages',
+                    counter: unreadCount,
                   }}
                 />
               </SItemWithMargin>
@@ -86,40 +95,71 @@ export const Tablet: React.FC<ITablet> = () => {
                   item={{
                     url: '/my-balance',
                     key: 'my-balance',
-                    value: !isBalanceLoading && walletBalance?.usdCents ? (parseInt((walletBalance.usdCents / 100).toFixed(0), 10) ?? undefined) : undefined,
+                    value:
+                      !isBalanceLoading && walletBalance?.usdCents
+                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
+                          undefined
+                        : undefined,
                   }}
                 />
               </SItemWithMargin>
             )}
           </>
         )}
-        <SItemWithMargin>
-          <SearchInput />
-        </SItemWithMargin>
+        {user.loggedIn && user.userData?.options?.isCreator && (
+          <SItemWithMargin
+            style={{
+              position: 'static',
+            }}
+          >
+            <SearchInput />
+          </SItemWithMargin>
+        )}
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button view="primaryGrad" onClick={handleCreateClick} withShadow={!globalSearchActive}>
+                  <Button
+                    view="primaryGrad"
+                    onClick={handleCreateClick}
+                    withShadow={!globalSearchActive}
+                  >
                     {t('button-create-decision')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <Button iconOnly view="quaternary" onClick={handleMenuClick}>
-                    <InlineSVG svg={menuIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+                    <InlineSVG
+                      svg={menuIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width="24px"
+                      height="24px"
+                    />
                   </Button>
+                  <MoreMenuTablet
+                    isVisible={moreMenuOpen}
+                    handleClose={() => setMoreMenuOpen(false)}
+                  />
                 </SItemWithMargin>
               </>
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button view="primaryGrad" onClick={handleCreateClick} withShadow={!globalSearchActive}>
+                  <Button
+                    view="primaryGrad"
+                    onClick={handleCreateClick}
+                    withShadow={!globalSearchActive}
+                  >
                     {t('button-create')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar withClick avatarUrl={user.userData?.avatarUrl} onClick={handleUserClick} />
+                  <UserAvatar
+                    withClick
+                    avatarUrl={user.userData?.avatarUrl}
+                    onClick={handleUserClick}
+                  />
                 </SItemWithMargin>
               </>
             )}
@@ -166,4 +206,6 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
+
+  position: relative;
 `;

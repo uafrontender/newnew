@@ -24,6 +24,7 @@ export const Header: React.FC<IHeader> = (props) => {
 
   // Try to pre-fetch the content
   useEffect(() => {
+    router.prefetch('/');
     router.prefetch('/sign-up');
     router.prefetch('/profile');
     router.prefetch('/creation');
@@ -82,7 +83,8 @@ const SContentWrapper = styled.div`
     content: '';
     z-index: -1;
     position: absolute;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: ${(props) => props.theme.colorsThemed.background.backgroundHeader};
+    opacity: 0.8;
+    filter: blur(10px);
   }
 `;

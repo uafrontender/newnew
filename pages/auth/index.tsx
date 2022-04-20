@@ -116,7 +116,11 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
           coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
           bio: data.me?.bio,
-          dateOfBirth: data.me?.dateOfBirth,
+          dateOfBirth: {
+            day: data.me?.dateOfBirth?.day,
+            month: data.me?.dateOfBirth?.month,
+            year: data.me?.dateOfBirth?.year,
+          },
           countryCode: data.me?.countryCode,
           options: {
             isActivityPrivate: data.me?.options?.isActivityPrivate,
@@ -147,7 +151,11 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({
         dispatch(setUserLoggedIn(true));
 
         setIsLoading(false);
-        router.push('/');
+        if (data.redirectUrl) {
+          router.push(data.redirectUrl);
+        } else {
+          router.push('/');
+        }
       } catch (err) {
         // NB! Might need an error toast
         console.error(err);

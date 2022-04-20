@@ -10,6 +10,7 @@ import Text from '../../atoms/Text';
 interface ICommentEllipseMenu {
   isVisible: boolean;
   canDeleteComment: boolean;
+  isMyComment: boolean;
   handleClose: () => void;
   onDeleteComment: () => void;
   onUserReport: () => void;
@@ -17,6 +18,7 @@ interface ICommentEllipseMenu {
 
 const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
   isVisible,
+  isMyComment,
   canDeleteComment,
   handleClose,
   onDeleteComment,
@@ -54,9 +56,11 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
               <Text variant={2}>{t('comments.delete')}</Text>
             </SButton>
           )}
-          <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('comments.report')}</Text>
-          </SButton>
+          {!isMyComment && (
+            <SButton onClick={reportUserHandler}>
+              <Text variant={2}>{t('comments.report')}</Text>
+            </SButton>
+          )}
         </SContainer>
       )}
     </AnimatePresence>

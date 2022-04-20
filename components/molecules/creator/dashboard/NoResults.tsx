@@ -27,7 +27,7 @@ export const NoResults: React.FC<INoResults> = ({ isCreatorConnectedToStripe }) 
 
   const shareHandler = useCallback(() => {
     if (window && user.userData?.username) {
-      const url = `${window.location.origin}/u/${user.userData?.username}`;
+      const url = `${window.location.origin}/${user.userData?.username}`;
 
       copyPostUrlToClipboard(url)
         .then(() => {

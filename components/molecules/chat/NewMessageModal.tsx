@@ -3,7 +3,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-import randomID from '../../../utils/randomIdGenerator';
 import Modal from '../../organisms/Modal';
 import SearchInput from '../../atoms/chat/SearchInput';
 import {
@@ -169,7 +168,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
       };
 
       return (
-        <SChatItemContainer key={randomID()}>
+        <SChatItemContainer key={chat.id?.toString()}>
           <SChatItemM onClick={handleItemClick}>
             {chat.visavis?.avatarUrl && (
               <SUserAvatar>
@@ -183,11 +182,13 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
-          {index !== chatRooms!!.length - 1 && <SChatSeparator />}
+          {filteredChatrooms.length > 0
+            ? index !== filteredChatrooms!!.length - 1 && <SChatSeparator />
+            : index !== chatRooms!!.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
-    [chatRooms, closeModal, openChat]
+    [chatRooms, closeModal, openChat, filteredChatrooms]
   );
 
   const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
@@ -234,7 +235,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
                   <NewAnnouncement handleClick={createNewAnnouncement} />
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
-                      <SSection key={randomID()}>
+                      <SSection key={section.letter}>
                         <SLetter>{section.letter}</SLetter>
                         {section.chats.map(renderChatItem)}
                       </SSection>

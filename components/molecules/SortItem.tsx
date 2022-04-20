@@ -8,6 +8,7 @@ import Text from '../atoms/Text';
 import SortItemOption from './SortItemOption';
 
 interface ISortItem {
+  category: string;
   item: {
     key: string,
     options: object[]
@@ -20,6 +21,7 @@ export const SortItem: React.FC<ISortItem> = (props) => {
   const {
     item,
     selected,
+    category,
     handleChange,
   } = props;
   const { t } = useTranslation('home');
@@ -37,9 +39,10 @@ export const SortItem: React.FC<ISortItem> = (props) => {
 
     return (
       <SItemOptionWrapper
-        key={`sort-item-${parentOption.key}-${option.key}`}
+        key={`sort-item-${parentOption.key}-${option.key}-category`}
       >
         <SortItemOption
+          category={category}
           item={option}
           parent={parentOption}
           selected={optionSelected}
@@ -47,7 +50,7 @@ export const SortItem: React.FC<ISortItem> = (props) => {
         />
       </SItemOptionWrapper>
     );
-  }, [handleChange, selected]);
+  }, [handleChange, selected, category]);
 
   return (
     <SItemHolder>

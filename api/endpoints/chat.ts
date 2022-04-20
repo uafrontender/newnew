@@ -1,25 +1,7 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, fetchProtobufProtectedIntercepted, fetchProtobuf, cookiesInstance } from '../apiConfigs';
 
 export const BASE_URL_CHAT = `${BASE_URL}/chat`;
-
-export const createRoom = (payload: newnewapi.CreateRoomRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.CreateRoomRequest, newnewapi.CreateRoomResponse>(
-    newnewapi.CreateRoomRequest,
-    newnewapi.CreateRoomResponse,
-    `${BASE_URL_CHAT}/create_room`,
-    'post',
-    payload
-  );
-
-export const deleteMyRoom = (payload: newnewapi.DeleteMyRoomRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.DeleteMyRoomRequest, newnewapi.EmptyResponse>(
-    newnewapi.DeleteMyRoomRequest,
-    newnewapi.EmptyResponse,
-    `${BASE_URL_CHAT}/delete_room`,
-    'post',
-    payload
-  );
 
 export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
   fetchProtobufProtectedIntercepted<newnewapi.MarkRoomAsReadRequest, newnewapi.EmptyResponse>(
@@ -31,12 +13,16 @@ export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
   );
 
 export const getMessages = (payload: newnewapi.GetMessagesRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.GetMessagesRequest, newnewapi.GetMessagesResponse>(
+  fetchProtobuf<newnewapi.GetMessagesRequest, newnewapi.GetMessagesResponse>(
     newnewapi.GetMessagesRequest,
     newnewapi.GetMessagesResponse,
     `${BASE_URL_CHAT}/get_messages`,
     'post',
-    payload
+    payload,
+    // Optional authentication
+    (cookiesInstance.get('accessToken') ? {
+      'x-auth-token': cookiesInstance.get('accessToken'),
+    } : {}),
   );
 
 export const getMyRooms = (payload: newnewapi.GetMyRoomsRequest) =>
@@ -62,6 +48,24 @@ export const deleteMessage = (payload: newnewapi.DeleteMessageRequest) =>
     newnewapi.DeleteMessageRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_CHAT}/delete_message`,
+    'post',
+    payload
+  );
+
+export const getTotalUnreadMessageCounts = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.TotalUnreadMessageCounts>(
+    newnewapi.EmptyRequest,
+    newnewapi.TotalUnreadMessageCounts,
+    `${BASE_URL_CHAT}/get_total_unread_message_counts`,
+    'post',
+    payload
+  );
+
+export const getRoom = (payload: newnewapi.GetRoomRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.GetRoomRequest, newnewapi.ChatRoom>(
+    newnewapi.GetRoomRequest,
+    newnewapi.ChatRoom,
+    `${BASE_URL_CHAT}/get_room`,
     'post',
     payload
   );

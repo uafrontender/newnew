@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/* eslint-disable consistent-return */
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
-import { toNumber } from 'lodash';
 
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import Text from '../../atoms/Text';
@@ -17,12 +17,13 @@ import { IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUserAlias } from '../../atoms/chat/styles';
 import GoBackButton from '../GoBackButton';
-import randomID from '../../../utils/randomIdGenerator';
 import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { markUser } from '../../../api/endpoints/user';
+import { ChannelsContext } from '../../../contexts/channelsContext';
+import { SocketContext } from '../../../contexts/socketContext';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -34,16 +35,18 @@ const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const ReportUserModal = dynamic(() => import('./ReportUserModal'));
 
-const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) => {
+const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
   const { t } = useTranslation('chat');
-  // const scrollRef: any = useRef();
 
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const socketConnection = useContext(SocketContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const { usersIBlocked, usersBlockedMe, unblockUser } = useGetBlockedUsers();
   const [messageText, setMessageText] = useState<string>('');
@@ -52,6 +55,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
   const [isMessagingDisabled, setIsMessagingDisabled] = useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -117,14 +121,45 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
-        if (chatRoom.myRole === 2) setIsMyAnnouncement(true);
+        /* eslint-disable no-unused-expressions */
+        chatRoom.myRole === 2 ? setIsMyAnnouncement(true) : setIsMyAnnouncement(false);
       } else {
         setIsAnnouncement(false);
         setIsMyAnnouncement(false);
       }
+      if (chatRoom.id) {
+        addChannel(`chat_${chatRoom.id.toString()}`, {
+          chatRoomUpdates: {
+            chatRoomId: chatRoom.id,
+          },
+        });
+      }
+      return () => {
+        if (chatRoom.id) removeChannel(`chat_${chatRoom.id.toString()}`);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
+
+  useEffect(() => {
+    const socketHandlerMessageCreated = (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.ChatMessageCreated.decode(arr);
+      if (decoded) {
+        setNewMessage(decoded.newMessage);
+      }
+    };
+    if (socketConnection) {
+      socketConnection.on('ChatMessageCreated', socketHandlerMessageCreated);
+    }
+
+    return () => {
+      if (socketConnection && socketConnection.connected) {
+        socketConnection.off('ChatMessageCreated', socketHandlerMessageCreated);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
 
   useEffect(() => {
     if (inView && !messagesLoading && messagesNextPageToken) {
@@ -237,42 +272,40 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <React.Fragment key={item.id ? item.id.toString() : randomID()}>
-          <SMessage id={item.id ? item.id.toString() : randomID()} mine={isMine} prevSameUser={prevSameUser}>
-            {!nextSameUser && (
-              <SUserAvatar
-                mine={isMine}
-                avatarUrl={
-                  !isMine && chatRoom && chatRoom.visavis?.avatarUrl
-                    ? chatRoom.visavis?.avatarUrl
-                    : user.userData?.avatarUrl
-                }
-              />
-            )}
-            <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
-              <SMessageText mine={isMine} weight={600} variant={3}>
-                {item.content?.text}
-              </SMessageText>
-            </SMessageContent>
-          </SMessage>
+        <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
+          {!nextSameUser && (
+            <SUserAvatar
+              mine={isMine}
+              avatarUrl={
+                !isMine && chatRoom && chatRoom.visavis?.avatarUrl
+                  ? chatRoom.visavis?.avatarUrl
+                  : user.userData?.avatarUrl
+              }
+            />
+          )}
+          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+            <SMessageText mine={isMine} weight={600} variant={3}>
+              {item.content?.text}
+            </SMessageText>
+          </SMessageContent>
           {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
-        </React.Fragment>
+        </SMessage>
       );
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
-        moment(toNumber(item.createdAt?.seconds)).format('DD.MM.YYYY') !==
-          moment(toNumber(nextElement?.createdAt?.seconds)).format('DD.MM.YYYY')
+        moment((item.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY') !==
+          moment((nextElement?.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY')
       ) {
-        let date = moment(toNumber(item.createdAt?.seconds)).format('MMM DD');
+        let date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
 
         return (
-          <>
+          <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage key={randomID()} type="info">
+            <SMessage type="info">
               <SMessageContent
                 type="info"
                 prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
@@ -283,11 +316,26 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
                 </SMessageText>
               </SMessageContent>
             </SMessage>
-          </>
+          </React.Fragment>
+        );
+      }
+      if (item.createdAt?.seconds && !nextElement) {
+        const date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        return (
+          <React.Fragment key={item.id?.toString()}>
+            {content}
+            <SMessage type="info">
+              <SMessageContent type="info" prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}>
+                <SMessageText type="info" weight={600} variant={3}>
+                  {date}
+                </SMessageText>
+              </SMessageContent>
+            </SMessage>
+          </React.Fragment>
         );
       }
 
-      return content;
+      return <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>;
     },
     [chatRoom, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, scrollRef]
   );
@@ -373,7 +421,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
           </SActionsDiv>
         </STopPart>
       )}
-      {localUserData.isAnnouncement && chatRoom && (
+      {isAnnouncement && !isMyAnnouncement && chatRoom && (
         <SAnnouncementHeader>
           <SAnnouncementText>
             {t('announcement.top-message-start')} <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
@@ -384,7 +432,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList, newMessage }) =
       <SCenterPart id="messagesScrollContainer">
         {localUserData?.justSubscribed &&
           chatRoom &&
-          !isMyAnnouncement &&
+          messages.length === 0 &&
+          !isAnnouncement &&
           (chatRoom.myRole === 1 ? (
             <WelcomeMessage userAlias={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''} />
           ) : (
@@ -769,4 +818,6 @@ const SAnnouncementName = styled.span`
 
 const SRef = styled.span`
   text-indent: -9999px;
+  height: 0;
+  overflow: hidden;
 `;

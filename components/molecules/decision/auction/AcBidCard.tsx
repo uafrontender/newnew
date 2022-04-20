@@ -22,7 +22,7 @@ const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
     window?.history.replaceState({
       fromPost: true,
     }, '', '');
-    router.push(`/u/${bid.bidder?.username}`);
+    router.push(`/${bid.bidder?.username}`);
   }
 
   return (
@@ -43,7 +43,10 @@ const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
     >
       <SCardWrapper>
         <SAvatar
-          onClick={() => handleRedirectToUser()}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRedirectToUser();
+          }}
         >
           <img
             src={bid.bidder?.avatarUrl!! as string}

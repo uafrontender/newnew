@@ -26,8 +26,16 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
+import acImage from '../public/images/creation/AC.webp';
+import mcImage from '../public/images/creation/MC.webp';
+import cfImage from '../public/images/creation/CF.webp';
+import acImageStatic from '../public/images/creation/AC-static.png';
+import mcImageStatic from '../public/images/creation/MC-static.png';
+import cfImageStatic from '../public/images/creation/CF-static.png';
+
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
+import TutorialCard from '../components/molecules/TutorialCard';
 
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -41,7 +49,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   // Posts
   // Top section/Curated posts
   const [topSectionCollection, setTopSectionCollection] = useState<newnewapi.Post[]>(
-    (top10posts.posts as newnewapi.Post[]) ?? []
+    (top10posts?.posts as newnewapi.Post[]) ?? []
   );
   // For you - authenticated users only
   const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
@@ -69,7 +77,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
   // Display post
-  const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>(postFromQuery ?? undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -125,7 +134,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       try {
         setCollectionACInitialLoading(true);
 
-        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({});
+        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
@@ -149,7 +160,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     async function fetchMultipleChoices() {
       try {
         setCollectionMCInitialLoading(true);
-        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({});
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
 
@@ -173,7 +186,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     async function fetchCrowdfundings() {
       try {
         setCollectionCFInitialLoading(true);
-        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({});
+        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resCF = await fetchTopCrowdfundings(cfPayload);
 
@@ -226,8 +241,6 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(creatorOnRisePayload);
 
         if (resCreatorOnRisePayload) {
-          // TODO: change logic and layout here, because we have multiple creators on the rise
-          // console.log(resCreatorOnRisePayload.data?.posts);
           setCollectionCreator(() => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]);
           setCollectionCreatorInitialLoading(false);
         } else {
@@ -267,6 +280,17 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           collection={collectionAC}
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
+          tutorialCard={!user.loggedIn ? (
+            <TutorialCard
+              image={acImage}
+              title={t('ac-block-tutorial-card.title')}
+              caption={t('ac-block-tutorial-card.caption')}
+              imageStyle={{
+                position: 'relative',
+                left: '10%'
+              }}
+            />
+          ) : undefined}
         />
       )}
       {!collectionMCError && (
@@ -276,6 +300,13 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           collection={collectionMC}
           loading={collectionMCInitialLoading}
           handlePostClicked={handleOpenPostModal}
+          tutorialCard={!user.loggedIn ? (
+            <TutorialCard
+              image={mcImage}
+              title={t('mc-block-tutorial-card.title')}
+              caption={t('mc-block-tutorial-card.caption')}
+            />
+          ) : undefined}
         />
       )}
       {!collectionCFError && (
@@ -285,6 +316,17 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           collection={collectionCF}
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
+          tutorialCard={!user.loggedIn ? (
+            <TutorialCard
+              image={cfImage}
+              title={t('cf-block-tutorial-card.title')}
+              caption={t('cf-block-tutorial-card.caption')}
+              imageStyle={{
+                position: 'relative',
+                left: '5%',
+              }}
+            />
+          ) : undefined}
         />
       )}
       {!collectionBiggestError && (
@@ -303,7 +345,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
             username: switchPostType(collectionCreator[0])[0].creator?.username!!,
           }}
           type="creator"
-          category={`u/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
+          category={`/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
           collection={collectionCreator}
           handlePostClicked={handleOpenPostModal}
         />
@@ -341,11 +383,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const top10payload = new newnewapi.EmptyRequest({});
 
   const resTop10 = await fetchCuratedPosts(top10payload);
-
-  // if (!resTop10.data?.posts || resTop10.error) {
-  if (resTop10.error) {
-    throw new Error('Request failed');
-  }
 
   if (post || !Array.isArray(post)) {
     const getPostPayload = new newnewapi.GetPostRequest({
