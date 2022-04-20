@@ -32,10 +32,9 @@ export const SearchInput: React.FC = () => {
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
@@ -236,7 +235,7 @@ export const SearchInput: React.FC = () => {
                 )}
                 <SButton
                   onClick={() => {
-                    router.push(`/search?query=${searchValue}`);
+                    router.push(`/search?query=${searchValue}&tab=decisions`);
                   }}
                   view="quaternary"
                 >
@@ -277,7 +276,7 @@ export const SearchInput: React.FC = () => {
               )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}`);
+                  router.push(`/search?query=${searchValue}&tab=decisions`);
                 }}
                 view="quaternary"
               >
