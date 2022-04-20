@@ -46,7 +46,12 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   // Loading state
   const { ref: loadingRef, inView } = useInView();
 
-  const [activeTabs, setActiveTabs] = useState<string[]>([]);
+  const [activeTabs, setActiveTabs] = useState<newnewapi.Post.Filter[]>([
+    newnewapi.Post.Filter.ALL,
+    // newnewapi.Post.Filter.AUCTIONS,
+    // newnewapi.Post.Filter.CROWDFUNDINGS,
+    // newnewapi.Post.Filter.MULTIPLE_CHOICES,
+  ]);
   const [activeFilter, setActiveFilter] = useState<string>('mostFunded');
   const [postSorting, setPostSorting] = useState<newnewapi.PostSorting>(
     newnewapi.PostSorting.MOST_FUNDED_FIRST
@@ -78,6 +83,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             pageToken,
           },
           sorting: postSorting,
+          filters: activeTabs,
         });
         const res = await searchPosts(payload);
 
@@ -130,27 +136,33 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
             setPostSorting(newnewapi.PostSorting.MOST_FUNDED_FIRST);
         }
       }
+      if (router.query.filter) {
+        const filters = (router.query.filter as string).split('-');
+        const arr: newnewapi.Post.Filter[] = [];
+        filters.forEach((filter) => {
+          switch (filter) {
+            case 'ac':
+              arr.push(newnewapi.Post.Filter.AUCTIONS);
+              break;
+            case 'mc':
+              arr.push(newnewapi.Post.Filter.MULTIPLE_CHOICES);
+              break;
+            case 'cf':
+              arr.push(newnewapi.Post.Filter.CROWDFUNDINGS);
+              break;
+            default:
+              arr.push(newnewapi.Post.Filter.ALL);
+          }
+          setActiveTabs(arr);
+        });
+      } else {
+        setActiveTabs([newnewapi.Post.Filter.ALL]);
+      }
     }
-    if (router.query.filter) {
-      const filters = (router.query.filter as string).split('-');
-      const arr: string[] = [];
-      filters.forEach((filter) => {
-        switch (filter) {
-          case 'ac':
-            arr.push('auction');
-            break;
-          case 'mc':
-            arr.push('multipleChoice');
-            break;
-          case 'cf':
-            arr.push('crowdfunding');
-            break;
-        }
-        setActiveTabs(arr);
-      });
-    }
+    if (!router.query.filter && activeTabs.length > 1)
+      setActiveTabs([newnewapi.Post.Filter.ALL]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLoad]);
+  }, [initialLoad, router]);
 
   useEffect(() => {
     if (query.length > 0) {
@@ -198,7 +210,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       getSearchResult();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postSorting]);
+  }, [postSorting, activeTabs]);
 
   useEffect(() => {
     if (inView && !loadingPosts && postsNextPageToken) {
@@ -212,13 +224,13 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       const routerArr: string[] = [];
       activeTabs.forEach((filter) => {
         switch (filter) {
-          case 'auction':
+          case newnewapi.Post.Filter.AUCTIONS:
             routerArr.push('ac');
             break;
-          case 'multipleChoice':
+          case newnewapi.Post.Filter.MULTIPLE_CHOICES:
             routerArr.push('mc');
             break;
-          case 'crowdfunding':
+          case newnewapi.Post.Filter.CROWDFUNDINGS:
             routerArr.push('cf');
             break;
         }
@@ -239,14 +251,17 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
   const tabTypes = useMemo(
     () => [
       {
+        type: newnewapi.Post.Filter.AUCTIONS,
         id: 'auction',
         title: t('decisions.postTypes.events'),
       },
       {
+        type: newnewapi.Post.Filter.MULTIPLE_CHOICES,
         id: 'multipleChoice',
         title: t('decisions.postTypes.superpolls'),
       },
       {
+        type: newnewapi.Post.Filter.CROWDFUNDINGS,
         id: 'crowdfunding',
         title: t('decisions.postTypes.goals'),
       },
@@ -272,11 +287,11 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     [t]
   );
 
-  const updateActiveTabs = useCallback((id: string) => {
+  const updateActiveTabs = useCallback((type: newnewapi.Post.Filter) => {
     setActiveTabs((curr) => {
       const arr = [...curr];
-      const index = arr.findIndex((item) => item === id);
-      index < 0 ? arr.push(id) : arr.splice(index, 1);
+      const index = arr.findIndex((item) => item === type);
+      index < 0 ? arr.push(type) : arr.splice(index, 1);
       return arr;
     });
   }, []);
@@ -288,9 +303,9 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           <STab
             size="sm"
             view="secondary"
-            active={activeTabs.findIndex((item) => item === tab.id) > -1}
+            active={activeTabs.findIndex((item) => item === tab.type) > -1}
             key={tab.id}
-            onClick={() => updateActiveTabs(tab.id)}
+            onClick={() => updateActiveTabs(tab.type)}
           >
             {tab.title}
           </STab>
@@ -367,7 +382,6 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           <SCardsSection>
             {initialLoad && (
               <List
-                categories={activeTabs}
                 loading={loadingPosts}
                 collection={resultsPosts}
                 handlePostClicked={handleOpenPostModal}

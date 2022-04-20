@@ -15,7 +15,6 @@ import switchPostType from '../../../utils/switchPostType';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 interface IList {
-  categories: string[];
   collection: any;
   loading: boolean;
   skeletonsBgColor?: string;
@@ -24,7 +23,6 @@ interface IList {
 }
 
 export const List: React.FC<IList> = ({
-  categories,
   collection,
   loading,
   skeletonsBgColor,
@@ -41,14 +39,7 @@ export const List: React.FC<IList> = ({
       handlePostClicked(item);
     };
 
-    let isPostVisible = true;
-    if (categories.length > 0) {
-      const objKey = Object.keys(item)[0];
-      if (categories.findIndex((category) => category === objKey) < 0)
-        isPostVisible = false;
-    }
-
-    return isPostVisible ? (
+    return (
       <SItemWrapper
         key={switchPostType(item)[0].postUuid}
         onClick={handleItemClick}
@@ -60,7 +51,7 @@ export const List: React.FC<IList> = ({
           height={isMobile ? '564px' : '336px'}
         />
       </SItemWrapper>
-    ) : null;
+    );
   };
 
   return (
