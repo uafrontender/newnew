@@ -288,6 +288,7 @@
         "others": "others",
         "voters": "voters",
         "voted": "voted",
+        "freeVoteBtn": "Free \nvote",
         "supportBtn": "Vote",
         "supportAgainBtn": "Vote \nagain",
         "raiseBidBtn": "Place a vote",
@@ -312,6 +313,13 @@
           "body_custom_votes": "Buy any number of votes you want to vote on {{ creator }}'s Superpoll",
           "option_caption": "Superpoll option",
           "voteBtn": "Vote"
+        },
+        "ConfirmUseFreeVoteModal": {
+          "tag": "Free vote",
+          "line_1": "Ready to use your free vote on this option?",
+          "line_2": "Once you do, you won't be able to change the vote.",
+          "line_3": "You can always buy more votes later if you want to add even more!",
+          "useFreeVoteBtn": "Use my free vote"
         }
       },
       "BidCard": {
@@ -324,8 +332,10 @@
             "vote": "vote"
           }
         },
-        "suggestionPlaceholder": "Add a suggestion ...",
-        "placeABidBtn": "Place a vote"
+        "subscribeToCreatorCaption": "Subscribe to {{ creator }} to add your own options to this Superpoll!",
+        "subscribeBtn": "Subscribe",
+        "suggestionPlaceholder": "Add your own option...",
+        "placeABidBtn": "Post my option"
       }
     },
     "FloatingActionButton": {

@@ -55,6 +55,8 @@ interface IMcOptionsTab {
   pagingToken: string | undefined | null;
   minAmount: number;
   votePrice: number;
+  canVoteForFree: boolean;
+  canSubscribe: boolean;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -71,6 +73,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   pagingToken,
   minAmount,
   votePrice,
+  canVoteForFree,
+  canSubscribe,
   handleLoadOptions,
   handleAddOrUpdateOptionFromResponse,
 }) => {
@@ -128,6 +132,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   // Handlers
+
+  // Redirect to user's page
+  const handleRedirectToPostCreator = () => {
+    window?.history.replaceState(
+      {
+        fromPost: true,
+      },
+      '',
+      ''
+    );
+    router.push(`/${post.creator?.username}/subscribe`);
+  };
+
   const handleTogglePaymentModalOpen = async () => {
     if (isAPIValidateLoading) return;
     if (!user.loggedIn) {
@@ -448,86 +465,116 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {post.isSuggestionsAllowed &&
-        !hasVotedOptionId &&
-        postStatus === 'voting' ? (
-          <SActionSection
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-          >
-            <SuggestionTextArea
-              value={newOptionText}
-              disabled={optionBeingSupported !== ''}
-              placeholder={t(
-                'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <VotesAmountTextInput
-              value={newBidAmount}
-              inputAlign="left"
-              disabled={optionBeingSupported !== ''}
-              placeholder={
-                !newBidAmount || parseInt(newBidAmount) > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              onChange={(newValue: string) => setNewBidAmount(newValue)}
-              bottomPlaceholder={
-                !newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`
-              }
-              minAmount={minAmount}
-            />
-            <SPlaceABidButton
-              view="primaryGrad"
-              size="sm"
-              disabled={
-                !newOptionText ||
-                !newBidAmount ||
-                parseInt(newBidAmount) < minAmount ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+        {
+          post.isSuggestionsAllowed
+          && !hasVotedOptionId
+          && canVoteForFree
+          && postStatus === 'voting'
+          ? (
+            <SActionSection
+              ref={(el) => {
+                actionSectionContainer.current = el!!;
               }}
-              onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
-            </SPlaceABidButton>
-            {!isMobileOrTablet && (
-              <SBottomPlaceholder>
-                {!newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`}
-              </SBottomPlaceholder>
-            )}
-          </SActionSection>
-        ) : (
-          <div
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-            style={{
-              height: 0,
-            }}
-          />
-        )}
+              <SuggestionTextArea
+                value={newOptionText}
+                disabled={optionBeingSupported !== ''}
+                placeholder={t(
+                  'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
+                )}
+                onChange={handleUpdateNewOptionText}
+              />
+              <VotesAmountTextInput
+                value={newBidAmount}
+                inputAlign="left"
+                disabled={optionBeingSupported !== ''}
+                placeholder={
+                  !newBidAmount || parseInt(newBidAmount) > 1
+                    ? t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                      )
+                    : t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                      )
+                }
+                onChange={(newValue: string) => setNewBidAmount(newValue)}
+                bottomPlaceholder={
+                  !newBidAmount || parseInt(newBidAmount) === 1
+                    ? `${1} ${t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                      )} = $ ${1 * votePrice}`
+                    : `${newBidAmount} ${t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                      )} = $ ${parseInt(newBidAmount) * votePrice}`
+                }
+                minAmount={minAmount}
+              />
+              <SPlaceABidButton
+                view="primaryGrad"
+                size="sm"
+                disabled={
+                  !newOptionText ||
+                  !newBidAmount ||
+                  parseInt(newBidAmount) < minAmount ||
+                  optionBeingSupported !== '' ||
+                  !newOptionTextValid
+                }
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => handleTogglePaymentModalOpen()}
+              >
+                {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
+              </SPlaceABidButton>
+              {!isMobileOrTablet && (
+                <SBottomPlaceholder>
+                  {!newBidAmount || parseInt(newBidAmount) === 1
+                    ? `${1} ${t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                      )} = $ ${1 * votePrice}`
+                    : `${newBidAmount} ${t(
+                        'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                      )} = $ ${parseInt(newBidAmount) * votePrice}`}
+                </SBottomPlaceholder>
+              )}
+            </SActionSection>
+          ) : (
+            post.isSuggestionsAllowed
+            && !hasVotedOptionId
+            && !canVoteForFree
+            && postStatus === 'voting'
+            && canSubscribe
+            ? (
+              <SActionSectionSubscribe
+                ref={(el) => {
+                  actionSectionContainer.current = el!!;
+                }}
+              >
+                <Text
+                  variant={3}
+                >
+                  {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', { creator: post.creator?.nickname })}
+                </Text>
+                <SSubscribeButton
+                  onClick={() => {
+                    handleRedirectToPostCreator();
+                  }}
+                >
+                  {t('McPost.OptionsTab.ActionSection.subscribeBtn')}
+                </SSubscribeButton>
+              </SActionSectionSubscribe>
+            ) : (
+              <div
+                ref={(el) => {
+                  actionSectionContainer.current = el!!;
+                }}
+                style={{
+                  height: 0,
+                }}
+              />
+            )
+          )
+        }
         <STutorialTooltipHolder>
           <TutorialTooltip
             isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
@@ -662,7 +709,12 @@ const STabContainer = styled(motion.div)`
   width: 100%;
   /* height: calc(100% - 50px); */
 
+  display: flex;
+  flex-direction: column;
+
   ${({ theme }) => theme.media.tablet} {
+    display: initial;
+
     height: calc(100% - 56px);
     height: 100%;
   }
@@ -775,6 +827,66 @@ const SActionSection = styled.div`
     textarea {
       max-width: 277px;
     }
+  }
+`;
+
+const SActionSectionSubscribe = styled.div`
+  order: -1;
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  min-height: 50px;
+  width: 100%;
+  z-index: 5;
+
+  padding-top: 24px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  div {
+    width: 100%;
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+  }
+  ${({ theme }) => theme.media.tablet} {
+    order: unset;
+
+    padding-top: 18px;
+
+    border-top: 1.5px solid
+      ${({ theme }) => theme.colorsThemed.background.outlines1};
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-wrap: nowrap;
+    justify-content: initial;
+    gap: 16px;
+
+    div {
+      width: initial;
+      text-align: left;
+    }
+    button {
+      max-width: 130px;
+    }
+  }
+`;
+
+const SSubscribeButton = styled(Button)`
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+  color: ${({ theme }) => theme.colors.dark};
+
+  :active:enabled, :focus:enabled, :hover:enabled {
+    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
   }
 `;
 

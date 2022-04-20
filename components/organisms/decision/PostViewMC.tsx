@@ -197,9 +197,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   const [totalVotes, setTotalVotes] = useState(post.totalVotes ?? 0);
 
   // Free votes
-  // const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree);
-  // test
-  const [hasFreeVote, setHasFreeVote] = useState(true);
+  const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree ?? false);
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -366,9 +364,13 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
       const res = await fetchPostByUUID(fetchPostPayload);
 
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+      console.log(res)
 
+      if (!res.data || res.error) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      setHasFreeVote(res.data.multipleChoice?.canVoteForFree ?? false);
       setTotalVotes(res.data.multipleChoice!!.totalVotes as number);
       setNumberOfOptions(res.data.multipleChoice!!.optionCount as number);
       handleUpdatePostStatus(res.data.multipleChoice!!.status!!);
@@ -648,6 +650,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
                 ? Math.floor(appConstants?.mcVotePrice / 100)
                 : 1
             }
+            canSubscribe={post.creator?.options?.isOfferingSubscription ?? false}
+            canVoteForFree={hasFreeVote}
             handleLoadOptions={fetchOptions}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
