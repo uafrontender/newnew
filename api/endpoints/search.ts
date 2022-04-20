@@ -29,7 +29,7 @@ export const searchPosts = (payload: newnewapi.SearchPostsRequest) =>
     payload
   );
 
-export const SearchCreators = (payload: newnewapi.SearchCreatorsRequest) =>
+export const searchCreators = (payload: newnewapi.SearchCreatorsRequest) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SearchCreatorsRequest,
     newnewapi.SearchCreatorsResponse
