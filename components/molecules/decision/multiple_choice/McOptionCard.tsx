@@ -12,7 +12,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+import { doFreeVote, voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
   getTopUpWalletWithPaymentPurposeUrl,
@@ -34,6 +34,7 @@ import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
 import getDisplayname from '../../../../utils/getDisplayname';
+import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -44,7 +45,9 @@ interface IMcOptionCard {
   votePrice: number;
   noAction: boolean;
   votingAllowed: boolean;
+  canVoteForFree: boolean;
   optionBeingSupported?: string;
+  handleResetFreeVote: () => void;
   handleSetSupportedBid: (id: string) => void;
   handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
   handleAddOrUpdateOptionFromResponse: (
@@ -61,7 +64,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   votePrice,
   noAction,
   votingAllowed,
+  canVoteForFree,
   optionBeingSupported,
+  handleResetFreeVote,
   handleSetSupportedBid,
   handleSetPaymentSuccesModalOpen,
   handleAddOrUpdateOptionFromResponse,
@@ -133,6 +138,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
 
   // Handlers
   const handleTogglePaymentModalOpen = () => {
@@ -312,6 +318,46 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }
   }, [option.id, postId, supportBidAmount, user.loggedIn, router.locale]);
 
+  const handleVoteForFree = useCallback(async () => {
+    setUseFreeVoteModalOpen(false);
+    setLoadingModalOpen(true);
+    try {
+      const payload = new newnewapi.VoteOnPostRequest({
+        votesCount: appConstants.mcFreeVoteCount,
+        optionId: option.id,
+        postUuid: postId,
+      });
+
+      const res = await doFreeVote(payload);
+
+      if (
+        !res.data ||
+        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.error
+      ) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      const optionFromResponse = (res.data
+        .option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByMe = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+      setLoadingModalOpen(false);
+      handleResetFreeVote();
+      handleSetPaymentSuccesModalOpen(true);
+    } catch (err) {
+     console.error(err);
+     setLoadingModalOpen(false);
+    }
+  }, [
+    postId,
+    option.id,
+    appConstants.mcFreeVoteCount,
+    handleAddOrUpdateOptionFromResponse,
+    handleSetPaymentSuccesModalOpen,
+    handleResetFreeVote,
+  ]);
+
   return (
     <>
       <motion.div
@@ -376,33 +422,54 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 view="quaternary"
                 disabled={disabled}
                 isBlue={isBlue}
-                onClick={() => handleOpenSupportForm()}
+                canVoteForFree={canVoteForFree}
+                onClick={() => {
+                  if (canVoteForFree) {
+                    setUseFreeVoteModalOpen(true);
+                  } else {
+                    handleOpenSupportForm();
+                  }
+                }}
               >
                 <div>
                   {
-                    !isBlue
-                    ? t('McPost.OptionsTab.OptionCard.raiseBidBtn')
-                    : t('McPost.OptionsTab.OptionCard.supportAgainBtn')
+                    canVoteForFree ? (
+                      t('McPost.OptionsTab.OptionCard.freeVoteBtn')
+                    ) : (
+                      isBlue
+                      ? t('McPost.OptionsTab.OptionCard.supportAgainBtn')
+                      : t('McPost.OptionsTab.OptionCard.raiseBidBtn')
+                    )
                   }
                 </div>
               </SSupportButton>
             ) : (
               <SSupportButtonDesktop
                 active={isSupportMenuOpen}
+                canVoteForFree={canVoteForFree}
                 view="secondary"
                 disabled={disabled}
                 isBlue={isBlue}
                 onClick={(e) => {
                   if (!isSupportMenuOpen) {
-                    setSelectVotesMenuTop(e.clientY)
-                    handleOpenSupportForm();
+                    if (canVoteForFree) {
+                      setUseFreeVoteModalOpen(true);
+                      e.stopPropagation();
+                    } else {
+                      setSelectVotesMenuTop(e.clientY)
+                      handleOpenSupportForm();
+                    }
                   }
                 }}
               >
                   {
-                    !option.isSupportedByMe
-                    ? t('McPost.OptionsTab.OptionCard.supportBtn')
-                    : t('McPost.OptionsTab.OptionCard.supportAgainBtn')
+                    canVoteForFree ? (
+                      t('McPost.OptionsTab.OptionCard.freeVoteBtn')
+                    ) : (
+                      !isBlue
+                      ? t('McPost.OptionsTab.OptionCard.supportBtn')
+                      : t('McPost.OptionsTab.OptionCard.supportAgainBtn')
+                    )
                   }
               </SSupportButtonDesktop>
             )
@@ -424,6 +491,12 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handleOpenPaymentModal={() => handleTogglePaymentModalOpen()}
           />
         ) : null}
+        {/* Use Free vote modal */}
+        <McConfirmUseFreeVoteModal
+          isVisible={useFreeVoteModalOpen}
+          handleMakeFreeVote={handleVoteForFree}
+          closeModal={() => setUseFreeVoteModalOpen(false)}
+        />
         {/* Payment Modal */}
         {paymentModalOpen ? (
           <PaymentModal
@@ -853,6 +926,7 @@ const SSpanBiddersRegular = styled.span`
 
 const SSupportButton = styled(Button)<{
   isBlue: boolean;
+  canVoteForFree: boolean;
 }>`
   width: 100%;
 
@@ -883,11 +957,20 @@ const SSupportButton = styled(Button)<{
       background: #FFFFFF;
     ` : null
   )}
+
+  ${({ canVoteForFree }) => (
+    canVoteForFree
+    ? css`
+      color: ${({ theme }) => theme.colors.dark};
+      background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+    ` : null
+  )}
 `;
 
 const SSupportButtonDesktop = styled(Button)<{
   isBlue: boolean;
   active: boolean;
+  canVoteForFree: boolean;
 }>`
   height: 100%;
   width: 60px;
@@ -930,6 +1013,14 @@ const SSupportButtonDesktop = styled(Button)<{
     ? css`
       color: ${({ theme }) => theme.colors.dark};
       background: #FFFFFF;
+    ` : null
+  )}
+
+  ${({ canVoteForFree }) => (
+    canVoteForFree
+    ? css`
+      color: ${({ theme }) => theme.colors.dark};
+      background: ${({ theme }) => theme.colorsThemed.accent.yellow};
     ` : null
   )}
 `;

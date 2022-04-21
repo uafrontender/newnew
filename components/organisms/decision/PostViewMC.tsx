@@ -189,6 +189,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
     };
   }, []);
 
+  // Post loading state
+  const [postLoading, setPostLoading] = useState(false);
+
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
@@ -198,6 +201,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   // Free votes
   const [hasFreeVote, setHasFreeVote] = useState(post.canVoteForFree ?? false);
+  const handleResetFreeVote = () => setHasFreeVote(false);
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
@@ -357,6 +361,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   );
 
   const fetchPostLatestData = useCallback(async () => {
+    setPostLoading(true);
     try {
       const fetchPostPayload = new newnewapi.GetPostRequest({
         postUuid: post.postUuid,
@@ -374,8 +379,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       setTotalVotes(res.data.multipleChoice!!.totalVotes as number);
       setNumberOfOptions(res.data.multipleChoice!!.optionCount as number);
       handleUpdatePostStatus(res.data.multipleChoice!!.status!!);
+      setPostLoading(false);
     } catch (err) {
       console.error(err);
+      setPostLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -632,6 +639,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         {currentTab === 'options' ? (
           <McOptionsTab
             post={post}
+            postLoading={postLoading}
             postStatus={postStatus}
             postCreator={
               (post.creator?.nickname as string) ?? post.creator?.username
@@ -653,6 +661,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
             canSubscribe={post.creator?.options?.isOfferingSubscription ?? false}
             canVoteForFree={hasFreeVote}
             handleLoadOptions={fetchOptions}
+            handleResetFreeVote={handleResetFreeVote}
             handleAddOrUpdateOptionFromResponse={
               handleAddOrUpdateOptionFromResponse
             }
