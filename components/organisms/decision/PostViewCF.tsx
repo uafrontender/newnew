@@ -869,7 +869,7 @@ const STutorialTooltipHolder = styled.div`
   left: 20px;
   bottom: 70%;
   text-align: left;
-  z-index: 1;
+  z-index: 10;
   div {
     width: 190px;
   }
