@@ -43,6 +43,10 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../atoms/decision/TutorialTooltip';
+import { setTutorialStatus } from '../../../api/endpoints/user';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -116,7 +120,29 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   };
 
+  const goToNextStep = () => {
+    if (user.loggedIn) {
+      const payload = new newnewapi.SetTutorialStatusRequest({
+        cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+      });
+      setTutorialStatus(payload);
+    }
+    dispatch(
+      setUserTutorialsProgress({
+        remainingCfSteps: [
+          ...user.userTutorialsProgress.remainingCfSteps!!,
+        ].slice(1),
+      })
+    );
+  };
+
   useEffect(() => {
+    if (
+      user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+      newnewapi.CfTutorialStep.CF_GO
+    ) {
+      goToNextStep();
+    }
     const handleHashChange = () => {
       const { hash } = window.location;
       if (!hash) {
@@ -134,7 +160,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     return () => {
       window.removeEventListener('hashchange', handleHashChange, false);
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.userTutorialsProgress]);
 
   // Vote from sessionId
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -359,7 +386,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     switch (postStatus) {
       case 'voting': {
         return (
-          <>
+          <SBackersHolder>
             <CfBackersStatsSection
               targetBackerCount={post.targetBackerCount}
               currentNumBackers={currentBackers}
@@ -375,7 +402,19 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
                 }
               />
             ) : null}
-          </>
+            <STutorialTooltipHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                  newnewapi.CfTutorialStep.CF_GOAL_PROGRESS
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.cf.peopleBids.title')}
+                text={t('tutorials.cf.peopleBids.text')}
+                dotPosition={DotPositionEnum.BottomRight}
+              />
+            </STutorialTooltipHolder>
+          </SBackersHolder>
         );
       }
       case 'waiting_for_response': {
@@ -436,6 +475,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     }
 
     return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     t,
     post,
@@ -446,6 +486,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     myPledgeAmount,
     handleFollowDecision,
     handleAddPledgeFromResponse,
+    user,
   ]);
 
   // Increment channel subs after mounting
@@ -611,14 +652,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     }
   }, [pledges, user.userData?.userUuid]);
 
-  const goToNextStep = () => {
-    dispatch(
-      setUserTutorialsProgress({
-        goalStep: 1,
-      })
-    );
-  };
-
   return (
     <SWrapper>
       <SExpiresSection>
@@ -716,17 +749,31 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       ) : null}
       {/* Mobile floating button */}
       {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
-        <SActionButton
-          view="primaryGrad"
-          onClick={() => setChoosePledgeModalOpen(true)}
-        >
-          {t('CfPost.FloatingActionButton.choosePledgeBtn')}
-        </SActionButton>
+        <>
+          <SActionButton
+            view="primaryGrad"
+            onClick={() => setChoosePledgeModalOpen(true)}
+          >
+            {t('CfPost.FloatingActionButton.choosePledgeBtn')}
+          </SActionButton>
+          <STutorialTooltipHolderMobile>
+            <TutorialTooltip
+              isTooltipVisible={
+                user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                newnewapi.CfTutorialStep.CF_BACK_GOAL
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.cf.createYourBid.title')}
+              text={t('tutorials.cf.createYourBid.text')}
+              dotPosition={DotPositionEnum.BottomRight}
+            />
+          </STutorialTooltipHolderMobile>
+        </>
       ) : null}
       <HeroPopup
         isPopupVisible={
-          user.userTutorialsProgress &&
-          user.userTutorialsProgress.goalStep === 0
+          user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+          newnewapi.CfTutorialStep.CF_HERO
         }
         postType="CF"
         closeModal={goToNextStep}
@@ -815,4 +862,35 @@ const SActivitesContainer = styled.div`
 
   height: 100%;
   width: 100%;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: 20px;
+  bottom: 70%;
+  text-align: left;
+  z-index: 10;
+  div {
+    width: 190px;
+  }
+
+  ${({ theme }) => theme.media.tablet} {
+    left: 0;
+    bottom: 90%;
+  }
+`;
+
+const SBackersHolder = styled.div`
+  position: relative;
+`;
+
+const STutorialTooltipHolderMobile = styled.div`
+  position: fixed;
+  left: 20%;
+  bottom: 82px;
+  text-align: left;
+  z-index: 999;
+  div {
+    width: 190px;
+  }
 `;

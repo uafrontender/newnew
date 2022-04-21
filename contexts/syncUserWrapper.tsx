@@ -1,9 +1,12 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
 import React, { useEffect } from 'react';
-import { getMe } from '../api/endpoints/user';
 import {
-  IUserTutorialsProgress,
+  getMe,
+  getTutorialsStatus,
+  setTutorialStatus,
+} from '../api/endpoints/user';
+import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
   setUserTutorialsProgress,
@@ -19,7 +22,6 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
 
   useEffect(() => {
     async function syncUserData() {
-      // console.log('Sync user data');
       try {
         const payload = new newnewapi.EmptyRequest({});
 
@@ -70,18 +72,100 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
       }
     }
 
-    const localUserTutorialsProgress = loadStateLS('userTutorialsProgress');
-    if (!localUserTutorialsProgress) {
-      saveStateLS('userTutorialsProgress', user.userTutorialsProgress);
+    async function syncUserTutorialsProgress(
+      localUserTutorialsProgress: newnewapi.IGetTutorialsStatusResponse
+    ) {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+        const { data } = await getTutorialsStatus(payload);
+        if (data) {
+          if (
+            !_.isEqual(data, localUserTutorialsProgress) &&
+            localUserTutorialsProgress
+          ) {
+            const syncedObj: newnewapi.IGetTutorialsStatusResponse = {
+              ...data,
+            };
+
+            if (
+              localUserTutorialsProgress.remainingAcSteps &&
+              syncedObj.remainingAcSteps!!.length >
+                localUserTutorialsProgress.remainingAcSteps.length
+            ) {
+              syncedObj.remainingAcSteps =
+                localUserTutorialsProgress.remainingAcSteps;
+              const payloadSetData = new newnewapi.SetTutorialStatusRequest({
+                acCurrentStep: localUserTutorialsProgress.remainingAcSteps!![0],
+              });
+              await setTutorialStatus(payloadSetData);
+            }
+
+            if (
+              localUserTutorialsProgress.remainingMcSteps &&
+              syncedObj.remainingMcSteps!!.length >
+                localUserTutorialsProgress.remainingMcSteps.length
+            ) {
+              syncedObj.remainingMcSteps =
+                localUserTutorialsProgress.remainingMcSteps;
+              const payloadSetData = new newnewapi.SetTutorialStatusRequest({
+                mcCurrentStep: localUserTutorialsProgress.remainingMcSteps!![0],
+              });
+              await setTutorialStatus(payloadSetData);
+            }
+
+            if (
+              localUserTutorialsProgress.remainingCfSteps &&
+              syncedObj.remainingCfSteps!!.length >
+                localUserTutorialsProgress.remainingCfSteps.length
+            ) {
+              syncedObj.remainingCfSteps =
+                localUserTutorialsProgress.remainingCfSteps;
+              const payloadSetData = new newnewapi.SetTutorialStatusRequest({
+                cfCurrentStep: localUserTutorialsProgress.remainingCfSteps!![0],
+              });
+              await setTutorialStatus(payloadSetData);
+            }
+            dispatch(setUserTutorialsProgress(syncedObj));
+            saveStateLS('userTutorialsProgress', syncedObj);
+          } else {
+            dispatch(setUserTutorialsProgress(data));
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(
+            logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+          );
+        }
+      }
     }
-    if (!_.isEqual(user.userTutorialsProgress, localUserTutorialsProgress)) {
-      dispatch(setUserTutorialsProgress(localUserTutorialsProgress as IUserTutorialsProgress));
-    }
+
+    const localUserTutorialsProgress = loadStateLS(
+      'userTutorialsProgress'
+    ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
       syncUserData();
+      syncUserTutorialsProgress(localUserTutorialsProgress);
+    } else {
+      if (!localUserTutorialsProgress) {
+        saveStateLS('userTutorialsProgress', user.userTutorialsProgress);
+      }
+      if (!_.isEqual(user.userTutorialsProgress, localUserTutorialsProgress)) {
+        dispatch(
+          setUserTutorialsProgress(
+            localUserTutorialsProgress as newnewapi.IGetTutorialsStatusResponse
+          )
+        );
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user.loggedIn]);
 
   return <>{children}</>;
 };

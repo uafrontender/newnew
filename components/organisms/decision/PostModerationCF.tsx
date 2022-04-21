@@ -37,6 +37,7 @@ import isBrowser from '../../../utils/isBrowser';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+import { setTutorialStatus } from '../../../api/endpoints/user';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -356,9 +357,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   }, [socketConnection, post, setPledges, sortPleges]);
 
   const goToNextStep = () => {
+    if (user.loggedIn) {
+      const payload = new newnewapi.SetTutorialStatusRequest({
+        cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+      });
+      setTutorialStatus(payload);
+    }
     dispatch(
       setUserTutorialsProgress({
-        goalStep: 1,
+        remainingCfSteps: [
+          ...user.userTutorialsProgress.remainingCfSteps!!,
+        ].slice(1),
       })
     );
   };
@@ -449,8 +458,8 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       </SActivitesContainer>
       <HeroPopup
         isPopupVisible={
-          user.userTutorialsProgress &&
-          user.userTutorialsProgress.goalStep === 0
+          user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+          newnewapi.CfTutorialStep.CF_HERO
         }
         postType="CF"
         closeModal={goToNextStep}

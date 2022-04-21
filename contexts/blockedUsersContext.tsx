@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
-import { GetMyBlockedUsers } from '../api/endpoints/user';
+import { getMyBlockedUsers } from '../api/endpoints/user';
 
 const BlockedUsersContext = createContext({
   usersBlockedMe: [] as string[],
@@ -50,8 +50,9 @@ export const BlockedUsersProvider: React.FC = ({ children }) => {
       try {
         setUsersBlockedLoading(true);
         const payload = new newnewapi.EmptyRequest();
-        const res = await GetMyBlockedUsers(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        const res = await getMyBlockedUsers(payload);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         setUsersIBlocked(res.data.userUuidsIBlocked);
         setUsersBlockedMe(res.data.userUuidsBlockedMe);
       } catch (err) {
@@ -62,11 +63,18 @@ export const BlockedUsersProvider: React.FC = ({ children }) => {
     fetchBlockedUsers();
   }, [user.loggedIn]);
 
-  return <BlockedUsersContext.Provider value={contextValue}>{children}</BlockedUsersContext.Provider>;
+  return (
+    <BlockedUsersContext.Provider value={contextValue}>
+      {children}
+    </BlockedUsersContext.Provider>
+  );
 };
 
 export function useGetBlockedUsers() {
   const context = useContext(BlockedUsersContext);
-  if (!context) throw new Error('useGetBlockedUsers must be used inside a `BlockedUsersProvider`');
+  if (!context)
+    throw new Error(
+      'useGetBlockedUsers must be used inside a `BlockedUsersProvider`'
+    );
   return context;
 }

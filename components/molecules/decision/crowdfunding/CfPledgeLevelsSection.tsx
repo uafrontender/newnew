@@ -5,7 +5,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
 import {
   createPaymentSession,
@@ -25,6 +25,11 @@ import InlineSvg from '../../../atoms/InlineSVG';
 
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { setTutorialStatus } from '../../../../api/endpoints/user';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
@@ -45,6 +50,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     const router = useRouter();
     const theme = useTheme();
     const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.user);
 
     const { appConstants } = useGetAppConstants();
@@ -243,6 +249,22 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
       if (!paymentModalOpen) setPledgeAmount(undefined);
     }, [paymentModalOpen]);
 
+    const goToNextStep = () => {
+      if (user.loggedIn) {
+        const payload = new newnewapi.SetTutorialStatusRequest({
+          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+        });
+        setTutorialStatus(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingCfSteps: [
+            ...user.userTutorialsProgress.remainingCfSteps!!,
+          ].slice(1),
+        })
+      );
+    };
+
     return (
       <>
         <SSectionContainer
@@ -253,7 +275,9 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
         >
           <SInfoSubsection>
             <STitle variant={2} weight={600}>
-              {t('CfPost.BackersTab.info.title', { creator: post.creator?.nickname })}
+              {t('CfPost.BackersTab.info.title', {
+                creator: post.creator?.nickname,
+              })}
             </STitle>
           </SInfoSubsection>
           {isFormOpen ? (
@@ -271,7 +295,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               <Button
                 size="sm"
                 view="primaryGrad"
-                disabled={customPledgeAmount === '' || parseInt(customPledgeAmount) < Math.round(appConstants.minCfPledge / 100)}
+                disabled={
+                  customPledgeAmount === '' ||
+                  parseInt(customPledgeAmount) <
+                    Math.round(appConstants.minCfPledge / 100)
+                }
                 onClick={() => handleCustomPledgePaymentModal()}
               >
                 {t('CfPost.BackersTab.CustomPledge.pledgeBtn')}
@@ -329,6 +357,18 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 positionRight="0px"
                 active={showRightGradient}
               />
+              <STutorialTooltipHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                    newnewapi.CfTutorialStep.CF_BACK_GOAL
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.cf.createYourBid.title')}
+                  text={t('tutorials.cf.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipHolder>
             </SButtonsContainer>
           )}
         </SSectionContainer>
@@ -472,4 +512,15 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: -180px;
+  bottom: 70%;
+  text-align: left;
+  z-index: 1;
+  div {
+    width: 190px;
+  }
 `;

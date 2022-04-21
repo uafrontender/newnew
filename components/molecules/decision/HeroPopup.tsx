@@ -15,8 +15,8 @@ import Button from '../../atoms/Button';
 
 const IMAGES: any = {
   AC: acImage,
-  CF: mcImage,
-  MC: cfImage,
+  CF: cfImage,
+  MC: mcImage,
 };
 
 interface IHeroPopup {
