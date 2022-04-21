@@ -48,6 +48,7 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { setTutorialStatus } from '../../../../api/endpoints/user';
 
 interface IAcOptionsTab {
   postId: string;
@@ -125,24 +126,19 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   const goToNextStep = () => {
-    switch (user.userTutorialsProgress.eventsStep) {
-      case 2:
-        dispatch(
-          setUserTutorialsProgress({
-            eventsStep: 3,
-          })
-        );
-        break;
-      case 3:
-        dispatch(
-          setUserTutorialsProgress({
-            eventsStep: 4,
-          })
-        );
-        break;
-      default:
-        return null;
+    if (user.loggedIn) {
+      const payload = new newnewapi.SetTutorialStatusRequest({
+        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+      });
+      setTutorialStatus(payload);
     }
+    dispatch(
+      setUserTutorialsProgress({
+        remainingAcSteps: [
+          ...user.userTutorialsProgress.remainingAcSteps!!,
+        ].slice(1),
+      })
+    );
   };
 
   // Handlers
@@ -528,20 +524,26 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             >
               {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
             </Button>
-            <STutorialTooltipHolder>
+            <STutorialTooltipTextAreaHolder>
               <TutorialTooltip
-                isTooltipVisible={user.userTutorialsProgress.eventsStep === 3}
+                isTooltipVisible={
+                  user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                }
                 closeTooltip={goToNextStep}
                 title={t('tutorials.ac.createYourBid.title')}
                 text={t('tutorials.ac.createYourBid.text')}
-                dotPosition={DotPositionEnum.BottomLeft}
+                dotPosition={DotPositionEnum.BottomRight}
               />
-            </STutorialTooltipHolder>
+            </STutorialTooltipTextAreaHolder>
           </SActionSection>
         )}
         <STutorialTooltipHolder>
           <TutorialTooltip
-            isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
+            isTooltipVisible={
+              user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+              newnewapi.AcTutorialStep.AC_ALL_BIDS
+            }
             closeTooltip={goToNextStep}
             title={t('tutorials.ac.peopleBids.title')}
             text={t('tutorials.ac.peopleBids.text')}
@@ -631,21 +633,24 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       {/* Mobile floating button */}
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <>
-        <SActionButton
-          view="primaryGrad"
-          onClick={() => setSuggestNewMobileOpen(true)}
-        >
-          {t('AcPost.FloatingActionButton.suggestNewBtn')}
-        </SActionButton>
-        <STutorialTooltipHolderMobile>
-          <TutorialTooltip
-            isTooltipVisible={user.userTutorialsProgress.eventsStep === 3}
-            closeTooltip={goToNextStep}
-            title={t('tutorials.ac.createYourBid.title')}
-            text={t('tutorials.ac.createYourBid.text')}
-            dotPosition={DotPositionEnum.BottomLeft}
-          />
-        </STutorialTooltipHolderMobile>
+          <SActionButton
+            view="primaryGrad"
+            onClick={() => setSuggestNewMobileOpen(true)}
+          >
+            {t('AcPost.FloatingActionButton.suggestNewBtn')}
+          </SActionButton>
+          <STutorialTooltipHolderMobile>
+            <TutorialTooltip
+              isTooltipVisible={
+                user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+                newnewapi.AcTutorialStep.AC_TEXT_FIELD
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.ac.createYourBid.title')}
+              text={t('tutorials.ac.createYourBid.text')}
+              dotPosition={DotPositionEnum.BottomRight}
+            />
+          </STutorialTooltipHolderMobile>
         </>
       ) : null}
     </>
@@ -876,6 +881,17 @@ const STutorialTooltipHolderMobile = styled.div`
   position: fixed;
   left: 20%;
   bottom: 82px;
+  text-align: left;
+  z-index: 999;
+  div {
+    width: 190px;
+  }
+`;
+
+const STutorialTooltipTextAreaHolder = styled.div`
+  position: absolute;
+  left: -140px;
+  bottom: 94%;
   text-align: left;
   div {
     width: 190px;

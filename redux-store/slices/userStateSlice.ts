@@ -12,12 +12,6 @@ export type TUserData = Omit<
   'toJSON' | '_nickname' | '_email' | '_dateOfBirth'
 >;
 
-export interface IUserTutorialsProgress {
-  eventsStep: number;
-  superPollStep: number;
-  goalStep: number;
-}
-
 export interface IUserStateInterface {
   loggedIn: boolean;
   signupEmailInput: string;
@@ -25,7 +19,7 @@ export interface IUserStateInterface {
   notificationsCount: number;
   directMessagesCount: number;
   userData?: TUserData;
-  userTutorialsProgress: IUserTutorialsProgress;
+  userTutorialsProgress: newnewapi.IGetTutorialsStatusResponse;
 }
 
 const defaultUIState: IUserStateInterface = {
@@ -36,11 +30,32 @@ const defaultUIState: IUserStateInterface = {
   directMessagesCount: 12,
   userTutorialsProgress: {
     // AC
-    eventsStep: 0,
+    remainingAcSteps: [
+      newnewapi.AcTutorialStep.AC_HERO,
+      newnewapi.AcTutorialStep.AC_TIMER,
+      newnewapi.AcTutorialStep.AC_ALL_BIDS,
+      newnewapi.AcTutorialStep.AC_BOOST_BID,
+      newnewapi.AcTutorialStep.AC_TEXT_FIELD,
+      newnewapi.AcTutorialStep.AC_TUTORIAL_COMPLETED,
+    ],
     // MC
-    superPollStep: 0,
+    remainingMcSteps: [
+      newnewapi.McTutorialStep.MC_HERO,
+      newnewapi.McTutorialStep.MC_TIMER,
+      newnewapi.McTutorialStep.MC_ALL_OPTIONS,
+      newnewapi.McTutorialStep.MC_VOTE,
+      newnewapi.McTutorialStep.MC_TEXT_FIELD,
+      newnewapi.McTutorialStep.MC_TUTORIAL_COMPLETED,
+    ],
     // CF
-    goalStep: 0,
+    remainingCfSteps: [
+      newnewapi.CfTutorialStep.CF_HERO,
+      newnewapi.CfTutorialStep.CF_TIMER,
+      newnewapi.CfTutorialStep.CF_GO,
+      newnewapi.CfTutorialStep.CF_GOAL_PROGRESS,
+      newnewapi.CfTutorialStep.CF_BACK_GOAL,
+      newnewapi.CfTutorialStep.CF_TUTORIAL_COMPLETED,
+    ],
   },
 };
 
@@ -59,7 +74,7 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     },
     setUserTutorialsProgressInner(
       state,
-      { payload }: PayloadAction<IUserTutorialsProgress>
+      { payload }: PayloadAction<newnewapi.IGetTutorialsStatusResponse>
     ) {
       state.userTutorialsProgress = {
         ...state.userTutorialsProgress,
@@ -104,7 +119,8 @@ export const logoutUserClearCookiesAndRedirect =
   };
 
 export const setUserTutorialsProgress =
-  (payload: any): AppThunk => (dispatch) => {
+  (payload: any): AppThunk =>
+  (dispatch) => {
     dispatch(setUserTutorialsProgressInner(payload));
 
     const localUserTutorialsProgress = loadStateLS(
