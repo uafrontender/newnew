@@ -48,6 +48,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+import { setTutorialStatus } from '../../../api/endpoints/user';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -598,9 +599,17 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   ]);
 
   const goToNextStep = () => {
+    if (user.loggedIn) {
+      const payload = new newnewapi.SetTutorialStatusRequest({
+        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+      });
+      setTutorialStatus(payload);
+    }
     dispatch(
       setUserTutorialsProgress({
-        eventsStep: 1,
+        remainingAcSteps: [
+          ...user.userTutorialsProgress.remainingAcSteps!!,
+        ].slice(1),
       })
     );
   };
@@ -739,8 +748,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
       </PaymentSuccessModal>
       <HeroPopup
         isPopupVisible={
-          user.userTutorialsProgress &&
-          user.userTutorialsProgress.eventsStep === 0
+          user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+          newnewapi.AcTutorialStep.AC_HERO
         }
         postType="AC"
         closeModal={goToNextStep}
