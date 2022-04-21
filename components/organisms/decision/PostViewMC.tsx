@@ -49,6 +49,7 @@ import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+import { setTutorialStatus } from '../../../api/endpoints/user';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -571,9 +572,17 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   ]);
 
   const goToNextStep = () => {
+    if (user.loggedIn) {
+      const payload = new newnewapi.SetTutorialStatusRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+      });
+      setTutorialStatus(payload);
+    }
     dispatch(
       setUserTutorialsProgress({
-        superPollStep: 1,
+        remainingMcSteps: [
+          ...user.userTutorialsProgress.remainingMcSteps!!,
+        ].slice(1),
       })
     );
   };
@@ -697,8 +706,8 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       </PaymentSuccessModal>
       <HeroPopup
         isPopupVisible={
-          user.userTutorialsProgress &&
-          user.userTutorialsProgress.superPollStep === 0
+          user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+          newnewapi.McTutorialStep.MC_HERO
         }
         postType="MC"
         closeModal={goToNextStep}

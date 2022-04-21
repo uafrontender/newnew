@@ -1,9 +1,11 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-unused-expressions */
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { setTutorialStatus } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import isBrowser from '../../../utils/isBrowser';
@@ -27,7 +29,13 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   const { user } = useAppSelector((state) => state);
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
@@ -58,14 +66,27 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   useEffect(() => {
     switch (postType) {
       case 'ac':
-        user.userTutorialsProgress.eventsStep === 1 &&
+        if (
+          user.userTutorialsProgress.remainingAcSteps &&
+          user.userTutorialsProgress.remainingAcSteps[0] ===
+            newnewapi.AcTutorialStep.AC_TIMER
+        )
           setIsTooltipVisible(true);
         break;
       case 'cf':
-        user.userTutorialsProgress.goalStep === 1 && setIsTooltipVisible(true);
+        if (
+          user.userTutorialsProgress.remainingCfSteps &&
+          user.userTutorialsProgress.remainingCfSteps[0] ===
+            newnewapi.CfTutorialStep.CF_TIMER
+        )
+          setIsTooltipVisible(true);
         break;
       case 'mc':
-        user.userTutorialsProgress.superPollStep === 1 &&
+        if (
+          user.userTutorialsProgress.remainingMcSteps &&
+          user.userTutorialsProgress.remainingMcSteps[0] ===
+            newnewapi.McTutorialStep.MC_TIMER
+        )
           setIsTooltipVisible(true);
         break;
       default:
@@ -75,28 +96,51 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 
   const goToNextStep = () => {
     setIsTooltipVisible(false);
+    let payload;
     switch (postType) {
       case 'ac':
+        if (user.loggedIn) {
+          payload = new newnewapi.SetTutorialStatusRequest({
+            acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+          });
+        }
         dispatch(
           setUserTutorialsProgress({
-            eventsStep: 2,
+            remainingAcSteps: [
+              ...user.userTutorialsProgress.remainingAcSteps!!,
+            ].slice(1),
           })
         );
         break;
       case 'cf':
+        if (user.loggedIn) {
+          payload = new newnewapi.SetTutorialStatusRequest({
+            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+          });
+        }
         dispatch(
           setUserTutorialsProgress({
-            goalStep: 2,
+            remainingCfSteps: [
+              ...user.userTutorialsProgress.remainingCfSteps!!,
+            ].slice(1),
           })
         );
         break;
       default:
+        if (user.loggedIn) {
+          payload = new newnewapi.SetTutorialStatusRequest({
+            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+          });
+        }
         dispatch(
           setUserTutorialsProgress({
-            superPollStep: 2,
+            remainingMcSteps: [
+              ...user.userTutorialsProgress.remainingMcSteps!!,
+            ].slice(1),
           })
         );
     }
+    if (user.loggedIn && payload) setTutorialStatus(payload);
   };
 
   useEffect(() => {
@@ -118,7 +162,11 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
                     closeTooltip={goToNextStep}
                     title={t('tutorials.timer.title')}
                     text={t('tutorials.timer.text')}
-                    dotPosition={isMobileOrTablet ? DotPositionEnum.TopLeft : DotPositionEnum.TopRight}
+                    dotPosition={
+                      isMobileOrTablet
+                        ? DotPositionEnum.TopLeft
+                        : DotPositionEnum.TopRight
+                    }
                   />
                 </STutorialTooltipHolder>
               </STimerItem>
@@ -135,7 +183,11 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
                   closeTooltip={goToNextStep}
                   title={t('tutorials.timer.title')}
                   text={t('tutorials.timer.text')}
-                  dotPosition={isMobileOrTablet ? DotPositionEnum.TopLeft : DotPositionEnum.TopRight}
+                  dotPosition={
+                    isMobileOrTablet
+                      ? DotPositionEnum.TopLeft
+                      : DotPositionEnum.TopRight
+                  }
                 />
               </STutorialTooltipHolder>
             )}
@@ -169,7 +221,11 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               closeTooltip={goToNextStep}
               title={t('tutorials.timer.title')}
               text={t('tutorials.timer.text')}
-              dotPosition={isMobileOrTablet ? DotPositionEnum.TopLeft : DotPositionEnum.TopRight}
+              dotPosition={
+                isMobileOrTablet
+                  ? DotPositionEnum.TopLeft
+                  : DotPositionEnum.TopRight
+              }
             />
           </STutorialTooltipHolder>
         </STimerItemEnded>
