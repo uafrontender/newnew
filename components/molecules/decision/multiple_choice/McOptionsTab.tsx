@@ -46,6 +46,7 @@ import TutorialTooltip, {
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
+import { setTutorialStatus } from '../../../../api/endpoints/user';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -437,24 +438,19 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   }, [hasVotedOptionId, postLoading, post.isSuggestionsAllowed, postStatus, isMobileOrTablet]);
 
   const goToNextStep = () => {
-    switch (user.userTutorialsProgress.superPollStep) {
-      case 2:
-        dispatch(
-          setUserTutorialsProgress({
-            superPollStep: 3,
-          })
-        );
-        break;
-      case 3:
-        dispatch(
-          setUserTutorialsProgress({
-            superPollStep: 4,
-          })
-        );
-        break;
-      default:
-        return null;
+    if (user.loggedIn) {
+      const payload = new newnewapi.SetTutorialStatusRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+      });
+      setTutorialStatus(payload);
     }
+    dispatch(
+      setUserTutorialsProgress({
+        remainingMcSteps: [
+          ...user.userTutorialsProgress.remainingMcSteps!!,
+        ].slice(1),
+      })
+    );
   };
 
   return (
@@ -558,6 +554,18 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               >
                 {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
               </SAddFreeVoteButton>
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                    newnewapi.McTutorialStep.MC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.mc.createYourBid.title')}
+                  text={t('tutorials.mc.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
             </SActionSection>
           ) : (
             post.isSuggestionsAllowed
@@ -599,7 +607,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         }
         <STutorialTooltipHolder>
           <TutorialTooltip
-            isTooltipVisible={user.userTutorialsProgress.eventsStep === 2}
+            isTooltipVisible={
+              user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+              newnewapi.McTutorialStep.MC_ALL_OPTIONS
+            }
             closeTooltip={goToNextStep}
             title={t('tutorials.mc.peopleBids.title')}
             text={t('tutorials.mc.peopleBids.text')}
@@ -689,12 +700,26 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
       postStatus === 'voting' ? (
-        <SActionButton
-          view="primaryGrad"
-          onClick={() => setSuggestNewMobileOpen(true)}
-        >
-          {t('McPost.FloatingActionButton.suggestNewBtn')}
-        </SActionButton>
+        <>
+          <SActionButton
+            view="primaryGrad"
+            onClick={() => setSuggestNewMobileOpen(true)}
+          >
+            {t('McPost.FloatingActionButton.suggestNewBtn')}
+          </SActionButton>
+          <STutorialTooltipHolderMobile>
+            <TutorialTooltip
+              isTooltipVisible={
+                user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                newnewapi.McTutorialStep.MC_TEXT_FIELD
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.mc.createYourBid.title')}
+              text={t('tutorials.mc.createYourBid.text')}
+              dotPosition={DotPositionEnum.BottomRight}
+            />
+          </STutorialTooltipHolderMobile>
+        </>
       ) : null}
     </>
   );
@@ -806,6 +831,7 @@ const SAddFreeVoteButton = styled(Button)`
 
 const SActionSection = styled.div`
   display: none;
+  position: relative;
 
   ${({ theme }) => theme.media.tablet} {
     display: flex;
@@ -931,6 +957,27 @@ const STutorialTooltipHolder = styled.div`
   position: absolute;
   left: 40%;
   bottom: 90%;
+  text-align: left;
+  div {
+    width: 190px;
+  }
+`;
+
+const STutorialTooltipHolderMobile = styled.div`
+  position: fixed;
+  left: 20%;
+  bottom: 82px;
+  text-align: left;
+  z-index: 999;
+  div {
+    width: 190px;
+  }
+`;
+
+const STutorialTooltipTextAreaHolder = styled.div`
+  position: absolute;
+  left: -140px;
+  bottom: 94%;
   text-align: left;
   div {
     width: 190px;

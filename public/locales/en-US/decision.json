@@ -537,49 +537,45 @@
   },
   "tutorials": {
     "timer": {
-      "title": "Decision timer",
-      "text": "When the time reach 00:00 the decision is closed."
+      "title": "Countdown",
+      "text": "When time’s up, the creator picks their favorite bid and posts a video doing the bid."
     },
     "ac": {
       "peopleBids": {
-        "title": "People bids",
-        "text": "Here is where other people bids appear."
+        "title": "All bids",
+        "text": "These are all the bids submitted for the creator to choose from."
       },
       "supportPeopleBids": {
-        "title": "Support people bids",
-        "text": "Tapping here you can support other’s people bids."
+        "title": "Boost a bid",
+        "text": "Boost exisiting bids that you want to see happen IRL."
       },
       "createYourBid": {
-        "title": "Create your bid",
-        "text": "Add a suggestion, a price and create your own bid."
+        "title": "Make your own!",
+        "text": "Come up with your own bid and set your price."
       }
     },
     "mc": {
       "peopleBids": {
-        "title": "People bids",
-        "text": "Here is where other people bids appear."
+        "title": "All options",
+        "text": "These are all the options you can vote on."
       },
       "supportPeopleBids": {
-        "title": "Support people bids",
-        "text": "Tapping here you can support other’s people bids."
+        "title": "Voting",
+        "text": "Vote on your favorite option. The option with the most amount of votes wins!"
       },
       "createYourBid": {
-        "title": "Create your bid",
-        "text": "Add a suggestion, a price and create your own bid."
+        "title": "Make your own!",
+        "text": "Come up with your own bid and set your price."
       }
     },
     "cf": {
       "peopleBids": {
-        "title": "People bids",
-        "text": "Here is where other people bids appear."
-      },
-      "supportPeopleBids": {
-        "title": "Support people bids",
-        "text": "Tapping here you can support other’s people bids."
+        "title": "Goal progress",
+        "text": "See how close the Creator is to reaching their Goal. "
       },
       "createYourBid": {
-        "title": "Create your bid",
-        "text": "Add a suggestion, a price and create your own bid."
+        "title": "Back the Goal",
+        "text": "Contribute to help the creator reach their Goal!"
       }
     }
   }
