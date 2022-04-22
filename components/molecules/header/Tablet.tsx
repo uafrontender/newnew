@@ -35,7 +35,7 @@ export const Tablet: React.FC<ITablet> = () => {
 
   const handleCreateClick = () => {
     if (!user.userData?.options?.isCreator) {
-      router.push('/creator-onboarding-stage-1');
+      router.push('/creator-onboarding');
     } else {
       router.push('/creation');
     }

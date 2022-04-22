@@ -4,7 +4,6 @@ import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-import userIcon from '../../../public/images/svg/icons/filled/UnregisteredUser.svg';
 import InlineSvg from '../../atoms/InlineSVG';
 import Button from '../../atoms/Button';
 
@@ -15,75 +14,68 @@ interface IOnboardingProfileImageInput {
   handleChangeImageInEdit: (newValue: any) => void;
 }
 
-const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileImageInput> = ({
-  imageInEditUrl,
-  handleChangeImageInEdit,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('creator-onboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileImageInput> =
+  ({ imageInEditUrl, handleChangeImageInEdit }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('creator-onboarding');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+    ].includes(resizeMode);
 
-  const imageInputRef = useRef<HTMLInputElement>();
+    const imageInputRef = useRef<HTMLInputElement>();
 
-  return (
-    <SContainer>
-      <SLabel>
-        { t('DetailsSection.form.profilePicture.label') }
-      </SLabel>
-      <SInputContainer>
-        <SProfileImage>
-          {!imageInEditUrl ? (
+    return (
+      <SContainer>
+        <SLabel>{t('DetailsSection.form.profilePicture.label')}</SLabel>
+        <SInputContainer>
+          {imageInEditUrl && (
+            <SProfileImage>
+              <img
+                alt="Profile avatar"
+                src={imageInEditUrl}
+                draggable={false}
+              />
+            </SProfileImage>
+          )}
+          <SUploadButton
+            view="secondary"
+            onClick={() => imageInputRef.current?.click()}
+          >
             <InlineSvg
-              svg={userIcon}
-              fill={theme.colorsThemed.text.tertiary}
+              svg={DownloadIcon}
               width="24px"
               height="24px"
+              fill={theme.colorsThemed.text.primary}
             />
-          ) : (
-            <img
-              alt="Profile avatar"
-              src={imageInEditUrl}
-              draggable={false}
-            />
-          )}
-        </SProfileImage>
-        <SUploadButton
-          view="secondary"
-          onClick={() => imageInputRef.current?.click()}
-        >
-          <InlineSvg
-            svg={DownloadIcon}
-            width="24px"
-            height="24px"
-            fill={theme.colorsThemed.text.primary}
+            {!imageInEditUrl
+              ? t('DetailsSection.form.profilePicture.uploadBtn')
+              : t('DetailsSection.form.profilePicture.uploadNewBtn')}
+          </SUploadButton>
+          <SImageInput
+            type="file"
+            accept="image/*"
+            multiple={false}
+            ref={(el) => {
+              imageInputRef.current = el!!;
+            }}
+            onChange={handleChangeImageInEdit}
           />
-          {!imageInEditUrl ? (
-            t('DetailsSection.form.profilePicture.uploadBtn')
-          ) : (
-            t('DetailsSection.form.profilePicture.uploadNewBtn')
-          )}
-        </SUploadButton>
-        <SImageInput
-          type="file"
-          accept="image/*"
-          multiple={false}
-          ref={(el) => {
-            imageInputRef.current = el!!;
-          }}
-          onChange={handleChangeImageInEdit}
-        />
-      </SInputContainer>
-      {true && (
-        <SCaption>
-          {isMobileOrTablet ? (
-            t('DetailsSection.form.profilePicture.captionMobile')
-          ) : t('DetailsSection.form.profilePicture.captionDesktop') }
-        </SCaption>
-      )}
-    </SContainer>
-  );
-};
+        </SInputContainer>
+        {true && (
+          <SCaption>
+            {isMobileOrTablet
+              ? t('DetailsSection.form.profilePicture.captionMobile')
+              : t('DetailsSection.form.profilePicture.captionDesktop')}
+          </SCaption>
+        )}
+      </SContainer>
+    );
+  };
 
 export default OnboardingProfileImageInput;
 
