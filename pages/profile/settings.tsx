@@ -1,5 +1,9 @@
 import React, {
-  ReactElement, useCallback, useContext, useEffect, useState,
+  ReactElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -12,11 +16,23 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setColorMode, TColorMode } from '../../redux-store/slices/uiStateSlice';
-import { logoutUser, logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
+import {
+  setColorMode,
+  TColorMode,
+} from '../../redux-store/slices/uiStateSlice';
+import {
+  logoutUser,
+  logoutUserClearCookiesAndRedirect,
+  setUserData,
+} from '../../redux-store/slices/userStateSlice';
 
 // API
-import { getUserByUsername, logout, markUser, updateMe } from '../../api/endpoints/user';
+import {
+  getUserByUsername,
+  logout,
+  markUser,
+  updateMe,
+} from '../../api/endpoints/user';
 
 import { NextPageWithLayout } from '../_app';
 import MyProfileSettingsLayout from '../../components/templates/MyProfileSettingsLayout';
@@ -25,7 +41,9 @@ import Headline from '../../components/atoms/Headline';
 import GoBackButton from '../../components/molecules/GoBackButton';
 import SettingsColorModeSwitch from '../../components/molecules/profile/SettingsColorModeSwitch';
 import SettingsWallet from '../../components/organisms/settings/SettingsWallet';
-import SettingsAccordion, { AccordionSection } from '../../components/organisms/settings/SettingsAccordion';
+import SettingsAccordion, {
+  AccordionSection,
+} from '../../components/organisms/settings/SettingsAccordion';
 import SettingsPersonalInformationSection from '../../components/organisms/settings/SettingsPersonalInformationSection';
 import SettingsNotificationsSection from '../../components/organisms/settings/SettingsNotificationSection';
 import TransactionsSection from '../../components/organisms/settings/TransactionsSection';
@@ -62,13 +80,23 @@ const MyProfileSettginsIndex: NextPage = () => {
   const { userData, loggedIn } = useAppSelector((state) => state.user);
   const { resizeMode, colorMode } = useAppSelector((state) => state.ui);
   // Measurements
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
 
   // Blocked users
   const { usersIBlocked: usersIBlockedIds, unblockUser } = useGetBlockedUsers();
-  const [blockedUsers, setBlockedUsers] = useState<Omit<newnewapi.User, 'toJSON'>[]>([])
+  const [blockedUsers, setBlockedUsers] = useState<
+    Omit<newnewapi.User, 'toJSON'>[]
+  >([]);
 
   const unblockUserAsync = async (uuid: string) => {
     try {
@@ -77,12 +105,13 @@ const MyProfileSettginsIndex: NextPage = () => {
         userUuid: uuid,
       });
       const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   // Logout loading
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
@@ -91,108 +120,98 @@ const MyProfileSettginsIndex: NextPage = () => {
     (mode: TColorMode) => {
       dispatch(setColorMode(mode));
     },
-    [dispatch],
+    [dispatch]
   );
 
-  const handleLogout = useCallback(
-    async () => {
-      try {
-        setIsLogoutLoading(true);
+  const handleLogout = useCallback(async () => {
+    try {
+      setIsLogoutLoading(true);
 
-        const payload = new newnewapi.EmptyRequest({});
+      const payload = new newnewapi.EmptyRequest({});
 
-        const res = await logout(
-          payload,
-        );
+      const res = await logout(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Log out failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Log out failed');
 
-        // Unset credential cookies
-        removeCookie(
-          'accessToken',
-          {
-            path: '/',
-          },
-        );
-        removeCookie(
-          'refreshToken',
-          {
-            path: '/',
-          },
-        );
-        setIsLogoutLoading(false);
+      // Unset credential cookies
+      removeCookie('accessToken', {
+        path: '/',
+      });
+      removeCookie('refreshToken', {
+        path: '/',
+      });
+      setIsLogoutLoading(false);
 
-        dispatch(logoutUser(''));
-      } catch (err) {
-        console.error(err);
-        setIsLogoutLoading(false);
-        if ((err as Error).message === 'No token') {
-          dispatch(logoutUserClearCookiesAndRedirect());
-        }
-        // Refresh token was present, session probably expired
-        // Redirect to sign up page
-        if ((err as Error).message === 'Refresh token invalid') {
-          dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
-        }
+      dispatch(logoutUser(''));
+    } catch (err) {
+      console.error(err);
+      setIsLogoutLoading(false);
+      if ((err as Error).message === 'No token') {
+        dispatch(logoutUserClearCookiesAndRedirect());
       }
-    },
-    [dispatch, setIsLogoutLoading, removeCookie],
-  );
+      // Refresh token was present, session probably expired
+      // Redirect to sign up page
+      if ((err as Error).message === 'Refresh token invalid') {
+        dispatch(
+          logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+        );
+      }
+    }
+  }, [dispatch, setIsLogoutLoading, removeCookie]);
 
   // temp
-  const [notifications, setNotifications] = useState(
-    [
-      {
-        title: 'Email Notifications',
-        parameter: 'email',
-        configs: [
-          {
-            title: 'New bids',
-            parameter: 'new_bids',
-            value: true,
-          },
-          {
-            title: 'New decisions',
-            parameter: 'new_decisions',
-            value: true,
-          },
-          {
-            title: 'Flags',
-            parameter: 'flags',
-            value: true,
-          },
-        ],
-      },
-      {
-        title: 'Push Notifications',
-        parameter: 'push',
-        configs: [
-          {
-            title: 'New bids',
-            parameter: 'new_bids',
-            value: true,
-          },
-          {
-            title: 'New decisions',
-            parameter: 'new_decisions',
-            value: true,
-          },
-          {
-            title: 'Flags',
-            parameter: 'flags',
-            value: true,
-          },
-        ],
-      },
-    ],
-  );
+  const [notifications, setNotifications] = useState([
+    {
+      title: 'Email Notifications',
+      parameter: 'email',
+      configs: [
+        {
+          title: 'New bids',
+          parameter: 'new_bids',
+          value: true,
+        },
+        {
+          title: 'New decisions',
+          parameter: 'new_decisions',
+          value: true,
+        },
+        {
+          title: 'Flags',
+          parameter: 'flags',
+          value: true,
+        },
+      ],
+    },
+    {
+      title: 'Push Notifications',
+      parameter: 'push',
+      configs: [
+        {
+          title: 'New bids',
+          parameter: 'new_bids',
+          value: true,
+        },
+        {
+          title: 'New decisions',
+          parameter: 'new_decisions',
+          value: true,
+        },
+        {
+          title: 'Flags',
+          parameter: 'flags',
+          value: true,
+        },
+      ],
+    },
+  ]);
   const [spendingHidden, setSpendingHidden] = useState(false);
 
   const handleToggleAccountPrivate = async () => {
     try {
       const updateMePayload = new newnewapi.UpdateMeRequest({
         isActivityPrivate: !userData?.options?.isActivityPrivate,
-      })
+      });
 
       const res = await updateMe(updateMePayload);
 
@@ -200,99 +219,119 @@ const MyProfileSettginsIndex: NextPage = () => {
 
       if (!data || error) throw new Error(error?.message ?? 'Request failed');
 
-      dispatch(setUserData({
-        options: {
-          isActivityPrivate: data.me?.options?.isActivityPrivate,
-          isCreator: data.me?.options?.isCreator,
-          isVerified: data.me?.options?.isVerified,
-          creatorStatus: data.me?.options?.creatorStatus,
-        },
-      }))
+      dispatch(
+        setUserData({
+          options: {
+            isActivityPrivate: data.me?.options?.isActivityPrivate,
+            isCreator: data.me?.options?.isCreator,
+            isVerified: data.me?.options?.isVerified,
+            creatorStatus: data.me?.options?.creatorStatus,
+          },
+        })
+      );
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const accordionSections: AccordionSection[] = [
     {
       title: t('Settings.sections.PersonalInformation.title'),
-      content: <SettingsPersonalInformationSection
-        currentEmail={userData?.email ?? ''}
-        currentDate={userData?.dateOfBirth ? (
-          new Date(
-            userData.dateOfBirth.year!!,
-            userData.dateOfBirth.month!! - 1,
-            userData.dateOfBirth.day!!,
-          )
-        ) : undefined}
-        // ) : (
-        //   new Date(
-        //     parsed.year!!,
-        //     parsed.month!!,
-        //     parsed.day!!,
-        //   )
-        // )}
-        isMobile={isMobile}
-        handleSetActive={() => {}}
-      />,
+      content: (
+        <SettingsPersonalInformationSection
+          currentEmail={userData?.email ?? ''}
+          currentDate={
+            userData?.dateOfBirth &&
+            userData?.dateOfBirth.day &&
+            userData?.dateOfBirth.month &&
+            userData?.dateOfBirth.year
+              ? new Date(
+                  userData.dateOfBirth.year,
+                  userData.dateOfBirth.month - 1,
+                  userData.dateOfBirth.day
+                )
+              : undefined
+          }
+          // ) : (
+          //   new Date(
+          //     parsed.year!!,
+          //     parsed.month!!,
+          //     parsed.day!!,
+          //   )
+          // )}
+          isMobile={isMobile}
+          handleSetActive={() => {}}
+        />
+      ),
     },
     {
       title: t('Settings.sections.Notifications.title'),
-      content: <SettingsNotificationsSection
-        configs={notifications}
-        handleUpdateItem={(category, itemname) => {
-          const newNotifications = [...notifications];
-          const idx1 = newNotifications.findIndex((c) => c.parameter === category);
-          const idx2 = newNotifications[idx1].configs.findIndex((i) => i.parameter === itemname);
-          newNotifications[idx1].configs[idx2].value = !newNotifications[idx1].configs[idx2].value;
-          setNotifications(() => newNotifications);
-        }}
-        handleSetActive={() => {}}
-      />,
+      content: (
+        <SettingsNotificationsSection
+          configs={notifications}
+          handleUpdateItem={(category, itemname) => {
+            const newNotifications = [...notifications];
+            const idx1 = newNotifications.findIndex(
+              (c) => c.parameter === category
+            );
+            const idx2 = newNotifications[idx1].configs.findIndex(
+              (i) => i.parameter === itemname
+            );
+            newNotifications[idx1].configs[idx2].value =
+              !newNotifications[idx1].configs[idx2].value;
+            setNotifications(() => newNotifications);
+          }}
+          handleSetActive={() => {}}
+        />
+      ),
     },
     {
       title: t('Settings.sections.Transactions.title'),
-      content: <TransactionsSection
-        transactions={[
-          {
-            actor: userData!!,
-            recipient: unicornbabe,
-            date: new Date('05.23.2021'),
-            amount: 2.99,
-            direction: 'from',
-            action: 'bid',
-          },
-          {
-            actor: userData!!,
-            recipient: userData!!,
-            date: new Date('04.23.2021'),
-            amount: 400,
-            direction: 'to',
-            action: 'topup',
-          },
-        ]}
-        handleSetActive={() => {}}
-      />,
+      content: (
+        <TransactionsSection
+          transactions={[
+            {
+              actor: userData!!,
+              recipient: unicornbabe,
+              date: new Date('05.23.2021'),
+              amount: 2.99,
+              direction: 'from',
+              action: 'bid',
+            },
+            {
+              actor: userData!!,
+              recipient: userData!!,
+              date: new Date('04.23.2021'),
+              amount: 400,
+              direction: 'to',
+              action: 'topup',
+            },
+          ]}
+          handleSetActive={() => {}}
+        />
+      ),
     },
     {
       title: t('Settings.sections.Privacy.title'),
-      content: <PrivacySection
-        isSpendingHidden={spendingHidden}
-        isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
-        blockedUsers={blockedUsers}
-        handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
-        handleToggleAccountPrivate={handleToggleAccountPrivate}
-        handleUnblockUser={unblockUserAsync}
-        handleCloseAccount={() => {}}
-        handleSetActive={() => {}}
-      />,
+      content: (
+        <PrivacySection
+          isSpendingHidden={spendingHidden}
+          isAccountPrivate={userData?.options?.isActivityPrivate ?? false}
+          blockedUsers={blockedUsers}
+          handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
+          handleToggleAccountPrivate={handleToggleAccountPrivate}
+          handleUnblockUser={unblockUserAsync}
+          handleCloseAccount={() => {}}
+          handleSetActive={() => {}}
+        />
+      ),
     },
   ];
 
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch(`/`);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -307,9 +346,11 @@ const MyProfileSettginsIndex: NextPage = () => {
 
       if (!decoded) return;
 
-      dispatch(setUserData({
-        email: decoded.me?.email,
-      }));
+      dispatch(
+        setUserData({
+          email: decoded.me?.email,
+        })
+      );
     };
 
     if (socketConnection) {
@@ -321,7 +362,7 @@ const MyProfileSettginsIndex: NextPage = () => {
         socketConnection.off('MeUpdated', handlerSocketMeUpdated);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   useEffect(() => {
@@ -329,9 +370,9 @@ const MyProfileSettginsIndex: NextPage = () => {
       try {
         const users: newnewapi.User[] = [];
 
-        usersIBlockedIds.forEach( async (uuid) => {
+        usersIBlockedIds.forEach(async (uuid) => {
           const payload = new newnewapi.GetUserRequest({
-            uuid
+            uuid,
           });
 
           const res = await getUserByUsername(payload);
@@ -353,17 +394,11 @@ const MyProfileSettginsIndex: NextPage = () => {
   return (
     <div>
       <SMain>
-        <SGoBackButton
-          onClick={() => router.back()}
-        >
+        <SGoBackButton onClick={() => router.back()}>
           {isMobile ? t('Settings.heading') : t('Settings.goBackBtn')}
         </SGoBackButton>
         {!isMobile ? (
-          <SHeadline
-            variant={4}
-          >
-            { t('Settings.heading') }
-          </SHeadline>
+          <SHeadline variant={4}>{t('Settings.heading')}</SHeadline>
         ) : null}
         <SettingsColorModeSwitch
           theme={theme}
@@ -377,35 +412,37 @@ const MyProfileSettginsIndex: NextPage = () => {
           }}
           handleSetColorMode={handleSetColorMode}
           wrapperStyle={{
-            ...(isMobile ? {
-              position: 'absolute',
-              top: -6,
-              right: 16,
-            } : {}),
-            ...(isTablet ? {
-              position: 'absolute',
-              top: 36,
-              right: 0,
-            } : {}),
-            ...(!isMobileOrTablet ? {
-              position: 'absolute',
-              top: 115.5,
-              right: -68,
-            } : {}),
+            ...(isMobile
+              ? {
+                  position: 'absolute',
+                  top: -6,
+                  right: 16,
+                }
+              : {}),
+            ...(isTablet
+              ? {
+                  position: 'absolute',
+                  top: 36,
+                  right: 0,
+                }
+              : {}),
+            ...(!isMobileOrTablet
+              ? {
+                  position: 'absolute',
+                  top: 115.5,
+                  right: -68,
+                }
+              : {}),
           }}
         />
         <SettingsWallet />
-        <SettingsAccordion
-          sections={accordionSections}
-        />
+        <SettingsAccordion sections={accordionSections} />
         <SBottomLinksDiv>
           <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton>
           <Link href="/help">
-            <SBlockOption>
-              {t('Settings.bottomDiv.help')}
-            </SBlockOption>
+            <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
           </Link>
           <SBlockOptionButton
             disabled={isLogoutLoading}
@@ -419,12 +456,10 @@ const MyProfileSettginsIndex: NextPage = () => {
   );
 };
 
-(MyProfileSettginsIndex as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return (
-    <MyProfileSettingsLayout>
-      { page }
-    </MyProfileSettingsLayout>
-  );
+(MyProfileSettginsIndex as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
+  return <MyProfileSettingsLayout>{page}</MyProfileSettingsLayout>;
 };
 
 export default MyProfileSettginsIndex;
@@ -485,7 +520,8 @@ const SBlockOptionButton = styled.button`
   &:hover {
     color: ${(props) => props.theme.colorsThemed.text.primary};
   }
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     outline: none;
   }
   &:disabled {
@@ -509,11 +545,13 @@ const SBlockOption = styled.a`
   }
 `;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale,
-    ['common', 'profile'],
-  );
+export async function getStaticProps(context: {
+  locale: string;
+}): Promise<any> {
+  const translationContext = await serverSideTranslations(context.locale, [
+    'common',
+    'profile',
+  ]);
 
   return {
     props: {
