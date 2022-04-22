@@ -5,10 +5,11 @@ This is a NewNew web
 First, run the development server:
 
 Use node v14
+
 ```bash
-nvm install 14.19.0
+nvm install 16.14.2
 # optionally make it a default version
-nvm alias default 14
+nvm alias default 16
 ```
 
 ```bash

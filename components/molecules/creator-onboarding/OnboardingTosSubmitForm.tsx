@@ -1,10 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Button from '../../atoms/Button';
@@ -17,51 +13,52 @@ interface IOnboardingTosSubmitForm {
   hasScrolledDownDesktop?: boolean;
 }
 
-const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm> = ({
-  handleGoToNext,
-  hasScrolledDown,
-  hasScrolledDownDesktop,
-}) => {
-  const { t } = useTranslation('creator-onboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm> =
+  ({ handleGoToNext, hasScrolledDown, hasScrolledDownDesktop }) => {
+    const { t } = useTranslation('creator-onboarding');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const [agreed, setAgreed] = useState(false);
+    const [agreed, setAgreed] = useState(false);
 
-  if (isMobile) {
+    if (isMobile) {
+      return (
+        <SMobileButtonContainer>
+          <SMobileButton
+            view="primaryGrad"
+            disabled={!hasScrolledDown}
+            onClick={() => handleGoToNext()}
+          >
+            {t('TosSection.submitMobile')}
+          </SMobileButton>
+        </SMobileButtonContainer>
+      );
+    }
+
     return (
-      <SMobileButtonContainer>
-        <SMobileButton
+      <STabletForm>
+        <SCheckBox
+          label={
+            hasScrolledDownDesktop
+              ? t('TosSection.agreedToTosCheckbox')
+              : t('TosSection.scrollDownToContinue')
+          }
+          selected={agreed}
+          disabled={!hasScrolledDownDesktop}
+          handleChange={(e) => setAgreed(!agreed)}
+        />
+        <Button
           view="primaryGrad"
-          disabled={!hasScrolledDown}
+          disabled={!agreed}
           onClick={() => handleGoToNext()}
         >
-          { t('TosSection.submitMobile') }
-        </SMobileButton>
-      </SMobileButtonContainer>
+          {t('TosSection.submitDesktop')}
+        </Button>
+      </STabletForm>
     );
-  }
-
-  return (
-    <STabletForm>
-      <SCheckBox
-        label={hasScrolledDownDesktop ? (
-          t('TosSection.agreenToTosCheckbox')
-        ) : t('TosSection.scrollDownToContinue')}
-        selected={agreed}
-        disabled={!hasScrolledDownDesktop}
-        handleChange={(e) => setAgreed(!agreed)}
-      />
-      <Button
-        view="primaryGrad"
-        disabled={!agreed}
-        onClick={() => handleGoToNext()}
-      >
-        { t('TosSection.submitDesktop') }
-      </Button>
-    </STabletForm>
-  );
-};
+  };
 
 OnboardingTosSubmitForm.defaultProps = {
   hasScrolledDown: undefined,
@@ -81,9 +78,11 @@ const SMobileButtonContainer = styled.div`
 
   background-color: ${({ theme }) => theme.colorsThemed.background.primary};
 
-  box-shadow:
-    0px 0px 32px 36px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, .9)' : 'rgba(241, 243, 249, 1)')};
-  ;
+  box-shadow: 0px 0px 32px 36px
+    ${({ theme }) =>
+      theme.name === 'dark'
+        ? 'rgba(20, 21, 31, .9)'
+        : 'rgba(241, 243, 249, 1)'}; ;
 `;
 
 const SMobileButton = styled(Button)`
@@ -96,6 +95,7 @@ const STabletForm = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   padding-top: 20px;
+  padding-bottom: 20px;
 
   height: 102px;
   padding-left: 152px;

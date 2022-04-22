@@ -1,6 +1,4 @@
-import React, {
-  MutableRefObject, useCallback, useEffect, useRef,
-} from 'react';
+import React, { MutableRefObject, useCallback, useEffect, useRef } from 'react';
 import _map from 'lodash/map';
 import styled from 'styled-components';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -21,10 +19,9 @@ export const ResizeMode: React.FC<IResizeMode> = (props) => {
 
   const handleResizeObserver = useCallback(() => {
     let newResizeMode: string = '';
-
-    _map(sizes, (key: number, value: string) => {
-      if (!newResizeMode && ref.current.offsetWidth >= key) {
-        newResizeMode = value;
+    _map(sizes, (value: number, key: string) => {
+      if (!newResizeMode && ref.current.offsetWidth >= value) {
+        newResizeMode = key;
       }
     });
 
@@ -43,13 +40,14 @@ export const ResizeMode: React.FC<IResizeMode> = (props) => {
     };
   }, [handleResizeObserver]);
 
-  return (
-    <SContainer ref={ref}>
-      {children}
-    </SContainer>
-  );
+  return <SContainer ref={ref}>{children}</SContainer>;
 };
 
 export default ResizeMode;
 
-const SContainer = styled.div``;
+const SContainer = styled.div`
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+`;

@@ -28,12 +28,22 @@ const SCreatorStripeLayout = styled.div`
   overflow: hidden;
 `;
 
-const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({ hideProgressBar, children }) => {
+const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
+  hideProgressBar,
+  children,
+}) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+    'laptop',
+  ].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
   return (
@@ -58,12 +68,13 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({ hideProgressBar, 
             </SHomeLogoButton>
           ) : null}
           <SContentContainer>{children}</SContentContainer>
-          {!isMobileOrTablet && !router.pathname.includes('creator-onboarding-stage-1') && (
-            <SSideMessage>
-              <SHeadline variant={3}>{t(`stripe.side.heading`)}</SHeadline>
-              <Text variant={2}>{t(`stripe.side.subheading`)}</Text>
-            </SSideMessage>
-          )}
+          {!isMobileOrTablet &&
+            !router.pathname.includes('creator-onboarding') && (
+              <SSideMessage>
+                <SHeadline variant={3}>{t(`stripe.side.heading`)}</SHeadline>
+                <Text variant={2}>{t(`stripe.side.subheading`)}</Text>
+              </SSideMessage>
+            )}
         </SCreatorStripeLayout>
       </SkeletonTheme>
     </ErrorBoundary>
