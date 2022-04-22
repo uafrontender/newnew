@@ -15,17 +15,16 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import OnboardingSectionTos from '../components/molecules/creator-onboarding/OnboardingSectionTos';
 import { acceptCreatorTerms } from '../api/endpoints/user';
 
-interface ICreatorOnboardingStage1 {
+interface ICreatorOnboardingTerms {}
 
-}
-
-const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
+const CreatorOnboardingTerms: NextPage<ICreatorOnboardingTerms> = () => {
   const { t } = useTranslation('creator-onboarding');
 
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
   // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
+  // TODO: go back.
   const goToNext = async () => {
     try {
       const acceptTermsPayload = new newnewapi.EmptyRequest({});
@@ -34,46 +33,37 @@ const CreatorOnboardingStage1: NextPage<ICreatorOnboardingStage1> = () => {
 
       if (res.error) throw new Error('Request failed');
 
-      router.push('/creator-onboarding-stage-2');
+      router.push('/creator-onboarding');
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch('/creator-onboarding-stage-2');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
+        <title>{t('meta.title')}</title>
         <meta name="description" content={t('meta.description')} />
       </Head>
-      <OnboardingSectionTos
-        handleGoToNext={goToNext}
-      />
+      <OnboardingSectionTos handleGoToNext={goToNext} />
     </>
   );
 };
 
-(CreatorOnboardingStage1 as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return (
-    <CreatorOnboardingLayout>
-      { page }
-    </CreatorOnboardingLayout>
-  );
+(CreatorOnboardingTerms as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
+  return <CreatorOnboardingLayout>{page}</CreatorOnboardingLayout>;
 };
 
-export default CreatorOnboardingStage1;
+export default CreatorOnboardingTerms;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale,
-    ['creator-onboarding'],
-  );
+export async function getStaticProps(context: {
+  locale: string;
+}): Promise<any> {
+  const translationContext = await serverSideTranslations(context.locale, [
+    'creator-onboarding',
+  ]);
 
   return {
     props: {
