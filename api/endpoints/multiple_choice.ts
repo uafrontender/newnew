@@ -66,6 +66,16 @@ export const voteOnPostWithWallet = (
   payload,
 );
 
+export const doFreeVote = (
+  payload: newnewapi.VoteOnPostRequest,
+) => fetchProtobufProtectedIntercepted<newnewapi.VoteOnPostRequest, newnewapi.VoteOnPostResponse>(
+  newnewapi.VoteOnPostRequest,
+  newnewapi.VoteOnPostResponse,
+  `${BASE_URL_MULTICHOICE}/do_free_vote`,
+  'post',
+  payload,
+);
+
 export const deleteMcOption = (
   payload: newnewapi.DeleteMcOptionRequest,
 ) => fetchProtobufProtectedIntercepted<newnewapi.DeleteMcOptionRequest, newnewapi.EmptyResponse>(

@@ -208,10 +208,12 @@ const McSuccessOptionsTab: React.FunctionComponent<IMcSuccessOptionsTab> = ({
               creator={option.creator ?? post.creator!!}
               postId={post.postUuid}
               votingAllowed={false}
+              canVoteForFree={false}
               index={i}
               minAmount={0}
               votePrice={0}
               noAction
+              handleResetFreeVote={() => {}}
               handleSetSupportedBid={() => {}}
               handleSetPaymentSuccesModalOpen={() => {}}
               handleAddOrUpdateOptionFromResponse={() => {}}
