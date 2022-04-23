@@ -18,8 +18,8 @@ import { debounce } from 'lodash';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
-import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
-import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+// import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
+import { doFreeVote, voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
   getTopUpWalletWithPaymentPurposeUrl,
@@ -32,7 +32,7 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
-import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
+// import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
 import PaymentModal from '../../checkout/PaymentModal';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
@@ -44,10 +44,13 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { setTutorialStatus } from '../../../../api/endpoints/user';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
+  postLoading: boolean;
   postStatus: TPostStatusStringified;
   postCreator: string;
   postDeadline: string;
@@ -56,6 +59,9 @@ interface IMcOptionsTab {
   pagingToken: string | undefined | null;
   minAmount: number;
   votePrice: number;
+  canVoteForFree: boolean;
+  canSubscribe: boolean;
+  handleResetFreeVote: () => void;
   handleLoadOptions: (token?: string) => void;
   handleAddOrUpdateOptionFromResponse: (
     newOption: newnewapi.MultipleChoice.Option
@@ -64,6 +70,7 @@ interface IMcOptionsTab {
 
 const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   post,
+  postLoading,
   postStatus,
   postCreator,
   postDeadline,
@@ -72,7 +79,10 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   pagingToken,
   minAmount,
   votePrice,
+  canVoteForFree,
+  canSubscribe,
   handleLoadOptions,
+  handleResetFreeVote,
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const { t } = useTranslation('decision');
@@ -92,6 +102,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   ].includes(resizeMode);
 
   const { walletBalance } = useContext(WalletContext);
+  const { appConstants } = useGetAppConstants();
 
   const hasVotedOptionId = useMemo(() => {
     const supportedOption = options.find((o) => o.isSupportedByMe);
@@ -108,7 +119,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    post.isSuggestionsAllowed && !hasVotedOptionId ? 56 : 0
+    post.isSuggestionsAllowed
+      && !hasVotedOptionId
+      && postStatus === 'voting' ? 56 : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -126,28 +139,42 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   // Payment modal
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
-  const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
+  const [useFreeVoteModalOpen, setUseFreeVoteModalOpen] = useState(false);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
 
   // Handlers
-  const handleTogglePaymentModalOpen = async () => {
-    if (isAPIValidateLoading) return;
-    if (!user.loggedIn) {
-      router.push(`/${post?.creator?.username}/subscribe`);
-      return;
-    }
-    // Check if subscribed
-    const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-      creatorUuid: post.creator?.uuid,
-    });
 
-    const res = await getSubscriptionStatus(getStatusPayload);
-
-    if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-      router.push(`/${post.creator?.username}/subscribe`);
-      return;
-    }
-    setPaymentModalOpen(true);
+  // Redirect to user's page
+  const handleRedirectToPostCreator = () => {
+    window?.history.replaceState(
+      {
+        fromPost: true,
+      },
+      '',
+      ''
+    );
+    router.push(`/${post.creator?.username}/subscribe`);
   };
+
+  // const handleTogglePaymentModalOpen = async () => {
+  //   if (isAPIValidateLoading) return;
+  //   if (!user.loggedIn) {
+  //     router.push(`/${post?.creator?.username}/subscribe`);
+  //     return;
+  //   }
+  //   // Check if subscribed
+  //   const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
+  //     creatorUuid: post.creator?.uuid,
+  //   });
+
+  //   const res = await getSubscriptionStatus(getStatusPayload);
+
+  //   if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
+  //     router.push(`/${post.creator?.username}/subscribe`);
+  //     return;
+  //   }
+  //   setPaymentModalOpen(true);
+  // };
 
   const validateTextViaAPI = useCallback(async (text: string) => {
     setIsAPIValidateLoading(true);
@@ -290,7 +317,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         setSuggestNewMobileOpen(false);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
-        setPaymentSuccesModalOpen(true);
+        setPaymentSuccessModalOpen(true);
       }
     } catch (err) {
       setPaymentModalOpen(false);
@@ -337,6 +364,49 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     }
   }, [newBidAmount, newOptionText, post.postUuid, router.locale]);
 
+  const handleVoteForFree = useCallback(async () => {
+    setUseFreeVoteModalOpen(false);
+    setLoadingModalOpen(true);
+    try {
+      const payload = new newnewapi.VoteOnPostRequest({
+        votesCount: appConstants.mcFreeVoteCount,
+        optionText: newOptionText,
+        postUuid: post.postUuid,
+      });
+
+      const res = await doFreeVote(payload);
+
+      if (
+        !res.data ||
+        res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+        res.error
+      ) {
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+
+      const optionFromResponse = (res.data
+        .option as newnewapi.MultipleChoice.Option)!!;
+      optionFromResponse.isSupportedByMe = true;
+      // optionFromResponse.isCreatedBySubscriber = true;
+      handleAddOrUpdateOptionFromResponse(optionFromResponse);
+
+      setNewOptionText('');
+      setSuggestNewMobileOpen(false);
+      setLoadingModalOpen(false);
+      handleResetFreeVote();
+      setPaymentSuccessModalOpen(true);
+    } catch (err) {
+     console.error(err);
+     setLoadingModalOpen(false);
+    }
+  }, [
+    newOptionText,
+    post.postUuid,
+    appConstants.mcFreeVoteCount,
+    handleResetFreeVote,
+    handleAddOrUpdateOptionFromResponse,
+  ]);
+
   useEffect(() => {
     if (inView && !optionsLoading && pagingToken) {
       handleLoadOptions(pagingToken);
@@ -350,17 +420,22 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        setHeightDelta(size + (!isMobileOrTablet ? 20 : 0));
+        console.log(size)
+        setHeightDelta(size);
       }
     });
 
-    if (!hasVotedOptionId && post.isSuggestionsAllowed) {
+    if (post.isSuggestionsAllowed
+      && !postLoading
+      && !hasVotedOptionId
+      && postStatus === 'voting'
+      && actionSectionContainer.current
+    ) {
       resizeObserver.observe(actionSectionContainer.current!!);
     } else {
       setHeightDelta(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasVotedOptionId, post.isSuggestionsAllowed, isMobileOrTablet]);
+  }, [hasVotedOptionId, postLoading, post.isSuggestionsAllowed, postStatus, isMobileOrTablet]);
 
   const goToNextStep = () => {
     if (user.loggedIn) {
@@ -420,6 +495,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               votePrice={votePrice}
               optionBeingSupported={optionBeingSupported}
               votingAllowed={postStatus === 'voting'}
+              canVoteForFree={canVoteForFree}
+              handleResetFreeVote={handleResetFreeVote}
               noAction={
                 (hasVotedOptionId !== undefined &&
                   hasVotedOptionId !== option.id) ||
@@ -429,7 +506,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 setOptionBeingSupported(id)
               }
               handleSetPaymentSuccesModalOpen={(newValue: boolean) =>
-                setPaymentSuccesModalOpen(newValue)
+                setPaymentSuccessModalOpen(newValue)
               }
               handleAddOrUpdateOptionFromResponse={
                 handleAddOrUpdateOptionFromResponse
@@ -444,98 +521,90 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {post.isSuggestionsAllowed &&
-        !hasVotedOptionId &&
-        postStatus === 'voting' ? (
-          <SActionSection
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-          >
-            <SuggestionTextArea
-              value={newOptionText}
-              disabled={optionBeingSupported !== ''}
-              placeholder={t(
-                'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
-              )}
-              onChange={handleUpdateNewOptionText}
-            />
-            <VotesAmountTextInput
-              value={newBidAmount}
-              inputAlign="left"
-              disabled={optionBeingSupported !== ''}
-              placeholder={
-                !newBidAmount || parseInt(newBidAmount) > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              onChange={(newValue: string) => setNewBidAmount(newValue)}
-              bottomPlaceholder={
-                !newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`
-              }
-              minAmount={minAmount}
-            />
-            <SPlaceABidButton
-              view="primaryGrad"
-              size="sm"
-              disabled={
-                !newOptionText ||
-                !newBidAmount ||
-                parseInt(newBidAmount) < minAmount ||
-                optionBeingSupported !== '' ||
-                !newOptionTextValid
-              }
-              style={{
-                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+        {
+          post.isSuggestionsAllowed
+          && !hasVotedOptionId
+          && canVoteForFree
+          && postStatus === 'voting'
+          ? (
+            <SActionSection
+              ref={(el) => {
+                actionSectionContainer.current = el!!;
               }}
-              onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
-            </SPlaceABidButton>
-            <STutorialTooltipTextAreaHolder>
-              <TutorialTooltip
-                isTooltipVisible={
-                  user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-                  newnewapi.McTutorialStep.MC_TEXT_FIELD
-                }
-                closeTooltip={goToNextStep}
-                title={t('tutorials.mc.createYourBid.title')}
-                text={t('tutorials.mc.createYourBid.text')}
-                dotPosition={DotPositionEnum.BottomRight}
+              <SuggestionTextArea
+                value={newOptionText}
+                disabled={optionBeingSupported !== ''}
+                placeholder={t(
+                  'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
+                )}
+                onChange={handleUpdateNewOptionText}
               />
-            </STutorialTooltipTextAreaHolder>
-            {!isMobileOrTablet && (
-              <SBottomPlaceholder>
-                {!newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`}
-              </SBottomPlaceholder>
-            )}
-          </SActionSection>
-        ) : (
-          <div
-            ref={(el) => {
-              actionSectionContainer.current = el!!;
-            }}
-            style={{
-              height: 0,
-            }}
-          />
-        )}
+              <SAddFreeVoteButton
+                size="sm"
+                disabled={
+                  !newOptionText ||
+                  optionBeingSupported !== '' ||
+                  !newOptionTextValid
+                }
+                style={{
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => setUseFreeVoteModalOpen(true)}
+              >
+                {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
+              </SAddFreeVoteButton>
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                    newnewapi.McTutorialStep.MC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.mc.createYourBid.title')}
+                  text={t('tutorials.mc.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            </SActionSection>
+          ) : (
+            post.isSuggestionsAllowed
+            && !hasVotedOptionId
+            && !canVoteForFree
+            && postStatus === 'voting'
+            && canSubscribe
+            && !postLoading
+            ? (
+              <SActionSectionSubscribe
+                ref={(el) => {
+                  actionSectionContainer.current = el!!;
+                }}
+              >
+                <Text
+                  variant={3}
+                >
+                  {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', { creator: post.creator?.nickname })}
+                </Text>
+                <SSubscribeButton
+                  onClick={() => {
+                    handleRedirectToPostCreator();
+                  }}
+                >
+                  {t('McPost.OptionsTab.ActionSection.subscribeBtn')}
+                </SSubscribeButton>
+              </SActionSectionSubscribe>
+            ) : (
+              <div
+                ref={(el) => {
+                  actionSectionContainer.current = el!!;
+                }}
+                style={{
+                  height: 0,
+                }}
+              />
+            )
+          )
+        }
         <STutorialTooltipHolder>
           <TutorialTooltip
             isTooltipVisible={
@@ -564,51 +633,29 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               placeholder="Add a option ..."
               onChange={handleUpdateNewOptionText}
             />
-            <VotesAmountTextInput
-              value={newBidAmount}
-              inputAlign="left"
-              disabled={optionBeingSupported !== ''}
-              placeholder={
-                !newBidAmount || parseInt(newBidAmount) > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              bottomPlaceholder={
-                !newBidAmount || parseInt(newBidAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${newBidAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(newBidAmount) * votePrice}`
-              }
-              onChange={(newValue: string) => setNewBidAmount(newValue)}
-              minAmount={minAmount}
-            />
-            <Button
-              view="primaryGrad"
+            <SAddFreeVoteButton
               size="sm"
               disabled={
                 !newOptionText ||
-                !newBidAmount ||
-                parseInt(newBidAmount) < minAmount ||
                 optionBeingSupported !== '' ||
                 !newOptionTextValid
               }
               style={{
                 ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
               }}
-              onClick={() => handleTogglePaymentModalOpen()}
+              onClick={() => setUseFreeVoteModalOpen(true)}
             >
               {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
-            </Button>
+            </SAddFreeVoteButton>
           </SSuggestNewContainer>
         </OptionActionMobileModal>
       ) : null}
+      {/* Use Free vote modal */}
+      <McConfirmUseFreeVoteModal
+        isVisible={useFreeVoteModalOpen}
+        handleMakeFreeVote={handleVoteForFree}
+        closeModal={() => setUseFreeVoteModalOpen(false)}
+      />
       {/* Payment Modal */}
       {paymentModalOpen ? (
         <PaymentModal
@@ -640,8 +687,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
-        isVisible={paymentSuccesModalOpen}
-        closeModal={() => setPaymentSuccesModalOpen(false)}
+        isVisible={paymentSuccessModalOpen}
+        closeModal={() => setPaymentSuccessModalOpen(false)}
       >
         {t('PaymentSuccessModal.mc', {
           postCreator,
@@ -687,7 +734,12 @@ const STabContainer = styled(motion.div)`
   width: 100%;
   /* height: calc(100% - 50px); */
 
+  display: flex;
+  flex-direction: column;
+
   ${({ theme }) => theme.media.tablet} {
+    display: initial;
+
     height: calc(100% - 56px);
     height: 100%;
   }
@@ -766,6 +818,17 @@ const SSuggestNewContainer = styled.div`
   }
 `;
 
+const SAddFreeVoteButton = styled(Button)`
+  width: 100%;
+
+  color: ${({ theme }) => theme.colors.dark};
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+
+  &:active:enabled, &:hover:enabled, &:focus:enabled {
+    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+  }
+`;
+
 const SActionSection = styled.div`
   display: none;
   position: relative;
@@ -793,33 +856,84 @@ const SActionSection = styled.div`
       width: 100%;
     }
   }
+`;
+
+const SActionSectionSubscribe = styled.div`
+  order: -1;
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  min-height: 50px;
+  width: 100%;
+  z-index: 5;
+
+  padding-top: 24px;
+
+  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+
+  div {
+    width: 100%;
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+  }
+  ${({ theme }) => theme.media.tablet} {
+    order: unset;
+
+    padding-top: 18px;
+
+    border-top: 1.5px solid
+      ${({ theme }) => theme.colorsThemed.background.outlines1};
+  }
 
   ${({ theme }) => theme.media.laptop} {
     flex-wrap: nowrap;
     justify-content: initial;
+    gap: 16px;
 
-    textarea {
-      max-width: 277px;
+    div {
+      width: initial;
+      text-align: left;
+    }
+    button {
+      max-width: 130px;
     }
   }
 `;
 
-const SBottomPlaceholder = styled.div`
-  display: none;
+const SSubscribeButton = styled(Button)`
+  background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
-  ${({ theme }) => theme.media.laptop} {
-    display: block;
+  color: ${({ theme }) => theme.colors.dark};
 
-    position: absolute;
-    bottom: -25px;
-
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 16px;
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-    width: max-content;
+  :active:enabled, :focus:enabled, :hover:enabled {
+    background: ${({ theme }) => theme.colorsThemed.accent.yellow};
   }
 `;
+
+// const SBottomPlaceholder = styled.div`
+//   display: none;
+
+//   ${({ theme }) => theme.media.laptop} {
+//     display: block;
+
+//     position: absolute;
+//     bottom: 0px;
+
+//     font-weight: 600;
+//     font-size: 12px;
+//     line-height: 16px;
+//     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+//     width: max-content;
+//   }
+// `;
 
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
@@ -835,9 +949,9 @@ const SPaymentModalOptionText = styled.div`
   gap: 8px;
 `;
 
-const SPlaceABidButton = styled(Button)`
-  min-width: 123px;
-`;
+// const SPlaceABidButton = styled(Button)`
+//   min-width: 123px;
+// `;
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;
