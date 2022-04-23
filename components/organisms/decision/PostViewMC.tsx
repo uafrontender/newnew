@@ -370,8 +370,6 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
       const res = await fetchPostByUUID(fetchPostPayload);
 
-      console.log(res)
-
       if (!res.data || res.error) {
         throw new Error(res.error?.message ?? 'Request failed');
       }

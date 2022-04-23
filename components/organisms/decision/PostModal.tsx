@@ -56,6 +56,7 @@ import PostSuccessMC from './PostSuccessMC';
 import PostSuccessCF from './PostSuccessCF';
 import PostAwaitingResponseAC from './PostAwaitingResponseAC';
 import PostAwaitingResponseMC from './PostAwaitingResponseMC';
+import PostAwaitingResponseCF from './PostAwaitingResponseCF';
 
 interface IPostModal {
   isOpen: boolean;
@@ -321,7 +322,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
     if (postToRender === 'cf') {
       return (
-        <PostSuccessCF
+        <PostAwaitingResponseCF
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Crowdfunding}
         />

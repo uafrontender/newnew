@@ -58,7 +58,7 @@ const STextWrapper = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    width: 65%;
+    width: 75%;
   }
 `;
 

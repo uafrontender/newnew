@@ -532,8 +532,8 @@
   },
   "CfPostAwaiting": {
     "hero": {
-      "title": "Votes are in!",
-      "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
+      "title": "It's happening!",
+      "body": "{{ creator }} has {{ time }} to show you this Goal. Stay tuned!",
       "expires": {
         "days": "days",
         "hours": "hours",
