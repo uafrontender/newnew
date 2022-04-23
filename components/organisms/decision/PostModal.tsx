@@ -16,7 +16,7 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 
-import { fetchMoreLikePosts } from '../../../api/endpoints/post';
+import { fetchMoreLikePosts, markPost } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -38,6 +38,8 @@ import PostViewProcessing from './PostViewProcessing';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
+import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
@@ -57,6 +59,12 @@ import PostSuccessCF from './PostSuccessCF';
 import PostAwaitingResponseAC from './PostAwaitingResponseAC';
 import PostAwaitingResponseMC from './PostAwaitingResponseMC';
 import PostAwaitingResponseCF from './PostAwaitingResponseCF';
+import PostShareModal from '../../molecules/decision/PostShareModal';
+import PostShareMenu from '../../molecules/decision/PostShareMenu';
+import PostEllipseModal from '../../molecules/decision/PostEllipseModal';
+import PostEllipseMenu from '../../molecules/decision/PostEllipseMenu';
+import { FollowingsContext } from '../../../contexts/followingContext';
+import { markUser } from '../../../api/endpoints/user';
 
 interface IPostModal {
   isOpen: boolean;
@@ -99,6 +107,65 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const shouldRenderVotingFinishedModal = useMemo(() => (
     postStatus === 'succeeded' || postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision'
   ), [postStatus]);
+
+
+  // Local controls for wairting and success views
+  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+  const [isFollowingDecision, setIsFollowingDecision] = useState(!!postParsed?.isFavoritedByMe)
+
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+
+  const handleFollowDecision = async () => {
+    try {
+      if (!user.loggedIn) {
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
+      }
+      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+        postUuid: postParsed?.postUuid,
+      });
+
+      const res = await markPost(markAsViewedPayload);
+
+      if (!res.error) {
+        setIsFollowingDecision(!isFollowingDecision);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleToggleFollowingCreator = async () => {
+    try {
+      if (!user.loggedIn) {
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
+      }
+
+      const payload = new newnewapi.MarkUserRequest({
+        userUuid: postParsed?.creator?.uuid,
+        markAs: followingsIds.includes(postParsed?.creator?.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+      });
+
+      const res = await markUser(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      if (followingsIds.includes(postParsed?.creator?.uuid as string)) {
+        removeId(postParsed?.creator?.uuid as string);
+      } else {
+        addId(postParsed?.creator?.uuid as string);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
@@ -543,8 +610,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <Head>
           <title>{postParsed?.title}</title>
         </Head>
-        {!isMobile && (
-          <SGoBackButtonDesktop
+        <SPostSuccessWaitingControlsDiv
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SWaitingSuccessControlsBtn
             view="secondary"
             iconOnly
             onClick={handleCloseAndGoBack}
@@ -555,12 +624,79 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               width="24px"
               height="24px"
             />
-          </SGoBackButtonDesktop>
-        )}
+          </SWaitingSuccessControlsBtn>
+          <SWaitingSuccessControlsBtn
+            view="secondary"
+            iconOnly
+            onClick={() => setShareMenuOpen(true)}
+          >
+            <InlineSvg
+              svg={ShareIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SWaitingSuccessControlsBtn>
+          <SWaitingSuccessControlsBtn
+            view="secondary"
+            iconOnly
+            onClick={() => setEllipseMenuOpen(true)}
+          >
+            <InlineSvg
+              svg={MoreIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SWaitingSuccessControlsBtn>
+          {/* Share menu */}
+          {!isMobile && (
+            <PostShareMenu
+              postId={postParsed?.postUuid!!}
+              isVisible={shareMenuOpen}
+              handleClose={() => setShareMenuOpen(false)}
+            />
+          )}
+          {isMobile && shareMenuOpen ? (
+            <PostShareModal
+              isOpen={shareMenuOpen}
+              zIndex={11}
+              postId={postParsed?.postUuid!!}
+              onClose={() => setShareMenuOpen(false)}
+            />
+          ) : null}
+          {/* Ellipse menu */}
+          {!isMobile && (
+            <PostEllipseMenu
+              isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              isVisible={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleClose={() => setEllipseMenuOpen(false)}
+            />
+          )}
+          {isMobile && ellipseMenuOpen ? (
+            <PostEllipseModal
+              isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              zIndex={11}
+              isOpen={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              onClose={() => setEllipseMenuOpen(false)}
+            />
+          ) : null}
+        </SPostSuccessWaitingControlsDiv>
         {postParsed && typeOfPost ? (
           <SPostModalContainer
             id="post-modal-container"
             isMyPost={isMyPost}
+            style={{
+              ...(isMobile ? {
+                paddingTop: 0,
+              } : {}),
+            }}
             onClick={(e) => e.stopPropagation()}
             ref={(el) => {
               modalContainerRef.current = el!!;
@@ -785,5 +921,64 @@ const SGoBackButtonDesktop = styled(Button)`
   ${({ theme }) => theme.media.laptop} {
     right: 24px;
     top: 32px;
+  }
+`;
+
+// Waiting and Success
+const SPostSuccessWaitingControlsDiv = styled.div`
+  position: absolute;
+  right: 16px;
+  top: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+
+  border: transparent;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  z-index: 1000;
+
+  cursor: pointer;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row-reverse;
+    gap: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-direction: column;
+    gap: 8px;
+    right: 24px;
+    top: 32px;
+  }
+`;
+
+const SWaitingSuccessControlsBtn = styled(Button)`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  border: transparent;
+
+  background: #2d2d2d2e;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  cursor: pointer;
+
+  ${({ theme }) => theme.media.tablet} {
+    background: #fdfdfd10;
   }
 `;
