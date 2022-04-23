@@ -1,5 +1,5 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, fetchProtobuf, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import { BASE_URL, cookiesInstance, fetchProtobuf, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
 export const BASE_URL_POST = `${BASE_URL}/post`;
 
@@ -45,7 +45,10 @@ export const fetchPostByUUID = (payload: newnewapi.GetPostRequest) =>
     newnewapi.Post,
     `${BASE_URL_POST}/get_post`,
     'post',
-    payload
+    payload,
+    (cookiesInstance.get('accessToken') ? {
+      'x-auth-token': cookiesInstance.get('accessToken'),
+    } : {}),
   );
 
 export const fetchUsersPosts = (payload: newnewapi.GetUserPostsRequest) =>

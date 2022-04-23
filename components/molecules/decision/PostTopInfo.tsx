@@ -70,7 +70,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
 
-  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial)
+  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);

@@ -345,6 +345,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <SBidDetails
           isBlue={isBlue}
           active={!!optionBeingSupported && !disabled}
+          noAction={!votingAllowed}
         >
           <SLottieAnimationContainer>
             {/* {shouldAnimate ? (
@@ -623,6 +624,7 @@ const SContainer = styled(motion.div)<{
 const SBidDetails = styled.div<{
   isBlue: boolean;
   active: boolean;
+  noAction: boolean;
 }>`
   position: relative;
 
@@ -664,8 +666,8 @@ const SBidDetails = styled.div<{
     border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
     border-bottom-left-radius: ${({ theme }) => theme.borderRadius.medium};
 
-    ${({ active }) =>
-      active
+    ${({ active, noAction }) =>
+      active || noAction
         ? css`
             border-top-right-radius: ${({ theme }) =>
               theme.borderRadius.medium};

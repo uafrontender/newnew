@@ -189,7 +189,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
                         src={winningOption.creator?.avatarUrl!!}
                       />
                       <SWinningBidCreatorText>
-                        { winningOption.creator?.uuid === user.userData?.userUuid ? (
+                        { winningOption.creator?.uuid === user.userData?.userUuid || winningOption.isSupportedByMe ? (
                             winningOption.supporterCount > 1 ? (
                               t('me')
                             ) : t('my')
@@ -198,8 +198,9 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
                         ) }
                         {winningOption.supporterCount > 1 ? (
                           <>
-                            {formatNumber(winningOption.supporterCount, true)}
                             {' & '}
+                            {formatNumber(winningOption.supporterCount, true)}
+                            {' '}
                             {t('AcPostSuccess.others')}
                           </>
                         ) : null}

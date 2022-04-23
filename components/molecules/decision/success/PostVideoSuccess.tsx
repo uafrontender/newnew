@@ -138,7 +138,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           </SSoundButton>
         </>
       )}
-      {!responseViewed && openedTab === 'announcement' ? (
+      {!responseViewed && openedTab === 'announcement' && response ? (
         <SWatchResponseWrapper>
           <SWatchResponseBtn
             shouldView={!responseViewed}

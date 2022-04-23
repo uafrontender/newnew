@@ -3,6 +3,8 @@ import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { AuthLayoutContext } from './AuthLayout';
 
+import useImageLoaded from "../../utils/hooks/useImageLoaded";
+
 // Sign in
 import SignInIntro from '../../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
 import SignInHold from '../../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
@@ -18,7 +20,9 @@ interface IHeroVisual {
 const HeroVisual: React.FunctionComponent<IHeroVisual> = ({style}) => {
   const theme = useTheme();
   const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>('intro');
-  const [introLoaded, setIntroLoaded] = useState(false);
+  const {
+    ref: introRef, loaded: introLoaded, onLoad: onIntroLoaded,
+  } = useImageLoaded();
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
@@ -57,10 +61,11 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({style}) => {
         }}
       >
         <SImage
-          src={theme.name === 'dark' ? SignInIntro.src : SignInIntroLight.src}
-          onLoad={() => {
-            setIntroLoaded(true);
+          ref={(el) => {
+            introRef.current = el!!;
           }}
+          src={theme.name === 'dark' ? SignInIntro.src : SignInIntroLight.src}
+          onLoad={onIntroLoaded}
         />
       </SImageWrapper>
       <SImageWrapper
