@@ -486,6 +486,48 @@
     "of_target_backers": "of {{ target_count }} backers",
     "you_backed_for": "You backed it for"
   },
+  "AcPostAwaiting": {
+    "hero": {
+      "title": "Time's up!",
+      "body": "{{ creator }} has {{ time }} to select and do their favorite bid!",
+      "expires": {
+        "days": "days",
+        "hours": "hours",
+        "minutes": "minutes",
+        "seconds": "seconds"
+      }
+    },
+    "wants_to_know": "{{ creator }} wants to know...",
+    "in_total_bids": "in total bids",
+    "others": "others",
+    "bid": "bid",
+    "bid_chosen": "Bid chosen",
+    "see_all": "see all bids",
+    "OptionsTab": {
+      "backBtn": "Back"
+    }
+  },
+  "McPostAwaiting": {
+    "hero_text": "This Superpoll has ended!",
+    "wants_to_know": "{{ creator }} wants to know...",
+    "in_total_votes": "total votes",
+    "others": "others",
+    "voted": "voted",
+    "votes": "votes",
+    "vote": "vote",
+    "option_chosen": "Highest voted option",
+    "see_all": "see all options",
+    "OptionsTab": {
+      "backBtn": "Back"
+    }
+  },
+  "CfPostAwaiting": {
+    "hero_text": "This Goal has ended!",
+    "wants_to_know": "{{ creator }}'s Goal",
+    "creators_backers": "{{ creator }}'s backers",
+    "of_target_backers": "of {{ target_count }} backers",
+    "you_backed_for": "You backed it for"
+  },
   "RecommendationsSection": {
     "heading": "More like this"
   },

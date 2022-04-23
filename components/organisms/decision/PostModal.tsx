@@ -54,6 +54,7 @@ import PostSuccessAC from './PostSuccessAC';
 import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
 import PostSuccessMC from './PostSuccessMC';
 import PostSuccessCF from './PostSuccessCF';
+import PostAwaitingResponseAC from './PostAwaitingResponseAC';
 
 interface IPostModal {
   isOpen: boolean;
@@ -300,6 +301,34 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
+  const renderPostWaitingForResponse = (postToRender: TPostType) => {
+    if (postToRender === 'ac') {
+      return (
+        <PostAwaitingResponseAC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Auction}
+        />
+      );
+    }
+    if (postToRender === 'mc') {
+      return (
+        <PostSuccessMC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.MultipleChoice}
+        />
+      );
+    }
+    if (postToRender === 'cf') {
+      return (
+        <PostSuccessCF
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Crowdfunding}
+        />
+      );
+    }
+    return <div />;
+  }
+
   const renderPostSuccess = (postToRender: TPostType) => {
     if (postToRender === 'mc') {
       return (
@@ -537,6 +566,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           >
             {postStatus === 'succeeded' ? (
               renderPostSuccess(typeOfPost)
+            ) : null}
+            {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
+              renderPostWaitingForResponse(typeOfPost)
             ) : null}
           </SPostModalContainer>
         ) : null}
