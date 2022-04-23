@@ -1,11 +1,10 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
 import React, {
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -23,26 +22,45 @@ import { getMcOption } from '../../../api/endpoints/multiple_choice';
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import BoxIcon from '../../../public/images/creation/MC.webp';
 import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import McSuccessOptionsTab from '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab';
+import secondsToDHMS from '../../../utils/secondsToDHMS';
+import WaitingForResponseBox from '../../molecules/decision/waiting/WaitingForResponseBox';
 
-interface IPostSuccessMC {
+interface IPostAwaitingResponseMC {
   post: newnewapi.MultipleChoice;
 }
 
-const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
+const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> = ({
   post,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const { mutedMode } = useAppSelector((state) => state.ui);
+
+  const waitingTime = useMemo(() => {
+    const end = (post.responseUploadDeadline?.seconds as number) * 1000;
+    const parsed = (end - Date.now()) / 1000;
+    const dhms = secondsToDHMS(parsed, 'noTrim');
+
+    let countdownsrt = `${dhms.days} ${t('AcPostAwaiting.hero.expires.days')} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+
+    if (dhms.days === '0') {
+      countdownsrt = `${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+      if (dhms.hours === '0') {
+        countdownsrt = `${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+        if (dhms.minutes === '0') {
+          countdownsrt = `${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+        }
+      }
+    }
+    countdownsrt = `${countdownsrt} `;
+    return countdownsrt;
+  }, [post.responseUploadDeadline?.seconds, t]);
 
     // Winninfg option
   const [winningOption, setWinningOption] =
@@ -153,12 +171,16 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
         <SActivitesContainer>
           {openedMainSection === 'main' ? (
             <>
-              <DecisionEndedBox
-                type="mc"
-                imgSrc={BoxIcon.src}
-              >
-                {t('McPostSuccess.hero_text')}
-              </DecisionEndedBox>
+              <WaitingForResponseBox
+                title={t('McPostAwaiting.hero.title')}
+                body={t(
+                  'McPostAwaiting.hero.body',
+                  {
+                    creator: post.creator?.nickname,
+                    time: waitingTime
+                  })
+                }
+              />
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
@@ -237,36 +259,6 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
                 </>
                 )}
               </SMainSectionWrapper>
-              {!isMobile ? (
-                <>
-                  {!responseViewed && videoTab === 'announcement' ? (
-                    <SWatchResponseWrapper>
-                      <SWatchResponseBtn
-                        shouldView={!responseViewed}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
-                      </SWatchResponseBtn>
-                    </SWatchResponseWrapper>
-                  ) : null}
-                  {responseViewed ? (
-                    <SToggleVideoWidget>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'announcement'}
-                        onClick={() => setVideoTab('announcement')}
-                      >
-                        { t('PostVideoSuccess.tabs.watch_original') }
-                      </SChangeTabBtn>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'response'}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        { t('PostVideoSuccess.tabs.watch_response')}
-                      </SChangeTabBtn>
-                    </SToggleVideoWidget>
-                  ) : null}
-                </>
-              ) : null}
             </>
           ) : (
             <McSuccessOptionsTab
@@ -294,7 +286,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
   );
 };
 
-export default PostSuccessMC;
+export default PostAwaitingResponseMC;
 
 const SWrapper = styled.div`
   width: 100%;
@@ -599,75 +591,6 @@ const SWinningOptionDetailsTitle = styled(Headline)`
     text-align: left;
   }
 `;
-
-
-// Watch response for the first time
-const SWatchResponseWrapper = styled.div`
-  width: 100%;
-  height: 60px;
-
-  overflow: hidden;
-  border-radius: 16px;
-`;
-
-const SWatchResponseBtn = styled.button<{
-  shouldView?: boolean;
-}>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
-  border: transparent;
-  border-radius: 16px;
-
-  padding: 17px 24px;
-
-  width: 100%;
-  height: 100%;
-
-  color: #FFFFFF;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-
-  cursor: pointer;
-
-  &:active, &:focus {
-    outline: none;
-  }
-`;
-
-const SToggleVideoWidget = styled.div`
-  display: flex;
-
-  height: 60px;
-  width: 100%;
-
-  overflow: hidden;
-  border-radius: 16px;
-`;
-
-const SChangeTabBtn = styled.button<{
-  shouldView?: boolean;
-}>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
-  border: transparent;
-
-  padding: 17px 24px;
-
-  width: 50%;
-  height: 100%;
-
-  text-align: center;
-  color: #FFFFFF;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-
-  cursor: pointer;
-
-  &:active, &:focus {
-    outline: none;
-  }
-`;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
