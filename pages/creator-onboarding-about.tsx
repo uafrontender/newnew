@@ -13,7 +13,11 @@ import { useAppSelector } from '../redux-store/store';
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import { getSupportedCreatorCountries } from '../api/endpoints/payments';
-import { getAvailableCreatorTags, getMyCreatorTags, getMyOnboardingState } from '../api/endpoints/user';
+import {
+  getAvailableCreatorTags,
+  getMyCreatorTags,
+  getMyOnboardingState,
+} from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import OnboardingSectionAbout from '../components/molecules/creator-onboarding/OnboardingSectionAbout';
@@ -22,10 +26,13 @@ interface ICreatorOnboardingAbout {
   availableTags: newnewapi.CreatorTags;
 }
 
-const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({ availableTags }) => {
+const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
+  availableTags,
+}) => {
   const { t } = useTranslation('creator-onboarding');
 
-  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,7 +69,10 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({ availableTa
         <meta name="description" content={t('meta.description')} />
       </Head>
       {!isLoading ? (
-        <OnboardingSectionAbout availableTags={availableTags.tags} currentTags={currentTags} />
+        <OnboardingSectionAbout
+          availableTags={availableTags.tags}
+          currentTags={currentTags}
+        />
       ) : (
         <Lottie
           width={64}
@@ -78,14 +88,23 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({ availableTa
   );
 };
 
-(CreatorOnboardingAbout as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return <CreatorOnboardingLayout hideProgressBar>{page}</CreatorOnboardingLayout>;
+(CreatorOnboardingAbout as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
+  return (
+    <CreatorOnboardingLayout hideOnboardingHeader>
+      {page}
+    </CreatorOnboardingLayout>
+  );
 };
 
 export default CreatorOnboardingAbout;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['creator-onboarding', 'profile']);
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'creator-onboarding',
+    'profile',
+  ]);
 
   try {
     const tagsPayload = new newnewapi.EmptyRequest({});

@@ -26,11 +26,11 @@ const countriesMock: Omit<newnewapi.Country, 'toJSON'>[] = [
   },
 ];
 
-interface ICreatorOnboardingStage2 {
+interface ICreatorOnboarding {
   availableCountriesRes: newnewapi.GetSupportedCreatorCountriesResponse;
 }
 
-const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
+const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   availableCountriesRes,
 }) => {
   const { t } = useTranslation('creator-onboarding');
@@ -38,16 +38,13 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
-  useLeavePageConfirm(
-    true,
-    t('DetailsSection.leaveMsg'),
-    [
-      '/creator/dashboard',
-      '/verify-new-email',
-    ],
-  );
+  useLeavePageConfirm(true, t('DetailsSection.leaveMsg'), [
+    '/creator/dashboard',
+    '/verify-new-email',
+  ]);
 
-  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
 
   // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
   const goToNext = () => {
@@ -57,7 +54,7 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/creator/dashboard');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -80,13 +77,15 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
+        <title>{t('meta.title')}</title>
         <meta name="description" content={t('meta.description')} />
       </Head>
       {onboardingState ? (
         <OnboardingSectionDetails
           isAvatarCustom={onboardingState?.isCustomAvatar ?? false}
-          availableCountries={availableCountriesRes.countries as newnewapi.Country[]}
+          availableCountries={
+            availableCountriesRes.countries as newnewapi.Country[]
+          }
           goToDashboard={goToNext}
         />
       ) : (
@@ -104,21 +103,19 @@ const CreatorOnboardingStage2: NextPage<ICreatorOnboardingStage2> = ({
   );
 };
 
-(CreatorOnboardingStage2 as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return (
-    <CreatorOnboardingLayout>
-      { page }
-    </CreatorOnboardingLayout>
-  );
+(CreatorOnboarding as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
+  return <CreatorOnboardingLayout>{page}</CreatorOnboardingLayout>;
 };
 
-export default CreatorOnboardingStage2;
+export default CreatorOnboarding;
 
-export const getServerSideProps:GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['creator-onboarding', 'profile'],
-  );
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'creator-onboarding',
+    'profile',
+  ]);
 
   try {
     const countriesPayload = new newnewapi.EmptyRequest({});

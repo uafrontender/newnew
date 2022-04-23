@@ -7,15 +7,17 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
 
-type TOnboardingEmailInput = React.ComponentPropsWithoutRef<'input'> & {
+type TOnboardingInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   isTaken?: boolean;
   labelCaption: string;
-  errorCaption: string;
-  cantChangeInfoCaption: string;
-}
+  errorCaption?: string;
+  cantChangeInfoCaption?: string;
+};
 
-const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
+const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
+  id,
+  type,
   value,
   isValid,
   isTaken,
@@ -36,9 +38,7 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
 
   return (
     <SContainer>
-      <SLabel>
-        { labelCaption }
-      </SLabel>
+      <SLabel>{labelCaption}</SLabel>
       {readOnly && (
         <SReadonlyLock>
           <InlineSvg
@@ -49,18 +49,20 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
           />
         </SReadonlyLock>
       )}
-      <SOnboardingEmailInput
-        id="settings_email_input"
-        type="email"
+      <SOnboardingInput
+        id={id}
+        type={type}
         value={value}
         readOnly={readOnly}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
         style={{
-          ...(readOnly ? {
-            cursor: 'default',
-            userSelect: 'none',
-          } : {}),
+          ...(readOnly
+            ? {
+                cursor: 'default',
+                userSelect: 'none',
+              }
+            : {}),
         }}
         onBlur={() => {
           if (value && (value as string).length > 0 && !isValid) {
@@ -75,38 +77,27 @@ const OnboardingEmailInput: React.FunctionComponent<TOnboardingEmailInput> = ({
         }}
         {...rest}
       />
-      {readOnly && (
-      <SReadonlyCaption>
-        { cantChangeInfoCaption }
-      </SReadonlyCaption>
-      )}
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {readOnly && <SReadonlyCaption>{cantChangeInfoCaption}</SReadonlyCaption>}
+      {errorBordersShown ? (
+        <AnimatedPresence animateWhenInView={false} animation="t-09">
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width="16px" height="16px" />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
     </SContainer>
   );
 };
 
-OnboardingEmailInput.defaultProps = {
+OnboardingInput.defaultProps = {
   isValid: undefined,
   isTaken: undefined,
+  errorCaption: '',
+  cantChangeInfoCaption: '',
 };
 
-export default OnboardingEmailInput;
+export default OnboardingInput;
 
 const SContainer = styled.div`
   position: relative;
@@ -145,11 +136,11 @@ const SReadonlyCaption = styled.div`
   margin-top: 6px;
 `;
 
-interface ISOnboardingEmailInput {
-  errorBordersShown?: boolean
+interface ISOnboardingInput {
+  errorBordersShown?: boolean;
 }
 
-const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
+const SOnboardingInput = styled.input<ISOnboardingInput>`
   display: block;
 
   height: 44px;
@@ -168,7 +159,8 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
     if (!errorBordersShown) {
       // NB! Temp
       return 'transparent';
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -196,11 +188,12 @@ const SOnboardingEmailInput = styled.input<ISOnboardingEmailInput>`
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   ${({ theme }) => theme.media.tablet} {
