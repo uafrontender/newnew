@@ -508,7 +508,16 @@
     }
   },
   "McPostAwaiting": {
-    "hero_text": "This Superpoll has ended!",
+    "hero": {
+      "title": "Votes are in!",
+      "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
+      "expires": {
+        "days": "days",
+        "hours": "hours",
+        "minutes": "minutes",
+        "seconds": "seconds"
+      }
+    },
     "wants_to_know": "{{ creator }} wants to know...",
     "in_total_votes": "total votes",
     "others": "others",
@@ -522,7 +531,16 @@
     }
   },
   "CfPostAwaiting": {
-    "hero_text": "This Goal has ended!",
+    "hero": {
+      "title": "Votes are in!",
+      "body": "{{ creator }} has {{ time }} to do this option. Stay tuned!",
+      "expires": {
+        "days": "days",
+        "hours": "hours",
+        "minutes": "minutes",
+        "seconds": "seconds"
+      }
+    },
     "wants_to_know": "{{ creator }}'s Goal",
     "creators_backers": "{{ creator }}'s backers",
     "of_target_backers": "of {{ target_count }} backers",

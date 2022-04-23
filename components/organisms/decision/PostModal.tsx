@@ -55,6 +55,7 @@ import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
 import PostSuccessMC from './PostSuccessMC';
 import PostSuccessCF from './PostSuccessCF';
 import PostAwaitingResponseAC from './PostAwaitingResponseAC';
+import PostAwaitingResponseMC from './PostAwaitingResponseMC';
 
 interface IPostModal {
   isOpen: boolean;
@@ -312,7 +313,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
     if (postToRender === 'mc') {
       return (
-        <PostSuccessMC
+        <PostAwaitingResponseMC
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.MultipleChoice}
         />

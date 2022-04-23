@@ -6,12 +6,12 @@ import Headline from '../../../atoms/Headline';
 
 import HourGlassImage from '../../../../public/images/decision/hourglass-mock.png';
 
-interface IDecisionEndedBox {
+interface IWaitingForResponseBox {
   title: string;
   body: string;
 }
 
-const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
+const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> = ({
   title,
   body,
 }) => (
@@ -37,7 +37,7 @@ const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
     </SBox>
   )
 
-export default DecisionEndedBox;
+export default WaitingForResponseBox;
 
 const SBox = styled.div`
   display: flex;
