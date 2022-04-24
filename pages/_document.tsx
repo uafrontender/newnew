@@ -61,12 +61,14 @@ export default class MyDocument extends Document {
           <link rel="prefetch" href="/images/signup/floating-assets/Top-Middle-Sphere.png" as="image" crossOrigin="anonymous" media="(min-width: 760px)"/>
           <link rel="prefetch" href="/images/signup/floating-assets/Votes.png" as="image" crossOrigin="anonymous" media="(min-width: 760px)"/>
             {/* Landing page */}
-              {/* Dark */}
               {/* NB! Video is not supported, so preload placeholders */}
+              {/* Dark */}
           {/* <link rel="preload" href="/images/home/Landing-Page-Dark.mp4" as="video" crossOrigin="anonymous" /> */}
           <link rel="prefetch" href="/images/home/Landing-Page-Hold-Frame-Light.webp" as="image" crossOrigin="anonymous" />
+          <link rel="prefetch" href="/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp" as="image" crossOrigin="anonymous" />
               {/* Light */}
           <link rel="prefetch" href="/images/home/Landing-Page-Hold-Frame-Dark.webp" as="image" crossOrigin="anonymous" />
+          <link rel="prefetch" href="/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp" as="image" crossOrigin="anonymous" />
             {/* Creation screen */}
           <link rel="prefetch" href="/images/creation/AC-static.png" as="image" crossOrigin="anonymous" />
           <link rel="prefetch" href="/images/creation/MC-static.png" as="image" crossOrigin="anonymous" />
