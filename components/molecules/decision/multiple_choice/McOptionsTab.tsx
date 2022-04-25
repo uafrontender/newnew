@@ -662,6 +662,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${parseInt(newBidAmount) * votePrice}`}
+          {...(
+            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100 ? {} : {
+              predefinedOption: 'card'
+            }
+          )}
           showTocApply={!user?.loggedIn}
           {...{
             ...(walletBalance &&

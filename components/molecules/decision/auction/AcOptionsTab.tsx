@@ -605,6 +605,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${newBidAmount}`}
+          {...(
+            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(newBidAmount) * 100 ? {} : {
+              predefinedOption: 'card'
+            }
+          )}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

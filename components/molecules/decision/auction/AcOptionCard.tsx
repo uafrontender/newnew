@@ -500,7 +500,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               }
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
+              {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
             </Button>
             <SCancelButton
               view="transparent"
@@ -541,7 +541,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 disabled={!supportBidAmount}
                 onClick={() => handleTogglePaymentModalOpen()}
               >
-                {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
+                {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
               </Button>
             </SSuggestSupportMobileContainer>
           </OptionActionMobileModal>
@@ -552,6 +552,11 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         <PaymentModal
           isOpen={paymentModalOpen}
           zIndex={12}
+          {...(
+            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(supportBidAmount) * 100 ? {} : {
+              predefinedOption: 'card'
+            }
+          )}
           amount={`$${supportBidAmount}`}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
