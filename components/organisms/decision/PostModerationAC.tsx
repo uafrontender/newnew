@@ -208,6 +208,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const [winningOption, setWinningOption] =
     useState<newnewapi.Auction.Option | undefined>();
 
+  const handleUpdateWinningOption = (selectedOption: newnewapi.Auction.Option) => {
+    setWinningOption(selectedOption);
+    setWinningOptionId(selectedOption.id);
+    handleChangeTab('winner');
+  };
+
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
@@ -350,6 +356,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
+      if (res.data.auction?.winningOptionId && !winningOptionId) {
+        setWinningOptionId(res.data.auction?.winningOptionId);
+        handleChangeTab('winner');
+      }
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
       handleUpdatePostStatus(res.data.auction!!.status!!);
@@ -412,10 +422,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       }
     }
 
-    if (winningOptionId) {
+    if (winningOptionId && !winningOption?.id) {
       fetchAndSetWinningOption(winningOptionId as number);
     }
-  }, [winningOptionId]);
+  }, [winningOptionId, winningOption?.id]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -576,6 +586,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         title={post.title}
         postId={post.postUuid}
         amountInBids={totalAmount}
+        hasWinner={!!winningOptionId}
+        hasResponse={!!post.response}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer
@@ -595,8 +607,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
             handleLoadBids={fetchBids}
+            handleRemoveOption={handleRemoveOption}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleUpdateWinningOptionId={(id: number) => setWinningOptionId(id)}
+            handleUpdateWinningOption={handleUpdateWinningOption}
           />
         ) : currentTab === 'comments' && post.isCommentsAllowed ? (
           <CommentsTab
@@ -606,6 +619,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           />
         ) : winningOption ? (
           <AcWinnerTabModeration
+            postId={post.postUuid}
             option={winningOption}
             postStatus={postStatus}
           />

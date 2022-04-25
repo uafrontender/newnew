@@ -20,6 +20,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
+  postType: string;
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
@@ -27,6 +28,7 @@ interface IPostViewScheduled {
 
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   post,
+  postType,
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
@@ -134,11 +136,14 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
         postId={post.postUuid}
         postStatus={postStatus}
         creator={post.creator!!}
+        hasWinner={false}
+        hasResponse={false}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
         startsAtSeconds={post.startsAt?.seconds as number}
       />
       <SActivitesContainer>
         <PostScheduledSection
+          postType={postType}
           timestampSeconds={new Date((post.startsAt?.seconds as number) * 1000).getTime()}
           isFollowing={isFollowing}
           handleFollowDecision={handleFollowDecision}

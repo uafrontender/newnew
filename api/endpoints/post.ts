@@ -25,7 +25,7 @@ export const deleteMyPost = (payload: newnewapi.DeleteMyPostRequest) =>
   fetchProtobufProtectedIntercepted<newnewapi.DeleteMyPostRequest, newnewapi.EmptyResponse>(
     newnewapi.DeleteMyPostRequest,
     newnewapi.EmptyResponse,
-    `${BASE_URL_POST}/cancel_my_post`,
+    `${BASE_URL_POST}/delete_my_post`,
     'post',
     payload
   );

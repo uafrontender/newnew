@@ -32,8 +32,9 @@ interface IAcOptionsTabModeration {
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   handleLoadBids: (token?: string) => void;
+  handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleUpdateWinningOptionId: (id: number) => void;
+  handleUpdateWinningOption: (winningOption: newnewapi.Auction.Option) => void;
 }
 
 const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> = ({
@@ -43,8 +44,9 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
   optionsLoading,
   pagingToken,
   handleLoadBids,
+  handleRemoveOption,
   handleUpdatePostStatus,
-  handleUpdateWinningOptionId,
+  handleUpdateWinningOption,
 }) => {
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -71,7 +73,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
 
       if (res.data) {
         handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
-        handleUpdateWinningOptionId(winningOption.id as number);
+        handleUpdateWinningOption(winningOption);
       }
     } catch (err) {
       console.error(err);
@@ -109,11 +111,6 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
             >
               { t('AcPostModeration.OptionsTab.NoOptions.caption_1') }
             </SNoOptionsCaption>
-            <SNoOptionsCaption
-              variant={3}
-            >
-              { t('AcPostModeration.OptionsTab.NoOptions.caption_2') }
-            </SNoOptionsCaption>
           </SNoOptionsYet>
         ) : null}
         <SBidsContainer
@@ -133,6 +130,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
               key={option.id.toString()}
               postStatus={postStatus}
               option={option as TAcOptionWithHighestField}
+              handleRemoveOption={handleRemoveOption}
               handleConfirmWinningOption={() => handleConfirmWinningOption(option)}
             />
           ))}
@@ -231,7 +229,6 @@ const SNoOptionsYet = styled.div`
 `;
 
 const SNoOptionsImgContainer = styled.div`
-  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;

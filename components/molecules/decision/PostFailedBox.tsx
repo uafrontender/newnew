@@ -9,6 +9,7 @@ interface IPostFailedBox {
   title: string;
   body: string;
   buttonCaption: string;
+  imageSrc?: string;
   style?: React.CSSProperties;
   handleButtonClick: () => void;
 }
@@ -17,6 +18,7 @@ const PostFailedBox: React.FunctionComponent<IPostFailedBox> = ({
   title,
   body,
   buttonCaption,
+  imageSrc,
   style,
   handleButtonClick,
 }) => (
@@ -24,7 +26,7 @@ const PostFailedBox: React.FunctionComponent<IPostFailedBox> = ({
       style={style ?? {}}
     >
       <SIconImg
-        src={PostFailIcon.src}
+        src={imageSrc ?? PostFailIcon.src}
       />
       <SHeadline
         variant={2}
@@ -48,6 +50,7 @@ const PostFailedBox: React.FunctionComponent<IPostFailedBox> = ({
 
 PostFailedBox.defaultProps = {
   style: undefined,
+  imageSrc: undefined,
 }
 
 export default PostFailedBox;
@@ -74,6 +77,8 @@ const SFailedBox = styled.div`
 const SIconImg = styled.img`
   grid-area: imageArea;
 
+  height: 60px;
+  margin-right: 16px;
 `;
 
 const SHeadline = styled(Text)`

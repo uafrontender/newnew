@@ -2,22 +2,27 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 
-import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
 
 interface IAcOptionCardModerationEllipseModal {
   isOpen: boolean;
   zIndex: number;
+  canDeleteOption: boolean;
   onClose: () => void;
-  handleOpenDeletePostModal: () => void;
+  handleOpenReportOptionModal: () => void;
+  handleOpenBlockUserModal: () => void;
+  handleOpenRemoveOptionModal: () => void;
 }
 
 const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardModerationEllipseModal> = ({
   isOpen,
   zIndex,
+  canDeleteOption,
   onClose,
-  handleOpenDeletePostModal,
+  handleOpenReportOptionModal,
+  handleOpenBlockUserModal,
+  handleOpenRemoveOptionModal,
 }) => {
   const { t } = useTranslation('decision');
 
@@ -35,16 +40,32 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
           }}
         >
           <SButton
+            view="secondary"
             onClick={() => {
-              handleOpenDeletePostModal();
+              handleOpenReportOptionModal();
               onClose();
             }}
           >
-            <Text
-              variant={3}
-            >
-              { t('ellipse.deleteDecision') }
-            </Text>
+            { t('AcPostModeration.OptionsTab.OptionCard.ellipse.report') }
+          </SButton>
+          <SButton
+            view="secondary"
+            onClick={() => {
+              handleOpenBlockUserModal();
+              onClose();
+            }}
+          >
+            { t('AcPostModeration.OptionsTab.OptionCard.ellipse.block') }
+          </SButton>
+          <SButton
+            view="secondary"
+            disabled={!canDeleteOption}
+            onClick={() => {
+              handleOpenRemoveOptionModal();
+              onClose();
+            }}
+          >
+            { t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove') }
           </SButton>
         </SContentContainer>
         <Button
@@ -78,16 +99,9 @@ const SWrapper = styled.div`
 
 const SContentContainer = styled.div`
   width: calc(100% - 32px);
-  height: fit-content;
-
   display: flex;
   flex-direction: column;
-
-  padding: 16px;
-
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
+  gap: 6px;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
@@ -96,15 +110,27 @@ const SContentContainer = styled.div`
   }
 `;
 
-const SButton = styled.button`
-  background: none;
+
+const SButton = styled(Button)`
   border: transparent;
 
   text-align: center;
 
   cursor: pointer;
 
-  &:focus {
+  height: 56px;
+
+  &:focus, &:hover {
     outline: none;
+  }
+
+  &:focus:enabled, &:hover:enabled {
+    outline: none;
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
 `;
