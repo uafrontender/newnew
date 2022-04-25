@@ -8,12 +8,14 @@ import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseMenuModeration {
+  postType: string;
   isVisible: boolean;
   handleClose: () => void;
   handleOpenDeletePostModal: () => void;
 }
 
 const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModeration> = ({
+  postType,
   isVisible,
   handleClose,
   handleOpenDeletePostModal,
@@ -44,7 +46,7 @@ const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModerat
             <Text
               variant={3}
             >
-              { t('ellipse.deleteDecision') }
+              { t('ellipse.deleteDecision', { postType: t(`postType.${postType}`) })}
             </Text>
           </SButton>
         </SContainer>

@@ -7,6 +7,7 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseModalModeration {
+  postType: string;
   isOpen: boolean;
   zIndex: number;
   onClose: () => void;
@@ -14,6 +15,7 @@ interface IPostEllipseModalModeration {
 }
 
 const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModeration> = ({
+  postType,
   isOpen,
   zIndex,
   onClose,
@@ -43,7 +45,7 @@ const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModer
             <Text
               variant={3}
             >
-              { t('ellipse.deleteDecision') }
+              { t('ellipse.deleteDecision', { postType: t(`postType.${postType}`) })}
             </Text>
           </SButton>
         </SContentContainer>

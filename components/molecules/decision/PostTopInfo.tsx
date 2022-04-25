@@ -226,6 +226,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
+              postType={postType as string}
               isFollowing={followingsIds.includes(creator.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
@@ -236,6 +237,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
+              postType={postType as string}
               isFollowing={followingsIds.includes(creator.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
@@ -274,7 +276,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailed.title')}
+          title={t('PostFailed.title', { postType: t(`postType.${postType}`) })}
           body={t('PostFailed.body.not_reached_goal')}
           buttonCaption={t('PostFailed.ctaButton')}
           handleButtonClick={() => {

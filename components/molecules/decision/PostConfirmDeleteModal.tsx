@@ -5,12 +5,14 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 
 interface IPostConfirmDeleteModal {
+  postType: string;
   isVisible: boolean,
   closeModal: () => void;
   handleConfirmDelete: () => void;
 }
 
 const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
+  postType,
   isVisible,
   closeModal,
   handleConfirmDelete,
@@ -25,9 +27,11 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
     >
       <SContainer>
         <SModal>
-          <SModalTitle>{t('DeletePostModal.title')}</SModalTitle>
+          <SModalTitle>
+            {t('DeletePostModal.title', { postType: t(`postType.${postType}`) })}
+          </SModalTitle>
           <SModalMessage>
-            {t('DeletePostModal.body')}
+            {t('DeletePostModal.body', { postType: t(`postType.${postType}`) })}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton>

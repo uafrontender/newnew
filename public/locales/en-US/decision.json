@@ -3,9 +3,9 @@
   "me": "me",
   "I": "I",
   "postType": {
-    "ac": "Auction",
-    "mc": "Multiple Choice",
-    "cf": "Crowdfunding"
+    "ac": "Event",
+    "mc": "Superpoll",
+    "cf": "Goal"
   },
   "loadMoreBtn": "Load more",
   "expires": {
@@ -40,33 +40,33 @@
     "cf": "Stay tuned, {{postCreator}} will upload response on {{postDeadline}}"
   },
   "PostFailedBoxModeration": {
-    "title": "Decision failed",
+    "title": "{{ postType }} failed",
     "body": "Let's start again and share more.",
     "ctaButton": "Make a new one"
   },
   "PostDeletedByMe": {
-    "title": "Decision deleted",
+    "title": "{{ postType }} deleted",
     "body": {
-      "by_creator": "You deleted this decision"
+      "by_creator": "You deleted this {{ postType }}"
     },
     "ctaButton": "Make a new one"
   },
   "PostDeleted": {
-    "title": "Decision deleted",
+    "title": "{{ postType }} deleted",
     "body": {
-      "by_creator": "Creator deleted this decision"
+      "by_creator": "Creator deleted this {{ postType }}"
     },
     "ctaButton": "See others"
   },
   "PostFailed": {
-    "title": "Decision failed",
+    "title": "{{ postType }} failed",
     "body": {
       "not_reached_goal": "Decision hasn't reached its goal"
     },
     "ctaButton": "See others"
   },
   "PostFailedBox": {
-    "title": "Decision failed",
+    "title": "{{ postType }} failed",
     "body": "Let's start again and share more.",
     "ctaButton": "Make a new one"
   },
@@ -86,17 +86,17 @@
     }
   },
   "PostSuccess": {
-    "title": "This decision is finished!",
+    "title": "This {{ postType }} is finished!",
     "body": "Checkout more like it.",
     "ctaButton": "See more"
   },
   "ellipse": {
     "follow-creator": "Follow creator",
     "unfollow-creator": "Unfollow creator",
-    "follow-decision": "Follow decision",
-    "unfollow-decision": "Unfollow decision",
+    "follow-decision": "Follow {{ postType }}",
+    "unfollow-decision": "Unfollow {{ postType }}",
     "report": "Report",
-    "deleteDecision": "Delete decision",
+    "deleteDecision": "Delete {{ postType }}",
     "cancel": "Cancel"
   },
   "PostVideo": {
@@ -171,16 +171,23 @@
     }
   },
   "DeletePostModal": {
-    "title": "Delete decision",
-    "body": "Are you sure you want to permanently delete this decision? You can't undo the action.",
+    "title": "Delete {{ postType }}",
+    "body": "Are you sure you want to delete this {{ postType }}? You won't be able to restore it once it's deleted...",
     "cancelBtn": "Cancel",
-    "confirmBtn": "Delete permenently"
+    "confirmBtn": "Delete"
   },
   "DeleteCommentModal": {
     "title": "Delete comment",
     "body": "Are you sure you want to permanently delete this comment? You can't undo the action.",
     "cancelBtn": "Cancel",
-    "confirmBtn": "Delete permenently"
+    "confirmBtn": "Delete"
+  },
+  "BlockUserModal": {
+    "title": "Block user",
+    "message-first-part": "Do you really want to block",
+    "message-second-part": "?",
+    "button-cancel": "Cancel",
+    "button-confirm": "Block user"
   },
   "tabs": {
     "comments": "Comments",
@@ -193,7 +200,7 @@
   "PostScheduled": {
     "PostScheduledSection": {
       "title": "Coming soon",
-      "subtitle_1": "Decision is not active yet.",
+      "subtitle_1": "{{ postType }} is not active yet.",
       "subtitle_2": "Follow to not miss the update.",
       "timer": {
         "days": "Days",
@@ -201,8 +208,8 @@
         "minutes": "Minutes",
         "seconds": "Seconds"
       },
-      "followBtn": "Follow decision",
-      "unfollowBtn": "Unfollow decision"
+      "followBtn": "Follow {{ postType }}",
+      "unfollowBtn": "Unfollow {{ postType }}"
     }
   },
   "AcPost": {
@@ -378,24 +385,23 @@
   "AcPostModeration": {
     "PostTopInfo": {
       "SelectWinner": {
-        "title": "Time's up!",
-        "body": "It's time to select the winning bid."
+        "title": "Time to choose!",
+        "body": "Select your favorite bid then upload a response video before time runs out"
       }
     },
     "OptionsTab": {
       "me": "me",
       "NoOptions": {
-        "caption_1": "No active bids yet.",
-        "caption_2": "Share the decision to get as many as possible!"
+        "caption_1": "Be the first to bid..."
       },
       "selectWinner": {
-        "title": "Confirm winner",
-        "body": "You are about to select a winner.",
+        "title": "Confirm favorite bid",
+        "body": "If you choose this as your favorite bid you'll need to upload a video of yourself doing it!",
         "cancelBtn": "Cancel",
-        "confirmBtn": "Confirm winner"
+        "confirmBtn": "Confirm favorite bid"
       },
       "OptionCard": {
-        "pickBtn": "Pick",
+        "pickBtn": "Select",
         "ellipse": {
           "report": "Report bid",
           "block": "Block user",
@@ -415,7 +421,7 @@
       "title": "Delete option",
       "body": "Are you sure you want to permanently delete this option? You can't undo the action.",
       "cancelBtn": "Cancel",
-      "confirmBtn": "Delete permenently"
+      "confirmBtn": "Delete"
     },
     "floatingUploadResponseBtn": "Respond now with a video"
   },
@@ -441,7 +447,7 @@
       "title": "Delete option",
       "body": "Are you sure you want to permanently delete this option? You can't undo the action.",
       "cancelBtn": "Cancel",
-      "confirmBtn": "Delete permenently"
+      "confirmBtn": "Delete"
     }
   },
   "CfPostModeration": {

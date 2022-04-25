@@ -208,6 +208,12 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const [winningOption, setWinningOption] =
     useState<newnewapi.Auction.Option | undefined>();
 
+  const handleUpdateWinningOption = (selectedOption: newnewapi.Auction.Option) => {
+    setWinningOption(selectedOption);
+    setWinningOptionId(selectedOption.id);
+    handleChangeTab('winner');
+  };
+
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
@@ -412,10 +418,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       }
     }
 
-    if (winningOptionId) {
+    if (winningOptionId && !winningOption?.id) {
       fetchAndSetWinningOption(winningOptionId as number);
     }
-  }, [winningOptionId]);
+  }, [winningOptionId, winningOption?.id]);
 
   useEffect(() => {
     const socketHandlerOptionCreatedOrUpdated = (data: any) => {
@@ -596,7 +602,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             pagingToken={optionsNextPageToken}
             handleLoadBids={fetchBids}
             handleUpdatePostStatus={handleUpdatePostStatus}
-            handleUpdateWinningOptionId={(id: number) => setWinningOptionId(id)}
+            handleUpdateWinningOption={handleUpdateWinningOption}
           />
         ) : currentTab === 'comments' && post.isCommentsAllowed ? (
           <CommentsTab

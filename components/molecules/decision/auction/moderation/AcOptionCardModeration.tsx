@@ -28,6 +28,7 @@ import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
+import BlockUserModalPost from '../../BlockUserModalPost';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -208,6 +209,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
           {!isMobile && (
             <AcOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
+              canDeleteOption={postStatus === 'voting'}
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -294,10 +296,21 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         <AcOptionCardModerationEllipseModal
           isOpen={isEllipseMenuOpen}
           zIndex={16}
+          canDeleteOption={postStatus === 'voting'}
           onClose={() => setIsEllipseMenuOpen(false)}
-          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+          handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+          handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+          handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
         />
       )}
+      {/* Confirm block user modal */}
+      <BlockUserModalPost
+        confirmBlockUser={isBlockModalOpen}
+        onUserBlock={() => {}}
+        user={option.creator!!}
+        closeModal={() => setIsBlockModalOpen(false)}
+      />
+      {/* Report modal */}
     </>
   );
 };

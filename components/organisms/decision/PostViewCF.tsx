@@ -446,7 +446,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
               currentNumBackers={currentBackers}
             />
             <PostSuccessBox
-              title={t('PostSuccess.title')}
+              title={t('PostSuccess.title', { postType: t(`postType.cf`) })}
               body={t('PostSuccess.body')}
               buttonCaption={t('PostSuccess.ctaButton')}
               style={{

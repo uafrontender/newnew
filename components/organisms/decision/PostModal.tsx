@@ -307,6 +307,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewScheduled
           key={postParsed?.postUuid}
+          postType={postToRender}
           post={postParsed!!}
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
@@ -668,6 +669,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
+              postType={typeOfPost as string}
               isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
@@ -678,6 +680,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
+              postType={typeOfPost as string}
               isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
@@ -750,8 +753,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             )
           ) : isMyPost ? (
             <PostFailedBox
-              title={t('PostDeletedByMe.title')}
-              body={t('PostDeletedByMe.body.by_creator')}
+              title={t('PostDeletedByMe.title', { postType: t(`postType.${typeOfPost}`) })}
+              body={t('PostDeletedByMe.body.by_creator', { postType: t(`postType.${typeOfPost}`) })}
               buttonCaption={t('PostDeletedByMe.ctaButton')}
               handleButtonClick={() => {
                 router.push('/creation');

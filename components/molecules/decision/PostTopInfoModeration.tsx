@@ -65,8 +65,6 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [deletePostOpen, setDeletePostOpen] = useState(false);
 
-  console.log(postStatus)
-
   const handleOpenShareMenu = () => setShareMenuOpen(true);
   const handleCloseShareMenu = () => setShareMenuOpen(false);
 
@@ -167,6 +165,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenuModeration
+              postType={postType as string}
               isVisible={ellipseMenuOpen}
               handleClose={handleCloseEllipseMenu}
               handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -174,6 +173,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModalModeration
+              postType={postType as string}
               zIndex={11}
               isOpen={ellipseMenuOpen}
               onClose={handleCloseEllipseMenu}
@@ -206,7 +206,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailedBoxModeration.title')}
+          title={t('PostFailedBoxModeration.title', { postType: t(`postType.${postType}`) })}
           body={t('PostFailedBoxModeration.body')}
           buttonCaption={t('PostFailedBoxModeration.ctaButton')}
           handleButtonClick={() => {
@@ -216,6 +216,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
       )}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
+        postType={postType as string}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
         handleConfirmDelete={handleDeletePost}
