@@ -11,6 +11,7 @@ import useOnClickOutside from '../../../../../utils/hooks/useOnClickOutside';
 interface IMcOptionCardModerationEllipseMenu {
   isVisible: boolean;
   isBySubscriber: boolean;
+  canBeDeleted: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
@@ -20,6 +21,7 @@ interface IMcOptionCardModerationEllipseMenu {
 const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardModerationEllipseMenu> = ({
   isVisible,
   isBySubscriber,
+  canBeDeleted,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
@@ -71,6 +73,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardMo
             </>
           ) : null}
           <SButton
+            disabled={!canBeDeleted}
             onClick={() => {
               handleOpenRemoveOptionModal();
               handleClose();
@@ -128,6 +131,15 @@ const SButton = styled.button`
 
   &:focus, &:hover {
     outline: none;
+  }
+
+  &:focus:enabled, &:hover:enabled {
+    outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
 `;

@@ -28,12 +28,14 @@ import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
+import BlockUserModalPost from '../../BlockUserModalPost';
 
 interface IAcOptionCardModeration {
   index: number;
   option: TAcOptionWithHighestField;
   postStatus: TPostStatusStringified;
   handleConfirmWinningOption: () => void;
+  handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
 }
 
 const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> = ({
@@ -41,6 +43,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
   option,
   postStatus,
   handleConfirmWinningOption,
+  handleRemoveOption,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -73,7 +76,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
       const res = await deleteAcOption(payload);
 
       if (!res.error) {
-        console.log('deleted');
+        handleRemoveOption(option);
       }
     } catch (err) {
       console.error(err);
@@ -208,6 +211,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
           {!isMobile && (
             <AcOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
+              canDeleteOption={postStatus === 'voting' || postStatus === 'wating_for_decision'}
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -294,10 +298,21 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         <AcOptionCardModerationEllipseModal
           isOpen={isEllipseMenuOpen}
           zIndex={16}
+          canDeleteOption={postStatus === 'voting'}
           onClose={() => setIsEllipseMenuOpen(false)}
-          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+          handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+          handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+          handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
         />
       )}
+      {/* Confirm block user modal */}
+      <BlockUserModalPost
+        confirmBlockUser={isBlockModalOpen}
+        onUserBlock={() => {}}
+        user={option.creator!!}
+        closeModal={() => setIsBlockModalOpen(false)}
+      />
+      {/* Report modal */}
     </>
   );
 };

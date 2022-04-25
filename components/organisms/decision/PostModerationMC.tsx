@@ -1,7 +1,7 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 import React, {
   useCallback,
@@ -10,47 +10,38 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useTranslation } from 'next-i18next';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
-import PostTimer from '../../molecules/decision/PostTimer';
-import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import DecisionTabs from '../../molecules/decision/PostTabs';
 import {
   fetchCurrentOptionsForMCPost,
   getMcOption,
-  voteOnPost,
 } from '../../../api/endpoints/multiple_choice';
+import isBrowser from '../../../utils/isBrowser';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostType from '../../../utils/switchPostType';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
-import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
-import isBrowser from '../../../utils/isBrowser';
-import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import Lottie from '../../atoms/Lottie';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
-import HeroPopup from '../../molecules/decision/HeroPopup';
-import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { setTutorialStatus } from '../../../api/endpoints/user';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+
+import Lottie from '../../atoms/Lottie';
+import LoadingModal from '../../molecules/LoadingModal';
+import GoBackButton from '../../molecules/GoBackButton';
+import HeroPopup from '../../molecules/decision/HeroPopup';
+import PostTimer from '../../molecules/decision/PostTimer';
+import ResponseTimer from '../../molecules/decision/ResponseTimer';
+import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import DecisionTabs from '../../molecules/decision/PostTabs';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
+import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
+
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -69,8 +60,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -80,7 +69,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { channelsWithSubs, addChannel, removeChannel } =
+  const { addChannel, removeChannel } =
     useContext(ChannelsContext);
 
   // Tabs
@@ -545,6 +534,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         title={post.title}
         postId={post.postUuid}
         totalVotes={totalVotes}
+        hasWinner={false}
+        hasResponse={!!post.response}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer decisionFailed={postStatus === 'failed'}>
@@ -559,11 +550,6 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
             options={options}
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
-            minAmount={
-              post.votePrice?.usdCents
-                ? parseInt((post.votePrice?.usdCents / 100).toFixed(0))
-                : 1
-            }
             handleLoadOptions={fetchOptions}
             handleRemoveOption={handleRemoveOption}
           />
@@ -575,6 +561,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           />
         ) : winningOption ? (
           <McWinnerTabModeration
+            postId={post.postUuid}
             option={winningOption}
             postStatus={postStatus}
           />
