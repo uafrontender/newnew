@@ -6,7 +6,7 @@ import Button from '../../atoms/Button';
 
 interface IPostConfirmDeleteModal {
   postType: string;
-  isVisible: boolean,
+  isVisible: boolean;
   closeModal: () => void;
   handleConfirmDelete: () => void;
 }

@@ -37,8 +37,12 @@ interface IPostTopInfoModeration {
   postId: string;
   postStatus: TPostStatusStringified;
   totalVotes?: number;
+  totalPledges?: number;
+  targetPledges?: number;
   postType?: TPostType;
   amountInBids?: number;
+  hasResponse: boolean;
+  hasWinner: boolean;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
@@ -49,6 +53,10 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   postStatus,
   totalVotes,
   amountInBids,
+  totalPledges,
+  targetPledges,
+  hasResponse,
+  hasWinner,
   handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
@@ -56,6 +64,33 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const failureReason = useMemo(() => {
+    if (postStatus !== 'failed') return '';
+
+    if (postType === 'ac') {
+      if (!hasWinner) {
+        return 'ac-no-winner';
+      }
+      if (amountInBids === 0 || !amountInBids) {
+        return 'ac';
+      }
+    }
+
+    if (postType === 'mc') {
+      if (totalVotes === 0 || !totalVotes) {
+        return 'mc';
+      }
+    }
+
+    if (postType === 'cf') {
+      if (!totalPledges || totalPledges!! < targetPledges!!) {
+        return 'cf';
+      }
+    }
+
+    return 'no-response';
+  }, [postStatus, postType, hasWinner, amountInBids, totalVotes, totalPledges, targetPledges]);
 
   const showWinnerOption = useMemo(() => (
     postType === 'ac' && postStatus === 'wating_for_decision'
@@ -167,6 +202,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
             <PostEllipseMenuModeration
               postType={postType as string}
               isVisible={ellipseMenuOpen}
+              canDeletePost={postStatus !== 'failed'}
               handleClose={handleCloseEllipseMenu}
               handleOpenDeletePostModal={handleOpenDeletePostModal}
             />
@@ -175,6 +211,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
             <PostEllipseModalModeration
               postType={postType as string}
               zIndex={11}
+              canDeletePost={postStatus !== 'failed'}
               isOpen={ellipseMenuOpen}
               onClose={handleCloseEllipseMenu}
               handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -207,10 +244,16 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
       {postStatus === 'failed' && (
         <PostFailedBox
           title={t('PostFailedBoxModeration.title', { postType: t(`postType.${postType}`) })}
-          body={t('PostFailedBoxModeration.body')}
-          buttonCaption={t('PostFailedBoxModeration.ctaButton')}
+          body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
+          buttonCaption={t('PostFailedBoxModeration.ctaButton', { postType: t(`postType.${postType}`) })}
           handleButtonClick={() => {
-            router.push('/creation');
+            if (postType === 'ac') {
+              router.push('/creation/auction');
+            } else if (postType === 'mc') {
+              router.push('/creation/multiple-choice');
+            } else {
+              router.push('/creation/crowdfunding');
+            }
           }}
         />
       )}
@@ -229,6 +272,8 @@ PostTopInfoModeration.defaultProps = {
   postType: undefined,
   totalVotes: undefined,
   amountInBids: undefined,
+  totalPledges: undefined,
+  targetPledges: undefined,
 };
 
 export default PostTopInfoModeration;

@@ -534,6 +534,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         title={post.title}
         postId={post.postUuid}
         totalVotes={totalVotes}
+        hasWinner={false}
+        hasResponse={!!post.response}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer decisionFailed={postStatus === 'failed'}>
@@ -559,6 +561,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           />
         ) : winningOption ? (
           <McWinnerTabModeration
+            postId={post.postUuid}
             option={winningOption}
             postStatus={postStatus}
           />

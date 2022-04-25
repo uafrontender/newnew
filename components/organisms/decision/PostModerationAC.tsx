@@ -586,6 +586,8 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         title={post.title}
         postId={post.postUuid}
         amountInBids={totalAmount}
+        hasWinner={!!winningOptionId}
+        hasResponse={!!post.response}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer
@@ -617,6 +619,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           />
         ) : winningOption ? (
           <AcWinnerTabModeration
+            postId={post.postUuid}
             option={winningOption}
             postStatus={postStatus}
           />
