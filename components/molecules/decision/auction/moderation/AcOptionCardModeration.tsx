@@ -35,6 +35,7 @@ interface IAcOptionCardModeration {
   option: TAcOptionWithHighestField;
   postStatus: TPostStatusStringified;
   handleConfirmWinningOption: () => void;
+  handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
 }
 
 const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> = ({
@@ -42,6 +43,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
   option,
   postStatus,
   handleConfirmWinningOption,
+  handleRemoveOption,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -74,7 +76,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
       const res = await deleteAcOption(payload);
 
       if (!res.error) {
-        console.log('deleted');
+        handleRemoveOption(option);
       }
     } catch (err) {
       console.error(err);

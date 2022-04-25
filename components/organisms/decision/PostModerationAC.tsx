@@ -356,6 +356,10 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
+      if (res.data.auction?.winningOptionId && !winningOptionId) {
+        setWinningOptionId(res.data.auction?.winningOptionId);
+        handleChangeTab('winner');
+      }
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
       handleUpdatePostStatus(res.data.auction!!.status!!);
@@ -601,6 +605,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             optionsLoading={optionsLoading}
             pagingToken={optionsNextPageToken}
             handleLoadBids={fetchBids}
+            handleRemoveOption={handleRemoveOption}
             handleUpdatePostStatus={handleUpdatePostStatus}
             handleUpdateWinningOption={handleUpdateWinningOption}
           />
