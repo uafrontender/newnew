@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
@@ -23,6 +23,7 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
   zIndex: number;
@@ -49,6 +50,8 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
+
+  const { walletBalance } = useContext(WalletContext);
 
   const [pledgeAmount, setPledgeAmount] =
     useState<number | undefined>(undefined);
@@ -336,6 +339,11 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           isOpen={paymentModalOpen}
           zIndex={14}
           amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+          {...(
+            walletBalance?.usdCents && pledgeAmount && walletBalance.usdCents >= pledgeAmount ? {} : {
+              predefinedOption: 'card'
+            }
+          )}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

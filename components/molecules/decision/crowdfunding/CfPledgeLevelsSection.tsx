@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -30,6 +30,7 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
@@ -54,6 +55,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     const user = useAppSelector((state) => state.user);
 
     const { appConstants } = useGetAppConstants();
+    const { walletBalance } = useContext(WalletContext);
 
     const containerRef = useRef<HTMLDivElement>();
 
@@ -378,6 +380,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
             isOpen={paymentModalOpen}
             zIndex={12}
             amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+            {...(
+              walletBalance?.usdCents && pledgeAmount && walletBalance.usdCents >= pledgeAmount ? {} : {
+                predefinedOption: 'card'
+              }
+            )}
             showTocApply={!user?.loggedIn}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

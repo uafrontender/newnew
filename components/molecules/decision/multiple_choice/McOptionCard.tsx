@@ -4,7 +4,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -40,6 +40,7 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -86,6 +87,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const { appConstants } = useGetAppConstants();
+  const { walletBalance } = useContext(WalletContext);
 
   const isBlue = useMemo(
     () => !!option.isSupportedByMe,
@@ -565,6 +567,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             showTocApply={!user?.loggedIn}
             isOpen={paymentModalOpen}
             amount={`$${parseInt(supportBidAmount) * votePrice}`}
+            {...(
+              walletBalance?.usdCents && walletBalance.usdCents >= parseInt(supportBidAmount) * votePrice * 100 ? {} : {
+                predefinedOption: 'card'
+              }
+            )}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             handlePayWithWallet={handlePayWithWallet}
