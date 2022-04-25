@@ -12,26 +12,35 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import { TPostType } from '../../../utils/switchPostType';
 
+import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
+import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
-
-import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
-import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-
-import { formatNumber } from '../../../utils/format';
+import PostFailedBox from './PostFailedBox';
 import PostShareMenu from './PostShareMenu';
 import PostShareModal from './PostShareModal';
 import PostEllipseMenu from './PostEllipseMenu';
 import PostEllipseModal from './PostEllipseModal';
-import { markPost } from '../../../api/endpoints/post';
-import { FollowingsContext } from '../../../contexts/followingContext';
-import { markUser } from '../../../api/endpoints/user';
-import Headline from '../../atoms/Headline';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
+import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
+import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
-import Text from '../../atoms/Text';
-import PostFailedBox from './PostFailedBox';
+import MCIcon from '../../../public/images/creation/MC.webp';
+import ACIcon from '../../../public/images/creation/AC.webp';
+import CFIcon from '../../../public/images/creation/CF.webp';
+
+import { formatNumber } from '../../../utils/format';
+import { markPost } from '../../../api/endpoints/post';
+import { markUser } from '../../../api/endpoints/user';
+import { FollowingsContext } from '../../../contexts/followingContext';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import getDisplayname from '../../../utils/getDisplayname';
+
+const images = {
+  ac: ACIcon.src,
+  mc: MCIcon.src,
+  cf: CFIcon.src,
+}
 
 interface IPostTopInfo {
   postId: string;
@@ -41,8 +50,12 @@ interface IPostTopInfo {
   isFollowingDecisionInitial: boolean;
   postType?: TPostType;
   startsAtSeconds: number;
-  amountInBids?: number;
   totalVotes?: number;
+  totalPledges?: number;
+  targetPledges?: number;
+  amountInBids?: number;
+  hasResponse: boolean;
+  hasWinner: boolean;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -54,6 +67,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   startsAtSeconds,
   isFollowingDecisionInitial,
   amountInBids,
+  totalPledges,
+  targetPledges,
+  hasResponse,
+  hasWinner,
   totalVotes,
 }) => {
   const theme = useTheme();
@@ -63,6 +80,34 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+
+  const failureReason = useMemo(() => {
+    if (postStatus !== 'failed') return '';
+
+    if (postType === 'ac') {
+      if (!hasWinner) {
+        return 'ac-no-winner';
+      }
+      if (amountInBids === 0 || !amountInBids) {
+        return 'ac';
+      }
+    }
+
+    if (postType === 'mc') {
+      if (totalVotes === 0 || !totalVotes) {
+        return 'mc';
+      }
+    }
+
+    if (postType === 'cf') {
+      if (!totalPledges || totalPledges!! < targetPledges!!) {
+        return 'cf';
+      }
+    }
+
+    return 'no-response';
+  }, [postStatus, postType, hasWinner, amountInBids, totalVotes, totalPledges, targetPledges]);
+
 
   const showSelectingWinnerOption = useMemo(() => (
     postType === 'ac' && postStatus === 'wating_for_decision'
@@ -226,6 +271,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenu
+              postType={postType as string}
               isFollowing={followingsIds.includes(creator.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
@@ -236,6 +282,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
+              postType={postType as string}
               isFollowing={followingsIds.includes(creator.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
@@ -274,9 +321,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailed.title')}
-          body={t('PostFailed.body.not_reached_goal')}
-          buttonCaption={t('PostFailed.ctaButton')}
+          title={t('PostFailedBox.title', { postType: t(`postType.${postType}`) })}
+          body={t(`PostFailedBoxModeration.reason.${failureReason}`, { creator: getDisplayname(creator) })}
+          buttonCaption={t('PostFailedBox.ctaButton', { postTypeMultiple: t(`postType.multiple.${postType}`) })}
+          imageSrc={images[postType!!]}
           handleButtonClick={() => {
             document.getElementById('post-modal-container')?.scrollTo({
               top: document.getElementById('recommendations-section-heading')?.offsetTop,
@@ -293,6 +341,8 @@ PostTopInfo.defaultProps = {
   postType: undefined,
   amountInBids: undefined,
   totalVotes: undefined,
+  totalPledges: undefined,
+  targetPledges: undefined,
 };
 
 export default PostTopInfo;

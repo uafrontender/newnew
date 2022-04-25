@@ -8,20 +8,20 @@ import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 import getDisplayname from '../../../utils/getDisplayname';
 
-interface IBlockUserModalProfile {
+interface IBlockUserModalPost {
   user: newnewapi.IUser;
   confirmBlockUser: boolean;
   onUserBlock: () => void;
   closeModal: () => void;
 }
 
-const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
+const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
   confirmBlockUser,
   onUserBlock,
   user,
   closeModal,
 }) => {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation('decision');
 
   const { blockUser } = useGetBlockedUsers();
 
@@ -43,17 +43,17 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
     blockUserRequest();
   };
   return (
-    <Modal show={confirmBlockUser} onClose={closeModal}>
+    <Modal additionalZ={15} show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
+          <SModalTitle>{t('BlockUserModal.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {getDisplayname(user)} {t('modal.block-user.message-second-part')}
+            {t('BlockUserModal.message-first-part')} {getDisplayname(user)} {t('BlockUserModal.message-second-part')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>{t('modal.block-user.button-cancel')}</SCancelButton>
+            <SCancelButton>{t('BlockUserModal.button-cancel')}</SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.block-user.button-confirm')}
+              {t('BlockUserModal.button-confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -62,9 +62,9 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   );
 };
 
-export default BlockUserModalProfile;
+export default BlockUserModalPost;
 
-BlockUserModalProfile.defaultProps = {};
+BlockUserModalPost.defaultProps = {};
 
 const SContainer = styled.div`
   display: flex;

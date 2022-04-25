@@ -30,12 +30,15 @@ import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMe
 import McConfirmDeleteOption from './McConfirmDeleteOption';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
+import getDisplayname from '../../../../../utils/getDisplayname';
+import BlockUserModalPost from '../../BlockUserModalPost';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser,
   postId: string;
   index: number;
+  canBeDeleted: boolean;
 }
 
 const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> = ({
@@ -43,6 +46,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
   creator,
   postId,
   index,
+  canBeDeleted,
 }) => {
   const router = useRouter();
   const theme = useTheme();
@@ -170,7 +174,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                   >
                     {t('McPost.OptionsTab.OptionCard.subscriber_suggestion',
                       {
-                        nickname: option.creator?.nickname ?? option.creator?.username
+                        nickname: getDisplayname(option?.creator!!)
                       },
                     )}
                   </SSpanBiddersHighlighted>
@@ -218,6 +222,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
             <McOptionCardModerationEllipseMenu
               isVisible={isEllipseMenuOpen}
               isBySubscriber={!isCreatorsBid}
+              canBeDeleted={canBeDeleted}
               handleClose={() => setIsEllipseMenuOpen(false)}
               handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
               handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
@@ -239,9 +244,23 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
           isOpen={isEllipseMenuOpen}
           zIndex={16}
           onClose={() => setIsEllipseMenuOpen(false)}
-          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+          isBySubscriber={!isCreatorsBid}
+          canBeDeleted={canBeDeleted}
+          handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+          handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+          handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
         />
       )}
+      {/* Confirm block user modal */}
+      {!isCreatorsBid && (
+        <BlockUserModalPost
+          confirmBlockUser={isBlockModalOpen}
+          onUserBlock={() => {}}
+          user={option.creator!!}
+          closeModal={() => setIsBlockModalOpen(false)}
+        />
+      )}
+      {/* Report modal */}
     </>
   );
 };

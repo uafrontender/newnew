@@ -38,6 +38,7 @@ import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { setTutorialStatus } from '../../../api/endpoints/user';
+import CfBackersStatsSectionModerationFailed from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -414,6 +415,10 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
+        hasWinner={false}
+        hasResponse={!!post.response}
+        totalPledges={currentBackers}
+        targetPledges={post.targetBackerCount}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <SActivitesContainer>
@@ -437,10 +442,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         />
         {currentTab === 'backers' ? (
           !crowdfundingSuccess ? (
-            <CfBackersStatsSectionModeration
-              targetBackerCount={post.targetBackerCount}
-              currentNumBackers={currentBackers}
-            />
+            postStatus === 'failed' ? (
+              <CfBackersStatsSectionModerationFailed
+                targetBackerCount={post.targetBackerCount}
+                currentNumBackers={currentBackers}
+              />
+            ) : (
+              <CfBackersStatsSectionModeration
+                targetBackerCount={post.targetBackerCount}
+                currentNumBackers={currentBackers}
+              />
+            )
           ) : (
             <CfCrowdfundingSuccessModeration
               post={post}
