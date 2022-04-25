@@ -5,7 +5,12 @@
   "postType": {
     "ac": "Event",
     "mc": "Superpoll",
-    "cf": "Goal"
+    "cf": "Goal",
+    "multiple": {
+      "ac": "Events",
+      "mc": "Superpolls",
+      "cf": "Goals"
+    }
   },
   "loadMoreBtn": "Load more",
   "expires": {
@@ -41,7 +46,6 @@
   },
   "PostFailedBoxModeration": {
     "title": "{{ postType }} is cancelled",
-    "body": "Let's start again and share more.",
     "reason": {
       "no-response": "Response was not uploaded",
       "ac-no-winner": "Winner was not selected",
@@ -51,31 +55,32 @@
     },
     "ctaButton": "New {{ postType }}"
   },
+  "PostFailedBox": {
+    "title": "This {{ postType }} is canceled",
+    "reason": {
+      "no-response": "{{ creator }} didn't post a response video in time",
+      "ac-no-winner": "{{ creator }} didn't choose a bid in time",
+      "ac": "Time ran out before any bids were made",
+      "mc": "Time ran out before any votes were made",
+      "cf": "Time ran out before the goal was reached"
+    },
+    "ctaButton": "See new {{ postTypeMultiple }}"
+  },
   "PostDeletedByMe": {
-    "title": "{{ postType }} deleted",
+    "title": "This {{ postType }} has been deleted",
     "body": {
-      "by_creator": "You deleted this {{ postType }}"
+      "by_creator": "You deleted this {{ postType }}",
+      "by_admin": "This {{ postType }} was in violation of our Community Guidelines"
     },
     "ctaButton": "Make a new one"
   },
   "PostDeleted": {
-    "title": "{{ postType }} deleted",
+    "title": "This {{ postType }} has been deleted",
     "body": {
-      "by_creator": "Creator deleted this {{ postType }}"
+      "by_creator": "{{ creator }} deleted this {{ postType }}",
+      "by_admin": "This {{ postType }} was in violation of our Community Guidelines"
     },
-    "ctaButton": "See others"
-  },
-  "PostFailed": {
-    "title": "{{ postType }} failed",
-    "body": {
-      "not_reached_goal": "Decision hasn't reached its goal"
-    },
-    "ctaButton": "See others"
-  },
-  "PostFailedBox": {
-    "title": "{{ postType }} failed",
-    "body": "Let's start again and share more.",
-    "ctaButton": "Make a new one"
+    "ctaButton": "See new {{ postTypeMultiple }}"
   },
   "PostSuccessModeration": {
     "title": "Your response is live!",

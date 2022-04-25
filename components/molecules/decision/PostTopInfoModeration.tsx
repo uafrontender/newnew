@@ -8,12 +8,15 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-import { deleteMyPost } from '../../../api/endpoints/post';
-
+import { formatNumber } from '../../../utils/format';
 import { TPostType } from '../../../utils/switchPostType';
+import { deleteMyPost } from '../../../api/endpoints/post';
+import { useAppSelector } from '../../../redux-store/store';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
+import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
+import PostFailedBox from './PostFailedBox';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostShareMenu from './PostShareMenu';
@@ -22,15 +25,18 @@ import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import PostEllipseMenuModeration from './PostEllipseMenuModeration';
 import PostEllipseModalModeration from './PostEllipseModalModeration';
 
+import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import MCIcon from '../../../public/images/creation/MC.webp';
+import ACIcon from '../../../public/images/creation/AC.webp';
+import CFIcon from '../../../public/images/creation/CF.webp';
 
-import { formatNumber } from '../../../utils/format';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-
-import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
-import Text from '../../atoms/Text';
-import PostFailedBox from './PostFailedBox';
+const images = {
+  ac: ACIcon.src,
+  mc: MCIcon.src,
+  cf: CFIcon.src,
+}
 
 interface IPostTopInfoModeration {
   title: string;
@@ -245,6 +251,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
         <PostFailedBox
           title={t('PostFailedBoxModeration.title', { postType: t(`postType.${postType}`) })}
           body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
+          imageSrc={images[postType!!]}
           buttonCaption={t('PostFailedBoxModeration.ctaButton', { postType: t(`postType.${postType}`) })}
           handleButtonClick={() => {
             if (postType === 'ac') {

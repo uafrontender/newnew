@@ -685,6 +685,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         postStatus={postStatus}
         title={post.title}
         creator={post.creator!!}
+        hasWinner={false}
+        hasResponse={!!post.response}
+        totalPledges={currentBackers}
+        targetPledges={post.targetBackerCount}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
       />

@@ -22,10 +22,10 @@ import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import ListPostModal from '../see-more/ListPostModal';
+import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
-import PostFailedBox from '../../molecules/decision/PostFailedBox';
+import ListPostModal from '../see-more/ListPostModal';
 // Posts views
 import PostViewAC from './PostViewAC';
 import PostViewMC from './PostViewMC';
@@ -35,25 +35,7 @@ import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
 import PostViewProcessing from './PostViewProcessing';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
-import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
-
-// Utils
-import isBrowser from '../../../utils/isBrowser';
-import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import switchPostStatus, {
-  TPostStatusStringified,
-} from '../../../utils/switchPostStatus';
-import switchPostStatusString from '../../../utils/switchPostStatusString';
-import Button from '../../atoms/Button';
-import CommentFromUrlContextProvider, {
-  CommentFromUrlContext,
-} from '../../../contexts/commentFromUrlContext';
 import PostSuccessAC from './PostSuccessAC';
-import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
 import PostSuccessMC from './PostSuccessMC';
 import PostSuccessCF from './PostSuccessCF';
 import PostAwaitingResponseAC from './PostAwaitingResponseAC';
@@ -63,8 +45,37 @@ import PostShareModal from '../../molecules/decision/PostShareModal';
 import PostShareMenu from '../../molecules/decision/PostShareMenu';
 import PostEllipseModal from '../../molecules/decision/PostEllipseModal';
 import PostEllipseMenu from '../../molecules/decision/PostEllipseMenu';
+import PostFailedBox from '../../molecules/decision/PostFailedBox';
+import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
+
+// Icons
+import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
+import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
+import MCIcon from '../../../public/images/creation/MC.webp';
+import ACIcon from '../../../public/images/creation/AC.webp';
+import CFIcon from '../../../public/images/creation/CF.webp';
+
+// Utils
+import isBrowser from '../../../utils/isBrowser';
+import switchPostType, { TPostType } from '../../../utils/switchPostType';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
+import switchPostStatusString from '../../../utils/switchPostStatusString';
+import CommentFromUrlContextProvider, {
+  CommentFromUrlContext,
+} from '../../../contexts/commentFromUrlContext';
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
+import getDisplayname from '../../../utils/getDisplayname';
+
+
+const images = {
+  ac: ACIcon.src,
+  mc: MCIcon.src,
+  cf: CFIcon.src,
+}
 
 interface IPostModal {
   isOpen: boolean;
@@ -103,6 +114,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
     return 'processing';
   });
+
+  // TODO: a way to determine if the post was deleted by the crator themselves
+  // pr by an admin
+  const deletedByCreator = useMemo(() => true, []);
 
   const shouldRenderVotingFinishedModal = useMemo(() => (
     postStatus === 'succeeded' || postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision'
@@ -754,7 +769,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           ) : isMyPost ? (
             <PostFailedBox
               title={t('PostDeletedByMe.title', { postType: t(`postType.${typeOfPost}`) })}
-              body={t('PostDeletedByMe.body.by_creator', { postType: t(`postType.${typeOfPost}`) })}
+              body={
+                deletedByCreator ? (
+                  t('PostDeletedByMe.body.by_creator', { postType: t(`postType.${typeOfPost}`) })
+                  ) : (
+                  t('PostDeletedByMe.body.by_admin', { postType: t(`postType.${typeOfPost}`) })
+                )
+              }
+              imageSrc={images[typeOfPost]}
               buttonCaption={t('PostDeletedByMe.ctaButton')}
               handleButtonClick={() => {
                 router.push('/creation');
@@ -762,9 +784,22 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             />
           ) : (
             <PostFailedBox
-              title={t('PostDeleted.title')}
-              body={t('PostDeleted.body.by_creator')}
-              buttonCaption={t('PostDeleted.ctaButton')}
+              title={t('PostDeleted.title', { postType: t(`postType.${typeOfPost}`) })}
+              body={
+                deletedByCreator ? (
+                  t('PostDeleted.body.by_creator', {
+                    creator: getDisplayname(postParsed.creator!!),
+                    postType: t(`postType.${typeOfPost}`),
+                  })
+                ) : (
+                  t('PostDeleted.body.by_admin', {
+                    creator: getDisplayname(postParsed.creator!!),
+                    postType: t(`postType.${typeOfPost}`),
+                  })
+                )
+              }
+              buttonCaption={t('PostDeleted.ctaButton', { postTypeMultiple: t(`postType.multiple.${typeOfPost}`)})}
+              imageSrc={images[typeOfPost]}
               style={{
                 marginBottom: '24px',
               }}
