@@ -239,8 +239,8 @@
     "OptionsTab": {
       "me": "me",
       "NoOptions": {
-        "caption_1": "No active bids yet.",
-        "caption_2": "Be the first to make a bid!"
+        "caption_1": "No bids yet...",
+        "caption_2": "Place a bid below"
       },
       "tags": {
         "my_vote": "My vote",

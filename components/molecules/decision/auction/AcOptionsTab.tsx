@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
@@ -41,8 +41,6 @@ import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
 import NoContentYetImg from '../../../../public/images/decision/no-content-yet-mock.png';
-import MakeFirstBidArrow from '../../../../public/images/svg/icons/filled/MakeFirstBidArrow.svg';
-import InlineSvg from '../../../atoms/InlineSVG';
 import PaymentSuccessModal from '../PaymentSuccessModal';
 import TutorialTooltip, {
   DotPositionEnum,
@@ -79,7 +77,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
 }) => {
-  const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
@@ -418,13 +415,6 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <SNoOptionsCaption variant={3}>
               {t('AcPost.OptionsTab.NoOptions.caption_2')}
             </SNoOptionsCaption>
-            {!isMobile && (
-              <SMakeBidArrowSvg
-                svg={MakeFirstBidArrow}
-                fill={theme.colorsThemed.background.quinary}
-                width="36px"
-              />
-            )}
           </SNoOptionsYet>
         ) : null}
         <SBidsContainer
@@ -605,6 +595,11 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${newBidAmount}`}
+          {...(
+            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(newBidAmount) * 100 ? {} : {
+              predefinedOption: 'card'
+            }
+          )}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -831,10 +826,6 @@ const SNoOptionsYet = styled.div`
 `;
 
 const SNoOptionsImgContainer = styled.div`
-  position: absolute;
-
-  top: 100px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -843,28 +834,16 @@ const SNoOptionsImgContainer = styled.div`
   height: 48px;
 
   img {
-    position: relative;
-    top: -24px;
     display: block;
     width: 100%;
     height: 100%;
   }
 
   margin-bottom: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    position: initial;
-  }
 `;
 
 const SNoOptionsCaption = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`;
-
-const SMakeBidArrowSvg = styled(InlineSvg)`
-  position: absolute;
-  left: 26%;
-  bottom: -58px;
 `;
 
 const STutorialTooltipHolder = styled.div`
