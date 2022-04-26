@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useMemo, useState } from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
@@ -40,7 +41,7 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const { t } = useTranslation('creation');
   const user = useAppSelector((state) => state.user);
-  const { post, videoProcessing, postData } = useAppSelector((state) => state.creation);
+  const { post, videoProcessing, fileProcessing, postData } = useAppSelector((state) => state.creation);
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -140,15 +141,23 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
       <SMobileContainer onClick={preventCLick}>
         <SContent>
           <SPlayerWrapper>
-            {open && (
-              <BitmovinPlayer
-                id="published-modal"
-                muted={false}
-                resources={videoProcessing?.targetUrls}
-                thumbnails={post.thumbnailParameters}
-                borderRadius="16px"
-              />
-            )}
+            {open ? (
+              fileProcessing.progress === 100 ? (
+                <BitmovinPlayer
+                  id="published-modal"
+                  muted={false}
+                  resources={videoProcessing?.targetUrls}
+                  thumbnails={post.thumbnailParameters}
+                  borderRadius="16px"
+                />
+              ) : (
+                <SText
+                  variant={2}
+                >
+                  Your video will be available once processed
+                </SText>
+              )
+            ) : null}
           </SPlayerWrapper>
           <SUserBlock>
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
@@ -287,4 +296,10 @@ const SUserTitle = styled(Text)`
   padding-left: 12px;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+`;
+
+const SText = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  padding-top: 120px;
 `;
