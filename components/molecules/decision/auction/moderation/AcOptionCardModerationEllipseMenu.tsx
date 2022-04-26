@@ -10,6 +10,7 @@ import useOnClickOutside from '../../../../../utils/hooks/useOnClickOutside';
 
 interface IAcOptionCardModerationEllipseMenu {
   isVisible: boolean;
+  canDeleteOption: boolean;
   handleClose: () => void;
   handleOpenReportOptionModal: () => void;
   handleOpenBlockUserModal: () => void;
@@ -18,6 +19,7 @@ interface IAcOptionCardModerationEllipseMenu {
 
 const AcOptionCardModerationEllipseMenu: React.FunctionComponent<IAcOptionCardModerationEllipseMenu> = ({
   isVisible,
+  canDeleteOption,
   handleClose,
   handleOpenReportOptionModal,
   handleOpenBlockUserModal,
@@ -65,6 +67,7 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<IAcOptionCardMo
             </Text>
           </SButton>
           <SButton
+            disabled={!canDeleteOption}
             onClick={() => {
               handleOpenRemoveOptionModal();
               handleClose();
@@ -122,6 +125,15 @@ const SButton = styled.button`
 
   &:focus, &:hover {
     outline: none;
+  }
+
+  &:focus:enabled, &:hover:enabled {
+    outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
 `;

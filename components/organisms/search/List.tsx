@@ -6,32 +6,33 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import Card from '../../molecules/Card';
+import Lottie from '../../atoms/Lottie';
+import CardSkeleton from '../../molecules/CardSkeleton';
 
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
-import CardSkeleton from '../../molecules/CardSkeleton';
+
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 interface IList {
-  category: string;
   collection: any;
   loading: boolean;
-  wrapperStyle?: React.CSSProperties;
-  skeletonsBgColor?: string,
-  skeletonsHighlightColor?: string,
+  skeletonsBgColor?: string;
+  skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
 export const List: React.FC<IList> = ({
-  category,
   collection,
   loading,
-  wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
   handlePostClicked,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
@@ -54,26 +55,44 @@ export const List: React.FC<IList> = ({
   };
 
   return (
-    <SListWrapper
-      // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
-    >
+    <SListWrapper>
       {collection?.map(renderItem)}
-      {loading && Array(5).fill('_').map((_, i) => (
-        <CardSkeleton
-          key={i}
-          count={1}
-          cardWidth="100%"
-          cardHeight="100%"
-          bgColor={skeletonsBgColor}
-          highlightColor={skeletonsHighlightColor}
-        />
-      ))}
+      {collection.length > 0 &&
+        loading &&
+        Array(5)
+          .fill('_')
+          .map((_, i) => (
+            <CardSkeleton
+              key={i}
+              count={1}
+              cardWidth="100%"
+              cardHeight="100%"
+              bgColor={skeletonsBgColor}
+              highlightColor={skeletonsHighlightColor}
+            />
+          ))}
+      {collection.length === 0 && loading && (
+        <SAnimationContainer
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SAnimationContainer>
+      )}
     </SListWrapper>
   );
 };
 
 List.defaultProps = {
-  wrapperStyle: {},
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };
@@ -92,26 +111,19 @@ const SListWrapper = styled.div`
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    left: -8px;
     width: calc(100% + 26px);
-    padding: 24px 0 0 0;
-
-    margin: 0 auto;
-    max-width: 562px;
+    padding: 0;
   }
 
   ${(props) => props.theme.media.laptop} {
-    left: -16px;
     width: calc(100% + 32px);
-    padding: 32px 0 0 0;
-
-    max-width: 1248px;
+    padding: 0 !important;
+    margin: 0 -16px;
   }
 
   ${(props) => props.theme.media.laptopL} {
-    max-width: 1248px;
+    margin: 0 -16px;
   }
-
 
   .skeletonsContainer {
     display: block;
@@ -137,7 +149,6 @@ const SListWrapper = styled.div`
     ${(props) => props.theme.media.desktop} {
       width: calc(16.65% - 32px);
     }
-
 
     div {
       .skeletonSpan {
@@ -170,5 +181,13 @@ const SItemWrapper = styled.div`
   ${(props) => props.theme.media.desktop} {
     width: calc(16.65% - 32px);
   }
+`;
 
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

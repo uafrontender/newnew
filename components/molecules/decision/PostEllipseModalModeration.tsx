@@ -7,15 +7,19 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseModalModeration {
+  postType: string;
   isOpen: boolean;
+  canDeletePost: boolean;
   zIndex: number;
   onClose: () => void;
   handleOpenDeletePostModal: () => void;
 }
 
 const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModeration> = ({
+  postType,
   isOpen,
   zIndex,
+  canDeletePost,
   onClose,
   handleOpenDeletePostModal,
 }) => {
@@ -35,6 +39,7 @@ const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModer
           }}
         >
           <SButton
+            disabled={!canDeletePost}
             onClick={() => {
               handleOpenDeletePostModal();
               onClose();
@@ -43,7 +48,7 @@ const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModer
             <Text
               variant={3}
             >
-              { t('ellipse.deleteDecision') }
+              { t('ellipse.deleteDecision', { postType: t(`postType.${postType}`) })}
             </Text>
           </SButton>
         </SContentContainer>
@@ -106,5 +111,10 @@ const SButton = styled.button`
 
   &:focus {
     outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
 `;

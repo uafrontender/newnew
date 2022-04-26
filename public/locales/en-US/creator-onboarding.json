@@ -7,12 +7,9 @@
     "of": "of"
   },
   "TosSection": {
-    "heading": "Join the community and start earning",
-    "subheading": "Agree to NewNew community guidelines",
-    "submitMobile": "I have read statement and agree",
-    "submitDesktop": "Submit",
-    "scrollDownToContinue": "Scroll to bottom to continue.",
-    "agreenToTosCheckbox": "I agree to the terms and conditions."
+    "heading": "Start making money on NewNew",
+    "subheading": "Please review our terms...",
+    "close": "Done"
   },
   "DetailsSection": {
     "leaveMsg": "Are you sure you want to leave? The changes will be discarded",
@@ -20,8 +17,32 @@
       "heading": "Tell us a little about yourself.",
       "subheading": "This is the description that will show on your profile page."
     },
-    "heading": "Few more details...",
+    "heading": "We just need a few details...",
     "form": {
+      "firstName": {
+        "placeholder": "first name",
+        "labelCaption": "First name",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Firstname is too long",
+          "tooShort": "Firstname is too short",
+          "invalidChar": "Firstname has invalid characters",
+          "innappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
+        }
+      },
+      "lastName": {
+        "placeholder": "last name",
+        "labelCaption": "Last name",
+        "errors": {
+          "generic": "Please check input",
+          "tooLong": "Lastname is too long",
+          "tooShort": "Lastname is too short",
+          "invalidChar": "Lastname has invalid characters",
+          "innappropriate": "Offensive words are forbidden",
+          "linksForbidden": "Links not allowed"
+        }
+      },
       "username": {
         "placeholder": "@username",
         "labelCaption": "Username",
@@ -42,8 +63,8 @@
         }
       },
       "nickname": {
-        "placeholder": "Create your nickname",
-        "labelCaption": "Nickname",
+        "placeholder": "Create your display name",
+        "labelCaption": "Display name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Name is too long",
@@ -54,7 +75,7 @@
         }
       },
       "email": {
-        "label": "Email",
+        "label": "Email address",
         "placeholder": "email@email.com",
         "cantChangeInfoCaption": "You can't change this info.",
         "errors": {
@@ -79,7 +100,7 @@
         "label": "Profile photo",
         "captionMobile": "*recommended resolution 200x200 px",
         "captionDesktop": "Recommended resolution 200x200 px",
-        "uploadBtn": "Upload image",
+        "uploadBtn": "Upload photo",
         "uploadNewBtn": "Upload new image"
       }
     },
@@ -89,8 +110,9 @@
       "cancelButton": "Cancel"
     },
     "backButton": "Back",
-    "submitDesktop": "Save and continue",
-    "submitMobile": "Set up and continue"
+    "agreedToTosCheckbox": "I have read and agree to",
+    "submitDesktop": "Done",
+    "submitMobile": "Done"
   },
   "AboutSection": {
     "meta": {

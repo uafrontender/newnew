@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -17,11 +17,13 @@ import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 
 interface IAcWinnerTabModeration {
+  postId: string;
   option: newnewapi.Auction.Option;
   postStatus: TPostStatusStringified;
 }
 
 const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = ({
+  postId,
   option,
   postStatus,
 }) => {
@@ -32,6 +34,34 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
 
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
+
+  // Share
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handleCopyLink = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/post/${postId}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [postId]);
 
   const handleRedirectToUser = () => {
     window?.history.replaceState({
@@ -176,12 +206,12 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> = (
           <PostSuccessBoxModeration
             title={t('PostSuccessModeration.title')}
             body={t('PostSuccessModeration.body')}
-            buttonCaption={t('PostSuccessModeration.ctaButton')}
+            buttonCaption={isCopiedUrl ? t('PostSuccessModeration.ctaButton-copied') : t('PostSuccessModeration.ctaButton')}
             style={{
               marginTop: '24px',
             }}
             handleButtonClick={() => {
-              console.log('Share')
+              handleCopyLink();
             }}
           />
         ) : null}

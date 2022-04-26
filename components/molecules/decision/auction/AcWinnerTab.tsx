@@ -52,7 +52,10 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
   const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        router.push('/sign-up?reason=follow-decision');
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -222,7 +225,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
         )}
         {postStatus === 'succeeded' && (
           <PostSuccessBox
-            title={t('PostSuccess.title')}
+            title={t('PostSuccess.title', { postType: t(`postType.ac`) })}
             body={t('PostSuccess.body')}
             buttonCaption={t('PostSuccess.ctaButton')}
             style={{

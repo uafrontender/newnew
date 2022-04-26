@@ -24,6 +24,7 @@ import { ChannelsContext } from '../../../contexts/channelsContext';
 import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
 import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
 import { uploadPostResponse } from '../../../api/endpoints/post';
+import isSafari from '../../../utils/isSafari';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -269,7 +270,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             <SSoundButton
               iconOnly
               view="transparent"
-              onClick={() => handleToggleMuted()}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleMuted();
+                if (isSafari()) {
+                  (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                }
+              }}
             >
               <InlineSvg
                 svg={isMuted ? VolumeOff : VolumeOn}
@@ -290,7 +297,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               <SSoundButton
                 iconOnly
                 view="transparent"
-                onClick={() => handleToggleMuted()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleMuted();
+                  if (isSafari()) {
+                    (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                  }
+                }}
               >
                 <InlineSvg
                   svg={isMuted ? VolumeOff : VolumeOn}

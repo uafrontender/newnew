@@ -68,7 +68,11 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
           coverUrl: data.me?.coverUrl,
           userUuid: data.me?.userUuid,
           bio: data.me?.bio,
-          dateOfBirth: data.me?.dateOfBirth,
+          dateOfBirth: {
+            day: data.me?.dateOfBirth?.day,
+            month: data.me?.dateOfBirth?.month,
+            year: data.me?.dateOfBirth?.year,
+          },
           countryCode: data.me?.countryCode,
           options: {
             isActivityPrivate: data.me?.options?.isActivityPrivate,

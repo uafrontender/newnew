@@ -212,84 +212,92 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
   }, [timerActive, timerSeconds]);
 
   return (
-    <SCodeVerificationMenu
-      onClick={() => {
-        if (submitError) {
-          handleTryAgain();
-        }
-      }}
-    >
-      <SBackButton
-        defer={isMobileOrTablet ? 250 : undefined}
-        onClick={() => router.back()}
-      />
-      <AnimatedLogoEmailVerification
-        isLoading={isSigninWithEmailLoading || isResendCodeLoading}
-      />
-      <SHeadline
-        variant={3}
+    <>
+        {!isMobileOrTablet && (
+          <SBackButtonDesktop
+            defer={isMobileOrTablet ? 250 : undefined}
+            onClick={() => router.back()}
+          />
+        )}
+      <SCodeVerificationMenu
+        onClick={() => {
+          if (submitError) {
+            handleTryAgain();
+          }
+        }}
       >
-        { t('heading.heading') }
-      </SHeadline>
-      <SSubheading variant={2} weight={600}>
-        {signupEmailInput.length > 0 ? (
-          <>
-            {t('heading.subheading')}
-            <br />
-            { signupEmailInput }
-          </>
-        ) : null}
-      </SSubheading>
-      <VerficationCodeInput
-        initialValue={codeInitial}
-        length={6}
-        disabled={isSigninWithEmailLoading || isResendCodeLoading || (timerSeconds < 1)}
-        error={submitError ? true : undefined}
-        onComplete={onCodeComplete}
-      />
-      {
-        timerActive && !timerHidden && !submitError && !isSucces ? (
-          <STimeoutDiv
-            isAlertColor={timerSeconds < 11}
-          >
-            { secondsToString(timerSeconds, 'm:s') }
-          </STimeoutDiv>
-        ) : (
-          !submitError
-          && !isSigninWithEmailLoading
-          && !isResendCodeLoading && (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-01"
-            delay={0.3}
-          >
-            <STimeExpired>
-              { t('timeExpired.not_receieved') }
-              {' '}
-              <button
-                type="button"
-                onClick={() => handleResendCode()}
-              >
-                { t('timeExpired.resendBtn') }
-              </button>
-            </STimeExpired>
-          </AnimatedPresence>
+        <SBackButton
+          defer={isMobileOrTablet ? 250 : undefined}
+          onClick={() => router.back()}
+        />
+        <AnimatedLogoEmailVerification
+          isLoading={isSigninWithEmailLoading || isResendCodeLoading}
+        />
+        <SHeadline
+          variant={3}
+        >
+          { t('heading.heading') }
+        </SHeadline>
+        <SSubheading variant={2} weight={600}>
+          {signupEmailInput.length > 0 ? (
+            <>
+              {t('heading.subheading')}
+              <br />
+              { signupEmailInput }
+            </>
+          ) : null}
+        </SSubheading>
+        <VerficationCodeInput
+          initialValue={codeInitial}
+          length={6}
+          disabled={isSigninWithEmailLoading || isResendCodeLoading || (timerSeconds < 1)}
+          error={submitError ? true : undefined}
+          onComplete={onCodeComplete}
+        />
+        {
+          timerActive && !timerHidden && !submitError && !isSucces ? (
+            <STimeoutDiv
+              isAlertColor={timerSeconds < 11}
+            >
+              { secondsToString(timerSeconds, 'm:s') }
+            </STimeoutDiv>
+          ) : (
+            !submitError
+            && !isSigninWithEmailLoading
+            && !isResendCodeLoading && (
+            <AnimatedPresence
+              animateWhenInView={false}
+              animation="t-01"
+              delay={0.3}
+            >
+              <STimeExpired>
+                { t('timeExpired.not_receieved') }
+                {' '}
+                <button
+                  type="button"
+                  onClick={() => handleResendCode()}
+                >
+                  { t('timeExpired.resendBtn') }
+                </button>
+              </STimeExpired>
+            </AnimatedPresence>
+            )
           )
-        )
-      }
-      {
-        !isSigninWithEmailLoading && !isResendCodeLoading && submitError && !isSucces ? (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-09"
-          >
-            <SErrorDiv>
-              { t('errors.invalidCode') }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
-    </SCodeVerificationMenu>
+        }
+        {
+          !isSigninWithEmailLoading && !isResendCodeLoading && submitError && !isSucces ? (
+            <AnimatedPresence
+              animateWhenInView={false}
+              animation="t-09"
+            >
+              <SErrorDiv>
+                { t('errors.invalidCode') }
+              </SErrorDiv>
+            </AnimatedPresence>
+          ) : null
+        }
+      </SCodeVerificationMenu>
+    </>
   );
 };
 
@@ -324,8 +332,9 @@ const SCodeVerificationMenu = styled.div`
   user-select: none;
 
   ${({ theme }) => theme.media.laptopL} {
-    top: calc(50% - 224px);
+    /* top: calc(50% - 224px); */
     left: calc(50% - 304px);
+    margin-top: calc(50vh - 224px);
 
     width: 608px;
     height: 448px;
@@ -355,13 +364,53 @@ const SBackButton = styled(GoBackButton)`
     }
   }
 
-
   ${({ theme }) => theme.media.tablet} {
     width: fit-content;
   }
 
   ${({ theme }) => theme.media.laptopL} {
     display: none;
+  }
+`;
+
+const SBackButtonDesktop = styled(GoBackButton)`
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: fit-content;
+
+  padding: 8px;
+
+  &:active {
+    & div > svg {
+      transform: scale(0.8);
+
+      transition: .2s ease-in-out;
+    }
+  }
+
+  ${({ theme }) => theme.media.laptopL} {
+    display: flex;
+
+    top: 90px;
+    left: 104px;
+
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    border-radius: 12px;
+
+    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+
+    div {
+      margin-right: 0;
+    }
   }
 `;
 

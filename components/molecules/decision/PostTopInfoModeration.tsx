@@ -8,12 +8,15 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../redux-store/store';
-import { deleteMyPost } from '../../../api/endpoints/post';
-
+import { formatNumber } from '../../../utils/format';
 import { TPostType } from '../../../utils/switchPostType';
+import { deleteMyPost } from '../../../api/endpoints/post';
+import { useAppSelector } from '../../../redux-store/store';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
+import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
+import PostFailedBox from './PostFailedBox';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 import PostShareMenu from './PostShareMenu';
@@ -22,23 +25,30 @@ import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import PostEllipseMenuModeration from './PostEllipseMenuModeration';
 import PostEllipseModalModeration from './PostEllipseModalModeration';
 
+import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
+import MCIcon from '../../../public/images/creation/MC.webp';
+import ACIcon from '../../../public/images/creation/AC.webp';
+import CFIcon from '../../../public/images/creation/CF.webp';
 
-import { formatNumber } from '../../../utils/format';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-
-import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
-import Text from '../../atoms/Text';
-import PostFailedBox from './PostFailedBox';
+const images = {
+  ac: ACIcon.src,
+  mc: MCIcon.src,
+  cf: CFIcon.src,
+}
 
 interface IPostTopInfoModeration {
   title: string;
   postId: string;
-  postStatus?: TPostStatusStringified;
+  postStatus: TPostStatusStringified;
   totalVotes?: number;
+  totalPledges?: number;
+  targetPledges?: number;
   postType?: TPostType;
   amountInBids?: number;
+  hasResponse: boolean;
+  hasWinner: boolean;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
@@ -49,6 +59,10 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   postStatus,
   totalVotes,
   amountInBids,
+  totalPledges,
+  targetPledges,
+  hasResponse,
+  hasWinner,
   handleUpdatePostStatus,
 }) => {
   const theme = useTheme();
@@ -57,6 +71,33 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
+  const failureReason = useMemo(() => {
+    if (postStatus !== 'failed') return '';
+
+    if (postType === 'ac') {
+      if (!hasWinner) {
+        return 'ac-no-winner';
+      }
+      if (amountInBids === 0 || !amountInBids) {
+        return 'ac';
+      }
+    }
+
+    if (postType === 'mc') {
+      if (totalVotes === 0 || !totalVotes) {
+        return 'mc';
+      }
+    }
+
+    if (postType === 'cf') {
+      if (!totalPledges || totalPledges!! < targetPledges!!) {
+        return 'cf';
+      }
+    }
+
+    return 'no-response';
+  }, [postStatus, postType, hasWinner, amountInBids, totalVotes, totalPledges, targetPledges]);
+
   const showWinnerOption = useMemo(() => (
     postType === 'ac' && postStatus === 'wating_for_decision'
   ), [postType, postStatus]);
@@ -64,7 +105,6 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [deletePostOpen, setDeletePostOpen] = useState(false);
-
 
   const handleOpenShareMenu = () => setShareMenuOpen(true);
   const handleCloseShareMenu = () => setShareMenuOpen(false);
@@ -150,6 +190,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
           {/* Share menu */}
           {!isMobile && (
             <PostShareMenu
+              postId={postId}
               isVisible={shareMenuOpen}
               handleClose={handleCloseShareMenu}
             />
@@ -158,20 +199,25 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
             <PostShareModal
               isOpen={shareMenuOpen}
               zIndex={11}
+              postId={postId}
               onClose={handleCloseShareMenu}
             />
           ) : null}
           {/* Ellipse menu */}
           {!isMobile && (
             <PostEllipseMenuModeration
+              postType={postType as string}
               isVisible={ellipseMenuOpen}
+              canDeletePost={postStatus !== 'failed'}
               handleClose={handleCloseEllipseMenu}
               handleOpenDeletePostModal={handleOpenDeletePostModal}
             />
           )}
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModalModeration
+              postType={postType as string}
               zIndex={11}
+              canDeletePost={postStatus !== 'failed'}
               isOpen={ellipseMenuOpen}
               onClose={handleCloseEllipseMenu}
               handleOpenDeletePostModal={handleOpenDeletePostModal}
@@ -203,16 +249,24 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailedBoxModeration.title')}
-          body={t('PostFailedBoxModeration.body')}
-          buttonCaption={t('PostFailedBoxModeration.ctaButton')}
+          title={t('PostFailedBoxModeration.title', { postType: t(`postType.${postType}`) })}
+          body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
+          imageSrc={images[postType!!]}
+          buttonCaption={t('PostFailedBoxModeration.ctaButton', { postType: t(`postType.${postType}`) })}
           handleButtonClick={() => {
-            router.push('/creation');
+            if (postType === 'ac') {
+              router.push('/creation/auction');
+            } else if (postType === 'mc') {
+              router.push('/creation/multiple-choice');
+            } else {
+              router.push('/creation/crowdfunding');
+            }
           }}
         />
       )}
       {/* Confirm delete post */}
       <PostConfirmDeleteModal
+        postType={postType as string}
         isVisible={deletePostOpen}
         closeModal={handleCloseDeletePostModal}
         handleConfirmDelete={handleDeletePost}
@@ -223,9 +277,10 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
 
 PostTopInfoModeration.defaultProps = {
   postType: undefined,
-  postStatus: undefined,
   totalVotes: undefined,
   amountInBids: undefined,
+  totalPledges: undefined,
+  targetPledges: undefined,
 };
 
 export default PostTopInfoModeration;

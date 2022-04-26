@@ -8,6 +8,7 @@ import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseMenu {
+  postType: string;
   isVisible: boolean;
   isFollowing: boolean;
   isFollowingDecision: boolean;
@@ -17,6 +18,7 @@ interface IPostEllipseMenu {
 }
 
 const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
+  postType,
   isVisible,
   isFollowing,
   isFollowingDecision,
@@ -59,7 +61,7 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
             <Text
               variant={3}
             >
-              { !isFollowingDecision ? t('ellipse.follow-decision') : t('ellipse.unfollow-decision') }
+              { !isFollowingDecision ? t('ellipse.follow-decision', { postType: t(`postType.${postType}`) }) : t('ellipse.unfollow-decision', { postType: t(`postType.${postType}`) }) }
             </Text>
           </SButton>
           <SSeparator />
@@ -94,7 +96,7 @@ const SContainer = styled(motion.div)`
   padding: 16px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;

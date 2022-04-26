@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useEffect, useRef,
 } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -12,20 +12,18 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
 import { useAppSelector } from '../../../../../redux-store/store';
+import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
 
-import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
-import McOptionCardModeration from './McOptionCardModeration';
 import GradientMask from '../../../../atoms/GradientMask';
-import useScrollGradients from '../../../../../utils/hooks/useScrollGradients';
+import McOptionCardModeration from './McOptionCardModeration';
 
 interface IMcOptionsTabModeration {
   post: newnewapi.MultipleChoice;
   options: newnewapi.MultipleChoice.Option[];
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
-  minAmount: number;
   handleLoadOptions: (token?: string) => void;
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
@@ -35,13 +33,10 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
   options,
   optionsLoading,
   pagingToken,
-  minAmount,
   handleLoadOptions,
   handleRemoveOption,
 }) => {
   const { t } = useTranslation('decision');
-  const router = useRouter();
-  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   // Infinite load
@@ -85,6 +80,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
+              canBeDeleted={options.length > 2}
               postId={post.postUuid}
             />
           ))}
@@ -117,7 +113,7 @@ export default McOptionsTabModeration;
 const STabContainer = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: calc(100% - 56px);
+  /* height: calc(100% - 56px); */
 `;
 
 const SBidsContainer = styled.div`

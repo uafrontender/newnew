@@ -1,7 +1,14 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
@@ -9,16 +16,16 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 
-import { fetchMoreLikePosts } from '../../../api/endpoints/post';
+import { fetchMoreLikePosts, markPost } from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Modal from '../Modal';
-import ListPostModal from '../search/ListPostModal';
+import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
-import PostFailedBox from '../../molecules/decision/PostFailedBox';
+import ListPostModal from '../see-more/ListPostModal';
 // Posts views
 import PostViewAC from './PostViewAC';
 import PostViewMC from './PostViewMC';
@@ -28,16 +35,47 @@ import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
 import PostViewProcessing from './PostViewProcessing';
+import PostSuccessAC from './PostSuccessAC';
+import PostSuccessMC from './PostSuccessMC';
+import PostSuccessCF from './PostSuccessCF';
+import PostAwaitingResponseAC from './PostAwaitingResponseAC';
+import PostAwaitingResponseMC from './PostAwaitingResponseMC';
+import PostAwaitingResponseCF from './PostAwaitingResponseCF';
+import PostShareModal from '../../molecules/decision/PostShareModal';
+import PostShareMenu from '../../molecules/decision/PostShareMenu';
+import PostEllipseModal from '../../molecules/decision/PostEllipseModal';
+import PostEllipseMenu from '../../molecules/decision/PostEllipseMenu';
+import PostFailedBox from '../../molecules/decision/PostFailedBox';
+import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
+import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
+import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
+import MCIcon from '../../../public/images/creation/MC.webp';
+import ACIcon from '../../../public/images/creation/AC.webp';
+import CFIcon from '../../../public/images/creation/CF.webp';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType, { TPostType } from '../../../utils/switchPostType';
-import switchPostStatus, { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import switchPostStatusString from '../../../utils/switchPostStatusString';
-import Button from '../../atoms/Button';
+import CommentFromUrlContextProvider, {
+  CommentFromUrlContext,
+} from '../../../contexts/commentFromUrlContext';
+import { FollowingsContext } from '../../../contexts/followingContext';
+import { markUser } from '../../../api/endpoints/user';
+import getDisplayname from '../../../utils/getDisplayname';
+
+
+const images = {
+  ac: ACIcon.src,
+  mc: MCIcon.src,
+  cf: CFIcon.src,
+}
 
 interface IPostModal {
   isOpen: boolean;
@@ -60,9 +98,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [postParsed, typeOfPost] = post ? switchPostType(post) : [undefined, undefined];
+  const [postParsed, typeOfPost] = post
+    ? switchPostType(post)
+    : [undefined, undefined];
   const [postStatus, setPostStatus] = useState<TPostStatusStringified>(() => {
     if (typeOfPost && postParsed?.status) {
       if (typeof postParsed.status === 'string') {
@@ -70,34 +112,122 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       return switchPostStatus(typeOfPost, postParsed?.status);
     }
-    return 'processing'
+    return 'processing';
   });
 
-  const handleUpdatePostStatus = useCallback((newStatus: number | string) => {
-    let status;
-    if (typeof newStatus === 'number') {
-      status = switchPostStatus(typeOfPost!!, newStatus);
-    } else {
-      status = switchPostStatusString(typeOfPost!!, newStatus);
+  // TODO: a way to determine if the post was deleted by the crator themselves
+  // pr by an admin
+  const deletedByCreator = useMemo(() => true, []);
+
+  const shouldRenderVotingFinishedModal = useMemo(() => (
+    postStatus === 'succeeded' || postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision'
+  ), [postStatus]);
+
+
+  // Local controls for wairting and success views
+  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
+  const [isFollowingDecision, setIsFollowingDecision] = useState(!!postParsed?.isFavoritedByMe)
+
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+
+  const handleFollowDecision = async () => {
+    try {
+      if (!user.loggedIn) {
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
+      }
+      const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+        postUuid: postParsed?.postUuid,
+      });
+
+      const res = await markPost(markAsViewedPayload);
+
+      if (!res.error) {
+        setIsFollowingDecision(!isFollowingDecision);
+      }
+    } catch (err) {
+      console.error(err);
     }
-    setPostStatus(status);
-  }, [typeOfPost]);
+  };
+
+  const handleToggleFollowingCreator = async () => {
+    try {
+      if (!user.loggedIn) {
+        window?.history.replaceState({
+          fromPost: true,
+        }, '', '');
+        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
+      }
+
+      const payload = new newnewapi.MarkUserRequest({
+        userUuid: postParsed?.creator?.uuid,
+        markAs: followingsIds.includes(postParsed?.creator?.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+      });
+
+      const res = await markUser(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+      if (followingsIds.includes(postParsed?.creator?.uuid as string)) {
+        removeId(postParsed?.creator?.uuid as string);
+      } else {
+        addId(postParsed?.creator?.uuid as string);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const handleUpdatePostStatus = useCallback(
+    (newStatus: number | string) => {
+      let status;
+      if (typeof newStatus === 'number') {
+        status = switchPostStatus(typeOfPost!!, newStatus);
+      } else {
+        status = switchPostStatusString(typeOfPost!!, newStatus);
+      }
+      setPostStatus(status);
+    },
+    [typeOfPost]
+  );
 
   const isMyPost = useMemo(
-    () => user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
+    () =>
+      user.loggedIn && user.userData?.userUuid === postParsed?.creator?.uuid,
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
 
-  const [currLocation] = useState(manualCurrLocation ?? (isBrowser() ? window.location.href : ''));
-  const [acSuggestionFromUrl, setAcSuggestionFromUrl] = useState<newnewapi.Auction.Option | undefined>(undefined);
-  const acSuggestionIDFromUrl = isBrowser() ? new URL(window.location.href).searchParams.get('suggestion') : undefined;
+  const [currLocation] = useState(
+    manualCurrLocation ?? (isBrowser() ? window.location.href : '')
+  );
+  const [acSuggestionFromUrl, setAcSuggestionFromUrl] =
+    useState<newnewapi.Auction.Option | undefined>(undefined);
+  const acSuggestionIDFromUrl = isBrowser()
+    ? new URL(window.location.href).searchParams.get('suggestion')
+    : undefined;
 
-  const [sessionId, setSessionId] = useState(() => (
+  const [sessionId, setSessionId] = useState(() =>
     isBrowser()
-    ? new URL(window.location.href).searchParams.get('?session_id') ||
-      new URL(window.location.href).searchParams.get('session_id')
-    : undefined
-  ));
+      ? new URL(window.location.href).searchParams.get('?session_id') ||
+        new URL(window.location.href).searchParams.get('session_id')
+      : undefined
+  );
+
+  const { handleSetCommentIdFromUrl } = useContext(CommentFromUrlContext);
+
+  useEffect(() => {
+    const commentId = isBrowser()
+      ? new URL(window.location.href).searchParams.get('?comment_id') ||
+        new URL(window.location.href).searchParams.get('comment_id')
+      : undefined;
+
+    handleSetCommentIdFromUrl?.(commentId ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const resetSessionId = () => setSessionId(undefined);
 
@@ -108,7 +238,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Recommendations (with infinite scroll)
   const innerHistoryStack = useRef<newnewapi.Post[]>([]);
   const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
-  const [nextPageToken, setNextPageToken] = useState<string | null | undefined>('');
+  const [nextPageToken, setNextPageToken] =
+    useState<string | null | undefined>('');
   const [recommenedPostsLoading, setRecommenedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
@@ -126,17 +257,24 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       handleClose();
       window.history.replaceState('', '', currLocation);
     }
-  }
+  };
 
   const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
     const newPostParsed = switchPostType(newPost)[0];
     handleOpenAnotherPost?.(newPost);
-    if (post !== undefined) innerHistoryStack.current.push(post as newnewapi.Post);
+    if (post !== undefined)
+      innerHistoryStack.current.push(post as newnewapi.Post);
     modalContainerRef.current?.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
-    window.history.pushState(newPostParsed.postUuid, 'Post', `/?post=${newPostParsed.postUuid}`);
+    window.history.pushState(
+      {
+        postId: newPostParsed.postUuid,
+      },
+      'Post',
+      `/post/${newPostParsed.postUuid}`
+    );
     setRecommenedPosts([]);
     setNextPageToken('');
   };
@@ -148,20 +286,26 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         setRecommenedPostsLoading(true);
         setTriedLoading(true);
 
-        const fetchRecommenedPostsPayload = new newnewapi.GetSimilarPostsRequest({
-          postUuid: postParsed?.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-        const postsResponse = await fetchMoreLikePosts(fetchRecommenedPostsPayload);
+        const fetchRecommenedPostsPayload =
+          new newnewapi.GetSimilarPostsRequest({
+            postUuid: postParsed?.postUuid,
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
+          });
+        const postsResponse = await fetchMoreLikePosts(
+          fetchRecommenedPostsPayload
+        );
 
         if (postsResponse.data && postsResponse.data.posts) {
-          setRecommenedPosts((curr) => [...curr, ...(postsResponse.data?.posts as newnewapi.Post[])]);
+          setRecommenedPosts((curr) => [
+            ...curr,
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
           setNextPageToken(postsResponse.data.paging?.nextPageToken);
         }
         setRecommenedPostsLoading(false);
@@ -178,6 +322,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewScheduled
           key={postParsed?.postUuid}
+          postType={postToRender}
           post={postParsed!!}
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
@@ -241,6 +386,62 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     return <div />;
   };
 
+  const renderPostWaitingForResponse = (postToRender: TPostType) => {
+    if (postToRender === 'ac') {
+      return (
+        <PostAwaitingResponseAC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Auction}
+        />
+      );
+    }
+    if (postToRender === 'mc') {
+      return (
+        <PostAwaitingResponseMC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.MultipleChoice}
+        />
+      );
+    }
+    if (postToRender === 'cf') {
+      return (
+        <PostAwaitingResponseCF
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Crowdfunding}
+        />
+      );
+    }
+    return <div />;
+  }
+
+  const renderPostSuccess = (postToRender: TPostType) => {
+    if (postToRender === 'mc') {
+      return (
+        <PostSuccessMC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.MultipleChoice}
+        />
+      );
+    }
+    if (postToRender === 'ac') {
+      return (
+        <PostSuccessAC
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Auction}
+        />
+      );
+    }
+    if (postToRender === 'cf') {
+      return (
+        <PostSuccessCF
+          key={postParsed?.postUuid}
+          post={postParsed as newnewapi.Crowdfunding}
+        />
+      );
+    }
+    return <div />;
+  }
+
   const renderPostModeration = (postToRender: TPostType) => {
     if (postStatus === 'processing') {
       return (
@@ -300,9 +501,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       setOpen(true);
       window.history.pushState(
-        postParsed.postUuid,
+        {
+          postId: postParsed.postUuid,
+        },
         'Post',
-        `/?post=${postParsed.postUuid}${additionalHash ?? ''}`);
+        `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+      );
     }
 
     return () => {
@@ -320,7 +524,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       if (!acSuggestionIDFromUrl) return;
       try {
         const payload = new newnewapi.GetAcOptionRequest({
-          optionId: parseInt(acSuggestionIDFromUrl, 10),
+          optionId: parseInt(acSuggestionIDFromUrl),
         });
 
         const res = await fetchAcOptionById(payload);
@@ -345,15 +549,25 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     const verify = () => {
       if (!isBrowser()) return;
 
-      const postId = new URL(window.location.href).searchParams.get('post');
+      const postId =
+        new URL(window.location.href).searchParams.get('post') ||
+        window?.history?.state?.postId;
 
-      if (innerHistoryStack.current && innerHistoryStack.current[innerHistoryStack.current.length - 1]) {
-        handleOpenAnotherPost?.(innerHistoryStack.current[innerHistoryStack.current.length - 1]);
+      if (
+        innerHistoryStack.current &&
+        innerHistoryStack.current[innerHistoryStack.current.length - 1]
+      ) {
+        handleOpenAnotherPost?.(
+          innerHistoryStack.current[innerHistoryStack.current.length - 1]
+        );
         modalContainerRef.current?.scrollTo({
           top: 0,
           behavior: 'smooth',
         });
-        innerHistoryStack.current = innerHistoryStack.current.slice(0, innerHistoryStack.current.length - 1);
+        innerHistoryStack.current = innerHistoryStack.current.slice(
+          0,
+          innerHistoryStack.current.length - 1
+        );
         setRecommenedPosts([]);
         setNextPageToken('');
       }
@@ -373,7 +587,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     if (inView && !recommenedPostsLoading) {
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
-      } else if (!triedLoading && !nextPageToken && recommenedPosts?.length === 0) {
+      } else if (
+        !triedLoading &&
+        !nextPageToken &&
+        recommenedPosts?.length === 0
+      ) {
         loadRecommendedPosts();
       }
     }
@@ -388,7 +606,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         }
         return switchPostStatus(typeOfPost, postParsed?.status);
       }
-      return 'processing'
+      return 'processing';
     });
   }, [postParsed, typeOfPost]);
 
@@ -396,13 +614,128 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   useEffect(() => {
     router.prefetch('/sign-up');
     router.prefetch('/creation');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (shouldRenderVotingFinishedModal && !isMyPost) {
+    return (
+      <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+        {postStatus === 'succeeded' && !isMobile && (
+          <PostSuccessAnimationBackground />
+        )}
+        <Head>
+          <title>{postParsed?.title}</title>
+        </Head>
+        <SPostSuccessWaitingControlsDiv
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SWaitingSuccessControlsBtn
+            view="secondary"
+            iconOnly
+            onClick={handleCloseAndGoBack}
+          >
+            <InlineSvg
+              svg={CancelIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SWaitingSuccessControlsBtn>
+          <SWaitingSuccessControlsBtn
+            view="secondary"
+            iconOnly
+            onClick={() => setShareMenuOpen(true)}
+          >
+            <InlineSvg
+              svg={ShareIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SWaitingSuccessControlsBtn>
+          <SWaitingSuccessControlsBtn
+            view="secondary"
+            iconOnly
+            onClick={() => setEllipseMenuOpen(true)}
+          >
+            <InlineSvg
+              svg={MoreIcon}
+              fill={theme.colorsThemed.text.primary}
+              width="24px"
+              height="24px"
+            />
+          </SWaitingSuccessControlsBtn>
+          {/* Share menu */}
+          {!isMobile && (
+            <PostShareMenu
+              postId={postParsed?.postUuid!!}
+              isVisible={shareMenuOpen}
+              handleClose={() => setShareMenuOpen(false)}
+            />
+          )}
+          {isMobile && shareMenuOpen ? (
+            <PostShareModal
+              isOpen={shareMenuOpen}
+              zIndex={11}
+              postId={postParsed?.postUuid!!}
+              onClose={() => setShareMenuOpen(false)}
+            />
+          ) : null}
+          {/* Ellipse menu */}
+          {!isMobile && (
+            <PostEllipseMenu
+              postType={typeOfPost as string}
+              isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              isVisible={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleClose={() => setEllipseMenuOpen(false)}
+            />
+          )}
+          {isMobile && ellipseMenuOpen ? (
+            <PostEllipseModal
+              postType={typeOfPost as string}
+              isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
+              isFollowingDecision={isFollowingDecision}
+              zIndex={11}
+              isOpen={ellipseMenuOpen}
+              handleFollowDecision={handleFollowDecision}
+              handleToggleFollowingCreator={handleToggleFollowingCreator}
+              onClose={() => setEllipseMenuOpen(false)}
+            />
+          ) : null}
+        </SPostSuccessWaitingControlsDiv>
+        {postParsed && typeOfPost ? (
+          <SPostModalContainer
+            id="post-modal-container"
+            isMyPost={isMyPost}
+            style={{
+              ...(isMobile ? {
+                paddingTop: 0,
+              } : {}),
+            }}
+            onClick={(e) => e.stopPropagation()}
+            ref={(el) => {
+              modalContainerRef.current = el!!;
+            }}
+          >
+            {postStatus === 'succeeded' ? (
+              renderPostSuccess(typeOfPost)
+            ) : null}
+            {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
+              renderPostWaitingForResponse(typeOfPost)
+            ) : null}
+          </SPostModalContainer>
+        ) : null}
+      </Modal>
+    );
+  }
 
   return (
     <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
       <Head>
-        <title>{ postParsed?.title }</title>
+        <title>{postParsed?.title}</title>
       </Head>
       {!isMobile && (
         <SGoBackButtonDesktop
@@ -410,7 +743,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           iconOnly
           onClick={handleCloseAndGoBack}
         >
-          <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+          <InlineSvg
+            svg={CancelIcon}
+            fill={theme.colorsThemed.text.primary}
+            width="24px"
+            height="24px"
+          />
         </SGoBackButtonDesktop>
       )}
       {postParsed && typeOfPost ? (
@@ -423,42 +761,64 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           }}
         >
           {postStatus !== 'deleted' ? (
-            isMyPost ? renderPostModeration(typeOfPost) : renderPostView(typeOfPost)
+            isMyPost ? (
+              renderPostModeration(typeOfPost)
+            ) : (
+              renderPostView(typeOfPost)
+            )
           ) : isMyPost ? (
-              <PostFailedBox
-                title={t('PostDeletedByMe.title')}
-                body={t('PostDeletedByMe.body.by_creator')}
-                buttonCaption={t('PostDeletedByMe.ctaButton')}
-                handleButtonClick={() => {
-                  router.push('/creation');
-                }}
-              />
+            <PostFailedBox
+              title={t('PostDeletedByMe.title', { postType: t(`postType.${typeOfPost}`) })}
+              body={
+                deletedByCreator ? (
+                  t('PostDeletedByMe.body.by_creator', { postType: t(`postType.${typeOfPost}`) })
+                  ) : (
+                  t('PostDeletedByMe.body.by_admin', { postType: t(`postType.${typeOfPost}`) })
+                )
+              }
+              imageSrc={images[typeOfPost]}
+              buttonCaption={t('PostDeletedByMe.ctaButton')}
+              handleButtonClick={() => {
+                router.push('/creation');
+              }}
+            />
           ) : (
             <PostFailedBox
-              title={t('PostDeleted.title')}
-              body={t('PostDeleted.body.by_creator')}
-              buttonCaption={t('PostDeleted.ctaButton')}
+              title={t('PostDeleted.title', { postType: t(`postType.${typeOfPost}`) })}
+              body={
+                deletedByCreator ? (
+                  t('PostDeleted.body.by_creator', {
+                    creator: getDisplayname(postParsed.creator!!),
+                    postType: t(`postType.${typeOfPost}`),
+                  })
+                ) : (
+                  t('PostDeleted.body.by_admin', {
+                    creator: getDisplayname(postParsed.creator!!),
+                    postType: t(`postType.${typeOfPost}`),
+                  })
+                )
+              }
+              buttonCaption={t('PostDeleted.ctaButton', { postTypeMultiple: t(`postType.multiple.${typeOfPost}`)})}
+              imageSrc={images[typeOfPost]}
               style={{
                 marginBottom: '24px',
               }}
               handleButtonClick={() => {
                 document.getElementById('post-modal-container')?.scrollTo({
-                  top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                  top: document.getElementById(
+                    'recommendations-section-heading'
+                  )?.offsetTop,
                   behavior: 'smooth',
-                })
+                });
               }}
             />
           )}
           {!isMyPost && (
-            <SRecommendationsSection
-              id="recommendations-section-heading"
-            >
+            <SRecommendationsSection id="recommendations-section-heading">
               <Headline variant={4}>
-                {
-                  recommenedPosts.length > 0 ? (
-                    t('RecommendationsSection.heading')
-                  ) : null
-                }
+                {recommenedPosts.length > 0
+                  ? t('RecommendationsSection.heading')
+                  : null}
               </Headline>
               {recommenedPosts && (
                 <ListPostModal
@@ -469,7 +829,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                     left: '-16px',
                   }}
                   skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={theme.colorsThemed.background.secondary}
+                  skeletonsHighlightColor={
+                    theme.colorsThemed.background.secondary
+                  }
                   handlePostClicked={handleOpenRecommendedPost}
                 />
               )}
@@ -478,9 +840,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 style={{
                   position: 'relative',
                   bottom: '10px',
-                  ...(recommenedPostsLoading ? {
-                    display: 'none'
-                  } : {}),
+                  ...(recommenedPostsLoading
+                    ? {
+                        display: 'none',
+                      }
+                    : {}),
                 }}
               />
             </SRecommendationsSection>
@@ -497,7 +861,11 @@ PostModal.defaultProps = {
   manualCurrLocation: undefined,
 };
 
-export default PostModal;
+export default (props: any) => (
+  <CommentFromUrlContextProvider>
+    <PostModal {...props} />
+  </CommentFromUrlContextProvider>
+);
 
 const SPostModalContainer = styled.div<{
   isMyPost: boolean;
@@ -591,5 +959,64 @@ const SGoBackButtonDesktop = styled(Button)`
   ${({ theme }) => theme.media.laptop} {
     right: 24px;
     top: 32px;
+  }
+`;
+
+// Waiting and Success
+const SPostSuccessWaitingControlsDiv = styled.div`
+  position: absolute;
+  right: 16px;
+  top: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+
+  border: transparent;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  z-index: 1000;
+
+  cursor: pointer;
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: row-reverse;
+    gap: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    flex-direction: column;
+    gap: 8px;
+    right: 24px;
+    top: 32px;
+  }
+`;
+
+const SWaitingSuccessControlsBtn = styled(Button)`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  border: transparent;
+
+  background: #2d2d2d2e;
+
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  cursor: pointer;
+
+  ${({ theme }) => theme.media.tablet} {
+    background: #fdfdfd10;
   }
 `;

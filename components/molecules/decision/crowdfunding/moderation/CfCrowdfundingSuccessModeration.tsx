@@ -1,5 +1,6 @@
 import React, {
-  useMemo,
+  useCallback,
+  useMemo, useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -34,57 +35,84 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
+  // Share
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handleCopyLink = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/post/${post.postUuid}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [post.postUuid]);
+
   const percentage = (currentNumBackers / post.targetBackerCount) * 100;
-  const size = useMemo(() => (
-    isTablet ? 180 : 240
-  ), [isTablet]);
+  const size = useMemo(() => 130, []);
   const radius = (size - 12) / 2;
 
   return (
     <SSectionContainer>
-      {!isMobile ? (
-        <>
-          <SProgressRingContainer>
-            {isTablet ? (
-              <SProgressRingSvg
-                width={size}
-                height={size}
-              >
-                <SBgRingCircle
-                  stroke={theme.colorsThemed.accent.green}
-                  strokeWidth="12px"
-                  strokeLinecap="round"
-                  fill="transparent"
-                  style={{
-                    transform: `rotate(${90 - (percentage !== 0 ? 4 : 0)}deg) scale(-1, 1)`,
-                    transformOrigin: 'center',
-                  }}
-                  r={radius}
-                  cx={size / 2}
-                  cy={size / 2}
-                />
-              </SProgressRingSvg>
-
-            ) : null}
-            <STrophyImg
-              src={WinnerIcon.src}
-            />
-            <STrophyGlow />
-          </SProgressRingContainer>
-        </>
-      ) : null}
-      <SCaptionSection>
-        <SHeadlineNumBackers
-          variant={3}
-        >
-          {currentNumBackers}
-        </SHeadlineNumBackers>
-        <STarget>
-          {t('CfPost.BackersStatsSection.of_backers', {
-            targetBackers: formatNumber(post.targetBackerCount, true),
-          })}
-        </STarget>
-      </SCaptionSection>
+      <STopSectionWrapper>
+        {!isMobile ? (
+          <>
+            <SProgressRingContainer>
+              {isTablet ? (
+                <SProgressRingSvg
+                  width={size}
+                  height={size}
+                >
+                  <SBgRingCircle
+                    stroke={theme.colorsThemed.accent.green}
+                    strokeWidth="6px"
+                    strokeLinecap="round"
+                    fill="transparent"
+                    style={{
+                      transform: `rotate(${90 - (percentage !== 0 ? 4 : 0)}deg) scale(-1, 1)`,
+                      transformOrigin: 'center',
+                    }}
+                    r={radius}
+                    cx={size / 2}
+                    cy={size / 2}
+                  />
+                </SProgressRingSvg>
+              ) : null}
+              <STrophyImg
+                src={WinnerIcon.src}
+              />
+              <STrophyGlow />
+            </SProgressRingContainer>
+          </>
+        ) : null}
+        <SCaptionSection>
+          <SHeadlineNumBackers
+            variant={3}
+          >
+            {currentNumBackers}
+          </SHeadlineNumBackers>
+          <STarget>
+            {t('CfPost.BackersStatsSection.of_backers', {
+              targetBackers: formatNumber(post.targetBackerCount, true),
+            })}
+          </STarget>
+        </SCaptionSection>
+      </STopSectionWrapper>
       <SWinnerCard>
         <SOptionDetails>
           <SNumBidders
@@ -134,12 +162,12 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
         <PostSuccessBoxModeration
           title={t('PostSuccessModeration.title')}
           body={t('PostSuccessModeration.body')}
-          buttonCaption={t('PostSuccessModeration.ctaButton')}
+          buttonCaption={isCopiedUrl ? t('PostSuccessModeration.ctaButton-copied') : t('PostSuccessModeration.ctaButton')}
           style={{
             marginTop: '24px',
           }}
           handleButtonClick={() => {
-            console.log('Share')
+            handleCopyLink();
           }}
         />
       ) : null}
@@ -152,28 +180,37 @@ export default CfCrowdfundingSuccessModeration;
 const SSectionContainer = styled(motion.div)`
   position: relative;
   width: 100%;
+  height: 100%;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const STopSectionWrapper = styled.div`
+
+  ${({ theme }) => theme.media.tablet} {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
 `;
 
 const SProgressRingContainer = styled.div`
-  position: absolute;
+  /* position: absolute; */
   left: 24px;
   top: 24px;
 
-
-  width: 180px;
-  height: 180px;
-
   ${({ theme }) => theme.media.laptop} {
-    width: 240px;
-    height: 240px;
+
   }
 `;
 
 const SProgressRingSvg = styled.svg`
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 24px;
+  left: 48px;
 `;
 
 const SBgRingCircle = styled.circle`
@@ -183,23 +220,21 @@ const SBgRingCircle = styled.circle`
 
 const STrophyImg = styled.img`
   position: absolute;
-  left: calc(50% - 40px);
-  top: calc(50% - 40px);
+  top: 56px;
+  left: 86px;
 
-  width: 80px;
+  width: 60px;
 
   ${({ theme }) => theme.media.laptop} {
-    left: calc(50% - 65px);
-    top: calc(50% - 65px);
-
+    position: static;
     width: 130px;
   }
 `;
 
 const STrophyGlow = styled.div`
   position: absolute;
-  left: calc(50% - 38px);
-  top: calc(50% - 38px);
+  top: 34px;
+  left: 58px;
 
   width: 76px;
   height: 76px;
@@ -210,6 +245,8 @@ const STrophyGlow = styled.div`
   filter: blur(50px);
 
   ${({ theme }) => theme.media.laptop} {
+    top: 24px;
+    left: 66px;
   }
 `;
 
@@ -220,16 +257,19 @@ const SCaptionSection = styled.div`
   margin-bottom: 70px;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-left: 55%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-    margin-top: 80px;
-    margin-bottom: 114px;
+    margin-bottom: 16px;
 
     text-align: left;
+
+    height: 150px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-top: 124px;
+    /* margin-top: 124px; */
   }
 `;
 

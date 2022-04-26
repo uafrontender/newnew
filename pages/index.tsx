@@ -77,7 +77,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
   // Display post
-  const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
+  const [postModalOpen, setPostModalOpen] = useState(false);
   const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>(postFromQuery ?? undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -133,7 +134,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       try {
         setCollectionACInitialLoading(true);
 
-        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({});
+        const liveAuctionsPayload = new newnewapi.PagedAuctionsRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
@@ -157,7 +160,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     async function fetchMultipleChoices() {
       try {
         setCollectionMCInitialLoading(true);
-        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({});
+        const multichoicePayload = new newnewapi.PagedMultipleChoicesRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
 
@@ -181,7 +186,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     async function fetchCrowdfundings() {
       try {
         setCollectionCFInitialLoading(true);
-        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({});
+        const cfPayload = new newnewapi.PagedCrowdfundingsRequest({
+          sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
+        });
 
         const resCF = await fetchTopCrowdfundings(cfPayload);
 
@@ -316,7 +323,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
               caption={t('cf-block-tutorial-card.caption')}
               imageStyle={{
                 position: 'relative',
-                left: '5%'
+                left: '5%',
               }}
             />
           ) : undefined}

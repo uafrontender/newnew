@@ -1,11 +1,46 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import { newnewapi } from 'newnew-api';
+import { debounce } from 'lodash';
+
+import { useAppSelector } from '../../../redux-store/store';
+
 import Button from '../Button';
-import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import InlineSVG from '../InlineSVG';
 import CommentTextArea from './CommentTextArea';
-import { useAppSelector } from '../../../redux-store/store';
+
+import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
+import { validateText } from '../../../api/endpoints/infrastructure';
+
+const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
+  let errorMsg = 'generic';
+
+  switch (status) {
+    case newnewapi.ValidateTextResponse.Status.TOO_LONG: {
+      errorMsg = 'tooLong';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.TOO_SHORT: {
+      errorMsg = 'tooShort';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE: {
+      errorMsg = 'innappropriate';
+      break;
+    }
+    case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION: {
+      errorMsg = 'linksForbidden';
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+
+  return errorMsg;
+};
 
 interface ICommentForm {
   position?: string;
@@ -21,22 +56,74 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
   onSubmit,
 }, ref) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
+  const user = useAppSelector((state) => state.user)
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [commentText, setCommentText] = useState('');
   const [focusedInput, setFocusedInput] = useState<boolean>(false);
+
+  const [commentText, setCommentText] = useState('');
+  const [commentTextError, setCommentTextError] = useState('');
+  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+
+  const validateTextViaAPI = useCallback(async (
+    text: string,
+  ) => {
+    setIsAPIValidateLoading(true);
+    try {
+      const payload = new newnewapi.ValidateTextRequest({
+        kind: newnewapi.ValidateTextRequest.Kind.POST_COMMENT,
+        text,
+      });
+
+      const res = await validateText(
+        payload,
+      );
+
+      if (!res.data?.status) throw new Error('An error occured');
+
+      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        setCommentTextError(errorSwitch(res.data?.status!!));
+      } else {
+        setCommentTextError('');
+      }
+
+      setIsAPIValidateLoading(false);
+    } catch (err) {
+      console.error(err);
+      setIsAPIValidateLoading(false);
+    }
+  }, []);
+
+  const validateTextViaAPIDebounced = useMemo(() => debounce((
+    text: string,
+  ) => {
+    validateTextViaAPI(text);
+  }, 250),
+  [validateTextViaAPI]);
 
   const handleChange = useCallback((id, value) => {
     setCommentText(value);
-  }, []);
+    validateTextViaAPIDebounced(value);
+  }, [validateTextViaAPIDebounced]);
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
+    if (isAPIValidateLoading) return;
+
+    if (!user.loggedIn) {
+      window?.history.replaceState({
+        fromPost: true,
+      }, '', '');
+      router.push(`/sign-up?reason=comment&redirect=${window.location.href}`);
+    }
+
     await onSubmit(commentText);
     setCommentText('');
-  }, [commentText, onSubmit]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentText, user.loggedIn, isAPIValidateLoading, onSubmit]);
 
   const handleBlur = useCallback(() => {
     setFocusedInput(false);
@@ -52,12 +139,19 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
       }}
       position={position}
       zIndex={zIndex}
+      onKeyDown={(e) => {
+        if (e.shiftKey && e.key === 'Enter') {
+          handleSubmit(e);
+        }
+      }}
     >
-      <SInputWrapper focus={focusedInput}>
+      <SInputWrapper>
         <CommentTextArea
           id="title"
           maxlength={150}
           value={commentText}
+          focus={focusedInput}
+          error={commentTextError ? t(`comments.errors.${commentTextError}`) : ''}
           onFocus={() => {
             setFocusedInput(true);
           }}
@@ -71,7 +165,10 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
           withShadow
           view={commentText ? 'primaryGrad' : 'quaternary'}
           onClick={handleSubmit}
-          disabled={!commentText}
+          disabled={!commentText || !!commentTextError}
+          style={{
+            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+          }}
         >
           <SInlineSVG
             svg={sendIcon}
@@ -135,17 +232,8 @@ const SCommentsForm = styled.form<{
   }
 `;
 
-interface ISInputWrapper {
-  focus: boolean;
-}
+interface ISInputWrapper {}
 const SInputWrapper = styled.div<ISInputWrapper>`
   width: 100%;
-  border-radius: 12px;
-  border: 1px solid
-    ${(props) => {
-      if (props.focus) {
-        return props.theme.colorsThemed.background.outlines2;
-      }
-      return props.theme.colorsThemed.background.secondary;
-    }};
+  border-radius: 16px;
 `;

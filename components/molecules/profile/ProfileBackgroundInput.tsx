@@ -16,6 +16,7 @@ import ImageIcon from '../../../public/images/svg/icons/filled/Image.svg';
 interface IProfileBackgroundInput {
   originalPictureUrl?: string;
   pictureInEditUrl?: string;
+  coverUrlInEditAnimated: boolean;
   crop: Point;
   zoom: number;
   initialObjectFit: CropperObjectFit;
@@ -30,6 +31,7 @@ interface IProfileBackgroundInput {
 const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> = ({
   originalPictureUrl,
   pictureInEditUrl,
+  coverUrlInEditAnimated,
   zoom,
   crop,
   initialObjectFit,
@@ -100,17 +102,29 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
               />
             </SOriginalImgDiv>
           ) : (
-            <ProfileBackgroundCropper
-              pictureUrlInEdit={pictureInEditUrl!!}
-              crop={crop}
-              zoom={zoom}
-              initialObjectFit={initialObjectFit}
-              mobileCropWidth={mobileCropWidth}
-              disabled={disabled}
-              onCropChange={disabled ? () => {} : onCropChange}
-              onCropComplete={disabled ? () => {} : onCropComplete}
-              onZoomChange={disabled ? () => {} : onZoomChange}
-            />
+            !coverUrlInEditAnimated ? (
+              <ProfileBackgroundCropper
+                pictureUrlInEdit={pictureInEditUrl!!}
+                crop={crop}
+                zoom={zoom}
+                initialObjectFit={initialObjectFit}
+                mobileCropWidth={mobileCropWidth}
+                disabled={disabled}
+                onCropChange={disabled ? () => {} : onCropChange}
+                onCropComplete={disabled ? () => {} : onCropComplete}
+                onZoomChange={disabled ? () => {} : onZoomChange}
+              />
+            ) : (
+              <SOriginalImgDiv
+                pictureUrl={pictureInEditUrl!!}
+              >
+                <img
+                  src={pictureInEditUrl!!}
+                  alt="Profile cover"
+                  draggable={false}
+                />
+              </SOriginalImgDiv>
+            )
           )}
           <SDeleteImgButton
             iconOnly

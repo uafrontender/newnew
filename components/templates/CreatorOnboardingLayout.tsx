@@ -12,53 +12,59 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import OnboardingProgressBar from '../molecules/creator-onboarding/OnboardingProgressBar';
+import OnboardingMobileHeader from '../molecules/creator-onboarding/OnboardingMobileHeader';
 import { useAppSelector } from '../../redux-store/store';
 import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
+import HeroVisual from './HeroVisual';
 
 export interface ICreatorOnboardingLayout {
-  hideProgressBar?: boolean;
+  hideOnboardingHeader?: boolean;
 }
 
 const SCreatorOnboardingLayout = styled.div`
   position: relative;
 
+  max-width: 100%;
   height: 100vh;
   width: 100vw;
 `;
 
-const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout> = ({
-  hideProgressBar,
-  children,
-}) => {
-  const theme = useTheme();
-  const router = useRouter();
-  const { t } = useTranslation('creator-onboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
+const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout> =
+  ({ hideOnboardingHeader, children }) => {
+    const theme = useTheme();
+    const router = useRouter();
+    const { t } = useTranslation('creator-onboarding');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobileOrTablet = [
+      'mobile',
+      'mobileS',
+      'mobileM',
+      'mobileL',
+      'tablet',
+      'laptop',
+    ].includes(resizeMode);
+    const isTablet = ['tablet'].includes(resizeMode);
 
-  const SideTextSwitch = () => {
-    if (router.pathname.includes('creator-onboarding-stripe')) {
-      return 'StripeSection'
-    }
-    if (router.pathname.includes('creator-onboarding-subrate')) {
-      return 'SubrateSection'
-    }
-    return 'DetailsSection';
-  }
+    const SideTextSwitch = () => {
+      if (router.pathname.includes('creator-onboarding-stripe')) {
+        return 'StripeSection';
+      }
+      if (router.pathname.includes('creator-onboarding-subrate')) {
+        return 'SubrateSection';
+      }
+      return 'DetailsSection';
+    };
 
-  return (
-    <ErrorBoundary>
-      <SkeletonTheme
-        baseColor={theme.colorsThemed.background.secondary}
-        highlightColor={theme.colorsThemed.background.tertiary}
-      >
-        <SCreatorOnboardingLayout>
-          <HomeLogoButton />
-          {
-            isTablet && hideProgressBar ? (
+    return (
+      <ErrorBoundary>
+        <SkeletonTheme
+          baseColor={theme.colorsThemed.background.secondary}
+          highlightColor={theme.colorsThemed.background.tertiary}
+        >
+          <SCreatorOnboardingLayout>
+            <HomeLogoButton />
+            {isTablet && hideOnboardingHeader ? (
               <SHomeLogoButton
                 style={{
                   display: 'block',
@@ -70,36 +76,37 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
                   </Col>
                 </Row>
               </SHomeLogoButton>
-            ) : null
-          }
-          <SContentContainer>
-            {!hideProgressBar && (
-              <OnboardingProgressBar
-                numStages={2}
-                currentStage={router.pathname.includes('creator-onboarding-stage-1') ? 1 : 2}
-              />
+            ) : null}
+            <SContentContainer>
+              {!hideOnboardingHeader && <OnboardingMobileHeader />}
+              {children}
+            </SContentContainer>
+            {!isMobileOrTablet &&
+              !router.pathname.includes('creator-onboarding') && (
+                <SSideMessage>
+                  {!hideOnboardingHeader && <OnboardingMobileHeader />}
+                  <SHeadline variant={3}>
+                    {t(`${SideTextSwitch()}.side.heading`)}
+                  </SHeadline>
+                  <Text variant={2}>
+                    {t(`${SideTextSwitch()}.side.subheading`)}
+                  </Text>
+                </SSideMessage>
+              )}
+            {!isMobileOrTablet && router.pathname.includes('creator-onboarding') && (
+              <HeroVisual style={{
+                top:'140px',
+                left:'0px',
+                width: 'calc(100vw - 800px)',
+                maxWidth: '100%',
+                height: '700px'
+              }}/>
             )}
-            {children}
-          </SContentContainer>
-          {!isMobileOrTablet && !router.pathname.includes('creator-onboarding-stage-1') && (
-            <SSideMessage>
-              <SHeadline
-                variant={3}
-              >
-                { t(`${SideTextSwitch()}.side.heading`) }
-              </SHeadline>
-              <Text
-                variant={2}
-              >
-                { t(`${SideTextSwitch()}.side.subheading`) }
-              </Text>
-            </SSideMessage>
-          )}
-        </SCreatorOnboardingLayout>
-      </SkeletonTheme>
-    </ErrorBoundary>
-  );
-};
+          </SCreatorOnboardingLayout>
+        </SkeletonTheme>
+      </ErrorBoundary>
+    );
+  };
 
 export default CreatorOnboardingLayout;
 
@@ -118,12 +125,14 @@ const SHomeLogoButton = styled(Container)`
 
   ${({ theme }) => theme.media.tablet} {
     position: relative;
-    margin: 12px 0px;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 
   ${(props) => props.theme.media.laptop} {
     display: block;
-    margin: 16px 0;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 `;
 

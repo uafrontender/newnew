@@ -1,17 +1,16 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
-import { useAppSelector } from '../../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
-import { createPaymentSession, getTopUpWalletWithPaymentPurposeUrl } from '../../../../api/endpoints/payments';
+import {
+  createPaymentSession,
+  getTopUpWalletWithPaymentPurposeUrl,
+} from '../../../../api/endpoints/payments';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -22,303 +21,388 @@ import PaymentModal from '../../checkout/PaymentModal';
 import useScrollGradientsHorizontal from '../../../../utils/hooks/useScrollGradientsHorizontal';
 import GradientMaskHorizontal from '../../../atoms/GradientMaskHorizontal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
+import InlineSvg from '../../../atoms/InlineSVG';
+
+import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import TutorialTooltip, {
+  DotPositionEnum,
+} from '../../../atoms/decision/TutorialTooltip';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
+import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
   pledgeLevels: newnewapi.IMoneyAmount[];
   post: newnewapi.Crowdfunding;
   handleSetPaymentSuccesModalOpen: (newValue: boolean) => void;
-  handleAddPledgeFromResponse: (newPledge: newnewapi.Crowdfunding.Pledge) => void;
+  handleAddPledgeFromResponse: (
+    newPledge: newnewapi.Crowdfunding.Pledge
+  ) => void;
 }
 
-const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> = ({
-  pledgeLevels,
-  post,
-  handleSetPaymentSuccesModalOpen,
-  handleAddPledgeFromResponse,
-}) => {
-  const { t } = useTranslation('decision');
-  const user = useAppSelector((state) => state.user);
+const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
+  ({
+    pledgeLevels,
+    post,
+    handleSetPaymentSuccesModalOpen,
+    handleAddPledgeFromResponse,
+  }) => {
+    const router = useRouter();
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.user);
 
-  const containerRef = useRef<HTMLDivElement>();
+    const { appConstants } = useGetAppConstants();
+    const { walletBalance } = useContext(WalletContext);
 
-  const buttonsContainerRef = useRef<HTMLDivElement>();
-  const { showLeftGradient, showRightGradient } = useScrollGradientsHorizontal(buttonsContainerRef);
+    const containerRef = useRef<HTMLDivElement>();
 
-  const [pledgeAmount, setPledgeAmount] = useState<number | undefined>(undefined);
+    const buttonsContainerRef = useRef<HTMLDivElement>();
+    const { showLeftGradient, showRightGradient } =
+      useScrollGradientsHorizontal(buttonsContainerRef);
 
-  const [customPledgeAmount, setCustomPledgeAmount] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
+    const [pledgeAmount, setPledgeAmount] =
+      useState<number | undefined>(undefined);
 
-  // Payment modal
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [loadingModalOpen, setLoadingModalOpen] = useState(false);
+    const [customPledgeAmount, setCustomPledgeAmount] = useState('');
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
-  // Handlers
-  const handleSetPledgeAmountAndOpenPaymentModal = useCallback((amount: number) => {
-    setPledgeAmount(amount);
-    setPaymentModalOpen(true);
-  }, [
-    setPledgeAmount,
-  ]);
+    // Payment modal
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
-  const handleCustomPledgePaymentModal = useCallback(() => {
-    setPledgeAmount(parseInt(customPledgeAmount, 10) * 100);
-    setPaymentModalOpen(true);
-  }, [
-    customPledgeAmount,
-  ])
+    // Handlers
+    const handleSetPledgeAmountAndOpenPaymentModal = useCallback(
+      (amount: number) => {
+        setPledgeAmount(amount);
+        setPaymentModalOpen(true);
+      },
+      [setPledgeAmount]
+    );
 
-  const handleOpenCustomPledgeForm = () => setIsFormOpen(true);
+    const handleCustomPledgePaymentModal = useCallback(() => {
+      setPledgeAmount(parseInt(customPledgeAmount) * 100);
+      setPaymentModalOpen(true);
+    }, [customPledgeAmount]);
 
-  const handleCloseCustomPledgeForm = () => {
-    setCustomPledgeAmount('');
-    setIsFormOpen(false);
-  }
+    const handleOpenCustomPledgeForm = () => setIsFormOpen(true);
 
-  // Make a pledge and close all forms and modals
-  const handlePayWithWallet = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      // Check if user is logged in
-      if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-          successUrl: `${window.location.href.split('#')[0]}&`,
-          cancelUrl: `${window.location.href.split('#')[0]}&`,
-          ...(!user.loggedIn ? {
-            nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-          } : {}),
-          cfPledgeRequest: {
+    const handleCloseCustomPledgeForm = () => {
+      setCustomPledgeAmount('');
+      setIsFormOpen(false);
+    };
+
+    // Make a pledge and close all forms and modals
+    const handlePayWithWallet = useCallback(async () => {
+      setLoadingModalOpen(true);
+      try {
+        // Check if user is logged in
+        if (!user.loggedIn) {
+          const getTopUpWalletWithPaymentPurposeUrlPayload =
+            new newnewapi.TopUpWalletWithPurposeRequest({
+              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${post.postUuid}`,
+              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                router.locale !== 'en-US' ? `${router.locale}/` : ''
+              }post/${post.postUuid}`,
+              ...(!user.loggedIn
+                ? {
+                    nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                  }
+                : {}),
+              cfPledgeRequest: {
+                amount: new newnewapi.MoneyAmount({
+                  usdCents: parseInt(pledgeAmount?.toString()!!),
+                }),
+                postUuid: post.postUuid,
+              },
+            });
+
+          const res = await getTopUpWalletWithPaymentPurposeUrl(
+            getTopUpWalletWithPaymentPurposeUrlPayload
+          );
+
+          if (!res.data || !res.data.sessionUrl || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          window.location.href = res.data.sessionUrl;
+        } else {
+          const makePledgePayload = new newnewapi.DoPledgeRequest({
             amount: new newnewapi.MoneyAmount({
-              usdCents: parseInt(pledgeAmount?.toString()!!, 10),
+              usdCents: parseInt(pledgeAmount?.toString()!!),
             }),
             postUuid: post.postUuid,
-          }
-        });
-
-        const res = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
-
-        if (!res.data
-          || !res.data.sessionUrl
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
-
-        window.location.href = res.data.sessionUrl;
-      } else {
-        const makePledgePayload = new newnewapi.DoPledgeRequest({
-          amount: new newnewapi.MoneyAmount({
-            usdCents: parseInt(pledgeAmount?.toString()!!, 10),
-          }),
-          postUuid: post.postUuid,
-        });
-
-        const res = await doPledgeWithWallet(makePledgePayload);
-
-        if (res.data && res.data.status === newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload = new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${window.location.href.split('#')[0]}&`,
-            cancelUrl: `${window.location.href.split('#')[0]}&`,
-            cfPledgeRequest: {
-              amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(pledgeAmount?.toString()!!, 10),
-              }),
-              postUuid: post.postUuid,
-            }
           });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(getTopUpWalletWithPaymentPurposeUrlPayload);
+          const res = await doPledgeWithWallet(makePledgePayload);
 
-          if (!resStripeRedirect.data
-            || !resStripeRedirect.data.sessionUrl
-            || resStripeRedirect.error
-          ) throw new Error(resStripeRedirect.error?.message ?? 'Request failed');
+          if (
+            res.data &&
+            res.data.status ===
+              newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE
+          ) {
+            const getTopUpWalletWithPaymentPurposeUrlPayload =
+              new newnewapi.TopUpWalletWithPurposeRequest({
+                successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                  router.locale !== 'en-US' ? `${router.locale}/` : ''
+                }post/${post.postUuid}`,
+                cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+                  router.locale !== 'en-US' ? `${router.locale}/` : ''
+                }post/${post.postUuid}`,
+                cfPledgeRequest: {
+                  amount: new newnewapi.MoneyAmount({
+                    usdCents: parseInt(pledgeAmount?.toString()!!),
+                  }),
+                  postUuid: post.postUuid,
+                },
+              });
 
-          window.location.href = resStripeRedirect.data.sessionUrl;
-          return;
+            const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+              getTopUpWalletWithPaymentPurposeUrlPayload
+            );
+
+            if (
+              !resStripeRedirect.data ||
+              !resStripeRedirect.data.sessionUrl ||
+              resStripeRedirect.error
+            )
+              throw new Error(
+                resStripeRedirect.error?.message ?? 'Request failed'
+              );
+
+            window.location.href = resStripeRedirect.data.sessionUrl;
+            return;
+          }
+
+          if (
+            !res.data ||
+            res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
+            res.error
+          )
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          setIsFormOpen(false);
+          setCustomPledgeAmount('');
+          handleAddPledgeFromResponse(
+            res.data.pledge as newnewapi.Crowdfunding.Pledge
+          );
+
+          setCustomPledgeAmount('');
+          setIsFormOpen(false);
+          setPaymentModalOpen(false);
+          setLoadingModalOpen(false);
+          handleSetPaymentSuccesModalOpen(true);
         }
-
-        if (!res.data
-          || res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS
-          || res.error
-        ) throw new Error(res.error?.message ?? 'Request failed');
-
-        setIsFormOpen(false);
-        setCustomPledgeAmount('');
-        handleAddPledgeFromResponse(res.data.pledge as newnewapi.Crowdfunding.Pledge);
-
-        setCustomPledgeAmount('');
-        setIsFormOpen(false);
+      } catch (err) {
+        console.error(err);
         setPaymentModalOpen(false);
         setLoadingModalOpen(false);
-        handleSetPaymentSuccesModalOpen(true);
       }
-    } catch (err) {
-      console.error(err);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-    }
-  }, [
-    pledgeAmount,
-    post.postUuid,
-    user.loggedIn,
-    handleAddPledgeFromResponse,
-    handleSetPaymentSuccesModalOpen,
-  ]);
+    }, [
+      user.loggedIn,
+      router.locale,
+      post.postUuid,
+      pledgeAmount,
+      handleAddPledgeFromResponse,
+      handleSetPaymentSuccesModalOpen,
+    ]);
 
-  const handlePayWithCardStripeRedirect = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      const createPaymentSessionPayload = new newnewapi.CreatePaymentSessionRequest({
-        successUrl: `${window.location.href.split('#')[0]}&`,
-        cancelUrl: `${window.location.href.split('#')[0]}&`,
-        ...(!user.loggedIn ? {
-          nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-        } : {}),
-        cfPledgeRequest: {
-          amount: new newnewapi.MoneyAmount({
-            usdCents: parseInt(pledgeAmount?.toString()!!, 10),
-          }),
-          postUuid: post.postUuid,
-        }
-      });
+    const handlePayWithCardStripeRedirect = useCallback(async () => {
+      setLoadingModalOpen(true);
+      try {
+        const createPaymentSessionPayload =
+          new newnewapi.CreatePaymentSessionRequest({
+            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${post.postUuid}`,
+            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+              router.locale !== 'en-US' ? `${router.locale}/` : ''
+            }post/${post.postUuid}`,
+            ...(!user.loggedIn
+              ? {
+                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+                }
+              : {}),
+            cfPledgeRequest: {
+              amount: new newnewapi.MoneyAmount({
+                usdCents: parseInt(pledgeAmount?.toString()!!),
+              }),
+              postUuid: post.postUuid,
+            },
+          });
 
-      const res = await createPaymentSession(createPaymentSessionPayload);
+        const res = await createPaymentSession(createPaymentSessionPayload);
 
-      if (!res.data
-        || !res.data.sessionUrl
-        || res.error
-      ) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || !res.data.sessionUrl || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      window.location.href = res.data.sessionUrl;
-    } catch (err) {
-      console.error(err);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-    }
-  }, [
-    user.loggedIn,
-    pledgeAmount,
-    post.postUuid,
-  ]);
+        window.location.href = res.data.sessionUrl;
+      } catch (err) {
+        console.error(err);
+        setPaymentModalOpen(false);
+        setLoadingModalOpen(false);
+      }
+    }, [router.locale, post.postUuid, user.loggedIn, pledgeAmount]);
 
-  useEffect(() => {
-    if (!paymentModalOpen) setPledgeAmount(undefined);
-  }, [paymentModalOpen]);
+    useEffect(() => {
+      if (!paymentModalOpen) setPledgeAmount(undefined);
+    }, [paymentModalOpen]);
 
-  return (
-    <>
-      <SSectionContainer
-        ref={(el) => {
-          // eslint-disable-next-line no-param-reassign
-          containerRef.current = el!!;
-        }}
-      >
-        <SInfoSubsection>
-          <STitle
-            variant={2}
-            weight={600}
-          >
-            { t('CfPost.BackersTab.info.title') }
-          </STitle>
-          <SCaption
-            variant={3}
-          >
-            { t('CfPost.BackersTab.info.caption') }
-          </SCaption>
-        </SInfoSubsection>
-        {isFormOpen ? (
-          <SNewPledgeForm>
-            <BidAmountTextInput
-              value={customPledgeAmount}
-              minAmount={1}
-              inputAlign="left"
-              style={{
-                padding: '12.5px 16px',
-                width: '100%',
-              }}
-              onChange={(newValue: string) => setCustomPledgeAmount(newValue)}
-            />
-            <Button
-              size="sm"
-              view="primaryGrad"
-              disabled={customPledgeAmount === ''}
-              onClick={() => handleCustomPledgePaymentModal()}
-            >
-              { t('CfPost.BackersTab.CustomPledge.pledgeBtn') }
-            </Button>
-            <SCancelButton
-              view="secondary"
-              onClick={() => handleCloseCustomPledgeForm()}
-            >
-              { t('CfPost.BackersTab.CustomPledge.cancelBtn') }
-            </SCancelButton>
-          </SNewPledgeForm>
-        ) : (
-          <SButtonsContainer
-            ref={(el) => {
-              buttonsContainerRef.current = el!!;
-            }}
-            numItems={1 + pledgeLevels.length}
-          >
-            {pledgeLevels.map((pledgeLevel, i, arr) => (
-              <CfMakeStandardPledgeCard
-                amount={pledgeLevel}
-                grandsVipStatus={i === arr.length - 1}
-                handleOpenMakePledgeForm={() => {
-                  handleSetPledgeAmountAndOpenPaymentModal(pledgeLevel.usdCents!!);
-                }}
-              />
-            ))}
-            <CfMakeCustomPledgeCard
-              handleOpenMakePledgeForm={handleOpenCustomPledgeForm}
-            />
-            <GradientMaskHorizontal
-              gradientType="secondary"
-              height={`${buttonsContainerRef.current?.getBoundingClientRect().height}px`}
-              positionBottom="0px"
-              positionLeft="0px"
-              active={showLeftGradient}
-            />
-            <GradientMaskHorizontal
-              gradientType="secondary"
-              height={`${buttonsContainerRef.current?.getBoundingClientRect().height}px`}
-              positionBottom="0px"
-              positionRight="0px"
-              active={showRightGradient}
-            />
-          </SButtonsContainer>
-        )}
-      </SSectionContainer>
-      {/* Payment Modal */}
-      {paymentModalOpen ? (
-        <PaymentModal
-          isOpen={paymentModalOpen}
-          zIndex={12}
-          amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
-          showTocApply
-          onClose={() => setPaymentModalOpen(false)}
-          handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={handlePayWithWallet}
+    const goToNextStep = () => {
+      if (user.loggedIn) {
+        const payload = new newnewapi.SetTutorialStatusRequest({
+          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+        });
+        setTutorialStatus(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingCfSteps: [
+            ...user.userTutorialsProgress.remainingCfSteps!!,
+          ].slice(1),
+        })
+      );
+    };
+
+    return (
+      <>
+        <SSectionContainer
+          ref={(el) => {
+            // eslint-disable-next-line no-param-reassign
+            containerRef.current = el!!;
+          }}
         >
-          <SPaymentModalHeader>
-            <SPaymentModalTitle
-              variant={3}
+          <SInfoSubsection>
+            <STitle variant={2} weight={600}>
+              {t('CfPost.BackersTab.info.title', {
+                creator: post.creator?.nickname,
+              })}
+            </STitle>
+          </SInfoSubsection>
+          {isFormOpen ? (
+            <SNewPledgeForm>
+              <BidAmountTextInput
+                value={customPledgeAmount}
+                minAmount={Math.round(appConstants.minCfPledge / 100)}
+                inputAlign="left"
+                style={{
+                  padding: '12.5px 16px',
+                  width: '100%',
+                }}
+                onChange={(newValue: string) => setCustomPledgeAmount(newValue)}
+              />
+              <Button
+                size="sm"
+                view="primaryGrad"
+                disabled={
+                  customPledgeAmount === '' ||
+                  parseInt(customPledgeAmount) <
+                    Math.round(appConstants.minCfPledge / 100)
+                }
+                onClick={() => handleCustomPledgePaymentModal()}
+              >
+                {t('CfPost.BackersTab.CustomPledge.pledgeBtn')}
+              </Button>
+              <SCancelButton
+                view="transparent"
+                iconOnly
+                onClick={() => handleCloseCustomPledgeForm()}
+              >
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width="24px"
+                  height="24px"
+                />
+              </SCancelButton>
+            </SNewPledgeForm>
+          ) : (
+            <SButtonsContainer
+              ref={(el) => {
+                buttonsContainerRef.current = el!!;
+              }}
+              numItems={1 + pledgeLevels.length}
             >
-              { t('CfPost.paymenModalHeader.subtitle') }
-            </SPaymentModalTitle>
-            <SPaymentModalOptionText>
-              { post.title }
-            </SPaymentModalOptionText>
-          </SPaymentModalHeader>
-        </PaymentModal>
-      ) : null }
-      {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
-      />
-    </>
-  );
-};
+              {pledgeLevels.map((pledgeLevel, i, arr) => (
+                <CfMakeStandardPledgeCard
+                  key={pledgeLevel.usdCents}
+                  amount={pledgeLevel}
+                  grandsVipStatus={i === arr.length - 1}
+                  handleOpenMakePledgeForm={() => {
+                    handleSetPledgeAmountAndOpenPaymentModal(
+                      pledgeLevel.usdCents!!
+                    );
+                  }}
+                />
+              ))}
+              <CfMakeCustomPledgeCard
+                handleOpenMakePledgeForm={handleOpenCustomPledgeForm}
+              />
+              <GradientMaskHorizontal
+                gradientType="secondary"
+                height={`${
+                  buttonsContainerRef.current?.getBoundingClientRect().height
+                }px`}
+                positionBottom="0px"
+                positionLeft="0px"
+                active={showLeftGradient}
+              />
+              <GradientMaskHorizontal
+                gradientType="secondary"
+                height={`${
+                  buttonsContainerRef.current?.getBoundingClientRect().height
+                }px`}
+                positionBottom="0px"
+                positionRight="0px"
+                active={showRightGradient}
+              />
+              <STutorialTooltipHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                    newnewapi.CfTutorialStep.CF_BACK_GOAL
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.cf.createYourBid.title')}
+                  text={t('tutorials.cf.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipHolder>
+            </SButtonsContainer>
+          )}
+        </SSectionContainer>
+        {/* Payment Modal */}
+        {paymentModalOpen ? (
+          <PaymentModal
+            isOpen={paymentModalOpen}
+            zIndex={12}
+            amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+            {...(
+              walletBalance?.usdCents && pledgeAmount && walletBalance.usdCents >= pledgeAmount ? {} : {
+                predefinedOption: 'card'
+              }
+            )}
+            showTocApply={!user?.loggedIn}
+            onClose={() => setPaymentModalOpen(false)}
+            handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
+            handlePayWithWallet={handlePayWithWallet}
+          >
+            <SPaymentModalHeader>
+              <SPaymentModalTitle variant={3}>
+                {t('CfPost.paymenModalHeader.subtitle')}
+              </SPaymentModalTitle>
+              <SPaymentModalOptionText>{post.title}</SPaymentModalOptionText>
+            </SPaymentModalHeader>
+          </PaymentModal>
+        ) : null}
+        {/* Loading Modal */}
+        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      </>
+    );
+  };
 
 export default CfPledgeLevelsSection;
 
@@ -345,11 +429,8 @@ const SInfoSubsection = styled.div`
 `;
 
 const STitle = styled(Text)`
-
-`;
-
-const SCaption = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+  text-align: center;
+  width: 100%;
 `;
 
 const SButtonsContainer = styled.div<{
@@ -363,7 +444,6 @@ const SButtonsContainer = styled.div<{
   width: 400px;
 
   overflow-x: auto;
-
 
   /* Hide scrollbar */
   ::-webkit-scrollbar {
@@ -400,10 +480,10 @@ const SNewPledgeForm = styled.div`
   width: 100%;
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
 
-  height: 108px;
+  height: 96px;
 
   div:first-child {
     width: 100%;
@@ -411,22 +491,24 @@ const SNewPledgeForm = styled.div`
 `;
 
 const SCancelButton = styled(Button)`
-  width: auto;
+  width: 48px;
+  height: 48px;
 
-  padding: 0px 12px;
+  padding: 0px;
 
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  flex-shrink: 0;
 
-  &:hover:enabled, &:focus:enabled {
-    background: none;
-    color: ${({ theme }) => theme.colorsThemed.text.primary};
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
+
+  &:hover:enabled,
+  &:active:enabled,
+  &:focus:enabled {
+    background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
 `;
 
 // Payment modal header
-const SPaymentModalHeader = styled.div`
-
-`;
+const SPaymentModalHeader = styled.div``;
 
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
@@ -437,4 +519,15 @@ const SPaymentModalOptionText = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const STutorialTooltipHolder = styled.div`
+  position: absolute;
+  left: -180px;
+  bottom: 70%;
+  text-align: left;
+  z-index: 1;
+  div {
+    width: 190px;
+  }
 `;
