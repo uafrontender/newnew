@@ -12,6 +12,15 @@ export const createPost = (payload: newnewapi.CreatePostRequest) =>
     payload
   );
 
+export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest) =>
+  fetchProtobufProtectedIntercepted<newnewapi.SetPostThumbnailRequest, newnewapi.EmptyResponse>(
+    newnewapi.SetPostThumbnailRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_POST}/set_post_thumbnail`,
+    'post',
+    payload
+  );
+
 export const markPost = (payload: newnewapi.MarkPostRequest) =>
   fetchProtobufProtectedIntercepted<newnewapi.MarkPostRequest, newnewapi.EmptyResponse>(
     newnewapi.MarkPostRequest,
