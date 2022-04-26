@@ -33,7 +33,7 @@ const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
-const ReportUserModal = dynamic(() => import('./ReportUserModal'));
+const ReportModal = dynamic(() => import('./ReportModal'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -484,7 +484,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </SBottomTextarea>
         )}
 
-          <ReportUserModal
+          <ReportModal
             show={confirmReportUser}
             reportedEntity={chatRoom && chatRoom.visavis?.nickname!! ||''}
             onClose={() => setConfirmReportUser(false)}

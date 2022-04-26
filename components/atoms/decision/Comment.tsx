@@ -17,7 +17,7 @@ import { TCommentWithReplies } from '../../interfaces/tcomment';
 
 const CommentEllipseMenu = dynamic(() => import('../../molecules/decision/CommentEllipseMenu'));
 const CommentEllipseModal = dynamic(() => import('../../molecules/decision/CommentEllipseModal'));
-const ReportUserModal = dynamic(() => import('../../molecules/chat/ReportUserModal'));
+const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 const DeleteCommentModal = dynamic(() => import('../../molecules/decision/DeleteCommentModal'));
 
 interface IComment {
@@ -182,7 +182,7 @@ const Comment: React.FC<IComment> = ({
           )}
           {!lastChild && <SSeparator />}
         </SCommentContent>
-        <ReportUserModal
+        <ReportModal
           show={confirmReportUser}
           reportedEntity={comment.sender?.nickname!!}
           onClose={() => setConfirmReportUser(false)}

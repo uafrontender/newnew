@@ -9,9 +9,9 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import InlineSVG from '../InlineSVG';
-import ChatEllipseMenu from './ChatEllipseMenu';
+import SubscriberEllipseMenu from './SubscriberEllipseMenu';
 import { markUser } from '../../../api/endpoints/user';
-import ReportUserModal from '../../molecules/chat/ReportUserModal';
+import ReportModal from '../../molecules/chat/ReportModal';
 import BlockUserModal from '../../molecules/chat/BlockUserModal';
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -88,7 +88,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
           <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
         </SMoreButton>
-        <ChatEllipseMenu
+        <SubscriberEllipseMenu
           user={subscriber.user!!}
           isVisible={ellipseMenuOpen}
           handleClose={handleCloseEllipseMenu}
@@ -96,7 +96,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           onUserBlock={onUserBlock}
           onUserReport={onUserReport}
         />
-          <ReportUserModal
+          <ReportModal
             show={confirmReportUser}
             reportedEntity={subscriber.user?.nickname!!}
             onClose={() => setConfirmReportUser(false)}

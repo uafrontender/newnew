@@ -13,14 +13,14 @@ interface ReportData {
   message: string
 }
 
-interface IReportUserModal {
+interface IReportModal {
   show: boolean;
   reportedEntity: string;
   onSubmit: (reportData: ReportData ) => void
   onClose: () => void;
 }
 
-const ReportUserModal: React.FC<IReportUserModal> = ({ show, reportedEntity, onClose, onSubmit }) => {
+const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, onSubmit }) => {
   const { t } = useTranslation('chat');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -126,7 +126,7 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ show, reportedEntity, onC
   );
 };
 
-export default ReportUserModal;
+export default ReportModal;
 
 const SContainer = styled.div`
   display: flex;
