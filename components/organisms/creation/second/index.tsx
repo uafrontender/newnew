@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useRef, useMemo, useState, useEffect, useContext, useCallback } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -25,7 +26,6 @@ import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -50,6 +50,10 @@ import {
   setCreationTargetBackerCount,
   setCreationFileUploadLoading,
   setCreationFileUploadProgress,
+  setCreationFileProcessingETA,
+  setCreationFileProcessingProgress,
+  setCreationFileProcessingError,
+  setCreationFileProcessingLoading,
 } from '../../../../redux-store/slices/creationStateSlice';
 
 import {
@@ -76,7 +80,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
   const router = useRouter();
   const dispatch = useAppDispatch();
   const playerRef: any = useRef(null);
-  const { post, auction, fileUpload, crowdfunding, multiplechoice, videoProcessing } = useAppSelector(
+  const xhrRef = useRef<XMLHttpRequest>();
+  const {
+    post, auction, fileUpload, fileProcessing, crowdfunding, multiplechoice, videoProcessing,
+  } = useAppSelector(
     (state) => state.creation
   );
   const user = useAppSelector((state) => state.user);
@@ -115,7 +122,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   const validateTextAPI = useCallback(
     async (text: string, kind: newnewapi.ValidateTextRequest.Kind) => {
@@ -170,8 +176,10 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
     multiplechoice.choices.findIndex((item) =>
       validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)
     ) !== -1;
+  // const disabled =
+  //   !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
   const disabled =
-    !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
+    !!titleError || !post.title || !post.announcementVideoUrl || !optionsAreValid;
 
   const validateTitleDebounced = useDebounce(post.title, 500);
   const formatStartsAt = useCallback(() => {
@@ -233,17 +241,18 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
         throw new Error(resProcessing.error?.message ?? 'An error occurred');
       }
 
-      removeChannel(videoProcessing?.taskUuid as string);
-
       dispatch(setCreationVideo(''));
-      dispatch(setCreationFileUploadError(false));
       dispatch(setCreationVideoProcessing({}));
+      dispatch(setCreationFileUploadError(false));
       dispatch(setCreationFileUploadLoading(false));
       dispatch(setCreationFileUploadProgress(0));
+      dispatch(setCreationFileProcessingError(false));
+      dispatch(setCreationFileProcessingLoading(false));
+      dispatch(setCreationFileProcessingProgress(0));
     } catch (error: any) {
       toast.error(error?.message);
     }
-  }, [dispatch, post?.announcementVideoUrl, removeChannel, videoProcessing?.taskUuid]);
+  }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
   const handleVideoUpload = useCallback(
     async (value) => {
       try {
@@ -262,20 +271,45 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
           throw new Error(res.error?.message ?? 'An error occurred');
         }
 
-        const uploadResponse = await fetch(res.data.uploadUrl, {
-          method: 'PUT',
-          body: value,
-          headers: {
-            'Content-Type': value.type,
-          },
+        const xhr = new XMLHttpRequest();
+        xhrRef.current = xhr;
+        let uploadStartTimestamp: number;
+        const uploadResponse = await new Promise((resolve, reject) => {
+          xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+              const uploadProgress = Math.round((event.loaded / event.total) * 100);
+              const percentageLeft = 100 - uploadProgress;
+              const secondsPassed = Math.round((event.timeStamp - uploadStartTimestamp) / 1000);
+              const factor = (secondsPassed / uploadProgress)
+              const eta = Math.round(factor * percentageLeft);
+              dispatch(setCreationFileUploadProgress(uploadProgress));
+              dispatch(setCreationFileUploadETA(eta));
+            }
+          });
+          xhr.addEventListener('loadstart', (event) => {
+            uploadStartTimestamp = event.timeStamp
+          })
+          xhr.addEventListener('loadend', () => {
+            dispatch(setCreationFileUploadProgress(100));
+            resolve(xhr.readyState === 4 && xhr.status === 200);
+          });
+          xhr.addEventListener('error', () => {
+            dispatch(setCreationFileUploadProgress(0));
+            reject(new Error('Upload failed'));
+          });
+          xhr.addEventListener('abort', () => {
+            console.log('Aborted');
+            dispatch(setCreationFileUploadProgress(0));
+            reject(new Error('Upload aborted'));
+          });
+          xhr.open('PUT', res.data!.uploadUrl, true);
+          xhr.setRequestHeader('Content-Type', value.type);
+          xhr.send(value);
         });
 
-        if (!uploadResponse.ok) {
+        if (!uploadResponse) {
           throw new Error('Upload failed');
         }
-
-        dispatch(setCreationFileUploadProgress(5));
-        dispatch(setCreationFileUploadETA(90));
 
         const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
           publicUrl: res.data.publicUrl,
@@ -286,12 +320,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
         if (!resProcessing.data || resProcessing.error) {
           throw new Error(resProcessing.error?.message ?? 'An error occurred');
         }
-
-        addChannel(resProcessing.data.taskUuid, {
-          processingProgress: {
-            taskUuid: resProcessing.data.taskUuid,
-          },
-        });
 
         dispatch(
           setCreationVideoProcessing({
@@ -305,16 +333,27 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
             },
           })
         );
-        dispatch(setCreationFileUploadProgress(10));
-        dispatch(setCreationFileUploadETA(80));
-        dispatch(setCreationVideo(res.data.publicUrl ?? ''));
-      } catch (error: any) {
-        dispatch(setCreationFileUploadError(true));
+
         dispatch(setCreationFileUploadLoading(false));
-        toast.error(error?.message);
+
+        dispatch(setCreationFileProcessingProgress(10));
+        dispatch(setCreationFileProcessingETA(80));
+        dispatch(setCreationFileProcessingLoading(true));
+        dispatch(setCreationFileProcessingError(false));
+        dispatch(setCreationVideo(res.data.publicUrl ?? ''));
+        xhrRef.current = undefined;
+      } catch (error: any) {
+        if (error.message === 'Upload failed') {
+          dispatch(setCreationFileUploadError(true));
+          toast.error(error?.message);
+        } else {
+          console.log('Upload aborted');
+        }
+        xhrRef.current = undefined;
+        dispatch(setCreationFileUploadLoading(false));
       }
     },
-    [addChannel, dispatch]
+    [dispatch]
   );
   const handleItemFocus = useCallback((key: string) => {
     if (key === 'title') {
@@ -600,19 +639,18 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
       if (!decoded) return;
 
       if (decoded.taskUuid === videoProcessing?.taskUuid) {
-        dispatch(setCreationFileUploadETA(decoded.estimatedTimeLeft?.seconds));
+        dispatch(setCreationFileProcessingETA(decoded.estimatedTimeLeft?.seconds));
 
-        if (decoded.fractionCompleted > fileUpload.progress) {
-          dispatch(setCreationFileUploadProgress(decoded.fractionCompleted));
+        if (decoded.fractionCompleted > fileProcessing.progress) {
+          dispatch(setCreationFileProcessingProgress(decoded.fractionCompleted));
         }
 
         if (decoded.fractionCompleted === 100) {
-          removeChannel(videoProcessing?.taskUuid);
-          dispatch(setCreationFileUploadLoading(false));
+          dispatch(setCreationFileProcessingLoading(false));
         }
       }
     },
-    [videoProcessing, fileUpload, dispatch, removeChannel]
+    [videoProcessing, fileProcessing, dispatch]
   );
 
   useEffect(() => {
@@ -679,11 +717,19 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                 </STabletBlockTitle>
               )}
               <FileUpload
-                {...fileUpload}
                 id="video"
                 value={videoProcessing?.targetUrls}
-                onChange={handleItemChange}
                 thumbnails={post.thumbnailParameters}
+                etaUpload={fileUpload.eta}
+                errorUpload={fileUpload.error}
+                loadingUpload={fileUpload.loading}
+                progressUpload={fileUpload.progress}
+                etaProcessing={fileProcessing.eta}
+                errorProcessing={fileProcessing.error}
+                loadingProcessing={fileProcessing.loading}
+                progressProcessing={fileProcessing.progress}
+                onChange={handleItemChange}
+                handleCancelVideoUpload={() => xhrRef.current?.abort()}
               />
             </SItemWrapper>
             {isMobile ? (
@@ -753,32 +799,40 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = (
                   </STabletBlockTitle>
                 </SItemWrapper>
                 {fileUpload?.progress === 100 ? (
-                  <SFloatingSubSectionWithPlayer>
-                    <SFloatingSubSectionPlayer>
-                      <BitmovinPlayer
-                        withMuteControl
-                        id="floating-preview"
-                        innerRef={playerRef}
-                        resources={videoProcessing?.targetUrls}
-                        borderRadius="16px"
-                        mutePosition="left"
-                      />
-                    </SFloatingSubSectionPlayer>
-                    <SFloatingSubSectionUser>
-                      <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-                      <SUserTitle variant={3} weight={600}>
-                        {post?.title}
-                      </SUserTitle>
-                    </SFloatingSubSectionUser>
-                    <SBottomEnd>
-                      <SButtonUser view="primary">{t(`secondStep.button.card.${typeOfPost}`)}</SButtonUser>
-                      <SCaption variant={2} weight={700}>
-                        {t('secondStep.card.left', {
-                          time: formatExpiresAt().fromNow(true),
-                        })}
-                      </SCaption>
-                    </SBottomEnd>
-                  </SFloatingSubSectionWithPlayer>
+                  fileProcessing?.progress === 100 ? (
+                    <SFloatingSubSectionWithPlayer>
+                      <SFloatingSubSectionPlayer>
+                        <BitmovinPlayer
+                          withMuteControl
+                          id="floating-preview"
+                          innerRef={playerRef}
+                          resources={videoProcessing?.targetUrls}
+                          borderRadius="16px"
+                          mutePosition="left"
+                        />
+                      </SFloatingSubSectionPlayer>
+                      <SFloatingSubSectionUser>
+                        <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
+                        <SUserTitle variant={3} weight={600}>
+                          {post?.title}
+                        </SUserTitle>
+                      </SFloatingSubSectionUser>
+                      <SBottomEnd>
+                        <SButtonUser view="primary">{t(`secondStep.button.card.${typeOfPost}`)}</SButtonUser>
+                        <SCaption variant={2} weight={700}>
+                          {t('secondStep.card.left', {
+                            time: formatExpiresAt().fromNow(true),
+                          })}
+                        </SCaption>
+                      </SBottomEnd>
+                    </SFloatingSubSectionWithPlayer>
+                  ) : (
+                    <SFloatingSubSection>
+                      <SFloatingSubSectionDescription variant={3} weight={600}>
+                        {t('secondStep.block.subTitle.floating-processing')}
+                      </SFloatingSubSectionDescription>
+                    </SFloatingSubSection>
+                  )
                 ) : (
                   <SFloatingSubSection>
                     <SFloatingSubSectionDescription variant={3} weight={600}>

@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
+import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 
 import Text from '../../atoms/Text';
@@ -12,11 +13,14 @@ import FullPreview from './FullPreview';
 import DeleteVideo from './DeleteVideo';
 
 import { loadVideo } from '../../../utils/loadVideo';
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+import { removeUploadedFile, stopVideoProcessing } from '../../../api/endpoints/upload';
+import { setCreationFileProcessingError, setCreationFileProcessingLoading, setCreationFileProcessingProgress, setCreationFileUploadError, setCreationFileUploadLoading, setCreationFileUploadProgress, setCreationVideo, setCreationVideoProcessing } from '../../../redux-store/slices/creationStateSlice';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -27,17 +31,35 @@ const ThumbnailPreviewEdit = dynamic(() => import('./ThumbnailPreviewEdit'), {
 
 interface IFileUpload {
   id: string;
-  eta?: number;
   value: any;
-  error?: boolean;
-  loading?: boolean;
-  onChange: (id: string, value: any) => void;
-  progress?: number;
+  etaUpload: number;
+  errorUpload: boolean;
+  loadingUpload: boolean;
+  progressUpload: number;
+  etaProcessing: number;
+  errorProcessing: boolean;
+  loadingProcessing: boolean;
+  progressProcessing: number;
   thumbnails: any;
+  onChange: (id: string, value: any) => void;
+  handleCancelVideoUpload: () => void;
 }
 
-export const FileUpload: React.FC<IFileUpload> = (props) => {
-  const { id, eta, value, error, loading, progress, onChange, thumbnails } = props;
+export const FileUpload: React.FC<IFileUpload> = ({
+  id,
+  value,
+  etaUpload,
+  errorUpload,
+  loadingUpload,
+  progressUpload,
+  etaProcessing,
+  errorProcessing,
+  loadingProcessing,
+  progressProcessing,
+  thumbnails,
+  onChange,
+  handleCancelVideoUpload,
+}) => {
   const [showVideoDelete, setShowVideoDelete] = useState(false);
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -46,6 +68,10 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState(null);
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const {
+    post, videoProcessing,
+  } = useAppSelector((state) => state.creation);
+  const dispatch = useAppDispatch();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
@@ -114,10 +140,42 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
   const handleRetryVideoUpload = useCallback(() => {
     onChange(id, localFile);
   }, [id, localFile, onChange]);
-  const handleCancelVideoUpload = useCallback(() => {
-    setLocalFile(null);
-    onChange(id, null);
-  }, [id, onChange]);
+  const handleCancelVideoProcessing = useCallback(async () => {
+    try {
+      const payload = new newnewapi.RemoveUploadedFileRequest({
+        publicUrl: post?.announcementVideoUrl,
+      });
+
+      const res = await removeUploadedFile(payload);
+
+      if (res?.error) {
+        throw new Error(res.error?.message ?? 'An error occurred');
+      }
+
+      const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
+        taskUuid: videoProcessing?.taskUuid,
+      });
+
+      const resProcessing = await stopVideoProcessing(payloadProcessing);
+
+      if (!resProcessing.data || resProcessing.error) {
+        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      }
+
+      setLocalFile(null);
+      onChange(id, null);
+      dispatch(setCreationVideo(''));
+      dispatch(setCreationVideoProcessing({}));
+      dispatch(setCreationFileUploadError(false));
+      dispatch(setCreationFileUploadLoading(false));
+      dispatch(setCreationFileUploadProgress(0));
+      dispatch(setCreationFileProcessingError(false));
+      dispatch(setCreationFileProcessingLoading(false));
+      dispatch(setCreationFileProcessingProgress(0));
+    } catch (err) {
+      console.error(err);
+    }
+  }, [dispatch, id, onChange, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
 
   const renderContent = useCallback(() => {
     let content = (
@@ -140,7 +198,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
       </SDropBox>
     );
 
-    if (loading) {
+    if (loadingUpload) {
       content = (
         <SLoadingBox>
           <SLoadingTitle variant={3} weight={600}>
@@ -152,24 +210,25 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('secondStep.video.loading.process', {
-                time: `${eta} seconds`,
-                progress,
+                time: `${etaUpload} seconds`,
+                progress: progressUpload,
               })}
             </SLoadingDescription>
             <SLoadingBottomBlockButton
               view="secondary"
-              onClick={handleCancelVideoUpload}
-              disabled={!value?.hlsStreamUrl}
+              onClick={() => {
+                handleCancelVideoUpload()
+              }}
             >
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
           </SLoadingBottomBlock>
           <SLoadingProgress>
-            <SLoadingProgressFilled progress={progress} />
+            <SLoadingProgressFilled progress={progressUpload} />
           </SLoadingProgress>
         </SLoadingBox>
       );
-    } else if (error) {
+    } else if (errorUpload || errorProcessing) {
       content = (
         <SErrorBox>
           <SErrorTitleWrapper>
@@ -182,7 +241,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
             {t('secondStep.video.error.description')}
           </SLoadingDescription>
           <SErrorBottomBlock>
-            <SLoadingBottomBlockButton view="secondary" onClick={handleCancelVideoUpload}>
+            <SLoadingBottomBlockButton view="secondary" onClick={handleCancelVideoProcessing}>
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
             <Button view="primaryGrad" onClick={handleRetryVideoUpload} disabled={!localFile}>
@@ -191,7 +250,41 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
           </SErrorBottomBlock>
         </SErrorBox>
       );
-    } else if (progress === 100) {
+    } else if (loadingProcessing) {
+      content = (
+        <SLoadingBox>
+          <SLoadingTitle variant={3} weight={600}>
+            {t('secondStep.video.processing.title')}
+          </SLoadingTitle>
+          <SLoadingDescription variant={2} weight={600}>
+            {t('secondStep.video.processing.description')}
+          </SLoadingDescription>
+          <SLoadingBottomBlock>
+            <SLoadingDescription variant={2} weight={600}>
+              {t('secondStep.video.processing.process', {
+                time: `${etaProcessing} seconds`,
+                progress: progressProcessing,
+              })}
+            </SLoadingDescription>
+            <SLoadingBottomBlockButton
+              view="secondary"
+              onClick={() => {
+                handleCancelVideoProcessing()
+              }}
+              disabled={!value?.hlsStreamUrl}
+            >
+              {t('secondStep.button.cancel')}
+            </SLoadingBottomBlockButton>
+          </SLoadingBottomBlock>
+          <SSpinnerWrapper>
+            <InlineSVG
+              svg={spinnerIcon}
+              width="16px"
+            />
+          </SSpinnerWrapper>
+        </SLoadingBox>
+      );
+    } else if (progressProcessing === 100) {
       content = (
         <SFileBox>
           <input
@@ -232,11 +325,15 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
     return content;
   }, [
     t,
-    eta,
     value,
-    error,
-    loading,
-    progress,
+    etaUpload,
+    errorUpload,
+    loadingUpload,
+    progressUpload,
+    etaProcessing,
+    errorProcessing,
+    loadingProcessing,
+    progressProcessing,
     isDesktop,
     localFile,
     thumbnails,
@@ -246,6 +343,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
     handleButtonClick,
     handleDeleteVideoShow,
     handleRetryVideoUpload,
+    handleCancelVideoProcessing,
     handleCancelVideoUpload,
   ]);
 
@@ -267,12 +365,7 @@ export const FileUpload: React.FC<IFileUpload> = (props) => {
 
 export default FileUpload;
 
-FileUpload.defaultProps = {
-  eta: 0,
-  error: false,
-  loading: false,
-  progress: 0,
-};
+FileUpload.defaultProps = {};
 
 const SWrapper = styled.div`
   width: 100%;
@@ -419,6 +512,21 @@ const SLoadingProgress = styled.div`
   margin-top: 6px;
   background: ${(props) => props.theme.colorsThemed.background.outlines1};
   border-radius: 16px;
+`;
+
+const SSpinnerWrapper = styled.div`
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  div {
+    animation: spin 0.7s linear infinite;
+  }
 `;
 
 interface ISProgress {

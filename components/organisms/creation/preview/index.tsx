@@ -44,7 +44,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const playerRef: any = useRef(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { post, auction, crowdfunding, multiplechoice, videoProcessing } = useAppSelector((state) => state.creation);
+  const { post, auction, crowdfunding, multiplechoice, videoProcessing, fileProcessing } = useAppSelector((state) => state.creation);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text, min);
@@ -174,7 +174,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (isMobile) {
         router.push(`/creation/${tab}/published`);
       } else {
-        playerRef.current.pause();
+        playerRef?.current?.pause();
         setShowModal(true);
       }
     } catch (err: any) {
@@ -267,7 +267,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
           {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SPlayerWrapper>
-            <BitmovinPlayer id="preview-mobile" muted={false} resources={videoProcessing?.targetUrls} />
+            {fileProcessing.progress === 100 ? (
+              <BitmovinPlayer id="preview-mobile" muted={false} resources={videoProcessing?.targetUrls} />
+            ) : (
+              <SText
+                variant={2}
+              >
+                Your video will be available once processed
+              </SText>
+            )}
           </SPlayerWrapper>
         </SContent>
         <SButtonWrapper>
@@ -290,14 +298,22 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>
-            <BitmovinPlayer
-              withMuteControl
-              id="preview"
-              innerRef={playerRef}
-              resources={videoProcessing?.targetUrls}
-              mutePosition="left"
-              borderRadius="16px"
-            />
+            {fileProcessing.progress === 100 ? (
+              <BitmovinPlayer
+                withMuteControl
+                id="preview"
+                innerRef={playerRef}
+                resources={videoProcessing?.targetUrls}
+                mutePosition="left"
+                borderRadius="16px"
+              />
+            ) : (
+              <SText
+                variant={2}
+              >
+                Your video will be available once processed
+              </SText>
+            )}
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
@@ -485,4 +501,9 @@ const STopLine = styled.div`
 const SInlineSVG = styled(InlineSVG)`
   min-width: 20px;
   min-height: 20px;
+`;
+
+const SText = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
 `;

@@ -20,7 +20,6 @@ import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
 import { getVideoUploadUrl, removeUploadedFile, startVideoProcessing, stopVideoProcessing } from '../../../api/endpoints/upload';
 import { SocketContext } from '../../../contexts/socketContext';
-import { ChannelsContext } from '../../../contexts/channelsContext';
 import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
 import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
 import { uploadPostResponse } from '../../../api/endpoints/post';
@@ -55,10 +54,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
 
   const socketConnection = useContext(SocketContext);
-  const {
-    addChannel,
-    removeChannel,
-  } = useContext(ChannelsContext);
 
   // Tabs
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
@@ -122,15 +117,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         throw new Error(resProcessing.error?.message ?? 'An error occurred');
       }
 
-      addChannel(
-        resProcessing.data.taskUuid,
-        {
-          processingProgress: {
-            taskUuid: resProcessing.data.taskUuid,
-          },
-        },
-      );
-
       setVideoProcessing({
         taskUuid: resProcessing.data.taskUuid,
         targetUrls: {
@@ -149,7 +135,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       setResponseFileUploadLoading(false)
       toast.error(error?.message);
     }
-  }, [addChannel]);
+  }, []);
 
   const handleVideoDelete = useCallback(async () => {
     try {
@@ -173,8 +159,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         throw new Error(resProcessing.error?.message ?? 'An error occurred');
       }
 
-      removeChannel(videoProcessing?.taskUuid as string);
-
       setUploadedResponseVideoUrl('');
       setResponseFileUploadError(false);
       setVideoProcessing({
@@ -186,7 +170,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     } catch (error: any) {
       toast.error(error?.message);
     }
-  }, [removeChannel, uploadedResponseVideoUrl, videoProcessing?.taskUuid]);
+  }, [uploadedResponseVideoUrl, videoProcessing?.taskUuid]);
 
   const handleItemChange = async (id: string, value: File) => {
     if (value) {
@@ -238,11 +222,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       }
 
       if (decoded.fractionCompleted === 100) {
-        removeChannel(videoProcessing?.taskUuid);
         setResponseFileUploadLoading(false);
       }
     }
-  }, [videoProcessing, responseFileUploadProgress, removeChannel]);
+  }, [videoProcessing, responseFileUploadProgress]);
 
   useEffect(() => {
     if (socketConnection) {

@@ -45,6 +45,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const {
     post,
     videoProcessing,
+    fileProcessing
   } = useAppSelector((state) => state.creation);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
@@ -95,12 +96,20 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     <>
       <SContent>
         <SPlayerWrapper>
-          <BitmovinPlayer
-            id="published"
-            muted={false}
-            resources={videoProcessing?.targetUrls}
-            thumbnails={post.thumbnailParameters}
-          />
+          {fileProcessing.progress === 100 ? (
+            <BitmovinPlayer
+              id="published"
+              muted={false}
+              resources={videoProcessing?.targetUrls}
+              thumbnails={post.thumbnailParameters}
+            />
+          ): (
+            <SText
+              variant={2}
+            >
+              Your video will be available once processed
+            </SText>
+          )}
         </SPlayerWrapper>
         <SUserBlock>
           <SUserAvatar
@@ -263,4 +272,9 @@ const SItemButton = styled.div<ISItemButton>`
 const SItemTitle = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   margin-top: 6px;
+`;
+
+const SText = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
 `;
