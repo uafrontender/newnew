@@ -7,9 +7,10 @@ import Button from '../../atoms/Button';
 import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
 import GoBackButton from '../GoBackButton';
+import { newnewapi } from 'newnew-api';
 
 interface ReportData {
-  reportType: string,
+  reason: newnewapi.ReportingReason
   message: string
 }
 
@@ -25,31 +26,32 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [reportType, setReportType] = useState<string | null>(null);
+  const [reason, setReason] = useState<newnewapi.ReportingReason| null>(null);
   const [message, setMessage] = useState('');
 
-  const disabled = reportType === null || message.length < 15;
+  const disabled = reason === null || message.length < 15;
 
   const reportTypes = useMemo(
     () => [
       {
-        id: 'report-spam',
+        id: newnewapi.ReportingReason.SPAM,
         title: t('modal.report-user.options.spam'),
       },
       {
-        id: 'report-abuse',
+        id: newnewapi.ReportingReason.VIOLENCE,
         title: t('modal.report-user.options.abuse'),
       },
       {
-        id: 'report-suicide',
+        // TODO: change
+        id: newnewapi.ReportingReason.OTHER,
         title: t('modal.report-user.options.suicide'),
       },
       {
-        id: 'report-hate',
+        id: newnewapi.ReportingReason.HATE_SPEECH,
         title: t('modal.report-user.options.hate-speech'),
       },
       {
-        id: 'report-harrasment',
+        id: newnewapi.ReportingReason.BULLYING,
         title: t('modal.report-user.options.harrasment'),
       },
     ],
@@ -59,9 +61,9 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
   const reportMaxLength = 150;
 
   const submitReport = () => {
-    if(reportType && message.length >= 15){
+    if(reason && message.length >= 15){
       onSubmit({
-        reportType,
+        reason,
         message
       })
     }
@@ -71,9 +73,9 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
     setMessage(e.target.value);
   }, []);
 
-  const handleTypeChange = useCallback((e: React.MouseEvent, id: string | undefined) => {
+  const handleTypeChange = useCallback((id: newnewapi.ReportingReason | undefined) => {
     /* eslint-disable no-unused-expressions */
-    id && setReportType(id);
+    id && setReason(id);
   }, []);
 
   return (
@@ -91,10 +93,10 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
             {reportTypes.map((item) => (
               <SCheckBoxWrapper key={item.id}>
                 <CheckBox
-                  id={item.id}
+                  id={item.id.toString()}
                   label={item.title}
-                  selected={reportType === item.id}
-                  handleChange={handleTypeChange}
+                  selected={reason === item.id}
+                  handleChange={()=>handleTypeChange(item.id)}
                 />
               </SCheckBoxWrapper>
             ))}

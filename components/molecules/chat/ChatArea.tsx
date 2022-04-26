@@ -24,6 +24,7 @@ import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { markUser } from '../../../api/endpoints/user';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
+import { reportUser } from '../../../api/endpoints/report';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -488,7 +489,13 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             show={confirmReportUser}
             reportedEntity={chatRoom && chatRoom.visavis?.nickname!! ||''}
             onClose={() => setConfirmReportUser(false)}
-            onSubmit={()=>{}}
+            onSubmit={async ({reason, message})=>{
+              if(chatRoom?.visavis?.uuid){
+                await reportUser(chatRoom.visavis.uuid, reason, message).catch(e=> console.error(e));
+              }
+
+              setConfirmReportUser(false);
+          }}
           />
       </SBottomPart>
     </SContainer>
