@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
@@ -9,14 +8,19 @@ import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
 import GoBackButton from '../GoBackButton';
 
-interface IReportUserModal {
-  confirmReportUser: boolean;
-  user: newnewapi.IUser | null;
-  isAnnouncement?: boolean;
-  closeModal: () => void;
+interface ReportData {
+  reportType: string,
+  message: string
 }
 
-const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, closeModal, isAnnouncement }) => {
+interface IReportUserModal {
+  show: boolean;
+  reportedEntity: string;
+  onSubmit: (reportData: ReportData ) => void
+  onClose: () => void;
+}
+
+const ReportUserModal: React.FC<IReportUserModal> = ({ show, reportedEntity, onClose, onSubmit }) => {
   const { t } = useTranslation('chat');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -24,7 +28,7 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
   const [reportType, setReportType] = useState<string | null>(null);
   const [message, setMessage] = useState('');
 
-  const disabled = reportType === null;
+  const disabled = reportType === null || message.length < 15;
 
   const reportTypes = useMemo(
     () => [
@@ -55,9 +59,11 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
   const reportMaxLength = 150;
 
   const submitReport = () => {
-    /* eslint-disable no-unused-expressions */
-    if (user && !disabled) {
-      console.log(user);
+    if(reportType && message.length >= 15){
+      onSubmit({
+        reportType,
+        message
+      })
     }
   };
 
@@ -71,13 +77,13 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
   }, []);
 
   return (
-    <Modal show={confirmReportUser} onClose={closeModal}>
+    <Modal show={show} onClose={onClose}>
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SModalHeader>
-            {isMobile && <GoBackButton onClick={closeModal} />}
+            {isMobile && <GoBackButton onClick={onClose} />}
             <SModalTitle>
-              {t('modal.report-user.title')} {user ? user.nickname : ''}
+              {t('modal.report-user.title')} {reportedEntity}
             </SModalTitle>
           </SModalHeader>
           <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
@@ -109,9 +115,9 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
             />
           </STextAreaWrapper>
           <SModalButtons>
-            {!isMobile && <SCancelButton onClick={closeModal}>{t('modal.report-user.button-cancel')}</SCancelButton>}
+            {!isMobile && <SCancelButton onClick={onClose}>{t('modal.report-user.button-cancel')}</SCancelButton>}
             <SConfirmButton view="primaryGrad" disabled={disabled} onClick={submitReport}>
-              {isAnnouncement ? t('modal.report-user.button-confirm-group') : t('modal.report-user.button-confirm')}
+              Report
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -121,10 +127,6 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
 };
 
 export default ReportUserModal;
-
-ReportUserModal.defaultProps = {
-  isAnnouncement: false,
-};
 
 const SContainer = styled.div`
   display: flex;

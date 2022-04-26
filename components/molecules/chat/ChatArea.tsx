@@ -484,14 +484,12 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </SBottomTextarea>
         )}
 
-        {confirmReportUser && (
           <ReportUserModal
-            confirmReportUser={confirmReportUser}
-            user={chatRoom && chatRoom.visavis!!}
-            closeModal={() => setConfirmReportUser(false)}
-            isAnnouncement={localUserData.isAnnouncement}
+            show={confirmReportUser}
+            reportedEntity={chatRoom && chatRoom.visavis?.nickname!! ||''}
+            onClose={() => setConfirmReportUser(false)}
+            onSubmit={()=>{}}
           />
-        )}
       </SBottomPart>
     </SContainer>
   );

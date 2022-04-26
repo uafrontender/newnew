@@ -96,13 +96,12 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           onUserBlock={onUserBlock}
           onUserReport={onUserReport}
         />
-        {confirmReportUser && (
           <ReportUserModal
-            confirmReportUser={confirmReportUser}
-            user={subscriber.user!!}
-            closeModal={() => setConfirmReportUser(false)}
+            show={confirmReportUser}
+            reportedEntity={subscriber.user?.nickname!!}
+            onClose={() => setConfirmReportUser(false)}
+            onSubmit={() => {}}
           />
-        )}
         {isSubscriberBlocked === true ||
           (confirmBlockUser && (
             <BlockUserModal

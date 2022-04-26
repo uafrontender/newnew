@@ -183,9 +183,10 @@ const Comment: React.FC<IComment> = ({
           {!lastChild && <SSeparator />}
         </SCommentContent>
         <ReportUserModal
-          confirmReportUser={confirmReportUser}
-          user={comment.sender!!}
-          closeModal={() => setConfirmReportUser(false)}
+          show={confirmReportUser}
+          reportedEntity={comment.sender?.nickname!!}
+          onClose={() => setConfirmReportUser(false)}
+          onSubmit={()=>{}}
         />
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
