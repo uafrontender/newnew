@@ -40,6 +40,7 @@ import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
 import AppConstantsContextProvider from '../contexts/appConstantsContext';
+import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -122,16 +123,18 @@ const MyApp = (props: IMyApp): ReactElement => {
                               <GlobalTheme>
                                 <div>
                                   <ToastContainer />
-                                  {!pageProps.error ? (
-                                    getLayout(<Component {...pageProps} />)
-                                  ) : (
-                                    <Error
-                                      errorMsg={pageProps.error?.message}
-                                      statusCode={
-                                        pageProps.error?.statusCode ?? 500
-                                      }
-                                    />
-                                  )}
+                                  <VideoProcessingWrapper>
+                                    {!pageProps.error ? (
+                                      getLayout(<Component {...pageProps} />)
+                                    ) : (
+                                      <Error
+                                        errorMsg={pageProps.error?.message}
+                                        statusCode={
+                                          pageProps.error?.statusCode ?? 500
+                                        }
+                                      />
+                                    )}
+                                  </VideoProcessingWrapper>
                                 </div>
                               </GlobalTheme>
                             </ResizeMode>

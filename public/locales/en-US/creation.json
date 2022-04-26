@@ -43,7 +43,8 @@
       },
       "subTitle": {
         "votesInfo": "All votes start at a $1 dollar by default",
-        "floating": "Upload file to preview your brand new decision"
+        "floating": "Upload file to preview your brand new decision",
+        "floating-processing": "Preview will be available after processing"
       }
     },
     "modal": {
@@ -168,6 +169,11 @@
       "loading": {
         "title": "Just a minute",
         "description": "Your file is uploading. Just give us a second to finish your upload.",
+        "process": "{{progress}}% • {{time}} left"
+      },
+      "processing": {
+        "title": "Processing the video...",
+        "description": "You can publish the post while the video is processed",
         "process": "{{progress}}% • {{time}} left"
       }
     }
