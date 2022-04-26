@@ -12,9 +12,10 @@ interface IPostEllipseMenu {
   isVisible: boolean;
   isFollowing: boolean;
   isFollowingDecision: boolean;
-  handleFollowDecision: () => {};
-  handleToggleFollowingCreator: () => {};
-  handleClose: () => void;
+  handleFollowDecision: () => void;
+  handleToggleFollowingCreator: () => void;
+  handleReportOpen: ()=> void;
+  onClose: () => void;
 }
 
 const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
@@ -24,13 +25,14 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
   isFollowingDecision,
   handleFollowDecision,
   handleToggleFollowingCreator,
-  handleClose,
+  handleReportOpen,
+  onClose,
 }) => {
   const { t } = useTranslation('decision');
   const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+  useOnClickEsc(containerRef, onClose);
+  useOnClickOutside(containerRef, onClose);
 
   return (
     <AnimatePresence>
@@ -66,10 +68,14 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
           </SButton>
           <SSeparator />
           <SButton
-            onClick={() => {}}
+            onClick={() => {
+              handleReportOpen();
+              onClose();
+            }}
           >
             <Text
               variant={3}
+              tone='error'
             >
               { t('ellipse.report') }
             </Text>

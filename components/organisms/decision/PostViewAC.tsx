@@ -62,6 +62,7 @@ interface IPostViewAC {
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
@@ -72,6 +73,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -658,6 +660,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer
         decisionFailed={postStatus === 'failed'}

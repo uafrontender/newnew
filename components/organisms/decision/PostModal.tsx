@@ -69,6 +69,8 @@ import CommentFromUrlContextProvider, {
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
+import ReportModal from '../../molecules/chat/ReportModal';
+import { reportPost } from '../../../api/endpoints/report';
 
 
 const images = {
@@ -130,7 +132,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-
+  const [reportPostOpen, setReportPostOpen] = useState(false);
+    console.log(reportPostOpen)
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
@@ -194,6 +197,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     },
     [typeOfPost]
   );
+
+  const handleReportOpen = useCallback(()=>{
+    console.log("CALLED")
+    setReportPostOpen(true)
+  },[])
 
   const isMyPost = useMemo(
     () =>
@@ -327,6 +335,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
         />
       );
     }
@@ -339,6 +348,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
         />
       );
     }
@@ -353,6 +363,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
         />
       );
     }
@@ -367,6 +378,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
         />
       );
     }
@@ -380,6 +392,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
         />
       );
     }
@@ -451,6 +464,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
         />
       );
     }
@@ -619,17 +633,143 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
+      <>
+        <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
+          {postStatus === 'succeeded' && !isMobile && (
+            <PostSuccessAnimationBackground />
+          )}
+          <Head>
+            <title>{postParsed?.title}</title>
+          </Head>
+          <SPostSuccessWaitingControlsDiv
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SWaitingSuccessControlsBtn
+              view="secondary"
+              iconOnly
+              onClick={handleCloseAndGoBack}
+            >
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
+            </SWaitingSuccessControlsBtn>
+            <SWaitingSuccessControlsBtn
+              view="secondary"
+              iconOnly
+              onClick={() => setShareMenuOpen(true)}
+            >
+              <InlineSvg
+                svg={ShareIcon}
+                fill={theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
+            </SWaitingSuccessControlsBtn>
+            <SWaitingSuccessControlsBtn
+              view="secondary"
+              iconOnly
+              onClick={() => setEllipseMenuOpen(true)}
+            >
+              <InlineSvg
+                svg={MoreIcon}
+                fill={theme.colorsThemed.text.primary}
+                width="24px"
+                height="24px"
+              />
+            </SWaitingSuccessControlsBtn>
+            {/* Share menu */}
+            {!isMobile && (
+              <PostShareMenu
+                postId={postParsed?.postUuid!!}
+                isVisible={shareMenuOpen}
+                handleClose={() => setShareMenuOpen(false)}
+              />
+            )}
+            {isMobile && shareMenuOpen ? (
+              <PostShareModal
+                isOpen={shareMenuOpen}
+                zIndex={11}
+                postId={postParsed?.postUuid!!}
+                onClose={() => setShareMenuOpen(false)}
+              />
+            ) : null}
+            {/* Ellipse menu */}
+            {!isMobile && (
+              <PostEllipseMenu
+                postType={typeOfPost as string}
+                isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
+                isFollowingDecision={isFollowingDecision}
+                isVisible={ellipseMenuOpen}
+                handleFollowDecision={handleFollowDecision}
+                handleToggleFollowingCreator={handleToggleFollowingCreator}
+                handleReportOpen={handleReportOpen}
+                onClose={() => setEllipseMenuOpen(false)}
+              />
+            )}
+            {isMobile && ellipseMenuOpen ? (
+              <PostEllipseModal
+                postType={typeOfPost as string}
+                isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
+                isFollowingDecision={isFollowingDecision}
+                zIndex={11}
+                isOpen={ellipseMenuOpen}
+                handleFollowDecision={handleFollowDecision}
+                handleToggleFollowingCreator={handleToggleFollowingCreator}
+                handleReportOpen={handleReportOpen}
+                onClose={() => setEllipseMenuOpen(false)}
+              />
+            ) : null}        
+          </SPostSuccessWaitingControlsDiv>
+          {postParsed && typeOfPost ? (
+            <SPostModalContainer
+              id="post-modal-container"
+              isMyPost={isMyPost}
+              style={{
+                ...(isMobile ? {
+                  paddingTop: 0,
+                } : {}),
+              }}
+              onClick={(e) => e.stopPropagation()}
+              ref={(el) => {
+                modalContainerRef.current = el!!;
+              }}
+            >
+              {postStatus === 'succeeded' ? (
+                renderPostSuccess(typeOfPost)
+              ) : null}
+              {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
+                renderPostWaitingForResponse(typeOfPost)
+              ) : null}
+            </SPostModalContainer>
+          ) : null}
+        </Modal>
+        <ReportModal
+            show={reportPostOpen}
+            reportedEntity='post'
+            onSubmit={async ({reason, message}) => {
+              if (postParsed) {
+                await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
+              }
+              
+              setReportPostOpen(false)
+            }}
+            onClose={() => setReportPostOpen(false)}
+          />
+      </>
+    );
+  }
+
+  return (
+    <>
       <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
-        {postStatus === 'succeeded' && !isMobile && (
-          <PostSuccessAnimationBackground />
-        )}
         <Head>
           <title>{postParsed?.title}</title>
         </Head>
-        <SPostSuccessWaitingControlsDiv
-          onClick={(e) => e.stopPropagation()}
-        >
-          <SWaitingSuccessControlsBtn
+        {!isMobile && (
+          <SGoBackButtonDesktop
             view="secondary"
             iconOnly
             onClick={handleCloseAndGoBack}
@@ -640,218 +780,122 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               width="24px"
               height="24px"
             />
-          </SWaitingSuccessControlsBtn>
-          <SWaitingSuccessControlsBtn
-            view="secondary"
-            iconOnly
-            onClick={() => setShareMenuOpen(true)}
-          >
-            <InlineSvg
-              svg={ShareIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SWaitingSuccessControlsBtn>
-          <SWaitingSuccessControlsBtn
-            view="secondary"
-            iconOnly
-            onClick={() => setEllipseMenuOpen(true)}
-          >
-            <InlineSvg
-              svg={MoreIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SWaitingSuccessControlsBtn>
-          {/* Share menu */}
-          {!isMobile && (
-            <PostShareMenu
-              postId={postParsed?.postUuid!!}
-              isVisible={shareMenuOpen}
-              handleClose={() => setShareMenuOpen(false)}
-            />
-          )}
-          {isMobile && shareMenuOpen ? (
-            <PostShareModal
-              isOpen={shareMenuOpen}
-              zIndex={11}
-              postId={postParsed?.postUuid!!}
-              onClose={() => setShareMenuOpen(false)}
-            />
-          ) : null}
-          {/* Ellipse menu */}
-          {!isMobile && (
-            <PostEllipseMenu
-              postType={typeOfPost as string}
-              isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
-              isFollowingDecision={isFollowingDecision}
-              isVisible={ellipseMenuOpen}
-              handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
-              handleClose={() => setEllipseMenuOpen(false)}
-            />
-          )}
-          {isMobile && ellipseMenuOpen ? (
-            <PostEllipseModal
-              postType={typeOfPost as string}
-              isFollowing={followingsIds.includes(postParsed?.creator?.uuid as string)}
-              isFollowingDecision={isFollowingDecision}
-              zIndex={11}
-              isOpen={ellipseMenuOpen}
-              handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
-              onClose={() => setEllipseMenuOpen(false)}
-            />
-          ) : null}
-        </SPostSuccessWaitingControlsDiv>
+          </SGoBackButtonDesktop>
+        )}
         {postParsed && typeOfPost ? (
           <SPostModalContainer
             id="post-modal-container"
             isMyPost={isMyPost}
-            style={{
-              ...(isMobile ? {
-                paddingTop: 0,
-              } : {}),
-            }}
             onClick={(e) => e.stopPropagation()}
             ref={(el) => {
               modalContainerRef.current = el!!;
             }}
           >
-            {postStatus === 'succeeded' ? (
-              renderPostSuccess(typeOfPost)
-            ) : null}
-            {postStatus === 'waiting_for_response' || postStatus === 'wating_for_decision' ? (
-              renderPostWaitingForResponse(typeOfPost)
-            ) : null}
+            {postStatus !== 'deleted' ? (
+              isMyPost ? (
+                renderPostModeration(typeOfPost)
+              ) : (
+                renderPostView(typeOfPost)
+              )
+            ) : isMyPost ? (
+              <PostFailedBox
+                title={t('PostDeletedByMe.title', { postType: t(`postType.${typeOfPost}`) })}
+                body={
+                  deletedByCreator ? (
+                    t('PostDeletedByMe.body.by_creator', { postType: t(`postType.${typeOfPost}`) })
+                    ) : (
+                    t('PostDeletedByMe.body.by_admin', { postType: t(`postType.${typeOfPost}`) })
+                  )
+                }
+                imageSrc={images[typeOfPost]}
+                buttonCaption={t('PostDeletedByMe.ctaButton')}
+                handleButtonClick={() => {
+                  router.push('/creation');
+                }}
+              />
+            ) : (
+              <PostFailedBox
+                title={t('PostDeleted.title', { postType: t(`postType.${typeOfPost}`) })}
+                body={
+                  deletedByCreator ? (
+                    t('PostDeleted.body.by_creator', {
+                      creator: getDisplayname(postParsed.creator!!),
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  ) : (
+                    t('PostDeleted.body.by_admin', {
+                      creator: getDisplayname(postParsed.creator!!),
+                      postType: t(`postType.${typeOfPost}`),
+                    })
+                  )
+                }
+                buttonCaption={t('PostDeleted.ctaButton', { postTypeMultiple: t(`postType.multiple.${typeOfPost}`)})}
+                imageSrc={images[typeOfPost]}
+                style={{
+                  marginBottom: '24px',
+                }}
+                handleButtonClick={() => {
+                  document.getElementById('post-modal-container')?.scrollTo({
+                    top: document.getElementById(
+                      'recommendations-section-heading'
+                    )?.offsetTop,
+                    behavior: 'smooth',
+                  });
+                }}
+              />
+            )}
+            {!isMyPost && (
+              <SRecommendationsSection id="recommendations-section-heading">
+                <Headline variant={4}>
+                  {recommenedPosts.length > 0
+                    ? t('RecommendationsSection.heading')
+                    : null}
+                </Headline>
+                {recommenedPosts && (
+                  <ListPostModal
+                    category=""
+                    loading={recommenedPostsLoading}
+                    collection={recommenedPosts}
+                    wrapperStyle={{
+                      left: '-16px',
+                    }}
+                    skeletonsBgColor={theme.colorsThemed.background.tertiary}
+                    skeletonsHighlightColor={
+                      theme.colorsThemed.background.secondary
+                    }
+                    handlePostClicked={handleOpenRecommendedPost}
+                  />
+                )}
+                <div
+                  ref={loadingRef}
+                  style={{
+                    position: 'relative',
+                    bottom: '10px',
+                    ...(recommenedPostsLoading
+                      ? {
+                          display: 'none',
+                        }
+                      : {}),
+                  }}
+                />
+              </SRecommendationsSection>
+            )}
           </SPostModalContainer>
         ) : null}
       </Modal>
-    );
-  }
-
-  return (
-    <Modal show={open} overlayDim onClose={() => handleCloseAndGoBack()}>
-      <Head>
-        <title>{postParsed?.title}</title>
-      </Head>
-      {!isMobile && (
-        <SGoBackButtonDesktop
-          view="secondary"
-          iconOnly
-          onClick={handleCloseAndGoBack}
-        >
-          <InlineSvg
-            svg={CancelIcon}
-            fill={theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
-          />
-        </SGoBackButtonDesktop>
-      )}
-      {postParsed && typeOfPost ? (
-        <SPostModalContainer
-          id="post-modal-container"
-          isMyPost={isMyPost}
-          onClick={(e) => e.stopPropagation()}
-          ref={(el) => {
-            modalContainerRef.current = el!!;
+      <ReportModal
+          show={reportPostOpen}
+          reportedEntity='post'
+          onSubmit={async ({reason, message}) => {
+            if (postParsed) {
+              await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
+            }
+            
+            setReportPostOpen(false)
           }}
-        >
-          {postStatus !== 'deleted' ? (
-            isMyPost ? (
-              renderPostModeration(typeOfPost)
-            ) : (
-              renderPostView(typeOfPost)
-            )
-          ) : isMyPost ? (
-            <PostFailedBox
-              title={t('PostDeletedByMe.title', { postType: t(`postType.${typeOfPost}`) })}
-              body={
-                deletedByCreator ? (
-                  t('PostDeletedByMe.body.by_creator', { postType: t(`postType.${typeOfPost}`) })
-                  ) : (
-                  t('PostDeletedByMe.body.by_admin', { postType: t(`postType.${typeOfPost}`) })
-                )
-              }
-              imageSrc={images[typeOfPost]}
-              buttonCaption={t('PostDeletedByMe.ctaButton')}
-              handleButtonClick={() => {
-                router.push('/creation');
-              }}
-            />
-          ) : (
-            <PostFailedBox
-              title={t('PostDeleted.title', { postType: t(`postType.${typeOfPost}`) })}
-              body={
-                deletedByCreator ? (
-                  t('PostDeleted.body.by_creator', {
-                    creator: getDisplayname(postParsed.creator!!),
-                    postType: t(`postType.${typeOfPost}`),
-                  })
-                ) : (
-                  t('PostDeleted.body.by_admin', {
-                    creator: getDisplayname(postParsed.creator!!),
-                    postType: t(`postType.${typeOfPost}`),
-                  })
-                )
-              }
-              buttonCaption={t('PostDeleted.ctaButton', { postTypeMultiple: t(`postType.multiple.${typeOfPost}`)})}
-              imageSrc={images[typeOfPost]}
-              style={{
-                marginBottom: '24px',
-              }}
-              handleButtonClick={() => {
-                document.getElementById('post-modal-container')?.scrollTo({
-                  top: document.getElementById(
-                    'recommendations-section-heading'
-                  )?.offsetTop,
-                  behavior: 'smooth',
-                });
-              }}
-            />
-          )}
-          {!isMyPost && (
-            <SRecommendationsSection id="recommendations-section-heading">
-              <Headline variant={4}>
-                {recommenedPosts.length > 0
-                  ? t('RecommendationsSection.heading')
-                  : null}
-              </Headline>
-              {recommenedPosts && (
-                <ListPostModal
-                  category=""
-                  loading={recommenedPostsLoading}
-                  collection={recommenedPosts}
-                  wrapperStyle={{
-                    left: '-16px',
-                  }}
-                  skeletonsBgColor={theme.colorsThemed.background.tertiary}
-                  skeletonsHighlightColor={
-                    theme.colorsThemed.background.secondary
-                  }
-                  handlePostClicked={handleOpenRecommendedPost}
-                />
-              )}
-              <div
-                ref={loadingRef}
-                style={{
-                  position: 'relative',
-                  bottom: '10px',
-                  ...(recommenedPostsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
-              />
-            </SRecommendationsSection>
-          )}
-        </SPostModalContainer>
-      ) : null}
-    </Modal>
+          onClose={() => setReportPostOpen(false)}
+        />
+    </>
   );
 };
 

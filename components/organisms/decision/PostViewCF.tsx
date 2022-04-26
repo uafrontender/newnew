@@ -59,6 +59,7 @@ interface IPostViewCF {
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: ()=>void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
@@ -68,6 +69,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   resetSessionId,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const router = useRouter();
   const { t } = useTranslation('decision');
@@ -691,6 +693,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         targetPledges={post.targetBackerCount}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer>
         <DecisionTabs

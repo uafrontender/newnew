@@ -62,6 +62,7 @@ interface IPostViewMC {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
@@ -71,6 +72,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   resetSessionId,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -638,6 +640,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer decisionFailed={postStatus === 'failed'}>
         <DecisionTabs
