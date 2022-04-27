@@ -70,7 +70,8 @@ const MyProfileSettginsIndex: NextPage = () => {
   const router = useRouter();
   // Translations
   const { t } = useTranslation('profile');
-  const { t: commonT } = useTranslation('common');
+  // TEMP
+  // const { t: commonT } = useTranslation('common');
   // useCookies
   const [, , removeCookie] = useCookies();
   // Socket
@@ -437,9 +438,10 @@ const MyProfileSettginsIndex: NextPage = () => {
         <SettingsWallet />
         <SettingsAccordion sections={accordionSections} />
         <SBottomLinksDiv>
-          <SBlockOptionButton>
+          {/* TEMP */}
+          {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
-          </SBlockOptionButton>
+          </SBlockOptionButton> */}
           <Link href="/help">
             <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
           </Link>
