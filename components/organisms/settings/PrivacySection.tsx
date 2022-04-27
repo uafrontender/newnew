@@ -1,6 +1,6 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
-import React from 'react';
+import React, { useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -8,6 +8,7 @@ import Caption from '../../atoms/Caption';
 import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
 import Button from '../../atoms/Button';
+import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
 
 type TPrivacySection = {
   isSpendingHidden: boolean,
@@ -16,7 +17,6 @@ type TPrivacySection = {
   handleToggleSpendingHidden: () => void;
   handleToggleAccountPrivate: () => void;
   handleUnblockUser: (uuid: string) => void;
-  handleCloseAccount: () => void;
   // Allows handling visuals for active/inactive state
   handleSetActive: () => void;
 };
@@ -28,10 +28,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   handleToggleSpendingHidden,
   handleToggleAccountPrivate,
   handleUnblockUser,
-  handleCloseAccount,
   handleSetActive,
 }) => {
   const { t } = useTranslation('profile');
+
+  const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] = useState(false);
 
   return (
     <SWrapper
@@ -125,17 +126,16 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         >
           { t('Settings.sections.Privacy.closeAccount.title') }
         </SHidingSubsectionTitle>
-        <SHidingSubsectionCaption
-          variant={2}
-        >
-          { t('Settings.sections.Privacy.closeAccount.caption') }
-        </SHidingSubsectionCaption>
         <SCloseAccountButton
-          onClick={handleCloseAccount}
+          onClick={() => setIsConfirmDeleteMyAccountVisible(true)}
           view="secondary"
         >
           { t('Settings.sections.Privacy.closeAccount.closeBtn') }
         </SCloseAccountButton>
+        <ConfirmDeleteAccountModal
+          isVisible={isConfirmDeleteMyAccountVisible}
+          closeModal={() => setIsConfirmDeleteMyAccountVisible(false)}
+        />
       </SCloseAccountSubsection>
     </SWrapper>
   );

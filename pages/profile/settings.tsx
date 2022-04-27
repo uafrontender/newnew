@@ -321,7 +321,6 @@ const MyProfileSettginsIndex: NextPage = () => {
           handleToggleSpendingHidden={() => setSpendingHidden((curr) => !curr)}
           handleToggleAccountPrivate={handleToggleAccountPrivate}
           handleUnblockUser={unblockUserAsync}
-          handleCloseAccount={() => {}}
           handleSetActive={() => {}}
         />
       ),
