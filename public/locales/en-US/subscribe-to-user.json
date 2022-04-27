@@ -30,20 +30,24 @@
     },
     "items": {
       "0": {
-        "q": "What is the NewNew subscription model?",
-        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+        "q": "How do subscriptions work?",
+        "a": "Subscribing to your favorite creator lets you unlock exclusive extras. These include 1-on-1 convos with that creator, free votes on every Superpoll the creator makes, and the power to add your own options to their Superpolls."
       },
       "1": {
-        "q": "What's included in a subscription?",
-        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+        "q": "How much is a subscription?",
+        "a": "Every creator sets their own subscription price and subscriptions start as low as $1.99 per month."
       },
       "2": {
-        "q": "Can I switch my subscription to another creator?",
-        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+        "q": "When I subscribe to one creator, does it mean I'm subscribed to all creators?",
+        "a": "Your subscription gives you access to the specific creator you chose on NewNew. "
       },
       "3": {
-        "q": "How can I cancel my subscription?",
-        "a": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris arcu mi, rutrum vel vulputate ut, sagittis ut sem. Maecenas ultrices tellus vel tempor finibus. Interdum."
+        "q": "Can I cancel a subscription?",
+        "a": "Yes. You can cancel a subscription at any time. Just go to the creator's profile, open the \"More\" menu and then tap unsubscribe. Don't worry…if you cancel in the middle of your billing period, you'll still be able to interact with the creator until the end of the billing period."
+      },
+      "4": {
+        "q": "Do all creators offer a subscription?",
+        "a": "No. Although every creator can offer subscriptions, some creators choose not to."
       }
     }
   },
