@@ -915,7 +915,7 @@ const SBidDetails = styled.div<{
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
-    padding: 14px;
+    padding: 16px;
 
     background-color: ${({ theme, isBlue }) =>
       isBlue
@@ -945,6 +945,10 @@ const SBidAmount = styled.div`
   justify-content: flex-start;
   gap: 8px;
 
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+
   margin-bottom: 6px;
 `;
 
@@ -957,6 +961,10 @@ const SOptionInfo = styled(Text)`
 
   margin-bottom: 8px;
 
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: initial;
   }
@@ -965,8 +973,13 @@ const SOptionInfo = styled(Text)`
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
 
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
+    padding-top: 4px;
   }
 `;
 
