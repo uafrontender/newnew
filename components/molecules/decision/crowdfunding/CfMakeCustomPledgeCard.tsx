@@ -43,7 +43,7 @@ const SStandardPledgeCard = styled.button`
   height: 96px;
   width: 96px;
 
-  margin: 0px 6px;
+  margin: 0px 0px;
 
   background-color: transparent;
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.accent.blue};

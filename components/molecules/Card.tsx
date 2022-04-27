@@ -859,7 +859,7 @@ const SButtonFirst = styled(Button)`
   width: 100%;
   height: 36px;
 
-  background: #FFFFFF;
+  background: ${({ theme }) => theme.name === 'light' ? '#F1F3F9' : '#FFFFFF'};
 
   span {
     font-weight: 700;
