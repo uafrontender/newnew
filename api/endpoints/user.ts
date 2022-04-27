@@ -241,15 +241,29 @@ export const getTutorialsStatus = (payload: newnewapi.EmptyRequest) =>
   );
 
 export const setTutorialStatus = (
-  payload: newnewapi.SetTutorialStatusRequest
+  payload: newnewapi.MarkTutorialStepAsCompletedRequest
 ) =>
   fetchProtobufProtectedIntercepted<
-    newnewapi.SetTutorialStatusRequest,
+    newnewapi.MarkTutorialStepAsCompletedRequest,
     newnewapi.EmptyResponse
   >(
-    newnewapi.SetTutorialStatusRequest,
+    newnewapi.MarkTutorialStepAsCompletedRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/set_tutorial_status`,
+    'post',
+    payload
+  );
+
+export const deleteMyAccount = (
+  payload: newnewapi.EmptyRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_USER}/delete_my_account`,
     'post',
     payload
   );

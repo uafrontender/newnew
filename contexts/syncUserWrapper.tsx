@@ -94,7 +94,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
             ) {
               syncedObj.remainingAcSteps =
                 localUserTutorialsProgress.remainingAcSteps;
-              const payloadSetData = new newnewapi.SetTutorialStatusRequest({
+              const payloadSetData = new newnewapi.MarkTutorialStepAsCompletedRequest({
                 acCurrentStep: localUserTutorialsProgress.remainingAcSteps!![0],
               });
               await setTutorialStatus(payloadSetData);
@@ -107,7 +107,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
             ) {
               syncedObj.remainingMcSteps =
                 localUserTutorialsProgress.remainingMcSteps;
-              const payloadSetData = new newnewapi.SetTutorialStatusRequest({
+              const payloadSetData = new newnewapi.MarkTutorialStepAsCompletedRequest({
                 mcCurrentStep: localUserTutorialsProgress.remainingMcSteps!![0],
               });
               await setTutorialStatus(payloadSetData);
@@ -120,7 +120,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
             ) {
               syncedObj.remainingCfSteps =
                 localUserTutorialsProgress.remainingCfSteps;
-              const payloadSetData = new newnewapi.SetTutorialStatusRequest({
+              const payloadSetData = new newnewapi.MarkTutorialStepAsCompletedRequest({
                 cfCurrentStep: localUserTutorialsProgress.remainingCfSteps!![0],
               });
               await setTutorialStatus(payloadSetData);

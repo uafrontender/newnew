@@ -439,7 +439,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
         mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
       });
       setTutorialStatus(payload);

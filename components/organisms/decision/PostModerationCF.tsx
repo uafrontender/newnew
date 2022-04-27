@@ -359,7 +359,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
         cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
       });
       setTutorialStatus(payload);

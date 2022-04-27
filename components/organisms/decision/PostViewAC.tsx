@@ -600,7 +600,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
         acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
       });
       setTutorialStatus(payload);
