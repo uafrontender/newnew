@@ -47,6 +47,7 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 
 interface IAcOptionsTab {
   postId: string;
@@ -88,6 +89,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   );
 
   const { walletBalance } = useContext(WalletContext);
+  const { appConstants } = useGetAppConstants();
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -446,7 +448,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               postCreator={postCreator}
               postDeadline={postDeadline}
               index={i}
-              minAmount={minAmount}
+              minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}
               votingAllowed={postStatus === 'voting'}
               optionBeingSupported={optionBeingSupported}
               handleSetSupportedBid={(id: string) =>
@@ -678,6 +680,7 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 10px)`};
+    padding-top: 0px;
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -752,7 +755,7 @@ const SActionSection = styled.div`
     align-items: flex-end;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 8px;
 
     min-height: 50px;
     width: 100%;
@@ -766,7 +769,7 @@ const SActionSection = styled.div`
       ${({ theme }) => theme.colorsThemed.background.outlines1};
 
     textarea {
-      width: 75% !important;
+      width: calc(80% - 8px) !important;
     }
 
     div {
