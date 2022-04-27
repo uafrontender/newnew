@@ -447,7 +447,7 @@ const SButtonsContainer = styled.div<{
   display: flex;
   flex-shrink: 0;
   flex-direction: row;
-  gap: 12px;
+  gap: 15px;
 
   width: 400px;
 

@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -319,6 +319,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     );
   };
 
+  useEffect(() => {
+    if (!isSupportFormOpen) {
+      setSupportBidAmount('');
+    }
+  }, [isSupportFormOpen]);
+
   return (
     <div
       key={index}
@@ -500,7 +506,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               }
               onClick={() => handleTogglePaymentModalOpen()}
             >
-              {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
+              {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
             </Button>
             <SCancelButton
               view="transparent"
@@ -541,7 +547,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 disabled={!supportBidAmount}
                 onClick={() => handleTogglePaymentModalOpen()}
               >
-                {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
+                {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
               </Button>
             </SSuggestSupportMobileContainer>
           </OptionActionMobileModal>
@@ -662,7 +668,7 @@ const SBidDetails = styled.div<{
       'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
-    padding: 14px;
+    padding: 16px;
 
     background-color: ${({ theme, isBlue }) =>
       isBlue
@@ -696,6 +702,10 @@ const SBidAmount = styled.div<{
 
   margin-bottom: 6px;
 
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+
   ${({ isWhite }) =>
     isWhite
       ? css`
@@ -706,6 +716,9 @@ const SBidAmount = styled.div<{
 
 const SCoinImg = styled.img`
   height: 28px;
+
+  position: relative;
+  top: -2px;
 `;
 
 const SOptionInfo = styled(Text)<{
@@ -714,6 +727,10 @@ const SOptionInfo = styled(Text)<{
   grid-area: optionInfo;
 
   margin-bottom: 8px;
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
 
   ${({ isWhite }) =>
     isWhite
@@ -730,8 +747,13 @@ const SOptionInfo = styled(Text)<{
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
 
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
+    padding-top: 4px;
   }
 `;
 

@@ -22,7 +22,7 @@ const FaqSection: React.FunctionComponent = () => {
       >
         { t('FAQ.heading') }
       </SHeadline>
-      {new Array(4).fill('').map((_, i) => (
+      {new Array(5).fill('').map((_, i) => (
         <FaqSectionOption
           key={i}
           question={t(`FAQ.items.${i}.q`)}
