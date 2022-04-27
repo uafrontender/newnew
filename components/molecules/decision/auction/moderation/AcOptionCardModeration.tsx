@@ -29,6 +29,8 @@ import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.s
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 import BlockUserModalPost from '../../BlockUserModalPost';
+import { reportEventOption } from '../../../../../api/endpoints/report';
+import ReportModal from '../../../chat/ReportModal';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -313,6 +315,15 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         closeModal={() => setIsBlockModalOpen(false)}
       />
       {/* Report modal */}
+      <ReportModal
+        show={isReportModalOpen}
+        reportedEntity={option.creator?.username!}
+        onSubmit={async ({reason, message}) => {
+          await reportEventOption(option.id, reason, message);
+          setIsReportModalOpen(false);
+        }}
+        onClose={()=>{setIsReportModalOpen(false)}}
+      />
     </>
   );
 };

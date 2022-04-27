@@ -54,7 +54,7 @@ export const reportPostResponse = (postId: string, reason: newnewapi.ReportingRe
   return reportContent(payload);
 };
 
-export const reportEventOption = (optionId: number, reason: newnewapi.ReportingReason, message:string) => {
+export const reportEventOption = (optionId: number | Long, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
     reason,
     message,
@@ -68,7 +68,7 @@ export const reportEventOption = (optionId: number, reason: newnewapi.ReportingR
   return reportContent(payload);
 };
 
-export const reportSuperpollOption = (optionId: number, reason: newnewapi.ReportingReason, message:string) => {
+export const reportSuperpollOption = (optionId: number | Long, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
     reason,
     message,
@@ -82,7 +82,7 @@ export const reportSuperpollOption = (optionId: number, reason: newnewapi.Report
   return reportContent(payload);
 };
 
-export const reportMessage = (messageId: number, reason: newnewapi.ReportingReason, message:string) => {
+export const reportMessage = (messageId: number | Long, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
     reason,
     message,

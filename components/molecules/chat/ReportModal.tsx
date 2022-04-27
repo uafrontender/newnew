@@ -65,7 +65,9 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
       onSubmit({
         reason,
         message
-      })
+      });
+      setReason(null);
+      setMessage('');
     }
   };
 

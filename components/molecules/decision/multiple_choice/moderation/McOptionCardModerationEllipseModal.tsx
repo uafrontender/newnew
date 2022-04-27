@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
+import Text from '../../../../atoms/Text';
 
 interface IMcOptionCardModerationEllipseModal {
   isOpen: boolean;
@@ -50,7 +51,7 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardM
                   onClose();
                 }}
               >
-                { t('McPostModeration.OptionsTab.OptionCard.ellipse.report') }
+                <Text variant={2} tone='error'>{ t('McPostModeration.OptionsTab.OptionCard.ellipse.report') }</Text>
               </SButton>
               <SButton
                 view="secondary"
@@ -59,7 +60,7 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardM
                   onClose();
                 }}
               >
-                { t('McPostModeration.OptionsTab.OptionCard.ellipse.block') }
+                 <Text variant={2}>{ t('McPostModeration.OptionsTab.OptionCard.ellipse.block') }</Text>
               </SButton>
             </>
           ) : null}
@@ -71,7 +72,7 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardM
               onClose();
             }}
           >
-            { t('McPostModeration.OptionsTab.OptionCard.ellipse.remove') }
+            <Text variant={2}>{ t('McPostModeration.OptionsTab.OptionCard.ellipse.remove') }</Text>
           </SButton>
         </SContentContainer>
         <Button
@@ -81,7 +82,7 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardM
             width: 'calc(100% - 32px)',
           }}
         >
-          { t('ellipse.cancel') }
+           <Text variant={2}>{ t('ellipse.cancel') }</Text>
         </Button>
       </SWrapper>
     </Modal>

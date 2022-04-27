@@ -32,6 +32,8 @@ import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../BlockUserModalPost';
+import ReportModal from '../../../chat/ReportModal';
+import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -261,6 +263,15 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         />
       )}
       {/* Report modal */}
+      <ReportModal
+        show={isReportModalOpen}
+        reportedEntity={option.creator?.username!}
+        onSubmit={async ({reason, message}) => {
+          await reportSuperpollOption(option.id, reason, message);
+          setIsReportModalOpen(false);
+        }}
+        onClose={()=>{setIsReportModalOpen(false)}}
+      />
     </>
   );
 };
