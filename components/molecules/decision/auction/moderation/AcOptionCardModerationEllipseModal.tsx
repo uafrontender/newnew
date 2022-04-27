@@ -75,6 +75,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={()=> onClose()}
         >
           <Text variant={2}>{ t('ellipse.cancel') }</Text>
         </Button>
@@ -103,6 +104,7 @@ const SContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
@@ -110,7 +112,6 @@ const SContentContainer = styled.div`
     margin: auto;
   }
 `;
-
 
 const SButton = styled(Button)`
   border: transparent;

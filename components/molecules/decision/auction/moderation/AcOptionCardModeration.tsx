@@ -16,7 +16,7 @@ import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
-import AcConfirmDeleteOption from './AcConfirmDeleteOption';
+import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 
@@ -290,7 +290,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         </SBidDetailsModal>
       </AcPickWinningOptionModal>
       {/* Delete option */}
-      <AcConfirmDeleteOption
+      <AcConfirmDeleteOptionModal
         isVisible={isDeleteModalOpen}
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}

@@ -86,6 +86,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={() => onClose()}
         >
           {t('Cancel')}
         </Button>
@@ -122,6 +123,8 @@ const SContentContainer = styled.div`
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;

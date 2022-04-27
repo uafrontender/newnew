@@ -51,7 +51,7 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
             {t('modal.block-user.message-first-part')} {getDisplayname(user)} {t('modal.block-user.message-second-part')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>{t('modal.block-user.button-cancel')}</SCancelButton>
+            <SCancelButton onClick={closeModal}>{t('modal.block-user.button-cancel')}</SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
               {t('modal.block-user.button-confirm')}
             </SConfirmButton>

@@ -27,7 +27,7 @@ import McSymbolIcon from '../../../../../public/images/decision/mc-option-mock.p
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMenu';
-import McConfirmDeleteOption from './McConfirmDeleteOption';
+import McConfirmDeleteOptionModal from './McConfirmDeleteOptionModal';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
@@ -235,7 +235,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
       </motion.div>
       {/* Modals */}
       {/* Delete option */}
-      <McConfirmDeleteOption
+      <McConfirmDeleteOptionModal
         isVisible={isDeleteModalOpen}
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}

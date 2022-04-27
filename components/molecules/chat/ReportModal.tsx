@@ -22,7 +22,7 @@ interface IReportModal {
 }
 
 const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, onSubmit }) => {
-  const { t } = useTranslation('chat');
+  const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 

@@ -59,5 +59,25 @@
       "max": "Text is too long, max {{value}} chars",
       "badWords": "Text contains swear words"
     }
+  },
+  "modal": {
+    "report-user": {
+      "title": "Report",
+      "subtitle": "Help us understand the problem. Please select a reason.",
+      "options": {
+        "spam": "Suspicious or spam",
+        "abuse": "Abusive or harmful",
+        "suicide": "Expresses intentions of self-harm or suicide",
+        "hate-speech": "Hate speech",
+        "harrasment": "Harrasment or bullying"
+      },
+      "additional-info": {
+        "label": "Additional info (optional)",
+        "placeholder": "Tell us more about the problem"
+      },
+      "button-cancel": "Cancel",
+      "button-confirm": "Report user",
+      "button-confirm-group": "Report group"
+    }
   }
 }

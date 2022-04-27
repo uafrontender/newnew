@@ -284,6 +284,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               height: '56px',
               width: 'calc(100% - 32px)',
             }}
+            onClick={onClose}
           >
             {t('CfPost.BackersTab.cancel')}
           </Button>

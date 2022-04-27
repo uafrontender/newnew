@@ -81,6 +81,7 @@ const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardM
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={() => onClose()}
         >
            <Text variant={2}>{ t('ellipse.cancel') }</Text>
         </Button>
@@ -109,7 +110,8 @@ const SContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
-
+  z-index: 1;
+  
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
     height: 480px;

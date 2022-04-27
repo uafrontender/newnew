@@ -62,6 +62,7 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={onClose}
         >
           {t('Cancel')}
         </Button>
@@ -95,6 +96,8 @@ const SContentContainer = styled.div`
     props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
