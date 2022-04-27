@@ -49,7 +49,7 @@ import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -580,10 +580,10 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -667,7 +667,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
                 ? Math.floor(appConstants?.mcVotePrice / 100)
                 : 1
             }
-            canSubscribe={post.creator?.options?.isOfferingSubscription ?? false}
+            canSubscribe={
+              post.creator?.options?.isOfferingSubscription ?? false
+            }
             canVoteForFree={hasFreeVote}
             handleLoadOptions={fetchOptions}
             handleResetFreeVote={handleResetFreeVote}
@@ -719,8 +721,9 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
       </PaymentSuccessModal>
       <HeroPopup
         isPopupVisible={
+          user!!.userTutorialsProgressSynced &&
           user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-          newnewapi.McTutorialStep.MC_HERO
+            newnewapi.McTutorialStep.MC_HERO
         }
         postType="MC"
         closeModal={goToNextStep}

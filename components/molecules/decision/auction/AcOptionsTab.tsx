@@ -46,7 +46,7 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 
 interface IAcOptionsTab {
   postId: string;
@@ -124,10 +124,10 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -595,11 +595,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${newBidAmount}`}
-          {...(
-            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(newBidAmount) * 100 ? {} : {
-              predefinedOption: 'card'
-            }
-          )}
+          {...(walletBalance?.usdCents &&
+          walletBalance.usdCents >= parseInt(newBidAmount) * 100
+            ? {}
+            : {
+                predefinedOption: 'card',
+              })}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

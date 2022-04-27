@@ -20,6 +20,7 @@ export interface IUserStateInterface {
   directMessagesCount: number;
   userData?: TUserData;
   userTutorialsProgress: newnewapi.IGetTutorialsStatusResponse;
+  userTutorialsProgressSynced: boolean;
 }
 
 const defaultUIState: IUserStateInterface = {
@@ -36,7 +37,6 @@ const defaultUIState: IUserStateInterface = {
       newnewapi.AcTutorialStep.AC_ALL_BIDS,
       newnewapi.AcTutorialStep.AC_BOOST_BID,
       newnewapi.AcTutorialStep.AC_TEXT_FIELD,
-      newnewapi.AcTutorialStep.AC_TUTORIAL_COMPLETED,
     ],
     // MC
     remainingMcSteps: [
@@ -45,18 +45,19 @@ const defaultUIState: IUserStateInterface = {
       newnewapi.McTutorialStep.MC_ALL_OPTIONS,
       newnewapi.McTutorialStep.MC_VOTE,
       newnewapi.McTutorialStep.MC_TEXT_FIELD,
-      newnewapi.McTutorialStep.MC_TUTORIAL_COMPLETED,
     ],
     // CF
     remainingCfSteps: [
       newnewapi.CfTutorialStep.CF_HERO,
       newnewapi.CfTutorialStep.CF_TIMER,
-      newnewapi.CfTutorialStep.CF_GO,
       newnewapi.CfTutorialStep.CF_GOAL_PROGRESS,
       newnewapi.CfTutorialStep.CF_BACK_GOAL,
-      newnewapi.CfTutorialStep.CF_TUTORIAL_COMPLETED,
     ],
+    remainingAcCrCurrentStep: [newnewapi.AcCreationTutorialStep.AC_CR_HERO],
+    remainingCfCrCurrentStep: [newnewapi.CfCreationTutorialStep.CF_CR_HERO],
+    remainingMcCrCurrentStep: [newnewapi.McCreationTutorialStep.MC_CR_HERO],
   },
+  userTutorialsProgressSynced: false,
 };
 
 export const userSlice: Slice<IUserStateInterface> = createSlice({
@@ -81,6 +82,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
         ...payload,
       };
     },
+    setUserTutorialsProgressSynced(state, { payload }: PayloadAction<boolean>) {
+      state.userTutorialsProgressSynced = payload;
+    },
     logoutUser(state) {
       state.loggedIn = false;
       state.userData = {
@@ -104,6 +108,7 @@ export const {
   setUserTutorialsProgressInner,
   setUserData,
   logoutUser,
+  setUserTutorialsProgressSynced,
 } = userSlice.actions;
 
 export default userSlice.reducer;
