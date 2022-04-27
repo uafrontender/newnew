@@ -133,7 +133,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [reportPostOpen, setReportPostOpen] = useState(false);
-    console.log(reportPostOpen)
+
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
@@ -199,7 +199,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const handleReportOpen = useCallback(()=>{
-    console.log("CALLED")
     setReportPostOpen(true)
   },[])
 

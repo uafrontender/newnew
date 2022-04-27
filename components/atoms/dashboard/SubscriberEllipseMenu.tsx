@@ -62,7 +62,7 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
             <Text variant={2}>{t('subscriptions.table.menu.view')}</Text>
           </SButton>
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('subscriptions.table.menu.report')}</Text>
+            <Text variant={2} tone='error'>{t('subscriptions.table.menu.report')}</Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
             <Text variant={2}>

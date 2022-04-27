@@ -18,13 +18,13 @@ export const reportUser = (userId: string, reason: newnewapi.ReportingReason, me
     message,
     content: {
       userProfile: {
-        userUuid: userId
+        userUuid: userId,
       }
     }
   });
 
   return reportContent(payload);
-}
+};
 
 export const reportPost = (postId: string, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
@@ -38,7 +38,7 @@ export const reportPost = (postId: string, reason: newnewapi.ReportingReason, me
   });
 
   return reportContent(payload);
-}
+};
 
 export const reportPostResponse = (postId: string, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
@@ -52,7 +52,7 @@ export const reportPostResponse = (postId: string, reason: newnewapi.ReportingRe
   });
 
   return reportContent(payload);
-}
+};
 
 export const reportEventOption = (optionId: number, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
@@ -60,13 +60,13 @@ export const reportEventOption = (optionId: number, reason: newnewapi.ReportingR
     message,
     content: {
       auOption: {
-        auOptionId: optionId
+        auOptionId: optionId,
       }
     }
   });
 
   return reportContent(payload);
-}
+};
 
 export const reportSuperpollOption = (optionId: number, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
@@ -74,13 +74,13 @@ export const reportSuperpollOption = (optionId: number, reason: newnewapi.Report
     message,
     content: {
       mcOption: {
-        mcOptionId: optionId
+        mcOptionId: optionId,
       }
     }
   });
 
   return reportContent(payload);
-}
+};
 
 export const reportMessage = (messageId: number, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
@@ -88,10 +88,10 @@ export const reportMessage = (messageId: number, reason: newnewapi.ReportingReas
     message,
     content: {
       chatMessage: {
-        chatMessageId: messageId 
+        chatMessageId: messageId,
       }
     }
   });
 
   return reportContent(payload);
-}
+};

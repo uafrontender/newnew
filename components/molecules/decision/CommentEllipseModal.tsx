@@ -52,7 +52,7 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
           )}
           {!isMyComment && (
             <SButton onClick={reportUserHandler}>
-              <Text variant={2}>{t('comments.report')}</Text>
+              <Text variant={2} tone='error'>{t('comments.report')}</Text>
             </SButton>
           )}
         </SContentContainer>
