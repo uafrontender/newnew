@@ -82,6 +82,9 @@ const SProfileBackground = styled.div<ISProfileBackground>`
 
   ${(props) => props.theme.media.tablet} {
     height: 200px;
+
+    border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 
   ${(props) => props.theme.media.laptop} {

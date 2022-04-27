@@ -45,12 +45,17 @@ const Modal: React.FC<IModal> = (props) => {
             transition={{ type: 'tween', duration: transitionSpeed ?? 0.5, delay: 0 }}
 
             show={show}
-            onClick={onClose}
+            // onClick={onClose}
             overlayDim={overlayDim ?? false}
             additionalZ={additionalZ ?? undefined}
             customBackdropFilterValue={customBackdropFilterValue ?? undefined}
             transitionSpeed={transitionSpeed ?? 0.5}
           >
+            <SClickableDiv
+              onClick={() => {
+                onClose?.();
+              }}
+            />
             {children}
           </StyledModalOverlay>
       </AnimatePresence>,
@@ -101,6 +106,12 @@ const StyledModalOverlay = styled(motion.div)<IStyledModalOverlay>`
     /* Some screens have dimmed overlay */
     background-color: ${({ overlayDim, theme }) => (overlayDim ? theme.colorsThemed.background.overlayDim : null)};
   }
+`;
+
+const SClickableDiv = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
 `;
 
 export default Modal;
