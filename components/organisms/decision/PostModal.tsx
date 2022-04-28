@@ -720,7 +720,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleReportOpen={handleReportOpen}
                 onClose={() => setEllipseMenuOpen(false)}
               />
-            ) : null}        
+            ) : null}
           </SPostSuccessWaitingControlsDiv>
           {postParsed && typeOfPost ? (
             <SPostModalContainer
@@ -745,18 +745,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             </SPostModalContainer>
           ) : null}
         </Modal>
-        <ReportModal
-            show={reportPostOpen}
-            reportedDisplayname={getDisplayname(postParsed?.creator!)}
-            onSubmit={async ({reason, message}) => {
-              if (postParsed) {
-                await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
-              }
-              
-              setReportPostOpen(false)
-            }}
-            onClose={() => setReportPostOpen(false)}
-          />
+        {postParsed?.creator && (
+          <ReportModal
+              show={reportPostOpen}
+              reportedDisplayname={getDisplayname(postParsed?.creator)}
+              onSubmit={async ({reason, message}) => {
+                if (postParsed) {
+                  await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
+                }
+
+                setReportPostOpen(false)
+              }}
+              onClose={() => setReportPostOpen(false)}
+            />
+        )}
       </>
     );
   }
@@ -882,18 +884,20 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           </SPostModalContainer>
         ) : null}
       </Modal>
-      <ReportModal
-          show={reportPostOpen}
-          reportedDisplayname={getDisplayname(postParsed?.creator!)}
-          onSubmit={async ({reason, message}) => {
-            if (postParsed) {
-              await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
-            }
-            
-            setReportPostOpen(false)
-          }}
-          onClose={() => setReportPostOpen(false)}
-        />
+      {postParsed?.creator && (
+        <ReportModal
+            show={reportPostOpen}
+            reportedDisplayname={getDisplayname(postParsed?.creator)}
+            onSubmit={async ({reason, message}) => {
+              if (postParsed) {
+                await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
+              }
+
+              setReportPostOpen(false)
+            }}
+            onClose={() => setReportPostOpen(false)}
+          />
+      )}
     </>
   );
 };

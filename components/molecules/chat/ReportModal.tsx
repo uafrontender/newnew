@@ -154,6 +154,7 @@ const SModal = styled.div`
   line-height: 24px;
   height: 100%;
   overflow: auto;
+  z-index: 1;
 
   ${(props) => props.theme.media.tablet} {
     height: auto;

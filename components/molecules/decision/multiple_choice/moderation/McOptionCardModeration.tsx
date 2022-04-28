@@ -263,15 +263,17 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         />
       )}
       {/* Report modal */}
-      <ReportModal
-        show={isReportModalOpen}
-        reportedDisplayname={getDisplayname(option.creator!)}
-        onSubmit={async ({reason, message}) => {
-          await reportSuperpollOption(option.id, reason, message);
-          setIsReportModalOpen(false);
-        }}
-        onClose={()=>{setIsReportModalOpen(false)}}
-      />
+      {option.isCreatedBySubscriber && option.creator && (
+        <ReportModal
+          show={isReportModalOpen}
+          reportedDisplayname={getDisplayname(option.creator)}
+          onSubmit={async ({reason, message}) => {
+            await reportSuperpollOption(option.id, reason, message);
+            setIsReportModalOpen(false);
+          }}
+          onClose={()=>{setIsReportModalOpen(false)}}
+        />
+      )}
     </>
   );
 };

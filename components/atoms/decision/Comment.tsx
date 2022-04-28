@@ -205,15 +205,17 @@ const Comment: React.FC<IComment> = ({
           onDeleteComment={onDeleteComment}
         />
       ) : null}
-      <ReportModal
-        show={confirmReportUser}
-        reportedDisplayname={getDisplayname(comment.sender!)}
-        onClose={() => setConfirmReportUser(false)}
-        onSubmit={async ({reason, message})=>{
-          reportMessage(comment.id, reason, message);
-          setConfirmReportUser(false);
-        }}
-      />
+      {!comment.isDeleted && (
+        <ReportModal
+          show={confirmReportUser}
+          reportedDisplayname={getDisplayname(comment.sender!)}
+          onClose={() => setConfirmReportUser(false)}
+          onSubmit={async ({reason, message})=>{
+            reportMessage(comment.id, reason, message);
+            setConfirmReportUser(false);
+          }}
+        />
+      )}
     </>
   );
 };
