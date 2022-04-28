@@ -24,6 +24,8 @@ import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { markUser } from '../../../api/endpoints/user';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
+import { reportUser } from '../../../api/endpoints/report';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -33,7 +35,7 @@ const SubscriptionExpired = dynamic(() => import('./SubscriptionExpired'));
 const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
-const ReportUserModal = dynamic(() => import('./ReportUserModal'));
+const ReportModal = dynamic(() => import('./ReportModal'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
@@ -483,15 +485,20 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             </SButton>
           </SBottomTextarea>
         )}
+        {chatRoom?.visavis &&
+          <ReportModal
+            show={confirmReportUser}
+            reportedDisplayname={getDisplayname(chatRoom.visavis)}
+            onClose={() => setConfirmReportUser(false)}
+            onSubmit={async ({reason, message})=>{
+              if(chatRoom?.visavis?.uuid){
+                await reportUser(chatRoom.visavis.uuid, reason, message).catch(e=> console.error(e));
+              }
 
-        {confirmReportUser && (
-          <ReportUserModal
-            confirmReportUser={confirmReportUser}
-            user={chatRoom && chatRoom.visavis!!}
-            closeModal={() => setConfirmReportUser(false)}
-            isAnnouncement={localUserData.isAnnouncement}
+              setConfirmReportUser(false);
+          }}
           />
-        )}
+        }
       </SBottomPart>
     </SContainer>
   );

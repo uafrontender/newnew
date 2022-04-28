@@ -142,6 +142,7 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = ({
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={onClose}
         >
           {t('Cancel')}
         </Button>

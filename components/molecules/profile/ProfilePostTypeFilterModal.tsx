@@ -84,6 +84,7 @@ const ProfilePostTypeFilterModal: React.FunctionComponent<IProfilePostTypeFilter
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={onClose}
         >
           {t('Cancel')}
         </Button>

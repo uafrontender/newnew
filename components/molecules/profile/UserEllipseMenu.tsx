@@ -66,7 +66,7 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('ellipse.report')}</Text>
+            <Text variant={2} tone='error'>{t('ellipse.report')}</Text>
           </SButton>
           {loggedIn && (
             <SButton onClick={blockHandler}>

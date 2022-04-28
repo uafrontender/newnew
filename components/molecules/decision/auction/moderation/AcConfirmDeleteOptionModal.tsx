@@ -4,13 +4,13 @@ import styled from 'styled-components';
 import Modal from '../../../../organisms/Modal';
 import Button from '../../../../atoms/Button';
 
-interface IMcConfirmDeleteOption {
+interface IAcConfirmDeleteOptionModal {
   isVisible: boolean,
   closeModal: () => void;
   handleConfirmDelete: () => void;
 }
 
-const McConfirmDeleteOption: React.FC<IMcConfirmDeleteOption> = ({
+const AcConfirmDeleteOptionModal: React.FC<IAcConfirmDeleteOptionModal> = ({
   isVisible,
   closeModal,
   handleConfirmDelete,
@@ -25,16 +25,16 @@ const McConfirmDeleteOption: React.FC<IMcConfirmDeleteOption> = ({
     >
       <SContainer>
         <SModal>
-          <SModalTitle>{t('McPostModeration.DeleteOptionModal.title')}</SModalTitle>
+          <SModalTitle>{t('AcPostModeration.DeleteOptionModal.title')}</SModalTitle>
           <SModalMessage>
-            {t('McPostModeration.DeleteOptionModal.body')}
+            {t('AcPostModeration.DeleteOptionModal.body')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>
-              {t('McPostModeration.DeleteOptionModal.cancelBtn')}
+            <SCancelButton onClick={closeModal}>
+              {t('AcPostModeration.DeleteOptionModal.cancelBtn')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
-              {t('McPostModeration.DeleteOptionModal.confirmBtn')}
+              {t('AcPostModeration.DeleteOptionModal.confirmBtn')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -43,7 +43,7 @@ const McConfirmDeleteOption: React.FC<IMcConfirmDeleteOption> = ({
   );
 };
 
-export default McConfirmDeleteOption;
+export default AcConfirmDeleteOptionModal;
 
 const SContainer = styled.div`
   display: flex;
