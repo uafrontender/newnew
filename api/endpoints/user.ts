@@ -253,3 +253,17 @@ export const markTutorialStepAsCompleted = (
     'post',
     payload
   );
+
+export const deleteMyAccount = (
+  payload: newnewapi.EmptyRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_USER}/delete_my_account`,
+    'post',
+    payload
+  );
