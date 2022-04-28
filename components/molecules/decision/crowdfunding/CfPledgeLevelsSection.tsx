@@ -1,5 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -29,7 +35,7 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
@@ -254,9 +260,9 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     const goToNextStep = () => {
       if (user.loggedIn) {
         const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
         });
-        setTutorialStatus(payload);
+        markTutorialStepAsCompleted(payload);
       }
       dispatch(
         setUserTutorialsProgress({
@@ -380,11 +386,13 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
             isOpen={paymentModalOpen}
             zIndex={12}
             amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
-            {...(
-              walletBalance?.usdCents && pledgeAmount && walletBalance.usdCents >= pledgeAmount ? {} : {
-                predefinedOption: 'card'
-              }
-            )}
+            {...(walletBalance?.usdCents &&
+            pledgeAmount &&
+            walletBalance.usdCents >= pledgeAmount
+              ? {}
+              : {
+                  predefinedOption: 'card',
+                })}
             showTocApply={!user?.loggedIn}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

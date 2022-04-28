@@ -5,7 +5,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { setTutorialStatus } from '../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import isBrowser from '../../../utils/isBrowser';
@@ -101,7 +101,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       case 'ac':
         if (user.loggedIn) {
           payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+            acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
           });
         }
         dispatch(
@@ -115,7 +115,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       case 'cf':
         if (user.loggedIn) {
           payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
           });
         }
         dispatch(
@@ -129,7 +129,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       default:
         if (user.loggedIn) {
           payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+            mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
           });
         }
         dispatch(
@@ -140,7 +140,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           })
         );
     }
-    if (user.loggedIn && payload) setTutorialStatus(payload);
+    if (user.loggedIn && payload) markTutorialStepAsCompleted(payload);
   };
 
   useEffect(() => {

@@ -44,7 +44,7 @@ import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -208,7 +208,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const [winningOption, setWinningOption] =
     useState<newnewapi.Auction.Option | undefined>();
 
-  const handleUpdateWinningOption = (selectedOption: newnewapi.Auction.Option) => {
+  const handleUpdateWinningOption = (
+    selectedOption: newnewapi.Auction.Option
+  ) => {
     setWinningOption(selectedOption);
     setWinningOptionId(selectedOption.id);
     handleChangeTab('winner');
@@ -529,9 +531,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   const goToNextStep = () => {
     if (user.loggedIn) {
       const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -639,8 +641,9 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       </SActivitesContainer>
       <HeroPopup
         isPopupVisible={
+          user!!.userTutorialsProgressSynced &&
           user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-          newnewapi.AcTutorialStep.AC_HERO
+            newnewapi.AcTutorialStep.AC_HERO
         }
         postType="AC"
         closeModal={goToNextStep}

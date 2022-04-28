@@ -240,7 +240,7 @@ export const getTutorialsStatus = (payload: newnewapi.EmptyRequest) =>
     payload
   );
 
-export const setTutorialStatus = (
+export const markTutorialStepAsCompleted = (
   payload: newnewapi.MarkTutorialStepAsCompletedRequest
 ) =>
   fetchProtobufProtectedIntercepted<
@@ -249,7 +249,7 @@ export const setTutorialStatus = (
   >(
     newnewapi.MarkTutorialStepAsCompletedRequest,
     newnewapi.EmptyResponse,
-    `${BASE_URL_USER}/set_tutorial_status`,
+    `${BASE_URL_USER}/mark_tutorial_step_as_completed`,
     'post',
     payload
   );
