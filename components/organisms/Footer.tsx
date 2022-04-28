@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import React from 'react';
 import Link from 'next/link';
 import { scroller } from 'react-scroll';
@@ -15,9 +16,9 @@ import ChangeLanguage from '../atoms/ChangeLanguage';
 import { useAppSelector } from '../../redux-store/store';
 
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
-import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
 import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
-import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
+// import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
+// import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
@@ -25,8 +26,11 @@ interface IFooter {
 }
 
 type TItem = {
-  key: string,
-  url: string
+  key: string;
+  url: string;
+  iconSrc?: string;
+  email?: boolean;
+  external?: boolean;
 };
 
 export const Footer: React.FC<IFooter> = () => {
@@ -41,34 +45,34 @@ export const Footer: React.FC<IFooter> = () => {
       url: '/about',
     },
     {
-      key: 'press',
-      url: '/press',
+      key: 'how-it-works',
+      url: '/how-it-works',
     },
-    {
-      key: 'jobs',
-      url: '/jobs',
-    },
-    {
-      key: 'help',
-      url: '/help',
-    },
-  ];
-  const centerItems: TItem[] = [
     {
       key: 'faq',
       url: '/faq',
-    },
-    {
-      key: 'how-it-works',
-      url: '/how-it-works',
     },
     {
       key: 'guidelines',
       url: '/guidelines',
     },
     {
-      key: 'accessibility',
-      url: '/accessibility',
+      key: 'jobs',
+      url: 'https://jobs.lever.co/NewNew',
+    },
+  ];
+  const centerItems: TItem[] = [
+    {
+      key: 'twitter',
+      url: 'https://twitter.com',
+      external: true,
+      iconSrc: twitterIcon,
+    },
+    {
+      key: 'email',
+      url: 'hi@newnew.co',
+      external: true,
+      email: true,
     },
   ];
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -84,13 +88,44 @@ export const Footer: React.FC<IFooter> = () => {
       router.push('/', '/');
     }
   };
-  const renderItem = (item: TItem) => (
-    <Link key={item.key} href={item.url} passHref>
-      <SBlockOption>
-        {t(`footer-${item.key}`)}
-      </SBlockOption>
-    </Link>
-  );
+  const renderItem = (item: TItem) => {
+    if (item.external) {
+      return (
+        <SExternalLink
+          key={item.key}
+          href={item.email ? `mailto: ${item.url}` : item.url}
+          target="_blank"
+        >
+          {item.iconSrc ? (
+            <SSvgHolder target="_blank">
+              <InlineSvg
+                svg={item.iconSrc}
+                fill={theme.colorsThemed.text.secondary}
+                width="20px"
+                height="20px"
+                hoverFill={theme.colorsThemed.text.primary}
+              />
+            </SSvgHolder>
+          ) : null}
+          <SBlockOption>
+            {!item.email ? t(`footer-${item.key}`) : item.url}
+          </SBlockOption>
+        </SExternalLink>
+      );
+    }
+
+    return (
+      <Link
+        key={item.key}
+        href={item.url}
+        passHref
+      >
+        <SBlockOption>
+          {t(`footer-${item.key}`)}
+        </SBlockOption>
+      </Link>
+    );
+  }
 
   return (
     <SWrapper>
@@ -122,8 +157,8 @@ export const Footer: React.FC<IFooter> = () => {
                   </SBlockTitle>
                   {centerItems.map(renderItem)}
                 </SBlock>
-                {isMobile && <SSeparator />}
-                <SBlock>
+                {/* {isMobile && <SSeparator />} */}
+                {/* <SBlock>
                   <SBlockTitle weight={700}>
                     {t('footer-bottom-title')}
                   </SBlockTitle>
@@ -162,7 +197,7 @@ export const Footer: React.FC<IFooter> = () => {
                       </SSvgHolder>
                     </Link>
                   </SBlockRow>
-                </SBlock>
+                </SBlock> */}
               </STopContent>
               <SSeparator />
               <SBlockBottomRow>
@@ -258,11 +293,11 @@ const SBlockOption = styled.a`
   }
 `;
 
-const SBlockRow = styled.div`
-  display: flex;
-  margin-bottom: 12px;
-  flex-direction: row;
-`;
+// const SBlockRow = styled.div`
+//   display: flex;
+//   margin-bottom: 12px;
+//   flex-direction: row;
+// `;
 
 const SBlockBottomRow = styled.div`
   display: flex;
@@ -296,8 +331,14 @@ const SBottomBlockOptionInc = styled.span`
   margin-right: 24px;
 `;
 
+const SExternalLink = styled.a`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 9px;
+`;
+
 const SSvgHolder = styled.a`
-  margin-right: 15px;
 `;
 
 const SIconHolder = styled.div`
