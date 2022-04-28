@@ -19,7 +19,10 @@ import { debounce } from 'lodash';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 // import { getSubscriptionStatus } from '../../../../api/endpoints/subscription';
-import { doFreeVote, voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+import {
+  doFreeVote,
+  voteOnPostWithWallet,
+} from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
   getTopUpWalletWithPaymentPurposeUrl,
@@ -46,7 +49,7 @@ import TutorialTooltip, {
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
-import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -119,9 +122,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
     useScrollGradients(containerRef);
 
   const [heightDelta, setHeightDelta] = useState(
-    post.isSuggestionsAllowed
-      && !hasVotedOptionId
-      && postStatus === 'voting' ? 56 : 0
+    post.isSuggestionsAllowed && !hasVotedOptionId && postStatus === 'voting'
+      ? 56
+      : 0
   );
   const actionSectionContainer = useRef<HTMLDivElement>();
 
@@ -396,8 +399,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       handleResetFreeVote();
       setPaymentSuccessModalOpen(true);
     } catch (err) {
-     console.error(err);
-     setLoadingModalOpen(false);
+      console.error(err);
+      setLoadingModalOpen(false);
     }
   }, [
     newOptionText,
@@ -420,29 +423,36 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        console.log(size)
+        console.log(size);
         setHeightDelta(size);
       }
     });
 
-    if (post.isSuggestionsAllowed
-      && !postLoading
-      && !hasVotedOptionId
-      && postStatus === 'voting'
-      && actionSectionContainer.current
+    if (
+      post.isSuggestionsAllowed &&
+      !postLoading &&
+      !hasVotedOptionId &&
+      postStatus === 'voting' &&
+      actionSectionContainer.current
     ) {
       resizeObserver.observe(actionSectionContainer.current!!);
     } else {
       setHeightDelta(0);
     }
-  }, [hasVotedOptionId, postLoading, post.isSuggestionsAllowed, postStatus, isMobileOrTablet]);
+  }, [
+    hasVotedOptionId,
+    postLoading,
+    post.isSuggestionsAllowed,
+    postStatus,
+    isMobileOrTablet,
+  ]);
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -521,90 +531,84 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-        {
-          post.isSuggestionsAllowed
-          && !hasVotedOptionId
-          && canVoteForFree
-          && postStatus === 'voting'
-          ? (
-            <SActionSection
-              ref={(el) => {
-                actionSectionContainer.current = el!!;
+        {post.isSuggestionsAllowed &&
+        !hasVotedOptionId &&
+        canVoteForFree &&
+        postStatus === 'voting' ? (
+          <SActionSection
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+          >
+            <SuggestionTextArea
+              value={newOptionText}
+              disabled={optionBeingSupported !== ''}
+              placeholder={t(
+                'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
+              )}
+              onChange={handleUpdateNewOptionText}
+            />
+            <SAddFreeVoteButton
+              size="sm"
+              disabled={
+                !newOptionText ||
+                optionBeingSupported !== '' ||
+                !newOptionTextValid
+              }
+              style={{
+                ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+              }}
+              onClick={() => setUseFreeVoteModalOpen(true)}
+            >
+              {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
+            </SAddFreeVoteButton>
+            <STutorialTooltipTextAreaHolder>
+              <TutorialTooltip
+                isTooltipVisible={
+                  user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+                  newnewapi.McTutorialStep.MC_TEXT_FIELD
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.mc.createYourBid.title')}
+                text={t('tutorials.mc.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomRight}
+              />
+            </STutorialTooltipTextAreaHolder>
+          </SActionSection>
+        ) : post.isSuggestionsAllowed &&
+          !hasVotedOptionId &&
+          !canVoteForFree &&
+          postStatus === 'voting' &&
+          canSubscribe &&
+          !postLoading ? (
+          <SActionSectionSubscribe
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+          >
+            <Text variant={3}>
+              {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', {
+                creator: post.creator?.nickname,
+              })}
+            </Text>
+            <SSubscribeButton
+              onClick={() => {
+                handleRedirectToPostCreator();
               }}
             >
-              <SuggestionTextArea
-                value={newOptionText}
-                disabled={optionBeingSupported !== ''}
-                placeholder={t(
-                  'McPost.OptionsTab.ActionSection.suggestionPlaceholder'
-                )}
-                onChange={handleUpdateNewOptionText}
-              />
-              <SAddFreeVoteButton
-                size="sm"
-                disabled={
-                  !newOptionText ||
-                  optionBeingSupported !== '' ||
-                  !newOptionTextValid
-                }
-                style={{
-                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-                }}
-                onClick={() => setUseFreeVoteModalOpen(true)}
-              >
-                {t('McPost.OptionsTab.ActionSection.placeABidBtn')}
-              </SAddFreeVoteButton>
-              <STutorialTooltipTextAreaHolder>
-                <TutorialTooltip
-                  isTooltipVisible={
-                    user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-                    newnewapi.McTutorialStep.MC_TEXT_FIELD
-                  }
-                  closeTooltip={goToNextStep}
-                  title={t('tutorials.mc.createYourBid.title')}
-                  text={t('tutorials.mc.createYourBid.text')}
-                  dotPosition={DotPositionEnum.BottomRight}
-                />
-              </STutorialTooltipTextAreaHolder>
-            </SActionSection>
-          ) : (
-            post.isSuggestionsAllowed
-            && !hasVotedOptionId
-            && !canVoteForFree
-            && postStatus === 'voting'
-            && canSubscribe
-            && !postLoading
-            ? (
-              <SActionSectionSubscribe
-                ref={(el) => {
-                  actionSectionContainer.current = el!!;
-                }}
-              >
-                <Text
-                  variant={3}
-                >
-                  {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', { creator: post.creator?.nickname })}
-                </Text>
-                <SSubscribeButton
-                  onClick={() => {
-                    handleRedirectToPostCreator();
-                  }}
-                >
-                  {t('McPost.OptionsTab.ActionSection.subscribeBtn')}
-                </SSubscribeButton>
-              </SActionSectionSubscribe>
-            ) : (
-              <div
-                ref={(el) => {
-                  actionSectionContainer.current = el!!;
-                }}
-                style={{
-                  height: 0,
-                }}
-              />
-            )
-          )
-        }
+              {t('McPost.OptionsTab.ActionSection.subscribeBtn')}
+            </SSubscribeButton>
+          </SActionSectionSubscribe>
+        ) : (
+          <div
+            ref={(el) => {
+              actionSectionContainer.current = el!!;
+            }}
+            style={{
+              height: 0,
+            }}
+          />
+        )}
         <STutorialTooltipHolder>
           <TutorialTooltip
             isTooltipVisible={
@@ -662,11 +666,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${parseInt(newBidAmount) * votePrice}`}
-          {...(
-            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100 ? {} : {
-              predefinedOption: 'card'
-            }
-          )}
+          {...(walletBalance?.usdCents &&
+          walletBalance.usdCents >= parseInt(newBidAmount) * votePrice * 100
+            ? {}
+            : {
+                predefinedOption: 'card',
+              })}
           showTocApply={!user?.loggedIn}
           {...{
             ...(walletBalance &&
@@ -830,7 +835,9 @@ const SAddFreeVoteButton = styled(Button)`
   color: ${({ theme }) => theme.colors.dark};
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
-  &:active:enabled, &:hover:enabled, &:focus:enabled {
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus:enabled {
     background: ${({ theme }) => theme.colorsThemed.accent.yellow};
   }
 `;
@@ -919,7 +926,9 @@ const SSubscribeButton = styled(Button)`
 
   color: ${({ theme }) => theme.colors.dark};
 
-  :active:enabled, :focus:enabled, :hover:enabled {
+  :active:enabled,
+  :focus:enabled,
+  :hover:enabled {
     background: ${({ theme }) => theme.colorsThemed.accent.yellow};
   }
 `;

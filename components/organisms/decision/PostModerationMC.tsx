@@ -25,7 +25,7 @@ import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import { setTutorialStatus } from '../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 
 import Lottie from '../../atoms/Lottie';
@@ -69,8 +69,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } =
-    useContext(ChannelsContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
   const tabs = useMemo(() => {
@@ -477,10 +476,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -583,8 +582,9 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       <HeroPopup
         isPopupVisible={
+          user!!.userTutorialsProgressSynced &&
           user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-          newnewapi.McTutorialStep.MC_HERO
+            newnewapi.McTutorialStep.MC_HERO
         }
         postType="MC"
         closeModal={goToNextStep}
