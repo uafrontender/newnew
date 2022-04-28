@@ -31,7 +31,6 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClos
 
   const disabled = reason === null || message.length < 15;
 
-  // TODO: change newnewapi.ReportingReason s once API changes are done
   const reportTypes = useMemo(
     () => [
       {
@@ -39,20 +38,19 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClos
         title: t('modal.report-user.options.spam'),
       },
       {
-        id: newnewapi.ReportingReason.VIOLENCE,
+        id: newnewapi.ReportingReason.HARMFUL,
         title: t('modal.report-user.options.abuse'),
       },
       {
-        // TODO: change
-        id: newnewapi.ReportingReason.DRUGS_AND_WEAPONS,
+        id: newnewapi.ReportingReason.SUICIDE,
         title: t('modal.report-user.options.suicide'),
       },
       {
-        id: newnewapi.ReportingReason.HATE_SPEECH,
+        id: newnewapi.ReportingReason.HATE,
         title: t('modal.report-user.options.hate-speech'),
       },
       {
-        id: newnewapi.ReportingReason.BULLYING,
+        id: newnewapi.ReportingReason.HARRASMENT,
         title: t('modal.report-user.options.harrasment'),
       },
       {

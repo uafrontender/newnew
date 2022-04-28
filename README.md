@@ -29,6 +29,19 @@ in `pages/api/hello.ts`.
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated
 as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
+## Development
+
+### newnew api
+
+We import a package from a gitlab repo and select a specific version by its commit hash
+If you need to update a version of the package, just change the commit hash in `package.json`
+And run `npm install`
+
+### Tools we use
+
+For front-end development we use VSCode code editor.
+TO BE Continued...
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
