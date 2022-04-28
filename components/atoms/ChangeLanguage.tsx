@@ -103,6 +103,9 @@ export default ChangeLanguage;
 
 const SContainer = styled.div`
   position: relative;
+
+  /* TEMP */
+  display: none;
 `;
 
 interface ISListHolder {

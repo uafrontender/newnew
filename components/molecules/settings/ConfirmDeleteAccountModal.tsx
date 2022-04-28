@@ -2,63 +2,61 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
-import { markUser } from '../../../api/endpoints/user';
+
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
-import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
-import getDisplayname from '../../../utils/getDisplayname';
 
-interface IBlockUserModalProfile {
-  user: newnewapi.IUser;
-  confirmBlockUser: boolean;
-  onUserBlock: () => void;
+import { useAppDispatch } from '../../../redux-store/store';
+import { deleteMyAccount } from '../../../api/endpoints/user';
+import { logoutUserClearCookiesAndRedirect } from '../../../redux-store/slices/userStateSlice';
+
+interface IConfirmDeleteAccountModal {
+  isVisible: boolean;
   closeModal: () => void;
 }
 
-const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
-  confirmBlockUser,
-  onUserBlock,
-  user,
+const ConfirmDeleteAccountModal: React.FC<IConfirmDeleteAccountModal> = ({
+  isVisible,
   closeModal,
 }) => {
   const { t } = useTranslation('profile');
+  const dispatch = useAppDispatch();
 
-  const { blockUser } = useGetBlockedUsers();
-
-  async function blockUserRequest() {
+  async function deleteUser() {
     try {
-      const payload = new newnewapi.MarkUserRequest({
-        markAs: 3,
-        userUuid: user.uuid,
-      });
-      const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-      blockUser(user.uuid!!);
-      onUserBlock();
+      const payload = new newnewapi.EmptyRequest({});
+
+      const res = await deleteMyAccount(payload);
+
+      if (!res.error) {
+        dispatch(logoutUserClearCookiesAndRedirect())
+      }
     } catch (err) {
       console.error(err);
     }
   }
   const handleConfirmClick = () => {
-    blockUserRequest();
+    deleteUser();
   };
   return (
-    <Modal show={confirmBlockUser} onClose={closeModal}>
+    <Modal show={isVisible} onClose={closeModal}>
       <SContainer>
-        <SModal>
-          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
+        <SModal
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SModalTitle>{t('modal.delete-my-account.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {getDisplayname(user)} {t('modal.block-user.message-second-part')}
+            {t('modal.delete-my-account.body')}
           </SModalMessage>
           <SModalButtons>
+            <SConfirmButton onClick={handleConfirmClick}>
+              {t('modal.delete-my-account.button-confirm')}
+            </SConfirmButton>
             <SCancelButton
               onClick={closeModal}
             >
-              {t('modal.block-user.button-cancel')}
+              {t('modal.delete-my-account.button-cancel')}
             </SCancelButton>
-            <SConfirmButton onClick={handleConfirmClick}>
-              {t('modal.block-user.button-confirm')}
-            </SConfirmButton>
           </SModalButtons>
         </SModal>
       </SContainer>
@@ -66,15 +64,15 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   );
 };
 
-export default BlockUserModalProfile;
+export default ConfirmDeleteAccountModal;
 
-BlockUserModalProfile.defaultProps = {};
+ConfirmDeleteAccountModal.defaultProps = {};
 
 const SContainer = styled.div`
+  position: absolute;
   display: flex;
   height: 100%;
   width: 100%;
-  position: absolute;
   justify-content: center;
   align-items: center;
 `;
@@ -97,23 +95,27 @@ const SModal = styled.div`
 const SModalTitle = styled.strong`
   font-size: 20px;
   margin-bottom: 16px;
+  text-align: center;
 `;
 
 const SModalMessage = styled.p`
   font-size: 16px;
   margin-bottom: 24px;
+  text-align: center;
 `;
 
 const SModalButtons = styled.div`
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
 `;
 
 const SCancelButton = styled(Button)`
   padding: 12px 24px;
   line-height: 24px;
   font-size: 14px;
-  margin-right: auto;
-  flex-shrink: 0;
   color: ${(props) =>
     props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
@@ -129,8 +131,6 @@ const SConfirmButton = styled(Button)`
   padding: 12px 24px;
   line-height: 24px;
   font-size: 14px;
-  margin-left: auto;
-  flex-shrink: 0;
   background-color: ${(props) => props.theme.colorsThemed.accent.error};
   &:hover {
     background-color: ${(props) => props.theme.colorsThemed.accent.error};

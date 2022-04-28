@@ -762,7 +762,7 @@ const SActionSection = styled.div`
     width: 100%;
     z-index: 5;
 
-    padding-top: 8px;
+    padding-top: 16px;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
