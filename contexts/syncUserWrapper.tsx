@@ -209,6 +209,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
       if (!localUserTutorialsProgress) {
         saveStateLS('userTutorialsProgress', user.userTutorialsProgress);
       }
+
       if (!_.isEqual(user.userTutorialsProgress, localUserTutorialsProgress)) {
         dispatch(
           setUserTutorialsProgress(
@@ -216,6 +217,7 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
           )
         );
       }
+      dispatch(setUserTutorialsProgressSynced(true));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.loggedIn]);
