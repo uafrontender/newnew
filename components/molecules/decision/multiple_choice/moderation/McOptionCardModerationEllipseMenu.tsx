@@ -54,6 +54,7 @@ const McOptionCardModerationEllipseMenu: React.FunctionComponent<IMcOptionCardMo
               >
                 <Text
                   variant={3}
+                  tone='error'
                 >
                   { t('McPostModeration.OptionsTab.OptionCard.ellipse.report') }
                 </Text>

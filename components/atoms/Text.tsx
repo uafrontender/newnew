@@ -5,6 +5,7 @@ interface IText {
   weight?: 500 | 600;
   variant?: 1 | 2 | 3;
   onClick?: (e: any) => void;
+  tone?: 'neutral' | 'error';
   children: React.ReactNode;
 }
 
@@ -29,12 +30,13 @@ Text.defaultProps = {
   weight: 500,
   variant: 1,
   onClick: () => {},
+  tone: 'neutral'
 };
 
 export default Text;
 
 const SText = styled.div<IText>`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
+  color: ${(props) => props.tone === 'error' ? props.theme.colorsThemed.accent.error : props.theme.colorsThemed.text.primary};
   font-weight: ${(props) => props.weight};
 `;
 

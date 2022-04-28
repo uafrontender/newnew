@@ -31,6 +31,8 @@ import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
 import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
+import ReportModal from '../molecules/chat/ReportModal';
+import { reportUser } from '../../api/endpoints/report';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -104,7 +106,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
-  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
+  const {usersIBlocked, unblockUser } = useGetBlockedUsers();
   const isUserBlocked = useMemo(() => (
     usersIBlocked.includes(user.uuid)
   ), [usersIBlocked, user.uuid]);
@@ -432,7 +435,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   setBlockUserModalOpen(true);
                 }
               }}
-              handleClickReport={() => {}}
+              handleClickReport={() => {setConfirmReportUser(true)}}
               handleClickUnsubscribe={() => {}}
             />
           )}
@@ -523,7 +526,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               setBlockUserModalOpen(true);
             }
           }}
-          handleClickReport={() => {}}
+          handleClickReport={() => {setConfirmReportUser(true)}}
           handleClickUnsubscribe={() => {}}
         />
       )}
@@ -532,6 +535,20 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         onUserBlock={() => {}}
         user={user}
         closeModal={() => setBlockUserModalOpen(false)}
+      />
+      <ReportModal
+        show={confirmReportUser}
+        reportedDisplayname={
+          currentUser.userData
+          ? currentUser.userData.nickname || `@${currentUser.userData.username}`
+          : ''}
+        onClose={() => setConfirmReportUser(false)}
+        onSubmit={async ({reason, message}) => {
+          if(currentUser.userData?.userUuid) {
+            await reportUser(currentUser.userData.userUuid, reason, message).catch(e => console.error(e));
+          }
+          setConfirmReportUser(false);
+        }}
       />
     </ErrorBoundary>
   );

@@ -29,7 +29,7 @@
     "lodash": "4.17.21",
     "lottie-web": "5.8.1",
     "moment": "2.29.1",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com:newnewinc/newnew-api#master",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#master",
     "next": "12.0.10",
     "next-i18next": "10.0.1",
     "next-redux-wrapper": "7.0.5",

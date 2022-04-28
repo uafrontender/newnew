@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
+import { newnewapi } from 'newnew-api';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
@@ -9,44 +9,53 @@ import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
 import GoBackButton from '../GoBackButton';
 
-interface IReportUserModal {
-  confirmReportUser: boolean;
-  user: newnewapi.IUser | null;
-  isAnnouncement?: boolean;
-  closeModal: () => void;
+interface ReportData {
+  reason: newnewapi.ReportingReason
+  message: string
 }
 
-const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, closeModal, isAnnouncement }) => {
-  const { t } = useTranslation('chat');
+interface IReportModal {
+  show: boolean;
+  reportedDisplayname: string;
+  onSubmit: (reportData: ReportData ) => void
+  onClose: () => void;
+}
+
+const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClose, onSubmit }) => {
+  const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
-  const [reportType, setReportType] = useState<string | null>(null);
+  const [reason, setReason] = useState<newnewapi.ReportingReason| null>(null);
   const [message, setMessage] = useState('');
 
-  const disabled = reportType === null;
+  const disabled = reason === null || message.length < 15;
 
   const reportTypes = useMemo(
     () => [
       {
-        id: 'report-spam',
+        id: newnewapi.ReportingReason.SPAM,
         title: t('modal.report-user.options.spam'),
       },
       {
-        id: 'report-abuse',
+        id: newnewapi.ReportingReason.HARMFUL,
         title: t('modal.report-user.options.abuse'),
       },
       {
-        id: 'report-suicide',
+        id: newnewapi.ReportingReason.SUICIDE,
         title: t('modal.report-user.options.suicide'),
       },
       {
-        id: 'report-hate',
+        id: newnewapi.ReportingReason.HATE,
         title: t('modal.report-user.options.hate-speech'),
       },
       {
-        id: 'report-harrasment',
+        id: newnewapi.ReportingReason.HARRASMENT,
         title: t('modal.report-user.options.harrasment'),
+      },
+      {
+        id: newnewapi.ReportingReason.OTHER,
+        title: t('modal.report-user.options.other'),
       },
     ],
     [t]
@@ -55,9 +64,13 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
   const reportMaxLength = 150;
 
   const submitReport = () => {
-    /* eslint-disable no-unused-expressions */
-    if (user && !disabled) {
-      console.log(user);
+    if(reason && message.length >= 15){
+      onSubmit({
+        reason,
+        message
+      });
+      setReason(null);
+      setMessage('');
     }
   };
 
@@ -65,19 +78,19 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
     setMessage(e.target.value);
   }, []);
 
-  const handleTypeChange = useCallback((e: React.MouseEvent, id: string | undefined) => {
+  const handleTypeChange = useCallback((id: newnewapi.ReportingReason | undefined) => {
     /* eslint-disable no-unused-expressions */
-    id && setReportType(id);
+    id && setReason(id);
   }, []);
 
   return (
-    <Modal show={confirmReportUser} onClose={closeModal}>
+    <Modal show={show} onClose={onClose}>
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SModalHeader>
-            {isMobile && <GoBackButton onClick={closeModal} />}
+            {isMobile && <GoBackButton onClick={onClose} />}
             <SModalTitle>
-              {t('modal.report-user.title')} {user ? user.nickname : ''}
+              {t('modal.report-user.title')} {reportedDisplayname}
             </SModalTitle>
           </SModalHeader>
           <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
@@ -85,17 +98,16 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
             {reportTypes.map((item) => (
               <SCheckBoxWrapper key={item.id}>
                 <CheckBox
-                  id={item.id}
+                  id={item.id.toString()}
                   label={item.title}
-                  selected={reportType === item.id}
-                  handleChange={handleTypeChange}
+                  selected={reason === item.id}
+                  handleChange={()=>handleTypeChange(item.id)}
                 />
               </SCheckBoxWrapper>
             ))}
           </SCheckBoxList>
           <STextAreaWrapper>
             <STextAreaTitle>
-              <label htmlFor="report-additional-info">{t('modal.report-user.additional-info.label')}</label>
               <span>
                 {message ? message.length : 0}/{reportMaxLength}
               </span>
@@ -109,9 +121,9 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
             />
           </STextAreaWrapper>
           <SModalButtons>
-            {!isMobile && <SCancelButton onClick={closeModal}>{t('modal.report-user.button-cancel')}</SCancelButton>}
+            {!isMobile && <SCancelButton onClick={onClose}>{t('modal.report-user.button-cancel')}</SCancelButton>}
             <SConfirmButton view="primaryGrad" disabled={disabled} onClick={submitReport}>
-              {isAnnouncement ? t('modal.report-user.button-confirm-group') : t('modal.report-user.button-confirm')}
+              Report
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -120,11 +132,7 @@ const ReportUserModal: React.FC<IReportUserModal> = ({ confirmReportUser, user, 
   );
 };
 
-export default ReportUserModal;
-
-ReportUserModal.defaultProps = {
-  isAnnouncement: false,
-};
+export default ReportModal;
 
 const SContainer = styled.div`
   display: flex;
@@ -146,6 +154,7 @@ const SModal = styled.div`
   line-height: 24px;
   height: 100%;
   overflow: auto;
+  z-index: 1;
 
   ${(props) => props.theme.media.tablet} {
     height: auto;
@@ -258,7 +267,7 @@ const STextAreaWrapper = styled.div`
 const STextAreaTitle = styled.div`
   margin-bottom: 10px;
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   font-size: 12px;
   font-weight: 600;

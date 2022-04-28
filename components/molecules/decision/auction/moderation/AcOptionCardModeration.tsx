@@ -16,7 +16,7 @@ import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
-import AcConfirmDeleteOption from './AcConfirmDeleteOption';
+import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 
@@ -27,8 +27,12 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 import BlockUserModalPost from '../../BlockUserModalPost';
+import { reportEventOption } from '../../../../../api/endpoints/report';
+import ReportModal from '../../../chat/ReportModal';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -288,7 +292,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         </SBidDetailsModal>
       </AcPickWinningOptionModal>
       {/* Delete option */}
-      <AcConfirmDeleteOption
+      <AcConfirmDeleteOptionModal
         isVisible={isDeleteModalOpen}
         closeModal={() => setIsDeleteModalOpen(false)}
         handleConfirmDelete={handleConfirmDelete}
@@ -313,6 +317,17 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         closeModal={() => setIsBlockModalOpen(false)}
       />
       {/* Report modal */}
+      {option.creator && 
+        <ReportModal
+          show={isReportModalOpen}
+          reportedDisplayname={getDisplayname(option.creator)}
+          onSubmit={async ({reason, message}) => {
+            await reportEventOption(option.id, reason, message);
+            setIsReportModalOpen(false);
+          }}
+          onClose={()=>{setIsReportModalOpen(false)}}
+        />
+      }
     </>
   );
 };

@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -14,10 +14,12 @@ import InlineSVG from '../InlineSVG';
 import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
+import { reportMessage } from '../../../api/endpoints/report';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const CommentEllipseMenu = dynamic(() => import('../../molecules/decision/CommentEllipseMenu'));
 const CommentEllipseModal = dynamic(() => import('../../molecules/decision/CommentEllipseModal'));
-const ReportUserModal = dynamic(() => import('../../molecules/chat/ReportUserModal'));
+const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 const DeleteCommentModal = dynamic(() => import('../../molecules/decision/DeleteCommentModal'));
 
 interface IComment {
@@ -43,6 +45,7 @@ const Comment: React.FC<IComment> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [confirmDeleteComment, setConfirmDeleteComment] = useState<boolean>(false);
 
@@ -59,9 +62,9 @@ const Comment: React.FC<IComment> = ({
     comment.replies ?? []
   ), [comment.replies]);
 
-  const onUserReport = () => {
+  const onUserReport = useCallback(() => {
     setConfirmReportUser(true);
-  };
+  }, []);
 
   const onDeleteComment = () => {
     setConfirmDeleteComment(true);
@@ -182,11 +185,6 @@ const Comment: React.FC<IComment> = ({
           )}
           {!lastChild && <SSeparator />}
         </SCommentContent>
-        <ReportUserModal
-          confirmReportUser={confirmReportUser}
-          user={comment.sender!!}
-          closeModal={() => setConfirmReportUser(false)}
-        />
         <DeleteCommentModal
           isVisible={confirmDeleteComment}
           closeModal={() => setConfirmDeleteComment(false)}
@@ -207,6 +205,17 @@ const Comment: React.FC<IComment> = ({
           onDeleteComment={onDeleteComment}
         />
       ) : null}
+      {!comment.isDeleted && comment.sender && (
+        <ReportModal
+          show={confirmReportUser}
+          reportedDisplayname={getDisplayname(comment.sender)}
+          onClose={() => setConfirmReportUser(false)}
+          onSubmit={async ({reason, message})=>{
+            reportMessage(comment.id, reason, message);
+            setConfirmReportUser(false);
+          }}
+        />
+      )}
     </>
   );
 };
