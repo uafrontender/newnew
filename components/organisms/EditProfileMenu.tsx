@@ -653,8 +653,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Check fields validity
   useEffect(() => {
-    const isUsernameValid = dataInEdit.username.length >= 8
-      && dataInEdit.username.length <= 15
+    const isUsernameValid = dataInEdit.username.length >= 2
+      && dataInEdit.username.length <= 25
       && validator.isAlphanumeric(dataInEdit.username)
       && validator.isLowercase(dataInEdit.username);
     const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
@@ -681,8 +681,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (Object.values(formErrors).some((v) => v !== '')) {
       setIsDataValid(false);
     } else {
-      const isUsernameValid = dataInEdit.username.length >= 8
-        && dataInEdit.username.length <= 15
+      const isUsernameValid = dataInEdit.username.length >= 2
+        && dataInEdit.username.length <= 25
         && validator.isAlphanumeric(dataInEdit.username)
         && validator.isLowercase(dataInEdit.username);
       const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
@@ -776,7 +776,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                         {
                           text: t('EditProfileMenu.inputs.username.points.1'),
                           isValid: dataInEdit.username ? (
-                            dataInEdit.username.length >= 8 && dataInEdit.username.length <= 15
+                            dataInEdit.username.length >= 2 && dataInEdit.username.length <= 25
                           ) : false,
                         },
                         {

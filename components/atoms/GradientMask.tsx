@@ -30,7 +30,7 @@ const SGradientMask = styled.div<IGradientMask>`
   }};
   left: 0;
   right: 0;
-  width: calc(100% - 5px);
+  width: calc(100%);
   height: ${(props) => (props.active ? '40px' : 0)};
   z-index: 1;
   position: absolute;

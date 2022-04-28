@@ -10,6 +10,7 @@ import { AnimatePresence } from 'framer-motion';
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
 import Logo from '../molecules/Logo';
+import HeroVisual from './HeroVisual';
 import Container from '../atoms/Grid/Container';
 import ErrorBoundary from '../organisms/ErrorBoundary';
 
@@ -20,14 +21,12 @@ import BottomGlassSphereImage from '../../public/images/signup/floating-assets/B
 import BottomSphereImage from '../../public/images/signup/floating-assets/Bottom-Sphere.png';
 import CrowdfundingImage from '../../public/images/signup/floating-assets/Crowdfunding.png';
 import LeftGlassSphereImage from '../../public/images/signup/floating-assets/Left-Glass-Sphere.png';
-// import BulbImage from '../../public/images/signup/floating-assets/Light-Bulb.png';
 import BulbImage from '../../public/images/signup/floating-assets/Sub-MC.webp';
 import ChoiceImage from '../../public/images/signup/floating-assets/Multiple-Choice.png';
 import RightGlassSphereImage from '../../public/images/signup/floating-assets/Right-Glass-Sphere.png';
 import TopGlassSphereImage from '../../public/images/signup/floating-assets/Top-Glass-Sphere.png';
 import TopMiddleSphereImage from '../../public/images/signup/floating-assets/Top-Middle-Sphere.png';
 import VotesImage from '../../public/images/signup/floating-assets/Votes.png';
-import HeroVisual from './HeroVisual';
 
 export const AuthLayoutContext = createContext({
   shouldHeroUnmount: false,
