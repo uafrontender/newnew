@@ -265,7 +265,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
       {/* Report modal */}
       <ReportModal
         show={isReportModalOpen}
-        reportedEntity={option.creator?.username!}
+        reportedDisplayname={getDisplayname(option.creator!)}
         onSubmit={async ({reason, message}) => {
           await reportSuperpollOption(option.id, reason, message);
           setIsReportModalOpen(false);

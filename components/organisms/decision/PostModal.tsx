@@ -747,7 +747,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         </Modal>
         <ReportModal
             show={reportPostOpen}
-            reportedEntity='post'
+            reportedDisplayname={getDisplayname(postParsed?.creator!)}
             onSubmit={async ({reason, message}) => {
               if (postParsed) {
                 await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));
@@ -884,7 +884,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       </Modal>
       <ReportModal
           show={reportPostOpen}
-          reportedEntity='post'
+          reportedDisplayname={getDisplayname(postParsed?.creator!)}
           onSubmit={async ({reason, message}) => {
             if (postParsed) {
               await reportPost(postParsed.postUuid, reason, message).catch(e=> console.error(e));

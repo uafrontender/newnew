@@ -27,10 +27,12 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 import BlockUserModalPost from '../../BlockUserModalPost';
 import { reportEventOption } from '../../../../../api/endpoints/report';
 import ReportModal from '../../../chat/ReportModal';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -317,7 +319,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
       {/* Report modal */}
       <ReportModal
         show={isReportModalOpen}
-        reportedEntity={option.creator?.username!}
+        reportedDisplayname={getDisplayname(option.creator!)}
         onSubmit={async ({reason, message}) => {
           await reportEventOption(option.id, reason, message);
           setIsReportModalOpen(false);

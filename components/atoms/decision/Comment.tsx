@@ -15,6 +15,7 @@ import UserAvatar from '../../molecules/UserAvatar';
 import CommentForm from './CommentForm';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { reportMessage } from '../../../api/endpoints/report';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const CommentEllipseMenu = dynamic(() => import('../../molecules/decision/CommentEllipseMenu'));
 const CommentEllipseModal = dynamic(() => import('../../molecules/decision/CommentEllipseModal'));
@@ -206,7 +207,7 @@ const Comment: React.FC<IComment> = ({
       ) : null}
       <ReportModal
         show={confirmReportUser}
-        reportedEntity={comment.sender?.username!}
+        reportedDisplayname={getDisplayname(comment.sender!)}
         onClose={() => setConfirmReportUser(false)}
         onSubmit={async ({reason, message})=>{
           reportMessage(comment.id, reason, message);

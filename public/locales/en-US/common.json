@@ -63,17 +63,17 @@
   "modal": {
     "report-user": {
       "title": "Report",
-      "subtitle": "Help us understand the problem. Please select a reason.",
+      "subtitle": "Help us understand so that we can investigate...",
       "options": {
         "spam": "Suspicious or spam",
         "abuse": "Abusive or harmful",
         "suicide": "Expresses intentions of self-harm or suicide",
         "hate-speech": "Hate speech",
-        "harrasment": "Harrasment or bullying"
+        "harrasment": "Harrasment or bullying",
+        "other": "Other"
       },
       "additional-info": {
-        "label": "Additional info (optional)",
-        "placeholder": "Tell us more about the problem"
+        "placeholder": "Please tell us a bit more..."
       },
       "button-cancel": "Cancel",
       "button-confirm": "Report user",

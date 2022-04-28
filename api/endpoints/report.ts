@@ -40,20 +40,6 @@ export const reportPost = (postId: string, reason: newnewapi.ReportingReason, me
   return reportContent(payload);
 };
 
-export const reportPostResponse = (postId: string, reason: newnewapi.ReportingReason, message:string) => {
-  const payload = new newnewapi.ReportContentRequest({
-    reason,
-    message,
-    content: {
-      postResponse: {
-        postUuid: postId,
-      }
-    }
-  });
-
-  return reportContent(payload);
-};
-
 export const reportEventOption = (optionId: number | Long, reason: newnewapi.ReportingReason, message:string) => {
   const payload = new newnewapi.ReportContentRequest({
     reason,

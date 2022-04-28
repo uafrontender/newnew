@@ -25,6 +25,7 @@ import { markUser } from '../../../api/endpoints/user';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
+import getDisplayname from '../../../utils/getDisplayname';
 
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
@@ -487,7 +488,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
           <ReportModal
             show={confirmReportUser}
-            reportedEntity={chatRoom && chatRoom.visavis?.nickname!! ||''}
+            reportedDisplayname={getDisplayname(chatRoom?.visavis!)}
             onClose={() => setConfirmReportUser(false)}
             onSubmit={async ({reason, message})=>{
               if(chatRoom?.visavis?.uuid){

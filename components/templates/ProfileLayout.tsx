@@ -538,7 +538,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       />
       <ReportModal
         show={confirmReportUser}
-        reportedEntity={currentUser.userData?.username || ''}
+        reportedDisplayname={currentUser.userData?.nickname || `@${currentUser.userData?.username}`}
         onClose={() => setConfirmReportUser(false)}
         onSubmit={async ({reason, message}) => {
           if(currentUser.userData?.userUuid) {

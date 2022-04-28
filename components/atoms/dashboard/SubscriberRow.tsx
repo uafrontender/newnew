@@ -15,6 +15,7 @@ import ReportModal from '../../molecules/chat/ReportModal';
 import BlockUserModal from '../../molecules/chat/BlockUserModal';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ISubscriberRow {
   subscriber: newnewapi.ISubscriber;
@@ -99,7 +100,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         />
           <ReportModal
             show={confirmReportUser}
-            reportedEntity={subscriber.user?.username!}
+            reportedDisplayname={getDisplayname(subscriber.user!)}
             onClose={() => setConfirmReportUser(false)}
             onSubmit={async ({reason, message}) => {
               if (subscriber.user?.uuid) {

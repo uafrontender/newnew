@@ -16,12 +16,12 @@ interface ReportData {
 
 interface IReportModal {
   show: boolean;
-  reportedEntity: string;
+  reportedDisplayname: string;
   onSubmit: (reportData: ReportData ) => void
   onClose: () => void;
 }
 
-const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, onSubmit }) => {
+const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClose, onSubmit }) => {
   const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
@@ -31,6 +31,7 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
 
   const disabled = reason === null || message.length < 15;
 
+  // TODO: change newnewapi.ReportingReason s once API changes are done
   const reportTypes = useMemo(
     () => [
       {
@@ -43,7 +44,7 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
       },
       {
         // TODO: change
-        id: newnewapi.ReportingReason.OTHER,
+        id: newnewapi.ReportingReason.DRUGS_AND_WEAPONS,
         title: t('modal.report-user.options.suicide'),
       },
       {
@@ -53,6 +54,10 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
       {
         id: newnewapi.ReportingReason.BULLYING,
         title: t('modal.report-user.options.harrasment'),
+      },
+      {
+        id: newnewapi.ReportingReason.OTHER,
+        title: t('modal.report-user.options.other'),
       },
     ],
     [t]
@@ -87,7 +92,7 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
           <SModalHeader>
             {isMobile && <GoBackButton onClick={onClose} />}
             <SModalTitle>
-              {t('modal.report-user.title')} {reportedEntity}
+              {t('modal.report-user.title')} {reportedDisplayname}
             </SModalTitle>
           </SModalHeader>
           <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
@@ -105,7 +110,6 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedEntity, onClose, on
           </SCheckBoxList>
           <STextAreaWrapper>
             <STextAreaTitle>
-              <label htmlFor="report-additional-info">{t('modal.report-user.additional-info.label')}</label>
               <span>
                 {message ? message.length : 0}/{reportMaxLength}
               </span>
@@ -264,7 +268,7 @@ const STextAreaWrapper = styled.div`
 const STextAreaTitle = styled.div`
   margin-bottom: 10px;
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   font-size: 12px;
   font-weight: 600;
