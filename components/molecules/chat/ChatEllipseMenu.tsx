@@ -68,7 +68,7 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
+            <Text variant={2} tone='error'>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
             {!isAnnouncement ? (
@@ -120,9 +120,11 @@ const SButton = styled.button`
   padding: 8px;
   box-sizing: border-box;
   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
+
   &:focus {
     outline: none;
   }
+
   &:hover {
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }

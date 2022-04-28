@@ -34,7 +34,7 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
             {t('DeletePostModal.body', { postType: t(`postType.${postType}`) })}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>
+            <SCancelButton onClick={closeModal}>
               {t('DeletePostModal.cancelBtn')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>

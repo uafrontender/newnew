@@ -14,6 +14,7 @@ interface IPostEllipseModal {
   zIndex: number;
   handleFollowDecision: () => void;
   handleToggleFollowingCreator: () => void;
+  handleReportOpen: () => void;
   onClose: () => void;
 }
 
@@ -25,6 +26,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
   zIndex,
   handleFollowDecision,
   handleToggleFollowingCreator,
+  handleReportOpen,
   onClose,
 }) => {
   const { t } = useTranslation('decision');
@@ -65,10 +67,14 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
           </SButton>
           <SSeparator />
           <SButton
-            onClick={() => {}}
+            onClick={() => {
+              handleReportOpen();
+              onClose();
+            }}
           >
             <Text
               variant={3}
+              tone='error'
             >
               { t('ellipse.report') }
             </Text>
@@ -80,6 +86,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={() => onClose()}
         >
           {t('Cancel')}
         </Button>
@@ -116,6 +123,8 @@ const SContentContainer = styled.div`
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;

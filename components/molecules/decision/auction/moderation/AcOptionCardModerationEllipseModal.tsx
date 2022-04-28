@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import Button from '../../../../atoms/Button';
 import Modal from '../../../../organisms/Modal';
+import Text from '../../../../atoms/Text';
 
 interface IAcOptionCardModerationEllipseModal {
   isOpen: boolean;
@@ -46,7 +47,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
               onClose();
             }}
           >
-            { t('AcPostModeration.OptionsTab.OptionCard.ellipse.report') }
+             <Text variant={2} tone='error'>{ t('AcPostModeration.OptionsTab.OptionCard.ellipse.report') }</Text>
           </SButton>
           <SButton
             view="secondary"
@@ -55,7 +56,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
               onClose();
             }}
           >
-            { t('AcPostModeration.OptionsTab.OptionCard.ellipse.block') }
+            <Text variant={2}>{ t('AcPostModeration.OptionsTab.OptionCard.ellipse.block') }</Text>
           </SButton>
           <SButton
             view="secondary"
@@ -65,7 +66,7 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
               onClose();
             }}
           >
-            { t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove') }
+            <Text variant={2}>{ t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove') }</Text>
           </SButton>
         </SContentContainer>
         <Button
@@ -74,8 +75,9 @@ const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardM
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={()=> onClose()}
         >
-          { t('ellipse.cancel') }
+          <Text variant={2}>{ t('ellipse.cancel') }</Text>
         </Button>
       </SWrapper>
     </Modal>
@@ -102,6 +104,7 @@ const SContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
@@ -109,7 +112,6 @@ const SContentContainer = styled.div`
     margin: auto;
   }
 `;
-
 
 const SButton = styled(Button)`
   border: transparent;

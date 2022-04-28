@@ -56,7 +56,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
             </>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
+            <Text variant={2} tone='error'>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
           </SButton>
           <SSeparator />
           <SButton onClick={blockUserHandler}>
@@ -73,6 +73,7 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={onClose}
         >
           {t('Cancel')}
         </Button>
@@ -111,6 +112,8 @@ const SContentContainer = styled.div`
     props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
