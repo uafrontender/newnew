@@ -37,7 +37,7 @@ import isBrowser from '../../../utils/isBrowser';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import CfBackersStatsSectionModerationFailed from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
@@ -359,10 +359,10 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -470,8 +470,9 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       </SActivitesContainer>
       <HeroPopup
         isPopupVisible={
+          user!!.userTutorialsProgressSynced &&
           user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-          newnewapi.CfTutorialStep.CF_HERO
+            newnewapi.CfTutorialStep.CF_HERO
         }
         postType="CF"
         closeModal={goToNextStep}

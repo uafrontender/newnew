@@ -37,7 +37,7 @@ import { formatNumber } from '../../../../utils/format';
 import AcIcon from '../../../../public/images/creation/AC-static.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -304,10 +304,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   // eslint-disable-next-line consistent-return
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
 
     dispatch(
@@ -559,11 +559,12 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${supportBidAmount}`}
-          {...(
-            walletBalance?.usdCents && walletBalance.usdCents >= parseInt(supportBidAmount) * 100 ? {} : {
-              predefinedOption: 'card'
-            }
-          )}
+          {...(walletBalance?.usdCents &&
+          walletBalance.usdCents >= parseInt(supportBidAmount) * 100
+            ? {}
+            : {
+                predefinedOption: 'card',
+              })}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
