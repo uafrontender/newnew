@@ -154,7 +154,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = (
               {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
             </span>
             {' '}
-            { t('McPost.PostTopInfo.votes') }
+            { totalVotes > 1 ? t('McPost.PostTopInfo.votes') : t('McPost.PostTopInfo.vote') }
           </SBidsAmount>
         ) : null}
         <SActionsDiv>
