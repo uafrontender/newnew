@@ -12,7 +12,10 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { doFreeVote, voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+import {
+  doFreeVote,
+  voteOnPostWithWallet,
+} from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
   getTopUpWalletWithPaymentPurposeUrl,
@@ -39,7 +42,7 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
-import { setTutorialStatus } from '../../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -357,8 +360,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
       handleResetFreeVote();
       handleSetPaymentSuccesModalOpen(true);
     } catch (err) {
-     console.error(err);
-     setLoadingModalOpen(false);
+      console.error(err);
+      setLoadingModalOpen(false);
     }
   }, [
     postId,
@@ -370,10 +373,10 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   ]);
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -463,15 +466,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 }}
               >
                 <div>
-                  {
-                    canVoteForFree ? (
-                      t('McPost.OptionsTab.OptionCard.freeVoteBtn')
-                    ) : (
-                      isBlue
-                      ? t('McPost.OptionsTab.OptionCard.supportAgainBtn')
-                      : t('McPost.OptionsTab.OptionCard.raiseBidBtn')
-                    )
-                  }
+                  {canVoteForFree
+                    ? t('McPost.OptionsTab.OptionCard.freeVoteBtn')
+                    : isBlue
+                    ? t('McPost.OptionsTab.OptionCard.supportAgainBtn')
+                    : t('McPost.OptionsTab.OptionCard.raiseBidBtn')}
                 </div>
               </SSupportButton>
               {index === 0 && (
@@ -503,21 +502,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                       setUseFreeVoteModalOpen(true);
                       e.stopPropagation();
                     } else {
-                      setSelectVotesMenuTop(e.clientY)
+                      setSelectVotesMenuTop(e.clientY);
                       handleOpenSupportForm();
                     }
                   }
                 }}
               >
-                  {
-                    canVoteForFree ? (
-                      t('McPost.OptionsTab.OptionCard.freeVoteBtn')
-                    ) : (
-                      !isBlue
-                      ? t('McPost.OptionsTab.OptionCard.supportBtn')
-                      : t('McPost.OptionsTab.OptionCard.supportAgainBtn')
-                    )
-                  }
+                {canVoteForFree
+                  ? t('McPost.OptionsTab.OptionCard.freeVoteBtn')
+                  : !isBlue
+                  ? t('McPost.OptionsTab.OptionCard.supportBtn')
+                  : t('McPost.OptionsTab.OptionCard.supportAgainBtn')}
               </SSupportButtonDesktop>
               {index === 0 && (
                 <STutorialTooltipHolder>
@@ -567,11 +562,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             showTocApply={!user?.loggedIn}
             isOpen={paymentModalOpen}
             amount={`$${parseInt(supportBidAmount) * votePrice}`}
-            {...(
-              walletBalance?.usdCents && walletBalance.usdCents >= parseInt(supportBidAmount) * votePrice * 100 ? {} : {
-                predefinedOption: 'card'
-              }
-            )}
+            {...(walletBalance?.usdCents &&
+            walletBalance.usdCents >=
+              parseInt(supportBidAmount) * votePrice * 100
+              ? {}
+              : {
+                  predefinedOption: 'card',
+                })}
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             handlePayWithWallet={handlePayWithWallet}
@@ -1019,19 +1016,19 @@ const SSupportButton = styled(Button)<{
 
   ${({ isBlue }) =>
     isBlue
-    ? css`
-      color: ${({ theme }) => theme.colors.dark};
-      background: #FFFFFF;
-    ` : null
-  }
+      ? css`
+          color: ${({ theme }) => theme.colors.dark};
+          background: #ffffff;
+        `
+      : null}
 
-  ${({ canVoteForFree }) => (
+  ${({ canVoteForFree }) =>
     canVoteForFree
-    ? css`
-      color: ${({ theme }) => theme.colors.dark};
-      background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-    ` : null
-  )}
+      ? css`
+          color: ${({ theme }) => theme.colors.dark};
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+        `
+      : null}
 `;
 
 const SSupportButtonDesktop = styled(Button)<{
@@ -1077,19 +1074,19 @@ const SSupportButtonDesktop = styled(Button)<{
 
   ${({ active }) =>
     active
-    ? css`
-      color: ${({ theme }) => theme.colors.dark};
-      background: #FFFFFF;
-    ` : null
-  }
+      ? css`
+          color: ${({ theme }) => theme.colors.dark};
+          background: #ffffff;
+        `
+      : null}
 
-  ${({ canVoteForFree }) => (
+  ${({ canVoteForFree }) =>
     canVoteForFree
-    ? css`
-      color: ${({ theme }) => theme.colors.dark};
-      background: ${({ theme }) => theme.colorsThemed.accent.yellow};
-    ` : null
-  )}
+      ? css`
+          color: ${({ theme }) => theme.colors.dark};
+          background: ${({ theme }) => theme.colorsThemed.accent.yellow};
+        `
+      : null}
 `;
 
 // Select votes mobile card
