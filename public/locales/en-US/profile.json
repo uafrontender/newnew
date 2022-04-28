@@ -90,7 +90,7 @@
           "linksForbidden": "Links not allowed"
         },
         "points": {
-          "1": "8-15 characters length",
+          "1": "2-25 characters length",
           "2": "Lower case only",
           "3": "No space and special characters"
         }

@@ -266,6 +266,9 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 10px)`};
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
 
     // Scrollbar
     &::-webkit-scrollbar {
