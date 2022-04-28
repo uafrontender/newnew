@@ -13,6 +13,12 @@
       "message-second-part": "?",
       "button-cancel": "Cancel",
       "button-confirm": "Block user"
+    },
+    "delete-my-account": {
+      "title": "Delete account",
+      "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "button-confirm": "Confirm and delete",
+      "button-cancel": "Cancel"
     }
   },
   "tabs": {
@@ -186,7 +192,7 @@
           "no_blocked_users": "No blocked users"
         },
         "closeAccount": {
-          "title": "Close account",
+          "title": "Delete my account",
           "caption": "Delete your account and account data.",
           "closeBtn": "Delete"
         }

@@ -46,7 +46,7 @@ import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateS
 import TutorialTooltip, {
   DotPositionEnum,
 } from '../../atoms/decision/TutorialTooltip';
-import { setTutorialStatus } from '../../../api/endpoints/user';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -124,10 +124,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
 
   const goToNextStep = () => {
     if (user.loggedIn) {
-      const payload = new newnewapi.SetTutorialStatusRequest({
-        cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![1],
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
       });
-      setTutorialStatus(payload);
+      markTutorialStepAsCompleted(payload);
     }
     dispatch(
       setUserTutorialsProgress({
@@ -139,12 +139,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   };
 
   useEffect(() => {
-    if (
-      user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-      newnewapi.CfTutorialStep.CF_GO
-    ) {
-      goToNextStep();
-    }
     const handleHashChange = () => {
       const { hash } = window.location;
       if (!hash) {
@@ -779,8 +773,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       ) : null}
       <HeroPopup
         isPopupVisible={
+          user!!.userTutorialsProgressSynced &&
           user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-          newnewapi.CfTutorialStep.CF_HERO
+            newnewapi.CfTutorialStep.CF_HERO
         }
         postType="CF"
         closeModal={goToNextStep}
