@@ -50,6 +50,7 @@ const AcOptionCardModerationEllipseMenu: React.FunctionComponent<IAcOptionCardMo
           >
             <Text
               variant={3}
+              tone='error'
             >
               { t('AcPostModeration.OptionsTab.OptionCard.ellipse.report') }
             </Text>
