@@ -9,11 +9,13 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import InlineSVG from '../InlineSVG';
-import ChatEllipseMenu from './ChatEllipseMenu';
+import SubscriberEllipseMenu from './SubscriberEllipseMenu';
 import { markUser } from '../../../api/endpoints/user';
-import ReportUserModal from '../../molecules/chat/ReportUserModal';
+import ReportModal from '../../molecules/chat/ReportModal';
 import BlockUserModal from '../../molecules/chat/BlockUserModal';
 import { useAppSelector } from '../../../redux-store/store';
+import { reportUser } from '../../../api/endpoints/report';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface ISubscriberRow {
   subscriber: newnewapi.ISubscriber;
@@ -88,7 +90,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
           <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
         </SMoreButton>
-        <ChatEllipseMenu
+        <SubscriberEllipseMenu
           user={subscriber.user!!}
           isVisible={ellipseMenuOpen}
           handleClose={handleCloseEllipseMenu}
@@ -96,13 +98,19 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           onUserBlock={onUserBlock}
           onUserReport={onUserReport}
         />
-        {confirmReportUser && (
-          <ReportUserModal
-            confirmReportUser={confirmReportUser}
-            user={subscriber.user!!}
-            closeModal={() => setConfirmReportUser(false)}
+        {subscriber.user && 
+          <ReportModal
+            show={confirmReportUser}
+            reportedDisplayname={getDisplayname(subscriber.user)}
+            onClose={() => setConfirmReportUser(false)}
+            onSubmit={async ({reason, message}) => {
+              if (subscriber.user?.uuid) {
+               await reportUser(subscriber.user.uuid, reason, message)
+              }
+              setConfirmReportUser(false)
+            }}
           />
-        )}
+          }
         {isSubscriberBlocked === true ||
           (confirmBlockUser && (
             <BlockUserModal

@@ -56,6 +56,7 @@ interface IPostTopInfo {
   amountInBids?: number;
   hasResponse: boolean;
   hasWinner: boolean;
+  handleReportOpen: ()=>void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -72,6 +73,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   hasResponse,
   hasWinner,
   totalVotes,
+  handleReportOpen,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -119,6 +121,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+  const [reportPostOpen, setReportPostOpen] = useState(false);
 
   const handleRedirectToUser = () => {
     window?.history.replaceState({
@@ -277,7 +280,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
               handleToggleFollowingCreator={handleToggleFollowingCreator}
-              handleClose={handleCloseEllipseMenu}
+              handleReportOpen={handleReportOpen}
+              onClose={handleCloseEllipseMenu}
             />
           )}
           {isMobile && ellipseMenuOpen ? (
@@ -289,6 +293,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               isOpen={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
               handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
             />
           ) : null}

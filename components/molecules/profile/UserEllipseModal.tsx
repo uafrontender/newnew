@@ -46,7 +46,6 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
     onClose();
   };
 
-
   return (
     <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
       <SWrapper>
@@ -61,7 +60,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('ellipse.report')}</Text>
+            <Text variant={2} tone='error'>{t('ellipse.report')}</Text>
           </SButton>
           {loggedIn && (
             <SButton onClick={blockHandler}>
@@ -75,6 +74,7 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={onClose}
         >
           {t('Cancel')}
         </Button>
@@ -108,6 +108,8 @@ const SContentContainer = styled.div`
     props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;

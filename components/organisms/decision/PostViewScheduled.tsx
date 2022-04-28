@@ -24,6 +24,7 @@ interface IPostViewScheduled {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
@@ -32,6 +33,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
@@ -140,6 +142,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
         hasResponse={false}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
         startsAtSeconds={post.startsAt?.seconds as number}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer>
         <PostScheduledSection

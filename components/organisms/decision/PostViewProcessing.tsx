@@ -25,6 +25,7 @@ interface IPostViewProcessing {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
@@ -32,6 +33,7 @@ const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
@@ -120,6 +122,7 @@ const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
         hasResponse={false}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
         startsAtSeconds={post.startsAt?.seconds as number}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer>
         <SAnimationContainer>

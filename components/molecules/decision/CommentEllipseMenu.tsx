@@ -58,7 +58,7 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
           )}
           {!isMyComment && (
             <SButton onClick={reportUserHandler}>
-              <Text variant={2}>{t('comments.report')}</Text>
+              <Text variant={2} tone='error'>{t('comments.report')}</Text>
             </SButton>
           )}
         </SContainer>
