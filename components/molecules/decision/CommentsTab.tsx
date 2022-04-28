@@ -590,6 +590,10 @@ const SActionSection = styled.div`
 
   overflow-y: auto;
 
+  padding-right: 12px;
+  margin-right: -14px;
+  width: calc(100% + 14px);
+
   // Scrollbar
   &::-webkit-scrollbar {
     width: 4px;

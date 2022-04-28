@@ -757,8 +757,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                       {
                         text: t('DetailsSection.form.username.points.1'),
                         isValid: usernameInEdit
-                          ? usernameInEdit.length >= 8 &&
-                            usernameInEdit.length <= 15
+                          ? usernameInEdit.length >= 2 &&
+                            usernameInEdit.length <= 25
                           : false,
                       },
                       {
