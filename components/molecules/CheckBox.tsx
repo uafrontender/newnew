@@ -14,18 +14,15 @@ interface ICheckBox {
 }
 
 export const CheckBox: React.FC<ICheckBox> = (props) => {
-  const {
-    id,
-    label,
-    selected,
-    handleChange,
-    ...rest
-  } = props;
+  const { id, label, selected, handleChange, ...rest } = props;
   const ref: any = useRef();
 
-  const onClick = useCallback((e) => {
-    handleChange(e, id);
-  }, [id, handleChange]);
+  const onClick = useCallback(
+    (e) => {
+      handleChange(e, id);
+    },
+    [id, handleChange]
+  );
 
   useEffect(() => {
     ref.current.anim.stop();
@@ -39,10 +36,7 @@ export const CheckBox: React.FC<ICheckBox> = (props) => {
   }, [ref, selected]);
 
   return (
-    <SWrapper
-      onClick={onClick}
-      {...rest}
-    >
+    <SWrapper onClick={onClick} {...rest}>
       <SAnimation>
         <Lottie
           ref={ref}

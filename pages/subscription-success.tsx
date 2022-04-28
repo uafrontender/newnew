@@ -33,11 +33,6 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId })
 
         if (res.data?.status?.activeRenewsAt) {
           console.log('Subscribed! Redirecting to chat');
-
-          // create chat room
-          // const payload = new newnewapi.CreateRoomRequest({ kind: 1, memberUuids: [userId] });
-          // await createRoom(payload);
-
           // I think we should not check is room created or not at this point
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');

@@ -217,7 +217,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
         )}
         {postStatus === 'succeeded' && (
           <PostSuccessBox
-            title={t('PostSuccess.title')}
+            title={t('PostSuccess.title', { postType: t(`postType.mc`) })}
             body={t('PostSuccess.body')}
             buttonCaption={t('PostSuccess.ctaButton')}
             style={{

@@ -1,12 +1,34 @@
 {
+  "subscribed-tag": "SUBSCRIBED",
+  "ellipse": {
+    "unsub": "Unsubscribe",
+    "report": "Report",
+    "block": "Block",
+    "unblock": "Unblock"
+  },
+  "modal": {
+    "block-user": {
+      "title": "Block user",
+      "message-first-part": "Do you really want to block",
+      "message-second-part": "?",
+      "button-cancel": "Cancel",
+      "button-confirm": "Block user"
+    },
+    "delete-my-account": {
+      "title": "Delete account",
+      "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "button-confirm": "Confirm and delete",
+      "button-cancel": "Cancel"
+    }
+  },
   "tabs": {
-    "activelyBidding": "Actively bidding on",
-    "purchases": "My purchases",
-    "viewHistory": "My view history",
-    "subscriptions": "My subscriptions",
+    "activelyBidding": "Active",
+    "purchases": "Purchases",
+    "viewHistory": "Viewing history",
+    "subscriptions": "Subscriptions",
     "myposts": "My posts",
-    "favorites": "My favorites",
-    "userInitial": "Creator’s decisions",
+    "favorites": "Favorites",
+    "userInitial": "Creator's decisions",
     "activity": "Activity"
   },
   "posts-filter": {
@@ -17,7 +39,7 @@
     "filter-2": "Crowdfunding",
     "filter-3": "Multiple choices"
   },
-  "AccountPrivate": "User preferred to hide their activity",
+  "AccountPrivate": "{{username}}'s activity is private",
   "ProfileLayout": {
     "headerButtons": {
       "edit": "Edit Profile",
@@ -26,7 +48,8 @@
     "buttons": {
       "favorites": "Favorites",
       "more": "More",
-      "sendMessage": "Send message"
+      "sendMessage": "Send message",
+      "copied": "Link copied!"
     }
   },
   "EditProfileMenu": {
@@ -43,7 +66,7 @@
         "changeCoverImage": "Change cover image"
       },
       "nickname": {
-        "placeholder": "Nickname",
+        "placeholder": "Display name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Name is too long",
@@ -55,7 +78,8 @@
       },
       "username": {
         "placeholder": "@username",
-        "frequencyCaption": "Username can be changed once a month.",
+        "frequencyCaption": "{{domain}}{{username}}",
+        "cannotBeChangedCaption": "Username can be changed once a month.",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Username is too long",
@@ -128,7 +152,7 @@
           },
           "captions": {
             "twoTimesOnly": "Birthdate can be changed 2 times only.",
-            "cannotChange": "You can’t change birthdate."
+            "cannotChange": "You can only change this once"
           },
           "saveBtn": "Save",
           "cancelBtn": "Cancel"
@@ -164,10 +188,11 @@
         },
         "blockedusers": {
           "title": "Blocked uses",
-          "unblockBtn": "Unblock"
+          "unblockBtn": "Unblock",
+          "no_blocked_users": "No blocked users"
         },
         "closeAccount": {
-          "title": "Close account",
+          "title": "Delete my account",
           "caption": "Delete your account and account data.",
           "closeBtn": "Delete"
         }

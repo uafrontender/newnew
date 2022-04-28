@@ -21,12 +21,14 @@ import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import Button from '../../atoms/Button';
 
 interface IPostScheduledSection {
+  postType: string;
   timestampSeconds: number;
   isFollowing: boolean;
   handleFollowDecision: () => {};
 }
 
 const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
+  postType,
   timestampSeconds,
   isFollowing,
   handleFollowDecision,
@@ -76,7 +78,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
         <SSubtitle1
           variant={2}
         >
-          { t('PostScheduled.PostScheduledSection.subtitle_1') }
+          { t('PostScheduled.PostScheduledSection.subtitle_1', { postType: t(`postType.${postType}`) })}
         </SSubtitle1>
         <SSubtitle2
           variant={2}
@@ -135,9 +137,9 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
         onClick={() => handleFollowDecision()}
       >
         {!isFollowing ? (
-          t('PostScheduled.PostScheduledSection.followBtn')
+          t('PostScheduled.PostScheduledSection.followBtn', { postType: t(`postType.${postType}`) })
         ) : (
-          t('PostScheduled.PostScheduledSection.unfollowBtn')
+          t('PostScheduled.PostScheduledSection.unfollowBtn', { postType: t(`postType.${postType}`) })
         )}
       </SCTAButton>
     </SContainer>

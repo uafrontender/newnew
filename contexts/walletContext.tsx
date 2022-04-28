@@ -40,7 +40,10 @@ const WalletContextProvider: React.FC = ({ children }) => {
   // Set up initial balance
   useEffect(() => {
     async function fetchIds() {
-      if (!user.loggedIn) return;
+      if (!user.loggedIn) {
+        setWalletBalance(undefined);
+        return;
+      }
       try {
         setIsLoading(true);
 

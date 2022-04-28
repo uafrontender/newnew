@@ -225,7 +225,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
         )}
         {postStatus === 'succeeded' && (
           <PostSuccessBox
-            title={t('PostSuccess.title')}
+            title={t('PostSuccess.title', { postType: t(`postType.ac`) })}
             body={t('PostSuccess.body')}
             buttonCaption={t('PostSuccess.ctaButton')}
             style={{

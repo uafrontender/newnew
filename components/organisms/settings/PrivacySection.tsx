@@ -1,6 +1,6 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
-import React from 'react';
+import React, { useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -8,6 +8,7 @@ import Caption from '../../atoms/Caption';
 import Text from '../../atoms/Text';
 import Toggle from '../../atoms/Toggle';
 import Button from '../../atoms/Button';
+import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
 
 type TPrivacySection = {
   isSpendingHidden: boolean,
@@ -15,8 +16,7 @@ type TPrivacySection = {
   blockedUsers: Omit<newnewapi.User, 'toJSON'>[];
   handleToggleSpendingHidden: () => void;
   handleToggleAccountPrivate: () => void;
-  handleUnblockUser: () => void;
-  handleCloseAccount: () => void;
+  handleUnblockUser: (uuid: string) => void;
   // Allows handling visuals for active/inactive state
   handleSetActive: () => void;
 };
@@ -28,10 +28,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
   handleToggleSpendingHidden,
   handleToggleAccountPrivate,
   handleUnblockUser,
-  handleCloseAccount,
   handleSetActive,
 }) => {
   const { t } = useTranslation('profile');
+
+  const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] = useState(false);
 
   return (
     <SWrapper
@@ -85,6 +86,13 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         >
           { t('Settings.sections.Privacy.blockedusers.title') }
         </SBlockedUsersContainerTitle>
+        {blockedUsers.length === 0 && (
+          <Text
+            variant={3}
+          >
+            {t('Settings.sections.Privacy.blockedusers.no_blocked_users')}
+          </Text>
+        )}
         {blockedUsers && blockedUsers.map((u) => (
           <SBlockedUserCard>
             <SAvatar>
@@ -104,7 +112,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
               { u.username }
             </SUsername>
             <SUnblockButton
-              onClick={handleUnblockUser}
+              onClick={() => handleUnblockUser(u.uuid)}
               view="secondary"
             >
               { t('Settings.sections.Privacy.blockedusers.unblockBtn') }
@@ -118,17 +126,16 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         >
           { t('Settings.sections.Privacy.closeAccount.title') }
         </SHidingSubsectionTitle>
-        <SHidingSubsectionCaption
-          variant={2}
-        >
-          { t('Settings.sections.Privacy.closeAccount.caption') }
-        </SHidingSubsectionCaption>
         <SCloseAccountButton
-          onClick={handleCloseAccount}
+          onClick={() => setIsConfirmDeleteMyAccountVisible(true)}
           view="secondary"
         >
           { t('Settings.sections.Privacy.closeAccount.closeBtn') }
         </SCloseAccountButton>
+        <ConfirmDeleteAccountModal
+          isVisible={isConfirmDeleteMyAccountVisible}
+          closeModal={() => setIsConfirmDeleteMyAccountVisible(false)}
+        />
       </SCloseAccountSubsection>
     </SWrapper>
   );

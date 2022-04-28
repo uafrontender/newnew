@@ -1,4 +1,13 @@
-import React, { useRef, useMemo, useState, useEffect, useContext, useCallback } from 'react';
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-expressions */
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
@@ -25,7 +34,6 @@ import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
-import { ChannelsContext } from '../../../../contexts/channelsContext';
 import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -50,6 +58,10 @@ import {
   setCreationTargetBackerCount,
   setCreationFileUploadLoading,
   setCreationFileUploadProgress,
+  setCreationFileProcessingETA,
+  setCreationFileProcessingProgress,
+  setCreationFileProcessingError,
+  setCreationFileProcessingLoading,
 } from '../../../../redux-store/slices/creationStateSlice';
 
 import {
@@ -60,6 +72,9 @@ import {
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import HeroPopup from '../../../molecules/creation/HeroPopup';
+import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -69,731 +84,958 @@ interface ICreationSecondStepContent {}
 
 type CardType = 'ac' | 'mc' | 'cf';
 
-export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> = () => {
-  const { t: tCommon } = useTranslation();
-  const { t } = useTranslation('creation');
-  const theme = useTheme();
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const playerRef: any = useRef(null);
-  const { post, auction, fileUpload, crowdfunding, multiplechoice, videoProcessing } = useAppSelector(
-    (state) => state.creation
-  );
-  const user = useAppSelector((state) => state.user);
-  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
-  const {
-    query: { tab },
-  } = router;
-  const { mySubscribers } = useGetSubscriptions();
-  const tabs: Tab[] = useMemo(
-    () => [
-      {
-        nameToken: 'auction',
-        url: '/creation/auction',
-      },
-      {
-        nameToken: 'multiple-choice',
-        url: '/creation/multiple-choice',
-      },
-      {
-        nameToken: 'crowdfunding',
-        url: '/creation/crowdfunding',
-      },
-    ],
-    []
-  );
-  const typesOfPost: any = useMemo(
-    () => ({
-      auction: 'ac',
-      'multiple-choice': 'mc',
-      crowdfunding: 'cf',
-    }),
-    []
-  );
-  const typeOfPost: CardType = typesOfPost[tab as string];
-  const [titleError, setTitleError] = useState('');
+export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
+  () => {
+    const { t: tCommon } = useTranslation();
+    const { t } = useTranslation('creation');
+    const theme = useTheme();
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+    const playerRef: any = useRef(null);
+    const xhrRef = useRef<XMLHttpRequest>();
+    const {
+      post,
+      auction,
+      fileUpload,
+      fileProcessing,
+      crowdfunding,
+      multiplechoice,
+      videoProcessing,
+    } = useAppSelector((state) => state.creation);
+    const user = useAppSelector((state) => state.user);
+    const { resizeMode, overlay } = useAppSelector((state) => state.ui);
+    const {
+      query: { tab },
+    } = router;
+    const { mySubscribers } = useGetSubscriptions();
+    const tabs: Tab[] = useMemo(
+      () => [
+        {
+          nameToken: 'auction',
+          url: '/creation/auction',
+        },
+        {
+          nameToken: 'multiple-choice',
+          url: '/creation/multiple-choice',
+        },
+        {
+          nameToken: 'crowdfunding',
+          url: '/creation/crowdfunding',
+        },
+      ],
+      []
+    );
+    const typesOfPost: any = useMemo(
+      () => ({
+        auction: 'ac',
+        'multiple-choice': 'mc',
+        crowdfunding: 'cf',
+      }),
+      []
+    );
+    const typeOfPost: CardType = typesOfPost[tab as string];
+    const [titleError, setTitleError] = useState('');
 
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
+    const [isTutorialVisible, setIsTutorialVisible] = useState(false);
+    const [tutorialType, setTutorialType] = useState('AC');
 
-  const validateTextAPI = useCallback(
-    async (text: string, kind: newnewapi.ValidateTextRequest.Kind) => {
-      if (!text) {
-        return '';
-      }
+    // Socket
+    const socketConnection = useContext(SocketContext);
 
-      try {
-        const payload = new newnewapi.ValidateTextRequest({
-          kind,
-          text,
-        });
-
-        const res = await validateText(payload);
-
-        if (!res?.data?.status) throw new Error('An error occured');
-
-        if (res?.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-          return tCommon('error.text.badWords');
+    const validateTextAPI = useCallback(
+      async (text: string, kind: newnewapi.ValidateTextRequest.Kind) => {
+        if (!text) {
+          return '';
         }
 
-        return '';
-      } catch (err) {
-        return '';
+        try {
+          const payload = new newnewapi.ValidateTextRequest({
+            kind,
+            text,
+          });
+
+          const res = await validateText(payload);
+
+          if (!res?.data?.status) throw new Error('An error occured');
+
+          if (res?.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+            return tCommon('error.text.badWords');
+          }
+
+          return '';
+        } catch (err) {
+          return '';
+        }
+      },
+      [tCommon]
+    );
+    const validateT = useCallback(
+      async (
+        text: string,
+        min: number,
+        max: number,
+        type: newnewapi.ValidateTextRequest.Kind
+      ) => {
+        let error = minLength(tCommon, text, min);
+
+        if (!error) {
+          error = maxLength(tCommon, text, max);
+          console.log(error);
+        }
+
+        if (!error) {
+          error = await validateTextAPI(text, type);
+        }
+
+        return error;
+      },
+      [tCommon, validateTextAPI]
+    );
+    const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    const isTablet = ['tablet'].includes(resizeMode);
+    const isDesktop = !isMobile && !isTablet;
+    const optionsAreValid =
+      tab !== 'multiple-choice' ||
+      multiplechoice.choices.findIndex((item) =>
+        validateT(
+          item.text,
+          CREATION_OPTION_MIN,
+          CREATION_OPTION_MAX,
+          newnewapi.ValidateTextRequest.Kind.POST_OPTION
+        )
+      ) !== -1;
+    // const disabled =
+    //   !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
+    const disabled =
+      !!titleError ||
+      !post.title ||
+      !post.announcementVideoUrl ||
+      !optionsAreValid;
+
+    const validateTitleDebounced = useDebounce(post.title, 500);
+    const formatStartsAt = useCallback(() => {
+      const time = moment(
+        `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+        ['hh:mm a']
+      );
+
+      return moment(post.startsAt.date)
+        .hours(time.hours())
+        .minutes(time.minutes());
+    }, [post.startsAt]);
+    const formatExpiresAt = useCallback(() => {
+      const time = moment(
+        `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+        ['hh:mm a']
+      );
+      const dateValue = moment(post.startsAt.date)
+        .hours(time.hours())
+        .minutes(time.minutes());
+
+      if (post.expiresAt === '1-hour') {
+        dateValue.add(1, 'h');
+      } else if (post.expiresAt === '6-hours') {
+        dateValue.add(6, 'h');
+      } else if (post.expiresAt === '12-hours') {
+        dateValue.add(12, 'h');
+      } else if (post.expiresAt === '1-day') {
+        dateValue.add(1, 'd');
+      } else if (post.expiresAt === '3-days') {
+        dateValue.add(3, 'd');
+      } else if (post.expiresAt === '5-days') {
+        dateValue.add(5, 'd');
+      } else if (post.expiresAt === '7-days') {
+        dateValue.add(7, 'd');
       }
-    },
-    [tCommon]
-  );
-  const validateT = useCallback(
-    async (text: string, min: number, max: number, type: newnewapi.ValidateTextRequest.Kind) => {
-      let error = minLength(tCommon, text, min);
 
-      if (!error) {
-        error = maxLength(tCommon, text, max);
-        console.log(error);
+      return dateValue;
+    }, [post.expiresAt, post.startsAt]);
+    const handleSubmit = useCallback(async () => {
+      router.push(`/creation/${tab}/preview`);
+    }, [tab, router]);
+    const handleCloseClick = useCallback(() => {
+      if (router.query?.referer) {
+        router.push(router.query.referer as string);
+      } else {
+        router.push('/');
       }
-
-      if (!error) {
-        error = await validateTextAPI(text, type);
-      }
-
-      return error;
-    },
-    [tCommon, validateTextAPI]
-  );
-  const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
-  const isDesktop = !isMobile && !isTablet;
-  const optionsAreValid =
-    tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) =>
-      validateT(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX, newnewapi.ValidateTextRequest.Kind.POST_OPTION)
-    ) !== -1;
-  const disabled =
-    !!titleError || !post.title || !post.announcementVideoUrl || fileUpload.progress !== 100 || !optionsAreValid;
-
-  const validateTitleDebounced = useDebounce(post.title, 500);
-  const formatStartsAt = useCallback(() => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-
-    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
-  }, [post.startsAt]);
-  const formatExpiresAt = useCallback(() => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-    const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
-
-    if (post.expiresAt === '1-hour') {
-      dateValue.add(1, 'h');
-    } else if (post.expiresAt === '6-hours') {
-      dateValue.add(6, 'h');
-    } else if (post.expiresAt === '12-hours') {
-      dateValue.add(12, 'h');
-    } else if (post.expiresAt === '1-day') {
-      dateValue.add(1, 'd');
-    } else if (post.expiresAt === '3-days') {
-      dateValue.add(3, 'd');
-    } else if (post.expiresAt === '5-days') {
-      dateValue.add(5, 'd');
-    } else if (post.expiresAt === '7-days') {
-      dateValue.add(7, 'd');
-    }
-
-    return dateValue;
-  }, [post.expiresAt, post.startsAt]);
-  const handleSubmit = useCallback(async () => {
-    router.push(`/creation/${tab}/preview`);
-  }, [tab, router]);
-  const handleCloseClick = useCallback(() => {
-    if (router.query?.referer) {
-      router.push(router.query.referer as string);
-    } else {
-      router.push('/');
-    }
-  }, [router]);
-  const handleVideoDelete = useCallback(async () => {
-    try {
-      const payload = new newnewapi.RemoveUploadedFileRequest({
-        publicUrl: post?.announcementVideoUrl,
-      });
-
-      const res = await removeUploadedFile(payload);
-
-      if (res?.error) {
-        throw new Error(res.error?.message ?? 'An error occurred');
-      }
-
-      const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
-        taskUuid: videoProcessing?.taskUuid,
-      });
-
-      const resProcessing = await stopVideoProcessing(payloadProcessing);
-
-      if (!resProcessing.data || resProcessing.error) {
-        throw new Error(resProcessing.error?.message ?? 'An error occurred');
-      }
-
-      removeChannel(videoProcessing?.taskUuid as string);
-
-      dispatch(setCreationVideo(''));
-      dispatch(setCreationFileUploadError(false));
-      dispatch(setCreationVideoProcessing({}));
-      dispatch(setCreationFileUploadLoading(false));
-      dispatch(setCreationFileUploadProgress(0));
-    } catch (error: any) {
-      toast.error(error?.message);
-    }
-  }, [dispatch, post?.announcementVideoUrl, removeChannel, videoProcessing?.taskUuid]);
-  const handleVideoUpload = useCallback(
-    async (value) => {
+    }, [router]);
+    const handleVideoDelete = useCallback(async () => {
       try {
-        dispatch(setCreationFileUploadETA(100));
-        dispatch(setCreationFileUploadProgress(1));
-        dispatch(setCreationFileUploadLoading(true));
-        dispatch(setCreationFileUploadError(false));
-
-        const payload = new newnewapi.GetVideoUploadUrlRequest({
-          filename: value.name,
+        const payload = new newnewapi.RemoveUploadedFileRequest({
+          publicUrl: post?.announcementVideoUrl,
         });
 
-        const res = await getVideoUploadUrl(payload);
+        const res = await removeUploadedFile(payload);
 
-        if (!res.data || res.error) {
+        if (res?.error) {
           throw new Error(res.error?.message ?? 'An error occurred');
         }
 
-        const uploadResponse = await fetch(res.data.uploadUrl, {
-          method: 'PUT',
-          body: value,
-          headers: {
-            'Content-Type': value.type,
-          },
+        const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
+          taskUuid: videoProcessing?.taskUuid,
         });
 
-        if (!uploadResponse.ok) {
-          throw new Error('Upload failed');
-        }
-
-        dispatch(setCreationFileUploadProgress(5));
-        dispatch(setCreationFileUploadETA(90));
-
-        const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
-          publicUrl: res.data.publicUrl,
-        });
-
-        const resProcessing = await startVideoProcessing(payloadProcessing);
+        const resProcessing = await stopVideoProcessing(payloadProcessing);
 
         if (!resProcessing.data || resProcessing.error) {
           throw new Error(resProcessing.error?.message ?? 'An error occurred');
         }
 
-        addChannel(resProcessing.data.taskUuid, {
-          processingProgress: {
-            taskUuid: resProcessing.data.taskUuid,
-          },
-        });
-
-        dispatch(
-          setCreationVideoProcessing({
-            taskUuid: resProcessing.data.taskUuid,
-            targetUrls: {
-              thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
-              hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
-              dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
-              originalVideoUrl: resProcessing?.data?.targetUrls?.originalVideoUrl,
-              thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
-            },
-          })
-        );
-        dispatch(setCreationFileUploadProgress(10));
-        dispatch(setCreationFileUploadETA(80));
-        dispatch(setCreationVideo(res.data.publicUrl ?? ''));
-      } catch (error: any) {
-        dispatch(setCreationFileUploadError(true));
+        dispatch(setCreationVideo(''));
+        dispatch(setCreationVideoProcessing({}));
+        dispatch(setCreationFileUploadError(false));
         dispatch(setCreationFileUploadLoading(false));
+        dispatch(setCreationFileUploadProgress(0));
+        dispatch(setCreationFileProcessingError(false));
+        dispatch(setCreationFileProcessingLoading(false));
+        dispatch(setCreationFileProcessingProgress(0));
+      } catch (error: any) {
         toast.error(error?.message);
       }
-    },
-    [addChannel, dispatch]
-  );
-  const handleItemFocus = useCallback((key: string) => {
-    if (key === 'title') {
-      setTitleError('');
-    }
-  }, []);
-  const handleItemBlur = useCallback(
-    async (key: string, value: string) => {
-      if (key === 'title') {
-        setTitleError(
-          await validateT(value, CREATION_TITLE_MIN, CREATION_TITLE_MAX, newnewapi.ValidateTextRequest.Kind.POST_TITLE)
-        );
-      }
-    },
-    [validateT]
-  );
-  const handleItemChange = useCallback(
-    async (key: string, value: any) => {
-      if (key === 'title') {
-        dispatch(setCreationTitle(value));
-      } else if (key === 'minimalBid') {
-        dispatch(setCreationMinBid(value));
-      } else if (key === 'comments') {
-        dispatch(setCreationComments(value));
-      } else if (key === 'allowSuggestions') {
-        dispatch(setCreationAllowSuggestions(value));
-      } else if (key === 'expiresAt') {
-        dispatch(setCreationExpireDate(value));
-      } else if (key === 'startsAt') {
-        dispatch(setCreationStartDate(value));
-      } else if (key === 'targetBackerCount') {
-        dispatch(setCreationTargetBackerCount(value));
-      } else if (key === 'choices') {
-        dispatch(setCreationChoices(value));
-      } else if (key === 'video') {
-        if (value) {
-          await handleVideoUpload(value);
-        } else {
-          await handleVideoDelete();
-        }
-      } else if (key === 'thumbnailParameters') {
-        dispatch(setCreationVideoThumbnails(value));
-      }
-    },
-    [dispatch, handleVideoUpload, handleVideoDelete]
-  );
-  const expireOptions = useMemo(
-    () => [
-      {
-        id: '1-hour',
-        title: t('secondStep.field.expiresAt.options.1-hour'),
-      },
-      {
-        id: '6-hours',
-        title: t('secondStep.field.expiresAt.options.6-hours'),
-      },
-      {
-        id: '12-hours',
-        title: t('secondStep.field.expiresAt.options.12-hours'),
-      },
-      {
-        id: '1-day',
-        title: t('secondStep.field.expiresAt.options.1-day'),
-      },
-      {
-        id: '3-days',
-        title: t('secondStep.field.expiresAt.options.3-days'),
-      },
-      {
-        id: '5-days',
-        title: t('secondStep.field.expiresAt.options.5-days'),
-      },
-      {
-        id: '7-days',
-        title: t('secondStep.field.expiresAt.options.7-days'),
-      },
-    ],
-    [t]
-  );
+    }, [dispatch, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
+    const handleVideoUpload = useCallback(
+      async (value) => {
+        try {
+          dispatch(setCreationFileUploadETA(100));
+          dispatch(setCreationFileUploadProgress(1));
+          dispatch(setCreationFileUploadLoading(true));
+          dispatch(setCreationFileUploadError(false));
 
-  const getDecisionPart = useCallback(
-    () => (
-      <>
-        <SItemWrapper>
-          <TextArea
-            id="title"
-            value={post?.title}
-            error={titleError}
-            onBlur={handleItemBlur}
-            onFocus={handleItemFocus}
-            onChange={handleItemChange}
-            placeholder={t('secondStep.input.placeholder')}
-          />
-        </SItemWrapper>
-        {tab === 'multiple-choice' && (
-          <>
-            <SSeparator margin="16px 0" />
-            <DraggableMobileOptions
-              id="choices"
-              min={2}
-              options={multiplechoice.choices}
+          const payload = new newnewapi.GetVideoUploadUrlRequest({
+            filename: value.name,
+          });
+
+          const res = await getVideoUploadUrl(payload);
+
+          if (!res.data || res.error) {
+            throw new Error(res.error?.message ?? 'An error occurred');
+          }
+
+          const xhr = new XMLHttpRequest();
+          xhrRef.current = xhr;
+          let uploadStartTimestamp: number;
+          const uploadResponse = await new Promise((resolve, reject) => {
+            xhr.upload.addEventListener('progress', (event) => {
+              if (event.lengthComputable) {
+                const uploadProgress = Math.round(
+                  (event.loaded / event.total) * 100
+                );
+                const percentageLeft = 100 - uploadProgress;
+                const secondsPassed = Math.round(
+                  (event.timeStamp - uploadStartTimestamp) / 1000
+                );
+                const factor = secondsPassed / uploadProgress;
+                const eta = Math.round(factor * percentageLeft);
+                dispatch(setCreationFileUploadProgress(uploadProgress));
+                dispatch(setCreationFileUploadETA(eta));
+              }
+            });
+            xhr.addEventListener('loadstart', (event) => {
+              uploadStartTimestamp = event.timeStamp;
+            });
+            xhr.addEventListener('loadend', () => {
+              dispatch(setCreationFileUploadProgress(100));
+              resolve(xhr.readyState === 4 && xhr.status === 200);
+            });
+            xhr.addEventListener('error', () => {
+              dispatch(setCreationFileUploadProgress(0));
+              reject(new Error('Upload failed'));
+            });
+            xhr.addEventListener('abort', () => {
+              console.log('Aborted');
+              dispatch(setCreationFileUploadProgress(0));
+              reject(new Error('Upload aborted'));
+            });
+            xhr.open('PUT', res.data!.uploadUrl, true);
+            xhr.setRequestHeader('Content-Type', value.type);
+            xhr.send(value);
+          });
+
+          if (!uploadResponse) {
+            throw new Error('Upload failed');
+          }
+
+          const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
+            publicUrl: res.data.publicUrl,
+          });
+
+          const resProcessing = await startVideoProcessing(payloadProcessing);
+
+          if (!resProcessing.data || resProcessing.error) {
+            throw new Error(
+              resProcessing.error?.message ?? 'An error occurred'
+            );
+          }
+
+          dispatch(
+            setCreationVideoProcessing({
+              taskUuid: resProcessing.data.taskUuid,
+              targetUrls: {
+                thumbnailUrl: resProcessing?.data?.targetUrls?.thumbnailUrl,
+                hlsStreamUrl: resProcessing?.data?.targetUrls?.hlsStreamUrl,
+                dashStreamUrl: resProcessing?.data?.targetUrls?.dashStreamUrl,
+                originalVideoUrl:
+                  resProcessing?.data?.targetUrls?.originalVideoUrl,
+                thumbnailImageUrl:
+                  resProcessing?.data?.targetUrls?.thumbnailImageUrl,
+              },
+            })
+          );
+
+          dispatch(setCreationFileUploadLoading(false));
+
+          dispatch(setCreationFileProcessingProgress(10));
+          dispatch(setCreationFileProcessingETA(80));
+          dispatch(setCreationFileProcessingLoading(true));
+          dispatch(setCreationFileProcessingError(false));
+          dispatch(setCreationVideo(res.data.publicUrl ?? ''));
+          xhrRef.current = undefined;
+        } catch (error: any) {
+          if (error.message === 'Upload failed') {
+            dispatch(setCreationFileUploadError(true));
+            toast.error(error?.message);
+          } else {
+            console.log('Upload aborted');
+          }
+          xhrRef.current = undefined;
+          dispatch(setCreationFileUploadLoading(false));
+        }
+      },
+      [dispatch]
+    );
+    const handleItemFocus = useCallback((key: string) => {
+      if (key === 'title') {
+        setTitleError('');
+      }
+    }, []);
+    const handleItemBlur = useCallback(
+      async (key: string, value: string) => {
+        if (key === 'title') {
+          setTitleError(
+            await validateT(
+              value,
+              CREATION_TITLE_MIN,
+              CREATION_TITLE_MAX,
+              newnewapi.ValidateTextRequest.Kind.POST_TITLE
+            )
+          );
+        }
+      },
+      [validateT]
+    );
+    const handleItemChange = useCallback(
+      async (key: string, value: any) => {
+        if (key === 'title') {
+          dispatch(setCreationTitle(value));
+        } else if (key === 'minimalBid') {
+          dispatch(setCreationMinBid(value));
+        } else if (key === 'comments') {
+          dispatch(setCreationComments(value));
+        } else if (key === 'allowSuggestions') {
+          dispatch(setCreationAllowSuggestions(value));
+        } else if (key === 'expiresAt') {
+          dispatch(setCreationExpireDate(value));
+        } else if (key === 'startsAt') {
+          dispatch(setCreationStartDate(value));
+        } else if (key === 'targetBackerCount') {
+          dispatch(setCreationTargetBackerCount(value));
+        } else if (key === 'choices') {
+          dispatch(setCreationChoices(value));
+        } else if (key === 'video') {
+          if (value) {
+            await handleVideoUpload(value);
+          } else {
+            await handleVideoDelete();
+          }
+        } else if (key === 'thumbnailParameters') {
+          dispatch(setCreationVideoThumbnails(value));
+        }
+      },
+      [dispatch, handleVideoUpload, handleVideoDelete]
+    );
+    const expireOptions = useMemo(
+      () => [
+        {
+          id: '1-hour',
+          title: t('secondStep.field.expiresAt.options.1-hour'),
+        },
+        {
+          id: '6-hours',
+          title: t('secondStep.field.expiresAt.options.6-hours'),
+        },
+        {
+          id: '12-hours',
+          title: t('secondStep.field.expiresAt.options.12-hours'),
+        },
+        {
+          id: '1-day',
+          title: t('secondStep.field.expiresAt.options.1-day'),
+        },
+        {
+          id: '3-days',
+          title: t('secondStep.field.expiresAt.options.3-days'),
+        },
+        {
+          id: '5-days',
+          title: t('secondStep.field.expiresAt.options.5-days'),
+        },
+        {
+          id: '7-days',
+          title: t('secondStep.field.expiresAt.options.7-days'),
+        },
+      ],
+      [t]
+    );
+
+    const getDecisionPart = useCallback(
+      () => (
+        <>
+          <SItemWrapper>
+            <TextArea
+              id="title"
+              value={post?.title}
+              error={titleError}
+              onBlur={handleItemBlur}
+              onFocus={handleItemFocus}
               onChange={handleItemChange}
-              validation={validateT}
+              placeholder={t('secondStep.input.placeholder')}
             />
-            {isMobile && <SSeparator margin="16px 0" />}
-          </>
-        )}
-        {tab === 'auction' && !isMobile && (
-          <>
-            <SSeparator margin="16px 0" />
-            <SItemWrapper>
-              <TabletFieldBlock
-                id="minimalBid"
-                type="input"
-                value={auction.minimalBid}
+          </SItemWrapper>
+          {tab === 'multiple-choice' && (
+            <>
+              <SSeparator margin="16px 0" />
+              <DraggableMobileOptions
+                id="choices"
+                min={2}
+                options={multiplechoice.choices}
                 onChange={handleItemChange}
-                formattedDescription={auction.minimalBid}
-                inputProps={{
-                  min: 5,
-                  type: 'number',
-                  pattern: '[0-9]*',
-                }}
+                validation={validateT}
               />
-            </SItemWrapper>
-          </>
-        )}
-        {tab === 'crowdfunding' && !isMobile && (
-          <>
-            <SSeparator margin="16px 0" />
-            <SItemWrapper>
-              <TabletFieldBlock
-                id="targetBackerCount"
-                type="input"
-                value={crowdfunding.targetBackerCount}
-                onChange={handleItemChange}
-                formattedDescription={crowdfunding.targetBackerCount}
-                inputProps={{
-                  min: 1,
-                  max: 999999,
-                  type: 'number',
-                  pattern: '[0-9]*',
-                }}
-              />
-            </SItemWrapper>
-          </>
-        )}
-      </>
-    ),
-    [
-      t,
-      tab,
-      isMobile,
-      titleError,
-      post?.title,
-      auction?.minimalBid,
-      crowdfunding?.targetBackerCount,
-      validateT,
-      handleItemBlur,
-      handleItemFocus,
-      handleItemChange,
-      multiplechoice.choices,
-    ]
-  );
-  const getAdvancedPart = useCallback(
-    () => (
-      <>
-        {isMobile ? (
-          <>
-            <SListWrapper>
-              {tab === 'auction' && (
+              {isMobile && <SSeparator margin="16px 0" />}
+            </>
+          )}
+          {tab === 'auction' && !isMobile && (
+            <>
+              <SSeparator margin="16px 0" />
+              <SItemWrapper>
+                <TabletFieldBlock
+                  id="minimalBid"
+                  type="input"
+                  value={auction.minimalBid}
+                  onChange={handleItemChange}
+                  formattedDescription={auction.minimalBid}
+                  inputProps={{
+                    min: 5,
+                    type: 'number',
+                    pattern: '[0-9]*',
+                  }}
+                />
+              </SItemWrapper>
+            </>
+          )}
+          {tab === 'crowdfunding' && !isMobile && (
+            <>
+              <SSeparator margin="16px 0" />
+              <SItemWrapper>
+                <TabletFieldBlock
+                  id="targetBackerCount"
+                  type="input"
+                  value={crowdfunding.targetBackerCount}
+                  onChange={handleItemChange}
+                  formattedDescription={crowdfunding.targetBackerCount}
+                  inputProps={{
+                    min: 1,
+                    max: 999999,
+                    type: 'number',
+                    pattern: '[0-9]*',
+                  }}
+                />
+              </SItemWrapper>
+            </>
+          )}
+        </>
+      ),
+      [
+        t,
+        tab,
+        isMobile,
+        titleError,
+        post?.title,
+        auction?.minimalBid,
+        crowdfunding?.targetBackerCount,
+        validateT,
+        handleItemBlur,
+        handleItemFocus,
+        handleItemChange,
+        multiplechoice.choices,
+      ]
+    );
+    const getAdvancedPart = useCallback(
+      () => (
+        <>
+          {isMobile ? (
+            <>
+              <SListWrapper>
+                {tab === 'auction' && (
+                  <SFieldWrapper>
+                    <MobileFieldBlock
+                      id="minimalBid"
+                      type="input"
+                      value={auction.minimalBid}
+                      onChange={handleItemChange}
+                      formattedDescription={auction.minimalBid}
+                      inputProps={{
+                        min: 5,
+                        type: 'number',
+                        pattern: '[0-9]*',
+                      }}
+                    />
+                  </SFieldWrapper>
+                )}
+                {tab === 'crowdfunding' && (
+                  <SFieldWrapper>
+                    <MobileFieldBlock
+                      id="targetBackerCount"
+                      type="input"
+                      value={crowdfunding.targetBackerCount}
+                      onChange={handleItemChange}
+                      formattedDescription={crowdfunding.targetBackerCount}
+                      inputProps={{
+                        min: 1,
+                        type: 'number',
+                        pattern: '[0-9]*',
+                      }}
+                    />
+                  </SFieldWrapper>
+                )}
                 <SFieldWrapper>
                   <MobileFieldBlock
-                    id="minimalBid"
-                    type="input"
-                    value={auction.minimalBid}
+                    id="expiresAt"
+                    type="select"
+                    value={post.expiresAt}
+                    options={expireOptions}
                     onChange={handleItemChange}
-                    formattedDescription={auction.minimalBid}
-                    inputProps={{
-                      min: 5,
-                      type: 'number',
-                      pattern: '[0-9]*',
-                    }}
+                    formattedValue={t(
+                      `secondStep.field.expiresAt.options.${post.expiresAt}`
+                    )}
+                    formattedDescription={formatExpiresAt().format(
+                      'DD MMM [at] hh:mm A'
+                    )}
                   />
                 </SFieldWrapper>
-              )}
-              {tab === 'crowdfunding' && (
                 <SFieldWrapper>
                   <MobileFieldBlock
-                    id="targetBackerCount"
-                    type="input"
-                    value={crowdfunding.targetBackerCount}
+                    id="startsAt"
+                    type="date"
+                    value={post.startsAt}
                     onChange={handleItemChange}
-                    formattedDescription={crowdfunding.targetBackerCount}
-                    inputProps={{
-                      min: 1,
-                      type: 'number',
-                      pattern: '[0-9]*',
-                    }}
+                    formattedValue={t(
+                      `secondStep.field.startsAt.modal.type.${post.startsAt?.type}`
+                    )}
+                    formattedDescription={formatStartsAt().format(
+                      'DD MMM [at] hh:mm A'
+                    )}
                   />
                 </SFieldWrapper>
-              )}
-              <SFieldWrapper>
-                <MobileFieldBlock
+              </SListWrapper>
+              <SSeparator />
+            </>
+          ) : (
+            <>
+              <SItemWrapper>
+                <TabletFieldBlock
                   id="expiresAt"
                   type="select"
                   value={post.expiresAt}
                   options={expireOptions}
+                  maxItems={5}
                   onChange={handleItemChange}
-                  formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-                  formattedDescription={formatExpiresAt().format('DD MMM [at] hh:mm A')}
+                  formattedValue={t(
+                    `secondStep.field.expiresAt.options.${post.expiresAt}`
+                  )}
+                  formattedDescription={formatExpiresAt().format(
+                    'DD MMM [at] hh:mm A'
+                  )}
                 />
-              </SFieldWrapper>
-              <SFieldWrapper>
-                <MobileFieldBlock
-                  id="startsAt"
-                  type="date"
-                  value={post.startsAt}
-                  onChange={handleItemChange}
-                  formattedValue={t(`secondStep.field.startsAt.modal.type.${post.startsAt?.type}`)}
-                  formattedDescription={formatStartsAt().format('DD MMM [at] hh:mm A')}
-                />
-              </SFieldWrapper>
-            </SListWrapper>
-            <SSeparator />
-          </>
-        ) : (
-          <>
-            <SItemWrapper>
-              <TabletFieldBlock
-                id="expiresAt"
-                type="select"
-                value={post.expiresAt}
-                options={expireOptions}
-                maxItems={5}
+              </SItemWrapper>
+              <SSeparator margin="16px 0" />
+              <STabletBlockTitle variant={1} weight={700}>
+                {t('secondStep.field.startsAt.tablet.title')}
+              </STabletBlockTitle>
+              <TabletStartDate
+                id="startsAt"
+                value={post.startsAt}
                 onChange={handleItemChange}
-                formattedValue={t(`secondStep.field.expiresAt.options.${post.expiresAt}`)}
-                formattedDescription={formatExpiresAt().format('DD MMM [at] hh:mm A')}
               />
-            </SItemWrapper>
-            <SSeparator margin="16px 0" />
-            <STabletBlockTitle variant={1} weight={700}>
-              {t('secondStep.field.startsAt.tablet.title')}
-            </STabletBlockTitle>
-            <TabletStartDate id="startsAt" value={post.startsAt} onChange={handleItemChange} />
-            <SSeparator margin="16px 0" />
-          </>
-        )}
-        {tab === 'multiple-choice' && mySubscribers.length > 0 && (
-          <SMobileFieldWrapper>
-            <MobileField
-              id="allowSuggestions"
-              type="toggle"
-              value={multiplechoice.options.allowSuggestions}
-              onChange={handleItemChange}
-            />
-          </SMobileFieldWrapper>
-        )}
-        <MobileField id="comments" type="toggle" value={post.options.commentsEnabled} onChange={handleItemChange} />
-      </>
-    ),
-    [
-      t,
-      tab,
-      isMobile,
-      post.startsAt,
-      post.expiresAt,
-      post.options.commentsEnabled,
-      auction.minimalBid,
-      mySubscribers.length,
-      crowdfunding.targetBackerCount,
-      multiplechoice.options.allowSuggestions,
-      expireOptions,
-      formatStartsAt,
-      formatExpiresAt,
-      handleItemChange,
-    ]
-  );
-  const handlerSocketUpdated = useCallback(
-    (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
-
-      if (!decoded) return;
-
-      if (decoded.taskUuid === videoProcessing?.taskUuid) {
-        dispatch(setCreationFileUploadETA(decoded.estimatedTimeLeft?.seconds));
-
-        if (decoded.fractionCompleted > fileUpload.progress) {
-          dispatch(setCreationFileUploadProgress(decoded.fractionCompleted));
-        }
-
-        if (decoded.fractionCompleted === 100) {
-          removeChannel(videoProcessing?.taskUuid);
-          dispatch(setCreationFileUploadLoading(false));
-        }
-      }
-    },
-    [videoProcessing, fileUpload, dispatch, removeChannel]
-  );
-
-  useEffect(() => {
-    const func = async () => {
-      if (validateTitleDebounced) {
-        setTitleError(
-          await validateT(
-            validateTitleDebounced,
-            CREATION_TITLE_MIN,
-            CREATION_TITLE_MAX,
-            newnewapi.ValidateTextRequest.Kind.POST_TITLE
-          )
-        );
-      }
-    };
-    func();
-  }, [validateT, validateTextAPI, validateTitleDebounced]);
-  useEffect(() => {
-    if (socketConnection) {
-      socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
-    }
-
-    return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('VideoProcessingProgress', handlerSocketUpdated);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, handlerSocketUpdated]);
-  useEffect(() => {
-    if (playerRef.current && isDesktop) {
-      if (overlay) {
-        playerRef.current.pause();
-      } else {
-        playerRef.current.play();
-      }
-    }
-  }, [overlay, isDesktop]);
-
-  return (
-    <>
-      <div>
-        <STabsWrapper>
-          <Tabs t={t} tabs={tabs} draggable={false} activeTabIndex={activeTabIndex} withTabIndicator={isDesktop} />
-          {isMobile && (
-            <SCloseIconWrapper>
-              <InlineSVG
-                clickable
-                svg={closeIcon}
-                fill={theme.colorsThemed.text.secondary}
-                width="24px"
-                height="24px"
-                onClick={handleCloseClick}
-              />
-            </SCloseIconWrapper>
+              <SSeparator margin="16px 0" />
+            </>
           )}
-        </STabsWrapper>
-        <SContent>
-          <SLeftPart>
-            <SItemWrapper noMargin={isDesktop}>
-              {!isMobile && (
-                <STabletBlockTitle variant={1} weight={700}>
-                  {t('secondStep.block.title.file')}
-                </STabletBlockTitle>
-              )}
-              <FileUpload
-                {...fileUpload}
-                id="video"
-                value={videoProcessing?.targetUrls}
+          {tab === 'multiple-choice' && mySubscribers.length > 0 && (
+            <SMobileFieldWrapper>
+              <MobileField
+                id="allowSuggestions"
+                type="toggle"
+                value={multiplechoice.options.allowSuggestions}
                 onChange={handleItemChange}
-                thumbnails={post.thumbnailParameters}
               />
-            </SItemWrapper>
-            {isMobile ? (
-              getDecisionPart()
-            ) : (
-              <SItemWrapper>
-                <TabletFieldWrapper>
+            </SMobileFieldWrapper>
+          )}
+          <MobileField
+            id="comments"
+            type="toggle"
+            value={post.options.commentsEnabled}
+            onChange={handleItemChange}
+          />
+        </>
+      ),
+      [
+        t,
+        tab,
+        isMobile,
+        post.startsAt,
+        post.expiresAt,
+        post.options.commentsEnabled,
+        auction.minimalBid,
+        mySubscribers.length,
+        crowdfunding.targetBackerCount,
+        multiplechoice.options.allowSuggestions,
+        expireOptions,
+        formatStartsAt,
+        formatExpiresAt,
+        handleItemChange,
+      ]
+    );
+    const handlerSocketUpdated = useCallback(
+      (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+
+        if (!decoded) return;
+
+        if (decoded.taskUuid === videoProcessing?.taskUuid) {
+          dispatch(
+            setCreationFileProcessingETA(decoded.estimatedTimeLeft?.seconds)
+          );
+
+          if (decoded.fractionCompleted > fileProcessing.progress) {
+            dispatch(
+              setCreationFileProcessingProgress(decoded.fractionCompleted)
+            );
+          }
+
+          if (decoded.fractionCompleted === 100) {
+            dispatch(setCreationFileProcessingLoading(false));
+          }
+        }
+      },
+      [videoProcessing, fileProcessing, dispatch]
+    );
+
+    useEffect(() => {
+      const func = async () => {
+        if (validateTitleDebounced) {
+          setTitleError(
+            await validateT(
+              validateTitleDebounced,
+              CREATION_TITLE_MIN,
+              CREATION_TITLE_MAX,
+              newnewapi.ValidateTextRequest.Kind.POST_TITLE
+            )
+          );
+        }
+      };
+      func();
+    }, [validateT, validateTextAPI, validateTitleDebounced]);
+    useEffect(() => {
+      if (socketConnection) {
+        socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
+      }
+
+      return () => {
+        if (socketConnection && socketConnection.connected) {
+          socketConnection.off('VideoProcessingProgress', handlerSocketUpdated);
+        }
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection, handlerSocketUpdated]);
+    useEffect(() => {
+      if (playerRef.current && isDesktop) {
+        if (overlay) {
+          playerRef.current.pause();
+        } else {
+          playerRef.current.play();
+        }
+      }
+    }, [overlay, isDesktop]);
+
+    useEffect(() => {
+      switch (activeTabIndex) {
+        case 1:
+          tutorialType !== 'MC' && setTutorialType('MC');
+          break;
+        case 2:
+          tutorialType !== 'CF' && setTutorialType('CF');
+          break;
+        default:
+          tutorialType !== 'AC' && setTutorialType('AC');
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTabIndex]);
+
+    useEffect(() => {
+      if (user!!.userTutorialsProgressSynced) {
+        switch (tutorialType) {
+          case 'MC':
+            user!!.userTutorialsProgress.remainingMcCrCurrentStep!![0] ===
+              newnewapi.McCreationTutorialStep.MC_CR_HERO &&
+              setIsTutorialVisible(true);
+            break;
+          case 'CF':
+            user!!.userTutorialsProgress.remainingCfCrCurrentStep!![0] ===
+              newnewapi.CfCreationTutorialStep.CF_CR_HERO &&
+              setIsTutorialVisible(true);
+            break;
+          default:
+            user!!.userTutorialsProgress.remainingAcCrCurrentStep!![0] ===
+              newnewapi.AcCreationTutorialStep.AC_CR_HERO &&
+              setIsTutorialVisible(true);
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tutorialType, user!!.userTutorialsProgressSynced]);
+
+    const goToNextStep = () => {
+      let payload = null;
+      switch (tutorialType) {
+        case 'MC':
+          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            mcCrCurrentStep:
+              user.userTutorialsProgress.remainingMcCrCurrentStep!![0],
+          });
+          dispatch(
+            setUserTutorialsProgress({
+              remainingMcCrCurrentStep: [
+                ...user.userTutorialsProgress.remainingMcCrCurrentStep!!,
+              ].slice(1),
+            })
+          );
+          break;
+        case 'CF':
+          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            cfCrCurrentStep:
+              user.userTutorialsProgress.remainingCfCrCurrentStep!![0],
+          });
+          dispatch(
+            setUserTutorialsProgress({
+              remainingCfCrCurrentStep: [
+                ...user.userTutorialsProgress.remainingCfCrCurrentStep!!,
+              ].slice(1),
+            })
+          );
+          break;
+        default:
+          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            acCrCurrentStep:
+              user.userTutorialsProgress.remainingAcCrCurrentStep!![0],
+          });
+          dispatch(
+            setUserTutorialsProgress({
+              remainingAcCrCurrentStep: [
+                ...user.userTutorialsProgress.remainingAcCrCurrentStep!!,
+              ].slice(1),
+            })
+          );
+      }
+      if (payload) markTutorialStepAsCompleted(payload);
+      setIsTutorialVisible(false);
+    };
+
+    return (
+      <>
+        <div>
+          <STabsWrapper>
+            <Tabs
+              t={t}
+              tabs={tabs}
+              draggable={false}
+              activeTabIndex={activeTabIndex}
+              withTabIndicator={isDesktop}
+            />
+            {isMobile && (
+              <SCloseIconWrapper>
+                <InlineSVG
+                  clickable
+                  svg={closeIcon}
+                  fill={theme.colorsThemed.text.secondary}
+                  width="24px"
+                  height="24px"
+                  onClick={handleCloseClick}
+                />
+              </SCloseIconWrapper>
+            )}
+          </STabsWrapper>
+          <SContent>
+            <SLeftPart>
+              <SItemWrapper noMargin={isDesktop}>
+                {!isMobile && (
                   <STabletBlockTitle variant={1} weight={700}>
-                    {t('secondStep.block.title.decision')}
+                    {t('secondStep.block.title.file')}
                   </STabletBlockTitle>
-                  {getDecisionPart()}
-                </TabletFieldWrapper>
+                )}
+                <FileUpload
+                  id="video"
+                  value={videoProcessing?.targetUrls}
+                  thumbnails={post.thumbnailParameters}
+                  etaUpload={fileUpload.eta}
+                  errorUpload={fileUpload.error}
+                  loadingUpload={fileUpload.loading}
+                  progressUpload={fileUpload.progress}
+                  etaProcessing={fileProcessing.eta}
+                  errorProcessing={fileProcessing.error}
+                  loadingProcessing={fileProcessing.loading}
+                  progressProcessing={fileProcessing.progress}
+                  onChange={handleItemChange}
+                  handleCancelVideoUpload={() => xhrRef.current?.abort()}
+                />
               </SItemWrapper>
-            )}
-            {!isMobile && tab === 'multiple-choice' && (
-              <SItemWrapper>
-                <TabletFieldWrapper>
-                  <STabletBlockSubTitle variant={3} weight={600}>
-                    {t('secondStep.block.subTitle.votesInfo')}
-                  </STabletBlockSubTitle>
-                </TabletFieldWrapper>
-              </SItemWrapper>
-            )}
-            {isMobile ? (
-              getAdvancedPart()
-            ) : (
-              <SItemWrapper>
-                <TabletFieldWrapper>
-                  <STabletBlockTitle variant={1} weight={700}>
-                    {t('secondStep.block.title.advanced')}
-                  </STabletBlockTitle>
-                  {getAdvancedPart()}
-                </TabletFieldWrapper>
-              </SItemWrapper>
-            )}
-            {isMobile ? (
-              <SButtonWrapper>
-                <SButtonContent>
-                  <SButton view="primaryGrad" onClick={handleSubmit} disabled={disabled}>
-                    {t('secondStep.button.preview')}
-                  </SButton>
-                </SButtonContent>
-              </SButtonWrapper>
-            ) : (
-              <SItemWrapper>
-                <STabletButtonsWrapper>
-                  <div>
-                    <SButton view="secondary" onClick={handleCloseClick}>
-                      {t('secondStep.button.cancel')}
-                    </SButton>
-                  </div>
-                  <div>
-                    <SButton view="primaryGrad" onClick={handleSubmit} disabled={disabled}>
+              {isMobile ? (
+                getDecisionPart()
+              ) : (
+                <SItemWrapper>
+                  <TabletFieldWrapper>
+                    <STabletBlockTitle variant={1} weight={700}>
+                      {t('secondStep.block.title.decision')}
+                    </STabletBlockTitle>
+                    {getDecisionPart()}
+                  </TabletFieldWrapper>
+                </SItemWrapper>
+              )}
+              {!isMobile && tab === 'multiple-choice' && (
+                <SItemWrapper>
+                  <TabletFieldWrapper>
+                    <STabletBlockSubTitle variant={3} weight={600}>
+                      {t('secondStep.block.subTitle.votesInfo')}
+                    </STabletBlockSubTitle>
+                  </TabletFieldWrapper>
+                </SItemWrapper>
+              )}
+              {isMobile ? (
+                getAdvancedPart()
+              ) : (
+                <SItemWrapper>
+                  <TabletFieldWrapper>
+                    <STabletBlockTitle variant={1} weight={700}>
+                      {t('secondStep.block.title.advanced')}
+                    </STabletBlockTitle>
+                    {getAdvancedPart()}
+                  </TabletFieldWrapper>
+                </SItemWrapper>
+              )}
+              {isMobile ? (
+                <SButtonWrapper>
+                  <SButtonContent>
+                    <SButton
+                      view="primaryGrad"
+                      onClick={handleSubmit}
+                      disabled={disabled}
+                    >
                       {t('secondStep.button.preview')}
                     </SButton>
-                  </div>
-                </STabletButtonsWrapper>
-              </SItemWrapper>
-            )}
-          </SLeftPart>
-          {isDesktop && (
-            <SRightPart>
-              <SFloatingPart>
-                <SItemWrapper noMargin={isDesktop}>
-                  <STabletBlockTitle variant={1} weight={700}>
-                    {t('secondStep.block.title.floating')}
-                  </STabletBlockTitle>
+                  </SButtonContent>
+                </SButtonWrapper>
+              ) : (
+                <SItemWrapper>
+                  <STabletButtonsWrapper>
+                    <div>
+                      <SButton view="secondary" onClick={handleCloseClick}>
+                        {t('secondStep.button.cancel')}
+                      </SButton>
+                    </div>
+                    <div>
+                      <SButton
+                        view="primaryGrad"
+                        onClick={handleSubmit}
+                        disabled={disabled}
+                      >
+                        {t('secondStep.button.preview')}
+                      </SButton>
+                    </div>
+                  </STabletButtonsWrapper>
                 </SItemWrapper>
-                {fileUpload?.progress === 100 ? (
-                  <SFloatingSubSectionWithPlayer>
-                    <SFloatingSubSectionPlayer>
-                      <BitmovinPlayer
-                        withMuteControl
-                        id="floating-preview"
-                        innerRef={playerRef}
-                        resources={videoProcessing?.targetUrls}
-                        borderRadius="16px"
-                        mutePosition="left"
-                      />
-                    </SFloatingSubSectionPlayer>
-                    <SFloatingSubSectionUser>
-                      <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
-                      <SUserTitle variant={3} weight={600}>
-                        {post?.title}
-                      </SUserTitle>
-                    </SFloatingSubSectionUser>
-                    <SBottomEnd>
-                      <SButtonUser view="primary">{t(`secondStep.button.card.${typeOfPost}`)}</SButtonUser>
-                      <SCaption variant={2} weight={700}>
-                        {t('secondStep.card.left', {
-                          time: formatExpiresAt().fromNow(true),
-                        })}
-                      </SCaption>
-                    </SBottomEnd>
-                  </SFloatingSubSectionWithPlayer>
-                ) : (
-                  <SFloatingSubSection>
-                    <SFloatingSubSectionDescription variant={3} weight={600}>
-                      {t('secondStep.block.subTitle.floating')}
-                    </SFloatingSubSectionDescription>
-                  </SFloatingSubSection>
-                )}
-              </SFloatingPart>
-            </SRightPart>
-          )}
-        </SContent>
-      </div>
-    </>
-  );
-};
+              )}
+            </SLeftPart>
+            {isDesktop && (
+              <SRightPart>
+                <SFloatingPart>
+                  <SItemWrapper noMargin={isDesktop}>
+                    <STabletBlockTitle variant={1} weight={700}>
+                      {t('secondStep.block.title.floating')}
+                    </STabletBlockTitle>
+                  </SItemWrapper>
+                  {fileUpload?.progress === 100 ? (
+                    fileProcessing?.progress === 100 ? (
+                      <SFloatingSubSectionWithPlayer>
+                        <SFloatingSubSectionPlayer>
+                          <BitmovinPlayer
+                            withMuteControl
+                            id="floating-preview"
+                            innerRef={playerRef}
+                            resources={videoProcessing?.targetUrls}
+                            borderRadius="16px"
+                            mutePosition="left"
+                          />
+                        </SFloatingSubSectionPlayer>
+                        <SFloatingSubSectionUser>
+                          <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
+                          <SUserTitle variant={3} weight={600}>
+                            {post?.title}
+                          </SUserTitle>
+                        </SFloatingSubSectionUser>
+                        <SBottomEnd>
+                          <SButtonUser view="primary">
+                            {t(`secondStep.button.card.${typeOfPost}`)}
+                          </SButtonUser>
+                          <SCaption variant={2} weight={700}>
+                            {t('secondStep.card.left', {
+                              time: formatExpiresAt().fromNow(true),
+                            })}
+                          </SCaption>
+                        </SBottomEnd>
+                      </SFloatingSubSectionWithPlayer>
+                    ) : (
+                      <SFloatingSubSection>
+                        <SFloatingSubSectionDescription
+                          variant={3}
+                          weight={600}
+                        >
+                          {t('secondStep.block.subTitle.floating-processing')}
+                        </SFloatingSubSectionDescription>
+                      </SFloatingSubSection>
+                    )
+                  ) : (
+                    <SFloatingSubSection>
+                      <SFloatingSubSectionDescription variant={3} weight={600}>
+                        {t('secondStep.block.subTitle.floating')}
+                      </SFloatingSubSectionDescription>
+                    </SFloatingSubSection>
+                  )}
+                </SFloatingPart>
+              </SRightPart>
+            )}
+          </SContent>
+        </div>
+        <HeroPopup
+          isPopupVisible={isTutorialVisible}
+          postType={tutorialType}
+          closeModal={goToNextStep}
+        />
+      </>
+    );
+  };
 
 export default CreationSecondStepContent;
 
@@ -894,10 +1136,15 @@ const SItemWrapper = styled.div<ISItemWrapper>`
 
 const TabletFieldWrapper = styled.div`
   border: 1px solid
-    ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+    ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colorsThemed.background.outlines1
+        : 'transparent'};
   padding: 23px;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: 16px;
 `;
 

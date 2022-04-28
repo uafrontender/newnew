@@ -52,7 +52,12 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SButton onClick={() => router.route === '/profile' ? handleClose() : handleClick('/profile')}>
+          <SButton
+            onClick={() => router.route === '/profile'
+              ? handleClose()
+              : handleClick(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile')
+            }
+          >
             <SAvatar>
               <img
                 src={user?.userData?.avatarUrl!! as string}

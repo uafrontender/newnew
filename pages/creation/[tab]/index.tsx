@@ -13,54 +13,47 @@ import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 import { NextPageWithLayout } from '../../_app';
 
-interface ICreationSecondStep {
-}
+interface ICreationSecondStep {}
 
 export const CreationSecondStep: React.FC<ICreationSecondStep> = (props) => {
   const { t } = useTranslation('creation');
   const router = useRouter();
 
-  useLeavePageConfirm(
-    true,
-    t('secondStep.modal.leave.message'),
-    [
-      '/creation',
-      '/creation/auction',
-      '/creation/multiple-choice',
-      '/creation/crowdfunding',
-      '/creation/auction/preview',
-      '/creation/multiple-choice/preview',
-      '/creation/crowdfunding/preview',
-      '/creation/auction/published',
-      '/creation/multiple-choice/published',
-      '/creation/crowdfunding/published',
-    ],
-  );
+  useLeavePageConfirm(true, t('secondStep.modal.leave.message'), [
+    '/creation',
+    '/creation/auction',
+    '/creation/multiple-choice',
+    '/creation/crowdfunding',
+    '/creation/auction/preview',
+    '/creation/multiple-choice/preview',
+    '/creation/crowdfunding/preview',
+    '/creation/auction/published',
+    '/creation/multiple-choice/published',
+    '/creation/crowdfunding/published',
+  ]);
 
   return (
     <SWrapper>
       <Head>
-        <title>
-          {t(`secondStep.meta.title-${router?.query?.tab}`)}
-        </title>
+        <title>{t(`secondStep.meta.title-${router?.query?.tab}`)}</title>
       </Head>
       <SecondStepContent {...props} />
     </SWrapper>
   );
 };
 
-(CreationSecondStep as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>
-    {page}
-  </CreationLayout>
-);
+(CreationSecondStep as NextPageWithLayout).getLayout = (
+  page: React.ReactElement
+) => <CreationLayout>{page}</CreationLayout>;
 
 export default CreationSecondStep;
 
-export async function getServerSideProps(context: NextPageContext): Promise<any> {
+export async function getServerSideProps(
+  context: NextPageContext
+): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation'],
+    ['common', 'creation']
   );
 
   // @ts-ignore

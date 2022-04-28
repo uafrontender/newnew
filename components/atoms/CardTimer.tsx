@@ -1,11 +1,13 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
-import { useTranslation } from 'next-i18next';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+
+import Caption from './Caption';
+
 import isBrowser from '../../utils/isBrowser';
 import secondsToDHM, { DHM } from '../../utils/secondsToDHM';
-import Caption from './Caption';
 
 interface ICardTimer {
   timestampSeconds: number;
@@ -48,15 +50,11 @@ const CardTimer: React.FunctionComponent<ICardTimer> = ({
         {t('card-time-left', { time: parsedString })}
       </SCaption>
     ) : (
-      <SCaption variant={2} weight={700}>
+      <SCaptionEnded variant={2} weight={700}>
         { t('card-time-expired-ended-on') }
         {' '}
-        { expirationDate.getDate() }
-        {' '}
-        { expirationDate.toLocaleString('default', { month: 'short', year: '2-digit' }) }
-        {' '}
-        { expirationDate.getFullYear() }
-      </SCaption>
+        { expirationDate.toLocaleDateString('en-US') }
+      </SCaptionEnded>
     )
   );
 };
@@ -68,4 +66,13 @@ const SCaption = styled(Caption)`
   justify-self: flex-end;
 
   color: ${(props) => props.theme.colorsThemed.text.secondary};
+`;
+
+const SCaptionEnded = styled(Caption)`
+  grid-area: timer;
+  justify-self: flex-end;
+
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+
+  letter-spacing: -0.5px;
 `;

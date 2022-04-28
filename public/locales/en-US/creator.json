@@ -64,6 +64,13 @@
           "contributions": "Contributions",
           "actions": "Actions"
         }
+      },
+      "expiresTime": {
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s",
+        "left_to_respond": "left to respond"
       }
     },
     "subscriptionStats": {

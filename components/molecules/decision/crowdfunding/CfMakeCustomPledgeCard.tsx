@@ -1,6 +1,8 @@
 import React from 'react';
-import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
+import { useTranslation } from 'next-i18next';
+
+import Headline from '../../../atoms/Headline';
 
 interface ICfMakeCustomPledgeCard {
   handleOpenMakePledgeForm: () => void;
@@ -29,26 +31,30 @@ export default CfMakeCustomPledgeCard;
 const SStandardPledgeCard = styled.button`
   display: flex;
   flex-shrink: 0;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 12px;
 
   cursor: pointer;
   transition: 0.2s linear;
 
-  border: transparent;
 
-  height: 108px;
+  height: 96px;
   width: 96px;
 
-  margin: 0px 6px;
+  margin: 0px 0px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
+  background-color: transparent;
+  border: 1.5px solid ${({ theme }) => theme.colorsThemed.accent.blue};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
   padding: 8px;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     outline: none;
-    background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
+    background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
+    color: #FFFFFF;
   }
 `;
 
@@ -65,7 +71,7 @@ const SCardInfo = styled.div`
   }
 `;
 
-const SCardAmount = styled.div`
+const SCardAmount = styled(Headline)`
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;

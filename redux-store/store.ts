@@ -13,7 +13,13 @@ import {
 import storage from 'redux-persist/lib/storage';
 import persistStore from 'redux-persist/lib/persistStore';
 import {
-  FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer,
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+  persistReducer,
 } from 'redux-persist';
 
 // Next-wrapper
@@ -37,19 +43,14 @@ const rootPersistConfig = {
 const uiPersistConfig = {
   key: 'ui',
   storage,
-  whitelist: [
-    // 'colorMode',
-    'mutedMode',
-  ],
+  whitelist: ['colorMode', 'mutedMode'],
 };
 
 const userPersistConfig = {
   key: 'user',
   storage,
-  whitelist: [
-    'loggedIn',
-    'userData',
-  ],
+  serializableCheck: false,
+  whitelist: ['loggedIn', 'userData'],
 };
 
 const creationPersistConfig = {
@@ -71,8 +72,8 @@ const combinedReducer = combineReducers({
 });
 
 export type EnhancedStoreWithPersistor = EnhancedStore & {
-  __persistor: any
-}
+  __persistor: any;
+};
 
 const makeStore = () => {
   if (!isBrowser()) {
@@ -80,30 +81,31 @@ const makeStore = () => {
     return configureStore({
       reducer: combinedReducer,
       devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
-      middleware: (getDefaultMiddleware) => (
+      middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
           serializableCheck: {
             ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
           },
-        })
-      ),
+        }),
     });
   }
 
   // Create a new reducer with our existing reducer
-  const persistedReducer = persistReducer(rootPersistConfig, combineReducers(reducers));
+  const persistedReducer = persistReducer(
+    rootPersistConfig,
+    combineReducers(reducers)
+  );
 
   // If it's on client side, create a persisted store
   const store = configureStore({
     reducer: persistedReducer,
     devTools: process.env.NEXT_PUBLIC_NODE_ENV !== 'production',
-    middleware: (getDefaultMiddleware) => (
+    middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
-      })
-    ),
+      }),
   });
 
   // Add __persistor to `store`
@@ -113,10 +115,14 @@ const makeStore = () => {
   return store;
 };
 
-export type RootState = StateFromReducersMapObject<typeof reducers>
-export type AppDispatch = ReducerFromReducersMapObject<typeof reducers>
-export type AppThunk<ReturnType = void> =
-  ThunkAction<ReturnType, RootState, unknown, Action<string>>
+export type RootState = StateFromReducersMapObject<typeof reducers>;
+export type AppDispatch = ReducerFromReducersMapObject<typeof reducers>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 
 export const useAppDispatch = (): any => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

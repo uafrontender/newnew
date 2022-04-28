@@ -7,6 +7,7 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseModal {
+  postType: string;
   isFollowing: boolean;
   isFollowingDecision: boolean;
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface IPostEllipseModal {
 }
 
 const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
+  postType,
   isFollowing,
   isFollowingDecision,
   isOpen,
@@ -58,7 +60,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             <Text
               variant={3}
             >
-              { !isFollowingDecision ? t('ellipse.follow-decision') : t('ellipse.unfollow-decision') }
+              { !isFollowingDecision ? t('ellipse.follow-decision', { postType: t(`postType.${postType}`) }) : t('ellipse.unfollow-decision', { postType: t(`postType.${postType}`) }) }
             </Text>
           </SButton>
           <SSeparator />

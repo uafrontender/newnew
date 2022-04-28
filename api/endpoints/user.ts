@@ -10,8 +10,13 @@ import {
 export const BASE_URL_USER = `${BASE_URL}/user`;
 
 // Own data
-export const validateUsernameTextField = (payload: newnewapi.ValidateUsernameRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.ValidateUsernameRequest, newnewapi.ValidateUsernameResponse>(
+export const validateUsernameTextField = (
+  payload: newnewapi.ValidateUsernameRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.ValidateUsernameRequest,
+    newnewapi.ValidateUsernameResponse
+  >(
     newnewapi.ValidateUsernameRequest,
     newnewapi.ValidateUsernameResponse,
     `${BASE_URL_USER}/validate_username`,
@@ -19,8 +24,23 @@ export const validateUsernameTextField = (payload: newnewapi.ValidateUsernameReq
     payload
   );
 
+export const getMe = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetMeResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.GetMeResponse,
+    `${BASE_URL_USER}/get_me`,
+    'post',
+    payload
+  );
+
 export const updateMe = (payload: newnewapi.UpdateMeRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.UpdateMeRequest, newnewapi.UpdateMeResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.UpdateMeRequest,
+    newnewapi.UpdateMeResponse
+  >(
     newnewapi.UpdateMeRequest,
     newnewapi.UpdateMeResponse,
     `${BASE_URL_USER}/update_me`,
@@ -29,8 +49,13 @@ export const updateMe = (payload: newnewapi.UpdateMeRequest) =>
   );
 
 // Same endpoint, but different method, for convenience
-export const sendVerificationNewEmail = (payload: newnewapi.SendVerificationEmailRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.SendVerificationEmailRequest, newnewapi.SendVerificationEmailResponse>(
+export const sendVerificationNewEmail = (
+  payload: newnewapi.SendVerificationEmailRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.SendVerificationEmailRequest,
+    newnewapi.SendVerificationEmailResponse
+  >(
     newnewapi.SendVerificationEmailRequest,
     newnewapi.SendVerificationEmailResponse,
     `${BASE_URL}/auth/send_verification_email`,
@@ -55,7 +80,10 @@ export const setMyEmail = (payload: newnewapi.SetMyEmailRequest) =>
   );
 
 export const acceptCreatorTerms = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/accept_creator_terms`,
@@ -64,7 +92,10 @@ export const acceptCreatorTerms = (payload: newnewapi.EmptyRequest) =>
   );
 
 export const getMyOnboardingState = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetMyOnboardingStateResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetMyOnboardingStateResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.GetMyOnboardingStateResponse,
     `${BASE_URL_USER}/get_my_onboarding_state`,
@@ -73,7 +104,10 @@ export const getMyOnboardingState = (payload: newnewapi.EmptyRequest) =>
   );
 
 export const becomeCreator = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.BecomeCreatorResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.BecomeCreatorResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.BecomeCreatorResponse,
     `${BASE_URL_USER}/become_creator`,
@@ -82,7 +116,10 @@ export const becomeCreator = (payload: newnewapi.EmptyRequest) =>
   );
 
 export const logout = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/log_out`,
@@ -98,7 +135,10 @@ export const getMyPosts = (
   },
   updateCookieServerSideCallback?: (tokensToAdd: TTokenCookie[]) => void
 ) =>
-  fetchProtobufProtectedIntercepted<newnewapi.GetRelatedToMePostsRequest, newnewapi.PagedCountedPostsResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetRelatedToMePostsRequest,
+    newnewapi.PagedCountedPostsResponse
+  >(
     newnewapi.GetRelatedToMePostsRequest,
     newnewapi.PagedCountedPostsResponse,
     `${BASE_URL}/post/get_related_to_me_posts`,
@@ -109,7 +149,10 @@ export const getMyPosts = (
   );
 
 export const markUser = (payload: newnewapi.MarkUserRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.MarkUserRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.MarkUserRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.MarkUserRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/mark_user`,
@@ -118,7 +161,10 @@ export const markUser = (payload: newnewapi.MarkUserRequest) =>
   );
 
 export const getCreatorsIFollow = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetCreatorsIFollowResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetCreatorsIFollowResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.GetCreatorsIFollowResponse,
     `${BASE_URL_USER}/get_creators_i_follow`,
@@ -147,7 +193,10 @@ export const getAvailableCreatorTags = (payload: newnewapi.EmptyRequest) =>
   );
 
 export const setMyCreatorTags = (payload: newnewapi.SetMyCreatorTagsRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.SetMyCreatorTagsRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.SetMyCreatorTagsRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.SetMyCreatorTagsRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_USER}/set_my_creator_tags`,
@@ -156,7 +205,10 @@ export const setMyCreatorTags = (payload: newnewapi.SetMyCreatorTagsRequest) =>
   );
 
 export const getMyCreatorTags = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.CreatorTags>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.CreatorTags
+  >(
     newnewapi.EmptyRequest,
     newnewapi.CreatorTags,
     `${BASE_URL_USER}/get_my_creator_tags`,
@@ -164,11 +216,54 @@ export const getMyCreatorTags = (payload: newnewapi.EmptyRequest) =>
     payload
   );
 
-export const GetMyBlockedUsers = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetMyBlockedUsersResponse>(
+export const getMyBlockedUsers = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetMyBlockedUsersResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.GetMyBlockedUsersResponse,
     `${BASE_URL_USER}/get_my_blocked_users`,
+    'post',
+    payload
+  );
+
+export const getTutorialsStatus = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetTutorialsStatusResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.GetTutorialsStatusResponse,
+    `${BASE_URL_USER}/get_tutorials_status`,
+    'post',
+    payload
+  );
+
+export const markTutorialStepAsCompleted = (
+  payload: newnewapi.MarkTutorialStepAsCompletedRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.MarkTutorialStepAsCompletedRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.MarkTutorialStepAsCompletedRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_USER}/mark_tutorial_step_as_completed`,
+    'post',
+    payload
+  );
+
+export const deleteMyAccount = (
+  payload: newnewapi.EmptyRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_USER}/delete_my_account`,
     'post',
     payload
   );

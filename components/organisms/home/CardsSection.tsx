@@ -185,13 +185,13 @@ export const CardsSection: React.FC<ICardSection> = ({
 
   const handleSeeMoreCLick = () => {
     if (type === 'default') {
-      router.push(`/search?category=${category}`);
+      router.push(`/see-more?category=${category}`);
     }
   };
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch(`/search?category=${category}`);
+    router.prefetch(`/see-more?category=${category}`);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -474,13 +474,21 @@ const SUserAvatar = styled(UserAvatar)<{
   height: 36px;
 
   border: 4px solid ${({ theme }) => theme.colorsThemed.background.primary};
+  background:${({ theme }) => theme.colorsThemed.background.primary};
 
   cursor: pointer;
+
+  transition: 0.2s linear;
 
   ${({ theme }) => theme.media.laptop} {
     width: 48px;
     height: 48px;
     left: ${({ index }) => index * 36}px;
+  }
+
+  &:hover {
+    z-index: 10;
+    transform: translateY(-10px);
   }
 `;
 

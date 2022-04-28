@@ -14,24 +14,24 @@ export interface ICreationStateInterface {
   post: {
     title: string;
     startsAt: {
-      type: string,
-      date: string,
-      time: string,
-      'hours-format': string,
+      type: string;
+      date: string;
+      time: string;
+      'hours-format': string;
     };
     expiresAt: string;
     options: {
       commentsEnabled: boolean;
     };
     announcementVideoUrl: string;
-    thumbnailParameters: TThumbnailParameters
+    thumbnailParameters: TThumbnailParameters;
   },
   auction: {
     minimalBid: number;
-  }
+  };
   crowdfunding: {
     targetBackerCount: number;
-  }
+  };
   multiplechoice: {
     choices: {
       id: number;
@@ -40,15 +40,21 @@ export interface ICreationStateInterface {
     options: {
       allowSuggestions: boolean;
     };
-  },
+  };
   postData?: TPostData,
-  videoProcessing?: TVideoProcessingData,
+  videoProcessing?: TVideoProcessingData;
   fileUpload: {
-    error: boolean,
-    loading: boolean,
-    progress: number,
-    eta: number,
-  },
+    error: boolean;
+    loading: boolean;
+    progress: number;
+    eta: number;
+  };
+  fileProcessing: {
+    error: boolean;
+    loading: boolean;
+    progress: number;
+    eta: number;
+  };
 }
 
 const defaultUIState: ICreationStateInterface = {
@@ -99,6 +105,12 @@ const defaultUIState: ICreationStateInterface = {
     targetUrls: {},
   },
   fileUpload: {
+    error: false,
+    loading: false,
+    progress: 0,
+    eta: 0,
+  },
+  fileProcessing: {
     error: false,
     loading: false,
     progress: 0,
@@ -155,6 +167,18 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationFileUploadETA(state, { payload }: PayloadAction<number>) {
       state.fileUpload.eta = payload;
     },
+    setCreationFileProcessingLoading(state, { payload }: PayloadAction<boolean>) {
+      state.fileProcessing.loading = payload;
+    },
+    setCreationFileProcessingError(state, { payload }: PayloadAction<boolean>) {
+      state.fileProcessing.error = payload;
+    },
+    setCreationFileProcessingProgress(state, { payload }: PayloadAction<number>) {
+      state.fileProcessing.progress = payload;
+    },
+    setCreationFileProcessingETA(state, { payload }: PayloadAction<number>) {
+      state.fileProcessing.eta = payload;
+    },
     setCreationVideoProcessing(state, { payload }: PayloadAction<TVideoProcessingData>) {
       state.videoProcessing = payload;
     },
@@ -164,6 +188,7 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
       state.crowdfunding = { ...defaultUIState.crowdfunding };
       state.multiplechoice = { ...defaultUIState.multiplechoice };
       state.fileUpload = { ...defaultUIState.fileUpload };
+      state.fileProcessing = { ...defaultUIState.fileProcessing };
       // @ts-ignore
       state.videoProcessing = { ...defaultUIState.videoProcessing };
     },
@@ -188,6 +213,10 @@ export const {
   setCreationTargetBackerCount,
   setCreationFileUploadLoading,
   setCreationFileUploadProgress,
+  setCreationFileProcessingLoading,
+  setCreationFileProcessingError,
+  setCreationFileProcessingProgress,
+  setCreationFileProcessingETA,
 } = creationSlice.actions;
 
 export default creationSlice.reducer;

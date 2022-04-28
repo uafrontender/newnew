@@ -25,7 +25,9 @@ export const CreationFirstStep = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
@@ -55,9 +57,7 @@ export const CreationFirstStep = () => {
       </SBackLine>
       <SWrapper>
         <Head>
-          <title>
-            {t('firstStep.meta.title')}
-          </title>
+          <title>{t('firstStep.meta.title')}</title>
         </Head>
         <CreationFirstStepContent />
       </SWrapper>
@@ -65,18 +65,18 @@ export const CreationFirstStep = () => {
   );
 };
 
-(CreationFirstStep as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>
-    {page}
-  </CreationLayout>
-);
+(CreationFirstStep as NextPageWithLayout).getLayout = (
+  page: React.ReactElement
+) => <CreationLayout>{page}</CreationLayout>;
 
 export default CreationFirstStep;
 
-export async function getServerSideProps(context: NextPageContext): Promise<any> {
+export async function getServerSideProps(
+  context: NextPageContext
+): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'creation'],
+    ['common', 'creation']
   );
 
   // @ts-ignore

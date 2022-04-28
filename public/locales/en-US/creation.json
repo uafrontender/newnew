@@ -43,7 +43,8 @@
       },
       "subTitle": {
         "votesInfo": "All votes start at a $1 dollar by default",
-        "floating": "Upload file to preview your brand new decision"
+        "floating": "Upload file to preview your brand new decision",
+        "floating-processing": "Preview will be available after processing"
       }
     },
     "modal": {
@@ -169,6 +170,11 @@
         "title": "Just a minute",
         "description": "Your file is uploading. Just give us a second to finish your upload.",
         "process": "{{progress}}% • {{time}} left"
+      },
+      "processing": {
+        "title": "Processing the video...",
+        "description": "You can publish the post while the video is processed",
+        "process": "{{progress}}% • {{time}} left"
       }
     }
   },
@@ -227,6 +233,29 @@
       "tiktok": "TikTok",
       "copy": "Copy Link",
       "copied": "Link Copied!"
+    }
+  },
+  "tutorials": {
+    "heroPopupCommon": {
+      "heroBtnText": "Let's go"
+    },
+    "heroPopupAC": {
+      "title": "Events",
+      "line1": "1. Open to ideas? Post a video and have the\n audience send you bids on what you should do",
+      "line2": "2. People send bids with their ideas, and\n how much they’ll pay to see you do it",
+      "line3": "3. Choose your favorite bid, then\n upload a video of yourself doing it!"
+    },
+    "heroPopupMC": {
+      "title": "Superpolls",
+      "line1": "1. Post a video poll with a few options\n for the audience to choose from",
+      "line2": "2. People pay to vote on their favorite option",
+      "line3": "3. Upload a video response of you doing\n the option that gets the most votes!"
+    },
+    "heroPopupCF": {
+      "title": "Goals",
+      "line1": "1. Post a video goal and choose the number\n of backers you need to reach that goal",
+      "line2": "2. Every backer will contribute a custom\n dollar amount to your goal",
+      "line3": "3. Upload a video of you fulfilling your\n goal IRL when you get enough backers!"
     }
   }
 }

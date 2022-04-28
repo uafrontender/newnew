@@ -1,44 +1,47 @@
-/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 import React, {
-  useCallback, useContext, useEffect, useMemo, useState,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
-import styled, { useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-
-import PostVideo from '../../molecules/decision/PostVideo';
-import PostTitle from '../../molecules/decision/PostTitle';
-import PostTimer from '../../molecules/decision/PostTimer';
-import GoBackButton from '../../molecules/GoBackButton';
-import InlineSvg from '../../atoms/InlineSVG';
-
-// Icons
-import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import DecisionTabs from '../../molecules/decision/PostTabs';
-import { fetchCurrentOptionsForMCPost, getMcOption, voteOnPost } from '../../../api/endpoints/multiple_choice';
+import {
+  fetchCurrentOptionsForMCPost,
+  getMcOption,
+} from '../../../api/endpoints/multiple_choice';
+import isBrowser from '../../../utils/isBrowser';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostType from '../../../utils/switchPostType';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import McOptionsTab from '../../molecules/decision/multiple_choice/McOptionsTab';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import LoadingModal from '../../molecules/LoadingModal';
-import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
-import isBrowser from '../../../utils/isBrowser';
-import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
+
 import Lottie from '../../atoms/Lottie';
-import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import LoadingModal from '../../molecules/LoadingModal';
+import GoBackButton from '../../molecules/GoBackButton';
+import HeroPopup from '../../molecules/decision/HeroPopup';
+import PostTimer from '../../molecules/decision/PostTimer';
 import ResponseTimer from '../../molecules/decision/ResponseTimer';
+import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import DecisionTabs from '../../molecules/decision/PostTabs';
+import CommentsTab from '../../molecules/decision/CommentsTab';
+import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
+import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
+
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -57,19 +60,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   handleGoBack,
   handleUpdatePostStatus,
 }) => {
-  const theme = useTheme();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
-  const {
-    channelsWithSubs,
-    addChannel,
-    removeChannel,
-  } = useContext(ChannelsContext);
+  const { addChannel, removeChannel } = useContext(ChannelsContext);
 
   // Tabs
   const tabs = useMemo(() => {
@@ -83,10 +83,14 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           label: 'options',
           value: 'options',
         },
-        {
-          label: 'comments',
-          value: 'comments',
-        },
+        ...(post.isCommentsAllowed
+          ? [
+              {
+                label: 'comments',
+                value: 'comments',
+              },
+            ]
+          : []),
       ];
     }
     return [
@@ -94,19 +98,28 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         label: 'options',
         value: 'options',
       },
-      {
-        label: 'comments',
-        value: 'comments',
-      },
+      ...(post.isCommentsAllowed
+        ? [
+            {
+              label: 'comments',
+              value: 'comments',
+            },
+          ]
+        : []),
     ];
-  }, [post.winningOptionId]);
+  }, [post.isCommentsAllowed, post.winningOptionId]);
 
-  const [currentTab, setCurrentTab] = useState<'options' | 'comments' | 'winner'>(() => {
+  const [currentTab, setCurrentTab] = useState<
+    'options' | 'comments' | 'winner'
+  >(() => {
     if (!isBrowser()) {
-      return 'options'
+      return 'options';
     }
     const { hash } = window.location;
-    if (hash && (hash === '#options' || hash === '#comments'|| hash === '#winner')) {
+    if (
+      hash &&
+      (hash === '#options' || hash === '#comments' || hash === '#winner')
+    ) {
       return hash.substring(1) as 'options' | 'comments';
     }
     if (post.winningOptionId) return 'winner';
@@ -115,12 +128,24 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   const handleChangeTab = (tab: string) => {
     if (tab === 'comments' && isMobile) {
-      window.history.pushState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+      window.history.pushState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     } else {
-      window.history.replaceState(post.postUuid, 'Post', `/?post=${post.postUuid}#${tab}`);
+      window.history.replaceState(
+        {
+          postId: post.postUuid,
+        },
+        'Post',
+        `/post/${post.postUuid}#${tab}`
+      );
     }
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-  }
+  };
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -130,20 +155,25 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         return;
       }
       const parsedHash = hash.substring(1);
-      if (parsedHash === 'options' || parsedHash === 'comments' || parsedHash === 'winner') {
+      if (
+        parsedHash === 'options' ||
+        parsedHash === 'comments' ||
+        parsedHash === 'winner'
+      ) {
         setCurrentTab(parsedHash);
       }
-    }
+    };
 
     window.addEventListener('hashchange', handleHashChange, false);
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange, false);
-    }
+    };
   }, []);
 
   // Respone upload
-  const [responseFreshlyUploaded, setResponseFreshlyUploaded] = useState<newnewapi.IVideoUrls | undefined>(undefined);
+  const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
+    useState<newnewapi.IVideoUrls | undefined>(undefined);
 
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
 
@@ -152,131 +182,142 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
   // Options
   const [options, setOptions] = useState<TMcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(post.optionCount ?? '');
-  const [optionsNextPageToken, setOptionsNextPageToken] = useState<string | undefined | null>('');
+  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
+    post.optionCount ?? ''
+  );
+  const [optionsNextPageToken, setOptionsNextPageToken] =
+    useState<string | undefined | null>('');
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
   // Winning option
-  const [winningOption, setWinningOption] = useState<newnewapi.MultipleChoice.Option | undefined>();
+  const [winningOption, setWinningOption] =
+    useState<newnewapi.MultipleChoice.Option | undefined>();
 
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-  const sortOptions = useCallback((unsortedArr: TMcOptionWithHighestField[]) => {
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < unsortedArr.length; i++) {
-      // eslint-disable-next-line no-param-reassign
-      unsortedArr[i].isHighest = false;
-    }
-
-    const highestOption = unsortedArr.sort((a, b) => (
-      (b?.voteCount as number) - (a?.voteCount as number)
-    ))[0];
-
-    const optionsByUser = user.userData?.userUuid
-      ? unsortedArr.filter((o) => o.creator?.uuid === user.userData?.userUuid)
-        .sort((a, b) => (
-          (b?.voteCount as number) - (a?.voteCount as number)
-        ))
-      : [];
-
-    const optionsSupportedByUser = user.userData?.userUuid
-      ? unsortedArr.filter((o) => o.isSupportedByMe)
-        .sort((a, b) => (
-          (b?.voteCount as number) - (a?.voteCount as number)
-        ))
-      : [];
-
-    // const optionsByVipUsers = [];
-
-    const workingArrSorted = unsortedArr.sort((a, b) => (
-      (b?.voteCount as number) - (a?.voteCount as number)
-    ));
-
-    const joinedArr = [
-      ...(
-        highestOption
-        && highestOption.creator?.uuid === user.userData?.userUuid ? [highestOption] : []),
-      ...optionsByUser,
-      ...optionsSupportedByUser,
-      // ...optionsByVipUsers,
-      ...(
-        highestOption
-        && highestOption.creator?.uuid !== user.userData?.userUuid ? [highestOption] : []),
-      ...workingArrSorted,
-    ];
-
-    const workingSortedUnique = joinedArr.length > 0
-      ? [...new Set(joinedArr)] : [];
-
-    const highestOptionIdx = (
-      workingSortedUnique as TMcOptionWithHighestField[]
-    ).findIndex((o) => o.id === highestOption.id);
-
-    if (workingSortedUnique[highestOptionIdx]) {
-      workingSortedUnique[highestOptionIdx].isHighest = true;
-    }
-
-    return workingSortedUnique;
-  }, [user.userData?.userUuid]);
-
-  const fetchOptions = useCallback(async (
-    pageToken?: string,
-  ) => {
-    if (optionsLoading) return;
-    try {
-      setOptionsLoading(true);
-      setLoadingOptionsError('');
-
-      const getCurrentOptionsPayload = new newnewapi.GetMcOptionsRequest({
-        postUuid: post.postUuid,
-        ...(pageToken ? {
-          paging: {
-            pageToken,
-          },
-        } : {}),
-      });
-
-      const res = await fetchCurrentOptionsForMCPost(getCurrentOptionsPayload);
-
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (res.data && res.data.options) {
-        setOptions((curr) => {
-          const workingArr = [...curr, ...res.data?.options as TMcOptionWithHighestField[]];
-
-          return sortOptions(workingArr);
-        });
-        setOptionsNextPageToken(res.data.paging?.nextPageToken);
+  const sortOptions = useCallback(
+    (unsortedArr: TMcOptionWithHighestField[]) => {
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < unsortedArr.length; i++) {
+        // eslint-disable-next-line no-param-reassign
+        unsortedArr[i].isHighest = false;
       }
 
-      setOptionsLoading(false);
-    } catch (err) {
-      setOptionsLoading(false);
-      setLoadingOptionsError((err as Error).message);
-      console.error(err);
-    }
-  }, [
-    optionsLoading,
-    setOptions,
-    sortOptions,
-    post,
-  ]);
+      const highestOption = unsortedArr.sort(
+        (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
+      )[0];
 
-  const handleRemoveOption = useCallback((
-    optionToRemove: newnewapi.MultipleChoice.Option,
-  ) => {
-    setOptions((curr) => {
-      const workingArr = [...curr];
-      const workingArrUnsorted = [...workingArr.filter((o) => o.id !== optionToRemove.id)];
-      return sortOptions(workingArrUnsorted);
-    });
-  }, [
-    setOptions,
-    sortOptions,
-  ]);
+      const optionsByUser = user.userData?.userUuid
+        ? unsortedArr
+            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
+            .sort((a, b) => (b?.voteCount as number) - (a?.voteCount as number))
+        : [];
+
+      const optionsSupportedByUser = user.userData?.userUuid
+        ? unsortedArr
+            .filter((o) => o.isSupportedByMe)
+            .sort((a, b) => (b?.voteCount as number) - (a?.voteCount as number))
+        : [];
+
+      // const optionsByVipUsers = [];
+
+      const workingArrSorted = unsortedArr.sort(
+        (a, b) => (b?.voteCount as number) - (a?.voteCount as number)
+      );
+
+      const joinedArr = [
+        ...(highestOption &&
+        highestOption.creator?.uuid === user.userData?.userUuid
+          ? [highestOption]
+          : []),
+        ...optionsByUser,
+        ...optionsSupportedByUser,
+        // ...optionsByVipUsers,
+        ...(highestOption &&
+        highestOption.creator?.uuid !== user.userData?.userUuid
+          ? [highestOption]
+          : []),
+        ...workingArrSorted,
+      ];
+
+      const workingSortedUnique =
+        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+
+      const highestOptionIdx = (
+        workingSortedUnique as TMcOptionWithHighestField[]
+      ).findIndex((o) => o.id === highestOption.id);
+
+      if (workingSortedUnique[highestOptionIdx]) {
+        workingSortedUnique[highestOptionIdx].isHighest = true;
+      }
+
+      return workingSortedUnique;
+    },
+    [user.userData?.userUuid]
+  );
+
+  const fetchOptions = useCallback(
+    async (pageToken?: string) => {
+      if (optionsLoading) return;
+      try {
+        setOptionsLoading(true);
+        setLoadingOptionsError('');
+
+        const getCurrentOptionsPayload = new newnewapi.GetMcOptionsRequest({
+          postUuid: post.postUuid,
+          ...(pageToken
+            ? {
+                paging: {
+                  pageToken,
+                },
+              }
+            : {}),
+        });
+
+        const res = await fetchCurrentOptionsForMCPost(
+          getCurrentOptionsPayload
+        );
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data && res.data.options) {
+          setOptions((curr) => {
+            const workingArr = [
+              ...curr,
+              ...(res.data?.options as TMcOptionWithHighestField[]),
+            ];
+
+            return sortOptions(workingArr);
+          });
+          setOptionsNextPageToken(res.data.paging?.nextPageToken);
+        }
+
+        setOptionsLoading(false);
+      } catch (err) {
+        setOptionsLoading(false);
+        setLoadingOptionsError((err as Error).message);
+        console.error(err);
+      }
+    },
+    [optionsLoading, setOptions, sortOptions, post]
+  );
+
+  const handleRemoveOption = useCallback(
+    (optionToRemove: newnewapi.MultipleChoice.Option) => {
+      setOptions((curr) => {
+        const workingArr = [...curr];
+        const workingArrUnsorted = [
+          ...workingArr.filter((o) => o.id !== optionToRemove.id),
+        ];
+        return sortOptions(workingArrUnsorted);
+      });
+    },
+    [setOptions, sortOptions]
+  );
 
   const fetchPostLatestData = useCallback(async () => {
     try {
@@ -286,7 +327,8 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
       const res = await fetchPostByUUID(fetchPostPayload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       setTotalVotes(res.data.multipleChoice!!.totalVotes as number);
       setNumberOfOptions(res.data.multipleChoice!!.optionCount as number);
@@ -294,25 +336,22 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     } catch (err) {
       console.error(err);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
   useEffect(() => {
-    addChannel(
-      post.postUuid,
-      {
-        postUpdates: {
-          postUuid: post.postUuid,
-        },
+    addChannel(post.postUuid, {
+      postUpdates: {
+        postUuid: post.postUuid,
       },
-    );
+    });
 
     return () => {
       removeChannel(post.postUuid);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -320,7 +359,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     setOptionsNextPageToken('');
     fetchOptions();
     fetchPostLatestData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
 
   useEffect(() => {
@@ -353,12 +392,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         setOptions((curr) => {
           const workingArr = [...curr];
           let workingArrUnsorted;
-          const idx = workingArr.findIndex((op) => op.id === decoded.option?.id);
+          const idx = workingArr.findIndex(
+            (op) => op.id === decoded.option?.id
+          );
           if (idx === -1) {
-            workingArrUnsorted = [...workingArr, decoded.option as TMcOptionWithHighestField];
+            workingArrUnsorted = [
+              ...workingArr,
+              decoded.option as TMcOptionWithHighestField,
+            ];
           } else {
-            workingArr[idx]
-              .voteCount = (decoded.option?.voteCount as number);
+            workingArr[idx].voteCount = decoded.option?.voteCount as number;
             workingArrUnsorted = workingArr;
           }
 
@@ -384,8 +427,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       const decoded = newnewapi.PostUpdated.decode(arr);
 
       if (!decoded) return;
-      const [decodedParsed] = switchPostType(
-        decoded.post as newnewapi.IPost);
+      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
         setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
@@ -403,7 +445,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     };
 
     if (socketConnection) {
-      socketConnection.on('McOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+      socketConnection.on(
+        'McOptionCreatedOrUpdated',
+        socketHandlerOptionCreatedOrUpdated
+      );
       socketConnection.on('McOptionDeleted', socketHandlerOptionDeleted);
       socketConnection.on('PostUpdated', socketHandlerPostData);
       socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
@@ -411,13 +456,16 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        socketConnection.off('McOptionCreatedOrUpdated', socketHandlerOptionCreatedOrUpdated);
+        socketConnection.off(
+          'McOptionCreatedOrUpdated',
+          socketHandlerOptionCreatedOrUpdated
+        );
         socketConnection.off('McOptionDeleted', socketHandlerOptionDeleted);
         socketConnection.off('PostUpdated', socketHandlerPostData);
         socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     socketConnection,
     post,
@@ -425,6 +473,22 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
     setOptions,
     sortOptions,
   ]);
+
+  const goToNextStep = () => {
+    if (user.loggedIn) {
+      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+        mcCurrentStep: user.userTutorialsProgress.remainingMcSteps!![0],
+      });
+      markTutorialStepAsCompleted(payload);
+    }
+    dispatch(
+      setUserTutorialsProgress({
+        remainingMcSteps: [
+          ...user.userTutorialsProgress.remainingMcSteps!!,
+        ].slice(1),
+      })
+    );
+  };
 
   return (
     <SWrapper>
@@ -439,11 +503,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         )}
         {postStatus === 'waiting_for_response' ? (
           <ResponseTimer
-            timestampSeconds={new Date((post.responseUploadDeadline?.seconds as number) * 1000).getTime()}
+            timestampSeconds={new Date(
+              (post.responseUploadDeadline?.seconds as number) * 1000
+            ).getTime()}
           />
         ) : (
           <PostTimer
-            timestampSeconds={new Date((post.expiresAt?.seconds as number) * 1000).getTime()}
+            timestampSeconds={new Date(
+              (post.expiresAt?.seconds as number) * 1000
+            ).getTime()}
             postType="mc"
           />
         )}
@@ -455,74 +523,77 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
-        handleUpdateResponseVideo={(newValue) => setResponseFreshlyUploaded(newValue)}
+        handleUpdateResponseVideo={(newValue) =>
+          setResponseFreshlyUploaded(newValue)
+        }
       />
       <PostTopInfoModeration
         postType="mc"
+        postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
         totalVotes={totalVotes}
+        hasWinner={false}
+        hasResponse={!!post.response}
         handleUpdatePostStatus={handleUpdatePostStatus}
       />
-      <SActivitesContainer>
+      <SActivitesContainer decisionFailed={postStatus === 'failed'}>
         <DecisionTabs
           tabs={tabs}
           activeTab={currentTab}
           handleChangeTab={handleChangeTab}
         />
-        {currentTab === 'options'
-          ? (
-            <McOptionsTabModeration
-              post={post}
-              options={options}
-              optionsLoading={optionsLoading}
-              pagingToken={optionsNextPageToken}
-              minAmount={post.votePrice?.usdCents
-                ? (
-                  parseInt((post.votePrice?.usdCents / 100).toFixed(0), 10)
-                ) : 1}
-              handleLoadOptions={fetchOptions}
-              handleRemoveOption={handleRemoveOption}
+        {currentTab === 'options' ? (
+          <McOptionsTabModeration
+            post={post}
+            options={options}
+            optionsLoading={optionsLoading}
+            pagingToken={optionsNextPageToken}
+            handleLoadOptions={fetchOptions}
+            handleRemoveOption={handleRemoveOption}
+          />
+        ) : currentTab === 'comments' && post.isCommentsAllowed ? (
+          <CommentsTab
+            canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
+            commentsRoomId={post.commentsRoomId as number}
+            handleGoBack={() => handleChangeTab('options')}
+          />
+        ) : winningOption ? (
+          <McWinnerTabModeration
+            postId={post.postUuid}
+            option={winningOption}
+            postStatus={postStatus}
+          />
+        ) : (
+          <SAnimationContainer>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
             />
-          ) : (
-            currentTab === 'comments'
-            ? (
-              <CommentsTab
-                canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
-                commentsRoomId={post.commentsRoomId as number}
-                handleGoBack={() => handleChangeTab('options')}
-              />
-            ) : winningOption ? (
-              <McWinnerTabModeration
-                option={winningOption}
-                postStatus={postStatus}
-              />
-            ) : (
-              <SAnimationContainer>
-                <Lottie
-                  width={64}
-                  height={64}
-                  options={{
-                    loop: true,
-                    autoplay: true,
-                    animationData: loadingAnimation,
-                  }}
-                />
-              </SAnimationContainer>
-            )
-          )}
+          </SAnimationContainer>
+        )}
       </SActivitesContainer>
       {/* Loading Modal */}
-      <LoadingModal
-        isOpen={loadingModalOpen}
-        zIndex={14}
+      <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      <HeroPopup
+        isPopupVisible={
+          user!!.userTutorialsProgressSynced &&
+          user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+            newnewapi.McTutorialStep.MC_HERO
+        }
+        postType="MC"
+        closeModal={goToNextStep}
       />
     </SWrapper>
   );
 };
 
-PostModerationMC.defaultProps = {
-};
+PostModerationMC.defaultProps = {};
 
 export default PostModerationMC;
 
@@ -532,13 +603,15 @@ const SWrapper = styled.div`
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
+    height: 648px;
+
     display: grid;
     grid-template-areas:
       'expires expires'
       'title title'
       'video activities';
     grid-template-columns: 284px 1fr;
-    grid-template-rows: max-content max-content 1fr;
+    grid-template-rows: max-content max-content minmax(0, 1fr);
 
     grid-column-gap: 16px;
 
@@ -546,6 +619,8 @@ const SWrapper = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
+    height: 728px;
+
     grid-template-areas:
       'video expires'
       'video title'
@@ -578,7 +653,9 @@ const SGoBackButton = styled(GoBackButton)`
   top: 4px;
 `;
 
-const SActivitesContainer = styled.div`
+const SActivitesContainer = styled.div<{
+  decisionFailed: boolean;
+}>`
   grid-area: activities;
 
   display: flex;
@@ -594,7 +671,14 @@ const SActivitesContainer = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-height: calc(580px);
+    ${({ decisionFailed }) =>
+      !decisionFailed
+        ? css`
+            max-height: 580px;
+          `
+        : css`
+            max-height: calc(580px - 120px);
+          `}
   }
 `;
 
