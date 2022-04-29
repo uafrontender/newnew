@@ -45,7 +45,7 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
     <Link href={item.url}>
       <a>
         <SNavItem variant={3} weight={600}>
-          <div className="navText" style={{ opacity: active ? 1 : 0.5 }}>
+          <div className='navText' style={{ opacity: active ? 1 : 0.5 }}>
             {t(`mobile-top-navigation-${item.key}`, {
               value: item.value,
             })}

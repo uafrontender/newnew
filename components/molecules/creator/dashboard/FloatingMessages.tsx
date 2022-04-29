@@ -11,12 +11,19 @@ interface IFloatingMessages {
   openChat: () => void;
 }
 
-export const FloatingMessages: React.FC<IFloatingMessages> = ({ withCounter, openChat }) => {
+export const FloatingMessages: React.FC<IFloatingMessages> = ({
+  withCounter,
+  openChat,
+}) => {
   const { unreadCountForCreator } = useGetChats();
   return (
     <SContainer onClick={openChat}>
-      <InlineSVG svg={chatIcon} width="24px" height="24px" />
-      {withCounter && <SIndicatorContainer>{unreadCountForCreator > 0 && <SIndicator minified />}</SIndicatorContainer>}
+      <InlineSVG svg={chatIcon} width='24px' height='24px' />
+      {withCounter && (
+        <SIndicatorContainer>
+          {unreadCountForCreator > 0 && <SIndicator minified />}
+        </SIndicatorContainer>
+      )}
     </SContainer>
   );
 };

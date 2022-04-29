@@ -7,7 +7,7 @@ const imgExtenstions = [
   '.jpeg',
   '.JPEG',
   '.webp',
-  '.WEBP'
+  '.WEBP',
 ];
 
 const isImage = (name: string) => {

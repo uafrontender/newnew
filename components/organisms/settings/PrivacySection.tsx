@@ -11,7 +11,7 @@ import Button from '../../atoms/Button';
 import ConfirmDeleteAccountModal from '../../molecules/settings/ConfirmDeleteAccountModal';
 
 type TPrivacySection = {
-  isSpendingHidden: boolean,
+  isSpendingHidden: boolean;
   isAccountPrivate: boolean;
   blockedUsers: Omit<newnewapi.User, 'toJSON'>[];
   handleToggleSpendingHidden: () => void;
@@ -32,23 +32,20 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 }) => {
   const { t } = useTranslation('profile');
 
-  const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] = useState(false);
+  const [isConfirmDeleteMyAccountVisible, setIsConfirmDeleteMyAccountVisible] =
+    useState(false);
 
   return (
-    <SWrapper
-      onMouseEnter={() => handleSetActive()}
-    >
+    <SWrapper onMouseEnter={() => handleSetActive()}>
       <SHidingSubsectionsContainer>
         <SHidingSubsection>
-          <SHidingSubsectionTitle
-            variant={2}
-          >
-            { t('Settings.sections.Privacy.privacySubsections.spendings.title') }
+          <SHidingSubsectionTitle variant={2}>
+            {t('Settings.sections.Privacy.privacySubsections.spendings.title')}
           </SHidingSubsectionTitle>
-          <SHidingSubsectionCaption
-            variant={2}
-          >
-            { t('Settings.sections.Privacy.privacySubsections.spendings.caption') }
+          <SHidingSubsectionCaption variant={2}>
+            {t(
+              'Settings.sections.Privacy.privacySubsections.spendings.caption'
+            )}
           </SHidingSubsectionCaption>
           <Toggle
             checked={isSpendingHidden}
@@ -60,15 +57,11 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
           />
         </SHidingSubsection>
         <SHidingSubsection>
-          <SHidingSubsectionTitle
-            variant={2}
-          >
-            { t('Settings.sections.Privacy.privacySubsections.private.title') }
+          <SHidingSubsectionTitle variant={2}>
+            {t('Settings.sections.Privacy.privacySubsections.private.title')}
           </SHidingSubsectionTitle>
-          <SHidingSubsectionCaption
-            variant={2}
-          >
-            { t('Settings.sections.Privacy.privacySubsections.private.caption') }
+          <SHidingSubsectionCaption variant={2}>
+            {t('Settings.sections.Privacy.privacySubsections.private.caption')}
           </SHidingSubsectionCaption>
           <Toggle
             checked={isAccountPrivate}
@@ -81,56 +74,40 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
         </SHidingSubsection>
       </SHidingSubsectionsContainer>
       <SBlockedUsersContainer>
-        <SBlockedUsersContainerTitle
-          variant={2}
-        >
-          { t('Settings.sections.Privacy.blockedusers.title') }
+        <SBlockedUsersContainerTitle variant={2}>
+          {t('Settings.sections.Privacy.blockedusers.title')}
         </SBlockedUsersContainerTitle>
         {blockedUsers.length === 0 && (
-          <Text
-            variant={3}
-          >
+          <Text variant={3}>
             {t('Settings.sections.Privacy.blockedusers.no_blocked_users')}
           </Text>
         )}
-        {blockedUsers && blockedUsers.map((u) => (
-          <SBlockedUserCard>
-            <SAvatar>
-              <img
-                alt={u.username}
-                src={u.avatarUrl}
-              />
-            </SAvatar>
-            <SNickname
-              variant={3}
-            >
-              { u.nickname }
-            </SNickname>
-            <SUsername
-              variant={2}
-            >
-              { u.username }
-            </SUsername>
-            <SUnblockButton
-              onClick={() => handleUnblockUser(u.uuid)}
-              view="secondary"
-            >
-              { t('Settings.sections.Privacy.blockedusers.unblockBtn') }
-            </SUnblockButton>
-          </SBlockedUserCard>
-        ))}
+        {blockedUsers &&
+          blockedUsers.map((u) => (
+            <SBlockedUserCard>
+              <SAvatar>
+                <img alt={u.username} src={u.avatarUrl} />
+              </SAvatar>
+              <SNickname variant={3}>{u.nickname}</SNickname>
+              <SUsername variant={2}>{u.username}</SUsername>
+              <SUnblockButton
+                onClick={() => handleUnblockUser(u.uuid)}
+                view='secondary'
+              >
+                {t('Settings.sections.Privacy.blockedusers.unblockBtn')}
+              </SUnblockButton>
+            </SBlockedUserCard>
+          ))}
       </SBlockedUsersContainer>
       <SCloseAccountSubsection>
-        <SHidingSubsectionTitle
-          variant={2}
-        >
-          { t('Settings.sections.Privacy.closeAccount.title') }
+        <SHidingSubsectionTitle variant={2}>
+          {t('Settings.sections.Privacy.closeAccount.title')}
         </SHidingSubsectionTitle>
         <SCloseAccountButton
           onClick={() => setIsConfirmDeleteMyAccountVisible(true)}
-          view="secondary"
+          view='secondary'
         >
-          { t('Settings.sections.Privacy.closeAccount.closeBtn') }
+          {t('Settings.sections.Privacy.closeAccount.closeBtn')}
         </SCloseAccountButton>
         <ConfirmDeleteAccountModal
           isVisible={isConfirmDeleteMyAccountVisible}
@@ -143,9 +120,7 @@ const PrivacySection: React.FunctionComponent<TPrivacySection> = ({
 
 export default PrivacySection;
 
-const SWrapper = styled.div`
-
-`;
+const SWrapper = styled.div``;
 
 const SHidingSubsectionsContainer = styled.div`
   display: flex;
@@ -154,15 +129,15 @@ const SHidingSubsectionsContainer = styled.div`
 
   padding-bottom: 16px;
 
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 const SHidingSubsection = styled.div`
   display: grid;
   grid-template-areas:
     'titleAr toggle'
-    'captionAr toggle'
-  ;
+    'captionAr toggle';
   grid-template-columns: 5fr 1fr;
 `;
 
@@ -184,7 +159,8 @@ const SBlockedUsersContainer = styled.div`
   gap: 18px;
 
   padding-bottom: 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 const SBlockedUsersContainerTitle = styled(Text)`
@@ -195,8 +171,7 @@ const SBlockedUserCard = styled.div`
   display: grid;
   grid-template-areas:
     'avatar nickname unblock'
-    'avatar username unblock'
-  ;
+    'avatar username unblock';
   grid-template-columns: 52px 2fr 4fr;
 `;
 
@@ -243,8 +218,7 @@ const SCloseAccountSubsection = styled.div`
   display: grid;
   grid-template-areas:
     'titleAr delete'
-    'captionAr delete'
-  ;
+    'captionAr delete';
   grid-template-columns: 5fr 1fr;
 
   padding-top: 16px;

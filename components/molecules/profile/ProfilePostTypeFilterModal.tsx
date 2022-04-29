@@ -16,82 +16,71 @@ interface IProfilePostTypeFilterModal {
   onClose: () => void;
 }
 
-const ProfilePostTypeFilterModal: React.FunctionComponent<IProfilePostTypeFilterModal> = ({
-  isOpen,
-  zIndex,
-  selected,
-  handleSelect,
-  onClose,
-}) => {
-  const { t } = useTranslation('profile');
+const ProfilePostTypeFilterModal: React.FunctionComponent<IProfilePostTypeFilterModal> =
+  ({ isOpen, zIndex, selected, handleSelect, onClose }) => {
+    const { t } = useTranslation('profile');
 
-  const options: PostsFilterOption[] = useMemo(() => (
-    [
-      {
-        nameToken: '0',
-        value: newnewapi.Post.Filter.ALL,
-      },
-      {
-        nameToken: '1',
-        value: newnewapi.Post.Filter.AUCTIONS,
-      },
-      {
-        nameToken: '3',
-        value: newnewapi.Post.Filter.MULTIPLE_CHOICES,
-      },
-      {
-        nameToken: '2',
-        value: newnewapi.Post.Filter.CROWDFUNDINGS,
-      },
-    ]
-  ), []);
+    const options: PostsFilterOption[] = useMemo(
+      () => [
+        {
+          nameToken: '0',
+          value: newnewapi.Post.Filter.ALL,
+        },
+        {
+          nameToken: '1',
+          value: newnewapi.Post.Filter.AUCTIONS,
+        },
+        {
+          nameToken: '3',
+          value: newnewapi.Post.Filter.MULTIPLE_CHOICES,
+        },
+        {
+          nameToken: '2',
+          value: newnewapi.Post.Filter.CROWDFUNDINGS,
+        },
+      ],
+      []
+    );
 
-  const handleClick = (value: newnewapi.Post.Filter) => {
-    // @ts-ignore
-    handleSelect(value.toString());
-    onClose();
-  };
+    const handleClick = (value: newnewapi.Post.Filter) => {
+      // @ts-ignore
+      handleSelect(value.toString());
+      onClose();
+    };
 
-  return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          {options.map((o) => (
-            <SButton
-              selected={o.value.toString() === (selected?.toString() ?? '0')}
-              onClick={() => handleClick(o.value)}
-            >
-              <Text
-                variant={3}
+    return (
+      <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            {options.map((o) => (
+              <SButton
+                selected={o.value.toString() === (selected?.toString() ?? '0')}
+                onClick={() => handleClick(o.value)}
               >
-                { t(`posts-filter.filter-${o.nameToken}`) }
-              </Text>
-            </SButton>
-          ))}
-        </SContentContainer>
-        <Button
-          view="secondary"
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-          onClick={onClose}
-        >
-          {t('Cancel')}
-        </Button>
-      </SWrapper>
-    </Modal>
-  );
-};
+                <Text variant={3}>
+                  {t(`posts-filter.filter-${o.nameToken}`)}
+                </Text>
+              </SButton>
+            ))}
+          </SContentContainer>
+          <Button
+            view='secondary'
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
+            }}
+            onClick={onClose}
+          >
+            {t('Cancel')}
+          </Button>
+        </SWrapper>
+      </Modal>
+    );
+  };
 
 export default ProfilePostTypeFilterModal;
 
@@ -142,9 +131,10 @@ const SButton = styled.button<{
   border-radius: 8px;
   padding: 8px;
 
-  color: ${({ selected, theme }) => (selected ? theme.colorsThemed.text.primary : 'initial')} !important;
-  background: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'initial')} !important;
-
+  color: ${({ selected, theme }) =>
+    selected ? theme.colorsThemed.text.primary : 'initial'} !important;
+  background: ${({ selected, theme }) =>
+    selected ? theme.colorsThemed.background.quinary : 'initial'} !important;
 
   &:focus {
     outline: none;

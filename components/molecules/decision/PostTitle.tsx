@@ -21,14 +21,11 @@ const PostTitle: React.FunctionComponent<IPostTitle> = ({
       shrink={shrink ?? false}
       onClick={() => setIsEllipsed((c) => !c)}
     >
-      { !isEllipsed && !shrink ? (
-        children
-      ) : (
-        (children as string).length > 100
-          ? (
-            `${(children as string).slice(0, 100)}...`
-          ) : children
-      ) }
+      {!isEllipsed && !shrink
+        ? children
+        : (children as string).length > 100
+        ? `${(children as string).slice(0, 100)}...`
+        : children}
     </SHeadline>
   );
 };
@@ -46,21 +43,24 @@ const SHeadline = styled(Headline)<{
   margin-top: 24px;
   margin-bottom: 12px;
 
-  transition: font-size linear .2s;
+  transition: font-size linear 0.2s;
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 16px;
   }
 
-  ${({ shrink }) => (shrink ? (css`
-    font-weight: 600;
-    font-size: 12px;
-    line-height: 16px;
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-    margin-bottom: 8px;
+  ${({ shrink }) =>
+    shrink
+      ? css`
+          font-weight: 600;
+          font-size: 12px;
+          line-height: 16px;
+          color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+          margin-bottom: 8px;
 
-    ${({ theme }) => theme.media.laptop} {
-      margin-bottom: 8px;
-    }
-  `) : null)};
+          ${({ theme }) => theme.media.laptop} {
+            margin-bottom: 8px;
+          }
+        `
+      : null};
 `;

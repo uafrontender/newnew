@@ -3,12 +3,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -34,277 +29,277 @@ interface IPostAwaitingResponseCF {
   post: newnewapi.Crowdfunding;
 }
 
-const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> = ({
-  post,
-}) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const waitingTime = useMemo(() => {
-    const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-    const parsed = (end - Date.now()) / 1000;
-    const dhms = secondsToDHMS(parsed, 'noTrim');
+    const waitingTime = useMemo(() => {
+      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
+      const parsed = (end - Date.now()) / 1000;
+      const dhms = secondsToDHMS(parsed, 'noTrim');
 
-    let countdownsrt = `${dhms.days} ${t('AcPostAwaiting.hero.expires.days')} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+      let countdownsrt = `${dhms.days} ${t(
+        'AcPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
 
-    if (dhms.days === '0') {
-      countdownsrt = `${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
-      if (dhms.hours === '0') {
-        countdownsrt = `${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
-        if (dhms.minutes === '0') {
-          countdownsrt = `${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+      if (dhms.days === '0') {
+        countdownsrt = `${dhms.hours} ${t(
+          'AcPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+        if (dhms.hours === '0') {
+          countdownsrt = `${dhms.minutes} ${t(
+            'AcPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+          if (dhms.minutes === '0') {
+            countdownsrt = `${dhms.seconds} ${t(
+              'AcPostAwaiting.hero.expires.seconds'
+            )}`;
+          }
         }
       }
-    }
-    countdownsrt = `${countdownsrt} `;
-    return countdownsrt;
-  }, [post.responseUploadDeadline?.seconds, t]);
+      countdownsrt = `${countdownsrt} `;
+      return countdownsrt;
+    }, [post.responseUploadDeadline?.seconds, t]);
 
-  // My pledge amount
-  const [myPledgeAmount, setMyPledgeAmount] = useState<newnewapi.MoneyAmount | undefined>(undefined);
-  const [pledges, setPledges] = useState<newnewapi.Crowdfunding.IPledge[]>([]);
-  const [pledgesNextPageToken, setPledgesNextPageToken] =
-    useState<string | undefined | null>('');
-  const [pledgesLoading, setPledgesLoading] = useState(false);
-  const [loadingPledgesError, setLoadingPledgesError] = useState('');
+    // My pledge amount
+    const [myPledgeAmount, setMyPledgeAmount] =
+      useState<newnewapi.MoneyAmount | undefined>(undefined);
+    const [pledges, setPledges] = useState<newnewapi.Crowdfunding.IPledge[]>(
+      []
+    );
+    const [pledgesNextPageToken, setPledgesNextPageToken] =
+      useState<string | undefined | null>('');
+    const [pledgesLoading, setPledgesLoading] = useState(false);
+    const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
-  const fetchPledgesForPost = useCallback(
-    async (pageToken?: string) => {
-      if (pledgesLoading) return;
-      try {
-        setPledgesLoading(true);
-        setLoadingPledgesError('');
+    const fetchPledgesForPost = useCallback(
+      async (pageToken?: string) => {
+        if (pledgesLoading) return;
+        try {
+          setPledgesLoading(true);
+          setLoadingPledgesError('');
 
-        const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
-          postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await fetchPledges(getCurrentPledgesPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.pledges) {
-          setPledges((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.pledges as newnewapi.Crowdfunding.IPledge[]),
-            ];
-            return workingArr;
+          const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
+            postUuid: post.postUuid,
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
           });
-          setPledgesNextPageToken(res.data.paging?.nextPageToken);
-        }
 
-        setPledgesLoading(false);
-      } catch (err) {
-        setPledgesLoading(false);
-        setLoadingPledgesError((err as Error).message);
-        console.error(err);
-      }
-    },
-    [pledgesLoading, setPledges, post]
-  );
+          const res = await fetchPledges(getCurrentPledgesPayload);
+
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          if (res.data && res.data.pledges) {
+            setPledges((curr) => {
+              const workingArr = [
+                ...curr,
+                ...(res.data?.pledges as newnewapi.Crowdfunding.IPledge[]),
+              ];
+              return workingArr;
+            });
+            setPledgesNextPageToken(res.data.paging?.nextPageToken);
+          }
+
+          setPledgesLoading(false);
+        } catch (err) {
+          setPledgesLoading(false);
+          setLoadingPledgesError((err as Error).message);
+          console.error(err);
+        }
+      },
+      [pledgesLoading, setPledges, post]
+    );
 
     // Video
-  // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
     // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
-  });
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
 
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
-      }
-      const parsedHash = hash.substring(1);
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+        const parsedHash = hash.substring(1);
 
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
 
-    handleCommentsInitialHash();
-  }, []);
+      handleCommentsInitialHash();
+    }, []);
 
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  useEffect(() => {
-    fetchPledgesForPost();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (pledgesNextPageToken) {
-      fetchPledgesForPost(pledgesNextPageToken);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pledgesNextPageToken]);
-
-  useEffect(() => {
-    let workingAmount = 0;
-
-    if (user.userData?.userUuid) {
-      workingAmount = pledges
-        .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
-        .reduce(
-          (acc, myPledge) =>
-            myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc,
-          0
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
         );
-    }
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
+      }
+    }, [inView, post.postUuid]);
 
+    useEffect(() => {
+      fetchPledgesForPost();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    if (workingAmount !== 0 && workingAmount !== undefined) {
-      setMyPledgeAmount(
-        new newnewapi.MoneyAmount({
-          usdCents: workingAmount,
-        })
-      );
-    }
-  }, [pledges, user.userData?.userUuid]);
+    useEffect(() => {
+      if (pledgesNextPageToken) {
+        fetchPledgesForPost(pledgesNextPageToken);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pledgesNextPageToken]);
 
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          <>
-            <WaitingForResponseBox
-              title={t('CfPostAwaiting.hero.title')}
-              body={t(
-                'CfPostAwaiting.hero.body',
-                {
+    useEffect(() => {
+      let workingAmount = 0;
+
+      if (user.userData?.userUuid) {
+        workingAmount = pledges
+          .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
+          .reduce(
+            (acc, myPledge) =>
+              myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc,
+            0
+          );
+      }
+
+      if (workingAmount !== 0 && workingAmount !== undefined) {
+        setMyPledgeAmount(
+          new newnewapi.MoneyAmount({
+            usdCents: workingAmount,
+          })
+        );
+      }
+    }, [pledges, user.userData?.userUuid]);
+
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
+          />
+          <SActivitesContainer>
+            <>
+              <WaitingForResponseBox
+                title={t('CfPostAwaiting.hero.title')}
+                body={t('CfPostAwaiting.hero.body', {
                   creator: post.creator?.nickname,
-                  time: waitingTime
-                })
-              }
-            />
-            <SMainSectionWrapper>
-              <SCreatorInfoDiv>
-                <SCreator>
-                  <SCreatorImage
-                    src={post.creator?.avatarUrl!!}
-                  />
-                  <SWantsToKnow>
-                    {t('CfPostAwaiting.wants_to_know', { creator: post.creator?.nickname })}
-                  </SWantsToKnow>
-                </SCreator>
-                {/* <STotal>
+                  time: waitingTime,
+                })}
+              />
+              <SMainSectionWrapper>
+                <SCreatorInfoDiv>
+                  <SCreator>
+                    <SCreatorImage src={post.creator?.avatarUrl!!} />
+                    <SWantsToKnow>
+                      {t('CfPostAwaiting.wants_to_know', {
+                        creator: post.creator?.nickname,
+                      })}
+                    </SWantsToKnow>
+                  </SCreator>
+                  {/* <STotal>
                   {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
                 </STotal> */}
-              </SCreatorInfoDiv>
-              <SPostTitle
-                variant={4}
-              >
-                {post.title}
-              </SPostTitle>
-              <SSeparator />
-              <SBackersInfo>
-                <SCreatorsBackers>
-                  {t('CfPostAwaiting.creators_backers', { creator: post.creator?.nickname })}
-                </SCreatorsBackers>
-                <SCurrentBackers
-                  variant={4}
-                >
-                  {formatNumber(post.currentBackerCount, true)}
-                </SCurrentBackers>
-                <STargetBackers
-                  variant={6}
-                >
-                  {t('CfPostAwaiting.of_target_backers', { target_count: formatNumber(post.targetBackerCount, true) })}
-                </STargetBackers>
-              </SBackersInfo>
-              {user.loggedIn && myPledgeAmount && (
-                <>
-                  <SSeparator />
-                  <YouBackedInfo>
-                    <SYouBackedFor>
-                      {t('CfPostAwaiting.you_backed_for')}
-                    </SYouBackedFor>
-                    <SYouBackedAmount
-                      variant={4}
-                    >
-                      {`$${formatNumber(Math.round(myPledgeAmount.usdCents / 100) ?? 0, true)}`}
-                    </SYouBackedAmount>
-                  </YouBackedInfo>
-                </>
-              )}
-            </SMainSectionWrapper>
-          </>
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
-          />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+                </SCreatorInfoDiv>
+                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SSeparator />
+                <SBackersInfo>
+                  <SCreatorsBackers>
+                    {t('CfPostAwaiting.creators_backers', {
+                      creator: post.creator?.nickname,
+                    })}
+                  </SCreatorsBackers>
+                  <SCurrentBackers variant={4}>
+                    {formatNumber(post.currentBackerCount, true)}
+                  </SCurrentBackers>
+                  <STargetBackers variant={6}>
+                    {t('CfPostAwaiting.of_target_backers', {
+                      target_count: formatNumber(post.targetBackerCount, true),
+                    })}
+                  </STargetBackers>
+                </SBackersInfo>
+                {user.loggedIn && myPledgeAmount && (
+                  <>
+                    <SSeparator />
+                    <YouBackedInfo>
+                      <SYouBackedFor>
+                        {t('CfPostAwaiting.you_backed_for')}
+                      </SYouBackedFor>
+                      <SYouBackedAmount variant={4}>
+                        {`$${formatNumber(
+                          Math.round(myPledgeAmount.usdCents / 100) ?? 0,
+                          true
+                        )}`}
+                      </SYouBackedAmount>
+                    </YouBackedInfo>
+                  </>
+                )}
+              </SMainSectionWrapper>
+            </>
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  };
 
 export default PostAwaitingResponseCF;
 
@@ -317,8 +312,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -330,12 +324,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -372,7 +364,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -382,7 +374,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 64px;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -468,12 +461,10 @@ const SCreatorsBackers = styled.div`
   }
 `;
 
-const SCurrentBackers = styled(Headline)`
-`;
+const SCurrentBackers = styled(Headline)``;
 
 const STargetBackers = styled(Headline)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
 `;
 
 // You backed info
@@ -499,10 +490,7 @@ const SYouBackedFor = styled.div`
   }
 `;
 
-const SYouBackedAmount = styled(Headline)`
-
-`;
-
+const SYouBackedAmount = styled(Headline)``;
 
 // Watch response for the first time
 const SWatchResponseWrapper = styled.div`
@@ -516,7 +504,8 @@ const SWatchResponseWrapper = styled.div`
 const SWatchResponseBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -525,14 +514,15 @@ const SWatchResponseBtn = styled.button<{
   width: 100%;
   height: 100%;
 
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
@@ -550,7 +540,10 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  background: ${({ shouldView, theme }) =>
+    shouldView
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border: transparent;
 
   padding: 17px 24px;
@@ -559,18 +552,18 @@ const SChangeTabBtn = styled.button<{
   height: 100%;
 
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
@@ -581,6 +574,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

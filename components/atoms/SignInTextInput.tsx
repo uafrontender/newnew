@@ -9,7 +9,7 @@ import AlertIcon from '../../public/images/svg/icons/filled/Alert.svg';
 type TTextInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   errorCaption: string;
-}
+};
 
 const SignInTextInput: React.FunctionComponent<TTextInput> = ({
   value,
@@ -40,23 +40,14 @@ const SignInTextInput: React.FunctionComponent<TTextInput> = ({
         }}
         {...rest}
       />
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {errorBordersShown ? (
+        <AnimatedPresence animateWhenInView={false} animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
     </>
   );
 };
@@ -68,7 +59,7 @@ SignInTextInput.defaultProps = {
 export default SignInTextInput;
 
 interface ISSignInTextInput {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SSignInTextInput = styled.input<ISSignInTextInput>`
@@ -89,7 +80,8 @@ const SSignInTextInput = styled.input<ISSignInTextInput>`
     if (!errorBordersShown) {
       // NB! Temp
       return theme.colorsThemed.background.outlines1;
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -105,15 +97,18 @@ const SSignInTextInput = styled.input<ISSignInTextInput>`
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   }
 
-  &:hover:enabled, &:focus, &:active {
+  &:hover:enabled,
+  &:focus,
+  &:active {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   ${({ theme }) => theme.media.tablet} {

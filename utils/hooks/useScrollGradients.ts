@@ -8,7 +8,9 @@ export const useScrollGradients = (ref: any, reverse: boolean = false) => {
     if (reverse) {
       setShowTopGradient(ref.current?.scrollHeight > ref.current?.clientHeight);
     } else {
-      setShowBottomGradient(ref.current?.scrollHeight > ref.current?.clientHeight);
+      setShowBottomGradient(
+        ref.current?.scrollHeight > ref.current?.clientHeight
+      );
     }
 
     const handleScroll = () => {
@@ -21,7 +23,7 @@ export const useScrollGradients = (ref: any, reverse: boolean = false) => {
         setShowBottomGradient(scrollY !== 0);
       } else {
         setShowTopGradient(scrollY !== 0);
-        setShowBottomGradient((scrollHeight - scrollY) - clientHeight > 2);
+        setShowBottomGradient(scrollHeight - scrollY - clientHeight > 2);
       }
     };
 

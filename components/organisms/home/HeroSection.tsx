@@ -92,7 +92,9 @@ export const HeroSection = () => {
   //   },
   // ], []);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const handleSignInClick = () => {
     router.push('/sign-up');
   };
@@ -126,12 +128,12 @@ export const HeroSection = () => {
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/sign-up');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <SWrapper
-      layoutId="heroSection"
+      layoutId='heroSection'
       transition={{
         ease: 'easeInOut',
         duration: 1,
@@ -141,7 +143,7 @@ export const HeroSection = () => {
         <SHeadline>
           <AnimatedPresence
             start={animateTitle}
-            animation="t-08"
+            animation='t-08'
             delay={0.4}
             onAnimationEnd={handleTitleAnimationEnd}
           >
@@ -151,23 +153,20 @@ export const HeroSection = () => {
         <SSubTitle weight={600}>
           <AnimatedPresence
             start={animateSubTitle}
-            animation="t-02"
+            animation='t-02'
             onAnimationEnd={handleSubTitleAnimationEnd}
           >
             {t('hero-block-subTitle')}
           </AnimatedPresence>
         </SSubTitle>
-        <AnimatedPresence
-          start={animateButton}
-          animation="t-01"
-        >
+        <AnimatedPresence start={animateButton} animation='t-01'>
           <SButtonsHolder>
             {isMobile ? (
               <>
                 <SButton
                   withDim
                   withShrink
-                  view="primaryGrad"
+                  view='primaryGrad'
                   onClick={handleSignInClick}
                 >
                   {t('hero-block-sign-in')}
@@ -175,7 +174,7 @@ export const HeroSection = () => {
                 <SButton
                   withDim
                   withShrink
-                  view="secondary"
+                  view='secondary'
                   onClick={handleExploreClick}
                 >
                   {t('hero-block-explore')}
@@ -185,7 +184,7 @@ export const HeroSection = () => {
               <SButton
                 withShrink
                 withShadow
-                view="primaryGrad"
+                view='primaryGrad'
                 onClick={handleExploreClick}
               >
                 {t('hero-block-explore-now')}
@@ -197,38 +196,46 @@ export const HeroSection = () => {
       <SHeroImage>
         {isMobile ? (
           <video
-            key="video-mobile"
+            key='video-mobile'
             loop
             muted
             autoPlay
             playsInline
-            poster={theme.name === 'light' ? HeroLightMobilePlaceholder.src : HeroDarkMobilePlaceholder.src}
+            poster={
+              theme.name === 'light'
+                ? HeroLightMobilePlaceholder.src
+                : HeroDarkMobilePlaceholder.src
+            }
           >
             <source
               src={
                 theme.name === 'light'
-                ? '/images/home/Landing-Page-Mobile-Light.mp4'
-                : '/images/home/Landing-Page-Mobile-Dark.mp4'
+                  ? '/images/home/Landing-Page-Mobile-Light.mp4'
+                  : '/images/home/Landing-Page-Mobile-Dark.mp4'
               }
-              type="video/mp4"
+              type='video/mp4'
             />
           </video>
         ) : (
           <video
-            key="video-desktop"
+            key='video-desktop'
             loop
             muted
             autoPlay
             playsInline
-            poster={theme.name === 'light' ? HeroLightPlaceholder.src : HeroDarkPlaceholder.src}
+            poster={
+              theme.name === 'light'
+                ? HeroLightPlaceholder.src
+                : HeroDarkPlaceholder.src
+            }
           >
             <source
               src={
                 theme.name === 'light'
-                ? '/images/home/Landing-Page-Light.mp4'
-                : '/images/home/Landing-Page-Dark.mp4'
+                  ? '/images/home/Landing-Page-Light.mp4'
+                  : '/images/home/Landing-Page-Dark.mp4'
               }
-              type="video/mp4"
+              type='video/mp4'
             />
           </video>
         )}
@@ -262,7 +269,7 @@ const STopWrapper = styled.div`
   white-space: pre-line;
 
   ${(props) => props.theme.media.laptop} {
-    max-width: 45%
+    max-width: 45%;
   }
 `;
 
@@ -286,7 +293,6 @@ const SSubTitle = styled(Text)`
   text-align: center;
 
   ${(props) => props.theme.media.tablet} {
-
     text-align: left;
   }
 

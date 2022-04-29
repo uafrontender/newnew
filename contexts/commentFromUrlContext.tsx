@@ -23,7 +23,11 @@ const CommentFromUrlContextProvider: React.FC = ({ children }) => {
     [commentId]
   );
 
-  return <CommentFromUrlContext.Provider value={contextValue}>{children}</CommentFromUrlContext.Provider>;
+  return (
+    <CommentFromUrlContext.Provider value={contextValue}>
+      {children}
+    </CommentFromUrlContext.Provider>
+  );
 };
 
 export default CommentFromUrlContextProvider;

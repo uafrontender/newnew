@@ -19,7 +19,16 @@ interface ITextArea {
 }
 
 export const TextArea: React.FC<ITextArea> = (props) => {
-  const { id = '', maxlength, value, error, onBlur = () => {}, onFocus = () => {}, onChange, placeholder } = props;
+  const {
+    id = '',
+    maxlength,
+    value,
+    error,
+    onBlur = () => {},
+    onFocus = () => {},
+    onChange,
+    placeholder,
+  } = props;
 
   const handleChange = useCallback(
     (e) => {
@@ -50,9 +59,9 @@ export const TextArea: React.FC<ITextArea> = (props) => {
         />
       </SContent>
       {error ? (
-        <AnimatedPresence animation="t-09">
+        <AnimatedPresence animation='t-09'>
           <SErrorDiv>
-            <InlineSvg svg={alertIcon} width="16px" height="16px" />
+            <InlineSvg svg={alertIcon} width='16px' height='16px' />
             {error}
           </SErrorDiv>
         </AnimatedPresence>

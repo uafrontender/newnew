@@ -8,7 +8,11 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import {
-  Player, PlayerAPI, PlayerConfig, PlayerEvent, SourceConfig,
+  Player,
+  PlayerAPI,
+  PlayerConfig,
+  PlayerEvent,
+  SourceConfig,
 } from 'bitmovin-player';
 
 import logoAnimation from '../../../public/animations/mobile_logo.json';
@@ -18,7 +22,7 @@ import isSafari from '../../../utils/isSafari';
 interface IPostBitmovinPlayer {
   id: string;
   muted?: boolean;
-  resources?: newnewapi.IVideoUrls,
+  resources?: newnewapi.IVideoUrls;
 }
 
 export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
@@ -30,38 +34,46 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
   const [loaded, setLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const playerConfig = useMemo<PlayerConfig>(() => ({
-    ui: false,
-    key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
-    playback: {
-      autoplay: true,
-      // NB! Need to be initially muted in order to comply with autoplay policies
-      // when opening the link from URL
-      muted: true,
-    },
-  }), []);
+  const playerConfig = useMemo<PlayerConfig>(
+    () => ({
+      ui: false,
+      key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
+      playback: {
+        autoplay: true,
+        // NB! Need to be initially muted in order to comply with autoplay policies
+        // when opening the link from URL
+        muted: true,
+      },
+    }),
+    []
+  );
 
-  const playerSource: SourceConfig = useMemo(() => ({
-    hls: resources?.hlsStreamUrl ?? '',
-    poster: resources?.thumbnailImageUrl ?? '',
-    ...(resources?.originalVideoUrl ? {
-      progressive: [
-        {
-          url: resources?.originalVideoUrl,
-          type: 'video/mp4',
-          bitrate: 500000,
-          label: 'Low',
-        },
-      ],
-    } : {}),
-    options: {
-      startTime: 0,
-    },
-  }), [
-    resources?.hlsStreamUrl,
-    resources?.thumbnailImageUrl,
-    resources?.originalVideoUrl,
-  ]);
+  const playerSource: SourceConfig = useMemo(
+    () => ({
+      hls: resources?.hlsStreamUrl ?? '',
+      poster: resources?.thumbnailImageUrl ?? '',
+      ...(resources?.originalVideoUrl
+        ? {
+            progressive: [
+              {
+                url: resources?.originalVideoUrl,
+                type: 'video/mp4',
+                bitrate: 500000,
+                label: 'Low',
+              },
+            ],
+          }
+        : {}),
+      options: {
+        startTime: 0,
+      },
+    }),
+    [
+      resources?.hlsStreamUrl,
+      resources?.thumbnailImageUrl,
+      resources?.originalVideoUrl,
+    ]
+  );
 
   const playerRef: any = useRef();
   const player = useRef<PlayerAPI | null>(null);
@@ -89,13 +101,10 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
       player?.current?.off(
         PlayerEvent.PlaybackFinished,
         // @ts-ignore
-        player.current.handlePlaybackFinished,
+        player.current.handlePlaybackFinished
       );
     }
-    player?.current?.on(
-      PlayerEvent.PlaybackFinished,
-      handlePlaybackFinished,
-    );
+    player?.current?.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     // @ts-ignore
     player.current.handlePlaybackFinished = handlePlaybackFinished;
   }, [handlePlaybackFinished]);
@@ -142,18 +151,16 @@ export const PostBitmovinPlayer: React.FC<IPostBitmovinPlayer> = ({
 
   return (
     <SContent>
-      <SImageBG
-        src={resources?.thumbnailImageUrl ?? ''}
-      />
+      <SImageBG src={resources?.thumbnailImageUrl ?? ''} />
       <SVideoWrapper>
         <SWrapper
           id={id}
           onClick={() => {
             if (isSafari()) {
               if (player.current?.isPlaying()) {
-                player.current?.pause()
+                player.current?.pause();
               } else {
-                player.current?.play()
+                player.current?.play();
               }
             }
           }}

@@ -32,7 +32,7 @@ const TermsOfServiceModal: React.FunctionComponent<ITermsOfServiceModal> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      if(!containerRef.current){
+      if (!containerRef.current) {
         return;
       }
 

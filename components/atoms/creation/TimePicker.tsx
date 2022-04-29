@@ -66,7 +66,12 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       };
 
       return (
-        <SItem id={`hour-${item.value}`} key={`hours-item-${item.value}`} onClick={handleItemClick} selected={selected}>
+        <SItem
+          id={`hour-${item.value}`}
+          key={`hours-item-${item.value}`}
+          onClick={handleItemClick}
+          selected={selected}
+        >
           <SItemLabel weight={500} variant={2} selected={selected}>
             {item.name}
           </SItemLabel>
@@ -146,7 +151,12 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         <SCalendarLabel variant={2} weight={500}>
           {`${time} ${format.toUpperCase()}`}
         </SCalendarLabel>
-        <InlineSVG svg={timeIcon} fill={theme.colorsThemed.text.secondary} width="24px" height="24px" />
+        <InlineSVG
+          svg={timeIcon}
+          fill={theme.colorsThemed.text.secondary}
+          width='24px'
+          height='24px'
+        />
       </SContainer>
       <AnimatedPresence
         start={animate}
@@ -156,10 +166,14 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       >
         <SListHolder direction={direction}>
           <SScrollListWrapper>
-            <SScrollList id="hoursContainer">{HOURS.map(renderHourItem)}</SScrollList>
+            <SScrollList id='hoursContainer'>
+              {HOURS.map(renderHourItem)}
+            </SScrollList>
           </SScrollListWrapper>
           <SScrollListWrapper>
-            <SScrollList id="minutesContainer">{MINUTES.map(renderMinuteItem)}</SScrollList>
+            <SScrollList id='minutesContainer'>
+              {MINUTES.map(renderMinuteItem)}
+            </SScrollList>
           </SScrollListWrapper>
           <SScrollList noPadding>{FORMAT.map(renderFormatItem)}</SScrollList>
         </SListHolder>
@@ -189,7 +203,8 @@ const SContainer = styled.div`
   transition: 0.2s linear;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+    background-color: ${({ theme }) =>
+      theme.colorsThemed.background.quaternary};
   }
 `;
 
@@ -255,15 +270,21 @@ const SItem = styled.div<ISItem>`
   margin: 0 8px;
   width: 40px;
   text-align: center;
-  background: ${(props) => (props.selected ? props.theme.colorsThemed.accent.blue : 'transparent')};
+  background: ${(props) =>
+    props.selected ? props.theme.colorsThemed.accent.blue : 'transparent'};
   border-radius: 12px;
 
   :hover {
     background: ${(props) =>
-      props.selected ? props.theme.colorsThemed.accent.blue : props.theme.colorsThemed.background.quaternary};
+      props.selected
+        ? props.theme.colorsThemed.accent.blue
+        : props.theme.colorsThemed.background.quaternary};
   }
 `;
 
 const SItemLabel = styled(Text)<ISItem>`
-  color: ${(props) => (props.selected ? props.theme.colors.white : props.theme.colorsThemed.text.primary)};
+  color: ${(props) =>
+    props.selected
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.text.primary};
 `;

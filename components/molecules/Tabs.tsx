@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import styled, { keyframes } from 'styled-components';
 
@@ -26,13 +21,7 @@ export interface Tab {
 }
 
 const Tabs: React.FunctionComponent<ITabs> = (props) => {
-  const {
-    t,
-    tabs,
-    draggable,
-    activeTabIndex,
-    withTabIndicator,
-  } = props;
+  const { t, tabs, draggable, activeTabIndex, withTabIndicator } = props;
   const router = useRouter();
 
   const [windowSize, setWindowSize] = useState({
@@ -41,11 +30,9 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
   });
 
   const [containerWidth, setContainerWidth] = useState<number>(
-    isBrowser() ? window.innerWidth : 768,
+    isBrowser() ? window.innerWidth : 768
   );
-  const [tabsWidth, setTabsWidth] = useState<number>(
-    tabs.length * 100,
-  );
+  const [tabsWidth, setTabsWidth] = useState<number>(tabs.length * 100);
 
   const shouldDrag = (draggable ?? true) && tabsWidth!! >= containerWidth!!;
 
@@ -69,9 +56,12 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
   const tabRefs = useRef<HTMLButtonElement[]>(new Array(tabs.length));
 
   // Route change
-  const handleChangeRoute = useCallback((path: string) => {
-    router.replace(path);
-  }, [router]);
+  const handleChangeRoute = useCallback(
+    (path: string) => {
+      router.replace(path);
+    },
+    [router]
+  );
 
   // Scrolling the tabs with mouse & touch
   const extractPositionDelta = (e: any) => {
@@ -124,7 +114,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
     setIsDragging(false);
 
     if (posLeft <= 0 && posLeft + tabsWidth!! < containerWidth) {
-      const position = -1 * (tabsWidth!!) + containerWidth;
+      const position = -1 * tabsWidth!! + containerWidth;
       setPosLeft(position);
       setPrevLeft(position);
     } else if (posLeft >= 0 && containerWidth - posLeft < tabsWidth!!) {
@@ -180,7 +170,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
     setIsDragging(false);
 
     if (posLeft <= 0 && posLeft + tabsWidth!! < containerWidth) {
-      const position = -1 * (tabsWidth!!) + containerWidth;
+      const position = -1 * tabsWidth!! + containerWidth;
       setPosLeft(position);
       setPrevLeft(position);
     } else if (posLeft >= 0 && containerWidth - posLeft < tabsWidth!!) {
@@ -194,7 +184,9 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
   };
 
   // Button-specific handlers to prevent unwanted cliks on Mouse event
-  const handleButtonMouseDownCapture = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleButtonMouseDownCapture = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     if (!shouldDrag) return;
     setMouseInitial(e.clientX);
   };
@@ -206,7 +198,10 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
     }
   };
 
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, tab: Tab) => {
+  const handleButtonClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    tab: Tab
+  ) => {
     if (wasDragged) {
       e.preventDefault();
       setWasDragged(false);
@@ -218,11 +213,10 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
   };
 
   useEffect(() => {
-    const tabsWidthUpdated = tabRefs.current
-      .reduce((acc, tabEl) => {
-        const w = tabEl.getBoundingClientRect().width;
-        return w + acc;
-      }, 0);
+    const tabsWidthUpdated = tabRefs.current.reduce((acc, tabEl) => {
+      const w = tabEl.getBoundingClientRect().width;
+      return w + acc;
+    }, 0);
 
     setTabsWidth(tabsWidthUpdated + (tabs.length + 1) * 24);
   }, [tabs.length]);
@@ -248,7 +242,8 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
 
   useEffect(() => {
     if (activeTabIndex === -1) return;
-    const boundingRect = tabRefs.current[activeTabIndex].getBoundingClientRect();
+    const boundingRect =
+      tabRefs.current[activeTabIndex].getBoundingClientRect();
 
     if (boundingRect.left < 0) {
       setPosLeft((curr) => curr + (0 - boundingRect.left) + 12);
@@ -261,10 +256,17 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
     setActiveTabIndicator((current) => ({
       ...current,
       width: boundingRect.width ?? 0,
-      left: (boundingRect.left - (tabsContainerRef.current?.getBoundingClientRect()?.left || 0)!!)
-        ?? 0,
+      left:
+        boundingRect.left -
+          (tabsContainerRef.current?.getBoundingClientRect()?.left || 0)!! ?? 0,
     }));
-  }, [activeTabIndex, windowSize, setPrevLeft, setPosLeft, setActiveTabIndicator]);
+  }, [
+    activeTabIndex,
+    windowSize,
+    setPrevLeft,
+    setPosLeft,
+    setActiveTabIndicator,
+  ]);
 
   useEffect(() => {
     if (!shouldDrag) setPosLeft(0);
@@ -298,28 +300,29 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
         draggable={false}
         shouldDrag={shouldDrag}
       >
-        {tabs && tabs.map((tab, i) => (
-          <STab
-            key={tab.nameToken}
-            ref={(el) => {
-              tabRefs.current[i] = el!!;
-            }}
-            type="button"
-            onClick={(e) => handleButtonClick(e, tab)}
-            activeTab={i === activeTabIndex}
-            extraMargin={i === 0 && shouldDrag}
-            onMouseLeave={handleButtonMouseLeave}
-            withTabIndicator={withTabIndicator}
-            onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
-          >
-            {t(`tabs.${tab.nameToken}`)}
-            {!!tab.counter && (
-              <SIndicatorContainer>
-                <Indicator counter={tab.counter} />
-              </SIndicatorContainer>
-            )}
-          </STab>
-        ))}
+        {tabs &&
+          tabs.map((tab, i) => (
+            <STab
+              key={tab.nameToken}
+              ref={(el) => {
+                tabRefs.current[i] = el!!;
+              }}
+              type='button'
+              onClick={(e) => handleButtonClick(e, tab)}
+              activeTab={i === activeTabIndex}
+              extraMargin={i === 0 && shouldDrag}
+              onMouseLeave={handleButtonMouseLeave}
+              withTabIndicator={withTabIndicator}
+              onMouseDownCapture={(e) => handleButtonMouseDownCapture(e)}
+            >
+              {t(`tabs.${tab.nameToken}`)}
+              {!!tab.counter && (
+                <SIndicatorContainer>
+                  <Indicator counter={tab.counter} />
+                </SIndicatorContainer>
+              )}
+            </STab>
+          ))}
         {withTabIndicator && (
           <SActiveTabIndicator
             style={{
@@ -353,7 +356,8 @@ const STabsContainer = styled.div<{
   shouldDrag: boolean;
 }>`
   display: flex;
-  justify-content: ${({ shouldDrag }) => (shouldDrag ? 'flex-start' : 'center')};
+  justify-content: ${({ shouldDrag }) =>
+    shouldDrag ? 'flex-start' : 'center'};
   gap: 24px;
 
   width: ${({ shouldDrag }) => (shouldDrag ? 'min-content' : '100%')};
@@ -387,13 +391,13 @@ const STab = styled.button<ISTab>`
   font-size: 14px;
   line-height: 24px;
 
-  color: ${({
-    activeTab,
-    theme,
-  }) => (activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary)};
+  color: ${({ activeTab, theme }) =>
+    activeTab
+      ? theme.colorsThemed.text.primary
+      : theme.colorsThemed.text.secondary};
 
   cursor: pointer;
-  transition: .2s ease-in-out;
+  transition: 0.2s ease-in-out;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -423,7 +427,7 @@ const SActiveTabIndicator = styled.div`
   opacity: 0;
 
   animation-duration: 1s;
-  animation-delay: .3s;
+  animation-delay: 0.3s;
   animation-fill-mode: forwards;
   animation-name: ${IndicatorInitialAnimation};
 
@@ -431,7 +435,7 @@ const SActiveTabIndicator = styled.div`
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) => theme.gradients.blueHorizontal};
 
-  transition: opacity .35s ease-in-out, left .25s linear, width .27s linear;
+  transition: opacity 0.35s ease-in-out, left 0.25s linear, width 0.27s linear;
 `;
 
 const SIndicatorContainer = styled.div`

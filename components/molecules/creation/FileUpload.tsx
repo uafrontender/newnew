@@ -15,12 +15,28 @@ import DeleteVideo from './DeleteVideo';
 import { loadVideo } from '../../../utils/loadVideo';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
-import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
+import {
+  MAX_VIDEO_SIZE,
+  MIN_VIDEO_DURATION,
+  MAX_VIDEO_DURATION,
+} from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
-import { removeUploadedFile, stopVideoProcessing } from '../../../api/endpoints/upload';
-import { setCreationFileProcessingError, setCreationFileProcessingLoading, setCreationFileProcessingProgress, setCreationFileUploadError, setCreationFileUploadLoading, setCreationFileUploadProgress, setCreationVideo, setCreationVideoProcessing } from '../../../redux-store/slices/creationStateSlice';
+import {
+  removeUploadedFile,
+  stopVideoProcessing,
+} from '../../../api/endpoints/upload';
+import {
+  setCreationFileProcessingError,
+  setCreationFileProcessingLoading,
+  setCreationFileProcessingProgress,
+  setCreationFileUploadError,
+  setCreationFileUploadLoading,
+  setCreationFileUploadProgress,
+  setCreationVideo,
+  setCreationVideoProcessing,
+} from '../../../redux-store/slices/creationStateSlice';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -68,12 +84,12 @@ export const FileUpload: React.FC<IFileUpload> = ({
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState(null);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const {
-    post, videoProcessing,
-  } = useAppSelector((state) => state.creation);
+  const { post, videoProcessing } = useAppSelector((state) => state.creation);
   const dispatch = useAppDispatch();
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
@@ -175,24 +191,30 @@ export const FileUpload: React.FC<IFileUpload> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [dispatch, id, onChange, post?.announcementVideoUrl, videoProcessing?.taskUuid]);
+  }, [
+    dispatch,
+    id,
+    onChange,
+    post?.announcementVideoUrl,
+    videoProcessing?.taskUuid,
+  ]);
 
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox htmlFor="file">
+      <SDropBox htmlFor='file'>
         <input
-          id="file"
+          id='file'
           ref={inputRef}
-          type="file"
+          type='file'
           style={{ display: 'none' }}
-          accept="video/*"
+          accept='video/*'
           multiple={false}
           onChange={handleFileChange}
         />
         <SPlaceholder weight={600} variant={2}>
           {t('secondStep.fileUpload.description')}
         </SPlaceholder>
-        <SButton view="primaryGrad" onClick={handleButtonClick}>
+        <SButton view='primaryGrad' onClick={handleButtonClick}>
           {t('secondStep.fileUpload.button')}
         </SButton>
       </SDropBox>
@@ -215,9 +237,9 @@ export const FileUpload: React.FC<IFileUpload> = ({
               })}
             </SLoadingDescription>
             <SLoadingBottomBlockButton
-              view="secondary"
+              view='secondary'
               onClick={() => {
-                handleCancelVideoUpload()
+                handleCancelVideoUpload();
               }}
             >
               {t('secondStep.button.cancel')}
@@ -232,7 +254,7 @@ export const FileUpload: React.FC<IFileUpload> = ({
       content = (
         <SErrorBox>
           <SErrorTitleWrapper>
-            <SInlineSVG svg={errorIcon} width="16px" height="16px" />
+            <SInlineSVG svg={errorIcon} width='16px' height='16px' />
             <SErrorTitle variant={3} weight={600}>
               {t('secondStep.video.error.title')}
             </SErrorTitle>
@@ -241,10 +263,17 @@ export const FileUpload: React.FC<IFileUpload> = ({
             {t('secondStep.video.error.description')}
           </SLoadingDescription>
           <SErrorBottomBlock>
-            <SLoadingBottomBlockButton view="secondary" onClick={handleCancelVideoProcessing}>
+            <SLoadingBottomBlockButton
+              view='secondary'
+              onClick={handleCancelVideoProcessing}
+            >
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
-            <Button view="primaryGrad" onClick={handleRetryVideoUpload} disabled={!localFile}>
+            <Button
+              view='primaryGrad'
+              onClick={handleRetryVideoUpload}
+              disabled={!localFile}
+            >
               {t('secondStep.button.retry')}
             </Button>
           </SErrorBottomBlock>
@@ -267,9 +296,9 @@ export const FileUpload: React.FC<IFileUpload> = ({
               })}
             </SLoadingDescription>
             <SLoadingBottomBlockButton
-              view="secondary"
+              view='secondary'
               onClick={() => {
-                handleCancelVideoProcessing()
+                handleCancelVideoProcessing();
               }}
               disabled={!value?.hlsStreamUrl}
             >
@@ -277,10 +306,7 @@ export const FileUpload: React.FC<IFileUpload> = ({
             </SLoadingBottomBlockButton>
           </SLoadingBottomBlock>
           <SSpinnerWrapper>
-            <InlineSVG
-              svg={spinnerIcon}
-              width="16px"
-            />
+            <InlineSVG svg={spinnerIcon} width='16px' />
           </SSpinnerWrapper>
         </SLoadingBox>
       );
@@ -288,33 +314,37 @@ export const FileUpload: React.FC<IFileUpload> = ({
       content = (
         <SFileBox>
           <input
-            id="file"
+            id='file'
             ref={inputRef}
-            type="file"
+            type='file'
             style={{ display: 'none' }}
-            accept="video/*"
+            accept='video/*'
             multiple={false}
             onChange={handleFileChange}
           />
           <SPlayerWrapper>
             <BitmovinPlayer
-              id="small-thumbnail"
+              id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
               thumbnails={thumbnails}
-              borderRadius="8px"
+              borderRadius='8px'
             />
           </SPlayerWrapper>
           <SButtonsContainer>
             <SButtonsContainerLeft>
-              <SVideoButton onClick={handleEditThumb}>{t('secondStep.video.setThumbnail')}</SVideoButton>
+              <SVideoButton onClick={handleEditThumb}>
+                {t('secondStep.video.setThumbnail')}
+              </SVideoButton>
               <SVideoButton danger onClick={handleDeleteVideoShow}>
                 {t('secondStep.video.deleteFile')}
               </SVideoButton>
             </SButtonsContainerLeft>
             {!isDesktop && (
               <div>
-                <SVideoButton onClick={handleFullPreview}>{t('secondStep.video.previewFull')}</SVideoButton>
+                <SVideoButton onClick={handleFullPreview}>
+                  {t('secondStep.video.previewFull')}
+                </SVideoButton>
               </div>
             )}
           </SButtonsContainer>
@@ -349,8 +379,16 @@ export const FileUpload: React.FC<IFileUpload> = ({
 
   return (
     <SWrapper>
-      <DeleteVideo open={showVideoDelete} handleClose={handleCloseDeleteVideoClick} handleSubmit={handleDeleteVideo} />
-      <FullPreview open={showFullPreview} value={value} handleClose={handleCloseFullPreviewClick} />
+      <DeleteVideo
+        open={showVideoDelete}
+        handleClose={handleCloseDeleteVideoClick}
+        handleSubmit={handleDeleteVideo}
+      />
+      <FullPreview
+        open={showFullPreview}
+        value={value}
+        handleClose={handleCloseFullPreviewClick}
+      />
       <ThumbnailPreviewEdit
         open={showThumbnailEdit}
         value={value}
@@ -404,11 +442,16 @@ const SFileBox = styled.div`
   ${({ theme }) => theme.media.tablet} {
     height: 176px;
     border: 1px solid
-      ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+      ${(props) =>
+        props.theme.name === 'light'
+          ? props.theme.colorsThemed.background.outlines1
+          : 'transparent'};
     padding: 23px;
     overflow: hidden;
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
   }
 `;
@@ -443,7 +486,10 @@ interface ISVideoButton {
 }
 
 const SVideoButton = styled.button<ISVideoButton>`
-  color: ${(props) => (props.danger ? props.theme.colorsThemed.accent.error : props.theme.colorsThemed.text.secondary)};
+  color: ${(props) =>
+    props.danger
+      ? props.theme.colorsThemed.accent.error
+      : props.theme.colorsThemed.text.secondary};
   border: none;
   cursor: pointer;
   outline: none;
@@ -500,7 +546,9 @@ const SLoadingBottomBlockButton = styled(Button)`
   &:focus:enabled,
   &:hover:enabled {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.secondary};
   }
 `;
 

@@ -43,7 +43,9 @@ export const ListItem: React.FC<IListItem> = (props) => {
   const { t } = useTranslation('creation');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
 
   const [mouseEntered, setMouseEntered] = useState(false);
@@ -75,11 +77,17 @@ export const ListItem: React.FC<IListItem> = (props) => {
           </SContent>
           <SImageWrapper>
             <Image
-              src={ (isMobile || isTablet) ? IMAGES[item.key] : (mouseEntered ? IMAGES[item.key] : IMAGES_STATIC[item.key])}
-              alt="Post type image"
+              src={
+                isMobile || isTablet
+                  ? IMAGES[item.key]
+                  : mouseEntered
+                  ? IMAGES[item.key]
+                  : IMAGES_STATIC[item.key]
+              }
+              alt='Post type image'
               width={isMobile ? 80 : 120}
               height={isMobile ? 80 : 120}
-              objectFit="contain"
+              objectFit='contain'
               priority
             />
           </SImageWrapper>

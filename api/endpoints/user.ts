@@ -254,9 +254,7 @@ export const markTutorialStepAsCompleted = (
     payload
   );
 
-export const deleteMyAccount = (
-  payload: newnewapi.EmptyRequest
-) =>
+export const deleteMyAccount = (payload: newnewapi.EmptyRequest) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,
     newnewapi.EmptyResponse

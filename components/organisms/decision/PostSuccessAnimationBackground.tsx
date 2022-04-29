@@ -15,13 +15,13 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
           index={i}
           delay={0}
           top={-200 - i * 60}
-          {...(
-            i % 2 === 0 ? {
-              left: i * 100,
-            } : {
-              right: 50 + i * 50,
-            }
-          )}
+          {...(i % 2 === 0
+            ? {
+                left: i * 100,
+              }
+            : {
+                right: 50 + i * 50,
+              })}
         />
       ))}
       {elements.map((el, i) => (
@@ -30,13 +30,13 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
           index={i}
           delay={2}
           top={-200 - i * 50}
-          {...(
-            i % 2 !== 0 ? {
-              left: 50 + i * 200,
-            } : {
-              right: 100 + i * 200,
-            }
-          )}
+          {...(i % 2 !== 0
+            ? {
+                left: 50 + i * 200,
+              }
+            : {
+                right: 100 + i * 200,
+              })}
         />
       ))}
       {elements.map((el, i) => (
@@ -45,13 +45,13 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
           index={i}
           delay={3}
           top={-200 - i * 50}
-          {...(
-            i % 2 === 0 ? {
-              left: 100 + i * 100,
-            } : {
-              right: 50 + i * 200,
-            }
-          )}
+          {...(i % 2 === 0
+            ? {
+                left: 100 + i * 100,
+              }
+            : {
+                right: 50 + i * 200,
+              })}
         />
       ))}
       {elements.map((el, i) => (
@@ -60,13 +60,13 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
           index={i}
           delay={5}
           top={-200 - i * 50}
-          {...(
-            i % 2 !== 0 ? {
-              left: 50 + i * 200,
-            } : {
-              right: 100 + i * 100,
-            }
-          )}
+          {...(i % 2 !== 0
+            ? {
+                left: 50 + i * 200,
+              }
+            : {
+                right: 100 + i * 100,
+              })}
         />
       ))}
       {elements.map((el, i) => (
@@ -75,18 +75,18 @@ const PostSuccessAnimationBackground: React.FunctionComponent = () => {
           index={i}
           delay={8}
           top={-200 - i * 50}
-          {...(
-            i % 2 === 0 ? {
-              left: 100 + i * 100,
-            } : {
-              right: 100 + i * 200,
-            }
-          )}
+          {...(i % 2 === 0
+            ? {
+                left: 100 + i * 100,
+              }
+            : {
+                right: 100 + i * 200,
+              })}
         />
       ))}
     </SContainer>
   );
-}
+};
 
 export default PostSuccessAnimationBackground;
 
@@ -125,22 +125,19 @@ const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
       style={{
         width,
         top,
-        ...(left ? {
-          left
-        } : {
-          right
-        })
+        ...(left
+          ? {
+              left,
+            }
+          : {
+              right,
+            }),
       }}
     >
-      <img
-        src={GoldImage.src}
-        alt="coin"
-        draggable={false}
-      />
+      <img src={GoldImage.src} alt='coin' draggable={false} />
     </SGoldIcon>
   );
-}
-
+};
 
 const RainingAnimation = (transform: string) => keyframes`
   0% {

@@ -12,7 +12,7 @@ import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../../atoms/InlineSVG';
 
 interface IPaymentSuccessModal {
-  isVisible: boolean,
+  isVisible: boolean;
   closeModal: () => void;
 }
 
@@ -25,40 +25,24 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal
-      show={isVisible}
-      additionalZ={14}
-      onClose={closeModal}
-    >
-      <SContainer
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal show={isVisible} additionalZ={14} onClose={closeModal}>
+      <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
           <SInlineSVG
             clickable
             scaleOnClick
             svg={CloseIcon}
             fill={theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
+            width='24px'
+            height='24px'
             onClick={closeModal}
           />
-          <Image
-            src={PaymentSuccesIcon}
-            height={140}
-            objectFit="contain"
-          />
-          <SModalTitle
-            variant={6}
-          >
+          <Image src={PaymentSuccesIcon} height={140} objectFit='contain' />
+          <SModalTitle variant={6}>
             {t('PaymentSuccessModal.title')}
           </SModalTitle>
-          <SModalMessage>
-            {children}
-          </SModalMessage>
-          <SDoneButton
-            onClick={closeModal}
-          >
+          <SModalMessage>{children}</SModalMessage>
+          <SDoneButton onClick={closeModal}>
             {t('PaymentSuccessModal.doneBtn')}
           </SDoneButton>
         </SModal>
@@ -82,10 +66,14 @@ const SModal = styled.div`
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px;
   box-sizing: border-box;
   display: flex;

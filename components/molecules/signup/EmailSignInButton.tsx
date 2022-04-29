@@ -1,13 +1,8 @@
-import React, {
-  useMemo,
-  useState,
-} from 'react';
+import React, { useMemo, useState } from 'react';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 
-type TEmailSignInButton = React.ComponentPropsWithoutRef<'button'> & {
-
-}
+type TEmailSignInButton = React.ComponentPropsWithoutRef<'button'> & {};
 
 const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
   disabled,
@@ -15,8 +10,8 @@ const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
   children,
 }) => {
   const [mousePosition, setMousePosition] = useState<{
-    x?: number,
-    y?: number,
+    x?: number;
+    y?: number;
   }>({
     x: 0,
     y: 0,
@@ -60,7 +55,7 @@ const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
       }}
       onClick={handleClick}
     >
-      { children }
+      {children}
     </SEmailSignInButton>
   );
 };
@@ -68,8 +63,8 @@ const EmailSignInButton: React.FunctionComponent<TEmailSignInButton> = ({
 export default EmailSignInButton;
 
 interface ISEmailSignInButton {
-  x?: number,
-  y?: number,
+  x?: number;
+  y?: number;
 }
 
 const SEmailSignInButton = styled.button<ISEmailSignInButton>`
@@ -90,7 +85,7 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
   border: transparent;
 
   cursor: pointer;
-  transition: .2s linear;
+  transition: 0.2s linear;
   /* No select */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -100,7 +95,12 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
   user-select: none;
 
   color: ${(props) => props.theme.colorsThemed.button.color.primary};
-  background: linear-gradient(300deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  background: linear-gradient(
+      300deg,
+      rgba(29, 180, 255, 0.85) 0%,
+      rgba(29, 180, 255, 0) 50%
+    ),
+    #1d6aff;
 
   span {
     z-index: 1;
@@ -113,8 +113,13 @@ const SEmailSignInButton = styled.button<ISEmailSignInButton>`
     top: 0;
     width: 100%;
     height: 100%;
-    transition: .5s ease;
-    background: linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+    transition: 0.5s ease;
+    background: linear-gradient(
+        140deg,
+        rgba(29, 180, 255, 0.85) 0%,
+        rgba(29, 180, 255, 0) 50%
+      ),
+      #1d6aff;
 
     border-radius: ${(props) => props.theme.borderRadius.medium};
     border: transparent;

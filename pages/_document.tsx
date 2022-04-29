@@ -1,19 +1,28 @@
 import React from 'react';
 import Document, {
-  Html, Head, Main, NextScript, DocumentContext, DocumentInitialProps,
+  Html,
+  Head,
+  Main,
+  NextScript,
+  DocumentContext,
+  DocumentInitialProps,
 } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
 export default class MyDocument extends Document {
-  static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
+  static async getInitialProps(
+    ctx: DocumentContext
+  ): Promise<DocumentInitialProps> {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
     try {
-      ctx.renderPage = () => originalRenderPage({
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
-      });
+      ctx.renderPage = () =>
+        originalRenderPage({
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          enhanceApp: (App) => (props) =>
+            sheet.collectStyles(<App {...props} />),
+        });
 
       const initialProps = await Document.getInitialProps(ctx);
       return {
@@ -32,18 +41,36 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html translate="no">
+      <Html translate='no'>
         <Head>
           {/* Fonts */}
-          <link href="/fonts/font-gilroy.css" rel="stylesheet" />
-          <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-Medium.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-          <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-SemiBold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-          <link rel="preload" href="/fonts/Radomir Tinkov - Gilroy-Bold.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+          <link href='/fonts/font-gilroy.css' rel='stylesheet' />
+          <link
+            rel='preload'
+            href='/fonts/Radomir Tinkov - Gilroy-Medium.otf'
+            as='font'
+            type='font/otf'
+            crossOrigin='anonymous'
+          />
+          <link
+            rel='preload'
+            href='/fonts/Radomir Tinkov - Gilroy-SemiBold.otf'
+            as='font'
+            type='font/otf'
+            crossOrigin='anonymous'
+          />
+          <link
+            rel='preload'
+            href='/fonts/Radomir Tinkov - Gilroy-Bold.otf'
+            as='font'
+            type='font/otf'
+            crossOrigin='anonymous'
+          />
         </Head>
         <body>
           <Main />
           <NextScript />
-          <div id="modal-root" />
+          <div id='modal-root' />
         </body>
       </Html>
     );

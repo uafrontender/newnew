@@ -14,16 +14,16 @@ import logoText from '../../public/images/svg/logo_text.svg';
 import logoAnimation from '../../public/animations/mobile_logo.json';
 
 export const Logo: React.FunctionComponent<{
-  style?: React.CSSProperties,
-}> = ({
-  style,
-}) => {
+  style?: React.CSSProperties;
+}> = ({ style }) => {
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleClick = () => {
     if (router.pathname === '/') {
@@ -50,9 +50,11 @@ export const Logo: React.FunctionComponent<{
   return (
     <SWrapper
       {...{
-        ...(style ? {
-          style,
-        } : {}),
+        ...(style
+          ? {
+              style,
+            }
+          : {}),
       }}
       onClick={handleClick}
     >

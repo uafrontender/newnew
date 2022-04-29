@@ -47,7 +47,7 @@ export const List: React.FC<IList> = ({
         <Card
           item={item}
           index={index + 1}
-          width="100%"
+          width='100%'
           height={isMobile ? '564px' : '336px'}
         />
       </SItemWrapper>
@@ -65,8 +65,8 @@ export const List: React.FC<IList> = ({
             <CardSkeleton
               key={i}
               count={1}
-              cardWidth="100%"
-              cardHeight="100%"
+              cardWidth='100%'
+              cardHeight='100%'
               bgColor={skeletonsBgColor}
               highlightColor={skeletonsHighlightColor}
             />

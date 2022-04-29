@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useContext, useEffect, useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -38,7 +36,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -51,10 +51,13 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   }, [dispatch]);
 
   const handleFollowDecision = async () => {
-    if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid) return;
+    if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
+      return;
     try {
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: !isFollowing ? newnewapi.MarkPostRequest.Kind.FAVORITE : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
+        markAs: !isFollowing
+          ? newnewapi.MarkPostRequest.Kind.FAVORITE
+          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
         postUuid: post.postUuid,
       });
 
@@ -147,7 +150,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
       <SActivitesContainer>
         <PostScheduledSection
           postType={postType}
-          timestampSeconds={new Date((post.startsAt?.seconds as number) * 1000).getTime()}
+          timestampSeconds={new Date(
+            (post.startsAt?.seconds as number) * 1000
+          ).getTime()}
           isFollowing={isFollowing}
           handleFollowDecision={handleFollowDecision}
         />
@@ -214,7 +219,6 @@ const SActivitesContainer = styled.div`
   align-self: bottom;
 
   height: 100%;
-
 
   ${({ theme }) => theme.media.tablet} {
     min-height: initial;

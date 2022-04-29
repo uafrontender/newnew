@@ -72,7 +72,7 @@ const STitle = styled.h3`
   line-height: 24px;
   font-weight: 600;
   margin: 0;
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SText = styled.p`

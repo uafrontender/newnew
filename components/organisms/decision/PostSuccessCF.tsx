@@ -3,11 +3,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -33,17 +29,18 @@ interface IPostSuccessCF {
   post: newnewapi.Crowdfunding;
 }
 
-const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
-  post,
-}) => {
+const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({ post }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // My pledge amount
-  const [myPledgeAmount, setMyPledgeAmount] = useState<newnewapi.MoneyAmount | undefined>(undefined);
+  const [myPledgeAmount, setMyPledgeAmount] =
+    useState<newnewapi.MoneyAmount | undefined>(undefined);
   const [pledges, setPledges] = useState<newnewapi.Crowdfunding.IPledge[]>([]);
   const [pledgesNextPageToken, setPledgesNextPageToken] =
     useState<string | undefined | null>('');
@@ -94,9 +91,10 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
     [pledgesLoading, setPledges, post]
   );
 
-    // Video
+  // Video
   // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
+  const [videoTab, setVideoTab] =
+    useState<'announcement' | 'response'>('announcement');
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
     post.isResponseViewedByMe ?? false
@@ -106,12 +104,9 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-    // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
+  // Comments
+  const { ref: commentsSectionRef, inView } = useInView({
+    threshold: 0.8,
   });
 
   // Scroll to comments if hash is present
@@ -154,14 +149,14 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
 
   useEffect(() => {
     fetchPledgesForPost();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (pledgesNextPageToken) {
       fetchPledgesForPost(pledgesNextPageToken);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pledgesNextPageToken]);
 
   useEffect(() => {
@@ -176,7 +171,6 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
           0
         );
     }
-
 
     if (workingAmount !== 0 && workingAmount !== undefined) {
       setMyPledgeAmount(
@@ -203,45 +197,38 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
         />
         <SActivitesContainer>
           <>
-            <DecisionEndedBox
-              type="mc"
-              imgSrc={BoxIcon.src}
-            >
+            <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
               {t('CfPostSuccess.hero_text')}
             </DecisionEndedBox>
             <SMainSectionWrapper>
               <SCreatorInfoDiv>
                 <SCreator>
-                  <SCreatorImage
-                    src={post.creator?.avatarUrl!!}
-                  />
+                  <SCreatorImage src={post.creator?.avatarUrl!!} />
                   <SWantsToKnow>
-                    {t('CfPostSuccess.wants_to_know', { creator: post.creator?.nickname })}
+                    {t('CfPostSuccess.wants_to_know', {
+                      creator: post.creator?.nickname,
+                    })}
                   </SWantsToKnow>
                 </SCreator>
                 {/* <STotal>
                   {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
                 </STotal> */}
               </SCreatorInfoDiv>
-              <SPostTitle
-                variant={4}
-              >
-                {post.title}
-              </SPostTitle>
+              <SPostTitle variant={4}>{post.title}</SPostTitle>
               <SSeparator />
               <SBackersInfo>
                 <SCreatorsBackers>
-                  {t('CfPostSuccess.creators_backers', { creator: post.creator?.nickname })}
+                  {t('CfPostSuccess.creators_backers', {
+                    creator: post.creator?.nickname,
+                  })}
                 </SCreatorsBackers>
-                <SCurrentBackers
-                  variant={4}
-                >
+                <SCurrentBackers variant={4}>
                   {formatNumber(post.currentBackerCount, true)}
                 </SCurrentBackers>
-                <STargetBackers
-                  variant={6}
-                >
-                  {t('CfPostSuccess.of_target_backers', { target_count: formatNumber(post.targetBackerCount, true) })}
+                <STargetBackers variant={6}>
+                  {t('CfPostSuccess.of_target_backers', {
+                    target_count: formatNumber(post.targetBackerCount, true),
+                  })}
                 </STargetBackers>
               </SBackersInfo>
               {user.loggedIn && myPledgeAmount && (
@@ -251,10 +238,11 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
                     <SYouBackedFor>
                       {t('CfPostSuccess.you_backed_for')}
                     </SYouBackedFor>
-                    <SYouBackedAmount
-                      variant={4}
-                    >
-                      {`$${formatNumber(Math.round(myPledgeAmount.usdCents / 100) ?? 0, true)}`}
+                    <SYouBackedAmount variant={4}>
+                      {`$${formatNumber(
+                        Math.round(myPledgeAmount.usdCents / 100) ?? 0,
+                        true
+                      )}`}
                     </SYouBackedAmount>
                   </YouBackedInfo>
                 </>
@@ -268,7 +256,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
                       shouldView={!responseViewed}
                       onClick={() => setVideoTab('response')}
                     >
-                      { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
+                      {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
                     </SWatchResponseBtn>
                   </SWatchResponseWrapper>
                 ) : null}
@@ -278,13 +266,13 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
                       shouldView={videoTab === 'announcement'}
                       onClick={() => setVideoTab('announcement')}
                     >
-                      { t('PostVideoSuccess.tabs.watch_original') }
+                      {t('PostVideoSuccess.tabs.watch_original')}
                     </SChangeTabBtn>
                     <SChangeTabBtn
                       shouldView={videoTab === 'response'}
                       onClick={() => setVideoTab('response')}
                     >
-                      { t('PostVideoSuccess.tabs.watch_response')}
+                      {t('PostVideoSuccess.tabs.watch_response')}
                     </SChangeTabBtn>
                   </SToggleVideoWidget>
                 ) : null}
@@ -294,10 +282,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({
         </SActivitesContainer>
       </SWrapper>
       {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
+        <SCommentsSection id='comments' ref={commentsSectionRef}>
           <SCommentsHeadline variant={4}>
             {t('SuccessCommon.Comments.heading')}
           </SCommentsHeadline>
@@ -322,8 +307,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -335,12 +319,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -377,7 +359,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -387,7 +369,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 64px;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -456,7 +439,6 @@ const STotal = styled.div`
     font-weight: 700;
     font-size: 12px;
     line-height: 16px;
-
   }
   ${({ theme }) => theme.media.laptop} {
     position: relative;
@@ -505,12 +487,10 @@ const SCreatorsBackers = styled.div`
   }
 `;
 
-const SCurrentBackers = styled(Headline)`
-`;
+const SCurrentBackers = styled(Headline)``;
 
 const STargetBackers = styled(Headline)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
 `;
 
 // You backed info
@@ -536,10 +516,7 @@ const SYouBackedFor = styled.div`
   }
 `;
 
-const SYouBackedAmount = styled(Headline)`
-
-`;
-
+const SYouBackedAmount = styled(Headline)``;
 
 // Watch response for the first time
 const SWatchResponseWrapper = styled.div`
@@ -553,7 +530,8 @@ const SWatchResponseWrapper = styled.div`
 const SWatchResponseBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -562,14 +540,15 @@ const SWatchResponseBtn = styled.button<{
   width: 100%;
   height: 100%;
 
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
@@ -587,7 +566,10 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  background: ${({ shouldView, theme }) =>
+    shouldView
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border: transparent;
 
   padding: 17px 24px;
@@ -596,18 +578,18 @@ const SChangeTabBtn = styled.button<{
   height: 100%;
 
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
@@ -618,6 +600,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

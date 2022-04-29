@@ -93,15 +93,18 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
                   </Text>
                 </SSideMessage>
               )}
-            {!isMobileOrTablet && router.pathname.includes('creator-onboarding') && (
-              <HeroVisual style={{
-                top:'140px',
-                left:'0px',
-                width: 'calc(100vw - 800px)',
-                maxWidth: '100%',
-                height: '700px'
-              }}/>
-            )}
+            {!isMobileOrTablet &&
+              router.pathname.includes('creator-onboarding') && (
+                <HeroVisual
+                  style={{
+                    top: '140px',
+                    left: '0px',
+                    width: 'calc(100vw - 800px)',
+                    maxWidth: '100%',
+                    height: '700px',
+                  }}
+                />
+              )}
           </SCreatorOnboardingLayout>
         </SkeletonTheme>
       </ErrorBoundary>

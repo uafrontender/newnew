@@ -13,34 +13,36 @@ import InlineSvg from '../InlineSVG';
 const SubsFeatures = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   return (
     <SContainer>
       <Image
         src={acImage}
-        alt="Enable subscription"
+        alt='Enable subscription'
         width={isMobile ? 232 : 162}
         height={isMobile ? 240 : 152}
-        objectFit="cover"
+        objectFit='cover'
       />
       <SContent>
         <STitle variant={6}>{t('subscribersFeatures.title')}</STitle>
         <SListItem>
           <SBullet>
-            <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+            <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
           </SBullet>
           {t('subscribersFeatures.firstFeature')}
         </SListItem>
         <SListItem>
           <SBullet>
-            <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+            <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
           </SBullet>
           {t('subscribersFeatures.secondFeature')}
         </SListItem>
         <SListItem>
           <SBullet>
-            <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+            <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
           </SBullet>
           {t('subscribersFeatures.thirdFeature')}
         </SListItem>
