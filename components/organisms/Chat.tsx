@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
 
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -18,11 +20,28 @@ interface IChat {
 }
 
 export const Chat: React.FC<IChat> = ({ username }) => {
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
   });
+
   const openChat = ({ chatRoom }: IChatData) => {
+    let route = '';
+
+    if (chatRoom?.visavis?.username) {
+      chatRoom.kind === 1
+        ? (route = chatRoom?.visavis?.username)
+        : (route = `${chatRoom?.visavis?.username}-announcement`);
+    } else {
+      chatRoom!!.kind === 4 && chatRoom!!.myRole === 2
+        ? (route = `${user.userData?.username}-announcement`)
+        : '';
+    }
+
+    router.push(`/direct-messages/${route}`);
+
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('chat');

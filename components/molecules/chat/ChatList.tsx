@@ -30,6 +30,8 @@ import { useAppSelector } from '../../../redux-store/store';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import InlineSVG from '../../atoms/InlineSVG';
 import { useGetChats } from '../../../contexts/chatContext';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
@@ -52,6 +54,7 @@ export const ChatList: React.FC<IFunctionProps> = ({
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('chatRoomsSubs');
 
+  const [isInitialLoaded, setIsInitialLoaded] = useState<boolean>(false);
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const [chatRooms, setChatRooms] =
     useState<newnewapi.IChatRoom[] | null>(null);
@@ -207,17 +210,21 @@ export const ChatList: React.FC<IFunctionProps> = ({
       });
       const res = await getMyRooms(payload);
 
-      if (!res.data || res.error)
+      if (!res.data || res.error) {
+        setIsInitialLoaded(true);
         throw new Error(res.error?.message ?? 'Request failed');
+      }
       if (res.data && res.data.rooms.length > 0) {
         if (res.data.rooms[0].myRole === 1) {
           setActiveTab('chatRoomsCreators');
         }
         openRoom(res.data.rooms[0]);
         setUpdatedChat(res.data.rooms[0]);
+        setIsInitialLoaded(true);
       }
     } catch (err) {
       console.error(err);
+      setIsInitialLoaded(true);
     }
   };
 
@@ -243,14 +250,14 @@ export const ChatList: React.FC<IFunctionProps> = ({
   }, []);
 
   useEffect(() => {
-    if (chatRooms && !searchedRooms) {
+    if (chatRooms && !searchedRooms && isInitialLoaded) {
       fetchLastActiveRoom();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unreadCountForCreator, unreadCountForUser]);
+  }, [unreadCountForCreator, unreadCountForUser, isInitialLoaded]);
 
   useEffect(() => {
-    if (updatedChat) {
+    if (updatedChat && isInitialLoaded) {
       let isAlreadyAdded: number | undefined;
       const isChatWithSub = updatedChat.myRole === 2;
 
@@ -303,7 +310,7 @@ export const ChatList: React.FC<IFunctionProps> = ({
       setUpdatedChat(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatedChat]);
+  }, [updatedChat, isInitialLoaded]);
 
   useEffect(() => {
     if (inView && !loadingRooms && chatRoomsNextPageToken) {
@@ -343,10 +350,8 @@ export const ChatList: React.FC<IFunctionProps> = ({
   useEffect(() => {
     if (!loadingRooms && chatRooms && chatRooms[0])
       if (chatRoomsCreators.length > 0 && chatRoomsSubs.length > 0) {
-        openRoom(chatRoomsSubs[0]);
         if (displayAllRooms) setDisplayAllRooms(false);
       } else {
-        openRoom(chatRooms[0]);
         setDisplayAllRooms(true);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -537,25 +542,37 @@ export const ChatList: React.FC<IFunctionProps> = ({
 
   return (
     <>
-      <SSectionContent>
-        {chatRooms && chatRooms.length > 0 ? (
-          <>
-            {chatRoomsCreators.length > 0 &&
-              chatRoomsSubs.length > 0 &&
-              !searchedRooms && <Tabs />}
-            {!searchedRooms
-              ? !displayAllRooms
-                ? eval(activeTab).map(renderChatItem)
-                : chatRooms.map(renderChatItem)
-              : searchedRooms.map(renderChatItem)}
-            {chatRoomsNextPageToken && !loadingRooms && !searchedRooms && (
-              <SRef ref={scrollRef}>Loading...</SRef>
-            )}
-          </>
-        ) : (
-          <EmptyInbox />
-        )}
-      </SSectionContent>
+      {isInitialLoaded ? (
+        <SSectionContent>
+          {chatRooms && chatRooms.length > 0 ? (
+            <>
+              {chatRoomsCreators.length > 0 &&
+                chatRoomsSubs.length > 0 &&
+                !searchedRooms && <Tabs />}
+              {!searchedRooms
+                ? !displayAllRooms
+                  ? eval(activeTab).map(renderChatItem)
+                  : chatRooms.map(renderChatItem)
+                : searchedRooms.map(renderChatItem)}
+              {chatRoomsNextPageToken && !loadingRooms && !searchedRooms && (
+                <SRef ref={scrollRef}>Loading...</SRef>
+              )}
+            </>
+          ) : (
+            <EmptyInbox />
+          )}
+        </SSectionContent>
+      ) : (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      )}
     </>
   );
 };
