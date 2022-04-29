@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 
-import Card from '../../molecules/Card';
+import PostCard from '../../molecules/PostCard';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
@@ -164,7 +164,7 @@ export const CardsSection: React.FC<ICardSection> = ({
             }`}
             onClick={handleItemClick}
           >
-            <Card
+            <PostCard
               item={item}
               index={tutorialCard !== undefined ? index + 1 : index}
               width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
@@ -183,7 +183,7 @@ export const CardsSection: React.FC<ICardSection> = ({
         }`}
         onClick={handleItemClick}
       >
-        <Card
+        <PostCard
           item={item}
           index={tutorialCard !== undefined ? index + 1 : index}
           width={isMobile ? '100%' : isTablet ? '200px' : '224px'}

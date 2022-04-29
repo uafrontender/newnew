@@ -5,7 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import Card from '../../molecules/Card';
+import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
@@ -24,7 +24,7 @@ interface IList {
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const List: React.FC<IList> = ({
+export const PostList: React.FC<IList> = ({
   category,
   collection,
   loading,
@@ -48,7 +48,7 @@ export const List: React.FC<IList> = ({
         key={switchPostType(item)[0].postUuid}
         onClick={handleItemClick}
       >
-        <Card
+        <PostCard
           item={item}
           index={index + 1}
           width='100%'
@@ -98,13 +98,13 @@ export const List: React.FC<IList> = ({
   );
 };
 
-List.defaultProps = {
+PostList.defaultProps = {
   wrapperStyle: {},
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };
 
-export default List;
+export default PostList;
 
 const SListWrapper = styled.div`
   width: 100%;

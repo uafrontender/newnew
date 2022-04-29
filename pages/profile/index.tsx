@@ -14,7 +14,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/see-more/List';
+import PostList from '../../components/organisms/see-more/PostList';
 
 interface IMyProfileIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -129,24 +129,13 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
-  // useUpdateEffect(() => {
-  //   handleUpdatePageToken('');
-  //   handleSetPosts([]);
-  //   loadPosts(undefined, true);
-  // }, [postsFilter]);
-
   return (
     <div>
       <SMain>
-        <PostsFilterSection
-          numDecisions={totalCount}
-          isLoading={isLoading}
-          postsFilter={postsFilter}
-          handleUpdateFilter={handleUpdateFilter}
-        />
+        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
           {posts && (
-            <List
+            <PostList
               category=''
               loading={isLoading}
               collection={posts}

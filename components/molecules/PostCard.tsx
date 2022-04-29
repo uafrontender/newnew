@@ -77,7 +77,13 @@ interface ICard {
   height?: string;
 }
 
-export const Card: React.FC<ICard> = ({ item, type, index, width, height }) => {
+export const PostCard: React.FC<ICard> = ({
+  item,
+  type,
+  index,
+  width,
+  height,
+}) => {
   const { t } = useTranslation('home');
   const theme = useTheme();
   const router = useRouter();
@@ -365,9 +371,9 @@ export const Card: React.FC<ICard> = ({ item, type, index, width, height }) => {
   );
 };
 
-export default Card;
+export default PostCard;
 
-Card.defaultProps = {
+PostCard.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
