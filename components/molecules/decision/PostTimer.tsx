@@ -153,7 +153,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
         <>
           {parsedSeconds.days !== '00' && (
             <>
-              <STimerItem className="timerItem">
+              <STimerItem className='timerItem'>
                 <div>{parsedSeconds.days}</div>
                 <div>{t('expires.days')}</div>
                 <STutorialTooltipHolder>
@@ -173,7 +173,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               <div>:</div>
             </>
           )}
-          <STimerItem className="timerItem">
+          <STimerItem className='timerItem'>
             <div>{parsedSeconds.hours}</div>
             <div>{t('expires.hours')}</div>
             {parsedSeconds.days === '00' && (
@@ -193,14 +193,14 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
             )}
           </STimerItem>
           <div>:</div>
-          <STimerItem className="timerItem">
+          <STimerItem className='timerItem'>
             <div>{parsedSeconds.minutes}</div>
             <div>{t('expires.minutes')}</div>
           </STimerItem>
           {parsedSeconds.days === '00' && (
             <>
               <div>:</div>
-              <STimerItem className="timerItem">
+              <STimerItem className='timerItem'>
                 <div>{parsedSeconds.seconds}</div>
                 <div>{t('expires.seconds')}</div>
               </STimerItem>

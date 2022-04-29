@@ -12,7 +12,9 @@ interface INoResults {
   isCreatorConnectedToStripe: boolean | undefined;
 }
 
-export const NoResults: React.FC<INoResults> = ({ isCreatorConnectedToStripe }) => {
+export const NoResults: React.FC<INoResults> = ({
+  isCreatorConnectedToStripe,
+}) => {
   const { t } = useTranslation('creator');
   const user = useAppSelector((state) => state.user);
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -45,18 +47,27 @@ export const NoResults: React.FC<INoResults> = ({ isCreatorConnectedToStripe }) 
   return (
     <SContainer>
       <SWrapper>
-        <Image src={emptyFolder} alt={t('noResults.title')} width={49} height={48} />
+        <Image
+          src={emptyFolder}
+          alt={t('noResults.title')}
+          width={49}
+          height={48}
+        />
         <STitle>{t('noResults.title')}</STitle>
         <SText>{t('noResults.text')}</SText>
-        <Button view="primaryGrad" onClick={shareHandler}>
-          {isCopiedUrl ? t('dashboard.subscriptionStats.copied') : t('noResults.btnShare')}
+        <Button view='primaryGrad' onClick={shareHandler}>
+          {isCopiedUrl
+            ? t('dashboard.subscriptionStats.copied')
+            : t('noResults.btnShare')}
         </Button>
       </SWrapper>
       <SUpdateSubs>
         {isCreatorConnectedToStripe ? (
-          <Link href="/creator/subscribers/edit-subscription-rate">{t('noResults.updateSub')}</Link>
+          <Link href='/creator/subscribers/edit-subscription-rate'>
+            {t('noResults.updateSub')}
+          </Link>
         ) : (
-          <Link href="/creator/get-paid">{t('noResults.updateSub')}</Link>
+          <Link href='/creator/get-paid'>{t('noResults.updateSub')}</Link>
         )}
       </SUpdateSubs>
     </SContainer>
@@ -71,7 +82,10 @@ const SContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 270px);
-  color: ${(props) => (props.theme.name !== 'light' ? props.theme.colorsThemed.text.tertiary : '#586070')};
+  color: ${(props) =>
+    props.theme.name !== 'light'
+      ? props.theme.colorsThemed.text.tertiary
+      : '#586070'};
   font-size: 14px;
 `;
 

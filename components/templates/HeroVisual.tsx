@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { AuthLayoutContext } from './AuthLayout';
 
-import useImageLoaded from "../../utils/hooks/useImageLoaded";
+import useImageLoaded from '../../utils/hooks/useImageLoaded';
 
 // Sign in
 import SignInIntro from '../../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
@@ -17,11 +17,14 @@ interface IHeroVisual {
   style?: React.CSSProperties;
 }
 
-const HeroVisual: React.FunctionComponent<IHeroVisual> = ({style}) => {
+const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
   const theme = useTheme();
-  const [currentState, setCurrentState] = useState<'intro' | 'hold' | 'outro'>('intro');
+  const [currentState, setCurrentState] =
+    useState<'intro' | 'hold' | 'outro'>('intro');
   const {
-    ref: introRef, loaded: introLoaded, onLoad: onIntroLoaded,
+    ref: introRef,
+    loaded: introLoaded,
+    onLoad: onIntroLoaded,
   } = useImageLoaded();
 
   const authLayoutContext = useContext(AuthLayoutContext);
@@ -48,8 +51,8 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({style}) => {
         y: 0,
         opacity: 0,
         transition: {
-          duration: 0.8
-        }
+          duration: 0.8,
+        },
       }}
       onUnmount={() => {
         setCurrentState('outro');
@@ -87,7 +90,7 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({style}) => {
         />
       </SImageWrapper>
     </SHeroVisual>
-  )
+  );
 };
 
 HeroVisual.defaultProps = {
@@ -104,7 +107,7 @@ const SHeroVisual = styled(motion.div)`
     display: block;
 
     right: 55%;
-    top: 25%
+    top: 25%;
   }
 
   ${({ theme }) => theme.media.laptop} {

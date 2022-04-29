@@ -6,36 +6,39 @@ import CheckBox from './CheckBox';
 
 interface ISortItemOption {
   item: {
-    key: string,
+    key: string;
   };
   parent: {
-    key: string,
-  }
+    key: string;
+  };
   category: string;
   selected: boolean;
   handleChange: (itemKey: string, parentKey: string) => void;
 }
 
 export const SortItemOption: React.FC<ISortItemOption> = (props) => {
-  const {
-    item,
-    parent,
-    selected,
-    category,
-    handleChange,
-  } = props;
+  const { item, parent, selected, category, handleChange } = props;
   const { t } = useTranslation('home');
 
-  const onChange = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const onChange = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    handleChange(item.key, parent.key);
-  }, [handleChange, item.key, parent.key]);
+      handleChange(item.key, parent.key);
+    },
+    [handleChange, item.key, parent.key]
+  );
 
   return (
     <SCheckBox
-      label={t(`sort-title-option-${parent.key}-${item.key}${item.key === 'num_bids' && ['ac', 'mc', 'cf'].includes(category) ? `-${category}` : ''}`)}
+      label={t(
+        `sort-title-option-${parent.key}-${item.key}${
+          item.key === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
+            ? `-${category}`
+            : ''
+        }`
+      )}
       selected={selected}
       handleChange={onChange}
     />
@@ -52,7 +55,8 @@ const SCheckBox = styled(CheckBox)`
     border-radius: 12px;
 
     :hover {
-      background-color: ${(props) => props.theme.colorsThemed.background.backgroundDDSelected};
+      background-color: ${(props) =>
+        props.theme.colorsThemed.background.backgroundDDSelected};
     }
   }
 `;

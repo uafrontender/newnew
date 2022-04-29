@@ -155,7 +155,7 @@ export const SearchInput: React.FC = () => {
     <>
       {isMobileOrTablet && globalSearchActive ? (
         <SCloseButtonMobile
-          view="tertiary"
+          view='tertiary'
           iconOnly
           onClick={() => {
             handleSearchClose();
@@ -194,7 +194,7 @@ export const SearchInput: React.FC = () => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Titles, genres, people"
+            placeholder='Titles, genres, people'
           />
           <SRightInlineSVG
             clickable
@@ -237,7 +237,7 @@ export const SearchInput: React.FC = () => {
                   onClick={() => {
                     router.push(`/search?query=${searchValue}&tab=decisions`);
                   }}
-                  view="quaternary"
+                  view='quaternary'
                 >
                   All results
                 </SButton>
@@ -278,7 +278,7 @@ export const SearchInput: React.FC = () => {
                 onClick={() => {
                   router.push(`/search?query=${searchValue}&tab=decisions`);
                 }}
-                view="quaternary"
+                view='quaternary'
               >
                 All results
               </SButton>

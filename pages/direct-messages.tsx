@@ -30,12 +30,18 @@ export const Chat = () => {
   );
 };
 
-(Chat as NextPageWithLayout).getLayout = (page: ReactElement) => <SGeneral>{page}</SGeneral>;
+(Chat as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <SGeneral>{page}</SGeneral>
+);
 
 export default Chat;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'chat', 'payment-modal']);
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'chat',
+    'payment-modal',
+  ]);
 
   return {
     props: {
@@ -52,6 +58,8 @@ const SGeneral = styled(General)`
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;

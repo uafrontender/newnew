@@ -13,25 +13,23 @@ import { useOnClickOutside } from '../../utils/hooks/useOnClickOutside';
 
 import { SUPPORTED_LANGUAGES } from '../../constants/general';
 
-interface IChangeLanguage {
-}
+interface IChangeLanguage {}
 
 export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
   const { t } = useTranslation();
   const ref: any = useRef();
-  const {
-    push,
-    locale,
-    pathname,
-  } = useRouter();
+  const { push, locale, pathname } = useRouter();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const options = SUPPORTED_LANGUAGES;
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
 
-  const ddHeight = (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
+  const ddHeight =
+    (options.length > 6 ? 372 : options.length * (isTablet ? 50 : 52)) + 24;
 
   const handleChangeLanguageClick = () => {
     setFocused(!focused);
@@ -67,31 +65,20 @@ export const ChangeLanguage: React.FC<IChangeLanguage> = () => {
 
   return (
     <SContainer ref={ref}>
-      <Button
-        view="changeLanguage"
-        onClick={handleChangeLanguageClick}
-      >
+      <Button view='changeLanguage' onClick={handleChangeLanguageClick}>
         {t(`selected-language-title-${locale}`)}
       </Button>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>
-              {options.map(renderItem)}
-            </SMobileList>
-            <SCancelButton
-              view="modalSecondary"
-              onClick={handleCloseClick}
-            >
+            <SMobileList>{options.map(renderItem)}</SMobileList>
+            <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
               {t('button-cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
       ) : (
-        <SListHolder
-          height={ddHeight}
-          focused={focused}
-        >
+        <SListHolder height={ddHeight} focused={focused}>
           {options.map(renderItem)}
         </SListHolder>
       )}
@@ -125,7 +112,8 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   padding-bottom: ${(props) => (props.focused ? '12px' : '0px')};
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -166,7 +154,8 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 `;
 
 interface ISButton {

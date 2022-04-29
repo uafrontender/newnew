@@ -14,7 +14,8 @@ import PostModal from '../components/organisms/decision/PostModal';
 const TestPostModal: NextPage = () => {
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   const handleOpenPost = (post: newnewapi.IPost) => {
     setDisplayedPost(post);
@@ -32,15 +33,18 @@ const TestPostModal: NextPage = () => {
         const getAllRequest = new newnewapi.PagingRequest({});
 
         const res = await fetchProtobuf<
-          newnewapi.PagingRequest, newnewapi.PagedPostsResponse>(
-            newnewapi.PagingRequest,
-            newnewapi.PagedPostsResponse,
-            `${BASE_URL}/post/get_curated_posts`,
-            'post',
-            getAllRequest,
-          );
+          newnewapi.PagingRequest,
+          newnewapi.PagedPostsResponse
+        >(
+          newnewapi.PagingRequest,
+          newnewapi.PagedPostsResponse,
+          `${BASE_URL}/post/get_curated_posts`,
+          'post',
+          getAllRequest
+        );
 
-        if (!res.data?.posts || !Array.isArray(res.data?.posts)) throw new Error('No posts');
+        if (!res.data?.posts || !Array.isArray(res.data?.posts))
+          throw new Error('No posts');
 
         setPosts(() => [...(res.data?.posts || [])!!]);
       } catch (err) {
@@ -55,46 +59,45 @@ const TestPostModal: NextPage = () => {
     <General>
       <div>
         <main>
-          <h1>
-            I am a test page for posts
-          </h1>
+          <h1>I am a test page for posts</h1>
           <div>
-            {posts && posts.map((postType, i) => {
-              if (postType.auction) {
-                const post = postType.auction;
+            {posts &&
+              posts.map((postType, i) => {
+                if (postType.auction) {
+                  const post = postType.auction;
+                  return (
+                    <div
+                      key={post.postUuid}
+                      onClick={() => handleOpenPost(postType)}
+                    >
+                      <div>{i + 1}) Auction</div>
+                      <h2>{post.title}</h2>
+                    </div>
+                  );
+                }
+                if (postType.crowdfunding) {
+                  const post = postType.crowdfunding;
+                  return (
+                    <div
+                      key={post.postUuid}
+                      onClick={() => handleOpenPost(postType)}
+                    >
+                      <div>{i + 1}) Crowdfunding</div>
+                      <h2>{post.title}</h2>
+                    </div>
+                  );
+                }
+                const post = postType.multipleChoice;
                 return (
                   <div
-                    key={post.postUuid}
+                    key={post!!.postUuid}
                     onClick={() => handleOpenPost(postType)}
                   >
-                    <div>{ i + 1 }) Auction</div>
-                    <h2>{post.title }</h2>
+                    <div>{i + 1}) Multiple choice</div>
+                    <h2>{post!!.title}</h2>
                   </div>
                 );
-              }
-              if (postType.crowdfunding) {
-                const post = postType.crowdfunding;
-                return (
-                  <div
-                    key={post.postUuid}
-                    onClick={() => handleOpenPost(postType)}
-                  >
-                    <div>{ i + 1 }) Crowdfunding</div>
-                    <h2>{post.title }</h2>
-                  </div>
-                );
-              }
-              const post = postType.multipleChoice;
-              return (
-                <div
-                  key={post!!.postUuid}
-                  onClick={() => handleOpenPost(postType)}
-                >
-                  <div>{ i + 1 }) Multiple choice</div>
-                  <h2>{post!!.title }</h2>
-                </div>
-              );
-            })}
+              })}
           </div>
         </main>
       </div>
@@ -112,7 +115,7 @@ const TestPostModal: NextPage = () => {
 export async function getStaticProps(context: NextPageContext): Promise<any> {
   const translationContext = await serverSideTranslations(
     context.locale as string,
-    ['common', 'home', 'decision', 'payment-modal'],
+    ['common', 'home', 'decision', 'payment-modal']
   );
 
   return {

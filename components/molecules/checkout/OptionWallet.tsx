@@ -41,10 +41,7 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
   }, [ref, selected]);
 
   return (
-    <SOptionWallet
-      selected={selected ?? false}
-      onClick={handleClick}
-    >
+    <SOptionWallet selected={selected ?? false} onClick={handleClick}>
       <SAnimation>
         <Lottie
           ref={ref}
@@ -62,27 +59,17 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
           style={{
             marginLeft: '4px',
             justifySelf: 'flex-start',
-            textAlign: 'left'
+            textAlign: 'left',
           }}
         >
-          <SSubtitle
-            variant={3}
-          >
-            { t('options.wallet.subtitle') }
-          </SSubtitle>
-          <Text
-            variant={2}
-          >
-            { t('options.wallet.name') }
-            {walletBalance && (
-              ` ($${formatNumber((walletBalance.usdCents!! / 100) ?? 0, true)})`
-            )}
+          <SSubtitle variant={3}>{t('options.wallet.subtitle')}</SSubtitle>
+          <Text variant={2}>
+            {t('options.wallet.name')}
+            {walletBalance &&
+              ` ($${formatNumber(walletBalance.usdCents!! / 100 ?? 0, true)})`}
           </Text>
         </div>
-        <InlineSvg
-          svg={NewnewLogoBlue}
-          width="48px"
-        />
+        <InlineSvg svg={NewnewLogoBlue} width='48px' />
         {/* <SFeesText
           variant={2}
         >
@@ -91,7 +78,7 @@ const OptionWallet: React.FunctionComponent<IOptionWallet> = ({
       </SLabelContent>
     </SOptionWallet>
   );
-}
+};
 
 OptionWallet.defaultProps = {
   selected: undefined,
@@ -109,19 +96,22 @@ const SOptionWallet = styled.button<{
   border-width: 2px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  border-color: ${({ theme, selected }) => (selected ? theme.colorsThemed.accent.blue : 'transparent')};
+  border-color: ${({ theme, selected }) =>
+    selected ? theme.colorsThemed.accent.blue : 'transparent'};
 
   width: 100%;
 
-  background: ${({ selected, theme }) => (selected ?
-    'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))' : theme.colorsThemed.background.tertiary)};;
+  background: ${({ selected, theme }) =>
+    selected
+      ? 'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))'
+      : theme.colorsThemed.background.tertiary};
 
   padding: 22px 16px;
   margin-top: 12px;
   margin-bottom: 12px;
 
   cursor: pointer;
-  transition: .2s linear;
+  transition: 0.2s linear;
 `;
 
 const SAnimation = styled.div`
@@ -143,4 +133,4 @@ const SSubtitle = styled(Text)`
 
 const SFeesText = styled(Text)`
   justify-self: flex-end;
-`
+`;

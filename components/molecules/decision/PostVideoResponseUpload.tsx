@@ -1,8 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
@@ -17,7 +13,11 @@ import DeleteVideo from '../creation/DeleteVideo';
 
 import { loadVideo } from '../../../utils/loadVideo';
 
-import { MAX_VIDEO_SIZE, MIN_VIDEO_DURATION, MAX_VIDEO_DURATION } from '../../../constants/general';
+import {
+  MAX_VIDEO_SIZE,
+  MIN_VIDEO_DURATION,
+  MAX_VIDEO_DURATION,
+} from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import Headline from '../../atoms/Headline';
@@ -70,24 +70,27 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
 
-  const handleFileChange = useCallback(async (e) => {
-    const file = e.target?.files[0];
+  const handleFileChange = useCallback(
+    async (e) => {
+      const file = e.target?.files[0];
 
-    if (file.size > MAX_VIDEO_SIZE) {
-      toast.error(t('PostVideo.UploadResponseForm.video.error.maxSize'));
-    } else {
-      const media: any = await loadVideo(file);
-
-      if (media.duration < MIN_VIDEO_DURATION) {
-        toast.error(t('PostVideo.UploadResponseForm.video.error.minLength'));
-      } else if (media.duration > MAX_VIDEO_DURATION) {
-        toast.error(t('PostVideo.UploadResponseForm.video.error.maxLength'));
+      if (file.size > MAX_VIDEO_SIZE) {
+        toast.error(t('PostVideo.UploadResponseForm.video.error.maxSize'));
       } else {
-        setLocalFile(file);
-        onChange(id, file);
+        const media: any = await loadVideo(file);
+
+        if (media.duration < MIN_VIDEO_DURATION) {
+          toast.error(t('PostVideo.UploadResponseForm.video.error.minLength'));
+        } else if (media.duration > MAX_VIDEO_DURATION) {
+          toast.error(t('PostVideo.UploadResponseForm.video.error.maxLength'));
+        } else {
+          setLocalFile(file);
+          onChange(id, file);
+        }
       }
-    }
-  }, [id, onChange, t]);
+    },
+    [id, onChange, t]
+  );
   const handleRetryVideoUpload = useCallback(() => {
     onChange(id, localFile);
   }, [id, localFile, onChange]);
@@ -98,28 +101,24 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
 
   const renderContent = useCallback(() => {
     let content = (
-      <SDropBox
-        htmlFor="file"
-      >
+      <SDropBox htmlFor='file'>
         <input
-          id="file"
+          id='file'
           ref={inputRef}
-          type="file"
+          type='file'
           style={{ display: 'none' }}
-          accept="video/*"
+          accept='video/*'
           multiple={false}
           onChange={handleFileChange}
         />
-        <SHeadline
-          variant={6}
-        >
+        <SHeadline variant={6}>
           {t('PostVideo.UploadResponseForm.fileUpload.title_1')}
-            <br />
+          <br />
           {t('PostVideo.UploadResponseForm.fileUpload.title_2')}
         </SHeadline>
         <SButton
-          id="upload-response-btn"
-          view="primaryGrad"
+          id='upload-response-btn'
+          view='primaryGrad'
           onClick={handleButtonClick}
         >
           {t('PostVideo.UploadResponseForm.fileUpload.button')}
@@ -147,7 +146,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               })}
             </SLoadingDescription>
             <SLoadingBottomBlockButton
-              view="secondary"
+              view='secondary'
               onClick={handleCancelVideoUpload}
               disabled={!value?.hlsStreamUrl}
             >
@@ -163,11 +162,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       content = (
         <SErrorBox>
           <SErrorTitleWrapper>
-            <SInlineSVG
-              svg={errorIcon}
-              width="16px"
-              height="16px"
-            />
+            <SInlineSVG svg={errorIcon} width='16px' height='16px' />
             <SErrorTitle variant={3} weight={600}>
               {t('PostVideo.UploadResponseForm.video.error.title')}
             </SErrorTitle>
@@ -177,13 +172,13 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           </SLoadingDescription>
           <SErrorBottomBlock>
             <SLoadingBottomBlockButton
-              view="secondary"
+              view='secondary'
               onClick={handleCancelVideoUpload}
             >
               {t('PostVideo.UploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
             <Button
-              view="primaryGrad"
+              view='primaryGrad'
               onClick={handleRetryVideoUpload}
               disabled={!localFile}
             >
@@ -196,21 +191,21 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       content = (
         <SFileBox>
           <input
-            id="file"
+            id='file'
             ref={inputRef}
-            type="file"
+            type='file'
             style={{ display: 'none' }}
-            accept="video/*"
+            accept='video/*'
             multiple={false}
             onChange={handleFileChange}
           />
           <SPlayerWrapper>
             <BitmovinPlayer
-              id="small-thumbnail"
+              id='small-thumbnail'
               innerRef={playerRef}
               resources={value}
               thumbnails={thumbnails}
-              borderRadius="8px"
+              borderRadius='8px'
             />
           </SPlayerWrapper>
           <SButtonsContainer>
@@ -313,10 +308,17 @@ const SFileBox = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 176px;
-    border: 1px solid ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.outlines1 : 'transparent')};
+    border: 1px solid
+      ${(props) =>
+        props.theme.name === 'light'
+          ? props.theme.colorsThemed.background.outlines1
+          : 'transparent'};
     padding: 23px;
     overflow: hidden;
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.secondary};
     border-radius: 16px;
   }
 `;
@@ -351,7 +353,10 @@ interface ISVideoButton {
 }
 
 const SVideoButton = styled.button<ISVideoButton>`
-  color: ${(props) => (props.danger ? props.theme.colorsThemed.accent.error : props.theme.colorsThemed.text.secondary)};
+  color: ${(props) =>
+    props.danger
+      ? props.theme.colorsThemed.accent.error
+      : props.theme.colorsThemed.text.secondary};
   border: none;
   cursor: pointer;
   outline: none;
@@ -409,7 +414,10 @@ const SLoadingBottomBlockButton = styled(Button)`
 
   &:focus:enabled,
   &:hover:enabled {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary)};
+    background: ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.secondary};
   }
 `;
 

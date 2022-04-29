@@ -12,14 +12,27 @@ interface INewMessageButton {
 const NewMessageButton: React.FC<INewMessageButton> = ({ handleClick }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
   return (
-    <SButton onClick={handleClick} view={!isMobileOrTablet ? 'secondary' : 'transparent'}>
+    <SButton
+      onClick={handleClick}
+      view={!isMobileOrTablet ? 'secondary' : 'transparent'}
+    >
       <SInlineSVG
         svg={NewMessageIcon}
-        fill={theme.name === 'light' ? theme.colorsThemed.text.primary : theme.colors.white}
-        width="24px"
-        height="24px"
+        fill={
+          theme.name === 'light'
+            ? theme.colorsThemed.text.primary
+            : theme.colors.white
+        }
+        width='24px'
+        height='24px'
       />
     </SButton>
   );

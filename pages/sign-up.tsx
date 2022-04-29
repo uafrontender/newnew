@@ -31,10 +31,7 @@ interface ISignup {
   redirectURL?: string;
 }
 
-const Signup: NextPage<ISignup> = ({
-  reason,
-  redirectURL,
-}) => {
+const Signup: NextPage<ISignup> = ({ reason, redirectURL }) => {
   const { t } = useTranslation('sign-up');
 
   const { loggedIn } = useAppSelector((state) => state.user);
@@ -53,20 +50,20 @@ const Signup: NextPage<ISignup> = ({
       if (postId && window?.history?.state?.fromPost) {
         router.push(`/post/${postId}`);
       }
-    }
+    };
 
     window?.addEventListener('popstate', handlerHistory);
 
     return () => {
       window?.removeEventListener('popstate', handlerHistory);
-    }
+    };
   }, [router]);
 
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
-        <meta name="description" content={t('meta.description')} />
+        <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
       </Head>
       <SignupMenu
         reason={reason ?? undefined}
@@ -76,21 +73,23 @@ const Signup: NextPage<ISignup> = ({
   );
 };
 
-(Signup as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(Signup as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return (
     <AuthLayout>
       <motion.div
-        key="sign-up"
+        key='sign-up'
         exit={{
           x: -1000,
           y: 0,
           opacity: 0,
           transition: {
-            duration: 1
-          }
+            duration: 1,
+          },
         }}
       >
-        { page }
+        {page}
       </motion.div>
     </AuthLayout>
   );
@@ -100,20 +99,26 @@ export default Signup;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { reason, redirect } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['sign-up', 'verify-email'],
-  );
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'sign-up',
+    'verify-email',
+  ]);
 
   const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';
 
-  if (reason && !Array.isArray(reason) && signupReasons.find((validT) => validT === reason)) {
+  if (
+    reason &&
+    !Array.isArray(reason) &&
+    signupReasons.find((validT) => validT === reason)
+  ) {
     return {
       props: {
         reason: reason as SignupReason,
-        ...(redirectURL ? {
-          redirectURL
-        }: {}),
+        ...(redirectURL
+          ? {
+              redirectURL,
+            }
+          : {}),
         ...translationContext,
       },
     };
@@ -121,9 +126,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      ...(redirectURL ? {
-        redirectURL
-      }: {}),
+      ...(redirectURL
+        ? {
+            redirectURL,
+          }
+        : {}),
       ...translationContext,
     },
   };

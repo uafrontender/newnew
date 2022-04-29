@@ -17,11 +17,7 @@ const FaqSection: React.FunctionComponent = () => {
 
   return (
     <SContainer>
-      <SHeadline
-        variant={5}
-      >
-        { t('FAQ.heading') }
-      </SHeadline>
+      <SHeadline variant={5}>{t('FAQ.heading')}</SHeadline>
       {new Array(5).fill('').map((_, i) => (
         <FaqSectionOption
           key={i}
@@ -30,10 +26,11 @@ const FaqSection: React.FunctionComponent = () => {
         />
       ))}
       <SBottomFooter>
-        {t('FAQ.helpCenterFooter.text')}
-        { ' ' }
-        <Link href="/how-it-works">
-          <a href="/how-it-works" target="_blank">{t('FAQ.helpCenterFooter.link')}</a>
+        {t('FAQ.helpCenterFooter.text')}{' '}
+        <Link href='/how-it-works'>
+          <a href='/how-it-works' target='_blank'>
+            {t('FAQ.helpCenterFooter.link')}
+          </a>
         </Link>
       </SBottomFooter>
     </SContainer>
@@ -80,7 +77,6 @@ const SBottomFooter = styled.div`
   font-size: 12px;
   line-height: 16px;
 
-
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   a {
@@ -88,11 +84,12 @@ const SBottomFooter = styled.div`
 
     color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       outline: none;
       color: ${({ theme }) => theme.colorsThemed.text.primary};
 
-      transition: .2s ease;
+      transition: 0.2s ease;
     }
   }
 
@@ -116,30 +113,22 @@ const FaqSectionOption: React.FunctionComponent<IFaqSectionOption> = ({
 
   return (
     <SFaqSectionOption>
-      <SQuestionDiv
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Text
-          variant={2}
-        >
-          {question}
-        </Text>
+      <SQuestionDiv onClick={() => setIsOpen(!isOpen)}>
+        <Text variant={2}>{question}</Text>
         <SInlineSVG
           svg={ArrowDown}
-          fill={!isOpen ? theme.colorsThemed.text.secondary : theme.colorsThemed.text.tertiary}
-          width="24px"
-          height="24px"
+          fill={
+            !isOpen
+              ? theme.colorsThemed.text.secondary
+              : theme.colorsThemed.text.tertiary
+          }
+          width='24px'
+          height='24px'
           focused={isOpen}
         />
       </SQuestionDiv>
-      <SAnswerDiv
-        isOpen={isOpen}
-      >
-        <Text
-          variant={2}
-        >
-          {answer}
-        </Text>
+      <SAnswerDiv isOpen={isOpen}>
+        <Text variant={2}>{answer}</Text>
       </SAnswerDiv>
     </SFaqSectionOption>
   );
@@ -170,9 +159,7 @@ const SQuestionDiv = styled.div`
 const SInlineSVG = styled(InlineSvg)<{
   focused: boolean;
 }>`
-
   transform: ${({ focused }) => (focused ? 'rotate(180deg)' : 'unset')};
-
 `;
 
 const SAnswerDiv = styled.div<{
@@ -186,5 +173,5 @@ const SAnswerDiv = styled.div<{
 
   max-height: ${({ isOpen }) => (isOpen ? '100%' : 0)};
   opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
-  transition: .2s linear;
+  transition: 0.2s linear;
 `;

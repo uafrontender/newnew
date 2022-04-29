@@ -16,7 +16,7 @@ export type TOverlay = true | false;
 export type TColorMode = 'light' | 'dark' | 'auto';
 export type TGlobalSearchActive = true | false;
 export type TResizeMode =
-  'mobile'
+  | 'mobile'
   | 'mobileS'
   | 'mobileM'
   | 'mobileL'
@@ -42,7 +42,8 @@ export const defaultUIState: UIStateInterface = {
   banner: {
     // show: true,
     show: false,
-    title: 'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
+    title:
+      'Few minutes left to find out who will be new Iron Man. Hurry up and make your choice.',
   },
   overlay: false,
   colorMode: 'auto',
@@ -62,7 +63,10 @@ export const uiSlice: Slice<UIStateInterface> = createSlice({
     setResizeMode(state, { payload }: PayloadAction<TResizeMode>) {
       state.resizeMode = payload;
     },
-    setGlobalSearchActive(state, { payload }: PayloadAction<TGlobalSearchActive>) {
+    setGlobalSearchActive(
+      state,
+      { payload }: PayloadAction<TGlobalSearchActive>
+    ) {
       state.globalSearchActive = payload;
     },
     setOverlay(state, { payload }: PayloadAction<TOverlay>) {

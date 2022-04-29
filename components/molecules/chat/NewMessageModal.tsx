@@ -26,9 +26,13 @@ import { getMyRooms } from '../../../api/endpoints/chat';
 import chevronLeftIcon from '../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import { IChatData } from '../../interfaces/ichat';
 
-const CloseModalButton = dynamic(() => import('../../atoms/chat/CloseModalButton'));
+const CloseModalButton = dynamic(
+  () => import('../../atoms/chat/CloseModalButton')
+);
 const NoResults = dynamic(() => import('../../atoms/chat/NoResults'));
-const NewAnnouncement = dynamic(() => import('../../atoms/chat/NewAnnouncement'));
+const NewAnnouncement = dynamic(
+  () => import('../../atoms/chat/NewAnnouncement')
+);
 
 interface INewMessageModal {
   showModal: boolean;
@@ -45,20 +49,32 @@ interface IChatroomsSorted {
   chats: IChatRoomUserNameWithoutEmoji[];
 }
 
-const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, closeModal }) => {
+const NewMessageModal: React.FC<INewMessageModal> = ({
+  openChat,
+  showModal,
+  closeModal,
+}) => {
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const scrollRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [chatroomsSortedList, setChatroomsSortedList] = useState<IChatroomsSorted[]>([]);
+  const [chatroomsSortedList, setChatroomsSortedList] = useState<
+    IChatroomsSorted[]
+  >([]);
   const [searchValue, setSearchValue] = useState('');
-  const [filteredChatrooms, setFilteredChatrooms] = useState<IChatRoomUserNameWithoutEmoji[]>([]);
+  const [filteredChatrooms, setFilteredChatrooms] = useState<
+    IChatRoomUserNameWithoutEmoji[]
+  >([]);
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] = useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
-  const [myAnnouncement, setMyAnnouncement] = useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] =
+    useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
+  const [myAnnouncement, setMyAnnouncement] =
+    useState<newnewapi.IChatRoom | null>(null);
 
   const passInputValue = (str: string) => {
     setSearchValue(str);
@@ -68,9 +84,12 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
     async function fetchMyRooms() {
       try {
         setLoadingRooms(true);
-        const payload = new newnewapi.GetMyRoomsRequest({ paging: { limit: 50 } });
+        const payload = new newnewapi.GetMyRoomsRequest({
+          paging: { limit: 50 },
+        });
         const res = await getMyRooms(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         const arr = [] as IChatRoomUserNameWithoutEmoji[];
         res.data.rooms.forEach((chat) => {
           if (chat.kind === 4) {
@@ -98,7 +117,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
     if (chatRooms) {
       const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
         if (c.visavis) {
-          const letter = clearNameFromEmoji(c.visavis?.username!!)[0].toLowerCase();
+          const letter = clearNameFromEmoji(
+            c.visavis?.username!!
+          )[0].toLowerCase();
           acc[letter] = (acc[letter] || []).concat(c);
         }
         return acc;
@@ -131,7 +152,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis) chat.userNameWithoutEmoji = clearNameFromEmoji(chat.visavis.username!!).toLowerCase();
+          if (chat.visavis)
+            chat.userNameWithoutEmoji = clearNameFromEmoji(
+              chat.visavis.username!!
+            ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
           if (chat.userNameWithoutEmoji.startsWith(searchValue)) arr.push(chat);
@@ -156,7 +180,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
   }, [searchValue, chatRooms]);
 
   const createNewAnnouncement = () => {
-    if (myAnnouncement) openChat({ chatRoom: myAnnouncement, showChatList: null });
+    if (myAnnouncement)
+      openChat({ chatRoom: myAnnouncement, showChatList: null });
     closeModal();
   };
 
@@ -206,8 +231,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
                 clickable
                 svg={chevronLeftIcon}
                 fill={theme.colorsThemed.text.tertiary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
                 onClick={closeModal}
               />
             )}
@@ -215,7 +240,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
           <SearchInput
             placeholderText={t('modal.new-message.search-placeholder')}
             bgColor={theme.colorsThemed.background.tertiary}
-            fontSize="16px"
+            fontSize='16px'
             style={{ marginBottom: '16px' }}
             passInputValue={passInputValue}
           />
@@ -224,7 +249,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ openChat, showModal, clos
               /* eslint-disable no-nested-ternary */
               searchValue.length > 0 ? (
                 filteredChatrooms.length > 0 ? (
-                  <SSectionContent ref={scrollRef}>{filteredChatrooms.map(renderChatItem)}</SSectionContent>
+                  <SSectionContent ref={scrollRef}>
+                    {filteredChatrooms.map(renderChatItem)}
+                  </SSectionContent>
                 ) : (
                   <>
                     <NoResults text={searchValue} />
@@ -285,7 +312,9 @@ const SSectionContent = styled.div`
 const SModal = styled.div`
   width: 100%;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px 16px;
   box-sizing: border-box;
   display: flex;
@@ -293,7 +322,9 @@ const SModal = styled.div`
   line-height: 24px;
   height: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   max-width: 100%;
   max-height: 100vh;
 

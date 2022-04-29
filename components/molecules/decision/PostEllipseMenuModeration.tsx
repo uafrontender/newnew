@@ -15,48 +15,49 @@ interface IPostEllipseMenuModeration {
   handleOpenDeletePostModal: () => void;
 }
 
-const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModeration> = ({
-  postType,
-  isVisible,
-  canDeletePost,
-  handleClose,
-  handleOpenDeletePostModal,
-}) => {
-  const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
+const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModeration> =
+  ({
+    postType,
+    isVisible,
+    canDeletePost,
+    handleClose,
+    handleOpenDeletePostModal,
+  }) => {
+    const { t } = useTranslation('decision');
+    const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+    useOnClickEsc(containerRef, handleClose);
+    useOnClickOutside(containerRef, handleClose);
 
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <SButton
-            disabled={!canDeletePost}
-            onClick={() => {
-              handleOpenDeletePostModal();
-              handleClose();
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <Text
-              variant={3}
+            <SButton
+              disabled={!canDeletePost}
+              onClick={() => {
+                handleOpenDeletePostModal();
+                handleClose();
+              }}
             >
-              { t('ellipse.deleteDecision', { postType: t(`postType.${postType}`) })}
-            </Text>
-          </SButton>
-        </SContainer>
-      )}
-    </AnimatePresence>
-  );
-};
+              <Text variant={3}>
+                {t('ellipse.deleteDecision', {
+                  postType: t(`postType.${postType}`),
+                })}
+              </Text>
+            </SButton>
+          </SContainer>
+        )}
+      </AnimatePresence>
+    );
+  };
 
 export default PostEllipseMenuModeration;
 
@@ -92,7 +93,8 @@ const SButton = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus:enabled, &:hover:enabled {
+  &:focus:enabled,
+  &:hover:enabled {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }
@@ -102,4 +104,3 @@ const SButton = styled.button`
     cursor: default;
   }
 `;
-

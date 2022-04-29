@@ -17,7 +17,10 @@ interface ICashOut {
   nextCashoutDate: google.protobuf.ITimestamp | null | undefined;
 }
 
-const CashOut: React.FC<ICashOut> = ({ nextCashoutAmount, nextCashoutDate }) => {
+const CashOut: React.FC<ICashOut> = ({
+  nextCashoutAmount,
+  nextCashoutDate,
+}) => {
   const { t } = useTranslation('creator');
   const router = useRouter();
 
@@ -28,7 +31,7 @@ const CashOut: React.FC<ICashOut> = ({ nextCashoutAmount, nextCashoutDate }) => 
   return (
     <SCashOutContainer>
       <SCashOutTopBlock>
-        <SInlineSVG svg={cashOutIcon} width="48px" height="48px" />
+        <SInlineSVG svg={cashOutIcon} width='48px' height='48px' />
         <SDescriptionWrapper>
           <SDescription variant={3} weight={600}>
             {t('dashboard.earnings.cashOut.amount')}
@@ -41,13 +44,15 @@ const CashOut: React.FC<ICashOut> = ({ nextCashoutAmount, nextCashoutDate }) => 
           {nextCashoutDate && (
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
-                date: moment(nextCashoutDate.seconds as number * 1000).format('MMM DD,YYYY'),
+                date: moment((nextCashoutDate.seconds as number) * 1000).format(
+                  'MMM DD,YYYY'
+                ),
               })}
             </SDescription>
           )}
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <SButton view="primaryGrad" onClick={handleSubmit}>
+      <SButton view='primaryGrad' onClick={handleSubmit}>
         {t('dashboard.earnings.cashOut.submit')}
       </SButton>
     </SCashOutContainer>

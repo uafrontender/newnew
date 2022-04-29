@@ -1,9 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, {
-  useRef,
-  useState,
-  useEffect,
-} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -19,7 +15,7 @@ type TDecisonTab = {
   label: string;
   value: string;
   amount?: string | undefined;
-}
+};
 
 interface IDecisionTabs {
   tabs: TDecisonTab[];
@@ -48,7 +44,9 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
   const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const [activeTabIndicator, setActiveTabIndicator] = useState<{
     width: number;
@@ -65,13 +63,15 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
   useEffect(() => {
     const activeTabIndex = tabs.findIndex((curr) => curr.value === activeTab);
     if (activeTabIndex === -1) return;
-    const boundingRect = tabRefs.current[activeTabIndex].getBoundingClientRect();
+    const boundingRect =
+      tabRefs.current[activeTabIndex].getBoundingClientRect();
 
     setActiveTabIndicator((current) => ({
       ...current,
       width: boundingRect.width ?? 0,
-      left: (boundingRect.left - tabsContainerRef.current?.getBoundingClientRect()?.left!!)
-        ?? 0,
+      left:
+        boundingRect.left -
+          tabsContainerRef.current?.getBoundingClientRect()?.left!! ?? 0,
     }));
   }, [activeTab, tabs, setActiveTabIndicator]);
 
@@ -86,36 +86,47 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
           tabsContainerRef.current = el!!;
         }}
         style={{
-          ...(tabs.length === 1 ? {
-            justifyContent: 'center',
-            visibility: 'hidden',
-            display: isMobile ? 'none' : 'flex'
-          }: {}),
+          ...(tabs.length === 1
+            ? {
+                justifyContent: 'center',
+                visibility: 'hidden',
+                display: isMobile ? 'none' : 'flex',
+              }
+            : {}),
         }}
       >
-        {tabs && tabs.map((tab, i) => (
-          <STab
-            key={tab.value}
-            ref={(el) => {
-              tabRefs.current[i] = el!!;
-            }}
-            type="button"
-            onClick={() => handleChangeTab(tab.value)}
-            activeTab={tab.value === activeTab}
-          >
-            <InlineSvg
-              // @ts-ignore
-              svg={tab.value === activeTab ? Icons[`${tab.value}Filled`] : Icons[tab.value]}
-              fill={tab.value === activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary}
-              width="24px"
-              height="24px"
-            />
-            <div>
-              {t(`tabs.${tab.label}`)}
-              {tab.amount ? ` ${tab.amount}` : ''}
-            </div>
-          </STab>
-        ))}
+        {tabs &&
+          tabs.map((tab, i) => (
+            <STab
+              key={tab.value}
+              ref={(el) => {
+                tabRefs.current[i] = el!!;
+              }}
+              type='button'
+              onClick={() => handleChangeTab(tab.value)}
+              activeTab={tab.value === activeTab}
+            >
+              <InlineSvg
+                // @ts-ignore
+                svg={
+                  tab.value === activeTab
+                    ? Icons[`${tab.value}Filled`]
+                    : Icons[tab.value]
+                }
+                fill={
+                  tab.value === activeTab
+                    ? theme.colorsThemed.text.primary
+                    : theme.colorsThemed.text.secondary
+                }
+                width='24px'
+                height='24px'
+              />
+              <div>
+                {t(`tabs.${tab.label}`)}
+                {tab.amount ? ` ${tab.amount}` : ''}
+              </div>
+            </STab>
+          ))}
         <SActiveTabIndicator
           style={{
             width: activeTabIndicator.width,
@@ -186,13 +197,13 @@ const STab = styled.button<ISTab>`
     line-height: 20px;
   }
 
-  color: ${({
-    activeTab,
-    theme,
-  }) => (activeTab ? theme.colorsThemed.text.primary : theme.colorsThemed.text.secondary)};
+  color: ${({ activeTab, theme }) =>
+    activeTab
+      ? theme.colorsThemed.text.primary
+      : theme.colorsThemed.text.secondary};
 
   cursor: pointer;
-  transition: .2s ease-in-out;
+  transition: 0.2s ease-in-out;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -226,7 +237,7 @@ const SActiveTabIndicator = styled.div`
   opacity: 0;
 
   animation-duration: 1s;
-  animation-delay: .3s;
+  animation-delay: 0.3s;
   animation-fill-mode: forwards;
   animation-name: ${IndicatorInitialAnimation};
 
@@ -234,5 +245,5 @@ const SActiveTabIndicator = styled.div`
   border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   background: ${({ theme }) => theme.colorsThemed.text.primary};
 
-  transition: opacity .35s ease-in-out, left .25s linear, width .27s linear;
+  transition: opacity 0.35s ease-in-out, left 0.25s linear, width 0.27s linear;
 `;

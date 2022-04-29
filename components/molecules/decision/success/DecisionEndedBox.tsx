@@ -13,20 +13,12 @@ const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
   type,
   children,
 }) => {
-
   if (type && type === 'mc') {
     return (
       <SBox>
-        <SHeadlineMC
-          variant={2}
-        >
-          { children }
-        </SHeadlineMC>
+        <SHeadlineMC variant={2}>{children}</SHeadlineMC>
         <SImageContainerMC>
-          <img
-            src={imgSrc}
-            alt="decision"
-          />
+          <img src={imgSrc} alt='decision' />
         </SImageContainerMC>
       </SBox>
     );
@@ -34,20 +26,13 @@ const DecisionEndedBox: React.FunctionComponent<IDecisionEndedBox> = ({
 
   return (
     <SBox>
-      <SHeadline
-        variant={2}
-      >
-        { children }
-      </SHeadline>
+      <SHeadline variant={2}>{children}</SHeadline>
       <SImageContainer>
-        <img
-          src={imgSrc}
-          alt="decision"
-        />
+        <img src={imgSrc} alt='decision' />
       </SImageContainer>
     </SBox>
   );
-}
+};
 
 export default DecisionEndedBox;
 
@@ -63,7 +48,7 @@ const SBox = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 
   width: 45%;
 
@@ -101,7 +86,7 @@ const SImageContainer = styled.div`
 `;
 
 const SHeadlineMC = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 
   width: 50%;
 

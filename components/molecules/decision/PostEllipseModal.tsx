@@ -32,12 +32,7 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
+    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
@@ -50,19 +45,21 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
               marginBottom: '28px',
             }}
           >
-            <Text
-              variant={3}
-            >
-              { !isFollowing ? t('ellipse.follow-creator') : t('ellipse.unfollow-creator') }
+            <Text variant={3}>
+              {!isFollowing
+                ? t('ellipse.follow-creator')
+                : t('ellipse.unfollow-creator')}
             </Text>
           </SButton>
-          <SButton
-            onClick={() => handleFollowDecision()}
-          >
-            <Text
-              variant={3}
-            >
-              { !isFollowingDecision ? t('ellipse.follow-decision', { postType: t(`postType.${postType}`) }) : t('ellipse.unfollow-decision', { postType: t(`postType.${postType}`) }) }
+          <SButton onClick={() => handleFollowDecision()}>
+            <Text variant={3}>
+              {!isFollowingDecision
+                ? t('ellipse.follow-decision', {
+                    postType: t(`postType.${postType}`),
+                  })
+                : t('ellipse.unfollow-decision', {
+                    postType: t(`postType.${postType}`),
+                  })}
             </Text>
           </SButton>
           <SSeparator />
@@ -72,16 +69,13 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
               onClose();
             }}
           >
-            <Text
-              variant={3}
-              tone='error'
-            >
-              { t('ellipse.report') }
+            <Text variant={3} tone='error'>
+              {t('ellipse.report')}
             </Text>
           </SButton>
         </SContentContainer>
         <Button
-          view="secondary"
+          view='secondary'
           style={{
             height: '56px',
             width: 'calc(100% - 32px)',
@@ -150,5 +144,6 @@ const SSeparator = styled.div`
   margin-top: 14px;
   margin-bottom: 14px;
   width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;

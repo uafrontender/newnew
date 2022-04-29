@@ -24,11 +24,15 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
 }) => {
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
 
-  const [parsedSeconds, setParsedSeconds] = useState<DHMS>(secondsToDHMS(parsed, 'noTrim'));
+  const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
+    secondsToDHMS(parsed, 'noTrim')
+  );
   const [seconds, setSeconds] = useState(parsed);
   const interval = useRef<number>();
 
@@ -50,63 +54,39 @@ const ResponseTimer: React.FunctionComponent<IResponseTimer> = ({
       <SWrapper>
         <SInlineSvg
           svg={isMobile ? AlertIcon : AlertIconInverted}
-          fill="#FFFFFF"
-          width="20px"
-          height="20px"
+          fill='#FFFFFF'
+          width='20px'
+          height='20px'
         />
         {parsedSeconds.days !== '0' && (
           <>
-            <STimeSpan>
-              {parsedSeconds.days}
-            </STimeSpan>
-            <span>
-              {t('expiresResponse.days')}
-            </span>
-            <span>
-              {` `}
-            </span>
+            <STimeSpan>{parsedSeconds.days}</STimeSpan>
+            <span>{t('expiresResponse.days')}</span>
+            <span>{` `}</span>
           </>
         )}
         {parsedSeconds.hours !== '0' && (
           <>
-            <STimeSpan>
-              {parsedSeconds.hours}
-            </STimeSpan>
-            <span>
-              {t('expiresResponse.hours')}
-            </span>
-            <span>
-              {' '}
-            </span>
+            <STimeSpan>{parsedSeconds.hours}</STimeSpan>
+            <span>{t('expiresResponse.hours')}</span>
+            <span> </span>
           </>
         )}
         {parsedSeconds.minutes !== '0' && (
           <>
-            <STimeSpan>
-              {parsedSeconds.minutes}
-            </STimeSpan>
-            <span>
-              {t('expiresResponse.minutes')}
-            </span>
-            <span>
-              {' '}
-            </span>
+            <STimeSpan>{parsedSeconds.minutes}</STimeSpan>
+            <span>{t('expiresResponse.minutes')}</span>
+            <span> </span>
           </>
         )}
         {parsedSeconds.days === '0' && (
           <>
-            <STimeSpan>
-              {parsedSeconds.seconds}
-            </STimeSpan>
-            <span>
-              {t('expiresResponse.seconds')}
-            </span>
-            <span>
-              {' '}
-            </span>
+            <STimeSpan>{parsedSeconds.seconds}</STimeSpan>
+            <span>{t('expiresResponse.seconds')}</span>
+            <span> </span>
           </>
         )}
-        { t('expiresResponse.left_to_respond') }
+        {t('expiresResponse.left_to_respond')}
       </SWrapper>
     </SContainer>
   );
@@ -155,7 +135,7 @@ const SWrapper = styled.div`
 
     background-color: ${({ theme }) => theme.colorsThemed.accent.pink};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
-    color: #FFFFFF;
+    color: #ffffff;
   }
 `;
 

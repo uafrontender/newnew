@@ -24,82 +24,64 @@ interface IPostVideoResponsePreviewModal {
   handleConfirm: () => void;
 }
 
-export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewModal> = ({
-  open,
-  value,
-  handleClose,
-  handleConfirm,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
+export const PostVideoResponsePreviewModal: React.FC<IPostVideoResponsePreviewModal> =
+  ({ open, value, handleClose, handleConfirm }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM'].includes(resizeMode);
 
-  const preventCLick = (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+    const preventCLick = (e: any) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
 
-  return (
-    <Modal
-      show={open}
-      additionalZ={15}
-      onClose={handleClose}
-    >
-      <SMobileContainer onClick={preventCLick}>
-        {!isMobile && (
-          <SModalTopLine>
-            <SModalTopLineTitleTablet variant={6}>
-              {t('PostVideo.UploadResponseForm.video.full.title')}
-            </SModalTopLineTitleTablet>
-          </SModalTopLine>
-        )}
-        <SModalVideoWrapper>
-          {open && (
-            <BitmovinPlayer
-              withMuteControl
-              id="full-preview"
-              resources={value}
-              borderRadius={isMobile ? '0' : '16px'}
-            />
-          )}
-        </SModalVideoWrapper>
-        <SControlsContainer>
+    return (
+      <Modal show={open} additionalZ={15} onClose={handleClose}>
+        <SMobileContainer onClick={preventCLick}>
           {!isMobile && (
-            <SCancelButton
-              view="secondary"
-              onClick={handleClose}
-            >
-              {t('PostVideo.UploadResponseForm.video.full.cancelBtn')}
-            </SCancelButton>
+            <SModalTopLine>
+              <SModalTopLineTitleTablet variant={6}>
+                {t('PostVideo.UploadResponseForm.video.full.title')}
+              </SModalTopLineTitleTablet>
+            </SModalTopLine>
           )}
-          <SPublishButton
-            view="primaryGrad"
-            onClick={handleConfirm}
-          >
-            {t('PostVideo.UploadResponseForm.video.full.publishBtn')}
-          </SPublishButton>
-        </SControlsContainer>
-        {isMobile && (
-          <SModalCloseIcon>
-            <Button
-              iconOnly
-              view="transparent"
-              onClick={handleClose}
-            >
-              <InlineSVG
-                svg={chevronLeft}
-                fill={theme.colors.white}
-                width="20px"
-                height="20px"
+          <SModalVideoWrapper>
+            {open && (
+              <BitmovinPlayer
+                withMuteControl
+                id='full-preview'
+                resources={value}
+                borderRadius={isMobile ? '0' : '16px'}
               />
-            </Button>
-          </SModalCloseIcon>
-        )}
-      </SMobileContainer>
-    </Modal>
-  );
-};
+            )}
+          </SModalVideoWrapper>
+          <SControlsContainer>
+            {!isMobile && (
+              <SCancelButton view='secondary' onClick={handleClose}>
+                {t('PostVideo.UploadResponseForm.video.full.cancelBtn')}
+              </SCancelButton>
+            )}
+            <SPublishButton view='primaryGrad' onClick={handleConfirm}>
+              {t('PostVideo.UploadResponseForm.video.full.publishBtn')}
+            </SPublishButton>
+          </SControlsContainer>
+          {isMobile && (
+            <SModalCloseIcon>
+              <Button iconOnly view='transparent' onClick={handleClose}>
+                <InlineSVG
+                  svg={chevronLeft}
+                  fill={theme.colors.white}
+                  width='20px'
+                  height='20px'
+                />
+              </Button>
+            </SModalCloseIcon>
+          )}
+        </SMobileContainer>
+      </Modal>
+    );
+  };
 
 export default PostVideoResponsePreviewModal;
 
@@ -196,9 +178,7 @@ const SControlsContainer = styled.div`
   }
 `;
 
-const SCancelButton = styled(Button)`
-
-`;
+const SCancelButton = styled(Button)``;
 
 const SPublishButton = styled(Button)`
   width: 100%;

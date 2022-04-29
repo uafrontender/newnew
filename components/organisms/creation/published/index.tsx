@@ -33,8 +33,7 @@ const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
 
-interface IPublishedContent {
-}
+interface IPublishedContent {}
 
 export const PublishedContent: React.FC<IPublishedContent> = () => {
   const { t } = useTranslation('creation');
@@ -42,48 +41,54 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const {
-    post,
-    videoProcessing,
-    fileProcessing
-  } = useAppSelector((state) => state.creation);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const { post, videoProcessing, fileProcessing } = useAppSelector(
+    (state) => state.creation
+  );
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleSubmit = useCallback(async () => {
     router.push('/');
     dispatch(clearCreation({}));
   }, [dispatch, router]);
   const formatStartsAt = useCallback(() => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+    const time = moment(
+      `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+      ['hh:mm a']
+    );
 
     return moment(post.startsAt.date)
       .hours(time.hours())
       .minutes(time.minutes());
   }, [post.startsAt]);
-  const socialButtons = useMemo(() => [
-    {
-      key: 'twitter',
-    },
-    {
-      key: 'facebook',
-    },
-    {
-      key: 'instagram',
-    },
-    {
-      key: 'tiktok',
-    },
-    {
-      key: 'copy',
-    },
-  ], []);
+  const socialButtons = useMemo(
+    () => [
+      {
+        key: 'twitter',
+      },
+      {
+        key: 'facebook',
+      },
+      {
+        key: 'instagram',
+      },
+      {
+        key: 'tiktok',
+      },
+      {
+        key: 'copy',
+      },
+    ],
+    []
+  );
   const renderItem = (item: any) => (
     <SItem key={item.key}>
       <SItemButton type={item.key}>
         <InlineSVG
           svg={SOCIAL_ICONS[item.key] as string}
-          width="50%"
-          height="50%"
+          width='50%'
+          height='50%'
         />
       </SItemButton>
       <SItemTitle variant={3} weight={600}>
@@ -98,47 +103,40 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
         <SPlayerWrapper>
           {fileProcessing.progress === 100 ? (
             <BitmovinPlayer
-              id="published"
+              id='published'
               muted={false}
               resources={videoProcessing?.targetUrls}
               thumbnails={post.thumbnailParameters}
             />
-          ): (
-            <SText
-              variant={2}
-            >
+          ) : (
+            <SText variant={2}>
               Your video will be available once processed
             </SText>
           )}
         </SPlayerWrapper>
         <SUserBlock>
-          <SUserAvatar
-            avatarUrl={user.userData?.avatarUrl}
-          />
+          <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
           <SUserTitle variant={3} weight={600}>
             {post?.title}
           </SUserTitle>
         </SUserBlock>
-        <STitle variant={6}>
-          {t('published.texts.title')}
-        </STitle>
+        <STitle variant={6}>{t('published.texts.title')}</STitle>
         <SSubTitle variant={2} weight={500}>
-          {t(`published.texts.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {
-            value: formatStartsAt()
-              .format('DD MMM [at] hh:mm A'),
-          })}
+          {t(
+            `published.texts.subTitle-${
+              post.startsAt.type === 'right-away' ? 'published' : 'scheduled'
+            }`,
+            {
+              value: formatStartsAt().format('DD MMM [at] hh:mm A'),
+            }
+          )}
         </SSubTitle>
-        <SSocials>
-          {socialButtons.map(renderItem)}
-        </SSocials>
+        <SSocials>{socialButtons.map(renderItem)}</SSocials>
       </SContent>
       {isMobile && (
         <SButtonWrapper>
           <SButtonContent>
-            <SButton
-              view="secondary"
-              onClick={handleSubmit}
-            >
+            <SButton view='secondary' onClick={handleSubmit}>
               {t('published.button.submit')}
             </SButton>
           </SButtonContent>

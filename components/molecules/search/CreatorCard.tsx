@@ -16,7 +16,7 @@ export const CreatorCard: React.FC<ICreatorCard> = ({ creator }) => (
     <SDisplayName>{creator.nickname}</SDisplayName>
     <SUserName>@{creator.username}</SUserName>
     <SBackground>
-      <Image src={creator.coverUrl!!} layout="fill" />
+      <Image src={creator.coverUrl!!} layout='fill' />
     </SBackground>
   </SCard>
 );

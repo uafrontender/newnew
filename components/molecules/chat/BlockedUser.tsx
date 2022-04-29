@@ -39,15 +39,26 @@ const BlockedUser: React.FC<IBlockedUser> = ({
             <SBottomActionIcon>🤐</SBottomActionIcon>
             <SBottomActionText>
               <SBottomActionTitle>
-                {isAnnouncement ? t('group-blocked.title') : t('user-blocked.title')}
+                {isAnnouncement
+                  ? t('group-blocked.title')
+                  : t('user-blocked.title')}
               </SBottomActionTitle>
               <SBottomActionMessage>
-                {isAnnouncement ? t('group-blocked.message') : t('user-blocked.message')}
+                {isAnnouncement
+                  ? t('group-blocked.message')
+                  : t('user-blocked.message')}
               </SBottomActionMessage>
             </SBottomActionText>
           </SBottomActionLeft>
-          <SBottomActionButton withDim withShrink view="quaternary" onClick={onUserBlock}>
-            {isAnnouncement ? t('group-blocked.button-text') : t('user-blocked.button-text')}
+          <SBottomActionButton
+            withDim
+            withShrink
+            view='quaternary'
+            onClick={onUserBlock}
+          >
+            {isAnnouncement
+              ? t('group-blocked.button-text')
+              : t('user-blocked.button-text')}
           </SBottomActionButton>
         </SBottomAction>
       )}

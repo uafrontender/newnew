@@ -22,7 +22,8 @@ export const TopDecisionsResults: React.FC<IFunction> = ({ keyword }) => {
       },
       {
         uuid: 'Superpoll',
-        title: 'This is another title that’s too This is another title that’s too...',
+        title:
+          'This is another title that’s too This is another title that’s too...',
         type: 'Superpoll',
         username: 'CreatorDisplayName',
         avatar: '/images/mock/test_user_1.jpg',

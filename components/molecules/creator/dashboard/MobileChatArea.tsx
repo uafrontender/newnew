@@ -32,7 +32,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -48,7 +49,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] = useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] =
+    useState<string | undefined | null>('');
   const [messagesLoading, setMessagesLoading] = useState(false);
 
   const getChatMessages = useCallback(
@@ -69,10 +71,14 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         });
         const res = await getMessages(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data && res.data.messages.length > 0) {
           setMessages((curr) => {
-            const arr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
+            const arr = [
+              ...curr,
+              ...(res.data?.messages as newnewapi.ChatMessage[]),
+            ];
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
@@ -91,7 +97,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     if (chatRoom) {
       setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
 
-      if (!chatRoom.lastMessage) setLocalUserData({ ...localUserData, justSubscribed: true });
+      if (!chatRoom.lastMessage)
+        setLocalUserData({ ...localUserData, justSubscribed: true });
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
@@ -170,7 +177,8 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           },
         });
         const res = await sendMessage(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
         setMessageText('');
@@ -199,7 +207,11 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
+        <SMessage
+          id={item.id?.toString()}
+          mine={isMine}
+          prevSameUser={prevSameUser}
+        >
           {!nextSameUser && (
             <SUserAvatar
               mine={isMine}
@@ -210,21 +222,33 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
               }
             />
           )}
-          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+          <SMessageContent
+            mine={isMine}
+            prevSameUser={prevSameUser}
+            nextSameUser={nextSameUser}
+          >
             <SMessageText mine={isMine} weight={600} variant={3}>
               {item.content?.text}
             </SMessageText>
           </SMessageContent>
-          {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
+          {index === messages.length - 1 && (
+            <SRef ref={scrollRef}>Loading...</SRef>
+          )}
         </SMessage>
       );
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
-        moment((item.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY') !==
-          moment((nextElement?.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY')
+        moment((item.createdAt?.seconds as number) * 1000).format(
+          'DD.MM.YYYY'
+        ) !==
+          moment((nextElement?.createdAt?.seconds as number) * 1000).format(
+            'DD.MM.YYYY'
+          )
       ) {
-        let date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        let date = moment((item.createdAt?.seconds as number) * 1000).format(
+          'MMM DD'
+        );
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -232,13 +256,13 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage type="info">
+            <SMessage type='info'>
               <SMessageContent
-                type="info"
+                type='info'
                 prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
                 nextSameUser={nextElement?.sender?.uuid === item.sender?.uuid}
               >
-                <SMessageText type="info" weight={600} variant={3}>
+                <SMessageText type='info' weight={600} variant={3}>
                   {date}
                 </SMessageText>
               </SMessageContent>
@@ -247,13 +271,18 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         );
       }
       if (item.createdAt?.seconds && !nextElement) {
-        const date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        const date = moment((item.createdAt?.seconds as number) * 1000).format(
+          'MMM DD'
+        );
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage type="info">
-              <SMessageContent type="info" prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}>
-                <SMessageText type="info" weight={600} variant={3}>
+            <SMessage type='info'>
+              <SMessageContent
+                type='info'
+                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
+              >
+                <SMessageText type='info' weight={600} variant={3}>
                   {date}
                 </SMessageText>
               </SMessageContent>
@@ -262,9 +291,18 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         );
       }
 
-      return <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>;
+      return (
+        <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>
+      );
     },
-    [chatRoom, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, scrollRef]
+    [
+      chatRoom,
+      t,
+      user.userData?.avatarUrl,
+      user.userData?.userUuid,
+      messages,
+      scrollRef,
+    ]
   );
 
   const clickHandler = () => {
@@ -290,20 +328,30 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           <GoBackButton onClick={clickHandler} />
           <SUserData>
             <SUserName>
-              {isMyAnnouncement ? user.userData?.nickname : chatRoom.visavis?.nickname}
+              {isMyAnnouncement
+                ? user.userData?.nickname
+                : chatRoom.visavis?.nickname}
               {isAnnouncement && t('announcement.title')}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
                 ? `@${chatRoom.visavis?.username}`
-                : `${chatRoom.memberCount && chatRoom.memberCount > 0 ? chatRoom.memberCount : 0} ${
-                    chatRoom.memberCount!! > 1 ? t('new-announcement.members') : t('new-announcement.member')
+                : `${
+                    chatRoom.memberCount && chatRoom.memberCount > 0
+                      ? chatRoom.memberCount
+                      : 0
+                  } ${
+                    chatRoom.memberCount!! > 1
+                      ? t('new-announcement.members')
+                      : t('new-announcement.member')
                   }`}
             </SUserAlias>
           </SUserData>
         </STopPart>
       )}
-      <SCenterPart id="messagesScrollContainer">{messages.length > 0 && messages.map(renderMessage)}</SCenterPart>
+      <SCenterPart id='messagesScrollContainer'>
+        {messages.length > 0 && messages.map(renderMessage)}
+      </SCenterPart>
       <SBottomPart>
         {isTextareaHidden() && (
           <SBottomTextarea>
@@ -323,9 +371,13 @@ const MobileChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             >
               <SInlineSVG
                 svg={sendIcon}
-                fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
+                fill={
+                  messageText
+                    ? theme.colors.white
+                    : theme.colorsThemed.text.primary
+                }
+                width='24px'
+                height='24px'
               />
             </SButton>
           </SBottomTextarea>
@@ -346,7 +398,8 @@ const SContainer = styled.div`
 
 const STopPart = styled.header`
   height: 80px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -425,7 +478,9 @@ const SButton = styled(Button)`
   margin-left: 12px;
   &:disabled {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
   }
 `;
 

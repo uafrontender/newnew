@@ -121,7 +121,7 @@ export const Tablet: React.FC<ITablet> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    view="primaryGrad"
+                    view='primaryGrad'
                     onClick={handleCreateClick}
                     withShadow={!globalSearchActive}
                   >
@@ -129,12 +129,12 @@ export const Tablet: React.FC<ITablet> = () => {
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button iconOnly view="quaternary" onClick={handleMenuClick}>
+                  <Button iconOnly view='quaternary' onClick={handleMenuClick}>
                     <InlineSVG
                       svg={menuIcon}
                       fill={theme.colorsThemed.text.primary}
-                      width="24px"
-                      height="24px"
+                      width='24px'
+                      height='24px'
                     />
                   </Button>
                   <MoreMenuTablet
@@ -147,7 +147,7 @@ export const Tablet: React.FC<ITablet> = () => {
               <>
                 <SItemWithMargin>
                   <Button
-                    view="primaryGrad"
+                    view='primaryGrad'
                     onClick={handleCreateClick}
                     withShadow={!globalSearchActive}
                   >
@@ -167,7 +167,7 @@ export const Tablet: React.FC<ITablet> = () => {
         ) : (
           <>
             <SItemWithMargin>
-              <Button view="quaternary" onClick={handleSignInClick}>
+              <Button view='quaternary' onClick={handleSignInClick}>
                 {t('button-login-in')}
               </Button>
             </SItemWithMargin>
@@ -175,7 +175,7 @@ export const Tablet: React.FC<ITablet> = () => {
               <Button
                 withDim
                 withShrink
-                view="primaryGrad"
+                view='primaryGrad'
                 onClick={handleSignUpClick}
                 withShadow={!globalSearchActive}
               >

@@ -10,7 +10,10 @@ import Headline from '../../../atoms/Headline';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { setUserData } from '../../../../redux-store/slices/userStateSlice';
-import { getMyCreatorTags, getMyOnboardingState } from '../../../../api/endpoints/user';
+import {
+  getMyCreatorTags,
+  getMyOnboardingState,
+} from '../../../../api/endpoints/user';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
@@ -20,7 +23,10 @@ interface IFunctionProps {
   todosCompletedLoading: (value: boolean) => void;
 }
 
-export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompletedLoading }) => {
+export const YourTodos: React.FC<IFunctionProps> = ({
+  todosCompleted,
+  todosCompletedLoading,
+}) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -31,7 +37,12 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
 
   const isProfileComplete = useCallback(() => {
-    if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0) {
+    if (
+      user.userData?.bio &&
+      user.userData?.bio !== null &&
+      user.userData?.bio.length > 0 &&
+      currentTags.length > 0
+    ) {
       return true;
     }
     return false;
@@ -134,9 +145,14 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
         <SItemText>
           <SBullet completed={item.completed}>
             {item.completed ? (
-              <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+              <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
             ) : (
-              <InlineSvg svg={RadioIcon} width="8" height="8" fill={theme.name === 'light' ? '#1B1C27' : '#fff'} />
+              <InlineSvg
+                svg={RadioIcon}
+                width='8'
+                height='8'
+                fill={theme.name === 'light' ? '#1B1C27' : '#fff'}
+              />
             )}
           </SBullet>
           <SItemTitle>
@@ -148,14 +164,19 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
           <SBottomActionButton
             withDim
             withShrink
-            view="primaryGrad"
+            view='primaryGrad'
             onClick={() => router.push('/creator-onboarding-about')}
           >
             {t('dashboard.todos.complete-profile-btn')}
           </SBottomActionButton>
         )}
         {!item.completed && item.id === 'add-cashout-method' && (
-          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/creator/get-paid')}>
+          <SBottomActionButton
+            withDim
+            withShrink
+            view='primaryGrad'
+            onClick={() => router.push('/creator/get-paid')}
+          >
             {t('dashboard.todos.add-cashout-method-btn')}
           </SBottomActionButton>
         )}
@@ -192,12 +213,14 @@ const SContainer = styled.div`
     width: 100%;
     padding: 20px 24px 24px;
     border-radius: 16px;
-    background: ${(props) => (props.theme.name === 'light' ? '#14151F' : props.theme.colors.white)};
+    background: ${(props) =>
+      props.theme.name === 'light' ? '#14151F' : props.theme.colors.white};
   }
 `;
 
 const STitle = styled(Headline)`
-  color: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33')};
+  color: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33'};
   font-weight: 600;
 `;
 
@@ -229,7 +252,8 @@ const SListItem = styled.div<ISListItem>`
   ${(props) => {
     if (!props.isFirst) {
       return css`
-          border-top: 1px solid ${() => (props.theme.name === 'light' ? '#272835' : '#E5E9F1')};
+          border-top: 1px solid ${() =>
+            props.theme.name === 'light' ? '#272835' : '#E5E9F1'};
         }
       `;
     }
@@ -239,13 +263,15 @@ const SListItem = styled.div<ISListItem>`
   ${(props) => {
     if (props.completed) {
       return css`
-          color: ${() => (props.theme.name === 'light' ? '#586070' : '#B3BBCA')};
+          color: ${() =>
+            props.theme.name === 'light' ? '#586070' : '#B3BBCA'};
           text-decoration:line-through;
         }
       `;
     }
     return css`
-      color: ${() => (props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33')};
+      color: ${() =>
+        props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33'};
     `;
   }}
 `;
@@ -272,7 +298,8 @@ const SBullet = styled.div<ISBullet>`
       `;
     }
     return css`
-      background: ${() => (props.theme.name === 'light' ? '#2C2C33' : '#B3BBCA')};
+      background: ${() =>
+        props.theme.name === 'light' ? '#2C2C33' : '#B3BBCA'};
     `;
   }}
 `;

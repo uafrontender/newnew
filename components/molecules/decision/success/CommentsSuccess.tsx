@@ -468,7 +468,7 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
   return (
     <>
       <STabContainer
-        key="comments"
+        key='comments'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -482,7 +482,7 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
-            position="sticky"
+            position='sticky'
             zIndex={1}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
@@ -490,7 +490,7 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
             {comments.length === 0 && !commentsLoading ? (
               <SNoCommentsYet>
                 <SNoCommentsImgContainer>
-                  <img src={NoContentYetImg.src} alt="No content yet" />
+                  <img src={NoContentYetImg.src} alt='No content yet' />
                 </SNoCommentsImgContainer>
                 <SNoCommentsCaption variant={3}>
                   {t('comments.noCommentsCaption')}
@@ -499,13 +499,13 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
                   <SMakeBidArrowSvg
                     svg={MakeFirstBidArrow}
                     fill={theme.colorsThemed.background.quinary}
-                    width="36px"
+                    width='36px'
                   />
                 )}
               </SNoCommentsYet>
             ) : null}
-            {
-              comments && comments.map((item, index) => {
+            {comments &&
+              comments.map((item, index) => {
                 return (
                   <Comment
                     key={item.id.toString()}
@@ -521,16 +521,16 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
                   />
                 );
               })}
-              <SLoaderDiv
-                ref={loadingRef}
-                style={{
-                  ...(commentsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
-              />
+            <SLoaderDiv
+              ref={loadingRef}
+              style={{
+                ...(commentsLoading
+                  ? {
+                      display: 'none',
+                    }
+                  : {}),
+              }}
+            />
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask

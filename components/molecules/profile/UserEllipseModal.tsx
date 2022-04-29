@@ -60,16 +60,20 @@ const UserEllipseModal: React.FunctionComponent<IUserEllipseModal> = ({
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2} tone='error'>{t('ellipse.report')}</Text>
+            <Text variant={2} tone='error'>
+              {t('ellipse.report')}
+            </Text>
           </SButton>
           {loggedIn && (
             <SButton onClick={blockHandler}>
-              <Text variant={2}>{!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}</Text>
+              <Text variant={2}>
+                {!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}
+              </Text>
             </SButton>
           )}
         </SContentContainer>
         <Button
-          view="modalSecondary"
+          view='modalSecondary'
           style={{
             height: '56px',
             width: 'calc(100% - 32px)',
@@ -105,7 +109,9 @@ const SContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
