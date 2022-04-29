@@ -112,14 +112,14 @@ export const Desktop: React.FC<IDesktop> = () => {
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button view="quaternary" onClick={handleDashboardClick}>
+                  <Button view='quaternary' onClick={handleDashboardClick}>
                     {t('button-dashboard')}
                   </Button>
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <Button
                     withShadow
-                    view="primaryGrad"
+                    view='primaryGrad'
                     onClick={handleCreateClick}
                   >
                     {t('button-create-decision')}
@@ -140,7 +140,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                     withDim
                     withShadow
                     withShrink
-                    view="primaryGrad"
+                    view='primaryGrad'
                     onClick={handleCreateClick}
                   >
                     {t('button-create-on-newnew')}
@@ -159,7 +159,7 @@ export const Desktop: React.FC<IDesktop> = () => {
         ) : (
           <>
             <SItemWithMargin>
-              <Button view="quaternary" onClick={handleSignInClick}>
+              <Button view='quaternary' onClick={handleSignInClick}>
                 {t('button-login-in')}
               </Button>
             </SItemWithMargin>
@@ -168,7 +168,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 withDim
                 withShrink
                 withShadow
-                view="primaryGrad"
+                view='primaryGrad'
                 onClick={handleSignUpClick}
               >
                 {t('button-sign-up')}

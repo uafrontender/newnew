@@ -43,9 +43,13 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('payment-modal');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(predefinedOption ?? 'wallet');
+  const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(
+    predefinedOption ?? 'wallet'
+  );
 
   useEffect(() => {
     if (predefinedOption) {
@@ -65,26 +69,45 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           {isMobile && <SGoBackButton onClick={() => onClose()} />}
           {!isMobile && (
             <SCloseButton onClick={() => onClose()}>
-              <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          <SPaymentMethodTitle variant={3}>{t('paymentMethodTitle')}</SPaymentMethodTitle>
+          <SPaymentMethodTitle variant={3}>
+            {t('paymentMethodTitle')}
+          </SPaymentMethodTitle>
           <SOptionsContainer>
             {!predefinedOption ? (
               <>
-                <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
-                <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+                <OptionWallet
+                  selected={selectedOption === 'wallet'}
+                  handleClick={() => setSelectedOption('wallet')}
+                />
+                <OptionCard
+                  selected={selectedOption === 'card'}
+                  handleClick={() => setSelectedOption('card')}
+                />
               </>
             ) : selectedOption === 'card' ? (
-              <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+              <OptionCard
+                selected={selectedOption === 'card'}
+                handleClick={() => setSelectedOption('card')}
+              />
             ) : (
-              <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
+              <OptionWallet
+                selected={selectedOption === 'wallet'}
+                handleClick={() => setSelectedOption('wallet')}
+              />
             )}
           </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
-              view="primaryGrad"
+              view='primaryGrad'
               onClick={() => {
                 if (selectedOption === 'card') {
                   handlePayWithCardStripeRedirect?.();
@@ -99,8 +122,8 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             {showTocApply && (
               <STocApply>
                 *{' '}
-                <Link href="/terms-and-conditions">
-                  <a href="/terms-and-conditions" target="_blank">
+                <Link href='/terms-and-conditions'>
+                  <a href='/terms-and-conditions' target='_blank'>
                     {t('tocApplyLink')}
                   </a>
                 </Link>{' '}
@@ -156,7 +179,7 @@ const SContentContainer = styled.div<{
     width: 480px;
     height: fit-content;
     min-height: 360px;
-    max-height: ${({ showTocApply }) => showTocApply ? '480px' : '412px'};
+    max-height: ${({ showTocApply }) => (showTocApply ? '480px' : '412px')};
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -196,7 +219,8 @@ const SCloseButton = styled.button`
 const SHeaderContainer = styled.div`
   padding-bottom: 16px;
   margin-bottom: 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 24px;

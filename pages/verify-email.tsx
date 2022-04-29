@@ -12,12 +12,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
-import AuthLayout, { AuthLayoutContext } from '../components/templates/AuthLayout';
+import AuthLayout, {
+  AuthLayoutContext,
+} from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 
-interface IVerifyEmail {
-
-}
+interface IVerifyEmail {}
 
 const VerifyEmail: NextPage<IVerifyEmail> = () => {
   const { t } = useTranslation('verify-email');
@@ -26,7 +26,13 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
   const router = useRouter();
 
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const authLayoutContext = useContext(AuthLayoutContext);
 
@@ -37,14 +43,14 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
 
   useEffect(() => {
     authLayoutContext.setShouldHeroUnmount(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
-        <meta name="description" content={t('meta.description')} />
+        <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
       </Head>
       <motion.div
         initial={{
@@ -57,33 +63,31 @@ const VerifyEmail: NextPage<IVerifyEmail> = () => {
           y: 0,
           opacity: 1,
           transition: {
-            duration: 1
-          }
+            duration: 1,
+          },
         }}
-        >
-        <CodeVerificationMenu
-          expirationTime={60}
-        />
+      >
+        <CodeVerificationMenu expirationTime={60} />
       </motion.div>
     </>
   );
 };
 
-(VerifyEmail as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
-  return (
-    <AuthLayout>
-      { page }
-    </AuthLayout>
-  );
+(VerifyEmail as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
+  return <AuthLayout>{page}</AuthLayout>;
 };
 
 export default VerifyEmail;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
-  const translationContext = await serverSideTranslations(
-    context.locale,
-    ['sign-up', 'verify-email'],
-  );
+export async function getStaticProps(context: {
+  locale: string;
+}): Promise<any> {
+  const translationContext = await serverSideTranslations(context.locale, [
+    'sign-up',
+    'verify-email',
+  ]);
 
   return {
     props: {

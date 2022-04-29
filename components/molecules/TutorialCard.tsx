@@ -21,17 +21,14 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
   height,
   imageStyle,
 }) => {
-  const {
-    resizeMode,
-  } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   return (
     <SWrapper>
-      <SImageBG
-        id="backgroundPart"
-        height={height}
-      >
+      <SImageBG id='backgroundPart' height={height}>
         <SImageHolder>
           <img
             src={image.src}
@@ -41,16 +38,8 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
           />
         </SImageHolder>
       </SImageBG>
-      <SHeadline
-        variant={4}
-      >
-        {title}
-      </SHeadline>
-      <SBottomContent
-        variant={isMobile ? 1 : 3}
-      >
-        {caption}
-      </SBottomContent>
+      <SHeadline variant={4}>{title}</SHeadline>
+      <SBottomContent variant={isMobile ? 1 : 3}>{caption}</SBottomContent>
     </SWrapper>
   );
 };
@@ -70,7 +59,6 @@ const SWrapper = styled.div`
   align-items: center;
 
   padding: 10px;
-
 
   border: 1.5px solid;
   border-radius: ${({ theme }) => theme.borderRadius.medium};

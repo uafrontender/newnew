@@ -1,12 +1,13 @@
 import { Area } from 'react-easy-crop/types';
 
-const createImage = (url: string) => new Promise((resolve, reject) => {
-  const image = new Image();
-  image.addEventListener('load', () => resolve(image));
-  image.addEventListener('error', (error) => reject(error));
-  image.setAttribute('crossOrigin', 'anonymous');
-  image.src = url;
-});
+const createImage = (url: string) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', (error) => reject(error));
+    image.setAttribute('crossOrigin', 'anonymous');
+    image.src = url;
+  });
 
 function getRadianAngle(degreeValue: number) {
   return (degreeValue * Math.PI) / 180;
@@ -20,10 +21,14 @@ function getRadianAngle(degreeValue: number) {
  * @param {string} filename - optional file name parameter
  */
 export default async function getCroppedImg(
-  imageSrc: string, pixelCrop: Area, rotation = 0,
-  filename = 'avatarImage.jpeg',
+  imageSrc: string,
+  pixelCrop: Area,
+  rotation = 0,
+  filename = 'avatarImage.jpeg'
 ): Promise<File> {
-  const image: HTMLImageElement = await createImage(imageSrc) as HTMLImageElement;
+  const image: HTMLImageElement = (await createImage(
+    imageSrc
+  )) as HTMLImageElement;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!!;
 
@@ -44,7 +49,7 @@ export default async function getCroppedImg(
   ctx.drawImage(
     image,
     safeArea / 2 - image.width * 0.5,
-    safeArea / 2 - image.height * 0.5,
+    safeArea / 2 - image.height * 0.5
   );
   const data = ctx.getImageData(0, 0, safeArea, safeArea);
 
@@ -56,21 +61,23 @@ export default async function getCroppedImg(
   ctx.putImageData(
     data,
     Math.round(0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x),
-    Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y),
+    Math.round(0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y)
   );
 
   // console.log(canvas.toDataURL('image/jpeg'));
 
   // Return as a file
   return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      if (!blob) throw new Error('Error saving image as file');
-      const file = new File([blob], filename, {
-        type: 'image/jpeg',
-      });
-      resolve(file);
-    },
-    'image/jpeg',
-    1);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) throw new Error('Error saving image as file');
+        const file = new File([blob], filename, {
+          type: 'image/jpeg',
+        });
+        resolve(file);
+      },
+      'image/jpeg',
+      1
+    );
   });
 }

@@ -301,8 +301,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
       <STabs>
         {tabTypes.map((tab) => (
           <STab
-            size="sm"
-            view="secondary"
+            size='sm'
+            view='secondary'
             active={activeTabs.findIndex((item) => item === tab.type) > -1}
             key={tab.id}
             onClick={() => updateActiveTabs(tab.type)}
@@ -344,8 +344,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           <Tabs />
           <SSort>
             <SSortButton
-              size="sm"
-              view="secondary"
+              size='sm'
+              view='secondary'
               onClick={() => {
                 setIsFilterOpened(true);
               }}
@@ -355,8 +355,8 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
                 // @ts-ignore
                 svg={isFilterOpened === true ? Close : Sort}
                 fill={theme.colorsThemed.text.secondary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
             </SSortButton>
             {isFilterOpened && (

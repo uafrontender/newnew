@@ -10,9 +10,7 @@ const MyProfileSettingsLayout: React.FunctionComponent = (props) => {
   return (
     <ErrorBoundary>
       <SGeneral>
-        <SSettingsLayout>
-          {children}
-        </SSettingsLayout>
+        <SSettingsLayout>{children}</SSettingsLayout>
       </SGeneral>
     </ErrorBoundary>
   );

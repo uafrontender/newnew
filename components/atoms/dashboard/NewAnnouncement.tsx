@@ -15,7 +15,12 @@ const NewAnnouncement: React.FC<INewAnnouncement> = ({ handleClick }) => {
 
   return (
     <SWrapper onClick={handleClick}>
-      <SInlineSVG svg={megaphone} fill={theme.colorsThemed.text.secondary} width="26px" height="26px" />
+      <SInlineSVG
+        svg={megaphone}
+        fill={theme.colorsThemed.text.secondary}
+        width='26px'
+        height='26px'
+      />
       <SText>
         <STitle>{t('new-announcement.title')}</STitle>
         <p>{t('new-announcement.text')}</p>
@@ -48,7 +53,9 @@ const SText = styled.div`
 const STitle = styled.strong`
   color: #fff;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;

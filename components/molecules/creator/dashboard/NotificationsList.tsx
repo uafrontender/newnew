@@ -15,144 +15,144 @@ export const NotificationsList = () => {
   const scrollRef: any = useRef();
   const user = useAppSelector((state) => state.user);
 
-  const collection = useMemo(() => ({
-    new: [
-      {
-        id: '1',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '2',
-        text: 'Bugaboo👻😈 subscribed on you.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '3',
-        text: 'SandyCandy posted a new comment on  ‘Where to dine tonight’?. ',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '4',
-        text: 'SugarDaddy subscribed on you.',
-        time: '30m ago',
-        unread: true,
-      },
-    ],
-    earlier: [
-      {
-        id: '5',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '6',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '7',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '8',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '9',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '10',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '11',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '12',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '13',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '14',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '15',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-      {
-        id: '16',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: true,
-      },
-      {
-        id: '17',
-        text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-        time: '30m ago',
-        unread: false,
-      },
-    ],
-  }), []);
-  const renderNotificationItem = useCallback((item) => {
-    const handleUserClick = () => {
-    };
+  const collection = useMemo(
+    () => ({
+      new: [
+        {
+          id: '1',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '2',
+          text: 'Bugaboo👻😈 subscribed on you.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '3',
+          text: 'SandyCandy posted a new comment on  ‘Where to dine tonight’?. ',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '4',
+          text: 'SugarDaddy subscribed on you.',
+          time: '30m ago',
+          unread: true,
+        },
+      ],
+      earlier: [
+        {
+          id: '5',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+        {
+          id: '6',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '7',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+        {
+          id: '8',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '9',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+        {
+          id: '10',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '11',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+        {
+          id: '12',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '13',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+        {
+          id: '14',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '15',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+        {
+          id: '16',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: true,
+        },
+        {
+          id: '17',
+          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
+          time: '30m ago',
+          unread: false,
+        },
+      ],
+    }),
+    []
+  );
+  const renderNotificationItem = useCallback(
+    (item) => {
+      const handleUserClick = () => {};
 
-    return (
-      <SNotificationItem key={`notification-item-${item.id}`}>
-        <SNotificationItemAvatar
-          withClick
-          onClick={handleUserClick}
-          avatarUrl={user.userData?.avatarUrl}
-        />
-        <SNotificationItemCenter>
-          <SNotificationItemText variant={3} weight={600}>
-            {item.text}
-          </SNotificationItemText>
-          <SNotificationItemTime variant={2} weight={600}>
-            {item.time}
-          </SNotificationItemTime>
-        </SNotificationItemCenter>
-        {!!item.unread && (
-          <SNotificationItemIndicator minified />
-        )}
-      </SNotificationItem>
-    );
-  }, [user.userData?.avatarUrl]);
+      return (
+        <SNotificationItem key={`notification-item-${item.id}`}>
+          <SNotificationItemAvatar
+            withClick
+            onClick={handleUserClick}
+            avatarUrl={user.userData?.avatarUrl}
+          />
+          <SNotificationItemCenter>
+            <SNotificationItemText variant={3} weight={600}>
+              {item.text}
+            </SNotificationItemText>
+            <SNotificationItemTime variant={2} weight={600}>
+              {item.time}
+            </SNotificationItemTime>
+          </SNotificationItemCenter>
+          {!!item.unread && <SNotificationItemIndicator minified />}
+        </SNotificationItem>
+      );
+    },
+    [user.userData?.avatarUrl]
+  );
 
-  const {
-    showTopGradient,
-    showBottomGradient,
-  } = useScrollGradients(scrollRef);
+  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
     <>
@@ -210,7 +210,11 @@ const SNotificationItemTime = styled(Caption)`
 `;
 
 const SNotificationItemIndicator = styled(Indicator)`
-  border: 3px solid ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary)};
+  border: 3px solid
+    ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
   padding: 5px;
 `;
 

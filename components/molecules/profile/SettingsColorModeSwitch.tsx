@@ -25,7 +25,7 @@ export type CMButtonCaptions = {
   light: string;
   dark: string;
   auto: string;
-}
+};
 
 interface ISettingsColorModeSwitch {
   theme: DefaultTheme;
@@ -33,111 +33,129 @@ interface ISettingsColorModeSwitch {
   isMobile: boolean;
   currentlySelectedMode: TColorMode;
   buttonsCaptions: CMButtonCaptions;
-  wrapperStyle?: React.CSSProperties,
+  wrapperStyle?: React.CSSProperties;
   handleSetColorMode: (mode: TColorMode) => void;
 }
 
 const options: Array<keyof typeof optionsIcons> = ['light', 'dark', 'auto'];
 
-const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch> = ({
-  theme,
-  variant,
-  isMobile,
-  buttonsCaptions,
-  currentlySelectedMode,
-  wrapperStyle,
-  handleSetColorMode,
-}) => {
-  const containerRef = useRef<HTMLDivElement>();
-  const buttonsRef = useRef<HTMLButtonElement[]>([]);
-  const [activeIcon, setActiveIcon] = useState(
-    options.findIndex((option) => option === currentlySelectedMode),
-  );
-  const [indicatorStyle, setIndicatorStyle] = useState<{
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  }>({
-    x: (buttonsRef.current[activeIcon]?.getBoundingClientRect().x || 0) - (containerRef.current?.getBoundingClientRect().x || 0)!!,
-    y: (buttonsRef.current[activeIcon]?.getBoundingClientRect().y || 0) - (containerRef.current?.getBoundingClientRect().y || 0)!!,
-    width: buttonsRef.current[activeIcon]?.getBoundingClientRect().width,
-    height: buttonsRef.current[activeIcon]?.getBoundingClientRect().height,
-  });
+const SettingsColorModeSwitch: React.FunctionComponent<ISettingsColorModeSwitch> =
+  ({
+    theme,
+    variant,
+    isMobile,
+    buttonsCaptions,
+    currentlySelectedMode,
+    wrapperStyle,
+    handleSetColorMode,
+  }) => {
+    const containerRef = useRef<HTMLDivElement>();
+    const buttonsRef = useRef<HTMLButtonElement[]>([]);
+    const [activeIcon, setActiveIcon] = useState(
+      options.findIndex((option) => option === currentlySelectedMode)
+    );
+    const [indicatorStyle, setIndicatorStyle] = useState<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>({
+      x:
+        (buttonsRef.current[activeIcon]?.getBoundingClientRect().x || 0) -
+        (containerRef.current?.getBoundingClientRect().x || 0)!!,
+      y:
+        (buttonsRef.current[activeIcon]?.getBoundingClientRect().y || 0) -
+        (containerRef.current?.getBoundingClientRect().y || 0)!!,
+      width: buttonsRef.current[activeIcon]?.getBoundingClientRect().width,
+      height: buttonsRef.current[activeIcon]?.getBoundingClientRect().height,
+    });
 
-  useEffect(() => {
-    setActiveIcon(buttonsRef.current.findIndex((option) => option.title === currentlySelectedMode));
-  }, [currentlySelectedMode]);
+    useEffect(() => {
+      setActiveIcon(
+        buttonsRef.current.findIndex(
+          (option) => option.title === currentlySelectedMode
+        )
+      );
+    }, [currentlySelectedMode]);
 
-  useEffect(() => {
-    const currentButtonRef = buttonsRef.current[activeIcon];
-    const container = containerRef.current;
+    useEffect(() => {
+      const currentButtonRef = buttonsRef.current[activeIcon];
+      const container = containerRef.current;
 
-    if (!container) return;
+      if (!container) return;
 
-    const updatedIndicatorStyle = {
-      x: currentButtonRef.getBoundingClientRect().x - (container?.getBoundingClientRect().x || 0),
-      y: currentButtonRef.getBoundingClientRect().y - (container?.getBoundingClientRect().y || 0),
-      width: currentButtonRef.getBoundingClientRect().width,
-      height: currentButtonRef.getBoundingClientRect().height,
-    };
+      const updatedIndicatorStyle = {
+        x:
+          currentButtonRef.getBoundingClientRect().x -
+          (container?.getBoundingClientRect().x || 0),
+        y:
+          currentButtonRef.getBoundingClientRect().y -
+          (container?.getBoundingClientRect().y || 0),
+        width: currentButtonRef.getBoundingClientRect().width,
+        height: currentButtonRef.getBoundingClientRect().height,
+      };
 
-    setIndicatorStyle(updatedIndicatorStyle);
-  }, [activeIcon, variant, setIndicatorStyle]);
+      setIndicatorStyle(updatedIndicatorStyle);
+    }, [activeIcon, variant, setIndicatorStyle]);
 
-  return (
-    <SSettingsColorModeSwitchWrapper
-      variant={variant}
-      style={wrapperStyle ?? {}}
-      ref={(el) => {
-        containerRef.current = el!!;
-      }}
-    >
-      <SMIndicator
-        style={{
-          left: indicatorStyle.x,
-          top: indicatorStyle.y,
-          width: indicatorStyle.width,
-          height: indicatorStyle.height,
+    return (
+      <SSettingsColorModeSwitchWrapper
+        variant={variant}
+        style={wrapperStyle ?? {}}
+        ref={(el) => {
+          containerRef.current = el!!;
         }}
-      />
-      {options && options.map((option, i) => (
-        <SColorSwitchButton
-          title={option}
-          ref={(el) => {
-            buttonsRef.current[i] = el!!;
-          }}
-          onClick={() => handleSetColorMode(option)}
-          isActive={i === activeIcon}
+      >
+        <SMIndicator
           style={{
-            borderRadius: '50px',
-            ...(option === currentlySelectedMode ? { cursor: 'default' } : {}),
+            left: indicatorStyle.x,
+            top: indicatorStyle.y,
+            width: indicatorStyle.width,
+            height: indicatorStyle.height,
           }}
-        >
-          <div
-            style={{
-              ...(variant === 'horizontal' ? { flexDirection: 'row' } : {}),
-            }}
-          >
-            <InlineSvg
-              svg={optionsIcons[option]}
-              width="20px"
-              height="20px"
-              fill={
-                theme.name === 'dark'
-                  ? '#FFFFFF' : (activeIcon === i
-                    ? '#FFFFFF' : '#2C2C33')
-              }
-            />
-            {variant === 'horizontal' && i === activeIcon && !isMobile ? (
-              <span>{ buttonsCaptions[option] }</span>
-            ) : null}
-          </div>
-        </SColorSwitchButton>
-      ))}
-    </SSettingsColorModeSwitchWrapper>
-  );
-};
+        />
+        {options &&
+          options.map((option, i) => (
+            <SColorSwitchButton
+              title={option}
+              ref={(el) => {
+                buttonsRef.current[i] = el!!;
+              }}
+              onClick={() => handleSetColorMode(option)}
+              isActive={i === activeIcon}
+              style={{
+                borderRadius: '50px',
+                ...(option === currentlySelectedMode
+                  ? { cursor: 'default' }
+                  : {}),
+              }}
+            >
+              <div
+                style={{
+                  ...(variant === 'horizontal' ? { flexDirection: 'row' } : {}),
+                }}
+              >
+                <InlineSvg
+                  svg={optionsIcons[option]}
+                  width='20px'
+                  height='20px'
+                  fill={
+                    theme.name === 'dark'
+                      ? '#FFFFFF'
+                      : activeIcon === i
+                      ? '#FFFFFF'
+                      : '#2C2C33'
+                  }
+                />
+                {variant === 'horizontal' && i === activeIcon && !isMobile ? (
+                  <span>{buttonsCaptions[option]}</span>
+                ) : null}
+              </div>
+            </SColorSwitchButton>
+          ))}
+      </SSettingsColorModeSwitchWrapper>
+    );
+  };
 
 SettingsColorModeSwitch.defaultProps = {
   wrapperStyle: {},
@@ -151,11 +169,11 @@ const SSettingsColorModeSwitchWrapper = styled.div<{
   position: relative;
 
   display: flex;
-  flex-direction: ${({ variant }) => (variant === 'horizontal' ? 'row' : 'column')};
+  flex-direction: ${({ variant }) =>
+    variant === 'horizontal' ? 'row' : 'column'};
   justify-content: flex-start;
   align-items: flex-start;
   gap: 16px;
-
 
   z-index: 0;
 `;
@@ -171,7 +189,6 @@ const SColorSwitchButton = styled.button<{
   border: 0px transparent;
   background: transparent;
 
-
   cursor: pointer;
   z-index: 3;
 
@@ -185,7 +202,8 @@ const SColorSwitchButton = styled.button<{
     width: 40px;
     height: 40px;
 
-    background-color: ${({ theme, isActive }) => (isActive ? 'transparent' : theme.colorsThemed.background.secondary)};
+    background-color: ${({ theme, isActive }) =>
+      isActive ? 'transparent' : theme.colorsThemed.background.secondary};
   }
 
   div {
@@ -197,7 +215,7 @@ const SColorSwitchButton = styled.button<{
       display: block;
       margin: 0px 8px;
 
-      color: #FFFFFF;
+      color: #ffffff;
       font-weight: 600;
       font-size: 14px;
       line-height: 20px;
@@ -222,11 +240,11 @@ const SMIndicator = styled(motion.div)`
 
   background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  transition: left .2s linear, top .2s linear, width .3s linear .2s;
+  transition: left 0.2s linear, top 0.2s linear, width 0.3s linear 0.2s;
 
   opacity: 0;
   animation-duration: 0.1s;
-  animation-delay: .4s;
+  animation-delay: 0.4s;
   animation-fill-mode: forwards;
   animation-name: ${IndicatorInitialAnimation};
 

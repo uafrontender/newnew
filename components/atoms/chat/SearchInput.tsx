@@ -14,14 +14,22 @@ interface ISearchInput {
   passInputValue?: (str: string) => void;
 }
 
-const SearchInput: React.FC<ISearchInput> = ({ placeholderText, bgColor, style, fontSize, passInputValue }) => {
+const SearchInput: React.FC<ISearchInput> = ({
+  placeholderText,
+  bgColor,
+  style,
+  fontSize,
+  passInputValue,
+}) => {
   const theme = useTheme();
   const inputRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
   const [focusedInput, setFocusedInput] = useState<boolean>(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);

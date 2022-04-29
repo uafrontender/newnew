@@ -10,23 +10,30 @@ import { useAppSelector } from '../../../redux-store/store';
 import GoBackButton from '../GoBackButton';
 
 interface ReportData {
-  reason: newnewapi.ReportingReason
-  message: string
+  reason: newnewapi.ReportingReason;
+  message: string;
 }
 
 interface IReportModal {
   show: boolean;
   reportedDisplayname: string;
-  onSubmit: (reportData: ReportData ) => void
+  onSubmit: (reportData: ReportData) => void;
   onClose: () => void;
 }
 
-const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClose, onSubmit }) => {
+const ReportModal: React.FC<IReportModal> = ({
+  show,
+  reportedDisplayname,
+  onClose,
+  onSubmit,
+}) => {
   const { t } = useTranslation('common');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [reason, setReason] = useState<newnewapi.ReportingReason| null>(null);
+  const [reason, setReason] = useState<newnewapi.ReportingReason | null>(null);
   const [message, setMessage] = useState('');
 
   const disabled = reason === null || message.length < 15;
@@ -64,24 +71,30 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClos
   const reportMaxLength = 150;
 
   const submitReport = () => {
-    if(reason && message.length >= 15){
+    if (reason && message.length >= 15) {
       onSubmit({
         reason,
-        message
+        message,
       });
       setReason(null);
       setMessage('');
     }
   };
 
-  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
-  }, []);
+  const handleMessageChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setMessage(e.target.value);
+    },
+    []
+  );
 
-  const handleTypeChange = useCallback((id: newnewapi.ReportingReason | undefined) => {
-    /* eslint-disable no-unused-expressions */
-    id && setReason(id);
-  }, []);
+  const handleTypeChange = useCallback(
+    (id: newnewapi.ReportingReason | undefined) => {
+      /* eslint-disable no-unused-expressions */
+      id && setReason(id);
+    },
+    []
+  );
 
   return (
     <Modal show={show} onClose={onClose}>
@@ -101,7 +114,7 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClos
                   id={item.id.toString()}
                   label={item.title}
                   selected={reason === item.id}
-                  handleChange={()=>handleTypeChange(item.id)}
+                  handleChange={() => handleTypeChange(item.id)}
                 />
               </SCheckBoxWrapper>
             ))}
@@ -113,16 +126,26 @@ const ReportModal: React.FC<IReportModal> = ({ show, reportedDisplayname, onClos
               </span>
             </STextAreaTitle>
             <STextArea
-              id="report-additional-info"
+              id='report-additional-info'
               maxLength={reportMaxLength}
               value={message}
               onChange={handleMessageChange}
-              placeholder={`${t('modal.report-user.additional-info.placeholder')}`}
+              placeholder={`${t(
+                'modal.report-user.additional-info.placeholder'
+              )}`}
             />
           </STextAreaWrapper>
           <SModalButtons>
-            {!isMobile && <SCancelButton onClick={onClose}>{t('modal.report-user.button-cancel')}</SCancelButton>}
-            <SConfirmButton view="primaryGrad" disabled={disabled} onClick={submitReport}>
+            {!isMobile && (
+              <SCancelButton onClick={onClose}>
+                {t('modal.report-user.button-cancel')}
+              </SCancelButton>
+            )}
+            <SConfirmButton
+              view='primaryGrad'
+              disabled={disabled}
+              onClick={submitReport}
+            >
               Report
             </SConfirmButton>
           </SModalButtons>
@@ -144,9 +167,13 @@ const SContainer = styled.div`
 const SModal = styled.div`
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 0 16px 16px;
   box-sizing: border-box;
   display: flex;
@@ -210,11 +237,15 @@ const SCancelButton = styled(Button)`
   margin-right: auto;
   flex-shrink: 0;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
   &:hover {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+      props.theme.name === 'light'
+        ? props.theme.colors.dark
+        : props.theme.colorsThemed.background.quaternary};
     color: ${(props) => props.theme.colors.white};
     background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }

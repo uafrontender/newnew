@@ -391,7 +391,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     <>
       <motion.div
         key={index}
-        layout="position"
+        layout='position'
         transition={{
           type: 'spring',
           damping: 20,
@@ -405,7 +405,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         }}
       >
         <SContainer
-          layout="position"
+          layout='position'
           transition={{
             type: 'spring',
             damping: 20,
@@ -453,7 +453,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           {noAction ? null : isMobile ? (
             <>
               <SSupportButton
-                view="quaternary"
+                view='quaternary'
                 disabled={disabled}
                 isBlue={isBlue}
                 canVoteForFree={canVoteForFree}
@@ -493,7 +493,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
               <SSupportButtonDesktop
                 active={isSupportMenuOpen}
                 canVoteForFree={canVoteForFree}
-                view="secondary"
+                view='secondary'
                 disabled={disabled}
                 isBlue={isBlue}
                 onClick={(e) => {
@@ -683,20 +683,20 @@ const RenderSupportersInfo: React.FunctionComponent<{
         {supporterCount > 0 ? (
           <>
             {firstVoter && (
-              <SSpanBiddersHighlighted className="spanHighlighted">
+              <SSpanBiddersHighlighted className='spanHighlighted'>
                 {firstVoter}
               </SSpanBiddersHighlighted>
             )}
-            <SSpanBiddersRegular className="spanRegular">
+            <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubstracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
             {supporterCountSubstracted > 0 ? (
-              <SSpanBiddersHighlighted className="spanHighlighted">
+              <SSpanBiddersHighlighted className='spanHighlighted'>
                 {formatNumber(supporterCountSubstracted, true)}{' '}
                 {t('McPost.OptionsTab.OptionCard.others')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
-            <SSpanBiddersRegular className="spanRegular">
+            <SSpanBiddersRegular className='spanRegular'>
               {t('McPost.OptionsTab.OptionCard.voted')}
             </SSpanBiddersRegular>
           </>
@@ -709,19 +709,19 @@ const RenderSupportersInfo: React.FunctionComponent<{
       <>
         {supporterCount > 0 ? (
           <>
-            <SSpanBiddersHighlighted className="spanHighlighted">
+            <SSpanBiddersHighlighted className='spanHighlighted'>
               {t('me')}
             </SSpanBiddersHighlighted>
-            <SSpanBiddersRegular className="spanRegular">
+            <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubstracted > 0 ? ` & ` : ''}
             </SSpanBiddersRegular>
             {supporterCountSubstracted > 0 ? (
-              <SSpanBiddersHighlighted className="spanHighlighted">
+              <SSpanBiddersHighlighted className='spanHighlighted'>
                 {formatNumber(supporterCountSubstracted, true)}{' '}
                 {t('McPost.OptionsTab.OptionCard.others')}
               </SSpanBiddersHighlighted>
             ) : null}{' '}
-            <SSpanBiddersRegular className="spanRegular">
+            <SSpanBiddersRegular className='spanRegular'>
               {t('McPost.OptionsTab.OptionCard.voted')}
             </SSpanBiddersRegular>
           </>
@@ -734,7 +734,7 @@ const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         <SSpanBiddersHighlighted
-          className="spanHighlighted"
+          className='spanHighlighted'
           onClick={(e) => {
             e.stopPropagation();
             handleRedirectToOptionCreator();
@@ -749,18 +749,18 @@ const RenderSupportersInfo: React.FunctionComponent<{
         >
           {optionCreator}
         </SSpanBiddersHighlighted>
-        <SSpanBiddersRegular className="spanRegular">
+        <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
         {supporterCountSubstracted > 0 ? (
           <>
-            <SSpanBiddersHighlighted className="spanHighlighted">
+            <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubstracted, true)}{' '}
               {t('McPost.OptionsTab.OptionCard.others')}
             </SSpanBiddersHighlighted>{' '}
           </>
         ) : null}
-        <SSpanBiddersRegular className="spanRegular">
+        <SSpanBiddersRegular className='spanRegular'>
           {t('McPost.OptionsTab.OptionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -771,7 +771,7 @@ const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         <SSpanBiddersHighlighted
-          className="spanHighlighted"
+          className='spanHighlighted'
           onClick={(e) => {
             e.stopPropagation();
             handleRedirectToOptionCreator();
@@ -783,22 +783,22 @@ const RenderSupportersInfo: React.FunctionComponent<{
         >
           {optionCreator}
         </SSpanBiddersHighlighted>
-        <SSpanBiddersHighlighted className="spanHighlighted">
+        <SSpanBiddersHighlighted className='spanHighlighted'>
           {', '}
           {`${t('me')}`}
         </SSpanBiddersHighlighted>
-        <SSpanBiddersRegular className="spanRegular">
+        <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted - 1 > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
         {supporterCountSubstracted - 1 > 0 ? (
           <>
-            <SSpanBiddersHighlighted className="spanHighlighted">
+            <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubstracted - 1, true)}{' '}
               {t('McPost.OptionsTab.OptionCard.others')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
-        <SSpanBiddersRegular className="spanRegular">
+        <SSpanBiddersRegular className='spanRegular'>
           {t('McPost.OptionsTab.OptionCard.voted')}
         </SSpanBiddersRegular>
       </>
@@ -809,7 +809,7 @@ const RenderSupportersInfo: React.FunctionComponent<{
     return (
       <>
         <SSpanBiddersHighlighted
-          className="spanHighlighted"
+          className='spanHighlighted'
           onClick={(e) => {
             e.stopPropagation();
             handleRedirectToOptionCreator();
@@ -821,18 +821,18 @@ const RenderSupportersInfo: React.FunctionComponent<{
         >
           {`${t('me')}`}
         </SSpanBiddersHighlighted>
-        <SSpanBiddersRegular className="spanRegular">
+        <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
         {supporterCountSubstracted > 0 ? (
           <>
-            <SSpanBiddersHighlighted className="spanHighlighted">
+            <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubstracted, true)}{' '}
               {t('McPost.OptionsTab.OptionCard.others')}
             </SSpanBiddersHighlighted>
           </>
         ) : null}{' '}
-        <SSpanBiddersRegular className="spanRegular">
+        <SSpanBiddersRegular className='spanRegular'>
           {t('McPost.OptionsTab.OptionCard.voted')}
         </SSpanBiddersRegular>
       </>

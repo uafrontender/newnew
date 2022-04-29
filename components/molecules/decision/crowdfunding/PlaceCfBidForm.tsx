@@ -20,17 +20,11 @@ const PlaceCfBidForm: React.FunctionComponent<IPlaceCfBidForm> = ({
 
   return (
     <SWrapper>
-      <Button
-        onClick={() => handlePlaceBid()}
-      >
-        Support
-      </Button>
+      <Button onClick={() => handlePlaceBid()}>Support</Button>
     </SWrapper>
   );
 };
 
 export default PlaceCfBidForm;
 
-const SWrapper = styled.div`
-
-`;
+const SWrapper = styled.div``;

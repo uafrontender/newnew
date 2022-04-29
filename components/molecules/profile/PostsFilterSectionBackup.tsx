@@ -35,41 +35,33 @@ const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
   const theme = useTheme();
   const { t } = useTranslation('profile');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <SFiltersSection>
-      <Text
-        variant={3}
-      >
-        {(numDecisions && numDecisions !== 0) ? (
+      <Text variant={3}>
+        {numDecisions && numDecisions !== 0 ? (
           <>
-            {numDecisions}
-            {' '}
-            { t('posts-filter.decisions') }
+            {numDecisions} {t('posts-filter.decisions')}
           </>
         ) : null}
-        {((!numDecisions || numDecisions === 0) && !isLoading) ? (
-          <>
-            { t('posts-filter.no-decisions') }
-          </>
-        ) : null}
-        {' '}
+        {(!numDecisions || numDecisions === 0) && !isLoading ? (
+          <>{t('posts-filter.no-decisions')}</>
+        ) : null}{' '}
       </Text>
-      <SFilterButton
-        view="secondary"
-        onClick={() => setFilterOpen(true)}
-      >
+      <SFilterButton view='secondary' onClick={() => setFilterOpen(true)}>
         <span>
-          { t(`posts-filter.filter-${postsFilter?.toString() ?? '0'}`) }
+          {t(`posts-filter.filter-${postsFilter?.toString() ?? '0'}`)}
         </span>
         <InlineSvg
           svg={ArrowDown}
           fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
         />
       </SFilterButton>
       {!isMobile ? (

@@ -25,7 +25,9 @@ interface ISubscriptionExpired {
 const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
   const { t } = useTranslation('chat');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   const handlePayWithCard = async () => {
@@ -38,7 +40,8 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
 
       const res = await subscribeToCreator(payload);
 
-      if (!res.data?.checkoutUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data?.checkoutUrl || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
       if (url) window.location.href = url;
@@ -52,14 +55,18 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
       <SBottomActionLeft>
         <SBottomActionIcon>🙊</SBottomActionIcon>
         <SBottomActionText>
-          <SBottomActionTitle>{t('subscription-expired.title')}</SBottomActionTitle>
-          <SBottomActionMessage>{t('subscription-expired.message')}</SBottomActionMessage>
+          <SBottomActionTitle>
+            {t('subscription-expired.title')}
+          </SBottomActionTitle>
+          <SBottomActionMessage>
+            {t('subscription-expired.message')}
+          </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
       <SBottomActionButton
         withDim
         withShrink
-        view="primaryGrad"
+        view='primaryGrad'
         onClick={() => {
           setPaymentModalOpen(true);
         }}
@@ -75,15 +82,22 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
         handlePayWithCardStripeRedirect={handlePayWithCard}
       >
         <div>
-          <SPaymentModalTitle variant={3}>{t('modal.renewSubcriptionsSubtitle')}</SPaymentModalTitle>
+          <SPaymentModalTitle variant={3}>
+            {t('modal.renewSubcriptionsSubtitle')}
+          </SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             {user.avatarUrl && (
               <SAvatar>
-                <img src={user.avatarUrl} alt={user.nickname ? user.nickname : `@${user.username}`} />
+                <img
+                  src={user.avatarUrl}
+                  alt={user.nickname ? user.nickname : `@${user.username}`}
+                />
               </SAvatar>
             )}
             <div>
-              <SCreatorUsername>{isMobile ? user.nickname : `@${user.username}`}</SCreatorUsername>
+              <SCreatorUsername>
+                {isMobile ? user.nickname : `@${user.username}`}
+              </SCreatorUsername>
             </div>
           </SPaymentModalCreatorInfo>
         </div>

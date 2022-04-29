@@ -9,10 +9,16 @@ import MessageCircle from '../../public/images/svg/icons/filled/MessageCircle.sv
 import { useAppSelector } from '../../redux-store/store';
 import { INotification, RoutingTarget } from '../../pages/notifications';
 
-const Notification: React.FC<INotification> = ({ content, routingTarget, createdAt }) => {
+const Notification: React.FC<INotification> = ({
+  content,
+  routingTarget,
+  createdAt,
+}) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   return (
     <SWrapper>
       <SAvatarHolder>
@@ -20,10 +26,14 @@ const Notification: React.FC<INotification> = ({ content, routingTarget, created
         {routingTarget !== RoutingTarget.Empty && (
           <SIcon>
             <SInlineSVG
-              svg={routingTarget === RoutingTarget.ChatRoom ? MessageIcon : MessageCircle}
+              svg={
+                routingTarget === RoutingTarget.ChatRoom
+                  ? MessageIcon
+                  : MessageCircle
+              }
               fill={theme.colors.white}
-              width="14px"
-              height="14px"
+              width='14px'
+              height='14px'
             />
           </SIcon>
         )}
@@ -35,7 +45,9 @@ const Notification: React.FC<INotification> = ({ content, routingTarget, created
         </p>
         <SDate>{moment(createdAt).fromNow()}</SDate>
       </SText>
-      {content.relatedPost && !isMobile && <SPostThumbnail avatarUrl={content.relatedPost.thumbnailImageUrl} />}
+      {content.relatedPost && !isMobile && (
+        <SPostThumbnail avatarUrl={content.relatedPost.thumbnailImageUrl} />
+      )}
     </SWrapper>
   );
 };
@@ -47,7 +59,8 @@ const SWrapper = styled.div`
   padding: 12px 0 0;
   border-bottom: 0;
   ${({ theme }) => theme.media.tablet} {
-    border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+    border-bottom: 1px solid
+      ${(props) => props.theme.colorsThemed.background.outlines1};
     padding: 20px 0;
   }
 `;
@@ -90,7 +103,8 @@ const SText = styled.div`
   font-weight: 600;
   width: 100%;
   color: ${(props) => props.theme.colorsThemed.text.secondary};
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   ${({ theme }) => theme.media.tablet} {
     border-bottom: 0;
     padding-bottom: 0;

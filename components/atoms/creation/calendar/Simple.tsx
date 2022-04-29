@@ -1,8 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useCallback, useEffect,
-} from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
@@ -29,16 +25,10 @@ interface ICalendarSimple {
 }
 
 export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
-  const {
-    date,
-    onChange,
-  } = props;
+  const { date, onChange } = props;
   const monthsToRender = [
-    moment()
-      .startOf('month'),
-    moment()
-      .startOf('month')
-      .add(1, 'month'),
+    moment().startOf('month'),
+    moment().startOf('month').add(1, 'month'),
   ];
 
   const theme = useTheme();
@@ -47,8 +37,9 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
-  const [visibleMonth, setVisibleMonth] = useState(monthsToRender.findIndex((m) => m.format('M') === moment(date)
-    .format('M')));
+  const [visibleMonth, setVisibleMonth] = useState(
+    monthsToRender.findIndex((m) => m.format('M') === moment(date).format('M'))
+  );
   const direction = useDropDownDirection(wrapperRef, 400);
 
   const hasPrevMonth = visibleMonth !== 0;
@@ -67,50 +58,54 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
-  const handleChange = useCallback((e: any, value: any) => {
-    if (e) {
-      e.preventDefault();
-    }
-    onChange(value.format());
-  }, [onChange]);
+  const handleChange = useCallback(
+    (e: any, value: any) => {
+      if (e) {
+        e.preventDefault();
+      }
+      onChange(value.format());
+    },
+    [onChange]
+  );
   const handlePrevMonth = useCallback(() => {
     setVisibleMonth(visibleMonth - 1);
   }, [visibleMonth]);
   const handleNextMonth = useCallback(() => {
     setVisibleMonth(visibleMonth + 1);
   }, [visibleMonth]);
-  const renderDay = useCallback((el: any) => (
-    <SDay key={el.value}>
-      <SDayLabel variant={2} weight={500}>
-        {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
-      </SDayLabel>
-    </SDay>
-  ), [t]);
-  const renderMonth = useCallback((el, index) => {
-    const opts: any = {
-      date: el,
-    };
+  const renderDay = useCallback(
+    (el: any) => (
+      <SDay key={el.value}>
+        <SDayLabel variant={2} weight={500}>
+          {t(`secondStep.field.startsAt.modal.days.${el.value}`)}
+        </SDayLabel>
+      </SDay>
+    ),
+    [t]
+  );
+  const renderMonth = useCallback(
+    (el, index) => {
+      const opts: any = {
+        date: el,
+      };
 
-    if (el === 0) {
-      opts.minDate = moment()
-        .startOf('day');
-    }
+      if (el === 0) {
+        opts.minDate = moment().startOf('day');
+      }
 
-    return (
-      <SDaysListItem
-        id={`month-item-${index}`}
-        key={`month-list-${el}`}
-      >
-        <RenderDays
-          view="sm"
-          selectedDate={moment(date)
-            .startOf('day')}
-          handleSelect={handleChange}
-          {...opts}
-        />
-      </SDaysListItem>
-    );
-  }, [date, handleChange]);
+      return (
+        <SDaysListItem id={`month-item-${index}`} key={`month-list-${el}`}>
+          <RenderDays
+            view='sm'
+            selectedDate={moment(date).startOf('day')}
+            handleSelect={handleChange}
+            {...opts}
+          />
+        </SDaysListItem>
+      );
+    },
+    [date, handleChange]
+  );
 
   useOnClickEsc(wrapperRef, handleClose);
   useOnClickOutside(wrapperRef, handleClose);
@@ -127,18 +122,15 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
 
   return (
     <SWrapper ref={wrapperRef}>
-      <SContainer
-        onClick={open ? handleClose : handleClick}
-      >
+      <SContainer onClick={open ? handleClose : handleClick}>
         <SCalendarLabel variant={2} weight={500}>
-          {moment(date)
-            .format('DD MMMM')}
+          {moment(date).format('DD MMMM')}
         </SCalendarLabel>
         <InlineSVG
           svg={calendarIcon}
           fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
         />
       </SContainer>
       <AnimatedPresence
@@ -157,17 +149,13 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
                 <InlineSVG
                   svg={chevronLeft}
                   fill={theme.colorsThemed.text.secondary}
-                  width="20px"
-                  height="20px"
+                  width='20px'
+                  height='20px'
                 />
               )}
             </SInlineSVGWrapper>
             <SMonth variant={2} weight={600}>
-              {
-                moment()
-                  .add(visibleMonth, 'month')
-                  .format('MMMM, YYYY')
-              }
+              {moment().add(visibleMonth, 'month').format('MMMM, YYYY')}
             </SMonth>
             <SInlineSVGWrapper
               onClick={handleNextMonth}
@@ -177,16 +165,14 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
                 <InlineSVG
                   svg={chevronRight}
                   fill={theme.colorsThemed.text.secondary}
-                  width="20px"
-                  height="20px"
+                  width='20px'
+                  height='20px'
                 />
               )}
             </SInlineSVGWrapper>
           </STopLine>
-          <SDays>
-            {DAYS.map(renderDay)}
-          </SDays>
-          <SDaysList id="monthsContainer">
+          <SDays>{DAYS.map(renderDay)}</SDays>
+          <SDaysList id='monthsContainer'>
             {monthsToRender.map(renderMonth)}
           </SDaysList>
         </SListHolder>
@@ -212,10 +198,11 @@ const SContainer = styled.div`
   border-radius: 16px;
   justify-content: space-between;
 
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+    background-color: ${({ theme }) =>
+      theme.colorsThemed.background.quaternary};
   }
 `;
 
@@ -291,9 +278,11 @@ const SInlineSVGWrapper = styled.div<ISInlineSVGWrapper>`
   align-items: center;
   justify-content: center;
 
-  ${(props) => props.disabled && css`
-    pointer-events: none;
-  `}
+  ${(props) =>
+    props.disabled &&
+    css`
+      pointer-events: none;
+    `}
 `;
 
 const SDaysList = styled.div`

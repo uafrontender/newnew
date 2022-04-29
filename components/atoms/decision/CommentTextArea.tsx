@@ -20,7 +20,17 @@ interface ICommentTextArea {
 }
 
 export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
-  const { id = '', maxlength, value, error, focus, onBlur = () => {}, onFocus = () => {}, onChange, placeholder } = props;
+  const {
+    id = '',
+    maxlength,
+    value,
+    error,
+    focus,
+    onBlur = () => {},
+    onFocus = () => {},
+    onChange,
+    placeholder,
+  } = props;
 
   const handleChange = useCallback(
     (e) => {
@@ -51,9 +61,9 @@ export const CommentTextArea: React.FC<ICommentTextArea> = (props) => {
         />
       </SContent>
       {error ? (
-        <AnimatedPresence animation="t-09">
+        <AnimatedPresence animation='t-09'>
           <SErrorDiv>
-            <InlineSvg svg={alertIcon} width="16px" height="16px" />
+            <InlineSvg svg={alertIcon} width='16px' height='16px' />
             {error}
           </SErrorDiv>
         </AnimatedPresence>
@@ -89,15 +99,15 @@ const SContent = styled.div<ISContent>`
   border-radius: 16px;
 
   border: 1.5px solid
-  ${({ focus, theme, error }) => {
-    if (error) {
-      return theme.colorsThemed.accent.error;
-    }
-    if (focus) {
-      return theme.colorsThemed.background.outlines2;
-    }
-    return theme.colorsThemed.background.secondary;
-  }};
+    ${({ focus, theme, error }) => {
+      if (error) {
+        return theme.colorsThemed.accent.error;
+      }
+      if (focus) {
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.background.secondary;
+    }};
 `;
 
 const SCommentTextArea = styled(CommentTextAreaAutoSize)`

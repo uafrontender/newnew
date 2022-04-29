@@ -36,20 +36,20 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
           {imageInEditUrl && (
             <SProfileImage>
               <img
-                alt="Profile avatar"
+                alt='Profile avatar'
                 src={imageInEditUrl}
                 draggable={false}
               />
             </SProfileImage>
           )}
           <SUploadButton
-            view="secondary"
+            view='secondary'
             onClick={() => imageInputRef.current?.click()}
           >
             <InlineSvg
               svg={DownloadIcon}
-              width="24px"
-              height="24px"
+              width='24px'
+              height='24px'
               fill={theme.colorsThemed.text.primary}
             />
             {!imageInEditUrl
@@ -57,8 +57,8 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
               : t('DetailsSection.form.profilePicture.uploadNewBtn')}
           </SUploadButton>
           <SImageInput
-            type="file"
-            accept="image/*"
+            type='file'
+            accept='image/*'
             multiple={false}
             ref={(el) => {
               imageInputRef.current = el!!;

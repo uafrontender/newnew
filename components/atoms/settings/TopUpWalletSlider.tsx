@@ -32,20 +32,20 @@ const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
     <SSliderWrapper>
       <Button
         iconOnly
-        size="sm"
-        view="transparent"
+        size='sm'
+        view='transparent'
         disabled={value <= min}
         onClick={handleDecrement}
       >
         <InlineSvg
           svg={MinusIcon}
           fill={theme.colorsThemed.text.primary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
         />
       </Button>
       <SSlider
-        type="range"
+        type='range'
         value={value}
         min={min}
         max={max}
@@ -54,16 +54,16 @@ const TopUpWalletSlider: React.FunctionComponent<ITopUpWalletSlider> = ({
       />
       <Button
         iconOnly
-        size="sm"
-        view="transparent"
+        size='sm'
+        view='transparent'
         disabled={value >= max}
         onClick={handleIncrement}
       >
         <InlineSvg
           svg={PlusIcon}
           fill={theme.colorsThemed.text.primary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
         />
       </Button>
     </SSliderWrapper>

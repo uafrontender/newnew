@@ -14,7 +14,7 @@ interface IPostEllipseMenu {
   isFollowingDecision: boolean;
   handleFollowDecision: () => void;
   handleToggleFollowingCreator: () => void;
-  handleReportOpen: ()=> void;
+  handleReportOpen: () => void;
   onClose: () => void;
 }
 
@@ -51,19 +51,21 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
               marginBottom: '16px',
             }}
           >
-            <Text
-              variant={3}
-            >
-              { !isFollowing ? t('ellipse.follow-creator') : t('ellipse.unfollow-creator') }
+            <Text variant={3}>
+              {!isFollowing
+                ? t('ellipse.follow-creator')
+                : t('ellipse.unfollow-creator')}
             </Text>
           </SButton>
-          <SButton
-            onClick={() => handleFollowDecision()}
-          >
-            <Text
-              variant={3}
-            >
-              { !isFollowingDecision ? t('ellipse.follow-decision', { postType: t(`postType.${postType}`) }) : t('ellipse.unfollow-decision', { postType: t(`postType.${postType}`) }) }
+          <SButton onClick={() => handleFollowDecision()}>
+            <Text variant={3}>
+              {!isFollowingDecision
+                ? t('ellipse.follow-decision', {
+                    postType: t(`postType.${postType}`),
+                  })
+                : t('ellipse.unfollow-decision', {
+                    postType: t(`postType.${postType}`),
+                  })}
             </Text>
           </SButton>
           <SSeparator />
@@ -73,11 +75,8 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
               onClose();
             }}
           >
-            <Text
-              variant={3}
-              tone='error'
-            >
-              { t('ellipse.report') }
+            <Text variant={3} tone='error'>
+              {t('ellipse.report')}
             </Text>
           </SButton>
         </SContainer>
@@ -124,5 +123,6 @@ const SSeparator = styled.div`
   margin-top: 8px;
   margin-bottom: 8px;
   width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;

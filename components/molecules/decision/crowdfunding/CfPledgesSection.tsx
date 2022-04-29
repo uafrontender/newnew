@@ -1,9 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useEffect,
-} from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -38,23 +36,22 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
 
   useEffect(() => {
     if (inView && !pledgesLoading && pagingToken) {
       handleLoadPledges(pagingToken);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pagingToken, pledgesLoading]);
 
   return (
     <SSectionContainer
-      key="pledges"
+      key='pledges'
       heightDelta={heightDelta}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -71,20 +68,12 @@ const CfPledgesSection: React.FunctionComponent<ICfPledgesSection> = ({
         ))}
       </SPledgesContainer>
       {!isMobile ? (
-        <SLoaderDiv
-          ref={loadingRef}
-        />
-      ) : (
-        pagingToken ? (
-          (
-            <SLoadMoreBtn
-              onClick={() => handleLoadPledges(pagingToken)}
-            >
-              { t('loadMoreBtn') }
-            </SLoadMoreBtn>
-          )
-        ) : null
-      )}
+        <SLoaderDiv ref={loadingRef} />
+      ) : pagingToken ? (
+        <SLoadMoreBtn onClick={() => handleLoadPledges(pagingToken)}>
+          {t('loadMoreBtn')}
+        </SLoadMoreBtn>
+      ) : null}
     </SSectionContainer>
   );
 };
@@ -97,10 +86,8 @@ const SSectionContainer = styled(motion.div)<{
   position: relative;
   width: 100%;
 
-
   ${({ theme }) => theme.media.tablet} {
     height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
-
 
     &:after {
       content: '';
@@ -112,7 +99,6 @@ const SSectionContainer = styled(motion.div)<{
       box-shadow: 0px -5px 18px 20px ${({ theme }) => (theme.name === 'dark' ? 'rgba(20, 21, 31, 0.9)' : 'rgba(241, 243, 249, 0.9)')};
       z-index: 10;
     }
-
   }
 `;
 
@@ -130,6 +116,4 @@ const SLoaderDiv = styled.div`
   height: 10px;
 `;
 
-const SLoadMoreBtn = styled(Button)`
-
-`;
+const SLoadMoreBtn = styled(Button)``;

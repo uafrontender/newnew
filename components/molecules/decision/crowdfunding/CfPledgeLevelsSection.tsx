@@ -293,7 +293,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               <BidAmountTextInput
                 value={customPledgeAmount}
                 minAmount={Math.round(appConstants.minCfPledge / 100)}
-                inputAlign="left"
+                inputAlign='left'
                 style={{
                   padding: '12.5px 16px',
                   width: '100%',
@@ -301,8 +301,8 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 onChange={(newValue: string) => setCustomPledgeAmount(newValue)}
               />
               <Button
-                size="sm"
-                view="primaryGrad"
+                size='sm'
+                view='primaryGrad'
                 disabled={
                   customPledgeAmount === '' ||
                   parseInt(customPledgeAmount) <
@@ -313,15 +313,15 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 {t('CfPost.BackersTab.CustomPledge.pledgeBtn')}
               </Button>
               <SCancelButton
-                view="transparent"
+                view='transparent'
                 iconOnly
                 onClick={() => handleCloseCustomPledgeForm()}
               >
                 <InlineSvg
                   svg={CancelIcon}
                   fill={theme.colorsThemed.text.primary}
-                  width="24px"
-                  height="24px"
+                  width='24px'
+                  height='24px'
                 />
               </SCancelButton>
             </SNewPledgeForm>
@@ -348,21 +348,21 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 handleOpenMakePledgeForm={handleOpenCustomPledgeForm}
               />
               <GradientMaskHorizontal
-                gradientType="secondary"
+                gradientType='secondary'
                 height={`${
                   buttonsContainerRef.current?.getBoundingClientRect().height
                 }px`}
-                positionBottom="0px"
-                positionLeft="0px"
+                positionBottom='0px'
+                positionLeft='0px'
                 active={showLeftGradient}
               />
               <GradientMaskHorizontal
-                gradientType="secondary"
+                gradientType='secondary'
                 height={`${
                   buttonsContainerRef.current?.getBoundingClientRect().height
                 }px`}
-                positionBottom="0px"
-                positionRight="0px"
+                positionBottom='0px'
+                positionRight='0px'
                 active={showRightGradient}
               />
               <STutorialTooltipHolder>

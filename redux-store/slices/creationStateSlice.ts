@@ -4,7 +4,10 @@ import { newnewapi } from 'newnew-api';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 export type TPostData = Omit<newnewapi.Post, 'toJSON' | '_nickname' | '_email'>;
-export type TVideoProcessingData = Omit<newnewapi.StartVideoProcessingResponse, 'toJSON' | '_nickname' | '_email'>;
+export type TVideoProcessingData = Omit<
+  newnewapi.StartVideoProcessingResponse,
+  'toJSON' | '_nickname' | '_email'
+>;
 export type TThumbnailParameters = {
   startTime: number;
   endTime: number;
@@ -25,7 +28,7 @@ export interface ICreationStateInterface {
     };
     announcementVideoUrl: string;
     thumbnailParameters: TThumbnailParameters;
-  },
+  };
   auction: {
     minimalBid: number;
   };
@@ -36,12 +39,12 @@ export interface ICreationStateInterface {
     choices: {
       id: number;
       text: string;
-    }[],
+    }[];
     options: {
       allowSuggestions: boolean;
     };
   };
-  postData?: TPostData,
+  postData?: TPostData;
   videoProcessing?: TVideoProcessingData;
   fileUpload: {
     error: boolean;
@@ -62,12 +65,9 @@ const defaultUIState: ICreationStateInterface = {
     title: '',
     startsAt: {
       type: 'right-away',
-      date: moment()
-        .format(),
-      time: moment()
-        .format('hh:mm'),
-      'hours-format': moment()
-        .format('a'),
+      date: moment().format(),
+      time: moment().format('hh:mm'),
+      'hours-format': moment().format('a'),
     },
     expiresAt: '1-hour',
     options: {
@@ -131,7 +131,10 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationVideo(state, { payload }: PayloadAction<string>) {
       state.post.announcementVideoUrl = payload;
     },
-    setCreationVideoThumbnails(state, { payload }: PayloadAction<TThumbnailParameters>) {
+    setCreationVideoThumbnails(
+      state,
+      { payload }: PayloadAction<TThumbnailParameters>
+    ) {
       state.post.thumbnailParameters = { ...payload };
     },
     setCreationComments(state, { payload }: PayloadAction<boolean>) {
@@ -167,19 +170,28 @@ export const creationSlice: Slice<ICreationStateInterface> = createSlice({
     setCreationFileUploadETA(state, { payload }: PayloadAction<number>) {
       state.fileUpload.eta = payload;
     },
-    setCreationFileProcessingLoading(state, { payload }: PayloadAction<boolean>) {
+    setCreationFileProcessingLoading(
+      state,
+      { payload }: PayloadAction<boolean>
+    ) {
       state.fileProcessing.loading = payload;
     },
     setCreationFileProcessingError(state, { payload }: PayloadAction<boolean>) {
       state.fileProcessing.error = payload;
     },
-    setCreationFileProcessingProgress(state, { payload }: PayloadAction<number>) {
+    setCreationFileProcessingProgress(
+      state,
+      { payload }: PayloadAction<number>
+    ) {
       state.fileProcessing.progress = payload;
     },
     setCreationFileProcessingETA(state, { payload }: PayloadAction<number>) {
       state.fileProcessing.eta = payload;
     },
-    setCreationVideoProcessing(state, { payload }: PayloadAction<TVideoProcessingData>) {
+    setCreationVideoProcessing(
+      state,
+      { payload }: PayloadAction<TVideoProcessingData>
+    ) {
       state.videoProcessing = payload;
     },
     clearCreation(state) {

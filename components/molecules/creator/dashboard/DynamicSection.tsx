@@ -1,4 +1,10 @@
-import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -36,10 +42,13 @@ export const DynamicSection = () => {
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { unreadCountForCreator } = useGetChats();
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
 
-  const [showNewMessageModal, setShowNewMessageModal] = useState<boolean>(false);
+  const [showNewMessageModal, setShowNewMessageModal] =
+    useState<boolean>(false);
 
   const closeNewMsgModal = () => {
     setShowNewMessageModal(false);
@@ -108,13 +117,17 @@ export const DynamicSection = () => {
     <STopButtons>
       {!isDesktop && (
         <>
-          <SButton view="secondary" onClick={handleNotificationsClick}>
+          <SButton view='secondary' onClick={handleNotificationsClick}>
             <SIconHolder>
               <SInlineSVG
                 svg={notificationsIcon}
-                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-                width="24px"
-                height="24px"
+                fill={
+                  theme.name === 'light'
+                    ? theme.colors.black
+                    : theme.colors.white
+                }
+                width='24px'
+                height='24px'
               />
               <SIndicatorContainer>
                 <SIndicator minified />
@@ -122,13 +135,17 @@ export const DynamicSection = () => {
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          <SButton view="secondary" onClick={handleChatClick}>
+          <SButton view='secondary' onClick={handleChatClick}>
             <SIconHolder>
               <SInlineSVG
                 svg={chatIcon}
-                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-                width="24px"
-                height="24px"
+                fill={
+                  theme.name === 'light'
+                    ? theme.colors.black
+                    : theme.colors.white
+                }
+                width='24px'
+                height='24px'
               />
               <SIndicatorContainer>
                 <SIndicator minified />
@@ -146,44 +163,67 @@ export const DynamicSection = () => {
       >
         <SAnimatedContainer ref={containerRef}>
           {tab === 'direct-messages' ? (
-            <Chat roomID={router.query.roomID && isString(router.query.roomID) ? router.query.roomID : ''} />
+            <Chat
+              roomID={
+                router.query.roomID && isString(router.query.roomID)
+                  ? router.query.roomID
+                  : ''
+              }
+            />
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  <Tabs t={t} tabs={tabs} draggable={false} activeTabIndex={activeTabIndex} />
+                  <Tabs
+                    t={t}
+                    tabs={tabs}
+                    draggable={false}
+                    activeTabIndex={activeTabIndex}
+                  />
                 </STabsWrapper>
                 <SSectionTopLineButtons>
                   {tab === 'notifications' ? (
                     <>
-                      <STopLineButton view="secondary" onClick={handleMarkAllAsRead}>
+                      <STopLineButton
+                        view='secondary'
+                        onClick={handleMarkAllAsRead}
+                      >
                         {t('dashboard.button.markAllAsRead')}
                       </STopLineButton>
                       {!isDesktop && (
-                        <STopLineButton view="secondary" onClick={handleMinimizeClick}>
+                        <STopLineButton
+                          view='secondary'
+                          onClick={handleMinimizeClick}
+                        >
                           {t('dashboard.button.minimize')}
                         </STopLineButton>
                       )}
                     </>
                   ) : (
                     <>
-                      <SChatButton view="secondary" onClick={handleSearchClick}>
+                      <SChatButton view='secondary' onClick={handleSearchClick}>
                         <SChatInlineSVG
                           svg={searchIcon}
                           fill={theme.colorsThemed.text.primary}
-                          width="20px"
-                          height="20px"
+                          width='20px'
+                          height='20px'
                         />
                       </SChatButton>
-                      <SChatButton view="secondary" onClick={handleBulkMessageClick}>
+                      <SChatButton
+                        view='secondary'
+                        onClick={handleBulkMessageClick}
+                      >
                         <SChatInlineSVG
                           svg={NewMessageIcon}
                           fill={theme.colorsThemed.text.primary}
-                          width="20px"
-                          height="20px"
+                          width='20px'
+                          height='20px'
                         />
                       </SChatButton>
-                      <NewMessageModal showModal={showNewMessageModal} closeModal={closeNewMsgModal} />
+                      <NewMessageModal
+                        showModal={showNewMessageModal}
+                        closeModal={closeNewMsgModal}
+                      />
                     </>
                   )}
                 </SSectionTopLineButtons>
@@ -208,7 +248,9 @@ const STopButtons = styled.div`
 const SButton = styled(Button)`
   padding: 8px 12px;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.button.background.secondary};
   margin-left: 12px;
   border-radius: 12px;
 
@@ -242,7 +284,9 @@ const SIndicatorContainer = styled.div`
 const SIndicator = styled(Indicator)`
   border: 3px solid
     ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
 `;
 
 const SAnimatedContainer = styled.div`
@@ -255,7 +299,9 @@ const SAnimatedContainer = styled.div`
   position: fixed;
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: 24px;
 
   ${(props) => props.theme.media.laptop} {
@@ -298,7 +344,9 @@ const STopLineButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   padding: 10px 12px;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.button.background.secondary};
   margin-left: 12px;
 `;
 

@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useContext, useEffect,
-} from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -38,7 +36,9 @@ const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -199,7 +199,6 @@ const SActivitesContainer = styled.div`
   align-self: bottom;
 
   height: 100%;
-
 
   ${({ theme }) => theme.media.tablet} {
     min-height: initial;

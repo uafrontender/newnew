@@ -637,7 +637,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           timestampSeconds={new Date(
             (post.expiresAt?.seconds as number) * 1000
           ).getTime()}
-          postType="ac"
+          postType='ac'
         />
       </SExpiresSection>
       <PostVideo
@@ -650,7 +650,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
-        postType="ac"
+        postType='ac'
         postId={post.postUuid}
         postStatus={postStatus}
         title={post.title}
@@ -757,7 +757,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           user!!.userTutorialsProgress.remainingAcSteps!![0] ===
             newnewapi.AcTutorialStep.AC_HERO
         }
-        postType="AC"
+        postType='AC'
         closeModal={goToNextStep}
       />
     </SWrapper>

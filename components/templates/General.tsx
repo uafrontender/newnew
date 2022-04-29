@@ -135,14 +135,14 @@ export const General: React.FC<IGeneral> = (props) => {
         highlightColor={theme.colorsThemed.background.tertiary}
       >
         <SWrapper
-          id="generalScrollContainer"
+          id='generalScrollContainer'
           ref={wrapperRef}
           withBanner={!!banner?.show}
           {...props}
         >
           <Head>
             <meta
-              name="theme-color"
+              name='theme-color'
               content={
                 specialStatusBarColor
                   ? specialStatusBarColor
@@ -174,7 +174,7 @@ export const General: React.FC<IGeneral> = (props) => {
             visible={isMobile && scrollDirection !== 'down'}
           />
           <SortingContainer
-            id="sorting-container"
+            id='sorting-container'
             withCookie={cookies.accepted !== 'true'}
             bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
           />

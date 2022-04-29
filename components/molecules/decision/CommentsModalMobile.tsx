@@ -151,7 +151,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
                 {comments.length === 0 && !commentsLoading ? (
                   <SNoCommentsYet>
                     <SNoCommentsImgContainer>
-                      <img src={NoContentYetImg.src} alt="No content yet" />
+                      <img src={NoContentYetImg.src} alt='No content yet' />
                     </SNoCommentsImgContainer>
                     <SNoCommentsCaption variant={3}>
                       {t('comments.noCommentsCaption')}

@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -31,19 +26,16 @@ interface ISorting {
 }
 
 export const Sorting: React.FC<ISorting> = (props) => {
-  const {
-    category,
-    options,
-    selected,
-    onChange,
-  } = props;
+  const { category, options, selected, onChange } = props;
   const { t } = useTranslation('home');
   const ref: any = useRef();
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const selectedCount = Object.keys(selected).length;
 
@@ -53,38 +45,42 @@ export const Sorting: React.FC<ISorting> = (props) => {
   const handleCloseClick = useCallback(() => {
     setFocused(false);
   }, []);
-  const handleChange = useCallback((itemKey: string, parentKey: string) => {
-    const newSelected: any = {
-      ...selected,
-    };
+  const handleChange = useCallback(
+    (itemKey: string, parentKey: string) => {
+      const newSelected: any = {
+        ...selected,
+      };
 
-    if (newSelected[parentKey] === itemKey) {
-      // @ts-ignore
-      delete newSelected[parentKey];
-    } else {
-      // @ts-ignore
-      newSelected[parentKey] = itemKey;
-    }
+      if (newSelected[parentKey] === itemKey) {
+        // @ts-ignore
+        delete newSelected[parentKey];
+      } else {
+        // @ts-ignore
+        newSelected[parentKey] = itemKey;
+      }
 
-    onChange(newSelected);
-  }, [selected, onChange]);
-  const renderItem = useCallback((item: any, index: number) => {
-    const isLast = index !== options.length - 1;
+      onChange(newSelected);
+    },
+    [selected, onChange]
+  );
+  const renderItem = useCallback(
+    (item: any, index: number) => {
+      const isLast = index !== options.length - 1;
 
-    return (
-      <SItemWrapper
-        key={`sort-item-${item.key}`}
-      >
-        <SortItem
-          item={item}
-          category={category}
-          selected={selected}
-          handleChange={handleChange}
-        />
-        {isLast && <SSeparator />}
-      </SItemWrapper>
-    );
-  }, [handleChange, selected, options.length, category]);
+      return (
+        <SItemWrapper key={`sort-item-${item.key}`}>
+          <SortItem
+            item={item}
+            category={category}
+            selected={selected}
+            handleChange={handleChange}
+          />
+          {isLast && <SSeparator />}
+        </SItemWrapper>
+      );
+    },
+    [handleChange, selected, options.length, category]
+  );
   const handleSubmit = useCallback(() => {
     setFocused(false);
   }, []);
@@ -138,35 +134,25 @@ export const Sorting: React.FC<ISorting> = (props) => {
           <SMobileListContainer focused={focused}>
             <SMobileList>
               <STopLine>
-                <Headline variant={6}>
-                  {t('sort-title')}
-                </Headline>
-                <SCloseIconWrapper
-                  onClick={handleCloseClick}
-                >
+                <Headline variant={6}>{t('sort-title')}</Headline>
+                <SCloseIconWrapper onClick={handleCloseClick}>
                   <InlineSVG
                     svg={closeIcon}
                     fill={theme.colorsThemed.text.primary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 </SCloseIconWrapper>
               </STopLine>
               {options.map(renderItem)}
             </SMobileList>
-            <SCancelButton
-              withShadow
-              view="primaryGrad"
-              onClick={handleSubmit}
-            >
+            <SCancelButton withShadow view='primaryGrad' onClick={handleSubmit}>
               {t('button-show-results')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
       ) : (
-        <SListHolder focused={focused}>
-          {options.map(renderItem)}
-        </SListHolder>
+        <SListHolder focused={focused}>{options.map(renderItem)}</SListHolder>
       )}
     </SWrapper>
   );
@@ -177,12 +163,12 @@ export const Sorting: React.FC<ISorting> = (props) => {
       return createPortal(
         <AnimatedPresence
           start={animate}
-          animation="trans-06"
+          animation='trans-06'
           animateWhenInView={false}
         >
           {content}
         </AnimatedPresence>,
-        document.getElementById('sorting-container') as HTMLElement,
+        document.getElementById('sorting-container') as HTMLElement
       );
     }
     return <div />;
@@ -247,7 +233,8 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   pointer-events: ${(props) => (props.focused ? 'unset' : 'none')};
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
@@ -283,7 +270,8 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 `;
 
 const SCancelButton = styled(Button)`

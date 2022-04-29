@@ -25,22 +25,21 @@ const GoBackButton: React.FunctionComponent<TGoBackButton> = ({
   onClick,
   ...rest
 }) => {
-  const handleClickDebounced = useMemo(() => debounce(onClick!!, defer ?? 0),
-    [onClick, defer]);
+  const handleClickDebounced = useMemo(
+    () => debounce(onClick!!, defer ?? 0),
+    [onClick, defer]
+  );
 
   return (
-    <SGoBackButton
-      onClick={!defer ? onClick : handleClickDebounced}
-      {...rest}
-    >
+    <SGoBackButton onClick={!defer ? onClick : handleClickDebounced} {...rest}>
       {!noArrow && (
         <InlineSvg
           svg={longArrow ? ArrowLeftIcon : BackButtonIcon}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
         />
       )}
-      { children }
+      {children}
     </SGoBackButton>
   );
 };
@@ -76,16 +75,17 @@ const SGoBackButton = styled.button`
     fill: ${({ theme }) => theme.colorsThemed.text.secondary};
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     outline: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
 
     & path {
       fill: ${({ theme }) => theme.colorsThemed.text.primary};
-      transition: .2s ease;
+      transition: 0.2s ease;
     }
 
-    transition: .2s ease;
+    transition: 0.2s ease;
   }
 
   ${({ theme }) => theme.media.tablet} {

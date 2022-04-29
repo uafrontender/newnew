@@ -15,17 +15,19 @@ import acImage from '../../../../public/images/creation/AC.png';
 export const EnableSubscription = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const router = useRouter();
 
   return (
     <SContainer>
       <Image
         src={acImage}
-        alt="Enable subscription"
+        alt='Enable subscription'
         width={isMobile ? 232 : 206}
         height={isMobile ? 240 : 202}
-        objectFit="cover"
+        objectFit='cover'
       />
       <SContent>
         <STitle variant={6}>{t('dashboard.enableSubscription.title')}</STitle>
@@ -35,7 +37,10 @@ export const EnableSubscription = () => {
           </SDescription>
           {/* <SLearnMore onClick={handleLearnMore}>{t('dashboard.enableSubscription.learnMore')}</SLearnMore> */}
         </SDescriptionWrapper>
-        <SButton view="primaryGrad" onClick={() => router.push('/creator/subscribers')}>
+        <SButton
+          view='primaryGrad'
+          onClick={() => router.push('/creator/subscribers')}
+        >
           {t('dashboard.enableSubscription.submit')}
         </SButton>
       </SContent>

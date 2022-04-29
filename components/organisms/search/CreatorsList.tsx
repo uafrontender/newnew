@@ -48,8 +48,8 @@ export const CreatorsList: React.FC<IList> = ({
             <CardSkeleton
               key={i}
               count={1}
-              cardWidth="100%"
-              cardHeight="100%"
+              cardWidth='100%'
+              cardHeight='100%'
               bgColor={skeletonsBgColor}
               highlightColor={skeletonsHighlightColor}
             />

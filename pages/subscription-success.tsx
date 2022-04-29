@@ -13,7 +13,9 @@ interface ISubscriptionSuccessPage {
   userId: string;
 }
 
-const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId }) => {
+const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
+  userId,
+}) => {
   const router = useRouter();
   console.log(router.query.username);
 
@@ -60,12 +62,18 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId })
     };
 
     if (socketConnection) {
-      socketConnection.on('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
+      socketConnection.on(
+        'CreatorSubscriptionChanged',
+        handlerSubscriptionUpdated
+      );
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        socketConnection.off('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
+        socketConnection.off(
+          'CreatorSubscriptionChanged',
+          handlerSubscriptionUpdated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

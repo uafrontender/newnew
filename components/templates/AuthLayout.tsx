@@ -39,14 +39,19 @@ const AuthLayoutContextProvider: React.FC = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       shouldHeroUnmount,
-      setShouldHeroUnmount: (newValue: boolean) => setShouldHeroUnmount(newValue),
+      setShouldHeroUnmount: (newValue: boolean) =>
+        setShouldHeroUnmount(newValue),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [shouldHeroUnmount]
   );
 
-  return <AuthLayoutContext.Provider value={contextValue}>{children}</AuthLayoutContext.Provider>;
-}
+  return (
+    <AuthLayoutContext.Provider value={contextValue}>
+      {children}
+    </AuthLayoutContext.Provider>
+  );
+};
 
 export interface IAuthLayout {}
 
@@ -70,16 +75,16 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
         <AuthLayoutContextProvider>
           <SAuthLayout>
             <BackgroundVisual
-              view={router.pathname.includes('verify-email') ? 'verify-email' : 'sign-up'}
+              view={
+                router.pathname.includes('verify-email')
+                  ? 'verify-email'
+                  : 'sign-up'
+              }
             />
-            {
-              !router.pathname.includes('verify-email') ? (
-                <HomeLogoButton />
-              ) : null
-            }
-            <AnimatePresence>
-              {children}
-            </AnimatePresence>
+            {!router.pathname.includes('verify-email') ? (
+              <HomeLogoButton />
+            ) : null}
+            <AnimatePresence>{children}</AnimatePresence>
           </SAuthLayout>
         </AuthLayoutContextProvider>
       </SkeletonTheme>
@@ -120,22 +125,17 @@ interface IBackgroundVisual {
   view: 'verify-email' | 'sign-up';
 }
 
-const BackgroundVisual:React.FunctionComponent<IBackgroundVisual> = ({
+const BackgroundVisual: React.FunctionComponent<IBackgroundVisual> = ({
   view,
 }) => {
-
   return (
     <SBackgroundVisual>
       <AnimatePresence>
-        {view === 'sign-up' && (
-          <HeroVisual key="hero-visual"/>
-        )}
-        {view === 'verify-email' && (
-          <VerifyEmailVisual/>
-        )}
+        {view === 'sign-up' && <HeroVisual key='hero-visual' />}
+        {view === 'verify-email' && <VerifyEmailVisual />}
       </AnimatePresence>
     </SBackgroundVisual>
-  )
+  );
 };
 
 const SBackgroundVisual = styled.div`
@@ -158,66 +158,65 @@ const SBackgroundVisual = styled.div`
 `;
 
 const VerifyEmailVisual: React.FunctionComponent = () => {
-
   return (
     <SVerifyEmailBgWrapper>
       <img
         src={BottomGlassSphereImage.src}
-        alt="background"
-        className="email-bg-BottomGlassSphereImage"
+        alt='background'
+        className='email-bg-BottomGlassSphereImage'
       />
       <img
         src={BottomSphereImage.src}
-        alt="background"
-        className="email-bg-BottomSphereImage"
+        alt='background'
+        className='email-bg-BottomSphereImage'
       />
       <img
         src={CrowdfundingImage.src}
-        alt="background"
-        className="email-bg-CrowdfundingImage"
+        alt='background'
+        className='email-bg-CrowdfundingImage'
       />
       <img
         src={LeftGlassSphereImage.src}
-        alt="background"
-        className="email-bg-LeftGlassSphereImage"
+        alt='background'
+        className='email-bg-LeftGlassSphereImage'
       />
       <img
         src={BulbImage.src}
-        alt="background"
-        className="email-bg-BulbImage"
+        alt='background'
+        className='email-bg-BulbImage'
       />
       <img
         src={ChoiceImage.src}
-        alt="background"
-        className="email-bg-ChoiceImage"
+        alt='background'
+        className='email-bg-ChoiceImage'
       />
       <img
         src={RightGlassSphereImage.src}
-        alt="background"
-        className="email-bg-RightGlassSphereImage"
+        alt='background'
+        className='email-bg-RightGlassSphereImage'
       />
       <img
         src={TopGlassSphereImage.src}
-        alt="background"
-        className="email-bg-TopGlassSphereImage"
+        alt='background'
+        className='email-bg-TopGlassSphereImage'
       />
       <img
         src={TopMiddleSphereImage.src}
-        alt="background"
-        className="email-bg-TopMiddleSphereImage"
+        alt='background'
+        className='email-bg-TopMiddleSphereImage'
       />
       <img
         src={TopMiddleSphereImage.src}
-        alt="background"
-        className="email-bg-BottomMiddleSphereImage"
+        alt='background'
+        className='email-bg-BottomMiddleSphereImage'
       />
       <img
         src={VotesImage.src}
-        alt="background"
-        className="email-bg-VotesImage"
+        alt='background'
+        className='email-bg-VotesImage'
       />
     </SVerifyEmailBgWrapper>
-  )
+  );
 };
 
 const SVerifyEmailBgWrapper = styled.div`
@@ -272,7 +271,8 @@ const SVerifyEmailBgWrapper = styled.div`
 
     transform: rotate(-30deg);
 
-    animation: enter-CrowdfundingImage ease forwards 1.4s, floating-CrowdfundingImage infinite alternate linear 3.2s 1.4s;
+    animation: enter-CrowdfundingImage ease forwards 1.4s,
+      floating-CrowdfundingImage infinite alternate linear 3.2s 1.4s;
   }
 
   .email-bg-LeftGlassSphereImage {
@@ -301,7 +301,8 @@ const SVerifyEmailBgWrapper = styled.div`
     height: 280px;
     object-fit: contain;
 
-    animation: enter-BulbImage ease forwards 1.4s, floating infinite alternate linear 3.6s 1.4s;
+    animation: enter-BulbImage ease forwards 1.4s,
+      floating infinite alternate linear 3.6s 1.4s;
   }
 
   .email-bg-ChoiceImage {
@@ -315,7 +316,8 @@ const SVerifyEmailBgWrapper = styled.div`
     height: 280px;
     object-fit: contain;
 
-    animation: enter-ChoiceImage ease forwards 1.4s, floating infinite alternate ease-out 3.8s 1.4s;
+    animation: enter-ChoiceImage ease forwards 1.4s,
+      floating infinite alternate ease-out 3.8s 1.4s;
   }
 
   .email-bg-RightGlassSphereImage {
@@ -390,9 +392,9 @@ const SVerifyEmailBgWrapper = styled.div`
 
     object-fit: contain;
 
-    animation: enter-VotesImage ease forwards 1.5s, floating infinite alternate ease-in 4s 1.5s;
+    animation: enter-VotesImage ease forwards 1.5s,
+      floating infinite alternate ease-in 4s 1.5s;
   }
-
 
   @keyframes floating {
     0% {

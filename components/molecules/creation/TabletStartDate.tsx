@@ -15,11 +15,7 @@ interface ITabletStartDate {
 }
 
 export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
-  const {
-    id,
-    value,
-    onChange,
-  } = props;
+  const { id, value, onChange } = props;
   const { t } = useTranslation('creation');
   const [animate, setAnimate] = useState(value.type === 'schedule');
   const [animation, setAnimation] = useState('o-12');
@@ -27,40 +23,46 @@ export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const handleAnimationEnd = useCallback(() => {
     setAnimate(false);
   }, []);
-  const handleTimeChange = useCallback((key, time: any) => {
-    onChange(id, { [key]: time });
-  }, [id, onChange]);
-  const handleDateChange = useCallback((date: any) => {
-    onChange(id, { date });
-  }, [id, onChange]);
-  const handleTypeChange = useCallback((e, type) => {
-    const changeBody: any = { type };
-    if (type === 'right-away') {
-      changeBody.date = moment()
-        .format();
-      changeBody.time = moment()
-        .format('hh:mm');
-      changeBody['hours-format'] = moment()
-        .format('a');
-    }
+  const handleTimeChange = useCallback(
+    (key, time: any) => {
+      onChange(id, { [key]: time });
+    },
+    [id, onChange]
+  );
+  const handleDateChange = useCallback(
+    (date: any) => {
+      onChange(id, { date });
+    },
+    [id, onChange]
+  );
+  const handleTypeChange = useCallback(
+    (e, type) => {
+      const changeBody: any = { type };
+      if (type === 'right-away') {
+        changeBody.date = moment().format();
+        changeBody.time = moment().format('hh:mm');
+        changeBody['hours-format'] = moment().format('a');
+      }
 
-    onChange(id, changeBody);
-    setAnimate(true);
-    setAnimation(type === 'schedule' ? 'o-12' : 'o-12-reverse');
-  }, [id, onChange]);
+      onChange(id, changeBody);
+      setAnimate(true);
+      setAnimation(type === 'schedule' ? 'o-12' : 'o-12-reverse');
+    },
+    [id, onChange]
+  );
 
   return (
     <SContainer>
       <SCheckBoxWrapper>
         <CheckBox
-          id="right-away"
+          id='right-away'
           label={t('secondStep.field.startsAt.tablet.type.right-away')}
           selected={value.type === 'right-away'}
           handleChange={handleTypeChange}
         />
       </SCheckBoxWrapper>
       <CheckBox
-        id="schedule"
+        id='schedule'
         label={t('secondStep.field.startsAt.tablet.type.schedule')}
         selected={value.type === 'schedule'}
         handleChange={handleTypeChange}
@@ -72,10 +74,7 @@ export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       >
         <SCalendarWrapper>
           <SCalendarInput>
-            <CalendarPicker
-              date={value?.date}
-              onChange={handleDateChange}
-            />
+            <CalendarPicker date={value?.date} onChange={handleDateChange} />
           </SCalendarInput>
           <STimeInput>
             <TimePicker

@@ -48,38 +48,50 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
 
   // Posts
   // Top section/Curated posts
-  const [topSectionCollection, setTopSectionCollection] = useState<newnewapi.Post[]>(
-    (top10posts?.posts as newnewapi.Post[]) ?? []
-  );
+  const [topSectionCollection, setTopSectionCollection] = useState<
+    newnewapi.Post[]
+  >((top10posts?.posts as newnewapi.Post[]) ?? []);
   // For you - authenticated users only
   const [collectionFY, setCollectionFY] = useState<newnewapi.Post[]>([]);
-  const [collectionFYInitialLoading, setCollectionFYInitialLoading] = useState(false);
+  const [collectionFYInitialLoading, setCollectionFYInitialLoading] =
+    useState(false);
   const [collectionFYError, setCollectionFYError] = useState(false);
   // Auctions
   const [collectionAC, setCollectionAC] = useState<newnewapi.Post[]>([]);
-  const [collectionACInitialLoading, setCollectionACInitialLoading] = useState(false);
+  const [collectionACInitialLoading, setCollectionACInitialLoading] =
+    useState(false);
   const [collectionACError, setCollectionACError] = useState(false);
   // Multiple choice
   const [collectionMC, setCollectionMC] = useState<newnewapi.Post[]>([]);
-  const [collectionMCInitialLoading, setCollectionMCInitialLoading] = useState(false);
+  const [collectionMCInitialLoading, setCollectionMCInitialLoading] =
+    useState(false);
   const [collectionMCError, setCollectionMCError] = useState(false);
   // Crowdfunding
   const [collectionCF, setCollectionCF] = useState<newnewapi.Post[]>([]);
-  const [collectionCFInitialLoading, setCollectionCFInitialLoading] = useState(false);
+  const [collectionCFInitialLoading, setCollectionCFInitialLoading] =
+    useState(false);
   const [collectionCFError, setCollectionCFError] = useState(false);
   // Biggest of all time
-  const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>([]);
-  const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] = useState(false);
+  const [collectionBiggest, setCollectionBiggest] = useState<newnewapi.Post[]>(
+    []
+  );
+  const [collectionBiggestInitialLoading, setCollectionBiggestInitialLoading] =
+    useState(false);
   const [collectionBiggestError, setCollectionBiggestError] = useState(false);
   // Creator on the rise
-  const [collectionCreator, setCollectionCreator] = useState<newnewapi.Post[]>([]);
-  const [collectionCreatorInitialLoading, setCollectionCreatorInitialLoading] = useState(false);
+  const [collectionCreator, setCollectionCreator] = useState<newnewapi.Post[]>(
+    []
+  );
+  const [collectionCreatorInitialLoading, setCollectionCreatorInitialLoading] =
+    useState(false);
   const [collectionCreatorError, setCollectionCreatorError] = useState(false);
 
   // Display post
   // const [postModalOpen, setPostModalOpen] = useState(!!postFromQuery);
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>(postFromQuery ?? undefined);
+  const [displayedPost, setDisplayedPost] = useState<
+    newnewapi.IPost | undefined
+  >(postFromQuery ?? undefined);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
     setDisplayedPost(post);
@@ -104,8 +116,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
 
         const fyPayload = new newnewapi.PagedRequest({
           paging: {
-            limit: 10
-          }
+            limit: 10,
+          },
         });
 
         const resFY = await fetchForYouPosts(fyPayload);
@@ -141,7 +153,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         const resLiveAuctions = await fetchLiveAuctions(liveAuctionsPayload);
 
         if (resLiveAuctions) {
-          setCollectionAC(() => resLiveAuctions.data?.auctions as newnewapi.Post[]);
+          setCollectionAC(
+            () => resLiveAuctions.data?.auctions as newnewapi.Post[]
+          );
           setCollectionACInitialLoading(false);
         } else {
           throw new Error('Request failed');
@@ -164,10 +178,14 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           sorting: newnewapi.PostSorting.MOST_FUNDED_FIRST,
         });
 
-        const resMultichoices = await fetchTopMultipleChoices(multichoicePayload);
+        const resMultichoices = await fetchTopMultipleChoices(
+          multichoicePayload
+        );
 
         if (resMultichoices) {
-          setCollectionMC(() => resMultichoices.data?.multipleChoices as newnewapi.Post[]);
+          setCollectionMC(
+            () => resMultichoices.data?.multipleChoices as newnewapi.Post[]
+          );
           setCollectionMCInitialLoading(false);
         } else {
           throw new Error('Request failed');
@@ -217,7 +235,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         const resBiggest = await fetchBiggestPosts(biggestPayload);
 
         if (resBiggest) {
-          setCollectionBiggest(() => resBiggest.data?.posts as newnewapi.Post[]);
+          setCollectionBiggest(
+            () => resBiggest.data?.posts as newnewapi.Post[]
+          );
           setCollectionBiggestInitialLoading(false);
         } else {
           throw new Error('Request failed');
@@ -238,10 +258,14 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
         setCollectionCreatorInitialLoading(true);
         const creatorOnRisePayload = new newnewapi.EmptyRequest({});
 
-        const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(creatorOnRisePayload);
+        const resCreatorOnRisePayload = await fetchFeaturedCreatorPosts(
+          creatorOnRisePayload
+        );
 
         if (resCreatorOnRisePayload) {
-          setCollectionCreator(() => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]);
+          setCollectionCreator(
+            () => resCreatorOnRisePayload.data?.posts as newnewapi.Post[]
+          );
           setCollectionCreatorInitialLoading(false);
         } else {
           throw new Error('Request failed');
@@ -262,12 +286,15 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       </Head>
       {!user.loggedIn && <HeroSection />}
       {topSectionCollection.length > 0 && (
-        <TopSection collection={topSectionCollection} handlePostClicked={handleOpenPostModal} />
+        <TopSection
+          collection={topSectionCollection}
+          handlePostClicked={handleOpenPostModal}
+        />
       )}
       {user.loggedIn && !collectionFYError && (
         <CardsSection
           title={t('for-you-block-title')}
-          category="for-you"
+          category='for-you'
           collection={collectionFY}
           loading={collectionFYInitialLoading}
           handlePostClicked={handleOpenPostModal}
@@ -276,63 +303,69 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       {!collectionACError && (
         <CardsSection
           title={t('ac-block-title')}
-          category="ac"
+          category='ac'
           collection={collectionAC}
           loading={collectionACInitialLoading}
           handlePostClicked={handleOpenPostModal}
-          tutorialCard={!user.loggedIn ? (
-            <TutorialCard
-              image={acImage}
-              title={t('ac-block-tutorial-card.title')}
-              caption={t('ac-block-tutorial-card.caption')}
-              imageStyle={{
-                position: 'relative',
-                left: '10%'
-              }}
-            />
-          ) : undefined}
+          tutorialCard={
+            !user.loggedIn ? (
+              <TutorialCard
+                image={acImage}
+                title={t('ac-block-tutorial-card.title')}
+                caption={t('ac-block-tutorial-card.caption')}
+                imageStyle={{
+                  position: 'relative',
+                  left: '10%',
+                }}
+              />
+            ) : undefined
+          }
         />
       )}
       {!collectionMCError && (
         <CardsSection
           title={t('mc-block-title')}
-          category="mc"
+          category='mc'
           collection={collectionMC}
           loading={collectionMCInitialLoading}
           handlePostClicked={handleOpenPostModal}
-          tutorialCard={!user.loggedIn ? (
-            <TutorialCard
-              image={mcImage}
-              title={t('mc-block-tutorial-card.title')}
-              caption={t('mc-block-tutorial-card.caption')}
-            />
-          ) : undefined}
+          tutorialCard={
+            !user.loggedIn ? (
+              <TutorialCard
+                image={mcImage}
+                title={t('mc-block-tutorial-card.title')}
+                caption={t('mc-block-tutorial-card.caption')}
+              />
+            ) : undefined
+          }
         />
       )}
       {!collectionCFError && (
         <CardsSection
           title={t('cf-block-title')}
-          category="cf"
+          category='cf'
           collection={collectionCF}
           loading={collectionCFInitialLoading}
           handlePostClicked={handleOpenPostModal}
-          tutorialCard={!user.loggedIn ? (
-            <TutorialCard
-              image={cfImage}
-              title={t('cf-block-tutorial-card.title')}
-              caption={t('cf-block-tutorial-card.caption')}
-              imageStyle={{
-                position: 'relative',
-                left: '5%',
-              }}
-            />
-          ) : undefined}
+          tutorialCard={
+            !user.loggedIn ? (
+              <TutorialCard
+                image={cfImage}
+                title={t('cf-block-tutorial-card.title')}
+                caption={t('cf-block-tutorial-card.caption')}
+                imageStyle={{
+                  position: 'relative',
+                  left: '5%',
+                }}
+              />
+            ) : undefined
+          }
         />
       )}
       {!collectionBiggestError && (
         <CardsSection
           title={t('biggest-block-title')}
-          category="biggest"
+          category='biggest'
           collection={collectionBiggest}
           loading={collectionBiggestInitialLoading}
           handlePostClicked={handleOpenPostModal}
@@ -341,11 +374,15 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
         <CardsSection
           user={{
-            avatarUrl: switchPostType(collectionCreator[0])[0].creator?.avatarUrl!!,
-            username: switchPostType(collectionCreator[0])[0].creator?.username!!,
+            avatarUrl: switchPostType(collectionCreator[0])[0].creator
+              ?.avatarUrl!!,
+            username: switchPostType(collectionCreator[0])[0].creator
+              ?.username!!,
           }}
-          type="creator"
-          category={`/${switchPostType(collectionCreator[0])[0].creator?.username as string}`}
+          type='creator'
+          category={`/${
+            switchPostType(collectionCreator[0])[0].creator?.username as string
+          }`}
           collection={collectionCreator}
           handlePostClicked={handleOpenPostModal}
         />
@@ -363,7 +400,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   );
 };
 
-(Home as NextPageWithLayout).getLayout = (page: ReactElement) => <HomeLayout>{page}</HomeLayout>;
+(Home as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <HomeLayout>{page}</HomeLayout>
+);
 
 export default Home;
 

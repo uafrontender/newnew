@@ -29,7 +29,9 @@ interface IThumbnailPreviewEdit {
   handleSubmit: (value: any) => void;
 }
 
-export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => {
+export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
+  props
+) => {
   const { open, value, thumbnails, handleClose, handleSubmit } = props;
   const theme = useTheme();
   const { t } = useTranslation('creation');
@@ -52,7 +54,12 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     handleSubmit(videoThumbs.current);
   }, [handleSubmit]);
   const renderChunks = useCallback(
-    (chunk, index) => <SProgressSeparator key={`chunk-${index}`} height={index % 5 === 0 ? '16px' : '6px'} />,
+    (chunk, index) => (
+      <SProgressSeparator
+        key={`chunk-${index}`}
+        height={index % 5 === 0 ? '16px' : '6px'}
+      />
+    ),
     []
   );
   const setDuration = useCallback((duration) => {
@@ -111,7 +118,10 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
     endTimeRef.current.innerHTML = getTime('end');
     startTimeRef.current.innerHTML = getTime('start');
 
-    playerRef.current.off(PlayerEvent.TimeChanged, playerRef.current.handleTimeChange);
+    playerRef.current.off(
+      PlayerEvent.TimeChanged,
+      playerRef.current.handleTimeChange
+    );
     const handleTimeChange = () => {
       if (setCurrentTime) {
         setCurrentTime(playerRef.current.getCurrentTime());
@@ -132,7 +142,8 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
   }, [getTime, videoDuration, setCurrentTime]);
   const getInitialXPosition = useCallback(() => {
     const generalWidth = chunks.length * 7 - 5;
-    const startPointPercentage = (videoThumbs.current.startTime * 100) / videoDuration;
+    const startPointPercentage =
+      (videoThumbs.current.startTime * 100) / videoDuration;
     const startPoint = (generalWidth * startPointPercentage) / 100;
 
     return -startPoint;
@@ -156,8 +167,8 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 clickable
                 svg={chevronLeft}
                 fill={theme.colorsThemed.text.primary}
-                width="20px"
-                height="20px"
+                width='20px'
+                height='20px'
                 onClick={handleClose}
               />
             )}
@@ -166,15 +177,17 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
                 {t('secondStep.video.thumbnail.title')}
               </SModalTopLineTitle>
             ) : (
-              <SModalTopLineTitleTablet variant={6}>{t('secondStep.video.thumbnail.title')}</SModalTopLineTitleTablet>
+              <SModalTopLineTitleTablet variant={6}>
+                {t('secondStep.video.thumbnail.title')}
+              </SModalTopLineTitleTablet>
             )}
             {!isMobile && (
               <InlineSVG
                 clickable
                 svg={closeIcon}
                 fill={theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
                 onClick={handleClose}
               />
             )}
@@ -182,13 +195,13 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
           <SPlayerWrapper>
             {open && (
               <BitmovinPlayer
-                id="thumbnail-preview-edit"
+                id='thumbnail-preview-edit'
                 muted={false}
                 innerRef={playerRef}
                 resources={value}
                 thumbnails={thumbnails}
                 setDuration={setDuration}
-                borderRadius="16px"
+                borderRadius='16px'
                 setCurrentTime={setCurrentTime}
               />
             )}
@@ -203,16 +216,16 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
           </STimeWrapper>
           <SSelectLine>
             <SProgressIndicator ref={progressIndicatorRef} />
-            <SInvisibleWrapper position="left">
-              <SProgressSeparator height="100%" />
+            <SInvisibleWrapper position='left'>
+              <SProgressSeparator height='100%' />
             </SInvisibleWrapper>
-            <SInvisibleWrapper position="right">
-              <SProgressSeparator height="100%" />
+            <SInvisibleWrapper position='right'>
+              <SProgressSeparator height='100%' />
             </SInvisibleWrapper>
             {!!chunks.length && (
               <SProgressLine
                 ref={progressRef}
-                drag="x"
+                drag='x'
                 style={{ x: initialX }}
                 onDrag={handleVideoSelectDrag}
                 onDragEnd={handleVideoSelectDrag}
@@ -236,16 +249,16 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (props) => 
         </SModalTopContent>
         {isMobile ? (
           <SModalButtonContainer>
-            <Button view="primaryGrad" onClick={onSubmit}>
+            <Button view='primaryGrad' onClick={onSubmit}>
               {t('secondStep.video.thumbnail.submit')}
             </Button>
           </SModalButtonContainer>
         ) : (
           <SButtonsWrapper>
-            <Button view="secondary" onClick={handleClose}>
+            <Button view='secondary' onClick={handleClose}>
               {t('secondStep.button.cancel')}
             </Button>
-            <Button view="primaryGrad" onClick={onSubmit}>
+            <Button view='primaryGrad' onClick={onSubmit}>
               {t('secondStep.video.thumbnail.submit')}
             </Button>
           </SButtonsWrapper>
@@ -385,7 +398,8 @@ const SSelectLine = styled.div`
   display: flex;
   overflow: hidden;
   position: relative;
-  background: ${(props) => props.theme.colorsThemed.background.thumbLineVisible};
+  background: ${(props) =>
+    props.theme.colorsThemed.background.thumbLineVisible};
   align-items: center;
   justify-content: space-between;
 `;
@@ -438,7 +452,9 @@ const SProgressSeparator = styled.div<ISProgressSeparator>`
   height: ${(props) => props.height};
   overflow: hidden;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.accent.blue : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.accent.blue
+      : props.theme.colors.white};
   border-radius: 2px;
   pointer-events: none;
 `;

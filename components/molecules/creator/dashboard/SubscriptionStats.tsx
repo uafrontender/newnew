@@ -24,10 +24,14 @@ export const SubscriptionStats = () => {
   const [filter, setFilter] = useState('7_days');
   const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState(true);
   const [newSubs, setNewSubs] = useState<newnewapi.ISubscriber[]>([]);
-  const [myAnnouncementRoomId, setMyAnnouncementRoomId] = useState<number | undefined>();
+  const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
+    useState<number | undefined>();
   const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
 
-  async function fetchMySubscribers(startDate: google.protobuf.ITimestamp, endDate: google.protobuf.ITimestamp) {
+  async function fetchMySubscribers(
+    startDate: google.protobuf.ITimestamp,
+    endDate: google.protobuf.ITimestamp
+  ) {
     try {
       if (mySubscribersIsLoading) {
         setMySubscribersIsLoading(false);
@@ -40,7 +44,8 @@ export const SubscriptionStats = () => {
           },
         });
         const res = await getMySubscribers(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
       }
     } catch (err) {
@@ -52,7 +57,10 @@ export const SubscriptionStats = () => {
   useEffect(() => {
     const startDate = dateToTimestamp(
       moment()
-        .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
+        .subtract(
+          filter.split('_')[0],
+          filter.split('_')[1] as moment.unitOfTime.DurationConstructor
+        )
         .startOf('day')
     );
     const endDate = dateToTimestamp(new Date());
@@ -73,7 +81,8 @@ export const SubscriptionStats = () => {
       });
       const res = await getMyRooms(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms[0].id) {
         setMyAnnouncementRoomId(toNumber(res.data.rooms[0].id));
       }
@@ -157,9 +166,15 @@ export const SubscriptionStats = () => {
     const handleUserClick = () => {};
     if (index < 6) {
       return (
-        <SSubscribersItem key={`list-item-subscriptionStats-subscriber-${item.user?.uuid}`}>
+        <SSubscribersItem
+          key={`list-item-subscriptionStats-subscriber-${item.user?.uuid}`}
+        >
           {item.user?.avatarUrl && (
-            <SSubscribersItemAvatar withClick onClick={handleUserClick} avatarUrl={item.user?.avatarUrl} />
+            <SSubscribersItemAvatar
+              withClick
+              onClick={handleUserClick}
+              avatarUrl={item.user?.avatarUrl}
+            />
           )}
           <SSubscribersItemInfo>
             <SSubscribersItemName variant={3} weight={600}>
@@ -175,7 +190,10 @@ export const SubscriptionStats = () => {
     return null;
   }, []);
   const handleSubmit = useCallback(() => {
-    if (myAnnouncementRoomId) router.push(`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`);
+    if (myAnnouncementRoomId)
+      router.push(
+        `/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`
+      );
   }, [router, myAnnouncementRoomId]);
 
   return (
@@ -183,7 +201,11 @@ export const SubscriptionStats = () => {
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.subscriptionStats.title')}</STitle>
         <STotalInsights>
-          <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
+          <DropDown
+            value={filter}
+            options={filterOptions}
+            handleChange={handleChangeFilter}
+          />
         </STotalInsights>
       </SHeaderLine>
       <STotalLine>
@@ -193,19 +215,21 @@ export const SubscriptionStats = () => {
           </STotalText>
         </STotalTextWrapper>
       </STotalLine>
-      {!mySubscribersIsLoading && <SSubscribersList>{newSubs.map(renderSubscriber)}</SSubscribersList>}
-      <SButtonSubmit view="secondary" onClick={handleSubmit}>
+      {!mySubscribersIsLoading && (
+        <SSubscribersList>{newSubs.map(renderSubscriber)}</SSubscribersList>
+      )}
+      <SButtonSubmit view='secondary' onClick={handleSubmit}>
         {t('dashboard.subscriptionStats.seeAll')}
       </SButtonSubmit>
       {myAnnouncementRoomId && (
         <SBannerContainer>
           <SBannerTopBlock>
-            <SInlineSVG svg={handIcon} width="24px" height="24px" />
+            <SInlineSVG svg={handIcon} width='24px' height='24px' />
             <SDescription variant={3} weight={600}>
               {t('dashboard.subscriptionStats.banner.description')}
             </SDescription>
           </SBannerTopBlock>
-          <SButton view="primaryGrad" onClick={handleSubmit}>
+          <SButton view='primaryGrad' onClick={handleSubmit}>
             {t('dashboard.subscriptionStats.banner.submit')}
           </SButton>
         </SBannerContainer>
@@ -290,7 +314,9 @@ const SButtonSubmit = styled(Button)`
     margin: 0 auto;
     padding: 12px 24px;
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
   }
 `;
 

@@ -12,9 +12,9 @@ export type TTransactionsSectionItem = {
   recipient: Omit<newnewapi.User, 'toJSON'> | TUserData;
   date: Date;
   amount: number;
-  direction: 'to' | 'from',
-  action: 'bid' | 'vote' | 'support' | 'topup' | 'withdraw'
-}
+  direction: 'to' | 'from';
+  action: 'bid' | 'vote' | 'support' | 'topup' | 'withdraw';
+};
 
 type TTransactionsSection = {
   transactions: TTransactionsSectionItem[];
@@ -29,9 +29,7 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
   const { userData } = useAppSelector((state) => state.user);
 
   return (
-    <SWrapper
-      onMouseEnter={() => handleSetActive()}
-    >
+    <SWrapper onMouseEnter={() => handleSetActive()}>
       {transactions.map((t, i) => (
         <TransactionCard
           // eslint-disable-next-line react/no-array-index-key

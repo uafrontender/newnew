@@ -32,12 +32,12 @@ const TopUpWalletInput: React.FunctionComponent<ITopUpWalletInput> = ({
         ref={(el) => {
           inputRef.current = el!!;
         }}
-        inputMode="numeric"
+        inputMode='numeric'
         value={`$${value}`}
         onChange={handleOnChange}
       />
     </SContainer>
-  )
+  );
 };
 
 export default TopUpWalletInput;

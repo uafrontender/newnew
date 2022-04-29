@@ -11,7 +11,7 @@ type TSettingsEmailInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   labelCaption: string;
   errorCaption: string;
-}
+};
 
 const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
   value,
@@ -34,14 +34,10 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
 
   return (
     <SContainer>
-      <SLabel
-        htmlFor="settings_email_input"
-      >
-        { labelCaption }
-      </SLabel>
+      <SLabel htmlFor='settings_email_input'>{labelCaption}</SLabel>
       <SSettingsEmailInput
-        id="settings_email_input"
-        type="email"
+        id='settings_email_input'
+        type='email'
         value={value}
         errorBordersShown={errorBordersShown}
         onChange={onChange}
@@ -58,23 +54,14 @@ const SettingsEmailInput: React.FunctionComponent<TSettingsEmailInput> = ({
         }}
         {...rest}
       />
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animateWhenInView={false}
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {errorBordersShown ? (
+        <AnimatedPresence animateWhenInView={false} animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
     </SContainer>
   );
 };
@@ -109,7 +96,7 @@ const SLabel = styled.label`
 `;
 
 interface ISSettingsEmailInput {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
@@ -131,7 +118,8 @@ const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
     if (!errorBordersShown) {
       // NB! Temp
       return theme.colorsThemed.background.outlines1;
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -147,15 +135,18 @@ const SSettingsEmailInput = styled.input<ISSettingsEmailInput>`
     color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   }
 
-  &:hover:enabled, &:focus, &:active {
+  &:hover:enabled,
+  &:focus,
+  &:active {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   ${({ theme }) => theme.media.tablet} {

@@ -13,38 +13,28 @@ export const NotificationsItem: React.FC<INotificationItem> = (props) => {
 
   return (
     <SWrapper>
-      <SUserAvatar
-        avatarUrl={item.bidForUser.avatar}
-      />
+      <SUserAvatar avatarUrl={item.bidForUser.avatar} />
       <SCenterContent>
-        <STitle>
-          {item.bidUser.nickname}
-        </STitle>
+        <STitle>{item.bidUser.nickname}</STitle>
         <SSubTitle>
-          bid
-          {' '}
+          bid{' '}
           <SBidRate>
             {item.bidCurrency}
             {item.bid}
-          </SBidRate>
-          {' '}
-          on
-          {' '}
-          <Link href="/bid">
+          </SBidRate>{' '}
+          on{' '}
+          <Link href='/bid'>
             <a>
               <SLinkTitle>
                 {item.bidForUser.nickname}
                 ’s
               </SLinkTitle>
             </a>
-          </Link>
-          {' '}
+          </Link>{' '}
           decision.
         </SSubTitle>
       </SCenterContent>
-      <SUserAvatarRight
-        avatarUrl={item.bidForUser.avatar}
-      />
+      <SUserAvatarRight avatarUrl={item.bidForUser.avatar} />
     </SWrapper>
   );
 };

@@ -10,89 +10,71 @@ type TOnboardingBioTextarea = React.ComponentPropsWithoutRef<'textarea'> & {
   maxChars: number;
   isValid: boolean;
   errorCaption: string;
-}
+};
 
-const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> = ({
-  maxChars,
-  value,
-  isValid,
-  errorCaption,
-  onChange,
-  ...rest
-}) => {
-  const { t } = useTranslation('creator-onboarding');
-  const [charCounter, setCharCounter] = useState((value as string).length);
+const OnboardingBioTextarea: React.FunctionComponent<TOnboardingBioTextarea> =
+  ({ maxChars, value, isValid, errorCaption, onChange, ...rest }) => {
+    const { t } = useTranslation('creator-onboarding');
+    const [charCounter, setCharCounter] = useState((value as string).length);
 
-  const [errorBordersShown, setErrorBordersShown] = useState(false);
-  const [focused, setFocused] = useState(false);
+    const [errorBordersShown, setErrorBordersShown] = useState(false);
+    const [focused, setFocused] = useState(false);
 
-  useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
-  }, [focused, isValid]);
+    useEffect(() => {
+      if (focused) return;
+      if (isValid) setErrorBordersShown(false);
+    }, [focused, isValid]);
 
-  useEffect(() => {
-    setCharCounter((value as string).length);
-  }, [value, setCharCounter]);
+    useEffect(() => {
+      setCharCounter((value as string).length);
+    }, [value, setCharCounter]);
 
-  return (
-    <SWrapper>
-      <SLabelDiv>
-        <div>
-          { t('AboutSection.bio.title') }
-        </div>
-        <SCharCounter>
-          { charCounter }
-          /
-          { maxChars }
-        </SCharCounter>
-      </SLabelDiv>
-      <SOnboardingBioTextareaDiv>
-        <textarea
-          value={value}
-          maxLength={maxChars}
-          onChange={onChange}
-          onPaste={(e) => {
-            const data = e.clipboardData.getData('Text');
+    return (
+      <SWrapper>
+        <SLabelDiv>
+          <div>{t('AboutSection.bio.title')}</div>
+          <SCharCounter>
+            {charCounter}/{maxChars}
+          </SCharCounter>
+        </SLabelDiv>
+        <SOnboardingBioTextareaDiv>
+          <textarea
+            value={value}
+            maxLength={maxChars}
+            onChange={onChange}
+            onPaste={(e) => {
+              const data = e.clipboardData.getData('Text');
 
-            if (!data || data.length > maxChars) {
-              e.preventDefault();
-            }
-          }}
-          onBlur={() => {
-            setFocused(false);
-            if (!isValid) {
-              setErrorBordersShown(true);
-            } else {
+              if (!data || data.length > maxChars) {
+                e.preventDefault();
+              }
+            }}
+            onBlur={() => {
+              setFocused(false);
+              if (!isValid) {
+                setErrorBordersShown(true);
+              } else {
+                setErrorBordersShown(false);
+              }
+            }}
+            onFocus={() => {
+              setFocused(true);
               setErrorBordersShown(false);
-            }
-          }}
-          onFocus={() => {
-            setFocused(true);
-            setErrorBordersShown(false);
-          }}
-          {...rest}
-        />
-      </SOnboardingBioTextareaDiv>
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
+            }}
+            {...rest}
+          />
+        </SOnboardingBioTextareaDiv>
+        {errorBordersShown ? (
+          <AnimatedPresence animation='t-09'>
             <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
+              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+              {errorCaption}
             </SErrorDiv>
           </AnimatedPresence>
-        ) : null
-      }
-    </SWrapper>
-  );
-};
+        ) : null}
+      </SWrapper>
+    );
+  };
 
 export default OnboardingBioTextarea;
 
@@ -101,7 +83,6 @@ const SWrapper = styled.div`
   flex-direction: column;
   margin-bottom: 16px;
 `;
-
 
 const SLabelDiv = styled.div`
   display: flex;
@@ -115,12 +96,10 @@ const SLabelDiv = styled.div`
   margin-bottom: 6px;
 `;
 
-const SCharCounter = styled.div`
-
-`;
+const SCharCounter = styled.div``;
 
 interface ISOnboardingBioTextareaDiv {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SOnboardingBioTextareaDiv = styled.div<ISOnboardingBioTextareaDiv>`
@@ -145,10 +124,11 @@ const SOnboardingBioTextareaDiv = styled.div<ISOnboardingBioTextareaDiv>`
     border-width: 1.5px;
     border-style: solid;
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      return 'transparent';
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        return 'transparent';
+      }
+      return theme.colorsThemed.accent.error;
+    }};
 
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
@@ -165,10 +145,12 @@ const SOnboardingBioTextareaDiv = styled.div<ISOnboardingBioTextareaDiv>`
       color: ${({ theme }) => theme.colorsThemed.text.quaternary};
     }
 
-    &:hover:enabled, &:focus:enabled, &:active:enabled {
+    &:hover:enabled,
+    &:focus:enabled,
+    &:active:enabled {
       outline: none;
 
-      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2}
+      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
     }
 
     &:disabled {
@@ -179,7 +161,6 @@ const SOnboardingBioTextareaDiv = styled.div<ISOnboardingBioTextareaDiv>`
       height: 120px;
     }
   }
-
 `;
 
 const SErrorDiv = styled.div`

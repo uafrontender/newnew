@@ -22,7 +22,12 @@ import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { ChannelsContext } from '../../../../contexts/channelsContext';
-import { getMessages, getRoom, markRoomAsRead, sendMessage } from '../../../../api/endpoints/chat';
+import {
+  getMessages,
+  getRoom,
+  markRoomAsRead,
+  sendMessage,
+} from '../../../../api/endpoints/chat';
 
 interface IChat {
   roomID: string;
@@ -40,8 +45,10 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
   const { addChannel, removeChannel } = useContext(ChannelsContext);
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
-  const [messagesNextPageToken, setMessagesNextPageToken] = useState<string | undefined | null>('');
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
+  const [messagesNextPageToken, setMessagesNextPageToken] =
+    useState<string | undefined | null>('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
 
@@ -66,10 +73,14 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         });
         const res = await getMessages(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data && res.data.messages.length > 0) {
           setMessages((curr) => {
-            const arr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
+            const arr = [
+              ...curr,
+              ...(res.data?.messages as newnewapi.ChatMessage[]),
+            ];
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
@@ -92,7 +103,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       });
       const res = await getRoom(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       if (res.data) {
         setChatRoom(res.data);
@@ -110,7 +122,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         roomId: toNumber(roomID),
       });
       const res = await markRoomAsRead(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
     } catch (err) {
       console.error(err);
     }
@@ -133,7 +146,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
     if (!chatRoom) {
       fetchChatRoom();
     }
-    if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0) markChatAsRead();
+    if (chatRoom?.unreadMessageCount && chatRoom?.unreadMessageCount > 0)
+      markChatAsRead();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatRoom]);
 
@@ -193,7 +207,8 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           },
         });
         const res = await sendMessage(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
         setMessageText('');
@@ -226,22 +241,38 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
-          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+        <SMessage
+          id={item.id?.toString()}
+          mine={isMine}
+          prevSameUser={prevSameUser}
+        >
+          <SMessageContent
+            mine={isMine}
+            prevSameUser={prevSameUser}
+            nextSameUser={nextSameUser}
+          >
             <SMessageText mine={isMine} weight={600} variant={3}>
               {item.content?.text}
             </SMessageText>
           </SMessageContent>
-          {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
+          {index === messages.length - 1 && (
+            <SRef ref={scrollRef}>Loading...</SRef>
+          )}
         </SMessage>
       );
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
-        moment((item.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY') !==
-          moment((nextElement?.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY')
+        moment((item.createdAt?.seconds as number) * 1000).format(
+          'DD.MM.YYYY'
+        ) !==
+          moment((nextElement?.createdAt?.seconds as number) * 1000).format(
+            'DD.MM.YYYY'
+          )
       ) {
-        let date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        let date = moment((item.createdAt?.seconds as number) * 1000).format(
+          'MMM DD'
+        );
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -249,13 +280,13 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage type="info">
+            <SMessage type='info'>
               <SMessageContent
-                type="info"
+                type='info'
                 prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
                 nextSameUser={nextElement?.sender?.uuid === item.sender?.uuid}
               >
-                <SMessageText type="info" weight={600} variant={3}>
+                <SMessageText type='info' weight={600} variant={3}>
                   {date}
                 </SMessageText>
               </SMessageContent>
@@ -264,13 +295,18 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         );
       }
       if (item.createdAt?.seconds && !nextElement) {
-        const date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        const date = moment((item.createdAt?.seconds as number) * 1000).format(
+          'MMM DD'
+        );
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage type="info">
-              <SMessageContent type="info" prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}>
-                <SMessageText type="info" weight={600} variant={3}>
+            <SMessage type='info'>
+              <SMessageContent
+                type='info'
+                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
+              >
+                <SMessageText type='info' weight={600} variant={3}>
                   {date}
                 </SMessageText>
               </SMessageContent>
@@ -279,10 +315,19 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
         );
       }
 
-      return <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>;
+      return (
+        <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [roomID, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, chatRoom]
+    [
+      roomID,
+      t,
+      user.userData?.avatarUrl,
+      user.userData?.userUuid,
+      messages,
+      chatRoom,
+    ]
   );
 
   // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef, true);
@@ -301,50 +346,74 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           clickable
           svg={chevronLeftIcon}
           fill={theme.colorsThemed.text.secondary}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
           onClick={handleGoBack}
         />
         {chatRoom?.kind === 4 ? (
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={user?.userData?.avatarUrl ? user?.userData?.avatarUrl : ''}
+            avatarUrl={
+              user?.userData?.avatarUrl ? user?.userData?.avatarUrl : ''
+            }
           />
         ) : (
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''}
+            avatarUrl={
+              chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''
+            }
           />
         )}
         {chatRoom?.kind === 4 ? (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {user.userData?.nickname ? user.userData?.nickname : user.userData?.username} {t('announcement.title')}
+              {user.userData?.nickname
+                ? user.userData?.nickname
+                : user.userData?.username}{' '}
+              {t('announcement.title')}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
-              {`${chatRoom.memberCount && chatRoom.memberCount > 0 ? chatRoom.memberCount : 0} ${
-                chatRoom.memberCount!! > 1 ? t('new-announcement.members') : t('new-announcement.member')
+              {`${
+                chatRoom.memberCount && chatRoom.memberCount > 0
+                  ? chatRoom.memberCount
+                  : 0
+              } ${
+                chatRoom.memberCount!! > 1
+                  ? t('new-announcement.members')
+                  : t('new-announcement.member')
               }`}
             </SUserName>
           </SUserDescription>
         ) : (
           <SUserDescription>
             <SUserNickName variant={3} weight={600}>
-              {chatRoom?.visavis?.nickname ? chatRoom?.visavis?.nickname : chatRoom?.visavis?.username}
+              {chatRoom?.visavis?.nickname
+                ? chatRoom?.visavis?.nickname
+                : chatRoom?.visavis?.username}
             </SUserNickName>
             <SUserName variant={2} weight={600}>
-              {chatRoom?.visavis?.username ? `@${chatRoom?.visavis?.username}` : chatRoom?.visavis?.nickname}
+              {chatRoom?.visavis?.username
+                ? `@${chatRoom?.visavis?.username}`
+                : chatRoom?.visavis?.nickname}
             </SUserName>
           </SUserDescription>
         )}
       </STopPart>
-      <SCenterPart id="messagesScrollContainer">{messages.length > 0 && messages.map(renderMessage)}</SCenterPart>
+      <SCenterPart id='messagesScrollContainer'>
+        {messages.length > 0 && messages.map(renderMessage)}
+      </SCenterPart>
       <SBottomPart>
         <SBottomTextarea>
           <STextArea>
-            <TextArea maxlength={500} value={messageText} onChange={handleChange} placeholder={t('chat.placeholder')} />
+            <TextArea
+              maxlength={500}
+              value={messageText}
+              onChange={handleChange}
+              placeholder={t('chat.placeholder')}
+            />
           </STextArea>
           <SButton
             withShadow
@@ -354,9 +423,13 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           >
             <SInlineSVG
               svg={sendIcon}
-              fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
+              fill={
+                messageText
+                  ? theme.colors.white
+                  : theme.colorsThemed.text.primary
+              }
+              width='24px'
+              height='24px'
             />
           </SButton>
         </SBottomTextarea>
@@ -415,7 +488,9 @@ const SButton = styled(Button)`
 
   &:disabled {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
   }
 `;
 
