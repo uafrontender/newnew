@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 4000",
     "lint": "next lint",
+    "prettify": "prettier --write \"**/*.ts(x)?\"",
     "test": "cypress run --browser chrome",
     "test:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
     "e2e": "cypress open",
