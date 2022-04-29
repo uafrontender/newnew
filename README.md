@@ -29,6 +29,16 @@ in `pages/api/hello.ts`.
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated
 as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
+## Development
+
+### Tools we use
+
+VSCode. We use this code editor in order to have the same set of tools available to us.
+Prettier - Code formatter. With projects vs code settings this extension will format the code on each save.
+ESLint - runs in pre-commit sequence. Will find issues with the code style, which can indicate an error.
+
+We should improve our tools and their configuration over time. For example we can add more rules to eslint.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

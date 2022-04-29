@@ -16,9 +16,7 @@
     "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/"
   },
   "pre-commit": [
-    "lint",
-    "test",
-    "test:mobile"
+    "lint"
   ],
   "dependencies": {
     "@reduxjs/toolkit": "1.7.1",
