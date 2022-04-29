@@ -31,6 +31,12 @@ as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of Reac
 
 ## Development
 
+### newnew api
+
+We import a package from a gitlab repo and select a specific version by its commit hash
+If you need to update a version of the package, just change the commit hash in `package.json`
+And run `npm install`
+
 ### Tools we use
 
 VSCode. We use this code editor in order to have the same set of tools available to us.
