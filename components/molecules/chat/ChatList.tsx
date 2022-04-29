@@ -36,11 +36,13 @@ const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
   searchText: string;
+  username?: string;
 }
 
 export const ChatList: React.FC<IFunctionProps> = ({
   openChat,
   searchText,
+  username,
 }) => {
   const { t } = useTranslation('chat');
   const theme = useTheme();
@@ -59,7 +61,7 @@ export const ChatList: React.FC<IFunctionProps> = ({
     newnewapi.IChatRoom[]
   >([]);
   const [chatRoomsSubs, setChatRoomsSubs] = useState<newnewapi.IChatRoom[]>([]);
-  const [displayAllRooms, setDisplayAllRooms] = useState(false);
+  const [displayAllRooms, setDisplayAllRooms] = useState(false); // if there are only subs or only creators
   const [searchedRooms, setSearchedRooms] =
     useState<newnewapi.IChatRoom[] | null>(null);
   const [updatedChat, setUpdatedChat] =
@@ -149,6 +151,7 @@ export const ChatList: React.FC<IFunctionProps> = ({
               )
                 arr.push(chat);
             });
+
             return arr;
           });
 
@@ -196,9 +199,45 @@ export const ChatList: React.FC<IFunctionProps> = ({
     }
   };
 
+  const fetchRoomByUsername = async (name: string, roomKind: number) => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        searchQuery: name,
+        roomKind,
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.rooms.length > 0) {
+        if (res.data.rooms[0].myRole === 1) {
+          setActiveTab('chatRoomsCreators');
+        }
+        openRoom(res.data.rooms[0]);
+        setUpdatedChat(res.data.rooms[0]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (!chatRooms) {
-      fetchMyRooms();
+      (async () => {
+        await fetchMyRooms();
+        if (username) {
+          const isAnnouncementRequested = username.split('-');
+          if (
+            isAnnouncementRequested.length > 0 &&
+            isAnnouncementRequested[isAnnouncementRequested.length - 1] ===
+              'announcement'
+          ) {
+            fetchRoomByUsername(isAnnouncementRequested[0], 4);
+          } else {
+            fetchRoomByUsername(username, 1);
+          }
+        }
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -213,7 +252,7 @@ export const ChatList: React.FC<IFunctionProps> = ({
   useEffect(() => {
     if (updatedChat) {
       let isAlreadyAdded: number | undefined;
-      const isChatWithSub = updatedChat.myRole === 1;
+      const isChatWithSub = updatedChat.myRole === 2;
 
       if (displayAllRooms) {
         isAlreadyAdded = chatRooms?.findIndex(
@@ -235,7 +274,7 @@ export const ChatList: React.FC<IFunctionProps> = ({
           ? chatRoomsSubs
           : chatRoomsCreators;
         arr?.splice(isAlreadyAdded, 1);
-
+        // console.log(updatedChat.id!!.toString() === activeChatIndex);
         if (updatedChat.id!!.toString() === activeChatIndex) {
           arr?.splice(0, 0, updatedChat);
           markChatAsRead(updatedChat.id as number);
@@ -522,6 +561,10 @@ export const ChatList: React.FC<IFunctionProps> = ({
 };
 
 export default ChatList;
+
+ChatList.defaultProps = {
+  username: '',
+};
 
 const SSectionContent = styled.div`
   height: calc(100% - 74px);

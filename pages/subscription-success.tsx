@@ -11,11 +11,14 @@ import { getSubscriptionStatus } from '../api/endpoints/subscription';
 
 interface ISubscriptionSuccessPage {
   userId: string;
+  username: string;
 }
 
-const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId }) => {
+const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
+  userId,
+  username,
+}) => {
   const router = useRouter();
-  console.log(router.query.username);
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -36,8 +39,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId })
           // I think we should not check is room created or not at this point
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-          router.push(`/direct-messages`);
+          router.push(`/direct-messages/${username}`);
         }
       } catch (err) {
         console.error(err);
@@ -60,12 +62,18 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId })
     };
 
     if (socketConnection) {
-      socketConnection.on('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
+      socketConnection.on(
+        'CreatorSubscriptionChanged',
+        handlerSubscriptionUpdated
+      );
     }
 
     return () => {
       if (socketConnection && socketConnection.connected) {
-        socketConnection.off('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
+        socketConnection.off(
+          'CreatorSubscriptionChanged',
+          handlerSubscriptionUpdated
+        );
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +111,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({ userId })
 export default SubscriptionSuccessPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { userId } = context.query;
+  const { userId, username } = context.query;
 
   if (!userId || Array.isArray(userId)) {
     return {
@@ -117,6 +125,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       userId,
+      username,
     },
   };
 };

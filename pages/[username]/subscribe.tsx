@@ -13,7 +13,10 @@ import { useRouter } from 'next/router';
 import { useAppSelector } from '../../redux-store/store';
 import { WalletContext } from '../../contexts/walletContext';
 import { getUserByUsername } from '../../api/endpoints/user';
-import { getSubscriptionStatus, subscribeToCreator } from '../../api/endpoints/subscription';
+import {
+  getSubscriptionStatus,
+  subscribeToCreator,
+} from '../../api/endpoints/subscription';
 
 import General from '../../components/templates/General';
 import Text from '../../components/atoms/Text';
@@ -42,16 +45,25 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   const { loggedIn } = useAppSelector((state) => state.user);
   const { banner } = useAppSelector((state) => state.ui);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const { walletBalance } = useContext(WalletContext);
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
 
-  const [subscriptionPrice, setSubscriptionPrice] = useState<number | undefined>(undefined);
+  const [subscriptionPrice, setSubscriptionPrice] =
+    useState<number | undefined>(undefined);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const predefinedOption = useMemo(() => {
@@ -62,7 +74,10 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   }, [walletBalance, subscriptionPrice]);
 
   const subPriceFormatted = useMemo(
-    () => (subscriptionPrice ? formatNumber(subscriptionPrice!! / 100 ?? 0, true) : ''),
+    () =>
+      subscriptionPrice
+        ? formatNumber(subscriptionPrice!! / 100 ?? 0, true)
+        : '',
     [subscriptionPrice]
   );
 
@@ -78,13 +93,14 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     try {
       const payload = new newnewapi.SubscribeToCreatorRequest({
         creatorUuid: user.uuid,
-        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&`,
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`,
         cancelUrl: window.location.href,
       });
 
       const res = await subscribeToCreator(payload);
 
-      if (!res.data?.checkoutUrl || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data?.checkoutUrl || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.checkoutUrl;
       if (url) window.location.href = url;
@@ -105,7 +121,9 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         console.log(res.data?.status?.product);
 
         if (res.data?.status?.product) {
-          setSubscriptionPrice(res.data?.status?.product.monthlyRate?.usdCents!!);
+          setSubscriptionPrice(
+            res.data?.status?.product.monthlyRate?.usdCents!!
+          );
         }
       } catch (err) {
         console.log(err);
@@ -129,12 +147,16 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     };
 
     if (isBrowser()) {
-      document?.getElementById('generalScrollContainer')?.addEventListener('scroll', handler);
+      document
+        ?.getElementById('generalScrollContainer')
+        ?.addEventListener('scroll', handler);
     }
 
     return () => {
       if (isBrowser()) {
-        document?.getElementById('generalScrollContainer')?.removeEventListener('scroll', handler);
+        document
+          ?.getElementById('generalScrollContainer')
+          ?.removeEventListener('scroll', handler);
       }
     };
   }, [isMobile]);
@@ -142,7 +164,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch(`/sign-up?reason=subscribe`);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -188,19 +210,20 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     <SUserInfoScrollDownAvatar>
                       <img alt={user.username} src={user.avatarUrl} />
                     </SUserInfoScrollDownAvatar>
-                    <SUserInfoScrollDownNickname>{user.nickname}</SUserInfoScrollDownNickname>
+                    <SUserInfoScrollDownNickname>
+                      {user.nickname}
+                    </SUserInfoScrollDownNickname>
                   </SUserInfoScrollDown>
-                  <SSubscribeButtonScrollDown onClick={() => handleOpenPaymentModal()}>
+                  <SSubscribeButtonScrollDown
+                    onClick={() => handleOpenPaymentModal()}
+                  >
                     {t('subscribeBtn', { amount: subPriceFormatted })}
                   </SSubscribeButtonScrollDown>
                 </SScrolledDownTopSection>
               )}
             </AnimatePresence>
             {isTablet && (
-              <SGoBackButtonTablet
-                defer={500}
-                onClick={() => router.back()}
-              />
+              <SGoBackButtonTablet defer={500} onClick={() => router.back()} />
             )}
             <STopSection
               ref={(el) => {
@@ -209,9 +232,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
             >
               {!isTablet && (
                 <SBackButton defer={500} onClick={() => router.back()}>
-                  {!isMobileOrTablet && (
-                    t('backBtn')
-                  )}
+                  {!isMobileOrTablet && t('backBtn')}
                 </SBackButton>
               )}
               <UserInfoSection>
@@ -220,8 +241,14 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                     <img alt={user.username} src={user.avatarUrl} />
                   </SSHeadingSectionAvatar>
                   <div>
-                    <SHeadline variant={4}>{t('TopSection.headline.line_1', { username: user.username })}</SHeadline>
-                    <SHeadline variant={2}>{t('TopSection.headline.line_2')}</SHeadline>
+                    <SHeadline variant={4}>
+                      {t('TopSection.headline.line_1', {
+                        username: user.username,
+                      })}
+                    </SHeadline>
+                    <SHeadline variant={2}>
+                      {t('TopSection.headline.line_2')}
+                    </SHeadline>
                   </div>
                 </SHeadingSection>
                 <SButtonsSection>
@@ -249,41 +276,41 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               <SBulletsSection>
                 <SBullet>
                   <SBulletImg alt="" src={dmsImage.src} />
-                  <SBulletTitle variant={5}>{t('TopSection.bullets.dms.title')}</SBulletTitle>
+                  <SBulletTitle variant={5}>
+                    {t('TopSection.bullets.dms.title')}
+                  </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t(
-                      'TopSection.bullets.dms.body',
-                      {
-                        nickname: user?.nickname
-                      }
-                    )}
+                    {t('TopSection.bullets.dms.body', {
+                      nickname: user?.nickname,
+                    })}
                   </SBulletBody>
                 </SBullet>
                 <SBullet>
                   <SBulletImg alt="" src={votesImage.src} />
-                  <SBulletTitle variant={5}>{t('TopSection.bullets.freeVotes.title')}</SBulletTitle>
+                  <SBulletTitle variant={5}>
+                    {t('TopSection.bullets.freeVotes.title')}
+                  </SBulletTitle>
                   <SBulletBody variant={3}>
-                    {t(
-                      'TopSection.bullets.freeVotes.body',
-                      {
-                        nickname: user?.nickname
-                      }
-                    )}
+                    {t('TopSection.bullets.freeVotes.body', {
+                      nickname: user?.nickname,
+                    })}
                   </SBulletBody>
                 </SBullet>
                 <SBullet>
                   <SBulletImg alt="" src={suggestionsImage.src} />
-                  <SBulletTitle variant={5}>{t('TopSection.bullets.suggestions.title')}</SBulletTitle>
+                  <SBulletTitle variant={5}>
+                    {t('TopSection.bullets.suggestions.title')}
+                  </SBulletTitle>
                   <SBulletBody variant={3}>
                     <Trans
                       t={t}
                       i18nKey="TopSection.bullets.suggestions.body"
                       components={[
                         // @ts-ignore
-                        <BoldSpan/>,
-                        user?.nickname
+                        <BoldSpan />,
+                        user?.nickname,
                       ]}
-                  />
+                    />
                   </SBulletBody>
                 </SBullet>
               </SBulletsSection>
@@ -310,13 +337,17 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         handlePayWithWallet={handlePayRegistered}
       >
         <SPaymentModalHeader>
-          <SPaymentModalTitle variant={3}>{t('paymenModalHeader.subtitle')}</SPaymentModalTitle>
+          <SPaymentModalTitle variant={3}>
+            {t('paymenModalHeader.subtitle')}
+          </SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>
               <img src={user.avatarUrl} alt={user.username} />
             </SAvatar>
             <SCreatorInfo>
-              <SCreatorUsername>{isMobile ? user.nickname : `@${user.username}`}</SCreatorUsername>
+              <SCreatorUsername>
+                {isMobile ? user.nickname : `@${user.username}`}
+              </SCreatorUsername>
             </SCreatorInfo>
           </SPaymentModalCreatorInfo>
         </SPaymentModalHeader>
@@ -327,7 +358,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
 export default SubscribeToUserPage;
 
-const BoldSpan: React.FC = ({ children }) => <strong><em>{children}</em></strong>
+const BoldSpan: React.FC = ({ children }) => (
+  <strong>
+    <em>{children}</em>
+  </strong>
+);
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { username } = context.query;
@@ -465,7 +500,9 @@ const SBackButton = styled(GoBackButton)`
 
   color: ${({ theme }) => theme.colors.dark};
 
-  &:active:enabled, &:hover:enabled, &:focus {
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus {
     color: ${({ theme }) => theme.colors.dark} !important;
     & div > svg {
       path {
@@ -478,7 +515,6 @@ const SBackButton = styled(GoBackButton)`
   }
 
   ${({ theme }) => theme.media.tablet} {
-
   }
 
   ${({ theme }) => theme.media.laptopM} {

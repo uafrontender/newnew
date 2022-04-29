@@ -13,7 +13,11 @@ import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
 import GoBackButton from '../molecules/GoBackButton';
 
-export const Chat = () => {
+interface IChat {
+  username?: string;
+}
+
+export const Chat: React.FC<IChat> = ({ username }) => {
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
@@ -22,10 +26,18 @@ export const Chat = () => {
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('chat');
-  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
+  const [chatListHidden, setChatListHidden] =
+    useState<boolean | undefined>(undefined);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
@@ -71,7 +83,11 @@ export const Chat = () => {
           />
           <NewMessage openChat={openChat} />
         </SToolbar>
-        <ChatList searchText={searchText} openChat={openChat} />
+        <ChatList
+          searchText={searchText}
+          openChat={openChat}
+          username={username}
+        />
       </SSidebar>
       <SContent>
         <ChatArea {...chatData} showChatList={showChatList} />
@@ -81,6 +97,10 @@ export const Chat = () => {
 };
 
 export default Chat;
+
+Chat.defaultProps = {
+  username: '',
+};
 
 const SContainer = styled.div`
   position: relative;
@@ -101,7 +121,10 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100%;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colors.black)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colors.black};
   flex-shrink: 0;
   ${(props) => {
     if (props.hidden === false) {

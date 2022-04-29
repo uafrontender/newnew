@@ -2,17 +2,21 @@ import React, { ReactElement } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 
-import General from '../components/templates/General';
-import Content from '../components/organisms/Chat';
+import General from '../../../components/templates/General';
+import Content from '../../../components/organisms/Chat';
 
-import { NextPageWithLayout } from './_app';
-import { useAppSelector } from '../redux-store/store';
+import { NextPageWithLayout } from '../../_app';
+import { useAppSelector } from '../../../redux-store/store';
 
-export const Chat = () => {
+interface IChat {
+  username: string;
+}
+
+const Chat: NextPage<IChat> = ({ username }) => {
   const { t } = useTranslation('chat');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -25,20 +29,28 @@ export const Chat = () => {
       <Head>
         <title>{t('meta.title')}</title>
       </Head>
-      <Content />
+      <Content username={username} />
     </>
   );
 };
 
-(Chat as NextPageWithLayout).getLayout = (page: ReactElement) => <SGeneral>{page}</SGeneral>;
-
 export default Chat;
 
+(Chat as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <SGeneral>{page}</SGeneral>
+);
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'chat', 'payment-modal']);
+  const { username } = context.query;
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'chat',
+    'payment-modal',
+  ]);
 
   return {
     props: {
+      username,
       ...translationContext,
     },
   };
@@ -52,6 +64,8 @@ const SGeneral = styled(General)`
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;

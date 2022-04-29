@@ -1,9 +1,17 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { ReactElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -68,8 +76,16 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const currentUser = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
@@ -107,10 +123,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   // Modals
   const [blockUserModalOpen, setBlockUserModalOpen] = useState(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const {usersIBlocked, unblockUser } = useGetBlockedUsers();
-  const isUserBlocked = useMemo(() => (
-    usersIBlocked.includes(user.uuid)
-  ), [usersIBlocked, user.uuid]);
+  const { usersIBlocked, unblockUser } = useGetBlockedUsers();
+  const isUserBlocked = useMemo(
+    () => usersIBlocked.includes(user.uuid),
+    [usersIBlocked, user.uuid]
+  );
 
   const unblockUserAsync = async (uuid: string) => {
     try {
@@ -119,12 +136,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         userUuid: uuid,
       });
       const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       unblockUser(uuid);
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   const tabs: Tab[] = useMemo(() => {
     if (user.options?.isCreator) {
@@ -144,29 +162,39 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   }, [user]);
 
   // Posts
-  const [creatorsDecisions, setCreatorsDecisions] = useState(postsCachedCreatorDecisions ?? []);
+  const [creatorsDecisions, setCreatorsDecisions] = useState(
+    postsCachedCreatorDecisions ?? []
+  );
   const [creatorsDecisionsFilter, setCreatorsDecisionsFilter] = useState(
     postsCachedCreatorDecisionsFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [creatorsDecisionsToken, setCreatorsDecisionsPageToken] = useState(postsCachedCreatorDecisionsPageToken);
-  const [creatorsDecisionsCount, setCreatorsDecisionsCount] = useState(postsCachedCreatorDecisionsCount);
+  const [creatorsDecisionsToken, setCreatorsDecisionsPageToken] = useState(
+    postsCachedCreatorDecisionsPageToken
+  );
+  const [creatorsDecisionsCount, setCreatorsDecisionsCount] = useState(
+    postsCachedCreatorDecisionsCount
+  );
 
-  const [activityDecisions, setActivityDecisions] = useState(postsCachedActivity ?? []);
+  const [activityDecisions, setActivityDecisions] = useState(
+    postsCachedActivity ?? []
+  );
   const [activityDecisionsFilter, setActivityDecisionsFilter] = useState(
     postsCachedActivityFilter ?? newnewapi.Post.Filter.ALL
   );
-  const [activityDecisionsToken, setActivityDecisionsPageToken] = useState(postsCachedActivityPageToken);
-  const [activityDecisionsCount, setActivityDecisionsCount] = useState(postsCachedActivityCount);
-
-  const handleSetPostsCreatorsDecisions: React.Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-    setCreatorsDecisions,
-    [setCreatorsDecisions]
+  const [activityDecisionsToken, setActivityDecisionsPageToken] = useState(
+    postsCachedActivityPageToken
+  );
+  const [activityDecisionsCount, setActivityDecisionsCount] = useState(
+    postsCachedActivityCount
   );
 
-  const handleSetActivityDecisions: React.Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-    setActivityDecisions,
-    [setActivityDecisions]
-  );
+  const handleSetPostsCreatorsDecisions: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setCreatorsDecisions, [setCreatorsDecisions]);
+
+  const handleSetActivityDecisions: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setActivityDecisions, [setActivityDecisions]);
 
   const handleUpdateFilter = useCallback(
     (value: newnewapi.Post.Filter) => {
@@ -237,19 +265,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     [renderedPage]
   );
 
-  // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
-  const handleClickSendMessage = useCallback(() => {
-    try {
-      if (!isSubscribed) {
-        router.push(`/${user.username}/subscribe`);
-      } else if (isSubscribed) {
-        router.push(`/direct-messages?user=${user.uuid}`);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [router, user, isSubscribed]);
-
   const renderChildren = () => {
     let postsForPage = {};
     let postsForPageFilter;
@@ -302,7 +317,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!currentUser.loggedIn) {
-        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
+        router.push(
+          `/sign-up?reason=follow-creator&redirect=${window.location.href}`
+        );
       }
 
       const payload = new newnewapi.MarkUserRequest({
@@ -334,15 +351,28 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     router.prefetch(`/${user.username}/subscribe`);
     router.prefetch(`/${user.username}/activity`);
     router.prefetch(`/${user.username}`);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Redirect to /profile page if the page is of current user's own
   useEffect(() => {
-    if (currentUser.loggedIn && currentUser.userData?.userUuid?.toString() === user.uuid.toString()) {
-      router.push(currentUser.userData?.options?.isCreator ? '/profile/my-posts' : '/profile');
+    if (
+      currentUser.loggedIn &&
+      currentUser.userData?.userUuid?.toString() === user.uuid.toString()
+    ) {
+      router.push(
+        currentUser.userData?.options?.isCreator
+          ? '/profile/my-posts'
+          : '/profile'
+      );
     }
-  }, [currentUser.loggedIn, currentUser.userData?.options?.isCreator, currentUser.userData?.userUuid, router, user.uuid]);
+  }, [
+    currentUser.loggedIn,
+    currentUser.userData?.options?.isCreator,
+    currentUser.userData?.userUuid,
+    router,
+    user.uuid,
+  ]);
 
   useEffect(() => {
     const handlerHistory = () => {
@@ -352,13 +382,13 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       if (postId && window?.history?.state?.fromPost) {
         router.push(`/post/${postId}`);
       }
-    }
+    };
 
     window?.addEventListener('popstate', handlerHistory);
 
     return () => {
       window?.removeEventListener('popstate', handlerHistory);
-    }
+    };
   }, [router]);
 
   useEffect(() => {
@@ -383,9 +413,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   return (
     <ErrorBoundary>
-      <SGeneral
-        restrictMaxWidth
-      >
+      <SGeneral restrictMaxWidth>
         <SProfileLayout>
           <ProfileBackground
             pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
@@ -396,22 +424,30 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             iconOnly
             onClick={() => handleToggleFollowingCreator()}
           >
-            <SSVGContainer
-              active={false}
-            >
+            <SSVGContainer active={false}>
               <InlineSvg
-                svg={followingsIds.includes(user.uuid as string) ? FavouritesIconFilled : FavouritesIconOutlined}
-                fill={followingsIds.includes(user.uuid as string) ? theme.colorsThemed.accent.blue : 'none'}
+                svg={
+                  followingsIds.includes(user.uuid as string)
+                    ? FavouritesIconFilled
+                    : FavouritesIconOutlined
+                }
+                fill={
+                  followingsIds.includes(user.uuid as string)
+                    ? theme.colorsThemed.accent.blue
+                    : 'none'
+                }
                 width={isMobileOrTablet ? '20px' : '24px'}
                 height={isMobileOrTablet ? '20px' : '24px'}
               />
             </SSVGContainer>
             {t('ProfileLayout.buttons.favorites')}
           </SFavoritesButton>
-          <SMoreButton view="transparent" iconOnly onClick={() => setIsEllipseMenuOpen(true)}>
-            <SSVGContainer
-              active={ellipseMenuOpen}
-            >
+          <SMoreButton
+            view="transparent"
+            iconOnly
+            onClick={() => setIsEllipseMenuOpen(true)}
+          >
+            <SSVGContainer active={ellipseMenuOpen}>
               <InlineSvg
                 svg={MoreIconFilled}
                 fill={theme.colorsThemed.text.primary}
@@ -435,16 +471,14 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   setBlockUserModalOpen(true);
                 }
               }}
-              handleClickReport={() => {setConfirmReportUser(true)}}
+              handleClickReport={() => {
+                setConfirmReportUser(true);
+              }}
               handleClickUnsubscribe={() => {}}
             />
           )}
-          <ProfileImage src={user.avatarUrl ?? ''}/>
-          {isSubscribed && (
-            <SSubcribedTag>
-              {t('subscribed-tag')}
-            </SSubcribedTag>
-          )}
+          <ProfileImage src={user.avatarUrl ?? ''} />
+          {isSubscribed && <SSubcribedTag>{t('subscribed-tag')}</SSubcribedTag>}
           <div
             style={{
               position: 'relative',
@@ -469,7 +503,10 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 <SUsernameButtonText>
                   @{/* Temp! */}
                   {user.username && user.username.length > 12
-                    ? `${user.username.substring(0, 6)}...${user.username.substring(user.username.length - 3)}`
+                    ? `${user.username.substring(
+                        0,
+                        6
+                      )}...${user.username.substring(user.username.length - 3)}`
                     : user.username}
                 </SUsernameButtonText>
               </SUsernameButton>
@@ -485,28 +522,42 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               >
                 {isCopiedUrl ? (
                   t('ProfileLayout.buttons.copied')
-                ): (
-                  <InlineSvg svg={ShareIconFilled} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                ) : (
+                  <InlineSvg
+                    svg={ShareIconFilled}
+                    fill={theme.colorsThemed.text.primary}
+                    width="20px"
+                    height="20px"
+                  />
                 )}
               </SShareButton>
             </SShareDiv>
             {user.options?.isCreator ? (
-              <Button
-                withShadow
-                view="primaryGrad"
-                style={{
-                  marginBottom: '16px',
-                }}
-                onClick={handleClickSendMessage}
+              <Link
+                href={
+                  !isSubscribed
+                    ? `/${user.username}/subscribe`
+                    : `/direct-messages/${user.username}`
+                }
               >
-                {t('ProfileLayout.buttons.sendMessage')}
-              </Button>
+                <Button
+                  withShadow
+                  view="primaryGrad"
+                  style={{
+                    marginBottom: '16px',
+                  }}
+                >
+                  {t('ProfileLayout.buttons.sendMessage')}
+                </Button>
+              </Link>
             ) : null}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
-          {tabs.length > 0 ? <ProfileTabs pageType="othersProfile" tabs={tabs} /> : null}
+          {tabs.length > 0 ? (
+            <ProfileTabs pageType="othersProfile" tabs={tabs} />
+          ) : null}
         </SProfileLayout>
         {renderChildren()}
       </SGeneral>
@@ -526,7 +577,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               setBlockUserModalOpen(true);
             }
           }}
-          handleClickReport={() => {setConfirmReportUser(true)}}
+          handleClickReport={() => {
+            setConfirmReportUser(true);
+          }}
           handleClickUnsubscribe={() => {}}
         />
       )}
@@ -540,12 +593,18 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
         show={confirmReportUser}
         reportedDisplayname={
           currentUser.userData
-          ? currentUser.userData.nickname || `@${currentUser.userData.username}`
-          : ''}
+            ? currentUser.userData.nickname ||
+              `@${currentUser.userData.username}`
+            : ''
+        }
         onClose={() => setConfirmReportUser(false)}
-        onSubmit={async ({reason, message}) => {
-          if(currentUser.userData?.userUuid) {
-            await reportUser(currentUser.userData.userUuid, reason, message).catch(e => console.error(e));
+        onSubmit={async ({ reason, message }) => {
+          if (currentUser.userData?.userUuid) {
+            await reportUser(
+              currentUser.userData.userUuid,
+              reason,
+              message
+            ).catch((e) => console.error(e));
           }
           setConfirmReportUser(false);
         }}
@@ -609,7 +668,9 @@ const SShareDiv = styled.div`
 const SUsernameButton = styled(Button)`
   cursor: default;
 
-  &:active:enabled, &:hover:enabled, &:focus:enabled {
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus:enabled {
     background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
 `;
@@ -656,8 +717,11 @@ const SSVGContainer = styled.div<{
     padding: 12px;
     border-radius: 16px;
     margin-bottom: 8px;
-    background: ${({ theme, active }) => active ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;' : theme.colorsThemed.background.quinary};
-    transition: .2s linear;
+    background: ${({ theme, active }) =>
+      active
+        ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
+        : theme.colorsThemed.background.quinary};
+    transition: 0.2s linear;
   }
 `;
 
@@ -667,7 +731,9 @@ const SFavoritesButton = styled(Button)`
   right: 4px;
 
   background: none;
-  &:active:enabled, &:hover:enabled, &:focus:enabled {
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus:enabled {
     background: none;
   }
 
@@ -700,7 +766,9 @@ const SMoreButton = styled(Button)`
   left: 4px;
 
   background: none;
-  &:active:enabled, &:hover:enabled, &:focus:enabled {
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus:enabled {
     background: none;
   }
 

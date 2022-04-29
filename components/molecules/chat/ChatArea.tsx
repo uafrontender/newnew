@@ -44,8 +44,16 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const { ref: scrollRef, inView } = useInView();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
@@ -54,10 +62,12 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
-  const [isMessagingDisabled, setIsMessagingDisabled] = useState<boolean>(false);
+  const [isMessagingDisabled, setIsMessagingDisabled] =
+    useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
 
   const [localUserData, setLocalUserData] = useState({
     justSubscribed: false,
@@ -74,7 +84,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
 
-  const [messagesNextPageToken, setMessagesNextPageToken] = useState<string | undefined | null>('');
+  const [messagesNextPageToken, setMessagesNextPageToken] =
+    useState<string | undefined | null>('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
@@ -97,10 +108,14 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         });
         const res = await getMessages(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data && res.data.messages.length > 0) {
           setMessages((curr) => {
-            const arr = [...curr, ...(res.data?.messages as newnewapi.ChatMessage[])];
+            const arr = [
+              ...curr,
+              ...(res.data?.messages as newnewapi.ChatMessage[]),
+            ];
             return arr;
           });
           setMessagesNextPageToken(res.data.paging?.nextPageToken);
@@ -119,12 +134,15 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     if (chatRoom) {
       setLocalUserData((data) => ({ ...data, ...chatRoom.visavis }));
 
-      if (!chatRoom.lastMessage) setLocalUserData({ ...localUserData, justSubscribed: true });
+      if (!chatRoom.lastMessage)
+        setLocalUserData({ ...localUserData, justSubscribed: true });
       getChatMessages();
       if (chatRoom.kind === 4) {
         setIsAnnouncement(true);
         /* eslint-disable no-unused-expressions */
-        chatRoom.myRole === 2 ? setIsMyAnnouncement(true) : setIsMyAnnouncement(false);
+        chatRoom.myRole === 2
+          ? setIsMyAnnouncement(true)
+          : setIsMyAnnouncement(false);
       } else {
         setIsAnnouncement(false);
         setIsMyAnnouncement(false);
@@ -171,7 +189,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   useEffect(() => {
     if (usersIBlocked.length > 0 && chatRoom) {
-      const isBlocked = usersIBlocked.find((i) => i === chatRoom?.visavis?.uuid);
+      const isBlocked = usersIBlocked.find(
+        (i) => i === chatRoom?.visavis?.uuid
+      );
       if (isBlocked) {
         setIsVisavisBlocked(true);
       }
@@ -181,7 +201,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
 
   useEffect(() => {
     if (usersBlockedMe.length > 0 && chatRoom) {
-      const isBlocked = usersBlockedMe.find((i) => i === chatRoom?.visavis?.uuid);
+      const isBlocked = usersBlockedMe.find(
+        (i) => i === chatRoom?.visavis?.uuid
+      );
       if (isBlocked) {
         setIsMessagingDisabled(true);
       }
@@ -211,7 +233,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         userUuid: chatRoom?.visavis?.uuid,
       });
       const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       unblockUser(chatRoom?.visavis?.uuid!!);
     } catch (err) {
       console.error(err);
@@ -245,7 +268,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           },
         });
         const res = await sendMessage(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.message) setMessages([res.data.message].concat(messages));
 
         setMessageText('');
@@ -274,7 +298,11 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const nextSameUser = nextElement?.sender?.uuid === item.sender?.uuid;
 
       const content = (
-        <SMessage id={item.id?.toString()} mine={isMine} prevSameUser={prevSameUser}>
+        <SMessage
+          id={item.id?.toString()}
+          mine={isMine}
+          prevSameUser={prevSameUser}
+        >
           {!nextSameUser && (
             <SUserAvatar
               mine={isMine}
@@ -285,21 +313,33 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
               }
             />
           )}
-          <SMessageContent mine={isMine} prevSameUser={prevSameUser} nextSameUser={nextSameUser}>
+          <SMessageContent
+            mine={isMine}
+            prevSameUser={prevSameUser}
+            nextSameUser={nextSameUser}
+          >
             <SMessageText mine={isMine} weight={600} variant={3}>
               {item.content?.text}
             </SMessageText>
           </SMessageContent>
-          {index === messages.length - 1 && <SRef ref={scrollRef}>Loading...</SRef>}
+          {index === messages.length - 1 && (
+            <SRef ref={scrollRef}>Loading...</SRef>
+          )}
         </SMessage>
       );
       if (
         item.createdAt?.seconds &&
         nextElement?.createdAt?.seconds &&
-        moment((item.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY') !==
-          moment((nextElement?.createdAt?.seconds as number) * 1000).format('DD.MM.YYYY')
+        moment((item.createdAt?.seconds as number) * 1000).format(
+          'DD.MM.YYYY'
+        ) !==
+          moment((nextElement?.createdAt?.seconds as number) * 1000).format(
+            'DD.MM.YYYY'
+          )
       ) {
-        let date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        let date = moment((item.createdAt?.seconds as number) * 1000).format(
+          'MMM DD'
+        );
         if (date === moment().format('MMM DD')) {
           date = t('chat.today');
         }
@@ -322,12 +362,17 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         );
       }
       if (item.createdAt?.seconds && !nextElement) {
-        const date = moment((item.createdAt?.seconds as number) * 1000).format('MMM DD');
+        const date = moment((item.createdAt?.seconds as number) * 1000).format(
+          'MMM DD'
+        );
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
             <SMessage type="info">
-              <SMessageContent type="info" prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}>
+              <SMessageContent
+                type="info"
+                prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
+              >
                 <SMessageText type="info" weight={600} variant={3}>
                   {date}
                 </SMessageText>
@@ -337,9 +382,18 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         );
       }
 
-      return <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>;
+      return (
+        <React.Fragment key={item.id?.toString()}>{content}</React.Fragment>
+      );
     },
-    [chatRoom, t, user.userData?.avatarUrl, user.userData?.userUuid, messages, scrollRef]
+    [
+      chatRoom,
+      t,
+      user.userData?.avatarUrl,
+      user.userData?.userUuid,
+      messages,
+      scrollRef,
+    ]
   );
 
   const clickHandler = () => {
@@ -379,21 +433,38 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           {isMobileOrTablet && <GoBackButton onClick={clickHandler} />}
           <SUserData>
             <SUserName>
-              {isMyAnnouncement ? user.userData?.nickname : chatRoom.visavis?.nickname}
+              {isMyAnnouncement
+                ? user.userData?.nickname
+                : chatRoom.visavis?.nickname}
               {isAnnouncement && t('announcement.title')}
             </SUserName>
             <SUserAlias>
               {!isAnnouncement
                 ? `@${chatRoom.visavis?.username}`
-                : `${chatRoom.memberCount && chatRoom.memberCount > 0 ? chatRoom.memberCount : 0} ${
-                    chatRoom.memberCount!! > 1 ? t('new-announcement.members') : t('new-announcement.member')
+                : `${
+                    chatRoom.memberCount && chatRoom.memberCount > 0
+                      ? chatRoom.memberCount
+                      : 0
+                  } ${
+                    chatRoom.memberCount!! > 1
+                      ? t('new-announcement.members')
+                      : t('new-announcement.member')
                   }`}
             </SUserAlias>
           </SUserData>
           <SActionsDiv>
             {!isMyAnnouncement && (
-              <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
-                <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
+              <SMoreButton
+                view="transparent"
+                iconOnly
+                onClick={() => handleOpenEllipseMenu()}
+              >
+                <InlineSVG
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width="20px"
+                  height="20px"
+                />
               </SMoreButton>
             )}
             {/* Ellipse menu */}
@@ -426,7 +497,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       {isAnnouncement && !isMyAnnouncement && chatRoom && (
         <SAnnouncementHeader>
           <SAnnouncementText>
-            {t('announcement.top-message-start')} <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
+            {t('announcement.top-message-start')}{' '}
+            <SAnnouncementName>{chatRoom.visavis?.username}</SAnnouncementName>{' '}
             {t('announcement.top-message-end')}
           </SAnnouncementText>
         </SAnnouncementHeader>
@@ -437,28 +509,38 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           messages.length === 0 &&
           !isAnnouncement &&
           (chatRoom.myRole === 1 ? (
-            <WelcomeMessage userAlias={chatRoom.visavis?.username ? chatRoom.visavis?.username : ''} />
+            <WelcomeMessage
+              userAlias={
+                chatRoom.visavis?.username ? chatRoom.visavis?.username : ''
+              }
+            />
           ) : (
             <NoMessagesYet />
           ))}
         {messages.length > 0 && messages.map(renderMessage)}
       </SCenterPart>
       <SBottomPart>
-        {(isVisavisBlocked === true || confirmBlockUser) && chatRoom && chatRoom.visavis && (
-          <BlockedUser
-            confirmBlockUser={confirmBlockUser}
-            isBlocked={isVisavisBlocked}
-            user={chatRoom.visavis}
-            onUserBlock={onUserBlock}
-            closeModal={() => setConfirmBlockUser(false)}
-            // isAnnouncement={isAnnouncement}
-          />
-        )}
-        {localUserData.subscriptionExpired && chatRoom && chatRoom.visavis?.uuid && (
-          <SubscriptionExpired user={chatRoom.visavis} />
-        )}
+        {(isVisavisBlocked === true || confirmBlockUser) &&
+          chatRoom &&
+          chatRoom.visavis && (
+            <BlockedUser
+              confirmBlockUser={confirmBlockUser}
+              isBlocked={isVisavisBlocked}
+              user={chatRoom.visavis}
+              onUserBlock={onUserBlock}
+              closeModal={() => setConfirmBlockUser(false)}
+              // isAnnouncement={isAnnouncement}
+            />
+          )}
+        {localUserData.subscriptionExpired &&
+          chatRoom &&
+          chatRoom.visavis?.uuid && (
+            <SubscriptionExpired user={chatRoom.visavis} />
+          )}
         {localUserData.accountDeleted && <AccountDeleted />}
-        {isMessagingDisabled && chatRoom && chatRoom.visavis && <MessagingDisabled user={chatRoom.visavis} />}
+        {isMessagingDisabled && chatRoom && chatRoom.visavis && (
+          <MessagingDisabled user={chatRoom.visavis} />
+        )}
 
         {isTextareaHidden() && (
           <SBottomTextarea>
@@ -478,27 +560,32 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             >
               <SInlineSVG
                 svg={sendIcon}
-                fill={messageText ? theme.colors.white : theme.colorsThemed.text.primary}
+                fill={
+                  messageText
+                    ? theme.colors.white
+                    : theme.colorsThemed.text.primary
+                }
                 width="24px"
                 height="24px"
               />
             </SButton>
           </SBottomTextarea>
         )}
-        {chatRoom?.visavis &&
+        {chatRoom?.visavis && (
           <ReportModal
             show={confirmReportUser}
             reportedDisplayname={getDisplayname(chatRoom.visavis)}
             onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({reason, message})=>{
-              if(chatRoom?.visavis?.uuid){
-                await reportUser(chatRoom.visavis.uuid, reason, message).catch(e=> console.error(e));
+            onSubmit={async ({ reason, message }) => {
+              if (chatRoom?.visavis?.uuid) {
+                await reportUser(chatRoom.visavis.uuid, reason, message).catch(
+                  (e) => console.error(e)
+                );
               }
-
               setConfirmReportUser(false);
-          }}
+            }}
           />
-        }
+        )}
       </SBottomPart>
     </SContainer>
   );
@@ -515,7 +602,8 @@ const SContainer = styled.div`
 
 const STopPart = styled.header`
   height: 80px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -611,7 +699,9 @@ const SButton = styled(Button)`
   margin-left: 12px;
   &:disabled {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
   }
 `;
 
@@ -816,7 +906,9 @@ const SAnnouncementText = styled.div`
   margin-bottom: 16px;
   border-radius: 16px;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 `;
 
 const SAnnouncementName = styled.span`
