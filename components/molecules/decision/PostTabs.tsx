@@ -23,7 +23,7 @@ interface IDecisionTabs {
   handleChangeTab: (val: string) => void;
 }
 
-const Icons = {
+const Icons: any = {
   bids: StatisticsIcon,
   bidsFilled: StatisticsIconFilled,
   options: StatisticsIcon,
