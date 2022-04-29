@@ -347,13 +347,13 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage type="info">
+            <SMessage type='info'>
               <SMessageContent
-                type="info"
+                type='info'
                 prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
                 nextSameUser={nextElement?.sender?.uuid === item.sender?.uuid}
               >
-                <SMessageText type="info" weight={600} variant={3}>
+                <SMessageText type='info' weight={600} variant={3}>
                   {date}
                 </SMessageText>
               </SMessageContent>
@@ -368,12 +368,12 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         return (
           <React.Fragment key={item.id?.toString()}>
             {content}
-            <SMessage type="info">
+            <SMessage type='info'>
               <SMessageContent
-                type="info"
+                type='info'
                 prevSameUser={prevElement?.sender?.uuid === item.sender?.uuid}
               >
-                <SMessageText type="info" weight={600} variant={3}>
+                <SMessageText type='info' weight={600} variant={3}>
                   {date}
                 </SMessageText>
               </SMessageContent>
@@ -455,15 +455,15 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           <SActionsDiv>
             {!isMyAnnouncement && (
               <SMoreButton
-                view="transparent"
+                view='transparent'
                 iconOnly
                 onClick={() => handleOpenEllipseMenu()}
               >
                 <InlineSVG
                   svg={MoreIconFilled}
                   fill={theme.colorsThemed.text.secondary}
-                  width="20px"
-                  height="20px"
+                  width='20px'
+                  height='20px'
                 />
               </SMoreButton>
             )}
@@ -503,7 +503,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
           </SAnnouncementText>
         </SAnnouncementHeader>
       )}
-      <SCenterPart id="messagesScrollContainer">
+      <SCenterPart id='messagesScrollContainer'>
         {localUserData?.justSubscribed &&
           chatRoom &&
           messages.length === 0 &&
@@ -565,8 +565,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                     ? theme.colors.white
                     : theme.colorsThemed.text.primary
                 }
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
             </SButton>
           </SBottomTextarea>

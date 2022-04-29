@@ -59,7 +59,7 @@ interface IPostViewCF {
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleReportOpen: ()=>void;
+  handleReportOpen: () => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
@@ -663,7 +663,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           timestampSeconds={new Date(
             (post.expiresAt?.seconds as number) * 1000
           ).getTime()}
-          postType="cf"
+          postType='cf'
         />
       </SExpiresSection>
       <PostVideo
@@ -676,7 +676,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
-        postType="cf"
+        postType='cf'
         postId={post.postUuid}
         postStatus={postStatus}
         title={post.title}
@@ -752,7 +752,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
       {isMobile && !choosePledgeModalOpen && postStatus === 'voting' ? (
         <>
           <SActionButton
-            view="primaryGrad"
+            view='primaryGrad'
             onClick={() => setChoosePledgeModalOpen(true)}
           >
             {t('CfPost.FloatingActionButton.choosePledgeBtn')}
@@ -777,7 +777,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
           user!!.userTutorialsProgress.remainingCfSteps!![0] ===
             newnewapi.CfTutorialStep.CF_HERO
         }
-        postType="CF"
+        postType='CF'
         closeModal={goToNextStep}
       />
     </SWrapper>

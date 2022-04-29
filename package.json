@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 4000",
     "lint": "next lint",
+    "prettify": "prettier --write \"**/*.ts(x)?\"",
     "test": "cypress run --browser chrome",
     "test:mobile": "cypress run --browser chrome --config \"viewportWidth=375,viewportHeight=667\"",
     "e2e": "cypress open",
@@ -16,9 +17,7 @@
     "deploy-storybook": "AWS_ACCESS_KEY_ID=AKIAXDXL4BH57N5KLJWF AWS_SECRET_ACCESS_KEY=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 aws s3 cp --recursive --acl public-read storybook-static/ s3://storybook.newnew.co/"
   },
   "pre-commit": [
-    "lint",
-    "test",
-    "test:mobile"
+    "lint"
   ],
   "dependencies": {
     "@reduxjs/toolkit": "1.7.1",
@@ -29,7 +28,7 @@
     "lodash": "4.17.21",
     "lottie-web": "5.8.1",
     "moment": "2.29.1",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#master",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#070c2f76c81f18afdb90e31852b6af6c47bc4752",
     "next": "12.0.10",
     "next-i18next": "10.0.1",
     "next-redux-wrapper": "7.0.5",

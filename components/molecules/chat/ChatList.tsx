@@ -412,8 +412,8 @@ export const ChatList: React.FC<IFunctionProps> = ({
               fill={
                 theme.name === 'light' ? theme.colors.black : theme.colors.white
               }
-              width="26px"
-              height="26px"
+              width='26px'
+              height='26px'
             />
           </SMyAvatar>
         );
@@ -438,8 +438,8 @@ export const ChatList: React.FC<IFunctionProps> = ({
               fill={
                 theme.name === 'light' ? theme.colors.black : theme.colors.white
               }
-              width="26px"
-              height="26px"
+              width='26px'
+              height='26px'
             />
           </SMyAvatar>
         );

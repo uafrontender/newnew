@@ -4,9 +4,7 @@ import type { NextPage } from 'next';
 const Test: NextPage = () => (
   <div>
     <main>
-      <h1>
-        I am a test page
-      </h1>
+      <h1>I am a test page</h1>
     </main>
   </div>
 );

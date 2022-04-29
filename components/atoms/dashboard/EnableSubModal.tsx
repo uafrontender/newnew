@@ -16,7 +16,12 @@ interface IEnableSubModal {
   subEnabled: () => void;
 }
 
-const EnableSubModal: React.FC<IEnableSubModal> = ({ confirmEnableSub, selectedProduct, closeModal, subEnabled }) => {
+const EnableSubModal: React.FC<IEnableSubModal> = ({
+  confirmEnableSub,
+  selectedProduct,
+  closeModal,
+  subEnabled,
+}) => {
   const { t } = useTranslation('creator');
   const handleSubmit = () => {
     subEnabled();
@@ -33,11 +38,14 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({ confirmEnableSub, selectedP
           <SModalContent>
             <SText>{t('enableSubModal.text')}</SText>
             <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
-            $${formatNumber(selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
+            $${formatNumber(
+              selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0,
+              true
+            )}
             ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
             <SNote>{t('enableSubModal.note')}</SNote>
           </SModalContent>
-          <SConfirmButton view="primaryGrad" onClick={handleSubmit}>
+          <SConfirmButton view='primaryGrad' onClick={handleSubmit}>
             {t('enableSubModal.bntText')}
           </SConfirmButton>
         </SModal>
@@ -58,9 +66,13 @@ const SContainer = styled.div`
 const SModal = styled.div`
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 0 16px 16px;
   box-sizing: border-box;
   display: flex;

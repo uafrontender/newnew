@@ -1,5 +1,12 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, createContext, useContext, useMemo, useState, useCallback } from 'react';
+import React, {
+  useEffect,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
@@ -36,7 +43,8 @@ export const ChatsProvider: React.FC = ({ children }) => {
         // setLoadingRooms(true);
         const payload = new newnewapi.EmptyRequest();
         const res = await getTotalUnreadMessageCounts(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         setData(res.data);
       } catch (err) {
         console.error(err);
@@ -58,9 +66,12 @@ export const ChatsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on('ChatUnreadCountsChanged', socketHandlerMessageCreated);
+      socketConnection.on(
+        'ChatUnreadCountsChanged',
+        socketHandlerMessageCreated
+      );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection]);
 
   const contextValue = useMemo(
@@ -73,11 +84,16 @@ export const ChatsProvider: React.FC = ({ children }) => {
     [unreadCount, unreadCountForUser, unreadCountForCreator, setData]
   );
 
-  return <ChatsContext.Provider value={contextValue}>{children}</ChatsContext.Provider>;
+  return (
+    <ChatsContext.Provider value={contextValue}>
+      {children}
+    </ChatsContext.Provider>
+  );
 };
 
 export function useGetChats() {
   const context = useContext(ChatsContext);
-  if (!context) throw new Error('useGetChat must be used inside a `ChatProvider`');
+  if (!context)
+    throw new Error('useGetChat must be used inside a `ChatProvider`');
   return context;
 }

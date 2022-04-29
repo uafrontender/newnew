@@ -25,15 +25,19 @@ const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
     count={count}
     borderRadius={16}
     duration={2}
-    className="skeletonSpan"
-    containerClassName="skeletonsContainer"
+    className='skeletonSpan'
+    containerClassName='skeletonsContainer'
     {...{
-      ...(bgColor ? {
-        baseColor: bgColor,
-      } : {}),
-      ...(highlightColor ? {
-        highlightColor,
-      } : {}),
+      ...(bgColor
+        ? {
+            baseColor: bgColor,
+          }
+        : {}),
+      ...(highlightColor
+        ? {
+            highlightColor,
+          }
+        : {}),
     }}
     wrapper={
       // eslint-disable-next-line react/no-unstable-nested-components
@@ -42,7 +46,7 @@ const CardSkeleton: React.FunctionComponent<ICardSkeleton> = ({
           width={cardWidth ?? undefined}
           height={cardHeight ?? undefined}
         >
-          { skeletons }
+          {skeletons}
         </SSingleSkeletonWrapper>
       )
     }
@@ -107,26 +111,37 @@ interface ICardSkeletonSection {
   height?: string;
 }
 
-export const CardSkeletonSection: React.FunctionComponent<ICardSkeletonSection> = ({
-  count,
-  width,
-  height,
-}) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isTablet = ['tablet'].includes(resizeMode);
-  const isLaptop = ['laptop'].includes(resizeMode);
-  const isDesktop = ['laptopL'].includes(resizeMode);
-  return (
-    <SCardSkeletonSectionWrapper>
-      <CardSkeleton
-        count={count}
-        cardWidth={width ?? isMobile ? '100vw' : isTablet ? '200px' : isLaptop ? '215px' : isDesktop ? '15vw' : '13vw'}
-        cardHeight={height ?? isMobile ? '564px' : isTablet ? '300px' : '336px'}
-      />
-    </SCardSkeletonSectionWrapper>
-  );
-};
+export const CardSkeletonSection: React.FunctionComponent<ICardSkeletonSection> =
+  ({ count, width, height }) => {
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    const isTablet = ['tablet'].includes(resizeMode);
+    const isLaptop = ['laptop'].includes(resizeMode);
+    const isDesktop = ['laptopL'].includes(resizeMode);
+    return (
+      <SCardSkeletonSectionWrapper>
+        <CardSkeleton
+          count={count}
+          cardWidth={
+            width ?? isMobile
+              ? '100vw'
+              : isTablet
+              ? '200px'
+              : isLaptop
+              ? '215px'
+              : isDesktop
+              ? '15vw'
+              : '13vw'
+          }
+          cardHeight={
+            height ?? isMobile ? '564px' : isTablet ? '300px' : '336px'
+          }
+        />
+      </SCardSkeletonSectionWrapper>
+    );
+  };
 
 CardSkeletonSection.defaultProps = {
   width: undefined,
@@ -138,7 +153,7 @@ const SCardSkeletonSectionWrapper = styled.div`
   overflow-y: hidden;
 
   opacity: 0;
-  animation: ${SkeletonWrapperAnimation} .1s forwards;
+  animation: ${SkeletonWrapperAnimation} 0.1s forwards;
 
   .skeletonsContainer {
     display: flex;
@@ -148,7 +163,6 @@ const SCardSkeletonSectionWrapper = styled.div`
 
     position: relative;
     left: 16px;
-
   }
 `;
 
@@ -163,14 +177,14 @@ export const CardSkeletonList: React.FunctionComponent<ICardSkeletonList> = ({
   wrapperStyle,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   return (
-    <SCardSkeletonListWrapper
-      style={wrapperStyle ? { ...wrapperStyle } : {}}
-    >
+    <SCardSkeletonListWrapper style={wrapperStyle ? { ...wrapperStyle } : {}}>
       <CardSkeleton
         count={count}
-        cardWidth="100%"
+        cardWidth='100%'
         cardHeight={isMobile ? '564px' : '336px'}
       />
     </SCardSkeletonListWrapper>
@@ -182,31 +196,30 @@ CardSkeletonList.defaultProps = {
 };
 
 const SCardSkeletonListWrapper = styled.div`
-
   opacity: 0;
-  animation: ${SkeletonWrapperAnimation} .3s forwards;
+  animation: ${SkeletonWrapperAnimation} 0.3s forwards;
 
   .skeletonsContainer {
     left: -16px;
-  width: 100vw;
-  cursor: default;
-  display: flex;
-  padding: 8px 0 0 0;
-  position: relative;
-  flex-wrap: wrap;
-  flex-direction: row;
+    width: 100vw;
+    cursor: default;
+    display: flex;
+    padding: 8px 0 0 0;
+    position: relative;
+    flex-wrap: wrap;
+    flex-direction: row;
 
-  ${(props) => props.theme.media.tablet} {
-    left: -8px;
-    width: calc(100% + 26px);
-    padding: 24px 0 0 0;
-  }
+    ${(props) => props.theme.media.tablet} {
+      left: -8px;
+      width: calc(100% + 26px);
+      padding: 24px 0 0 0;
+    }
 
-  ${(props) => props.theme.media.laptop} {
-    left: -16px;
-    width: calc(100% + 32px);
-    padding: 32px 0 0 0;
-  }
+    ${(props) => props.theme.media.laptop} {
+      left: -16px;
+      width: calc(100% + 32px);
+      padding: 32px 0 0 0;
+    }
 
     div {
       width: 100vw;

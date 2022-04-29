@@ -8,7 +8,6 @@ export default {
   title: 'Components/Inputs',
   component: UsernameInput,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
-
 } as ComponentMeta<typeof UsernameInput>;
 
 const Template: ComponentStory<typeof UsernameInput> = (args) => {
@@ -24,19 +23,15 @@ const Template: ComponentStory<typeof UsernameInput> = (args) => {
     >
       <UsernameInput
         value={value}
-        placeholder="@username"
+        placeholder='@username'
         isValid={value.length > 0 ? validator.isAlphanumeric(value) : true}
-        errorCaption="Input is incorrect"
+        errorCaption='Input is incorrect'
         popupCaption={
-          <div
-            style={{ width: '100px', height: '50px' }}
-          >
-            Caption
-          </div>
+          <div style={{ width: '100px', height: '50px' }}>Caption</div>
         }
-        frequencyCaption="Can be changed only two times"
+        frequencyCaption='Can be changed only two times'
         onChange={(e) => setValue(e.target.value)}
-        {...args as any}
+        {...(args as any)}
       />
     </div>
   );

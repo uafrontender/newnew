@@ -13,11 +13,13 @@ const SocketContextProvider: React.FC = ({ children }) => {
   // Will use access token if it is available to connect to socket.io
   useEffect(() => {
     const socketConnected = io(ENDPOINT, {
-      ...(cookies.accessToken ? {
-        query: {
-          token: cookies.accessToken,
-        },
-      } : {}),
+      ...(cookies.accessToken
+        ? {
+            query: {
+              token: cookies.accessToken,
+            },
+          }
+        : {}),
     });
     setSocket(() => socketConnected);
 
@@ -29,11 +31,7 @@ const SocketContextProvider: React.FC = ({ children }) => {
   }, [cookies]);
 
   return (
-    <SocketContext.Provider
-      value={socket}
-    >
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
 };
 

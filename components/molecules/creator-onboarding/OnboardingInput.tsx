@@ -43,8 +43,8 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
         <SReadonlyLock>
           <InlineSvg
             svg={LockIcon}
-            width="24px"
-            height="24px"
+            width='24px'
+            height='24px'
             fill={theme.colorsThemed.text.tertiary}
           />
         </SReadonlyLock>
@@ -79,9 +79,9 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
       />
       {readOnly && <SReadonlyCaption>{cantChangeInfoCaption}</SReadonlyCaption>}
       {errorBordersShown ? (
-        <AnimatedPresence animateWhenInView={false} animation="t-09">
+        <AnimatedPresence animateWhenInView={false} animation='t-09'>
           <SErrorDiv>
-            <InlineSvg svg={AlertIcon} width="16px" height="16px" />
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
             {errorCaption}
           </SErrorDiv>
         </AnimatedPresence>

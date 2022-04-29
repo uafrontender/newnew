@@ -6,7 +6,9 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { Area, Point } from 'react-easy-crop/types';
 
-import ProfileBackgroundCropper, { CropperObjectFit } from './ProfileBackgroundCropper';
+import ProfileBackgroundCropper, {
+  CropperObjectFit,
+} from './ProfileBackgroundCropper';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -24,85 +26,87 @@ interface IProfileBackgroundInput {
   handleSetPictureInEdit: (files: FileList | null) => void;
   handleUnsetPictureInEdit: () => void;
   onCropChange: (location: Point) => void;
-  onCropComplete: ((croppedArea: Area, croppedAreaPixels: Area) => void) | undefined;
+  onCropComplete:
+    | ((croppedArea: Area, croppedAreaPixels: Area) => void)
+    | undefined;
   onZoomChange: ((zoom: number) => void) | undefined;
 }
 
-const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> = ({
-  originalPictureUrl,
-  pictureInEditUrl,
-  coverUrlInEditAnimated,
-  zoom,
-  crop,
-  initialObjectFit,
-  disabled,
-  handleSetPictureInEdit,
-  handleUnsetPictureInEdit,
-  onCropChange,
-  onCropComplete,
-  onZoomChange,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('profile');
+const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
+  ({
+    originalPictureUrl,
+    pictureInEditUrl,
+    coverUrlInEditAnimated,
+    zoom,
+    crop,
+    initialObjectFit,
+    disabled,
+    handleSetPictureInEdit,
+    handleUnsetPictureInEdit,
+    onCropChange,
+    onCropComplete,
+    onZoomChange,
+  }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('profile');
 
-  const [mobileCropWidth, setMobileCropWidth] = useState(0);
-  const containerRef = useRef<HTMLDivElement>();
+    const [mobileCropWidth, setMobileCropWidth] = useState(0);
+    const containerRef = useRef<HTMLDivElement>();
 
-  // Drag & Drop support
-  const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
+    // Drag & Drop support
+    const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
 
-  const handleOnDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-    setDropZoneHighlighted(true);
-  };
-
-  const handleOnDragLeave = () => {
-    setDropZoneHighlighted(false);
-  };
-
-  const handleOnDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-    e.preventDefault();
-
-    if (disabled) return;
-
-    const { files } = e.dataTransfer;
-    handleSetPictureInEdit(files);
-  };
-
-  useEffect(() => {
-    const initialValue = containerRef.current?.getBoundingClientRect().width ?? 0;
-    setMobileCropWidth(initialValue);
-
-    const resetMobileCropWidth = () => {
-      const newValue = containerRef.current?.getBoundingClientRect().width ?? 0;
-      setMobileCropWidth(newValue);
+    const handleOnDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
+      setDropZoneHighlighted(true);
     };
 
-    window.addEventListener('resize', resetMobileCropWidth);
+    const handleOnDragLeave = () => {
+      setDropZoneHighlighted(false);
+    };
 
-    return () => window.removeEventListener('resize', resetMobileCropWidth);
-  }, []);
+    const handleOnDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+      e.preventDefault();
 
-  return (
-    <SProfileBackgroundInput
-      ref={(el) => {
-        containerRef.current = el!!;
-      }}
-    >
-      {pictureInEditUrl ? (
-        <>
-          {originalPictureUrl === pictureInEditUrl ? (
-            <SOriginalImgDiv
-              pictureUrl={originalPictureUrl}
-            >
-              <img
-                src={originalPictureUrl}
-                alt="Profile cover"
-                draggable={false}
-              />
-            </SOriginalImgDiv>
-          ) : (
-            !coverUrlInEditAnimated ? (
+      if (disabled) return;
+
+      const { files } = e.dataTransfer;
+      handleSetPictureInEdit(files);
+    };
+
+    useEffect(() => {
+      const initialValue =
+        containerRef.current?.getBoundingClientRect().width ?? 0;
+      setMobileCropWidth(initialValue);
+
+      const resetMobileCropWidth = () => {
+        const newValue =
+          containerRef.current?.getBoundingClientRect().width ?? 0;
+        setMobileCropWidth(newValue);
+      };
+
+      window.addEventListener('resize', resetMobileCropWidth);
+
+      return () => window.removeEventListener('resize', resetMobileCropWidth);
+    }, []);
+
+    return (
+      <SProfileBackgroundInput
+        ref={(el) => {
+          containerRef.current = el!!;
+        }}
+      >
+        {pictureInEditUrl ? (
+          <>
+            {originalPictureUrl === pictureInEditUrl ? (
+              <SOriginalImgDiv pictureUrl={originalPictureUrl}>
+                <img
+                  src={originalPictureUrl}
+                  alt='Profile cover'
+                  draggable={false}
+                />
+              </SOriginalImgDiv>
+            ) : !coverUrlInEditAnimated ? (
               <ProfileBackgroundCropper
                 pictureUrlInEdit={pictureInEditUrl!!}
                 crop={crop}
@@ -115,72 +119,70 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
                 onZoomChange={disabled ? () => {} : onZoomChange}
               />
             ) : (
-              <SOriginalImgDiv
-                pictureUrl={pictureInEditUrl!!}
-              >
+              <SOriginalImgDiv pictureUrl={pictureInEditUrl!!}>
                 <img
                   src={pictureInEditUrl!!}
-                  alt="Profile cover"
+                  alt='Profile cover'
                   draggable={false}
                 />
               </SOriginalImgDiv>
-            )
-          )}
-          <SDeleteImgButton
-            iconOnly
-            size="sm"
-            view="transparent"
-            withDim
-            withShrink
-            disabled={disabled}
-            onClick={() => {
-              handleUnsetPictureInEdit();
-            }}
+            )}
+            <SDeleteImgButton
+              iconOnly
+              size='sm'
+              view='transparent'
+              withDim
+              withShrink
+              disabled={disabled}
+              onClick={() => {
+                handleUnsetPictureInEdit();
+              }}
+            >
+              <InlineSvg
+                svg={BinIcon}
+                width='20px'
+                height='20px'
+                fill='#FFFFFF'
+              />
+            </SDeleteImgButton>
+          </>
+        ) : (
+          <SLabel
+            onDragOver={(e) => handleOnDragOver(e)}
+            onDragLeave={() => handleOnDragLeave()}
+            onDrop={(e) => handleOnDrop(e)}
           >
-            <InlineSvg
-              svg={BinIcon}
-              width="20px"
-              height="20px"
-              fill="#FFFFFF"
+            <SImageInput
+              type='file'
+              accept='image/*'
+              multiple={false}
+              disabled={disabled}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { files } = e.target;
+                handleSetPictureInEdit(files);
+              }}
             />
-          </SDeleteImgButton>
-        </>
-      ) : (
-        <SLabel
-          onDragOver={(e) => handleOnDragOver(e)}
-          onDragLeave={() => handleOnDragLeave()}
-          onDrop={(e) => handleOnDrop(e)}
-        >
-          <SImageInput
-            type="file"
-            accept="image/*"
-            multiple={false}
-            disabled={disabled}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const { files } = e.target;
-              handleSetPictureInEdit(files);
-            }}
-          />
-          <SChangeImageCaption
-            style={{
-              transform: !disabled && dropZoneHighlighted ? 'scale(1.1)' : 'none',
-            }}
-          >
-            <InlineSvg
-              svg={ImageIcon}
-              fill={theme.colorsThemed.text.secondary}
-              width="24px"
-              height="24px"
-            />
-            <div>
-              { t('EditProfileMenu.inputs.coverImage.changeCoverImage') }
-            </div>
-          </SChangeImageCaption>
-        </SLabel>
-      )}
-    </SProfileBackgroundInput>
-  );
-};
+            <SChangeImageCaption
+              style={{
+                transform:
+                  !disabled && dropZoneHighlighted ? 'scale(1.1)' : 'none',
+              }}
+            >
+              <InlineSvg
+                svg={ImageIcon}
+                fill={theme.colorsThemed.text.secondary}
+                width='24px'
+                height='24px'
+              />
+              <div>
+                {t('EditProfileMenu.inputs.coverImage.changeCoverImage')}
+              </div>
+            </SChangeImageCaption>
+          </SLabel>
+        )}
+      </SProfileBackgroundInput>
+    );
+  };
 
 ProfileBackgroundInput.defaultProps = {
   originalPictureUrl: undefined,
@@ -189,9 +191,7 @@ ProfileBackgroundInput.defaultProps = {
 
 export default ProfileBackgroundInput;
 
-interface ISProfileBackgroundInput {
-
-}
+interface ISProfileBackgroundInput {}
 
 const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
   position: relative;
@@ -211,7 +211,8 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
     width: 30px;
     height: 30px;
     border-bottom-right-radius: 70%;
-    box-shadow: 10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.primary};
+    box-shadow: 10px 15px 0px 0px
+      ${({ theme }) => theme.colorsThemed.background.primary};
 
     background: transparent;
     z-index: 10;
@@ -225,7 +226,8 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
     width: 30px;
     height: 30px;
     border-bottom-left-radius: 70%;
-    box-shadow: -10px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.primary};
+    box-shadow: -10px 15px 0px 0px
+      ${({ theme }) => theme.colorsThemed.background.primary};
 
     background: transparent;
     z-index: 10;
@@ -233,7 +235,6 @@ const SProfileBackgroundInput = styled.div<ISProfileBackgroundInput>`
   }
 
   ${(props) => props.theme.media.tablet} {
-
     border-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 `;
@@ -296,5 +297,5 @@ const SChangeImageCaption = styled.div`
   font-size: 14px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  transition: .2s linear;
+  transition: 0.2s linear;
 `;

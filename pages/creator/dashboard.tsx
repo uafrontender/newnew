@@ -30,12 +30,18 @@ export const Dashboard = () => {
   );
 };
 
-(Dashboard as NextPageWithLayout).getLayout = (page: ReactElement) => <SGeneral withChat>{page}</SGeneral>;
+(Dashboard as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <SGeneral withChat>{page}</SGeneral>
+);
 
 export default Dashboard;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'creator', 'chat']);
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'creator',
+    'chat',
+  ]);
 
   return {
     props: {
@@ -52,6 +58,8 @@ const SGeneral = styled(General)`
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;

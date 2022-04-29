@@ -20,7 +20,9 @@ export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   const { t } = useTranslation('creation');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
 
@@ -53,14 +55,19 @@ export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   );
 };
 
-(CreationPreview as NextPageWithLayout).getLayout = (page: React.ReactElement) => (
-  <CreationLayout>{page}</CreationLayout>
-);
+(CreationPreview as NextPageWithLayout).getLayout = (
+  page: React.ReactElement
+) => <CreationLayout>{page}</CreationLayout>;
 
 export default CreationPreview;
 
-export async function getServerSideProps(context: NextPageContext): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale as string, ['common', 'creation']);
+export async function getServerSideProps(
+  context: NextPageContext
+): Promise<any> {
+  const translationContext = await serverSideTranslations(
+    context.locale as string,
+    ['common', 'creation']
+  );
 
   // @ts-ignore
   if (!context?.req?.cookies?.accessToken) {

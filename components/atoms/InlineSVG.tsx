@@ -16,7 +16,13 @@ interface IInlineSvg {
 export const InlineSvg: React.FC<IInlineSvg> = (props) => {
   const { svg, ...rest } = props;
 
-  return <SSvgHolder {...rest} dangerouslySetInnerHTML={{ __html: svg }} {...props} />;
+  return (
+    <SSvgHolder
+      {...rest}
+      dangerouslySetInnerHTML={{ __html: svg }}
+      {...props}
+    />
+  );
 };
 
 InlineSvg.defaultProps = {

@@ -9,18 +9,18 @@ declare module 'styled-components' {
     media: IMedia;
     // Theme-agnostic colors
     width: {
-      maxContentWidth: number,
+      maxContentWidth: number;
     };
     colors: {
-      white: string,
-      black: string,
-      blue: string,
-      dark: string,
+      white: string;
+      black: string;
+      blue: string;
+      dark: string;
     };
     colorsThemed: {
       statusBar: {
         background: string;
-      },
+      };
       background: {
         primary: string;
         secondary: string;
@@ -42,7 +42,7 @@ declare module 'styled-components' {
         overlayDim: string;
         thumbLineHidden: string;
         thumbLineVisible: string;
-      },
+      };
       text: {
         // Used for both links and titles.
         primary: string;
@@ -52,7 +52,7 @@ declare module 'styled-components' {
         tertiary: string;
         // Used for initial state of text buttons.
         quaternary: string;
-      },
+      };
       accent: {
         blue: string;
         pink: string;
@@ -60,166 +60,166 @@ declare module 'styled-components' {
         green: string;
         error: string;
         success: string;
-      },
+      };
       social: {
         google: {
           main: string;
           hover: string;
           pressed: string;
-        },
+        };
         facebook: {
           main: string;
           hover: string;
           pressed: string;
-        },
+        };
         twitter: {
           main: string;
           hover: string;
           pressed: string;
-        },
+        };
         apple: {
           main: string;
           hover: string;
           pressed: string;
-        },
+        };
         instagram: {
-          main: string,
-          hover: string,
-          pressed: string,
-        },
+          main: string;
+          hover: string;
+          pressed: string;
+        };
         tiktok: {
-          main: string,
-          hover: string,
-          pressed: string,
-        },
+          main: string;
+          hover: string;
+          pressed: string;
+        };
         copy: {
-          main: string,
-          hover: string,
-          pressed: string,
-        },
-      },
+          main: string;
+          hover: string;
+          pressed: string;
+        };
+      };
       tag: {
         color: {
-          primary: string,
-        },
+          primary: string;
+        };
         background: {
-          primary: string,
-        },
-      },
+          primary: string;
+        };
+      };
       button: {
         color: {
-          primary: string,
-          primaryGrad: string,
-          primaryProgress: string,
-          secondary: string,
-          modalSecondary: string,
-          modalSecondarySelected: string,
-          tertiary: string,
-          quaternary: string,
-          transparent: string,
-          changeLanguage: string,
-          danger: string,
-        },
+          primary: string;
+          primaryGrad: string;
+          primaryProgress: string;
+          secondary: string;
+          modalSecondary: string;
+          modalSecondarySelected: string;
+          tertiary: string;
+          quaternary: string;
+          transparent: string;
+          changeLanguage: string;
+          danger: string;
+        };
         background: {
-          primary: string,
-          primaryGrad: string,
-          primaryProgress: string,
-          secondary: string,
-          modalSecondary: string,
-          modalSecondarySelected: string,
-          tertiary: string,
-          quaternary: string,
-          transparent: string,
-          changeLanguage: string,
-          danger: string,
-        },
+          primary: string;
+          primaryGrad: string;
+          primaryProgress: string;
+          secondary: string;
+          modalSecondary: string;
+          modalSecondarySelected: string;
+          tertiary: string;
+          quaternary: string;
+          transparent: string;
+          changeLanguage: string;
+          danger: string;
+        };
         hover: {
-          primary: string,
-          primaryGrad: string,
-          primaryProgress: string,
-          secondary: string,
-          modalSecondary: string,
-          modalSecondarySelected: string,
-          tertiary: string,
-          quaternary: string,
-          transparent: string,
-          changeLanguage: string,
-          danger: string,
-        },
+          primary: string;
+          primaryGrad: string;
+          primaryProgress: string;
+          secondary: string;
+          modalSecondary: string;
+          modalSecondarySelected: string;
+          tertiary: string;
+          quaternary: string;
+          transparent: string;
+          changeLanguage: string;
+          danger: string;
+        };
         active: {
-          primary: string,
-          primaryGrad: string,
-          primaryProgress: string,
-          secondary: string,
-          modalSecondary: string,
-          modalSecondarySelected: string,
-          tertiary: string,
-          quaternary: string,
-          transparent: string,
-          changeLanguage: string,
-          danger: string,
-        },
+          primary: string;
+          primaryGrad: string;
+          primaryProgress: string;
+          secondary: string;
+          modalSecondary: string;
+          modalSecondarySelected: string;
+          tertiary: string;
+          quaternary: string;
+          transparent: string;
+          changeLanguage: string;
+          danger: string;
+        };
         ripple: {
-          primary: string,
-          primaryGrad: string,
-          secondary: string,
-        },
+          primary: string;
+          primaryGrad: string;
+          secondary: string;
+        };
         progress: {
-          primaryProgress: string,
-        },
-        disabled: string,
-      },
-    },
+          primaryProgress: string;
+        };
+        disabled: string;
+      };
+    };
     shadows: {
-      mediumBlue: string,
-      intenseBlue: string,
-      mediumGrey: string,
-      cookie: string,
-      dashboardNotifications: string,
-    },
+      mediumBlue: string;
+      intenseBlue: string;
+      mediumGrey: string;
+      cookie: string;
+      dashboardNotifications: string;
+    };
     gradients: {
-      arrowLeft: string,
-      arrowRight: string,
-      blueDiagonal: string,
-      blueHorizontal: string,
-      heroNotifications: string,
-      heroNotificationsTablet: string,
-      bannerPink: string,
-      calendarTop: string,
-      calendarBottom: string,
-      creationSubmit: string,
+      arrowLeft: string;
+      arrowRight: string;
+      blueDiagonal: string;
+      blueHorizontal: string;
+      heroNotifications: string;
+      heroNotificationsTablet: string;
+      bannerPink: string;
+      calendarTop: string;
+      calendarBottom: string;
+      creationSubmit: string;
       listTop: {
-        primary: string,
-        secondary: string,
-        tertiary: string,
-      },
+        primary: string;
+        secondary: string;
+        tertiary: string;
+      };
       listBottom: {
-        primary: string,
-        secondary: string,
-        tertiary: string,
-      },
+        primary: string;
+        secondary: string;
+        tertiary: string;
+      };
       listLeft: {
-        primary: string,
-        secondary: string,
-        tertiary: string,
-      },
+        primary: string;
+        secondary: string;
+        tertiary: string;
+      };
       listRight: {
-        primary: string,
-        secondary: string,
-        tertiary: string,
-      },
+        primary: string;
+        secondary: string;
+        tertiary: string;
+      };
       decisionOption: {
-        yellow: string,
-        blue: string,
-        green: string,
-      },
-    },
+        yellow: string;
+        blue: string;
+        green: string;
+      };
+    };
     borderRadius: {
-      small: string,
-      smallLg: string,
-      medium: string,
-      large: string,
-      xxxLarge: string,
-    },
+      small: string;
+      smallLg: string;
+      medium: string;
+      large: string;
+      xxxLarge: string;
+    };
   }
 }

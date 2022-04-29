@@ -23,12 +23,17 @@ export const Subscriptions = () => {
   );
 };
 
-(Subscriptions as NextPageWithLayout).getLayout = (page: ReactElement) => <SGeneral withChat>{page}</SGeneral>;
+(Subscriptions as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <SGeneral withChat>{page}</SGeneral>
+);
 
 export default Subscriptions;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'creator']);
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'creator',
+  ]);
 
   return {
     props: {
@@ -45,6 +50,8 @@ const SGeneral = styled(General)`
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;

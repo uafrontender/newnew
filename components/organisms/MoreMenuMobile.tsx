@@ -15,7 +15,6 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
 
-
 interface IMoreMenuMobile {
   isVisible: boolean;
   handleClose: () => void;
@@ -50,12 +49,15 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SButton onClick={() => router.route.includes('direct-messages') ? handleClose() : handleClick('/direct-messages')}>
+          <SButton
+            onClick={() =>
+              router.route.includes('direct-messages')
+                ? handleClose()
+                : handleClick('/direct-messages')
+            }
+          >
             {unreadCount && unreadCount > 0 ? (
-              <Indicator
-                counter={unreadCount}
-                animate={false}
-              />
+              <Indicator counter={unreadCount} animate={false} />
             ) : null}
             <SText
               variant={2}
@@ -65,23 +67,28 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
             </SText>
             <InlineSvg
               svg={ChatIconFilled}
-              fill={router.route.includes('direct-messages') ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
+              fill={
+                router.route.includes('direct-messages')
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
             />
           </SButton>
           <SButton onClick={() => {}}>
-            <SText
-              variant={2}
-              active={router.route.includes('share')}
-            >
+            <SText variant={2} active={router.route.includes('share')}>
               {t('mobile-bottom-navigation-share')}
             </SText>
             <InlineSvg
               svg={ShareIcon}
-              fill={router.route.includes('share') ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
+              fill={
+                router.route.includes('share')
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
             />
           </SButton>
         </SContainer>
@@ -107,7 +114,9 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;
@@ -140,7 +149,10 @@ const SButton = styled.button`
 const SText = styled(Text)<{
   active: boolean;
 }>`
-  color: ${({ theme, active }) => active ? theme.colorsThemed.text.primary: theme.colorsThemed.text.tertiary};
+  color: ${({ theme, active }) =>
+    active
+      ? theme.colorsThemed.text.primary
+      : theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;

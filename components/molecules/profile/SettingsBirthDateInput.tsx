@@ -135,7 +135,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
             label={props.date.getFullYear().toString()}
             options={years}
             selected={props.date.getFullYear()}
-            width="110px"
+            width='110px'
             maxItems={4}
             closeOnSelect
             onSelect={(val) => props.changeYear(val)}
@@ -144,7 +144,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
             label={getLocalizedMonth(props.date.getMonth(), locale)}
             options={months}
             selected={props.date.getMonth()}
-            width="183px"
+            width='183px'
             maxItems={4}
             closeOnSelect
             onSelect={(val) => props.changeMonth(val)}
@@ -253,7 +253,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               }}
               readOnly
               disabled={props.disabled}
-              inputMode="numeric"
+              inputMode='numeric'
               value={inputData}
               onChange={handleChange}
               onPaste={(e) => e.preventDefault()}
@@ -265,14 +265,14 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
               onClick={() => explicitInputRef.current?.focus()}
             />
             <CalendarButton
-              type="button"
+              type='button'
               disabled={props.disabled}
               onClick={props.disabled ? () => {} : (props.onClick as any)}
             >
               <InlineSvg
                 svg={CalendarIcon}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
                 fill={
                   !calendarOpen
                     ? theme.colorsThemed.text.quaternary
@@ -295,8 +295,8 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
           <DatePicker
             disabled={disabled}
             selected={value ?? undefined}
-            placeholderText="DD-MM-YY"
-            dateFormat="dd-MM-yy"
+            placeholderText='DD-MM-YY'
+            dateFormat='dd-MM-yy'
             minDate={minDate}
             maxDate={maxDate}
             shouldCloseOnSelect={false}
@@ -311,7 +311,7 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
             renderCustomHeader={handleRenderCustomHeader}
             customInput={<CustomInputForwardRef disabled={disabled} />}
             // Calendar
-            popperPlacement="top-end"
+            popperPlacement='top-end'
             popperModifiers={[
               {
                 name: 'offset',
@@ -328,9 +328,9 @@ const SettingsBirthDateInput: React.FunctionComponent<ISettingsBirthDateInput> =
         </SDatePicker>
         <SBottomCaption>{bottomCaption}</SBottomCaption>
         {submitError ? (
-          <AnimatedPresence animateWhenInView={false} animation="t-09">
+          <AnimatedPresence animateWhenInView={false} animation='t-09'>
             <SErrorDiv>
-              <InlineSvg svg={AlertIcon} width="16px" height="16px" />
+              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
               {submitError}
             </SErrorDiv>
           </AnimatedPresence>

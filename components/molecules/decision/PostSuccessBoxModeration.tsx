@@ -13,55 +13,45 @@ interface IPostSuccessBoxModeration {
   handleButtonClick: () => void;
 }
 
-const PostSuccessBoxModeration: React.FunctionComponent<IPostSuccessBoxModeration> = ({
-  title,
-  body,
-  buttonCaption,
-  style,
-  handleButtonClick,
-}) => (
-    <SWaitingForResponseBox
-      style={style ?? {}}
-    >
-      <SIconImg
-        src={PostSuccessIcon.src}
-      />
-      <SHeadline
-        variant={2}
-      >
-        {title}
-      </SHeadline>
-      <SBody
-        variant={3}
-      >
-        {body}
-      </SBody>
+const PostSuccessBoxModeration: React.FunctionComponent<IPostSuccessBoxModeration> =
+  ({ title, body, buttonCaption, style, handleButtonClick }) => (
+    <SWaitingForResponseBox style={style ?? {}}>
+      <SIconImg src={PostSuccessIcon.src} />
+      <SHeadline variant={2}>{title}</SHeadline>
+      <SBody variant={3}>{body}</SBody>
       <SCtaButtonContainer>
-        <SCTAButton
-          onClick={handleButtonClick}
-        >
-          {buttonCaption}
-        </SCTAButton>
+        <SCTAButton onClick={handleButtonClick}>{buttonCaption}</SCTAButton>
       </SCtaButtonContainer>
     </SWaitingForResponseBox>
   );
 
 PostSuccessBoxModeration.defaultProps = {
   style: undefined,
-}
+};
 
 export default PostSuccessBoxModeration;
 
 const SWaitingForResponseBox = styled.div`
-  background: radial-gradient(100% 1411.13% at 0% 0%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, radial-gradient(100% 1411.13% at 100% 100%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, #1E1F29;
+  background: radial-gradient(
+        100% 1411.13% at 0% 0%,
+        rgba(54, 55, 74, 0.4) 0%,
+        rgba(54, 55, 74, 0) 81.65%
+      )
+      /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
+    radial-gradient(
+        100% 1411.13% at 100% 100%,
+        rgba(54, 55, 74, 0.4) 0%,
+        rgba(54, 55, 74, 0) 81.65%
+      )
+      /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
+    #1e1f29;
   box-shadow: 0px 10px 30px rgba(54, 55, 74, 0.2);
 
   display: grid;
   grid-template-areas:
     'imageArea headlineArea'
     'imageArea bodyArea'
-    'ctaArea ctaArea'
-  ;
+    'ctaArea ctaArea';
   grid-template-columns: 64px 1fr;
 
   padding: 16px;
@@ -73,29 +63,27 @@ const SWaitingForResponseBox = styled.div`
 
     grid-template-areas:
       'imageArea headlineArea ctaArea'
-      'imageArea bodyArea ctaArea'
-    ;
+      'imageArea bodyArea ctaArea';
     grid-template-columns: 64px 5fr 3fr;
   }
 `;
 
 const SIconImg = styled.img`
   grid-area: imageArea;
-
 `;
 
 const SHeadline = styled(Text)`
   grid-area: headlineArea;
   align-self: center;
 
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SBody = styled(Text)`
   grid-area: bodyArea;
   align-self: center;
 
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.8;
 `;
 
@@ -112,7 +100,7 @@ const SCtaButtonContainer = styled.div`
 `;
 
 const SCTAButton = styled.button`
-  background: #FFFFFF;
+  background: #ffffff;
 
   border: transparent;
   border-radius: 16px;

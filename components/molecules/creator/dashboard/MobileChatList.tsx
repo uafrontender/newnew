@@ -33,12 +33,17 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const { ref: scrollRef, inView } = useInView();
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(null);
-  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<string | undefined | null>('');
-  const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
-  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] =
+    useState<newnewapi.IChatRoom[] | null>(null);
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] =
+    useState<string | undefined | null>('');
+  const [searchedRooms, setSearchedRooms] =
+    useState<newnewapi.IChatRoom[] | null>(null);
+  const [updatedChat, setUpdatedChat] =
+    useState<newnewapi.IChatRoom | null>(null);
   const [prevSearchText, setPrevSearchText] = useState<string>('');
-  const [searchedRoomsLoading, setSearchedRoomsLoading] = useState<boolean>(false);
+  const [searchedRoomsLoading, setSearchedRoomsLoading] =
+    useState<boolean>(false);
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -55,7 +60,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         });
         const res = await getMyRooms(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr = [...curr!!, ...res.data?.rooms!!];
@@ -63,7 +69,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
         }
-        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken) setChatRoomsNextPageToken(null);
+        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken)
+          setChatRoomsNextPageToken(null);
         setLoadingRooms(false);
       } catch (err) {
         console.error(err);
@@ -84,7 +91,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       });
       const res = await getMyRooms(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms.length > 0) {
         setUpdatedChat(res.data.rooms[0]);
       }
@@ -109,7 +117,9 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
   useEffect(() => {
     if (updatedChat) {
-      const isAlreadyAdded = chatRooms?.findIndex((chat) => chat.id === updatedChat.id);
+      const isAlreadyAdded = chatRooms?.findIndex(
+        (chat) => chat.id === updatedChat.id
+      );
       if (isAlreadyAdded !== undefined) {
         const arr = chatRooms;
         arr?.splice(isAlreadyAdded, 1);
@@ -137,7 +147,10 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         console.log(searchText);
         const arr = [] as newnewapi.IChatRoom[];
         chatRooms.forEach((chat) => {
-          if (chat.visavis?.nickname?.startsWith(searchText) || chat.visavis?.username?.startsWith(searchText)) {
+          if (
+            chat.visavis?.nickname?.startsWith(searchText) ||
+            chat.visavis?.username?.startsWith(searchText)
+          ) {
             arr.push(chat);
           }
         });
@@ -146,7 +159,13 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       }
     }
     if (searchedRooms && !searchText) setSearchedRooms(null);
-  }, [searchText, chatRooms, searchedRooms, prevSearchText, searchedRoomsLoading]);
+  }, [
+    searchText,
+    chatRooms,
+    searchedRooms,
+    prevSearchText,
+    searchedRoomsLoading,
+  ]);
 
   async function markChatAsRead(id: number) {
     try {
@@ -154,7 +173,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         roomId: id,
       });
       const res = await markRoomAsRead(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
     } catch (err) {
       console.error(err);
     }
@@ -173,10 +193,14 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''} />
+          <UserAvatar
+            avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''}
+          />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username;
+      let chatName = chat.visavis?.nickname
+        ? chat.visavis?.nickname
+        : chat.visavis?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -186,15 +210,19 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             </SUserAvatar>
             <SInlineSVG
               svg={megaphone}
-              fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-              width="26px"
-              height="26px"
+              fill={
+                theme.name === 'light' ? theme.colors.black : theme.colors.white
+              }
+              width='26px'
+              height='26px'
             />
           </SMyAvatar>
         );
-        chatName = `${user.userData?.nickname ? user.userData?.nickname : user.userData?.username} ${t(
-          'announcement.title'
-        )}`;
+        chatName = `${
+          user.userData?.nickname
+            ? user.userData?.nickname
+            : user.userData?.username
+        } ${t('announcement.title')}`;
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -207,7 +235,10 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         }
       }
 
-      const unreadMessageCount = chat.unreadMessageCount && chat.unreadMessageCount > 0 ? chat.unreadMessageCount : 0;
+      const unreadMessageCount =
+        chat.unreadMessageCount && chat.unreadMessageCount > 0
+          ? chat.unreadMessageCount
+          : 0;
 
       return (
         <SChatItemContainer key={chat.id?.toString()}>
@@ -223,9 +254,12 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
             </SChatItemCenter>
             <SChatItemRight>
               <SChatItemTime variant={3} weight={600}>
-                {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
+                {chat.updatedAt &&
+                  moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
               </SChatItemTime>
-              {unreadMessageCount > 0 && <SUnreadCount>{unreadMessageCount}</SUnreadCount>}
+              {unreadMessageCount > 0 && (
+                <SUnreadCount>{unreadMessageCount}</SUnreadCount>
+              )}
             </SChatItemRight>
           </SChatItem>
           <SChatSeparator />
@@ -241,10 +275,14 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       {chatRooms && !searchedRooms && (
         <>
           <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
-          {chatRoomsNextPageToken && !searchedRooms && <SRef ref={scrollRef}>Loading...</SRef>}
+          {chatRoomsNextPageToken && !searchedRooms && (
+            <SRef ref={scrollRef}>Loading...</SRef>
+          )}
         </>
       )}
-      {searchedRooms && <SSectionContent>{searchedRooms.map(renderChatItem)}</SSectionContent>}
+      {searchedRooms && (
+        <SSectionContent>{searchedRooms.map(renderChatItem)}</SSectionContent>
+      )}
     </>
   );
 };

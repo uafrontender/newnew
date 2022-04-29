@@ -41,7 +41,9 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const { t } = useTranslation('creation');
   const user = useAppSelector((state) => state.user);
-  const { post, videoProcessing, fileProcessing, postData } = useAppSelector((state) => state.creation);
+  const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
+    (state) => state.creation
+  );
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -50,9 +52,14 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
     e.stopPropagation();
   };
   const formatStartsAt = useCallback(() => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+    const time = moment(
+      `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+      ['hh:mm a']
+    );
 
-    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+    return moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes());
   }, [post.startsAt]);
   const socialButtons = useMemo(
     () => [
@@ -128,10 +135,16 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const renderItem = (item: any) => (
     <SItem key={item.key}>
       <SItemButton type={item.key} onClick={socialBtnClickHandler}>
-        <InlineSVG svg={SOCIAL_ICONS[item.key] as string} width="25px" height="25px" />
+        <InlineSVG
+          svg={SOCIAL_ICONS[item.key] as string}
+          width='25px'
+          height='25px'
+        />
       </SItemButton>
       <SItemTitle variant={3} weight={600}>
-        {item.key === 'copy' && isCopiedUrl ? t(`published.socials.copied`) : t(`published.socials.${item.key}`)}
+        {item.key === 'copy' && isCopiedUrl
+          ? t(`published.socials.copied`)
+          : t(`published.socials.${item.key}`)}
       </SItemTitle>
     </SItem>
   );
@@ -144,16 +157,14 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
             {open ? (
               fileProcessing.progress === 100 ? (
                 <BitmovinPlayer
-                  id="published-modal"
+                  id='published-modal'
                   muted={false}
                   resources={videoProcessing?.targetUrls}
                   thumbnails={post.thumbnailParameters}
-                  borderRadius="16px"
+                  borderRadius='16px'
                 />
               ) : (
-                <SText
-                  variant={2}
-                >
+                <SText variant={2}>
                   Your video will be available once processed
                 </SText>
               )
@@ -166,9 +177,14 @@ export const PublishedModal: React.FC<IPublishedModal> = (props) => {
             </SUserTitle>
           </SUserBlock>
           <SSubTitle variant={2} weight={500}>
-            {t(`published.texts.desktop.subTitle-${post.startsAt.type === 'right-away' ? 'published' : 'scheduled'}`, {
-              value: formatStartsAt().format('DD MMM [at] hh:mm A'),
-            })}
+            {t(
+              `published.texts.desktop.subTitle-${
+                post.startsAt.type === 'right-away' ? 'published' : 'scheduled'
+              }`,
+              {
+                value: formatStartsAt().format('DD MMM [at] hh:mm A'),
+              }
+            )}
           </SSubTitle>
           <STitle variant={6}>{t('published.texts.title')}</STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>

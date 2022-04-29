@@ -47,7 +47,7 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
     <>
       <Head>
         <title>{t('meta.title')}</title>
-        <meta name="description" content={t('meta.description')} />
+        <meta name='description' content={t('meta.description')} />
       </Head>
       {!isLoading ? (
         <OnboardingSectionStripe

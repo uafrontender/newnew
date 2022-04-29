@@ -237,14 +237,14 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
               exit={{ opacity: 0, height: 0 }}
             >
               <Button
-                view="primaryGrad"
+                view='primaryGrad'
                 onClick={() => handleSaveModifications()}
                 disabled={isLoading || emailError !== ''}
               >
                 {t('Settings.sections.PersonalInformation.saveBtn')}
               </Button>
               <Button
-                view="secondary"
+                view='secondary'
                 style={{
                   ...(isMobile ? { order: -1 } : {}),
                 }}

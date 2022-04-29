@@ -67,16 +67,24 @@ export const Navigation = () => {
           <SItem active={active}>
             <SInlineSVG
               svg={active ? item.iconFilled : item.iconOutlined}
-              fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
+              fill={
+                active
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
             />
             <SLabel>{item.label}</SLabel>
           </SItem>
         </Link>
       );
     },
-    [router.route, theme.colorsThemed.accent.blue, theme.colorsThemed.text.tertiary]
+    [
+      router.route,
+      theme.colorsThemed.accent.blue,
+      theme.colorsThemed.text.tertiary,
+    ]
   );
 
   return <SContainer>{collection.map(renderItem)}</SContainer>;
@@ -112,13 +120,18 @@ const SItem = styled.a<ISItem>`
   flex-direction: row;
 
   svg {
-    fill: ${(props) => (props.active ? props.theme.colorsThemed.accent.blue : props.theme.colorsThemed.text.tertiary)};
+    fill: ${(props) =>
+      props.active
+        ? props.theme.colorsThemed.accent.blue
+        : props.theme.colorsThemed.text.tertiary};
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 
   label {
     color: ${(props) =>
-      props.active ? props.theme.colorsThemed.text.primary : props.theme.colorsThemed.text.secondary};
+      props.active
+        ? props.theme.colorsThemed.text.primary
+        : props.theme.colorsThemed.text.secondary};
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 

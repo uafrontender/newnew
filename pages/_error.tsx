@@ -9,10 +9,7 @@ interface IErrorPage {
   errorMsg: string;
 }
 
-const Error: NextPage<IErrorPage> = ({
-  statusCode,
-  errorMsg,
-}) => {
+const Error: NextPage<IErrorPage> = ({ statusCode, errorMsg }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -24,19 +21,17 @@ const Error: NextPage<IErrorPage> = ({
     // Refresh token was present, session probably expired
     // Redirect to sign up page
     if (errorMsg === 'Refresh token invalid') {
-      dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+      dispatch(
+        logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+      );
     }
   }, [errorMsg, dispatch]);
 
   return (
     // Temp
     <>
-      <p>
-        { statusCode }
-      </p>
-      <p>
-        An error occurred.
-      </p>
+      <p>{statusCode}</p>
+      <p>An error occurred.</p>
     </>
   );
 };

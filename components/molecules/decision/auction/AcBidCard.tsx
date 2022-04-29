@@ -10,25 +10,27 @@ interface IAcBidCard {
   bid: newnewapi.Auction.Bid;
 }
 
-const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
-  bid,
-}) => {
+const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
   const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const createdAtParsed = new Date((bid.createdAt?.seconds as number) * 1000);
 
   const handleRedirectToUser = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
+    window?.history.replaceState(
+      {
+        fromPost: true,
+      },
+      '',
+      ''
+    );
     router.push(`/${bid.bidder?.username}`);
-  }
+  };
 
   return (
     <motion.div
       key={bid.id.toString()}
-      layout="position"
+      layout='position'
       transition={{
         type: 'spring',
         damping: 20,
@@ -55,30 +57,23 @@ const AcBidCard:React.FunctionComponent<IAcBidCard> = ({
           />
         </SAvatar>
         <SBidInfo>
-          <SUsernameSpan
-            onClick={() => handleRedirectToUser()}
-          >
+          <SUsernameSpan onClick={() => handleRedirectToUser()}>
             {bid.bidder?.uuid !== user.userData?.userUuid
-              ? bid.bidder?.username : t('AcPost.me')}
+              ? bid.bidder?.username
+              : t('AcPost.me')}
           </SUsernameSpan>
-          <SDidABidSpan>
-            { t('AcPost.OptionsTab.BidCard.didABid') }
-          </SDidABidSpan>
+          <SDidABidSpan>{t('AcPost.OptionsTab.BidCard.didABid')}</SDidABidSpan>
           <SAmountSpan>
             $
             {bid.amount?.usdCents
-              ? (
-                `${(bid.amount?.usdCents as number / 100).toFixed(2)}`
-              ) : '00.00'}
+              ? `${((bid.amount?.usdCents as number) / 100).toFixed(2)}`
+              : '00.00'}
           </SAmountSpan>
         </SBidInfo>
         <SBidDate>
-          { createdAtParsed.getDate() }
-          {' '}
-          { createdAtParsed.toLocaleString('default', { month: 'short' }) }
-          {' '}
-          { createdAtParsed.getFullYear() }
-          {' '}
+          {createdAtParsed.getDate()}{' '}
+          {createdAtParsed.toLocaleString('default', { month: 'short' })}{' '}
+          {createdAtParsed.getFullYear()}{' '}
         </SBidDate>
       </SCardWrapper>
     </motion.div>
@@ -92,8 +87,7 @@ const SCardWrapper = styled.div`
   grid-template-columns: 36px 1fr;
   grid-template-areas:
     'avatar info'
-    'avatar date'
-  ;
+    'avatar date';
   align-items: center;
 `;
 

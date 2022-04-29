@@ -18,24 +18,16 @@ interface IScrollArrow {
 }
 
 export const ScrollArrow: React.FC<IScrollArrow> = (props) => {
-  const {
-    active,
-    position,
-    handleClick,
-  } = props;
+  const { active, position, handleClick } = props;
   const theme = useTheme();
 
   return (
-    <SArrowHolder
-      active={active}
-      onClick={handleClick}
-      position={position}
-    >
+    <SArrowHolder active={active} onClick={handleClick} position={position}>
       <InlineSVG
         svg={ICONS[position]}
         fill={theme.colorsThemed.background.outlines2}
-        width="24px"
-        height="24px"
+        width='24px'
+        height='24px'
       />
     </SArrowHolder>
   );
@@ -71,26 +63,29 @@ const SArrowHolder = styled.div<ISArrowHolder>`
     width: 100%;
   }
 
-  ${(props) => (props.position === 'left' ? css`
-    left: 12px;
+  ${(props) =>
+    props.position === 'left'
+      ? css`
+          left: 12px;
 
-    ${props.theme.media.laptop} {
-      left: -116px;
-    }
-    ${props.theme.media.laptopM} {
-      left: -76px;
-    }
-  ` : css`
-    right: 12px;
-    justify-content: flex-end;
+          ${props.theme.media.laptop} {
+            left: -116px;
+          }
+          ${props.theme.media.laptopM} {
+            left: -76px;
+          }
+        `
+      : css`
+          right: 12px;
+          justify-content: flex-end;
 
-    ${props.theme.media.laptop} {
-      right: -116px;
-    }
-    ${props.theme.media.laptopM} {
-      right: -76px;
-    }
-  `)}
+          ${props.theme.media.laptop} {
+            right: -116px;
+          }
+          ${props.theme.media.laptopM} {
+            right: -76px;
+          }
+        `}
 
   &:hover {
     border-color: ${({ theme }) => theme.colorsThemed.text.primary};

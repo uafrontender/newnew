@@ -18,8 +18,8 @@ interface IBitmovinPlayer {
   id: string;
   muted?: boolean;
   innerRef?: any;
-  resources?: any,
-  thumbnails?: any,
+  resources?: any;
+  thumbnails?: any;
   setDuration?: (duration: number) => void;
   borderRadius?: string;
   mutePosition?: 'left' | 'right';
@@ -45,20 +45,26 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const [loaded, setLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [isLoading, setIsLoading] = useState(false);
-  const playerConfig = useMemo<PlayerConfig>(() => ({
-    ui: false,
-    key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
-    playback: {
-      autoplay: true,
-    },
-  }), []);
-  const playerSource = useMemo(() => ({
-    hls: resources.hlsStreamUrl,
-    poster: resources.thumbnailImageUrl,
-    options: {
-      startTime: thumbnails?.startTime || 0,
-    },
-  }), [resources, thumbnails?.startTime]);
+  const playerConfig = useMemo<PlayerConfig>(
+    () => ({
+      ui: false,
+      key: process.env.NEXT_PUBLIC_BITMOVIN_PLAYER_KEY ?? '',
+      playback: {
+        autoplay: true,
+      },
+    }),
+    []
+  );
+  const playerSource = useMemo(
+    () => ({
+      hls: resources.hlsStreamUrl,
+      poster: resources.thumbnailImageUrl,
+      options: {
+        startTime: thumbnails?.startTime || 0,
+      },
+    }),
+    [resources, thumbnails?.startTime]
+  );
 
   const playerRef: any = useRef();
   const player: any = useRef(null);
@@ -99,44 +105,42 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
     if (!isLoading && !loaded) {
       setIsLoading(true);
 
-      player.current.load(playerSource)
-        .then(
-          () => {
-            setLoaded(true);
-            setIsLoading(false);
+      player.current.load(playerSource).then(
+        () => {
+          setLoaded(true);
+          setIsLoading(false);
 
-            player.current.play();
+          player.current.play();
 
-            if (setDuration) {
-              setDuration(player.current.getDuration());
-            }
-          },
-          (reason: any) => {
-            setLoaded(true);
-            setIsLoading(false);
-            console.error(`Error while creating Bitmovin Player instance -> ${reason}`);
-          },
-        );
+          if (setDuration) {
+            setDuration(player.current.getDuration());
+          }
+        },
+        (reason: any) => {
+          setLoaded(true);
+          setIsLoading(false);
+          console.error(
+            `Error while creating Bitmovin Player instance -> ${reason}`
+          );
+        }
+      );
     }
   }, [isLoading, loaded, playerSource, setDuration]);
   const subscribe = useCallback(() => {
     if (player.current.handlePlaybackFinished) {
       player.current.off(
         PlayerEvent.PlaybackFinished,
-        player.current.handlePlaybackFinished,
+        player.current.handlePlaybackFinished
       );
     }
-    player.current.on(
-      PlayerEvent.PlaybackFinished,
-      handlePlaybackFinished,
-    );
+    player.current.on(PlayerEvent.PlaybackFinished, handlePlaybackFinished);
     player.current.handlePlaybackFinished = handlePlaybackFinished;
 
     if (thumbnails?.endTime) {
       if (player.current.handleTimeChange) {
         player.current.off(
           PlayerEvent.TimeChanged,
-          player.current.handleTimeChange,
+          player.current.handleTimeChange
         );
       }
       player.current.on(PlayerEvent.TimeChanged, handleTimeChange);
@@ -175,30 +179,22 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
 
   return (
     <SContent>
-      <SImageBG
-        src={resources.thumbnailImageUrl}
-        borderRadius={borderRadius}
-      />
-      <SVideoWrapper
-        borderRadius={borderRadius}
-      >
-        <SWrapper
-          id={id}
-          ref={playerRef}
-        />
+      <SImageBG src={resources.thumbnailImageUrl} borderRadius={borderRadius} />
+      <SVideoWrapper borderRadius={borderRadius}>
+        <SWrapper id={id} ref={playerRef} />
       </SVideoWrapper>
       {withMuteControl && (
         <SModalSoundIcon position={mutePosition}>
           <Button
             iconOnly
-            view="transparent"
+            view='transparent'
             onClick={toggleThumbnailVideoMuted}
           >
             <InlineSVG
               svg={isMuted ? volumeOff : volumeOn}
               fill={theme.colors.white}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
             />
           </Button>
         </SModalSoundIcon>
@@ -217,10 +213,8 @@ BitmovinPlayer.defaultProps = {
   borderRadius: '0px',
   mutePosition: 'right',
   withMuteControl: false,
-  setDuration: () => {
-  },
-  setCurrentTime: () => {
-  },
+  setDuration: () => {},
+  setCurrentTime: () => {},
 };
 
 const SContent = styled.div`
@@ -284,11 +278,14 @@ interface ISModalSoundIcon {
 }
 
 const SModalSoundIcon = styled.div<ISModalSoundIcon>`
-  ${(props) => (props.position === 'left' ? css`
-    left: 16px;
-  ` : css`
-    right: 16px;
-  `)}
+  ${(props) =>
+    props.position === 'left'
+      ? css`
+          left: 16px;
+        `
+      : css`
+          right: 16px;
+        `}
   bottom: 16px;
   position: absolute;
 

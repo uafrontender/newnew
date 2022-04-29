@@ -110,7 +110,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
     return (
       <motion.div
         key={index}
-        layout="position"
+        layout='position'
         transition={{
           type: 'spring',
           damping: 20,
@@ -124,7 +124,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
         }}
       >
         <SContainerDoubleVote
-          layout="position"
+          layout='position'
           transition={{
             type: 'spring',
             damping: 20,

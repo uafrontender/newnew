@@ -9,9 +9,7 @@ import Lottie from '../components/atoms/Lottie';
 import { setMyEmail } from '../api/endpoints/user';
 
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
-import {
-  setUserData,
-} from '../redux-store/slices/userStateSlice';
+import { setUserData } from '../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 
@@ -44,19 +42,23 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
 
         const res = await setMyEmail(requestPayload);
 
-        if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
+        if (!res!! || res!!.error || !res.data)
+          throw new Error(res!!.error?.message ?? 'An error occured');
 
         const { data } = res!!;
 
         if (
-          !data
-          || data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
-        ) throw new Error('Request failed');
+          !data ||
+          data.status !== newnewapi.SetMyEmailResponse.Status.SUCCESS
+        )
+          throw new Error('Request failed');
 
         if (user.loggedIn) {
-          dispatch(setUserData({
-            email: email_address,
-          }));
+          dispatch(
+            setUserData({
+              email: email_address,
+            })
+          );
         }
 
         router.push('/');
@@ -70,7 +72,7 @@ const EmailUpdateRedirectPage: NextPage<IEmailUpdateRedirectPage> = ({
     }
 
     handleAuth();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -118,10 +120,11 @@ export default EmailUpdateRedirectPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { email_address, token } = context.query;
 
-  if (!email_address
-    || !token
-    || Array.isArray(email_address)
-    || Array.isArray(token)
+  if (
+    !email_address ||
+    !token ||
+    Array.isArray(email_address) ||
+    Array.isArray(token)
   ) {
     return {
       redirect: {

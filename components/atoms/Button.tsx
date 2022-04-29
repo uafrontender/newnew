@@ -11,7 +11,7 @@ import logoAnimation from '../../public/animations/mobile_logo.json';
 
 type TButton = React.ComponentPropsWithoutRef<'button'>;
 type TView =
-  'primary'
+  | 'primary'
   | 'primaryGrad'
   | 'primaryProgress'
   | 'secondary'
@@ -25,17 +25,17 @@ type TView =
 type TSize = 'sm' | 'lg';
 
 interface IButton {
-  size?: TSize,
-  view?: TView,
-  loading?: boolean,
-  progress?: number,
-  iconOnly?: boolean,
-  withDim?: boolean,
-  withShadow?: boolean,
-  withRipple?: boolean,
-  withShrink?: boolean,
-  withProgress?: boolean,
-  customDebounce?: number,
+  size?: TSize;
+  view?: TView;
+  loading?: boolean;
+  progress?: number;
+  iconOnly?: boolean;
+  withDim?: boolean;
+  withShadow?: boolean;
+  withRipple?: boolean;
+  withShrink?: boolean;
+  withProgress?: boolean;
+  customDebounce?: number;
 }
 
 const Button: React.FunctionComponent<IButton & TButton> = (props) => {
@@ -49,26 +49,28 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
     onClick,
     ...rest
   } = props;
-  const {
-    ref,
-    inView,
-  }: { ref: any, inView: boolean } = useInView();
+  const { ref, inView }: { ref: any; inView: boolean } = useInView();
   // Progress effect
   const [progress, setProgress] = useState(0);
   // Ripple effect
-  const [rippleOrigin, setRippleOrigin] = useState<{ x: string, y: string }>({
+  const [rippleOrigin, setRippleOrigin] = useState<{ x: string; y: string }>({
     x: '50%',
     y: '50%',
   });
   const [isRippling, setIsRippling] = useState(false);
 
-  const handleClickDebounced = useMemo(() => debounce(onClick!!, 800),
-    [onClick]);
-  const handleRestoreRippling = useMemo(() => debounce(() => {
-    if (!withRipple) return;
-    setIsRippling(false);
-  }, customDebounce ?? 750),
-  [withRipple, setIsRippling, customDebounce]);
+  const handleClickDebounced = useMemo(
+    () => debounce(onClick!!, 800),
+    [onClick]
+  );
+  const handleRestoreRippling = useMemo(
+    () =>
+      debounce(() => {
+        if (!withRipple) return;
+        setIsRippling(false);
+      }, customDebounce ?? 750),
+    [withRipple, setIsRippling, customDebounce]
+  );
 
   const handleOnBlurCapture = () => setIsRippling(false);
   const handleOnMouseDown = (e: any) => {
@@ -127,12 +129,8 @@ const Button: React.FunctionComponent<IButton & TButton> = (props) => {
       onTouchEndCapture={handleRestoreRippling}
       {...rest}
     >
-      <span>
-        {children}
-      </span>
-      {withProgress && (
-        <SProgress view={rest.view} progress={progress} />
-      )}
+      <span>{children}</span>
+      {withProgress && <SProgress view={rest.view} progress={progress} />}
       {loading && (
         <SLoader size={rest.size}>
           <Lottie
@@ -162,8 +160,7 @@ Button.defaultProps = {
   withRipple: false,
   withProgress: false,
   customDebounce: undefined,
-  onClick: () => {
-  },
+  onClick: () => {},
 };
 
 export default Button;
@@ -198,7 +195,8 @@ const SProgress = styled.div<ISProgress>`
   padding: 0;
   position: absolute;
   transition: width ease 1s;
-  background: ${(props) => props.theme.colorsThemed.button.progress[props.view ?? 'primary']};
+  background: ${(props) =>
+    props.theme.colorsThemed.button.progress[props.view ?? 'primary']};
 `;
 
 const SButton = styled.button<ISButton>`
@@ -222,22 +220,32 @@ const SButton = styled.button<ISButton>`
     font-size: ${(props) => (props.size === 'lg' ? 16 : 14)}px;
   }
 
-  ${(props) => (props.size === 'sm' ? css`
-    padding: ${props.iconOnly ? '12px' : '12px 24px'}
-  ` : css`
-    padding: ${props.iconOnly ? '16px' : '16px 24px'}
-  `)};
+  ${(props) =>
+    props.size === 'sm'
+      ? css`
+          padding: ${props.iconOnly ? '12px' : '12px 24px'};
+        `
+      : css`
+          padding: ${props.iconOnly ? '16px' : '16px 24px'};
+        `};
 
-  ${(props) => (props.size === 'lg' && !props.iconOnly && css`min-width: 343px;`)}
+  ${(props) =>
+    props.size === 'lg' &&
+    !props.iconOnly &&
+    css`
+      min-width: 343px;
+    `}
 
   border: transparent;
   border-radius: ${(props) => props.theme.borderRadius.medium};
 
-  color: ${(props) => props.theme.colorsThemed.button.color[props.view ?? 'primary']};
-  background: ${(props) => props.theme.colorsThemed.button.background[props.view ?? 'primary']};
+  color: ${(props) =>
+    props.theme.colorsThemed.button.color[props.view ?? 'primary']};
+  background: ${(props) =>
+    props.theme.colorsThemed.button.background[props.view ?? 'primary']};
 
   cursor: pointer;
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -248,46 +256,58 @@ const SButton = styled.button<ISButton>`
   user-select: none;
 
   // for gradient button background animation on hover
-  ${(props) => props.view === 'primaryGrad' && css`
-    :after {
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      content: '';
-      opacity: 0;
-      z-index: 1;
-      position: absolute;
-      background: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
-      transition: opacity 0.2s linear;
-    }
-  `}
+  ${(props) =>
+    props.view === 'primaryGrad' &&
+    css`
+      :after {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        opacity: 0;
+        z-index: 1;
+        position: absolute;
+        background: ${props.theme.colorsThemed.button.hover[
+          props.view ?? 'primary'
+        ]};
+        transition: opacity 0.2s linear;
+      }
+    `}
   &:active:enabled {
     outline: none;
-    background: ${(props) => props.theme.colorsThemed.button.active[props.view ?? 'primary']};
+    background: ${(props) =>
+      props.theme.colorsThemed.button.active[props.view ?? 'primary']};
   }
 
   &:focus:enabled,
   &:hover:enabled {
     outline: none;
 
-    ${(props) => (props.view === 'primaryGrad' ? css`
-      // for gradient button background animation on hover
-      :after {
-        opacity: 1;
-      }
-    ` : css`
-      background: ${props.theme.colorsThemed.button.hover[props.view ?? 'primary']};
-    `)}
+    ${(props) =>
+      props.view === 'primaryGrad'
+        ? css`
+            // for gradient button background animation on hover
+            :after {
+              opacity: 1;
+            }
+          `
+        : css`
+            background: ${props.theme.colorsThemed.button.hover[
+              props.view ?? 'primary'
+            ]};
+          `}
 
-    ${(props) => props.withShadow && css`
-      box-shadow: ${props.theme.shadows.intenseBlue};
-    `}
+    ${(props) =>
+      props.withShadow &&
+      css`
+        box-shadow: ${props.theme.shadows.intenseBlue};
+      `}
   }
 
   &:disabled {
     cursor: default;
-    opacity: .5;
+    opacity: 0.5;
     outline: none;
   }
 
@@ -296,51 +316,60 @@ const SButton = styled.button<ISButton>`
     font-weight: 700;
   }
 
-  ${(props) => props.withRipple && css`
-    &::before {
-      position: absolute;
+  ${(props) =>
+    props.withRipple &&
+    css`
+      &::before {
+        position: absolute;
 
-      top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
-      left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
+        top: ${`calc(${props.rippleOrigin.y} - ${props.elementWidth}px)`};
+        left: ${`calc(${props.rippleOrigin.x} - ${props.elementWidth}px)`};
 
-      border-radius: 50%;
+        border-radius: 50%;
 
-      z-index: 2;
+        z-index: 2;
 
-      width: ${props.elementWidth * 2}px;
-      height: ${props.elementWidth * 2}px;
+        width: ${props.elementWidth * 2}px;
+        height: ${props.elementWidth * 2}px;
 
-      transform: scale(0);
-      transform-origin: center;
+        transform: scale(0);
+        transform-origin: center;
 
-      // NB! Temp
-      content: '';
+        // NB! Temp
+        content: '';
 
-      background: ${props.theme.colorsThemed.button.ripple[props.view ?? 'primary']};
+        background: ${props.theme.colorsThemed.button.ripple[
+          props.view ?? 'primary'
+        ]};
 
-      ${(props.isRippling && css`
-        animation-duration: .9s;
-        animation-fill-mode: forwards;
-        animation-name: ${RippleAnimation};
-      `)}
-    }
-  `}
+        ${props.isRippling &&
+        css`
+          animation-duration: 0.9s;
+          animation-fill-mode: forwards;
+          animation-name: ${RippleAnimation};
+        `}
+      }
+    `}
 
-  ${(props) => (props.withShrink && css`
-    &:active {
-      transform: scale(0.9);
-    }
-  `)}
+  ${(props) =>
+    props.withShrink &&
+    css`
+      &:active {
+        transform: scale(0.9);
+      }
+    `}
 
-  ${(props) => (props.withDim && css`
-    &:active {
-      opacity: 0.5;
-    }
-  `)}
+  ${(props) =>
+    props.withDim &&
+    css`
+      &:active {
+        opacity: 0.5;
+      }
+    `}
 `;
 
 interface ISLoader {
-  size?: TSize
+  size?: TSize;
 }
 
 const SLoader = styled.div<ISLoader>`

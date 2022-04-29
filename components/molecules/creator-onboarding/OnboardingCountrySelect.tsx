@@ -1,6 +1,4 @@
-import React, {
-  useState, useRef, ReactElement, useEffect,
-} from 'react';
+import React, { useState, useRef, ReactElement, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,20 +16,20 @@ import InlineSvg from '../../atoms/InlineSVG';
 export type TOnboardingCountrySelectItem<T> = {
   name: string;
   value: T;
-}
+};
 
 interface IOnboardingCountrySelect<T> {
   label: string;
   selected?: T;
   options: TOnboardingCountrySelectItem<T>[];
-  maxItems?: number,
+  maxItems?: number;
   width?: string;
   disabled?: boolean;
-  closeOnSelect?: boolean,
+  closeOnSelect?: boolean;
   onSelect: (val: T) => void;
 }
 
-const OnboardingCountrySelect = <T, >({
+const OnboardingCountrySelect = <T,>({
   label,
   selected,
   options,
@@ -49,7 +47,9 @@ const OnboardingCountrySelect = <T, >({
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleToggle = () => setIsOpen((curr) => !curr);
   const handleClose = () => setIsOpen(false);
@@ -61,8 +61,9 @@ const OnboardingCountrySelect = <T, >({
 
   useEffect(() => {
     if (isOpen && selected) {
-      const itemTopPos = optionsRefs
-        .current[options.findIndex((o) => o.value === selected)].offsetTop;
+      const itemTopPos =
+        optionsRefs.current[options.findIndex((o) => o.value === selected)]
+          .offsetTop;
 
       if (optionsContainerRef.current) {
         optionsContainerRef.current.scrollTop = itemTopPos;
@@ -71,12 +72,8 @@ const OnboardingCountrySelect = <T, >({
   }, [selected, options, isOpen]);
 
   return (
-    <SFormItemContainer
-      pushedUp={isMobile && isOpen}
-    >
-      <SLabel>
-        {t('DetailsSection.form.CoR.label')}
-      </SLabel>
+    <SFormItemContainer pushedUp={isMobile && isOpen}>
+      <SLabel>{t('DetailsSection.form.CoR.label')}</SLabel>
       <SWrapper
         ref={(el) => {
           containerRef.current = el!!;
@@ -89,14 +86,12 @@ const OnboardingCountrySelect = <T, >({
             ...(width ? { width } : {}),
           }}
         >
-          <span>
-            {label}
-          </span>
+          <span>{label}</span>
           <SInlineSVG
             svg={ArrowDown}
             fill={theme.colorsThemed.text.quaternary}
-            width="24px"
-            height="24px"
+            width='24px'
+            height='24px'
             focused={isOpen}
           />
         </SLabelButton>
@@ -106,33 +101,36 @@ const OnboardingCountrySelect = <T, >({
               ref={(el) => {
                 optionsContainerRef.current = el!!;
               }}
-              width={containerRef.current?.getBoundingClientRect().width
-                ? `${containerRef.current?.getBoundingClientRect().width}px`
-                : 'inherit'}
-              height={maxItems ? `${(maxItems * 44) + 16}px` : undefined}
+              width={
+                containerRef.current?.getBoundingClientRect().width
+                  ? `${containerRef.current?.getBoundingClientRect().width}px`
+                  : 'inherit'
+              }
+              height={maxItems ? `${maxItems * 44 + 16}px` : undefined}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
               <div>
-                {options && options.map((o, i) => (
-                  <SOption
-                    key={o.name}
-                    ref={(el) => {
-                      optionsRefs.current[i] = el!!;
-                    }}
-                    selected={o.value === selected}
-                    onClick={() => {
-                      onSelect(o.value);
-                      if (closeOnSelect) handleClose();
-                    }}
-                  >
-                    {o.name}
-                  </SOption>
-                ))}
+                {options &&
+                  options.map((o, i) => (
+                    <SOption
+                      key={o.name}
+                      ref={(el) => {
+                        optionsRefs.current[i] = el!!;
+                      }}
+                      selected={o.value === selected}
+                      onClick={() => {
+                        onSelect(o.value);
+                        if (closeOnSelect) handleClose();
+                      }}
+                    >
+                      {o.name}
+                    </SOption>
+                  ))}
               </div>
             </SOptionsContainer>
-          ) : null }
+          ) : null}
         </AnimatePresence>
       </SWrapper>
     </SFormItemContainer>
@@ -156,20 +154,22 @@ const SFormItemContainer = styled.div<{
 
   margin-bottom: 16px;
 
-  transition: .3s transform linear;
+  transition: 0.3s transform linear;
 
-  ${({ pushedUp }) => (pushedUp ? (
-    css`
-      /* z-index: 5;
+  ${({ pushedUp }) =>
+    pushedUp
+      ? css`
+          /* z-index: 5;
       height: 80vh; */
-      width: calc(100% - 32px);
-      height: 30vh;
-      position: fixed;
-      z-index: 5;
-      transform: translateY(-286px);
-      background-color: ${({ theme }) => theme.colorsThemed.background.primary};
-    `
-  ) : null)}
+          width: calc(100% - 32px);
+          height: 30vh;
+          position: fixed;
+          z-index: 5;
+          transform: translateY(-286px);
+          background-color: ${({ theme }) =>
+            theme.colorsThemed.background.primary};
+        `
+      : null}
 
   ${({ theme }) => theme.media.tablet} {
     /* width: 284px; */
@@ -201,7 +201,6 @@ const SLabelButton = styled.button`
   justify-content: space-between;
   align-items: center;
 
-
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
@@ -228,16 +227,18 @@ const SLabelButton = styled.button`
     margin-right: 8px;
   }
 
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   &:focus {
     outline: none;
   }
 
-  &:hover:enabled, &:focus:active {
+  &:hover:enabled,
+  &:focus:active {
     cursor: pointer;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
+    background-color: ${({ theme }) =>
+      theme.colorsThemed.background.quaternary};
   }
 
   &:disabled {
@@ -281,7 +282,8 @@ const SOption = styled.button<{
 
   border: transparent;
   border-radius: ${({ theme }) => theme.borderRadius.smallLg};
-  background-color: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'transparent')};
+  background-color: ${({ selected, theme }) =>
+    selected ? theme.colorsThemed.background.quinary : 'transparent'};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   font-size: 14px;
@@ -296,26 +298,28 @@ const SOption = styled.button<{
   /* width: 100%; */
   padding: 8px 10px;
 
-
   cursor: ${({ selected }) => (selected ? 'default' : 'pointer')};
 
   span {
     margin-right: 8px;
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
 
-    ${({ selected }) => (!selected ? css`
-      background-color: ${({ theme }) => theme.colorsThemed.background.quaternary};
-    ` : null)};
+    ${({ selected }) =>
+      !selected
+        ? css`
+            background-color: ${({ theme }) =>
+              theme.colorsThemed.background.quaternary};
+          `
+        : null};
   }
 `;
 
 const SInlineSVG = styled(InlineSvg)<{
   focused: boolean;
 }>`
-
   transform: ${({ focused }) => (focused ? 'rotate(180deg)' : 'unset')};
-
 `;

@@ -1,12 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -34,257 +29,256 @@ interface IPostAwaitingResponseMC {
   post: newnewapi.MultipleChoice;
 }
 
-const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> = ({
-  post,
-}) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { mutedMode } = useAppSelector((state) => state.ui);
+const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { mutedMode } = useAppSelector((state) => state.ui);
 
-  const waitingTime = useMemo(() => {
-    const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-    const parsed = (end - Date.now()) / 1000;
-    const dhms = secondsToDHMS(parsed, 'noTrim');
+    const waitingTime = useMemo(() => {
+      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
+      const parsed = (end - Date.now()) / 1000;
+      const dhms = secondsToDHMS(parsed, 'noTrim');
 
-    let countdownsrt = `${dhms.days} ${t('AcPostAwaiting.hero.expires.days')} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+      let countdownsrt = `${dhms.days} ${t(
+        'AcPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
 
-    if (dhms.days === '0') {
-      countdownsrt = `${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
-      if (dhms.hours === '0') {
-        countdownsrt = `${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
-        if (dhms.minutes === '0') {
-          countdownsrt = `${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+      if (dhms.days === '0') {
+        countdownsrt = `${dhms.hours} ${t(
+          'AcPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+        if (dhms.hours === '0') {
+          countdownsrt = `${dhms.minutes} ${t(
+            'AcPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+          if (dhms.minutes === '0') {
+            countdownsrt = `${dhms.seconds} ${t(
+              'AcPostAwaiting.hero.expires.seconds'
+            )}`;
+          }
         }
       }
-    }
-    countdownsrt = `${countdownsrt} `;
-    return countdownsrt;
-  }, [post.responseUploadDeadline?.seconds, t]);
+      countdownsrt = `${countdownsrt} `;
+      return countdownsrt;
+    }, [post.responseUploadDeadline?.seconds, t]);
 
     // Winninfg option
-  const [winningOption, setWinningOption] =
-    useState<newnewapi.MultipleChoice.Option | undefined>();
+    const [winningOption, setWinningOption] =
+      useState<newnewapi.MultipleChoice.Option | undefined>();
 
     // Video
-  // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
     // Main screen vs all options
-  const [openedMainSection, setOpenedMainSection] = useState<'main' | 'options'>('main');
+    const [openedMainSection, setOpenedMainSection] =
+      useState<'main' | 'options'>('main');
 
     // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
-  });
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
 
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
-      }
-      const parsedHash = hash.substring(1);
-
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
-
-    handleCommentsInitialHash();
-  }, []);
-
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  // Load winning option
-  useEffect(() => {
-    async function fetchAndSetWinningOption(id: number) {
-      try {
-        const payload = new newnewapi.GetMcOptionRequest({
-          optionId: id,
-        });
-
-        const res = await getMcOption(payload);
-
-        console.log(res)
-
-        if (res.data?.option) {
-          setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
         }
-      } catch (err) {
-        console.log(err);
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
       }
-    }
+    }, [inView, post.postUuid]);
 
-    console.log(post.winningOptionId)
+    // Load winning option
+    useEffect(() => {
+      async function fetchAndSetWinningOption(id: number) {
+        try {
+          const payload = new newnewapi.GetMcOptionRequest({
+            optionId: id,
+          });
 
-    if (post.winningOptionId) {
-      fetchAndSetWinningOption(post.winningOptionId as number);
-    }
-  }, [post.winningOptionId]);
+          const res = await getMcOption(payload);
 
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          {openedMainSection === 'main' ? (
-            <>
-              <WaitingForResponseBox
-                title={t('McPostAwaiting.hero.title')}
-                body={t(
-                  'McPostAwaiting.hero.body',
-                  {
-                    creator: post.creator?.nickname,
-                    time: waitingTime
-                  })
-                }
-              />
-              <SMainSectionWrapper>
-                <SCreatorInfoDiv>
-                  <SCreator>
-                    <SCreatorImage
-                      src={post.creator?.avatarUrl!!}
-                    />
-                    <SWantsToKnow>
-                      {t('McPostSuccess.wants_to_know', { creator: post.creator?.nickname })}
-                    </SWantsToKnow>
-                  </SCreator>
-                  <STotal>
-                    {`${formatNumber(post.totalVotes ?? 0, true)}`}
-                    {' '}
-                    <span>
-                      {t('McPostSuccess.in_total_votes')}
-                    </span>
-                  </STotal>
-                </SCreatorInfoDiv>
-                <SPostTitle
-                  variant={4}
-                >
-                  {post.title}
-                </SPostTitle>
-                <SSeparator />
-                {winningOption && (
-                <>
-                  <SWinningBidCreator>
-                    <SCreator>
-                      <SCreatorImage
-                        src={winningOption.creator?.avatarUrl ?? winningOption.firstVoter?.avatarUrl!!}
-                      />
-                      <SWinningBidCreatorText>
-                        { winningOption.creator?.uuid === user.userData?.userUuid || winningOption.isSupportedByMe ? (
-                            winningOption.supporterCount > 1 ? (
-                              t('me')
-                            ) : t('I')
-                          ) : (
-                            getDisplayname(winningOption.creator ?? winningOption.firstVoter!!)
-                        ) }
-                        {winningOption.supporterCount > 1 ? (
-                          <>
-                            {' & '}
-                            {formatNumber(winningOption.supporterCount, true)}
-                            {' '}
-                            {t('McPostSuccess.others')}
-                          </>
-                        ) : null}
-                        {' '}
-                        {t('McPostSuccess.voted')}
-                      </SWinningBidCreatorText>
-                    </SCreator>
-                  </SWinningBidCreator>
-                  <SWinningOptionAmount
-                    variant={4}
-                  >
-                    {`${formatNumber(winningOption.voteCount ?? 0, true)}`}
-                    {' '}
-                    { winningOption.voteCount > 1 ? t('McPostSuccess.votes') : t('McPostSuccess.vote')}
-                  </SWinningOptionAmount>
-                  <SSeparator />
-                  <SWinningOptionDetails>
-                    <SWinningOptionDetailsBidChosen>
-                      {t('McPostSuccess.option_chosen')}
-                    </SWinningOptionDetailsBidChosen>
-                    <SWinningOptionDetailsSeeAll
-                      onClick={() => setOpenedMainSection('options')}
-                    >
-                      {t('McPostSuccess.see_all')}
-                    </SWinningOptionDetailsSeeAll>
-                    <SWinningOptionDetailsTitle
-                      variant={4}
-                    >
-                      {winningOption.text}
-                    </SWinningOptionDetailsTitle>
-                  </SWinningOptionDetails>
-                </>
-                )}
-              </SMainSectionWrapper>
-            </>
-          ) : (
-            <McSuccessOptionsTab
-              post={post}
-              handleGoBack={() => setOpenedMainSection('main')}
-            />
-          )}
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
+          console.log(res);
+
+          if (res.data?.option) {
+            setWinningOption(
+              res.data.option as newnewapi.MultipleChoice.Option
+            );
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      console.log(post.winningOptionId);
+
+      if (post.winningOptionId) {
+        fetchAndSetWinningOption(post.winningOptionId as number);
+      }
+    }, [post.winningOptionId]);
+
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+          <SActivitesContainer>
+            {openedMainSection === 'main' ? (
+              <>
+                <WaitingForResponseBox
+                  title={t('McPostAwaiting.hero.title')}
+                  body={t('McPostAwaiting.hero.body', {
+                    creator: post.creator?.nickname,
+                    time: waitingTime,
+                  })}
+                />
+                <SMainSectionWrapper>
+                  <SCreatorInfoDiv>
+                    <SCreator>
+                      <SCreatorImage src={post.creator?.avatarUrl!!} />
+                      <SWantsToKnow>
+                        {t('McPostSuccess.wants_to_know', {
+                          creator: post.creator?.nickname,
+                        })}
+                      </SWantsToKnow>
+                    </SCreator>
+                    <STotal>
+                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                      <span>{t('McPostSuccess.in_total_votes')}</span>
+                    </STotal>
+                  </SCreatorInfoDiv>
+                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SSeparator />
+                  {winningOption && (
+                    <>
+                      <SWinningBidCreator>
+                        <SCreator>
+                          <SCreatorImage
+                            src={
+                              winningOption.creator?.avatarUrl ??
+                              winningOption.firstVoter?.avatarUrl!!
+                            }
+                          />
+                          <SWinningBidCreatorText>
+                            {winningOption.creator?.uuid ===
+                              user.userData?.userUuid ||
+                            winningOption.isSupportedByMe
+                              ? winningOption.supporterCount > 1
+                                ? t('me')
+                                : t('I')
+                              : getDisplayname(
+                                  winningOption.creator ??
+                                    winningOption.firstVoter!!
+                                )}
+                            {winningOption.supporterCount > 1 ? (
+                              <>
+                                {' & '}
+                                {formatNumber(
+                                  winningOption.supporterCount,
+                                  true
+                                )}{' '}
+                                {t('McPostSuccess.others')}
+                              </>
+                            ) : null}{' '}
+                            {t('McPostSuccess.voted')}
+                          </SWinningBidCreatorText>
+                        </SCreator>
+                      </SWinningBidCreator>
+                      <SWinningOptionAmount variant={4}>
+                        {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
+                        {winningOption.voteCount > 1
+                          ? t('McPostSuccess.votes')
+                          : t('McPostSuccess.vote')}
+                      </SWinningOptionAmount>
+                      <SSeparator />
+                      <SWinningOptionDetails>
+                        <SWinningOptionDetailsBidChosen>
+                          {t('McPostSuccess.option_chosen')}
+                        </SWinningOptionDetailsBidChosen>
+                        <SWinningOptionDetailsSeeAll
+                          onClick={() => setOpenedMainSection('options')}
+                        >
+                          {t('McPostSuccess.see_all')}
+                        </SWinningOptionDetailsSeeAll>
+                        <SWinningOptionDetailsTitle variant={4}>
+                          {winningOption.text}
+                        </SWinningOptionDetailsTitle>
+                      </SWinningOptionDetails>
+                    </>
+                  )}
+                </SMainSectionWrapper>
+              </>
+            ) : (
+              <McSuccessOptionsTab
+                post={post}
+                handleGoBack={() => setOpenedMainSection('main')}
+              />
+            )}
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  };
 
 export default PostAwaitingResponseMC;
 
@@ -297,8 +291,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -310,12 +303,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -352,7 +343,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -362,7 +353,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 64px;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -431,7 +423,6 @@ const STotal = styled.div`
     font-weight: 700;
     font-size: 12px;
     line-height: 16px;
-
   }
   ${({ theme }) => theme.media.laptop} {
     position: relative;
@@ -493,7 +484,6 @@ const SWinningBidCreatorText = styled.span`
   }
 `;
 
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -510,16 +500,14 @@ const SWinningOptionDetails = styled.div`
   grid-template-areas:
     'bidchosen'
     'title'
-    'see_all'
-  ;
+    'see_all';
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'bidchosen see_all'
-      'title title'
-    ;
+      'title title';
     grid-template-columns: 1fr 1fr;
 
     margin-bottom: initial;
@@ -534,7 +522,6 @@ const SWinningOptionDetailsBidChosen = styled.div`
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
 
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
@@ -563,7 +550,9 @@ const SWinningOptionDetailsSeeAll = styled.button`
 
   cursor: pointer;
 
-  &:focus, &:hover, &:active {
+  &:focus,
+  &:hover,
+  &:active {
     outline: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -585,7 +574,6 @@ const SWinningOptionDetailsSeeAll = styled.button`
 const SWinningOptionDetailsTitle = styled(Headline)`
   grid-area: title;
 
-
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
@@ -601,6 +589,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

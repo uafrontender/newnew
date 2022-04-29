@@ -1,9 +1,9 @@
-import { newnewapi } from "newnew-api";
+import { newnewapi } from 'newnew-api';
 
-import { TPostType } from "./switchPostType";
+import { TPostType } from './switchPostType';
 
 export type TPostStatusStringified =
-  'scheduled'
+  | 'scheduled'
   | 'voting'
   | 'wating_for_decision'
   | 'waiting_for_response'
@@ -16,9 +16,11 @@ export type TPostStatusStringified =
 // TODO: Resolve stringification issue
 export default function switchPostStatus(
   postType: TPostType,
-  status: newnewapi.Auction.Status | newnewapi.Crowdfunding.Status | newnewapi.MultipleChoice.Status,
+  status:
+    | newnewapi.Auction.Status
+    | newnewapi.Crowdfunding.Status
+    | newnewapi.MultipleChoice.Status
 ): TPostStatusStringified {
-
   if (postType === 'ac') {
     switch (status as newnewapi.Auction.Status) {
       case newnewapi.Auction.Status.SCHEDULED: {

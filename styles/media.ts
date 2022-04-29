@@ -1,4 +1,5 @@
-const customMediaQuery = (minWidth: number) => `@media (min-width: ${minWidth}px)`;
+const customMediaQuery = (minWidth: number) =>
+  `@media (min-width: ${minWidth}px)`;
 
 interface ISIZES {
   desktop: number;

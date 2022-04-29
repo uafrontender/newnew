@@ -420,7 +420,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           />
           {/* Favorites and more options buttons */}
           <SFavoritesButton
-            view="transparent"
+            view='transparent'
             iconOnly
             onClick={() => handleToggleFollowingCreator()}
           >
@@ -443,7 +443,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             {t('ProfileLayout.buttons.favorites')}
           </SFavoritesButton>
           <SMoreButton
-            view="transparent"
+            view='transparent'
             iconOnly
             onClick={() => setIsEllipseMenuOpen(true)}
           >
@@ -490,7 +490,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             <SUsername variant={4}>{user.nickname}</SUsername>
             <SShareDiv>
               <SUsernameButton
-                view="tertiary"
+                view='tertiary'
                 iconOnly
                 style={{
                   paddingTop: '8px',
@@ -511,7 +511,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 </SUsernameButtonText>
               </SUsernameButton>
               <SShareButton
-                view="tertiary"
+                view='tertiary'
                 iconOnly
                 withDim
                 withShrink
@@ -526,8 +526,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   <InlineSvg
                     svg={ShareIconFilled}
                     fill={theme.colorsThemed.text.primary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 )}
               </SShareButton>
@@ -542,7 +542,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               >
                 <Button
                   withShadow
-                  view="primaryGrad"
+                  view='primaryGrad'
                   style={{
                     marginBottom: '16px',
                   }}
@@ -556,7 +556,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           {/* Temp, all creactors for now */}
           {/* {user.options?.isCreator && !user.options?.isPrivate */}
           {tabs.length > 0 ? (
-            <ProfileTabs pageType="othersProfile" tabs={tabs} />
+            <ProfileTabs pageType='othersProfile' tabs={tabs} />
           ) : null}
         </SProfileLayout>
         {renderChildren()}

@@ -6,7 +6,10 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
-import { getStandardSubscriptionProducts, setMySubscriptionProduct } from '../../../../api/endpoints/subscription';
+import {
+  getStandardSubscriptionProducts,
+  setMySubscriptionProduct,
+} from '../../../../api/endpoints/subscription';
 
 import Text from '../../../atoms/Text';
 import Lottie from '../../../atoms/Lottie';
@@ -21,11 +24,16 @@ interface ISubproductsSelect {
   mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
 }
 
-const SubproductsSelect: React.FC<ISubproductsSelect> = ({ mySubscriptionProduct }) => {
+const SubproductsSelect: React.FC<ISubproductsSelect> = ({
+  mySubscriptionProduct,
+}) => {
   const { t } = useTranslation('creator');
-  const [standardProducts, setStandardProducts] = useState<newnewapi.ISubscriptionProduct[]>([]);
+  const [standardProducts, setStandardProducts] = useState<
+    newnewapi.ISubscriptionProduct[]
+  >([]);
   const [featuredProductsIds, setFeaturedProductsIds] = useState<string[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<newnewapi.ISubscriptionProduct>();
+  const [selectedProduct, setSelectedProduct] =
+    useState<newnewapi.ISubscriptionProduct>();
   const [isLoading, setIsLoading] = useState(true);
   const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
   const router = useRouter();
@@ -34,10 +42,14 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ mySubscriptionProduct
     async function fetchOnboardingState() {
       try {
         const getStandardProductsPayload = new newnewapi.EmptyRequest({});
-        const getStandardProductsRes = await getStandardSubscriptionProducts(getStandardProductsPayload);
+        const getStandardProductsRes = await getStandardSubscriptionProducts(
+          getStandardProductsPayload
+        );
         if (getStandardProductsRes.data) {
           setStandardProducts(getStandardProductsRes.data.products);
-          setFeaturedProductsIds(getStandardProductsRes.data.featuredProductIds);
+          setFeaturedProductsIds(
+            getStandardProductsRes.data.featuredProductIds
+          );
         }
         setIsLoading(false);
       } catch (err) {
@@ -54,13 +66,19 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ mySubscriptionProduct
     } else {
       if (featuredProductsIds.length > 0 && standardProducts.length > 0) {
         setSelectedProduct(
-          standardProducts[standardProducts.findIndex((p) => featuredProductsIds.includes(p.id as string))]
+          standardProducts[
+            standardProducts.findIndex((p) =>
+              featuredProductsIds.includes(p.id as string)
+            )
+          ]
         );
       }
     }
   }, [mySubscriptionProduct, featuredProductsIds, standardProducts]);
 
-  const handleSetSelectedProduct = (product: newnewapi.ISubscriptionProduct) => {
+  const handleSetSelectedProduct = (
+    product: newnewapi.ISubscriptionProduct
+  ) => {
     setSelectedProduct(product);
   };
 
@@ -107,20 +125,22 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({ mySubscriptionProduct
           <SubsFeatures />
           <SActions>
             <Button
-              view="quaternary"
+              view='quaternary'
               onClick={() =>
-                !mySubscriptionProduct ? router.push('/creator/dashboard') : router.push('/creator/subscribers')
+                !mySubscriptionProduct
+                  ? router.push('/creator/dashboard')
+                  : router.push('/creator/subscribers')
               }
             >
               {t('SubrateSection.backButton')}
             </Button>
             {!mySubscriptionProduct ? (
-              <Button view="primaryGrad" onClick={() => handlerConfirmEnable()}>
+              <Button view='primaryGrad' onClick={() => handlerConfirmEnable()}>
                 {t('SubrateSection.submitDesktop')}
               </Button>
             ) : (
               <Button
-                view="primaryGrad"
+                view='primaryGrad'
                 disabled={mySubscriptionProduct.id === selectedProduct!!.id}
                 onClick={() => handlerUpdateRate()}
               >
@@ -184,7 +204,12 @@ interface IProductOption {
   handleClick: () => void;
 }
 
-const ProductOption: React.FunctionComponent<IProductOption> = ({ selected, featured, product, handleClick }) => {
+const ProductOption: React.FunctionComponent<IProductOption> = ({
+  selected,
+  featured,
+  product,
+  handleClick,
+}) => {
   const { t } = useTranslation('creator');
   const ref: any = useRef();
 
@@ -219,8 +244,14 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({ selected, feat
             <Text variant={1} weight={600}>
               ${formatNumber(product?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
             </Text>
-            <SPerMonth variant={2}>{t('SubrateSection.selectInput.perMonth')}</SPerMonth>
-            {featured && <SFeaturedLabel>{t('SubrateSection.selectInput.featured')}</SFeaturedLabel>}
+            <SPerMonth variant={2}>
+              {t('SubrateSection.selectInput.perMonth')}
+            </SPerMonth>
+            {featured && (
+              <SFeaturedLabel>
+                {t('SubrateSection.selectInput.featured')}
+              </SFeaturedLabel>
+            )}
           </>
         ) : (
           <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
@@ -240,7 +271,8 @@ const SProductOption = styled.button<{
   border-width: 2px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  border-color: ${({ theme, selected }) => (selected ? theme.colorsThemed.accent.blue : 'transparent')};
+  border-color: ${({ theme, selected }) =>
+    selected ? theme.colorsThemed.accent.blue : 'transparent'};
 
   width: 100%;
 
@@ -280,7 +312,8 @@ const SLabelContent = styled.div`
 `;
 
 const SPerMonth = styled(Text)`
-  color: ${({ theme }) => (theme.name === 'light' ? '#586070' : theme.colorsThemed.text.tertiary)};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? '#586070' : theme.colorsThemed.text.tertiary};
 `;
 
 const SFeaturedLabel = styled.div`

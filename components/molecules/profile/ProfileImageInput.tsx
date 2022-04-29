@@ -20,18 +20,20 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
 
   return (
     <SProfileImageInput>
-      { publicUrl ? (
+      {publicUrl ? (
         <img
           src={publicUrl}
-          alt="User avatar"
-          width="100%"
-          height="100%"
+          alt='User avatar'
+          width='100%'
+          height='100%'
           draggable={false}
         />
-      ) : <div />}
+      ) : (
+        <div />
+      )}
       <SImageInput
-        type="file"
-        accept="image/*"
+        type='file'
+        accept='image/*'
         multiple={false}
         disabled={disabled}
         ref={(el) => {
@@ -43,15 +45,11 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
         iconOnly
         withDim
         withShrink
-        view="transparent"
+        view='transparent'
         disabled={disabled}
         onClick={() => imageInputRef.current?.click()}
       >
-        <InlineSvg
-          svg={EditIcon}
-          width="20px"
-          height="20px"
-        />
+        <InlineSvg svg={EditIcon} width='20px' height='20px' />
       </SEditButton>
     </SProfileImageInput>
   );
@@ -70,14 +68,15 @@ const SProfileImageInput = styled.label`
   z-index: 6;
 
   border-radius: 50%;
-  box-shadow: 0px 0px 0px 14px ${({ theme }) => theme.colorsThemed.background.primary};
+  box-shadow: 0px 0px 0px 14px
+    ${({ theme }) => theme.colorsThemed.background.primary};
   background: ${({ theme }) => theme.colorsThemed.background.primary};
 
   width: 84px;
   height: 84px;
 
   cursor: pointer;
-  transition: .2s ease-in-out;
+  transition: 0.2s ease-in-out;
 
   /* No select */
   -webkit-touch-callout: none;
@@ -104,7 +103,7 @@ const SEditButton = styled(Button)`
   &:active:enabled {
     svg {
       path {
-        fill: ${({ theme }) => theme.colors.dark}
+        fill: ${({ theme }) => theme.colors.dark};
       }
     }
   }

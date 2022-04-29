@@ -275,7 +275,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
               </UserInfoSection>
               <SBulletsSection>
                 <SBullet>
-                  <SBulletImg alt="" src={dmsImage.src} />
+                  <SBulletImg alt='' src={dmsImage.src} />
                   <SBulletTitle variant={5}>
                     {t('TopSection.bullets.dms.title')}
                   </SBulletTitle>
@@ -286,7 +286,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   </SBulletBody>
                 </SBullet>
                 <SBullet>
-                  <SBulletImg alt="" src={votesImage.src} />
+                  <SBulletImg alt='' src={votesImage.src} />
                   <SBulletTitle variant={5}>
                     {t('TopSection.bullets.freeVotes.title')}
                   </SBulletTitle>
@@ -297,14 +297,14 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
                   </SBulletBody>
                 </SBullet>
                 <SBullet>
-                  <SBulletImg alt="" src={suggestionsImage.src} />
+                  <SBulletImg alt='' src={suggestionsImage.src} />
                   <SBulletTitle variant={5}>
                     {t('TopSection.bullets.suggestions.title')}
                   </SBulletTitle>
                   <SBulletBody variant={3}>
                     <Trans
                       t={t}
-                      i18nKey="TopSection.bullets.suggestions.body"
+                      i18nKey='TopSection.bullets.suggestions.body'
                       components={[
                         // @ts-ignore
                         <BoldSpan />,
