@@ -22,8 +22,7 @@ import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
-interface IFooter {
-}
+interface IFooter {}
 
 type TItem = {
   key: string;
@@ -75,7 +74,9 @@ export const Footer: React.FC<IFooter> = () => {
       email: true,
     },
   ];
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleLogoClick = () => {
     if (router.pathname === '/') {
@@ -94,15 +95,15 @@ export const Footer: React.FC<IFooter> = () => {
         <SExternalLink
           key={item.key}
           href={item.email ? `mailto: ${item.url}` : item.url}
-          target="_blank"
+          target='_blank'
         >
           {item.iconSrc ? (
-            <SSvgHolder target="_blank">
+            <SSvgHolder target='_blank'>
               <InlineSvg
                 svg={item.iconSrc}
                 fill={theme.colorsThemed.text.secondary}
-                width="20px"
-                height="20px"
+                width='20px'
+                height='20px'
                 hoverFill={theme.colorsThemed.text.primary}
               />
             </SSvgHolder>
@@ -115,17 +116,11 @@ export const Footer: React.FC<IFooter> = () => {
     }
 
     return (
-      <Link
-        key={item.key}
-        href={item.url}
-        passHref
-      >
-        <SBlockOption>
-          {t(`footer-${item.key}`)}
-        </SBlockOption>
+      <Link key={item.key} href={item.url} passHref>
+        <SBlockOption>{t(`footer-${item.key}`)}</SBlockOption>
       </Link>
     );
-  }
+  };
 
   return (
     <SWrapper>
@@ -138,8 +133,8 @@ export const Footer: React.FC<IFooter> = () => {
                   clickable
                   svg={mobileLogo}
                   fill={theme.colorsThemed.text.primary}
-                  width="48px"
-                  height="48px"
+                  width='48px'
+                  height='48px'
                   onClick={handleLogoClick}
                 />
               </SIconHolder>
@@ -205,12 +200,10 @@ export const Footer: React.FC<IFooter> = () => {
                   <SBottomBlockOptionInc>
                     {t('footer-inc')}
                   </SBottomBlockOptionInc>
-                  <Link href="/terms" passHref>
-                    <SBottomBlockOption>
-                      {t('footer-terms')}
-                    </SBottomBlockOption>
+                  <Link href='/terms' passHref>
+                    <SBottomBlockOption>{t('footer-terms')}</SBottomBlockOption>
                   </Link>
-                  <Link href="/privacy" passHref>
+                  <Link href='/privacy' passHref>
                     <SBottomBlockOption>
                       {t('footer-privacy')}
                     </SBottomBlockOption>
@@ -233,7 +226,10 @@ export const Footer: React.FC<IFooter> = () => {
 export default Footer;
 
 const SWrapper = styled.footer`
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.secondary : props.theme.colorsThemed.background.primary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.secondary
+      : props.theme.colorsThemed.background.primary};
 `;
 
 const SContent = styled.div`
@@ -268,7 +264,8 @@ const SBlock = styled.div`
 const SSeparator = styled.div`
   margin-top: 12px;
   margin-bottom: 24px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 36px;
@@ -338,8 +335,7 @@ const SExternalLink = styled.a`
   gap: 9px;
 `;
 
-const SSvgHolder = styled.a`
-`;
+const SSvgHolder = styled.a``;
 
 const SIconHolder = styled.div`
   top: 32px;

@@ -25,9 +25,12 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = ({ user }) => {
       <SBottomActionLeft>
         <SBottomActionIcon>🙊</SBottomActionIcon>
         <SBottomActionText>
-          <SBottomActionTitle>{t('messaging-disabled.title')}</SBottomActionTitle>
+          <SBottomActionTitle>
+            {t('messaging-disabled.title')}
+          </SBottomActionTitle>
           <SBottomActionMessage>
-            {user.nickname ? user.nickname : user.username} {t('messaging-disabled.message')}
+            {user.nickname ? user.nickname : user.username}{' '}
+            {t('messaging-disabled.message')}
           </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
@@ -35,7 +38,7 @@ const MessagingDisabled: React.FC<IMessagingDisabled> = ({ user }) => {
         withDim
         withShadow
         withShrink
-        view="primaryGrad"
+        view='primaryGrad'
         onClick={() => {
           router.push(`/${user.username}`);
         }}

@@ -5,15 +5,13 @@ interface IProfileImage {
   src: string;
 }
 
-const ProfileImage: React.FunctionComponent<IProfileImage> = ({
-  src,
-}) => (
+const ProfileImage: React.FunctionComponent<IProfileImage> = ({ src }) => (
   <SProfileImage>
     <img
       src={src}
-      alt="User avatar"
-      width="100%"
-      height="100%"
+      alt='User avatar'
+      width='100%'
+      height='100%'
       draggable={false}
     />
   </SProfileImage>
@@ -31,7 +29,8 @@ const SProfileImage = styled.div`
 
   border-radius: 50%;
 
-  box-shadow: 0px 0px 0px 16px ${({ theme }) => theme.colorsThemed.background.secondary};
+  box-shadow: 0px 0px 0px 16px
+    ${({ theme }) => theme.colorsThemed.background.secondary};
   background: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   width: 96px;
@@ -44,7 +43,6 @@ const SProfileImage = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
 
   ${(props) => props.theme.media.tablet} {
     top: 152px;

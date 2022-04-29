@@ -25,8 +25,10 @@ const MobileDashBoardChat: React.FC<IMobileDashBoardChat> = ({ closeChat }) => {
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('creator');
-  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(false);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const [chatListHidden, setChatListHidden] =
+    useState<boolean | undefined>(false);
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
@@ -94,7 +96,10 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100vh;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colors.black)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colors.black};
   flex-shrink: 0;
   ${(props) => {
     if (props.hidden === false) {

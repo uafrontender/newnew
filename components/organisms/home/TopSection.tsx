@@ -25,7 +25,7 @@ const SCROLL_STEP = {
 };
 
 interface ITopSection {
-  collection: newnewapi.Post[],
+  collection: newnewapi.Post[];
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -47,7 +47,9 @@ export const TopSection: React.FC<ITopSection> = ({
   const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
   const country = 'USA';
   let scrollStep = SCROLL_STEP.desktop;
@@ -119,29 +121,20 @@ export const TopSection: React.FC<ITopSection> = ({
         name={`top-section-${index}`}
         onClick={handleItemClick}
       >
-        <Card
-          type="inside"
-          item={item}
-          index={index + 1}
-        />
+        <Card type='inside' item={item} index={index + 1} />
       </SItemWrapper>
     );
   };
 
-  const {
-    renderLeftArrow,
-    renderRightArrow,
-  } = useHoverArrows(ref);
-  const {
-    showLeftGradient,
-    showRightGradient,
-  } = useScrollGradientsHorizontal(scrollContainerRef);
-
+  const { renderLeftArrow, renderRightArrow } = useHoverArrows(ref);
+  const { showLeftGradient, showRightGradient } =
+    useScrollGradientsHorizontal(scrollContainerRef);
 
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
       const currentScrollPosition = scrollContainerRef.current.scrollLeft;
-      const childWidth = scrollContainerRef.current.firstChild.getBoundingClientRect().width;
+      const childWidth =
+        scrollContainerRef.current.firstChild.getBoundingClientRect().width;
 
       setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
     });
@@ -153,22 +146,19 @@ export const TopSection: React.FC<ITopSection> = ({
 
   return (
     <SWrapper
-      name="topSection"
-      layoutId="topSection"
+      name='topSection'
+      layoutId='topSection'
       transition={{
         ease: 'easeInOut',
         duration: 1,
       }}
     >
-      <SHeadline
-        variant={4}
-        animation="t-01"
-      >
+      <SHeadline variant={4} animation='t-01'>
         {t('top-block-title', { country })}
       </SHeadline>
       <SListContainer ref={ref}>
         <SListWrapper
-          id="topScrollContainer"
+          id='topScrollContainer'
           ref={scrollContainerRef}
           onMouseUp={mouseUpHandler}
           onMouseDown={mouseDownHandler}
@@ -180,14 +170,14 @@ export const TopSection: React.FC<ITopSection> = ({
         {!isDragging && canScrollLeft && (
           <ScrollArrow
             active={renderLeftArrow}
-            position="left"
+            position='left'
             handleClick={handleLeftClick}
           />
         )}
         {!isDragging && canScrollRight && (
           <ScrollArrow
             active={renderRightArrow}
-            position="right"
+            position='right'
             handleClick={handleRightClick}
           />
         )}

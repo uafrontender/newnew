@@ -28,22 +28,15 @@ const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
 
   return (
     <SFiltersSection>
-      <SText
-        variant={3}
-      >
-        {(numDecisions && numDecisions !== 0) ? (
+      <SText variant={3}>
+        {numDecisions && numDecisions !== 0 ? (
           <>
-            {numDecisions}
-            {' '}
-            { t('posts-filter.decisions') }
+            {numDecisions} {t('posts-filter.decisions')}
           </>
         ) : null}
-        {((!numDecisions || numDecisions === 0) && !isLoading) ? (
-          <>
-            { t('posts-filter.no-decisions') }
-          </>
-        ) : null}
-        {' '}
+        {(!numDecisions || numDecisions === 0) && !isLoading ? (
+          <>{t('posts-filter.no-decisions')}</>
+        ) : null}{' '}
       </SText>
     </SFiltersSection>
   );

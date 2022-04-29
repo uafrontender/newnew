@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -33,29 +39,42 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const isMySuggestion = useMemo(() => (
-    user.loggedIn && option.creator?.uuid === user.userData?.userUuid
-  ), [user.loggedIn, option.creator?.uuid, user.userData?.userUuid]);
+  const isMySuggestion = useMemo(
+    () => user.loggedIn && option.creator?.uuid === user.userData?.userUuid,
+    [user.loggedIn, option.creator?.uuid, user.userData?.userUuid]
+  );
 
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   const handleRedirectToUser = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
+    window?.history.replaceState(
+      {
+        fromPost: true,
+      },
+      '',
+      ''
+    );
     router.push(`/${option.creator?.username!!}`);
   };
 
   const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState({
-          fromPost: true,
-        }, '', '');
-        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
+        window?.history.replaceState(
+          {
+            fromPost: true,
+          },
+          '',
+          ''
+        );
+        router.push(
+          `/sign-up?reason=follow-decision&redirect=${window.location.href}`
+        );
       }
       const markAsFavoritePayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -72,8 +91,10 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
 
   useEffect(() => {
     if (isBrowser()) {
-      const currScroll = document.getElementById('post-modal-container')!!.scrollTop!!;
-      const targetScroll = (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
+      const currScroll = document.getElementById('post-modal-container')!!
+        .scrollTop!!;
+      const targetScroll =
+        (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
       setIsScrolledDown(currScroll >= targetScroll!!);
     }
@@ -83,30 +104,35 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
     const handler = (e: Event) => {
       // @ts-ignore
       const currScroll = e?.currentTarget?.scrollTop!!;
-      const targetScroll = (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
+      const targetScroll =
+        (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
       if (currScroll >= targetScroll!!) {
         setIsScrolledDown(true);
       } else {
         setIsScrolledDown(false);
       }
-    }
+    };
 
     if (isBrowser()) {
-      document?.getElementById('post-modal-container')?.addEventListener('scroll', handler);
+      document
+        ?.getElementById('post-modal-container')
+        ?.addEventListener('scroll', handler);
     }
 
     return () => {
       if (isBrowser()) {
-        document?.getElementById('post-modal-container')?.removeEventListener('scroll', handler);
+        document
+          ?.getElementById('post-modal-container')
+          ?.removeEventListener('scroll', handler);
       }
-    }
+    };
   }, [isMobile]);
 
   return (
     <>
       <STabContainer
-        key="winner"
+        key='winner'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -116,71 +142,53 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
       >
         <SWinnerOptionCard
           style={{
-            ...(isMobile ? {
-              position: !isScrolledDown ? 'fixed' : 'relative',
-              bottom: !isScrolledDown ? '88px' : 'initial',
-              left: !isScrolledDown ? '16px' : 'initial',
-              width: !isScrolledDown ? 'calc(100% - 32px)' : '100%',
-            } : {}),
+            ...(isMobile
+              ? {
+                  position: !isScrolledDown ? 'fixed' : 'relative',
+                  bottom: !isScrolledDown ? '88px' : 'initial',
+                  left: !isScrolledDown ? '16px' : 'initial',
+                  width: !isScrolledDown ? 'calc(100% - 32px)' : '100%',
+                }
+              : {}),
           }}
         >
           <SOptionDetails>
-            <SNumBidders
-              variant={3}
-            >
-              <SSpanBold>
-                {formatNumber(
-                  option.supporterCount,
-                  true,
-                )}
-              </SSpanBold>
-              {' '}
+            <SNumBidders variant={3}>
+              <SSpanBold>{formatNumber(option.supporterCount, true)}</SSpanBold>{' '}
               <SSpanThin>
                 {option.supporterCount > 1
                   ? t('McPost.WinnerTab.WinnerOptionCard.voters_told_you')
-                  : t('McPost.WinnerTab.WinnerOptionCard.voter_told_you')
-                }
+                  : t('McPost.WinnerTab.WinnerOptionCard.voter_told_you')}
               </SSpanThin>
             </SNumBidders>
-            <SHeadline
-              variant={4}
-            >
-              { option.text }
+            <SHeadline variant={4}>{option.text}</SHeadline>
+            <SHeadline variant={4}>
+              ${formatNumber(option.voteCount * 5, true)}
             </SHeadline>
-            <SHeadline
-              variant={4}
-            >
-              $
-              {formatNumber(
-                option.voteCount * 5,
-                true,
-              )}
-            </SHeadline>
-            <SOptionCreator
-              variant={3}
-            >
+            <SOptionCreator variant={3}>
               <SSpanThin>
-                { t('McPost.WinnerTab.WinnerOptionCard.created_by') }
-              </SSpanThin>
-              {' '}
+                {t('McPost.WinnerTab.WinnerOptionCard.created_by')}
+              </SSpanThin>{' '}
               <SSpanBold
                 onClick={() => {
                   if (isMySuggestion) return;
                   handleRedirectToUser();
                 }}
                 style={{
-                  ...(!isMySuggestion ? {
-                    cursor: 'pointer',
-                  } : {}),
+                  ...(!isMySuggestion
+                    ? {
+                        cursor: 'pointer',
+                      }
+                    : {}),
                 }}
               >
-                {isMySuggestion ? t('McPost.OptionsTab.me') : (option.creator?.nickname ?? option.creator?.username)}
+                {isMySuggestion
+                  ? t('McPost.OptionsTab.me')
+                  : option.creator?.nickname ?? option.creator?.username}
               </SSpanBold>
             </SOptionCreator>
           </SOptionDetails>
-          <STrophyImg
-            src={WinnerIcon.src}
-          />
+          <STrophyImg src={WinnerIcon.src} />
           {!isMobile && (
             <>
               <STrophyGlow />
@@ -188,14 +196,20 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
               <STopScoop>
                 <mask id='mask-STopScoop'>
                   <svg>
-                    <circle id='circle-STopScoop' r='50' fill='#07e071' x='100%' y='100%'/>
+                    <circle
+                      id='circle-STopScoop'
+                      r='50'
+                      fill='#07e071'
+                      x='100%'
+                      y='100%'
+                    />
                   </svg>
                 </mask>
               </STopScoop>
               <SBottomScoop>
                 <mask id='mask-SBottomScoop'>
                   <svg>
-                    <circle id='circle-SBottomScoop' r='30' fill='#0ae46a'/>
+                    <circle id='circle-SBottomScoop' r='30' fill='#0ae46a' />
                   </svg>
                 </mask>
               </SBottomScoop>
@@ -225,9 +239,10 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
             }}
             handleButtonClick={() => {
               document.getElementById('post-modal-container')?.scrollTo({
-                top: document.getElementById('recommendations-section-heading')?.offsetTop,
+                top: document.getElementById('recommendations-section-heading')
+                  ?.offsetTop,
                 behavior: 'smooth',
-              })
+              });
             }}
           />
         )}
@@ -255,15 +270,22 @@ const SWinnerOptionCard = styled.div`
   padding: 16px;
   padding-right: 164px;
 
-  background: linear-gradient(211.77deg, #0FF34F 0%, #07DF74 33.86%, #00C291 76.49%);
+  background: linear-gradient(
+    211.77deg,
+    #0ff34f 0%,
+    #07df74 33.86%,
+    #00c291 76.49%
+  );
   border-radius: 24px;
 
   display: flex;
   justify-content: flex-start;
   align-items: center;
 
-  div, h4, span {
-    color: #FFFFFF;
+  div,
+  h4,
+  span {
+    color: #ffffff;
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -330,13 +352,14 @@ const STopScoop = styled.div`
 
   transform: rotate(-90deg);
 
-	width: 50px;
-	height: 80px;
+  width: 50px;
+  height: 80px;
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   svg {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -347,30 +370,29 @@ const SBottomScoop = styled.div`
 
   transform: rotate(214deg);
 
-	width: 50px;
-	height: 50px;
+  width: 50px;
+  height: 50px;
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   border-radius: 48%;
 
   svg {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
   }
 `;
 
 // Option details
 const SOptionDetails = styled.div`
-  color: #FFFFFF;
+  color: #ffffff;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 `;
 
-const SNumBidders = styled(Text)`
-
-`;
+const SNumBidders = styled(Text)``;
 
 const SHeadline = styled(Headline)`
   margin-bottom: 8px;
@@ -382,13 +404,9 @@ const SHeadline = styled(Headline)`
   }
 `;
 
-const SOptionCreator = styled(Text)`
+const SOptionCreator = styled(Text)``;
 
-`;
-
-const SSpanBold = styled.span`
-
-`;
+const SSpanBold = styled.span``;
 
 const SSpanThin = styled.span`
   opacity: 0.8;

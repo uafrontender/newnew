@@ -12,7 +12,7 @@ const HomeLayout: React.FC = (props) => {
     <ErrorBoundary>
       <AnimateSharedLayout>
         <GeneralTemplate
-          // restrictMaxWidth={true}
+        // restrictMaxWidth={true}
         >
           {children}
         </GeneralTemplate>

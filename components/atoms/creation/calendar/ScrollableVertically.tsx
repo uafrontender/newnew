@@ -5,12 +5,26 @@ import styled from 'styled-components';
 import Text from '../../Text';
 
 const isSameDate = (firstDate: moment.Moment, secondDate: Date) =>
-  moment(firstDate, 'DD/MM/YYYY').diff(moment(secondDate, 'DD/MM/YYYY'), 'days', false) === 0;
+  moment(firstDate, 'DD/MM/YYYY').diff(
+    moment(secondDate, 'DD/MM/YYYY'),
+    'days',
+    false
+  ) === 0;
 
-const isDisabled = (minDate: Date, currentDate: moment.Moment, maxDate: Date) => {
+const isDisabled = (
+  minDate: Date,
+  currentDate: moment.Moment,
+  maxDate: Date
+) => {
   const min = moment(moment(minDate).format('DD/MM/YYYY'), 'DD/MM/YYYY');
-  const max = moment(moment(maxDate || currentDate).format('DD/MM/YYYY'), 'DD/MM/YYYY');
-  const current = moment(moment(currentDate).format('DD/MM/YYYY'), 'DD/MM/YYYY');
+  const max = moment(
+    moment(maxDate || currentDate).format('DD/MM/YYYY'),
+    'DD/MM/YYYY'
+  );
+  const current = moment(
+    moment(currentDate).format('DD/MM/YYYY'),
+    'DD/MM/YYYY'
+  );
   return !(min <= current && current <= max);
 };
 
@@ -21,28 +35,29 @@ interface ICalendarScrollableVertically {
   selectedDate?: any | null;
 }
 
-export const CalendarScrollableVertically: React.FC<ICalendarScrollableVertically> = (props) => {
-  const { minDate, maxDate, onSelect, selectedDate } = props;
+export const CalendarScrollableVertically: React.FC<ICalendarScrollableVertically> =
+  (props) => {
+    const { minDate, maxDate, onSelect, selectedDate } = props;
 
-  const handleSelectedDate = (e: any, value: any) => {
-    if (e) {
-      e.preventDefault();
-    }
+    const handleSelectedDate = (e: any, value: any) => {
+      if (e) {
+        e.preventDefault();
+      }
 
-    if (onSelect) {
-      onSelect(value);
-    }
+      if (onSelect) {
+        onSelect(value);
+      }
+    };
+
+    return (
+      <RenderCalendarYear
+        minDate={minDate}
+        maxDate={maxDate}
+        selectedDate={selectedDate}
+        handleSelect={handleSelectedDate}
+      />
+    );
   };
-
-  return (
-    <RenderCalendarYear
-      minDate={minDate}
-      maxDate={maxDate}
-      selectedDate={selectedDate}
-      handleSelect={handleSelectedDate}
-    />
-  );
-};
 
 CalendarScrollableVertically.defaultProps = {
   selectedDate: null,
@@ -57,7 +72,9 @@ export const RenderCalendarYear = (props: any) => {
   let now = moment(minDate, 'DD/MMM/YYYY');
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < totalMonth; i++) {
-    elements.push(<RenderMonthCard key={i} currentMonth={now.clone()} {...props} />);
+    elements.push(
+      <RenderMonthCard key={i} currentMonth={now.clone()} {...props} />
+    );
     now = now.add(1, 'M');
   }
   return <SContent>{elements}</SContent>;
@@ -124,7 +141,14 @@ const SMonthHeader = styled(Text)`
 `;
 
 export const RenderSingleDay = (props: any) => {
-  const { i, view, isActive, handleClick, currentValue, isDisabled: _isDisabled } = props;
+  const {
+    i,
+    view,
+    isActive,
+    handleClick,
+    currentValue,
+    isDisabled: _isDisabled,
+  } = props;
   const onClick = (e: any) => {
     handleClick(e, currentValue);
   };
@@ -165,23 +189,39 @@ const SDay = styled(Text)<ISDay>`
   color: ${(props) =>
     props.isActive
       ? props.theme.colors.white
-      : `${props.isDisabled ? props.theme.colorsThemed.text.tertiary : props.theme.colorsThemed.text.primary}`};
-  cursor: ${(props) => (props.isDisabled || props.isActive ? 'not-allowed' : 'pointer')};
+      : `${
+          props.isDisabled
+            ? props.theme.colorsThemed.text.tertiary
+            : props.theme.colorsThemed.text.primary
+        }`};
+  cursor: ${(props) =>
+    props.isDisabled || props.isActive ? 'not-allowed' : 'pointer'};
   height: 44px;
   display: inline-block;
-  background: ${(props) => (props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent')};
+  background: ${(props) =>
+    props.isActive ? props.theme.colorsThemed.accent.blue : 'transparent'};
   line-height: 46px;
   border-radius: 22px;
-  pointer-events: ${(props) => (props.isDisabled || props.isActive ? 'none' : 'unset')};
+  pointer-events: ${(props) =>
+    props.isDisabled || props.isActive ? 'none' : 'unset'};
 
   :hover {
     background: ${(props) =>
-      props.isActive ? props.theme.colorsThemed.accent.blue : props.theme.colorsThemed.background.quaternary};
+      props.isActive
+        ? props.theme.colorsThemed.accent.blue
+        : props.theme.colorsThemed.background.quaternary};
   }
 `;
 
 export const RenderDays = (props: any) => {
-  const { date, view = 'md', minDate, maxDate, selectedDate, handleSelect } = props;
+  const {
+    date,
+    view = 'md',
+    minDate,
+    maxDate,
+    selectedDate,
+    handleSelect,
+  } = props;
   const startDate = date.startOf('month');
   const daysInMonth = date.daysInMonth();
   const balanceDayCount = startDate.day();

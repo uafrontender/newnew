@@ -1,10 +1,18 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, cookiesInstance, fetchProtobuf, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import {
+  BASE_URL,
+  cookiesInstance,
+  fetchProtobuf,
+  fetchProtobufProtectedIntercepted,
+} from '../apiConfigs';
 
 export const BASE_URL_POST = `${BASE_URL}/post`;
 
 export const createPost = (payload: newnewapi.CreatePostRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.CreatePostRequest, newnewapi.Post>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.CreatePostRequest,
+    newnewapi.Post
+  >(
     newnewapi.CreatePostRequest,
     newnewapi.Post,
     `${BASE_URL_POST}/create_post`,
@@ -13,7 +21,10 @@ export const createPost = (payload: newnewapi.CreatePostRequest) =>
   );
 
 export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.SetPostThumbnailRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.SetPostThumbnailRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.SetPostThumbnailRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_POST}/set_post_thumbnail`,
@@ -22,7 +33,10 @@ export const setPostThumbnail = (payload: newnewapi.SetPostThumbnailRequest) =>
   );
 
 export const markPost = (payload: newnewapi.MarkPostRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.MarkPostRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.MarkPostRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.MarkPostRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_POST}/mark_post`,
@@ -31,7 +45,10 @@ export const markPost = (payload: newnewapi.MarkPostRequest) =>
   );
 
 export const deleteMyPost = (payload: newnewapi.DeleteMyPostRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.DeleteMyPostRequest, newnewapi.EmptyResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.DeleteMyPostRequest,
+    newnewapi.EmptyResponse
+  >(
     newnewapi.DeleteMyPostRequest,
     newnewapi.EmptyResponse,
     `${BASE_URL_POST}/delete_my_post`,
@@ -39,8 +56,13 @@ export const deleteMyPost = (payload: newnewapi.DeleteMyPostRequest) =>
     payload
   );
 
-export const uploadPostResponse = (payload: newnewapi.UploadPostResponseRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.UploadPostResponseRequest, newnewapi.Post>(
+export const uploadPostResponse = (
+  payload: newnewapi.UploadPostResponseRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.UploadPostResponseRequest,
+    newnewapi.Post
+  >(
     newnewapi.UploadPostResponseRequest,
     newnewapi.Post,
     `${BASE_URL_POST}/upload_post_response`,
@@ -55,13 +77,18 @@ export const fetchPostByUUID = (payload: newnewapi.GetPostRequest) =>
     `${BASE_URL_POST}/get_post`,
     'post',
     payload,
-    (cookiesInstance.get('accessToken') ? {
-      'x-auth-token': cookiesInstance.get('accessToken'),
-    } : {}),
+    cookiesInstance.get('accessToken')
+      ? {
+          'x-auth-token': cookiesInstance.get('accessToken'),
+        }
+      : {}
   );
 
 export const fetchUsersPosts = (payload: newnewapi.GetUserPostsRequest) =>
-  fetchProtobuf<newnewapi.GetUserPostsRequest, newnewapi.PagedCountedPostsResponse>(
+  fetchProtobuf<
+    newnewapi.GetUserPostsRequest,
+    newnewapi.PagedCountedPostsResponse
+  >(
     newnewapi.GetUserPostsRequest,
     newnewapi.PagedCountedPostsResponse,
     `${BASE_URL_POST}/get_user_posts`,
@@ -89,7 +116,10 @@ export const fetchFeaturedCreatorPosts = (payload: newnewapi.EmptyRequest) =>
   );
 
 export const fetchForYouPosts = (payload: newnewapi.PagedRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.PagedRequest,
+    newnewapi.PagedPostsResponse
+  >(
     newnewapi.PagedRequest,
     newnewapi.PagedPostsResponse,
     `${BASE_URL_POST}/get_for_you_posts`,
@@ -116,7 +146,10 @@ export const fetchMoreLikePosts = (payload: newnewapi.GetSimilarPostsRequest) =>
   );
 
 export const getMyUrgentPosts = (payload: newnewapi.PagedRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.PagedRequest, newnewapi.PagedPostsResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.PagedRequest,
+    newnewapi.PagedPostsResponse
+  >(
     newnewapi.PagedRequest,
     newnewapi.PagedPostsResponse,
     `${BASE_URL_POST}/get_my_urgent_posts`,

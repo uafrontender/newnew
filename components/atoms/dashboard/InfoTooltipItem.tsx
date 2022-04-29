@@ -11,7 +11,11 @@ interface IInfoTooltipItem {
   closeTooltip: () => void;
 }
 
-const InfoTooltipItem: React.FC<IInfoTooltipItem> = ({ contributions, money, closeTooltip }) => {
+const InfoTooltipItem: React.FC<IInfoTooltipItem> = ({
+  contributions,
+  money,
+  closeTooltip,
+}) => {
   const { t } = useTranslation('creator');
   const ref: any = useRef();
 
@@ -22,13 +26,24 @@ const InfoTooltipItem: React.FC<IInfoTooltipItem> = ({ contributions, money, clo
   return (
     <SInfoTooltip ref={ref}>
       <SInfoTooltipItem>
-        <Image src={coin} alt={t('dashboard.expirationPosts.table.header.contributions')} width={22} height={24} />
+        <Image
+          src={coin}
+          alt={t('dashboard.expirationPosts.table.header.contributions')}
+          width={22}
+          height={24}
+        />
         <SInfoTooltipText>
-          {t('dashboard.expirationPosts.table.header.contributions')}: {contributions}
+          {t('dashboard.expirationPosts.table.header.contributions')}:{' '}
+          {contributions}
         </SInfoTooltipText>
       </SInfoTooltipItem>
       <SInfoTooltipItem>
-        <Image src={coin} alt={t('dashboard.expirationPosts.table.header.total')} width={22} height={24} />
+        <Image
+          src={coin}
+          alt={t('dashboard.expirationPosts.table.header.total')}
+          width={22}
+          height={24}
+        />
         <SInfoTooltipText>
           {t('dashboard.expirationPosts.table.header.total')}: {money}
         </SInfoTooltipText>

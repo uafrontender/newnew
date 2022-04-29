@@ -11,7 +11,7 @@ type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
   popupCaption: ReactElement;
   frequencyCaption: string;
   errorCaption: string;
-}
+};
 
 const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   value,
@@ -29,10 +29,8 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   const [focused, setFocused] = useState(false);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = (value as string).length > 0
-      ? e.target.value
-        .slice(1)
-      : e.target.value;
+    const newValue =
+      (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
 
     // @ts-ignore
     onChange(newValue || '');
@@ -67,22 +65,14 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         }}
         {...rest}
       />
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
       <AnimatePresence>
         {isPopupVisible ? (
           <SPopup
@@ -117,20 +107,12 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
           </SPopup>
         ) : null}
       </AnimatePresence>
-      <SCaptionDiv
-        disabled={disabled ?? false}
-      >
-        { frequencyCaption }
-      </SCaptionDiv>
+      <SCaptionDiv disabled={disabled ?? false}>{frequencyCaption}</SCaptionDiv>
       <SStyledButton
         disabled={disabled}
         onClick={() => setIsPopupVisible((curr) => !curr)}
       >
-        <InlineSvg
-          svg={AlertIcon}
-          width="24px"
-          height="24px"
-        />
+        <InlineSvg svg={AlertIcon} width='24px' height='24px' />
       </SStyledButton>
     </SWrapper>
   );
@@ -162,7 +144,6 @@ const SStyledButton = styled.button`
   background: transparent;
   box-shadow: none;
 
-
   cursor: pointer;
 
   svg {
@@ -171,7 +152,8 @@ const SStyledButton = styled.button`
     }
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
   }
 
@@ -182,7 +164,7 @@ const SStyledButton = styled.button`
 `;
 
 interface ISUsernameInput {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SUsernameInput = styled.input<ISUsernameInput>`
@@ -201,7 +183,8 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       return 'transparent';
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -217,15 +200,18 @@ const SUsernameInput = styled.input<ISUsernameInput>`
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled, &:focus:enabled, &:active:enabled {
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   &:disabled {
@@ -243,7 +229,7 @@ const SPopup = styled(motion.div)`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  transition: .2s linear;
+  transition: 0.2s linear;
   z-index: 6;
 
   &:after {
@@ -258,7 +244,9 @@ const SPopup = styled(motion.div)`
     display: inline-block;
 
     background-color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-    clip-path: path('M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z');
+    clip-path: path(
+      'M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z'
+    );
   }
 `;
 
@@ -278,7 +266,10 @@ const SCaptionDiv = styled.div<{
   margin-top: 6px;
 
   ${({ disabled }) => {
-    if (disabled) return css`opacity: 0.5;`;
+    if (disabled)
+      return css`
+        opacity: 0.5;
+      `;
     return null;
   }}
 `;

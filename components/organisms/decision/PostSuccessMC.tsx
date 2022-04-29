@@ -3,11 +3,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -35,22 +31,23 @@ interface IPostSuccessMC {
   post: newnewapi.MultipleChoice;
 }
 
-const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
-  post,
-}) => {
+const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({ post }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-    // Winninfg option
+  // Winninfg option
   const [winningOption, setWinningOption] =
     useState<newnewapi.MultipleChoice.Option | undefined>();
 
-    // Video
+  // Video
   // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
+  const [videoTab, setVideoTab] =
+    useState<'announcement' | 'response'>('announcement');
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
     post.isResponseViewedByMe ?? false
@@ -60,15 +57,13 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-    // Main screen vs all options
-  const [openedMainSection, setOpenedMainSection] = useState<'main' | 'options'>('main');
+  // Main screen vs all options
+  const [openedMainSection, setOpenedMainSection] =
+    useState<'main' | 'options'>('main');
 
-    // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
+  // Comments
+  const { ref: commentsSectionRef, inView } = useInView({
+    threshold: 0.8,
   });
 
   // Scroll to comments if hash is present
@@ -119,7 +114,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
 
         const res = await getMcOption(payload);
 
-        console.log(res)
+        console.log(res);
 
         if (res.data?.option) {
           setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
@@ -129,7 +124,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
       }
     }
 
-    console.log(post.winningOptionId)
+    console.log(post.winningOptionId);
 
     if (post.winningOptionId) {
       fetchAndSetWinningOption(post.winningOptionId as number);
@@ -153,88 +148,82 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
         <SActivitesContainer>
           {openedMainSection === 'main' ? (
             <>
-              <DecisionEndedBox
-                type="mc"
-                imgSrc={BoxIcon.src}
-              >
+              <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
                 {t('McPostSuccess.hero_text')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
-                    <SCreatorImage
-                      src={post.creator?.avatarUrl!!}
-                    />
+                    <SCreatorImage src={post.creator?.avatarUrl!!} />
                     <SWantsToKnow>
-                      {t('McPostSuccess.wants_to_know', { creator: post.creator?.nickname })}
+                      {t('McPostSuccess.wants_to_know', {
+                        creator: post.creator?.nickname,
+                      })}
                     </SWantsToKnow>
                   </SCreator>
                   <STotal>
-                    {`${formatNumber(post.totalVotes ?? 0, true)}`}
-                    {' '}
-                    <span>
-                      {t('McPostSuccess.in_total_votes')}
-                    </span>
+                    {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                    <span>{t('McPostSuccess.in_total_votes')}</span>
                   </STotal>
                 </SCreatorInfoDiv>
-                <SPostTitle
-                  variant={4}
-                >
-                  {post.title}
-                </SPostTitle>
+                <SPostTitle variant={4}>{post.title}</SPostTitle>
                 <SSeparator />
                 {winningOption && (
-                <>
-                  <SWinningBidCreator>
-                    <SCreator>
-                      <SCreatorImage
-                        src={winningOption.creator?.avatarUrl ?? winningOption.firstVoter?.avatarUrl!!}
-                      />
-                      <SWinningBidCreatorText>
-                        { winningOption.creator?.uuid === user.userData?.userUuid || winningOption.isSupportedByMe ? (
-                            winningOption.supporterCount > 1 ? (
-                              t('me')
-                            ) : t('I')
-                          ) : (
-                            getDisplayname(winningOption.creator ?? winningOption.firstVoter!!)
-                        ) }
-                        {winningOption.supporterCount > 1 ? (
-                          <>
-                            {' & '}
-                            {formatNumber(winningOption.supporterCount, true)}
-                            {' '}
-                            {t('McPostSuccess.others')}
-                          </>
-                        ) : null}
-                        {' '}
-                        {t('McPostSuccess.voted')}
-                      </SWinningBidCreatorText>
-                    </SCreator>
-                  </SWinningBidCreator>
-                  <SWinningOptionAmount
-                    variant={4}
-                  >
-                    {`${formatNumber(winningOption.voteCount ?? 0, true)}`}
-                    {' '}
-                    { winningOption.voteCount > 1 ? t('McPostSuccess.votes') : t('McPostSuccess.vote')}
-                  </SWinningOptionAmount>
-                  <SSeparator />
-                  <SWinningOptionDetails>
-                    <SWinningOptionDetailsBidChosen>
-                      {t('McPostSuccess.option_chosen')}
-                    </SWinningOptionDetailsBidChosen>
-                    <SWinningOptionDetailsSeeAll
-                      onClick={() => setOpenedMainSection('options')}
-                    >
-                      {t('McPostSuccess.see_all')}
-                    </SWinningOptionDetailsSeeAll>
-                    <SWinningOptionDetailsTitle
-                      variant={4}
-                    >
-                      {winningOption.text}
-                    </SWinningOptionDetailsTitle>
-                  </SWinningOptionDetails>
-                </>
+                  <>
+                    <SWinningBidCreator>
+                      <SCreator>
+                        <SCreatorImage
+                          src={
+                            winningOption.creator?.avatarUrl ??
+                            winningOption.firstVoter?.avatarUrl!!
+                          }
+                        />
+                        <SWinningBidCreatorText>
+                          {winningOption.creator?.uuid ===
+                            user.userData?.userUuid ||
+                          winningOption.isSupportedByMe
+                            ? winningOption.supporterCount > 1
+                              ? t('me')
+                              : t('I')
+                            : getDisplayname(
+                                winningOption.creator ??
+                                  winningOption.firstVoter!!
+                              )}
+                          {winningOption.supporterCount > 1 ? (
+                            <>
+                              {' & '}
+                              {formatNumber(
+                                winningOption.supporterCount,
+                                true
+                              )}{' '}
+                              {t('McPostSuccess.others')}
+                            </>
+                          ) : null}{' '}
+                          {t('McPostSuccess.voted')}
+                        </SWinningBidCreatorText>
+                      </SCreator>
+                    </SWinningBidCreator>
+                    <SWinningOptionAmount variant={4}>
+                      {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
+                      {winningOption.voteCount > 1
+                        ? t('McPostSuccess.votes')
+                        : t('McPostSuccess.vote')}
+                    </SWinningOptionAmount>
+                    <SSeparator />
+                    <SWinningOptionDetails>
+                      <SWinningOptionDetailsBidChosen>
+                        {t('McPostSuccess.option_chosen')}
+                      </SWinningOptionDetailsBidChosen>
+                      <SWinningOptionDetailsSeeAll
+                        onClick={() => setOpenedMainSection('options')}
+                      >
+                        {t('McPostSuccess.see_all')}
+                      </SWinningOptionDetailsSeeAll>
+                      <SWinningOptionDetailsTitle variant={4}>
+                        {winningOption.text}
+                      </SWinningOptionDetailsTitle>
+                    </SWinningOptionDetails>
+                  </>
                 )}
               </SMainSectionWrapper>
               {!isMobile ? (
@@ -245,7 +234,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
                         shouldView={!responseViewed}
                         onClick={() => setVideoTab('response')}
                       >
-                        { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
+                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
                       </SWatchResponseBtn>
                     </SWatchResponseWrapper>
                   ) : null}
@@ -255,13 +244,13 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
                         shouldView={videoTab === 'announcement'}
                         onClick={() => setVideoTab('announcement')}
                       >
-                        { t('PostVideoSuccess.tabs.watch_original') }
+                        {t('PostVideoSuccess.tabs.watch_original')}
                       </SChangeTabBtn>
                       <SChangeTabBtn
                         shouldView={videoTab === 'response'}
                         onClick={() => setVideoTab('response')}
                       >
-                        { t('PostVideoSuccess.tabs.watch_response')}
+                        {t('PostVideoSuccess.tabs.watch_response')}
                       </SChangeTabBtn>
                     </SToggleVideoWidget>
                   ) : null}
@@ -277,10 +266,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({
         </SActivitesContainer>
       </SWrapper>
       {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
+        <SCommentsSection id='comments' ref={commentsSectionRef}>
           <SCommentsHeadline variant={4}>
             {t('SuccessCommon.Comments.heading')}
           </SCommentsHeadline>
@@ -305,8 +291,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -318,12 +303,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -360,7 +343,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -370,7 +353,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 64px;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -439,7 +423,6 @@ const STotal = styled.div`
     font-weight: 700;
     font-size: 12px;
     line-height: 16px;
-
   }
   ${({ theme }) => theme.media.laptop} {
     position: relative;
@@ -501,7 +484,6 @@ const SWinningBidCreatorText = styled.span`
   }
 `;
 
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -518,16 +500,14 @@ const SWinningOptionDetails = styled.div`
   grid-template-areas:
     'bidchosen'
     'title'
-    'see_all'
-  ;
+    'see_all';
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'bidchosen see_all'
-      'title title'
-    ;
+      'title title';
     grid-template-columns: 1fr 1fr;
 
     margin-bottom: initial;
@@ -542,7 +522,6 @@ const SWinningOptionDetailsBidChosen = styled.div`
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
 
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
@@ -571,7 +550,9 @@ const SWinningOptionDetailsSeeAll = styled.button`
 
   cursor: pointer;
 
-  &:focus, &:hover, &:active {
+  &:focus,
+  &:hover,
+  &:active {
     outline: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -593,13 +574,11 @@ const SWinningOptionDetailsSeeAll = styled.button`
 const SWinningOptionDetailsTitle = styled(Headline)`
   grid-area: title;
 
-
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }
 `;
-
 
 // Watch response for the first time
 const SWatchResponseWrapper = styled.div`
@@ -613,7 +592,8 @@ const SWatchResponseWrapper = styled.div`
 const SWatchResponseBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -622,14 +602,15 @@ const SWatchResponseBtn = styled.button<{
   width: 100%;
   height: 100%;
 
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
@@ -647,7 +628,10 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  background: ${({ shouldView, theme }) =>
+    shouldView
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border: transparent;
 
   padding: 17px 24px;
@@ -656,18 +640,18 @@ const SChangeTabBtn = styled.button<{
   height: 100%;
 
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
@@ -678,6 +662,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

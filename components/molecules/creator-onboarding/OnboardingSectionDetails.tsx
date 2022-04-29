@@ -724,8 +724,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           <STopContainer>
             <SNameContainer>
               <OnboardingInput
-                id="settings_first_name_input"
-                type="text"
+                id='settings_first_name_input'
+                type='text'
                 value={firstNameInEdit}
                 isValid={firstNameInEdit.length > 1 ? true : false}
                 labelCaption={t('DetailsSection.form.firstName.labelCaption')}
@@ -736,8 +736,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 )}
               />
               <OnboardingInput
-                id="settings_last_name_input"
-                type="text"
+                id='settings_last_name_input'
+                type='text'
                 value={lastNameInEdit}
                 isValid={lastNameInEdit.length > 1 ? true : false}
                 labelCaption={t('DetailsSection.form.lastName.labelCaption')}
@@ -748,7 +748,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             </SNameContainer>
             <SUsernameNicknameContainer>
               <OnboardingSectionUsernameInput
-                type="text"
+                type='text'
                 value={usernameInEdit}
                 disabled={loadingModalOpen}
                 popupCaption={
@@ -788,7 +788,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 onChange={handleUpdateUsername}
               />
               <OnboardingSectionNicknameInput
-                type="text"
+                type='text'
                 value={nicknameInEdit}
                 disabled={loadingModalOpen}
                 placeholder={t('DetailsSection.form.nickname.placeholder')}
@@ -802,8 +802,8 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             </SUsernameNicknameContainer>
             <SFormItemContainer>
               <OnboardingInput
-                id="settings_email_input"
-                type="email"
+                id='settings_email_input'
+                type='email'
                 value={emailInEdit}
                 isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
                 isTaken={emailError === 'emailTaken'}
@@ -826,7 +826,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                   countries.findIndex((o) => o.value === selectedCountry)
                 ].name
               }
-              width="100%"
+              width='100%'
               selected={selectedCountry}
               options={countries}
               onSelect={(val) => setSelectedCountry(val)}
@@ -859,7 +859,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           {(isMobile || isTablet) && (
             <CheckboxWithALink
               label={t('DetailsSection.agreedToTosCheckbox')}
-              linkText={"NewNew's terms"}
+              linkText='NewNew’s terms'
               value={agreedToTos}
               onLinkClicked={() => setTermsVisible(true)}
               onToggled={() => setAgreedToTos(!agreedToTos)}
@@ -885,7 +885,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
               />
             )}
             <SButton
-              view="primaryGrad"
+              view='primaryGrad'
               disabled={Object.values(fieldsValid).some((v) => v === false)}
               style={{
                 width: isMobile ? '100%' : 'initial',

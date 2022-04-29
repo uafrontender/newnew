@@ -512,7 +512,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
             timestampSeconds={new Date(
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
-            postType="mc"
+            postType='mc'
           />
         )}
       </SExpiresSection>
@@ -528,7 +528,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         }
       />
       <PostTopInfoModeration
-        postType="mc"
+        postType='mc'
         postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
@@ -586,7 +586,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           user!!.userTutorialsProgress.remainingMcSteps!![0] ===
             newnewapi.McTutorialStep.MC_HERO
         }
-        postType="MC"
+        postType='MC'
         closeModal={goToNextStep}
       />
     </SWrapper>

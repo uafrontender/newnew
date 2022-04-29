@@ -20,17 +20,11 @@ const PlaceAcBidForm: React.FunctionComponent<IPlaceAcBidForm> = ({
 
   return (
     <SWrapper>
-      <Button
-        onClick={() => handlePlaceBid()}
-      >
-        Support
-      </Button>
+      <Button onClick={() => handlePlaceBid()}>Support</Button>
     </SWrapper>
   );
 };
 
 export default PlaceAcBidForm;
 
-const SWrapper = styled.div`
-
-`;
+const SWrapper = styled.div``;

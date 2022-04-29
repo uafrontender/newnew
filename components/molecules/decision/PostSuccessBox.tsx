@@ -20,47 +20,35 @@ const PostSuccessBox: React.FunctionComponent<IPostSuccessBox> = ({
   style,
   handleButtonClick,
 }) => (
-    <SSuccessBox
-      style={style ?? {}}
-    >
-      <SIconImg
-        src={PostSuccessIcon.src}
-      />
-      <SHeadline
-        variant={2}
-      >
-        {title}
-      </SHeadline>
-      <SBody
-        variant={3}
-      >
-        {body}
-      </SBody>
-      <SCtaButtonContainer>
-        <SCTAButton
-          onClick={handleButtonClick}
-        >
-          {buttonCaption}
-        </SCTAButton>
-      </SCtaButtonContainer>
-    </SSuccessBox>
-  );
+  <SSuccessBox style={style ?? {}}>
+    <SIconImg src={PostSuccessIcon.src} />
+    <SHeadline variant={2}>{title}</SHeadline>
+    <SBody variant={3}>{body}</SBody>
+    <SCtaButtonContainer>
+      <SCTAButton onClick={handleButtonClick}>{buttonCaption}</SCTAButton>
+    </SCtaButtonContainer>
+  </SSuccessBox>
+);
 
 PostSuccessBox.defaultProps = {
   style: undefined,
-}
+};
 
 export default PostSuccessBox;
 
 const SSuccessBox = styled.div`
-  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  background: linear-gradient(
+      315deg,
+      rgba(29, 180, 255, 0.85) 0%,
+      rgba(29, 180, 255, 0) 50%
+    ),
+    #1d6aff;
   box-shadow: 0px 10px 30px rgba(54, 55, 74, 0.2);
 
   display: grid;
   grid-template-areas:
     'imageArea headlineArea ctaArea'
-    'imageArea bodyArea ctaArea'
-  ;
+    'imageArea bodyArea ctaArea';
   grid-template-columns: 64px 5fr 3fr;
 
   padding: 16px;
@@ -74,21 +62,20 @@ const SSuccessBox = styled.div`
 
 const SIconImg = styled.img`
   grid-area: imageArea;
-
 `;
 
 const SHeadline = styled(Text)`
   grid-area: headlineArea;
   align-self: center;
 
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SBody = styled(Text)`
   grid-area: bodyArea;
   align-self: center;
 
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.8;
 `;
 
@@ -101,7 +88,7 @@ const SCtaButtonContainer = styled.div`
 `;
 
 const SCTAButton = styled.button`
-  background: #FFFFFF;
+  background: #ffffff;
 
   box-shadow: 0px 15px 35px -10px rgba(29, 134, 255, 0.35);
 

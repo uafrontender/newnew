@@ -263,7 +263,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       </CreatorCard>
       <SActionsDiv>
         <SShareButton
-          view="transparent"
+          view='transparent'
           iconOnly
           withDim
           withShrink
@@ -275,8 +275,8 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           <InlineSvg
             svg={ShareIconFilled}
             fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
+            width='24px'
+            height='24px'
           />
         </SShareButton>
         {isSupportFormOpen ? (
@@ -287,7 +287,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
           />
         ) : (
           <SSupportButton
-            view="secondary"
+            view='secondary'
             onClick={() => handleOpenSupportForm()}
           >
             {t('AcPost.OptionsTab.OptionCard.supportBtn')}
@@ -298,12 +298,12 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         <SSupportBidForm>
           <BidAmountTextInput
             value={supportBidAmount}
-            inputAlign="left"
+            inputAlign='left'
             onChange={(newValue: string) => setSupportBidAmount(newValue)}
             minAmount={minAmount}
           />
           <Button
-            view="primaryGrad"
+            view='primaryGrad'
             disabled={
               !supportBidAmount ? true : parseInt(supportBidAmount) < minAmount
             }
@@ -312,7 +312,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             {t('AcPost.OptionsTab.OptionCard.placeABidBtn')}
           </Button>
           <SCancelButton
-            view="secondary"
+            view='secondary'
             onClick={() => handleCloseSupportForm()}
           >
             {t('AcPost.OptionsTab.OptionCard.cancelBtn')}
@@ -329,13 +329,13 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
             <div>{option.title}</div>
             <BidAmountTextInput
               value={supportBidAmount}
-              inputAlign="center"
+              inputAlign='center'
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
             />
             <Button
-              view="primaryGrad"
-              size="sm"
+              view='primaryGrad'
+              size='sm'
               disabled={!supportBidAmount}
               onClick={() => handleTogglePaymentModalOpen()}
             >

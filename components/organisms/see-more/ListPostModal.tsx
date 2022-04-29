@@ -16,8 +16,8 @@ interface IListPostModal {
   collection: any;
   loading: boolean;
   wrapperStyle?: React.CSSProperties;
-  skeletonsBgColor?: string,
-  skeletonsHighlightColor?: string,
+  skeletonsBgColor?: string;
+  skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -31,7 +31,9 @@ export const ListPostModal: React.FC<IListPostModal> = ({
   handlePostClicked,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
@@ -46,7 +48,7 @@ export const ListPostModal: React.FC<IListPostModal> = ({
         <Card
           item={item}
           index={index + 1}
-          width="100%"
+          width='100%'
           height={isMobile ? '564px' : '336px'}
         />
       </SItemWrapper>
@@ -55,19 +57,22 @@ export const ListPostModal: React.FC<IListPostModal> = ({
 
   return (
     <SListPostModalWrapper
-      // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
+    // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
     >
       {collection?.map(renderItem)}
-      {loading && Array(5).fill('_').map((_, i) => (
-        <CardSkeleton
-          key={i}
-          count={1}
-          cardWidth="100%"
-          cardHeight="100%"
-          bgColor={skeletonsBgColor}
-          highlightColor={skeletonsHighlightColor}
-        />
-      ))}
+      {loading &&
+        Array(5)
+          .fill('_')
+          .map((_, i) => (
+            <CardSkeleton
+              key={i}
+              count={1}
+              cardWidth='100%'
+              cardHeight='100%'
+              bgColor={skeletonsBgColor}
+              highlightColor={skeletonsHighlightColor}
+            />
+          ))}
     </SListPostModalWrapper>
   );
 };
@@ -101,7 +106,6 @@ const SListPostModalWrapper = styled.div`
     padding: 32px 0 0 0;
   }
 
-
   .skeletonsContainer {
     display: block;
     height: 400px;
@@ -118,7 +122,6 @@ const SListPostModalWrapper = styled.div`
       width: calc(25% - 32px);
       margin: 0 16px 32px 16px;
     }
-
 
     div {
       .skeletonSpan {
@@ -148,5 +151,4 @@ const SItemWrapper = styled.div`
     width: calc(25% - 32px);
     margin: 0 16px 32px 16px;
   }
-
 `;

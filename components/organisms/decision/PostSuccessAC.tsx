@@ -3,11 +3,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -15,9 +11,7 @@ import { newnewapi } from 'newnew-api';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import {
-  fetchAcOptionById,
-} from '../../../api/endpoints/auction';
+import { fetchAcOptionById } from '../../../api/endpoints/auction';
 
 // test post
 // http://localhost:4000/post/421e53e4-8297-4ac6-ac74-47366bc1c43b
@@ -38,22 +32,23 @@ interface IPostSuccessAC {
   post: newnewapi.Auction;
 }
 
-const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
-  post,
-}) => {
+const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({ post }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-    // Winninfg option
+  // Winninfg option
   const [winningOption, setWinningOption] =
     useState<newnewapi.Auction.Option | undefined>();
 
-    // Video
+  // Video
   // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
+  const [videoTab, setVideoTab] =
+    useState<'announcement' | 'response'>('announcement');
   // Response viewed
   const [responseViewed, setResponseViewed] = useState(
     post.isResponseViewedByMe ?? false
@@ -63,15 +58,13 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
 
-    // Main screen vs all bids
-  const [openedMainSection, setOpenedMainSection] = useState<'main' | 'bids'>('main');
+  // Main screen vs all bids
+  const [openedMainSection, setOpenedMainSection] =
+    useState<'main' | 'bids'>('main');
 
-    // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
+  // Comments
+  const { ref: commentsSectionRef, inView } = useInView({
+    threshold: 0.8,
   });
 
   // Scroll to comments if hash is present
@@ -152,85 +145,79 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
         <SActivitesContainer>
           {openedMainSection === 'main' ? (
             <>
-              <DecisionEndedBox
-                imgSrc={BoxIcon.src}
-              >
+              <DecisionEndedBox imgSrc={BoxIcon.src}>
                 {t('AcPostSuccess.hero_text')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
                 <SCreatorInfoDiv>
                   <SCreator>
-                    <SCreatorImage
-                      src={post.creator?.avatarUrl!!}
-                    />
+                    <SCreatorImage src={post.creator?.avatarUrl!!} />
                     <SWantsToKnow>
-                      {t('AcPostSuccess.wants_to_know', { creator: post.creator?.nickname })}
+                      {t('AcPostSuccess.wants_to_know', {
+                        creator: post.creator?.nickname,
+                      })}
                     </SWantsToKnow>
                   </SCreator>
                   <STotal>
-                    {`$${formatNumber(post.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
-                    {' '}
-                    <span>
-                      {t('AcPostSuccess.in_total_bids')}
-                    </span>
+                    {`$${formatNumber(
+                      post.totalAmount?.usdCents!! / 100 ?? 0,
+                      true
+                    )}`}{' '}
+                    <span>{t('AcPostSuccess.in_total_bids')}</span>
                   </STotal>
                 </SCreatorInfoDiv>
-                <SPostTitle
-                  variant={4}
-                >
-                  {post.title}
-                </SPostTitle>
+                <SPostTitle variant={4}>{post.title}</SPostTitle>
                 <SSeparator />
                 {winningOption && (
-                <>
-                  <SWinningBidCreator>
-                    <SCreator>
-                      <SCreatorImage
-                        src={winningOption.creator?.avatarUrl!!}
-                      />
-                      <SWinningBidCreatorText>
-                        { winningOption.creator?.uuid === user.userData?.userUuid || winningOption.isSupportedByMe ? (
-                            winningOption.supporterCount > 1 ? (
-                              t('me')
-                            ) : t('my')
-                          ) : (
-                            getDisplayname(winningOption.creator!!)
-                        ) }
-                        {winningOption.supporterCount > 1 ? (
-                          <>
-                            {' & '}
-                            {formatNumber(winningOption.supporterCount, true)}
-                            {' '}
-                            {t('AcPostSuccess.others')}
-                          </>
-                        ) : null}
-                        {' '}
-                        {t('AcPostSuccess.bid')}
-                      </SWinningBidCreatorText>
-                    </SCreator>
-                  </SWinningBidCreator>
-                  <SWinningOptionAmount
-                    variant={4}
-                  >
-                    {`$${formatNumber(winningOption.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
-                  </SWinningOptionAmount>
-                  <SSeparator />
-                  <SWinningOptionDetails>
-                    <SWinningOptionDetailsBidChosen>
-                      {t('AcPostSuccess.bid_chosen')}
-                    </SWinningOptionDetailsBidChosen>
-                    <SWinningOptionDetailsSeeAll
-                      onClick={() => setOpenedMainSection('bids')}
-                    >
-                      {t('AcPostSuccess.see_all')}
-                    </SWinningOptionDetailsSeeAll>
-                    <SWinningOptionDetailsTitle
-                      variant={4}
-                    >
-                      {winningOption.title}
-                    </SWinningOptionDetailsTitle>
-                  </SWinningOptionDetails>
-                </>
+                  <>
+                    <SWinningBidCreator>
+                      <SCreator>
+                        <SCreatorImage
+                          src={winningOption.creator?.avatarUrl!!}
+                        />
+                        <SWinningBidCreatorText>
+                          {winningOption.creator?.uuid ===
+                            user.userData?.userUuid ||
+                          winningOption.isSupportedByMe
+                            ? winningOption.supporterCount > 1
+                              ? t('me')
+                              : t('my')
+                            : getDisplayname(winningOption.creator!!)}
+                          {winningOption.supporterCount > 1 ? (
+                            <>
+                              {' & '}
+                              {formatNumber(
+                                winningOption.supporterCount,
+                                true
+                              )}{' '}
+                              {t('AcPostSuccess.others')}
+                            </>
+                          ) : null}{' '}
+                          {t('AcPostSuccess.bid')}
+                        </SWinningBidCreatorText>
+                      </SCreator>
+                    </SWinningBidCreator>
+                    <SWinningOptionAmount variant={4}>
+                      {`$${formatNumber(
+                        winningOption.totalAmount?.usdCents!! / 100 ?? 0,
+                        true
+                      )}`}
+                    </SWinningOptionAmount>
+                    <SSeparator />
+                    <SWinningOptionDetails>
+                      <SWinningOptionDetailsBidChosen>
+                        {t('AcPostSuccess.bid_chosen')}
+                      </SWinningOptionDetailsBidChosen>
+                      <SWinningOptionDetailsSeeAll
+                        onClick={() => setOpenedMainSection('bids')}
+                      >
+                        {t('AcPostSuccess.see_all')}
+                      </SWinningOptionDetailsSeeAll>
+                      <SWinningOptionDetailsTitle variant={4}>
+                        {winningOption.title}
+                      </SWinningOptionDetailsTitle>
+                    </SWinningOptionDetails>
+                  </>
                 )}
               </SMainSectionWrapper>
               {!isMobile ? (
@@ -241,7 +228,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
                         shouldView={!responseViewed}
                         onClick={() => setVideoTab('response')}
                       >
-                        { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
+                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
                       </SWatchResponseBtn>
                     </SWatchResponseWrapper>
                   ) : null}
@@ -251,13 +238,13 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
                         shouldView={videoTab === 'announcement'}
                         onClick={() => setVideoTab('announcement')}
                       >
-                        { t('PostVideoSuccess.tabs.watch_original') }
+                        {t('PostVideoSuccess.tabs.watch_original')}
                       </SChangeTabBtn>
                       <SChangeTabBtn
                         shouldView={videoTab === 'response'}
                         onClick={() => setVideoTab('response')}
                       >
-                        { t('PostVideoSuccess.tabs.watch_response')}
+                        {t('PostVideoSuccess.tabs.watch_response')}
                       </SChangeTabBtn>
                     </SToggleVideoWidget>
                   ) : null}
@@ -273,10 +260,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({
         </SActivitesContainer>
       </SWrapper>
       {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
+        <SCommentsSection id='comments' ref={commentsSectionRef}>
           <SCommentsHeadline variant={4}>
             {t('SuccessCommon.Comments.heading')}
           </SCommentsHeadline>
@@ -301,8 +285,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -314,12 +297,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -356,7 +337,7 @@ const SMainSectionWrapper = styled.div`
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start\;
+    justify-content: flex-start\;;
   }
 `;
 
@@ -366,7 +347,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 64px;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -435,7 +417,6 @@ const STotal = styled.div`
     font-weight: 700;
     font-size: 12px;
     line-height: 16px;
-
   }
   ${({ theme }) => theme.media.laptop} {
     position: relative;
@@ -497,7 +478,6 @@ const SWinningBidCreatorText = styled.span`
   }
 `;
 
-
 // Winning option
 const SWinningOptionAmount = styled(Headline)`
   text-align: center;
@@ -514,16 +494,14 @@ const SWinningOptionDetails = styled.div`
   grid-template-areas:
     'bidchosen'
     'title'
-    'see_all'
-  ;
+    'see_all';
 
   margin-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
       'bidchosen see_all'
-      'title title'
-    ;
+      'title title';
     grid-template-columns: 1fr 1fr;
 
     margin-bottom: initial;
@@ -538,7 +516,6 @@ const SWinningOptionDetailsBidChosen = styled.div`
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-
 
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
@@ -567,7 +544,9 @@ const SWinningOptionDetailsSeeAll = styled.button`
 
   cursor: pointer;
 
-  &:focus, &:hover, &:active {
+  &:focus,
+  &:hover,
+  &:active {
     outline: none;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
   }
@@ -589,13 +568,11 @@ const SWinningOptionDetailsSeeAll = styled.button`
 const SWinningOptionDetailsTitle = styled(Headline)`
   grid-area: title;
 
-
   text-align: center;
   ${({ theme }) => theme.media.tablet} {
     text-align: left;
   }
 `;
-
 
 // Watch response for the first time
 const SWatchResponseWrapper = styled.div`
@@ -609,7 +586,8 @@ const SWatchResponseWrapper = styled.div`
 const SWatchResponseBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -618,14 +596,15 @@ const SWatchResponseBtn = styled.button<{
   width: 100%;
   height: 100%;
 
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
@@ -643,7 +622,10 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : theme.colorsThemed.background.tertiary)};
+  background: ${({ shouldView, theme }) =>
+    shouldView
+      ? theme.colorsThemed.accent.blue
+      : theme.colorsThemed.background.tertiary};
   border: transparent;
 
   padding: 17px 24px;
@@ -652,18 +634,18 @@ const SChangeTabBtn = styled.button<{
   height: 100%;
 
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
-
 
 // Comments
 const SCommentsHeadline = styled(Headline)`
@@ -674,6 +656,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

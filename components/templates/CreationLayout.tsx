@@ -16,9 +16,7 @@ const CreationLayout: React.FC<ICreationLayout> = (props) => {
       <AnimateSharedLayout>
         <Container>
           <Row>
-            <Col>
-              {children}
-            </Col>
+            <Col>{children}</Col>
           </Row>
         </Container>
       </AnimateSharedLayout>

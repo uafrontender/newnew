@@ -1,7 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, {
-  useEffect, useRef,
-} from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -20,34 +18,41 @@ interface IOnboardingSubproductSelect {
   handleSelectProduct: (product: newnewapi.ISubscriptionProduct) => void;
 }
 
-const OnboardingSubproductSelect: React.FunctionComponent<IOnboardingSubproductSelect> = ({
-  standardProducts,
-  currentProduct,
-  featuredProductsIds,
-  handleSelectProduct,
-}) => (
-  <SContainer>
-    <ProductOption
-      product={new newnewapi.SubscriptionProduct({
-        id: ''
-      })}
-      selected={currentProduct.id === ''}
-      featured={false}
-      handleClick={() => handleSelectProduct(new newnewapi.SubscriptionProduct({
-        id: ''
-      }))}
-    />
-    {standardProducts.map((p) => (
+const OnboardingSubproductSelect: React.FunctionComponent<IOnboardingSubproductSelect> =
+  ({
+    standardProducts,
+    currentProduct,
+    featuredProductsIds,
+    handleSelectProduct,
+  }) => (
+    <SContainer>
       <ProductOption
-        key={p.id}
-        product={p}
-        selected={currentProduct.id === p.id}
-        featured={featuredProductsIds.includes(p.id as string)}
-        handleClick={() => handleSelectProduct(p)}
+        product={
+          new newnewapi.SubscriptionProduct({
+            id: '',
+          })
+        }
+        selected={currentProduct.id === ''}
+        featured={false}
+        handleClick={() =>
+          handleSelectProduct(
+            new newnewapi.SubscriptionProduct({
+              id: '',
+            })
+          )
+        }
       />
-    ))}
-  </SContainer>
-);
+      {standardProducts.map((p) => (
+        <ProductOption
+          key={p.id}
+          product={p}
+          selected={currentProduct.id === p.id}
+          featured={featuredProductsIds.includes(p.id as string)}
+          handleClick={() => handleSelectProduct(p)}
+        />
+      ))}
+    </SContainer>
+  );
 
 export default OnboardingSubproductSelect;
 
@@ -91,10 +96,7 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
   }, [ref, selected]);
 
   return (
-    <SProductOption
-      selected={selected ?? false}
-      onClick={handleClick}
-    >
+    <SProductOption selected={selected ?? false} onClick={handleClick}>
       <SAnimation>
         <Lottie
           ref={ref}
@@ -108,39 +110,27 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
         />
       </SAnimation>
       <SLabelContent>
-        {
-          product.id !== '' ? (
-            <>
-              <Text
-                variant={2}
-              >
-                $
-                {formatNumber((product?.monthlyRate?.usdCents!! / 100) ?? 0, true)}
-              </Text>
-              <SPerMonth
-                variant={2}
-              >
-                { t('SubrateSection.selectInput.perMonth') }
-              </SPerMonth>
-              {featured && (
-                <SFeaturedLabel>
-                  { t('SubrateSection.selectInput.featured') }
-                </SFeaturedLabel>
-              )}
-            </>
-          ) : (
-            <Text
-              variant={2}
-            >
-              { t('SubrateSection.selectInput.noProduct') }
+        {product.id !== '' ? (
+          <>
+            <Text variant={2}>
+              ${formatNumber(product?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
             </Text>
-          )
-        }
+            <SPerMonth variant={2}>
+              {t('SubrateSection.selectInput.perMonth')}
+            </SPerMonth>
+            {featured && (
+              <SFeaturedLabel>
+                {t('SubrateSection.selectInput.featured')}
+              </SFeaturedLabel>
+            )}
+          </>
+        ) : (
+          <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
+        )}
       </SLabelContent>
     </SProductOption>
   );
 };
-
 
 const SProductOption = styled.button<{
   selected: boolean;
@@ -152,19 +142,22 @@ const SProductOption = styled.button<{
   border-width: 2px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  border-color: ${({ theme, selected }) => (selected ? theme.colorsThemed.accent.blue : 'transparent')};
+  border-color: ${({ theme, selected }) =>
+    selected ? theme.colorsThemed.accent.blue : 'transparent'};
 
   width: 100%;
 
-  background: ${({ selected, theme }) => (selected ?
-    'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))' : theme.colorsThemed.background.tertiary)};;
+  background: ${({ selected, theme }) =>
+    selected
+      ? 'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))'
+      : theme.colorsThemed.background.tertiary};
 
   padding: 27px 16px;
   margin-top: 6px;
   margin-bottom: 6px;
 
   cursor: pointer;
-  transition: .2s linear;
+  transition: 0.2s linear;
 
   ${({ theme }) => theme.media.tablet} {
     width: 45%;
@@ -189,7 +182,7 @@ const SLabelContent = styled.div`
 
 const SPerMonth = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-`
+`;
 
 const SFeaturedLabel = styled.div`
   position: absolute;
@@ -201,7 +194,7 @@ const SFeaturedLabel = styled.div`
 
   background: ${({ theme }) => theme.colorsThemed.accent.blue};
 
-  color: #FFF;
+  color: #fff;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;

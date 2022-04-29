@@ -100,36 +100,24 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = ({
   }, [postId, onClose]);
 
   return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
+    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
-          <Headline
-            variant={6}
-          >
-            {t('socials.share-to')}
-          </Headline>
+          <Headline variant={6}>{t('socials.share-to')}</Headline>
           <SSocialsSection>
             {/* <SSocials>
               {socialButtons.map(renderItem)}
             </SSocials> */}
             <SItem>
-              <SItemButtonWide
-                type="copy"
-                onClick={() => handlerCopy()}
-              >
+              <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
                 <InlineSvg
                   svg={SOCIAL_ICONS.copy as string}
-                  width="24px"
-                  height="24px"
+                  width='24px'
+                  height='24px'
                 />
                 {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
               </SItemButtonWide>
@@ -137,7 +125,7 @@ const PostShareModal: React.FunctionComponent<IPostShareModal> = ({
           </SSocialsSection>
         </SContentContainer>
         <Button
-          view="secondary"
+          view='secondary'
           style={{
             height: '56px',
             width: 'calc(100% - 32px)',
@@ -236,6 +224,6 @@ const SItemButtonWide = styled.div<ISItemButton>`
   font-size: 14px;
   line-height: 24px;
 
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
 `;

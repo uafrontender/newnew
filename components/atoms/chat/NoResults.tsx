@@ -15,7 +15,9 @@ const NoResults: React.FC<INoResults> = ({ text }) => {
       <SEmptyInboxText>
         {t('modal.new-message.no-results-text')} “{text}”.
       </SEmptyInboxText>
-      <SEmptyInboxText>{t('modal.new-message.no-results-search-text')}</SEmptyInboxText>
+      <SEmptyInboxText>
+        {t('modal.new-message.no-results-search-text')}
+      </SEmptyInboxText>
     </SEmptyInbox>
   );
 };

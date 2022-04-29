@@ -66,11 +66,15 @@ const UserEllipseMenu: React.FC<IUserEllipseMenu> = ({
             </SButton>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2} tone='error'>{t('ellipse.report')}</Text>
+            <Text variant={2} tone='error'>
+              {t('ellipse.report')}
+            </Text>
           </SButton>
           {loggedIn && (
             <SButton onClick={blockHandler}>
-              <Text variant={2}>{!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}</Text>
+              <Text variant={2}>
+                {!isBlocked ? t('ellipse.block') : t('ellipse.unblock')}
+              </Text>
             </SButton>
           )}
         </SContainer>
@@ -95,7 +99,9 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     top: 312px;

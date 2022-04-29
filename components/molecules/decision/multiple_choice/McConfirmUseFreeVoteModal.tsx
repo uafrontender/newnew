@@ -7,7 +7,7 @@ import Button from '../../../atoms/Button';
 import Modal from '../../../organisms/Modal';
 
 interface IMcConfirmUseFreeVoteModal {
-  isVisible: boolean,
+  isVisible: boolean;
   handleMakeFreeVote: () => void;
   closeModal: () => void;
 }
@@ -20,39 +20,24 @@ const McConfirmUseFreeVoteModal: React.FC<IMcConfirmUseFreeVoteModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal
-      show={isVisible}
-      additionalZ={12}
-      onClose={closeModal}
-    >
+    <Modal show={isVisible} additionalZ={12} onClose={closeModal}>
       <SContainer
-        // onClick={(e) => e.stopPropagation()}
+      // onClick={(e) => e.stopPropagation()}
       >
         <SModal>
-          <STag>
-            {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.tag')}
-          </STag>
+          <STag>{t('McPost.OptionsTab.ConfirmUseFreeVoteModal.tag')}</STag>
           <SModalMessage>
-            <Text
-              variant={2}
-            >
+            <Text variant={2}>
               {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.line_1')}
             </Text>
-            <Text
-              variant={2}
-            >
+            <Text variant={2}>
               {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.line_2')}
             </Text>
-            <Text
-              variant={2}
-            >
+            <Text variant={2}>
               {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.line_3')}
             </Text>
           </SModalMessage>
-          <SDoneButton
-            view="primaryGrad"
-            onClick={() => handleMakeFreeVote()}
-          >
+          <SDoneButton view='primaryGrad' onClick={() => handleMakeFreeVote()}>
             {t('McPost.OptionsTab.ConfirmUseFreeVoteModal.useFreeVoteBtn')}
           </SDoneButton>
         </SModal>
@@ -76,10 +61,14 @@ const SModal = styled.div`
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px;
   box-sizing: border-box;
   display: flex;

@@ -25,7 +25,12 @@ export const FinishProfileSetup = () => {
     <SCashOutContainer>
       <SCashOutTopBlock>
         <SImageWrapper>
-          <Image src={moneyIcon} alt={t('dashboard.earnings.todosIssue.text')} width={48} height={48} />
+          <Image
+            src={moneyIcon}
+            alt={t('dashboard.earnings.todosIssue.text')}
+            width={48}
+            height={48}
+          />
         </SImageWrapper>
         <SDescriptionWrapper>
           <SDescription variant={2} weight={600}>
@@ -33,7 +38,7 @@ export const FinishProfileSetup = () => {
           </SDescription>
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <SButton view="primaryGrad" onClick={handleClick}>
+      <SButton view='primaryGrad' onClick={handleClick}>
         {t('dashboard.earnings.todosIssue.btnText')}
       </SButton>
     </SCashOutContainer>
@@ -81,7 +86,7 @@ const SButton = styled(Button)`
   width: auto;
   display: block;
   flex-shrink: 0;
-  color: #2C2C33;
+  color: #2c2c33;
   padding: 16px 20px;
   margin-top: 16px;
   background: ${(props) => props.theme.colors.white};

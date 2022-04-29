@@ -12,13 +12,7 @@ interface IHeadline {
 }
 
 const Headline: React.FC<IHeadline> = (props) => {
-  const {
-    variant,
-    children,
-    animation,
-    animateWhenInView,
-    ...rest
-  } = props;
+  const { variant, children, animation, animateWhenInView, ...rest } = props;
 
   const components = {
     1: SH1,
@@ -43,9 +37,7 @@ const Headline: React.FC<IHeadline> = (props) => {
     );
   }
 
-  return (
-    <Component {...rest}>{children}</Component>
-  );
+  return <Component {...rest}>{children}</Component>;
 };
 
 Headline.defaultProps = {

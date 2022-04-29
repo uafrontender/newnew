@@ -3,7 +3,10 @@ import { DefaultTheme } from 'styled-components';
 import media from './media';
 
 // Basic variables, theme-agnostic
-const basicTheme: Omit<DefaultTheme, 'colorsThemed' | 'name' | 'gradients' | 'shadows'> = {
+const basicTheme: Omit<
+  DefaultTheme,
+  'colorsThemed' | 'name' | 'gradients' | 'shadows'
+> = {
   media,
   width: {
     maxContentWidth: 1440,
@@ -67,27 +70,33 @@ export const lightTheme: DefaultTheme = {
       google: {
         main: '#4285F4',
         hover: '#4285F4',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #4285F4',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #4285F4',
       },
       facebook: {
         main: '#1877F2',
         hover: '#1877F2',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1877F2',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1877F2',
       },
       twitter: {
         main: '#1DA1F2',
         hover: '#1DA1F2',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1DA1F2',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1DA1F2',
       },
       apple: {
         main: '#000000',
         hover: '#000000',
-        pressed: 'linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), #000000',
+        pressed:
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)), #000000',
       },
       instagram: {
         main: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
-        hover: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
-        pressed: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        hover:
+          'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        pressed:
+          'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
       },
       tiktok: {
         main: '#FFFFFF',
@@ -96,8 +105,10 @@ export const lightTheme: DefaultTheme = {
       },
       copy: {
         main: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-        hover: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-        pressed: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        hover:
+          'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        pressed:
+          'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
       },
     },
     tag: {
@@ -124,7 +135,8 @@ export const lightTheme: DefaultTheme = {
       },
       background: {
         primary: '#1D6AFF',
-        primaryGrad: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        primaryGrad:
+          'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         primaryProgress: '#C1C9D7',
         secondary: '#F1F3F9',
         modalSecondary: '#FFFFFF',
@@ -137,7 +149,8 @@ export const lightTheme: DefaultTheme = {
       },
       hover: {
         primary: '#1D6AFF',
-        primaryGrad: 'linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        primaryGrad:
+          'linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         primaryProgress: '#C1C9D7',
         secondary: '#E2E7F3',
         modalSecondary: '#F1F3F9',
@@ -175,45 +188,71 @@ export const lightTheme: DefaultTheme = {
   shadows: {
     mediumBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.25)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
-    mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
-    cookie: '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
+    mediumGrey:
+      '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
+    cookie:
+      '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
     dashboardNotifications: '0px 0px 35px rgba(100, 110, 129, 0.1)',
   },
   gradients: {
-    arrowLeft: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
-    arrowRight: 'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
-    blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-    blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-    heroNotifications: 'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
-    heroNotificationsTablet: 'linear-gradient(360deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
-    bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
-    calendarTop: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)',
-    calendarBottom: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 98.96%)',
-    creationSubmit: 'linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);',
+    arrowLeft:
+      'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+    arrowRight:
+      'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+    blueDiagonal:
+      'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueHorizontal:
+      'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    heroNotifications:
+      'linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
+    heroNotificationsTablet:
+      'linear-gradient(360deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1))',
+    bannerPink:
+      'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
+    calendarTop:
+      'linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)',
+    calendarBottom:
+      'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 98.96%)',
+    creationSubmit:
+      'linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);',
     listTop: {
-      primary: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
-      secondary: 'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0) 100%)',
-      tertiary: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
+      primary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
+      secondary:
+        'linear-gradient(180deg, rgba(241, 243, 249, 0.8) 0%, rgba(241, 243, 249, 0) 100%)',
+      tertiary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%)',
     },
     listBottom: {
-      primary: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
-      secondary: 'linear-gradient(180deg, rgba(241, 243, 249, 0) 0%, rgba(241, 243, 249, 0.8) 100%)',
-      tertiary: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
+      primary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
+      secondary:
+        'linear-gradient(180deg, rgba(241, 243, 249, 0) 0%, rgba(241, 243, 249, 0.8) 100%)',
+      tertiary:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)',
     },
     listLeft: {
-      primary: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
-      secondary: 'linear-gradient(90deg, rgba(241, 243, 249, 1) 0%, rgba(241, 243, 249, 0) 102.97%)',
-      tertiary: 'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+      primary:
+        'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+      secondary:
+        'linear-gradient(90deg, rgba(241, 243, 249, 1) 0%, rgba(241, 243, 249, 0) 102.97%)',
+      tertiary:
+        'linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
     },
     listRight: {
-      primary: 'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
-      secondary: 'linear-gradient(270deg, rgba(241, 243, 249, 1) 0%, rgba(241, 243, 249, 0) 102.97%)',
-      tertiary: 'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+      primary:
+        'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
+      secondary:
+        'linear-gradient(270deg, rgba(241, 243, 249, 1) 0%, rgba(241, 243, 249, 0) 102.97%)',
+      tertiary:
+        'linear-gradient(270deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 102.97%)',
     },
     decisionOption: {
-      yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%);',
+      yellow:
+        'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%);',
       blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%);',
-      green: 'linear-gradient(225deg, #0FF34F 0%, #07DF74 44.27%, #00C291 100%);',
+      green:
+        'linear-gradient(225deg, #0FF34F 0%, #07DF74 44.27%, #00C291 100%);',
     },
   },
 };
@@ -262,27 +301,33 @@ export const darkTheme: DefaultTheme = {
       google: {
         main: '#4285F4',
         hover: '#4285F4',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #4285F4',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #4285F4',
       },
       facebook: {
         main: '#1877F2',
         hover: '#1877F2',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1877F2',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1877F2',
       },
       twitter: {
         main: '#1DA1F2',
         hover: '#1DA1F2',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1DA1F2',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #1DA1F2',
       },
       apple: {
         main: '#000000',
         hover: '#000000',
-        pressed: 'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #FFFFFF',
+        pressed:
+          'linear-gradient(0deg, rgba(11, 10, 19, 0.2), rgba(11, 10, 19, 0.2)), #FFFFFF',
       },
       instagram: {
         main: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
-        hover: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
-        pressed: 'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        hover:
+          'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
+        pressed:
+          'radial-gradient(92.71% 92.71% at 5.21% 94.79%, #FEDA77 0%, #F58529 25.52%, #DD2A7B 51.56%, #8134AF 73.96%, #515BD4 100%)',
       },
       tiktok: {
         main: '#FFFFFF',
@@ -291,8 +336,10 @@ export const darkTheme: DefaultTheme = {
       },
       copy: {
         main: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-        hover: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-        pressed: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        hover:
+          'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        pressed:
+          'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
       },
     },
     tag: {
@@ -319,7 +366,8 @@ export const darkTheme: DefaultTheme = {
       },
       background: {
         primary: '#1D6AFF',
-        primaryGrad: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        primaryGrad:
+          'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         primaryProgress: '#14151F',
         secondary: '#14151F',
         modalSecondary: '#14151F',
@@ -332,7 +380,8 @@ export const darkTheme: DefaultTheme = {
       },
       hover: {
         primary: '#1D6AFF',
-        primaryGrad: 'linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+        primaryGrad:
+          'linear-gradient(140deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
         primaryProgress: '#14151F',
         secondary: '#1E1F29',
         modalSecondary: '#1E1F29',
@@ -370,45 +419,69 @@ export const darkTheme: DefaultTheme = {
   shadows: {
     mediumBlue: '0px 12px 35px -10px rgba(29, 124, 255, 0.6)',
     intenseBlue: '0px 15px 35px -10px rgba(29, 134, 255, 0.6)',
-    mediumGrey: '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
-    cookie: '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
+    mediumGrey:
+      '0px 0px 20px rgba(11, 10, 19, 0.04), 0px 0px 6px rgba(11, 10, 19, 0.04), 0px 0px 1px rgba(11, 10, 19, 0.04)',
+    cookie:
+      '0px 10px 20px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)',
     dashboardNotifications: 'unset',
   },
   gradients: {
     arrowLeft: 'linear-gradient(90deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
     arrowRight: 'linear-gradient(270deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
-    blueDiagonal: 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-    blueHorizontal: 'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
-    heroNotifications: 'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
-    heroNotificationsTablet: 'linear-gradient(360deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
-    bannerPink: 'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
-    calendarTop: 'linear-gradient(180deg, #14151F 0%, rgba(20, 21, 31, 0) 100%)',
-    calendarBottom: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, #14151F 100%)',
-    creationSubmit: 'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
+    blueDiagonal:
+      'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    blueHorizontal:
+      'linear-gradient(270deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF',
+    heroNotifications:
+      'linear-gradient(180deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
+    heroNotificationsTablet:
+      'linear-gradient(360deg, rgba(11, 10, 19, 0), rgba(11, 10, 19, 1))',
+    bannerPink:
+      'linear-gradient(135deg, #FF1D6A 48.23%, #FF6699 60.42%, #FF1D6A 72.21%)',
+    calendarTop:
+      'linear-gradient(180deg, #14151F 0%, rgba(20, 21, 31, 0) 100%)',
+    calendarBottom:
+      'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, #14151F 100%)',
+    creationSubmit:
+      'linear-gradient(360deg, #0B0A13 0%, rgba(11, 10, 19, 0) 100%)',
     listTop: {
-      primary: 'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
-      secondary: 'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
-      tertiary: 'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+      primary:
+        'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+      secondary:
+        'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
+      tertiary:
+        'linear-gradient(180deg, rgba(20, 21, 31, 0.8) 0%, rgba(20, 21, 31, 0) 100%)',
     },
     listBottom: {
-      primary: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
-      secondary: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
-      tertiary: 'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+      primary:
+        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+      secondary:
+        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
+      tertiary:
+        'linear-gradient(180deg, rgba(20, 21, 31, 0) 0%, rgba(20, 21, 31, 0.8) 100%)',
     },
     listLeft: {
-      primary: 'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
-      secondary: 'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
-      tertiary: 'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
+      primary:
+        'linear-gradient(90deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
+      secondary:
+        'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
+      tertiary:
+        'linear-gradient(90deg, rgba(20, 21, 31, 0.8) 0%, rgba(11, 10, 19, 0) 100%)',
     },
     listRight: {
-      primary: 'linear-gradient(270deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0)  100%)',
-      secondary: 'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
-      tertiary: 'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
+      primary:
+        'linear-gradient(270deg, rgb(11, 10, 19, 0.8) 0%, rgba(11, 10, 19, 0)  100%)',
+      secondary:
+        'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
+      tertiary:
+        'linear-gradient(270deg, rgba(20, 21, 31, 0.8)  0%, rgba(11, 10, 19, 0)  100%)',
     },
     decisionOption: {
-      yellow: 'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%)',
+      yellow:
+        'linear-gradient(225deg, #FFE604 5.73%, #F7DB0E 35.42%, #FDBA00 68.23%)',
       blue: 'linear-gradient(225deg, #00D5FF 5.73%, #1DB4FF 35.42%, #1D6AFF 68.23%)',
-      green: 'linear-gradient(225deg, #0FF34F 0%, #07DF74 44.27%, #00C291 100%)',
+      green:
+        'linear-gradient(225deg, #0FF34F 0%, #07DF74 44.27%, #00C291 100%)',
     },
   },
 };

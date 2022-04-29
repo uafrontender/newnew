@@ -10,7 +10,10 @@ import Lottie from '../../components/atoms/Lottie';
 import { signInWithTwitter } from '../../api/endpoints/auth';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { setUserData, setUserLoggedIn } from '../../redux-store/slices/userStateSlice';
+import {
+  setUserData,
+  setUserLoggedIn,
+} from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
 
@@ -31,7 +34,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
   useEffect(() => {
     if (user.loggedIn) router.push('/');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -48,54 +51,49 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
 
         const res = await signInWithTwitter(requestPayload);
 
-        if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
+        if (!res!! || res!!.error || !res.data)
+          throw new Error(res!!.error?.message ?? 'An error occured');
 
         const { data } = res!!;
 
-        if (
-          !data
-          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
-        ) throw new Error('No data');
+        if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS)
+          throw new Error('No data');
 
-        dispatch(setUserData({
-          username: data.me?.username,
-          nickname: data.me?.nickname,
-          email: data.me?.email,
-          avatarUrl: data.me?.avatarUrl,
-          coverUrl: data.me?.coverUrl,
-          userUuid: data.me?.userUuid,
-          bio: data.me?.bio,
-          dateOfBirth: {
-            day: data.me?.dateOfBirth?.day,
-            month: data.me?.dateOfBirth?.month,
-            year: data.me?.dateOfBirth?.year,
-          },
-          countryCode: data.me?.countryCode,
-          options: {
-            isActivityPrivate: data.me?.options?.isActivityPrivate,
-            isCreator: data.me?.options?.isCreator,
-            isVerified: data.me?.options?.isVerified,
-            creatorStatus: data.me?.options?.creatorStatus,
-          },
-        }));
+        dispatch(
+          setUserData({
+            username: data.me?.username,
+            nickname: data.me?.nickname,
+            email: data.me?.email,
+            avatarUrl: data.me?.avatarUrl,
+            coverUrl: data.me?.coverUrl,
+            userUuid: data.me?.userUuid,
+            bio: data.me?.bio,
+            dateOfBirth: {
+              day: data.me?.dateOfBirth?.day,
+              month: data.me?.dateOfBirth?.month,
+              year: data.me?.dateOfBirth?.year,
+            },
+            countryCode: data.me?.countryCode,
+            options: {
+              isActivityPrivate: data.me?.options?.isActivityPrivate,
+              isCreator: data.me?.options?.isCreator,
+              isVerified: data.me?.options?.isVerified,
+              creatorStatus: data.me?.options?.creatorStatus,
+            },
+          })
+        );
         // Set credential cookies
-        setCookie(
-          'accessToken',
-          data.credential?.accessToken,
-          {
-            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
-            path: '/',
-          },
-        );
-        setCookie(
-          'refreshToken',
-          data.credential?.refreshToken,
-          {
-            // Expire in 10 years
-            maxAge: (10 * 365 * 24 * 60 * 60),
-            path: '/',
-          },
-        );
+        setCookie('accessToken', data.credential?.accessToken, {
+          expires: new Date(
+            (data.credential?.expiresAt?.seconds as number)!! * 1000
+          ),
+          path: '/',
+        });
+        setCookie('refreshToken', data.credential?.refreshToken, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
 
         dispatch(setUserLoggedIn(true));
 
@@ -113,7 +111,7 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
     }
 
     handleAuth();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -149,10 +147,11 @@ export default TwitterAuthRedirectPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { oauth_token, oauth_verifier } = context.query;
 
-  if (!oauth_token
-    || !oauth_verifier
-    || Array.isArray(oauth_token)
-    || Array.isArray(oauth_verifier)
+  if (
+    !oauth_token ||
+    !oauth_verifier ||
+    Array.isArray(oauth_token) ||
+    Array.isArray(oauth_verifier)
   ) {
     return {
       redirect: {

@@ -29,12 +29,17 @@ export const TextArea: React.FC<ITextArea> = (props) => {
   return (
     <SWrapper>
       <SContent error={!!error}>
-        <STextArea value={value} onChange={handleChange} placeholder={placeholder} maxLength={maxlength} />
+        <STextArea
+          value={value}
+          onChange={handleChange}
+          placeholder={placeholder}
+          maxLength={maxlength}
+        />
       </SContent>
       {error ? (
-        <AnimatedPresence animation="t-09">
+        <AnimatedPresence animation='t-09'>
           <SErrorDiv>
-            <InlineSvg svg={alertIcon} width="16px" height="16px" />
+            <InlineSvg svg={alertIcon} width='16px' height='16px' />
             {error}
           </SErrorDiv>
         </AnimatedPresence>
@@ -63,7 +68,9 @@ const SContent = styled.div<ISContent>`
   padding: 10.5px 18.5px 10.5px 18.5px;
   position: relative;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
   border-radius: 16px;
 
   border-width: 1.5px;

@@ -17,78 +17,80 @@ interface IMcOptionCardModerationEllipseModal {
   handleOpenRemoveOptionModal: () => void;
 }
 
-const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardModerationEllipseModal> = ({
-  isOpen,
-  zIndex,
-  onClose,
-  isBySubscriber,
-  canBeDeleted,
-  handleOpenReportOptionModal,
-  handleOpenBlockUserModal,
-  handleOpenRemoveOptionModal,
-}) => {
-  const { t } = useTranslation('decision');
+const McOptionCardModerationEllipseModal: React.FunctionComponent<IMcOptionCardModerationEllipseModal> =
+  ({
+    isOpen,
+    zIndex,
+    onClose,
+    isBySubscriber,
+    canBeDeleted,
+    handleOpenReportOptionModal,
+    handleOpenBlockUserModal,
+    handleOpenRemoveOptionModal,
+  }) => {
+    const { t } = useTranslation('decision');
 
-  return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          {isBySubscriber ? (
-            <>
-              <SButton
-                view="secondary"
-                onClick={() => {
-                  handleOpenReportOptionModal();
-                  onClose();
-                }}
-              >
-                <Text variant={2} tone='error'>{ t('McPostModeration.OptionsTab.OptionCard.ellipse.report') }</Text>
-              </SButton>
-              <SButton
-                view="secondary"
-                onClick={() => {
-                  handleOpenBlockUserModal();
-                  onClose();
-                }}
-              >
-                 <Text variant={2}>{ t('McPostModeration.OptionsTab.OptionCard.ellipse.block') }</Text>
-              </SButton>
-            </>
-          ) : null}
-          <SButton
-            view="secondary"
-            disabled={!canBeDeleted}
-            onClick={() => {
-              handleOpenRemoveOptionModal();
-              onClose();
+    return (
+      <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
             }}
           >
-            <Text variant={2}>{ t('McPostModeration.OptionsTab.OptionCard.ellipse.remove') }</Text>
-          </SButton>
-        </SContentContainer>
-        <Button
-          view="secondary"
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-          onClick={() => onClose()}
-        >
-           <Text variant={2}>{ t('ellipse.cancel') }</Text>
-        </Button>
-      </SWrapper>
-    </Modal>
-  );
-};
+            {isBySubscriber ? (
+              <>
+                <SButton
+                  view='secondary'
+                  onClick={() => {
+                    handleOpenReportOptionModal();
+                    onClose();
+                  }}
+                >
+                  <Text variant={2} tone='error'>
+                    {t('McPostModeration.OptionsTab.OptionCard.ellipse.report')}
+                  </Text>
+                </SButton>
+                <SButton
+                  view='secondary'
+                  onClick={() => {
+                    handleOpenBlockUserModal();
+                    onClose();
+                  }}
+                >
+                  <Text variant={2}>
+                    {t('McPostModeration.OptionsTab.OptionCard.ellipse.block')}
+                  </Text>
+                </SButton>
+              </>
+            ) : null}
+            <SButton
+              view='secondary'
+              disabled={!canBeDeleted}
+              onClick={() => {
+                handleOpenRemoveOptionModal();
+                onClose();
+              }}
+            >
+              <Text variant={2}>
+                {t('McPostModeration.OptionsTab.OptionCard.ellipse.remove')}
+              </Text>
+            </SButton>
+          </SContentContainer>
+          <Button
+            view='secondary'
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
+            }}
+            onClick={() => onClose()}
+          >
+            <Text variant={2}>{t('ellipse.cancel')}</Text>
+          </Button>
+        </SWrapper>
+      </Modal>
+    );
+  };
 
 export default McOptionCardModerationEllipseModal;
 
@@ -111,7 +113,7 @@ const SContentContainer = styled.div`
   flex-direction: column;
   gap: 6px;
   z-index: 1;
-  
+
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
     height: 480px;
@@ -128,11 +130,13 @@ const SButton = styled(Button)`
 
   height: 56px;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
   }
 
-  &:focus:enabled, &:hover:enabled {
+  &:focus:enabled,
+  &:hover:enabled {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }
