@@ -17,11 +17,16 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
   disabled,
   onComplete,
 }) => {
-  const [code, setCode] = useState(initialValue ?? new Array(length).join('.').split('.'));
+  const [code, setCode] = useState(
+    initialValue ?? new Array(length).join('.').split('.')
+  );
   const inputs = useRef<HTMLInputElement[]>(new Array(length));
   const wrapperRef = useRef<HTMLDivElement>();
 
-  const handleSlotInput = (e: React.ChangeEvent<HTMLInputElement>, slot: number) => {
+  const handleSlotInput = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    slot: number
+  ) => {
     e.preventDefault();
     const newValue = e.target.value;
     // if (/[^1-9]/.test(newValue)) return;
@@ -39,7 +44,10 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
     }
   };
 
-  const handleDeleteSymbol = (e: React.KeyboardEvent<HTMLInputElement>, slot: number) => {
+  const handleDeleteSymbol = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    slot: number
+  ) => {
     if (e.key === 'Backspace' && !code[slot] && slot !== 0) {
       const workingCode = [...code];
       workingCode[slot - 1] = '';
@@ -55,7 +63,9 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
     }
   };
 
-  const handlePasteToFirstSlot = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePasteToFirstSlot = (
+    e: React.ClipboardEvent<HTMLInputElement>
+  ) => {
     const data = e.clipboardData.getData('Text');
 
     if (!data) return;
@@ -91,8 +101,8 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
           width: 0,
           height: 0,
         }}
-        aria-roledescription="Confirmation code input"
-        autoComplete="false"
+        aria-roledescription='Confirmation code input'
+        autoComplete='false'
         onFocus={(e) => {
           if (!disabled) wrapperRef?.current?.click();
           e.preventDefault();
@@ -100,7 +110,7 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
       />
       <SVerficationInput
         errorBordersShown={error}
-        role="textbox"
+        role='textbox'
         ref={(el) => {
           wrapperRef.current = el!!;
         }}
@@ -121,12 +131,12 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
         {code.map((symbol, i) => (
           <input
             key={i}
-            name="email-verification"
-            inputMode="numeric"
+            name='email-verification'
+            inputMode='numeric'
             maxLength={1}
             value={symbol}
             tabIndex={-1}
-            autoComplete="off"
+            autoComplete='off'
             // We need this one to be focused once page opens
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus={!code[0].length && i === 0}
@@ -181,12 +191,12 @@ const SVerficationInput = styled.div<ISVerficationInput>`
     border-width: 1.5px;
     border-style: solid;
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines1;
-    }
-    return theme.colorsThemed.accent.error;
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines1;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
 
     width: 52px;
     height: 72px;
@@ -206,7 +216,7 @@ const SVerficationInput = styled.div<ISVerficationInput>`
       outline: none;
       cursor: default;
 
-      pointer-events:none;
+      pointer-events: none;
 
       -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -216,14 +226,16 @@ const SVerficationInput = styled.div<ISVerficationInput>`
       user-select: none;
     }
 
-    &:focus, &:active {
+    &:focus,
+    &:active {
       outline: none;
 
-    border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      border-color: ${({ theme, errorBordersShown }) => {
+        if (!errorBordersShown) {
+          return theme.colorsThemed.background.outlines2;
+        }
+        return theme.colorsThemed.accent.error;
+      }};
     }
   }
 `;

@@ -1,10 +1,18 @@
 import { newnewapi } from 'newnew-api';
-import { BASE_URL, cookiesInstance, fetchProtobuf, fetchProtobufProtectedIntercepted } from '../apiConfigs';
+import {
+  BASE_URL,
+  cookiesInstance,
+  fetchProtobuf,
+  fetchProtobufProtectedIntercepted,
+} from '../apiConfigs';
 
 export const BASE_URL_PAYMENTS = `${BASE_URL}/payments`;
 
 export const getSupportedCreatorCountries = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.GetSupportedCreatorCountriesResponse>(
+  fetchProtobuf<
+    newnewapi.EmptyRequest,
+    newnewapi.GetSupportedCreatorCountriesResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.GetSupportedCreatorCountriesResponse,
     `${BASE_URL_PAYMENTS}/get_supported_creator_countries`,
@@ -13,8 +21,13 @@ export const getSupportedCreatorCountries = (payload: newnewapi.EmptyRequest) =>
   );
 
 // Payments for bids/pledges/votes via Stripe redirect
-export const createPaymentSession = (payload: newnewapi.CreatePaymentSessionRequest) =>
-  fetchProtobuf<newnewapi.CreatePaymentSessionRequest, newnewapi.CreatePaymentSessionResponse>(
+export const createPaymentSession = (
+  payload: newnewapi.CreatePaymentSessionRequest
+) =>
+  fetchProtobuf<
+    newnewapi.CreatePaymentSessionRequest,
+    newnewapi.CreatePaymentSessionResponse
+  >(
     newnewapi.CreatePaymentSessionRequest,
     newnewapi.CreatePaymentSessionResponse,
     `${BASE_URL_PAYMENTS}/create_payment_session`,
@@ -29,7 +42,9 @@ export const createPaymentSession = (payload: newnewapi.CreatePaymentSessionRequ
   );
 
 // Set up Stripe creator account
-export const fetchSetStripeLinkCreator = (payload: newnewapi.SetupStripeCreatorAccountRequest) =>
+export const fetchSetStripeLinkCreator = (
+  payload: newnewapi.SetupStripeCreatorAccountRequest
+) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.SetupStripeCreatorAccountRequest,
     newnewapi.SetupStripeCreatorAccountResponse
@@ -43,7 +58,10 @@ export const fetchSetStripeLinkCreator = (payload: newnewapi.SetupStripeCreatorA
 
 // Wallet
 export const getWalletBalance = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.EmptyRequest, newnewapi.GetWalletBalanceResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetWalletBalanceResponse
+  >(
     newnewapi.EmptyRequest,
     newnewapi.GetWalletBalanceResponse,
     `${BASE_URL_PAYMENTS}/get_wallet_balance`,
@@ -51,8 +69,13 @@ export const getWalletBalance = (payload: newnewapi.EmptyRequest) =>
     payload
   );
 
-export const getTopUpWalletSessionUrl = (payload: newnewapi.TopUpWalletRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.TopUpWalletRequest, newnewapi.TopUpWalletResponse>(
+export const getTopUpWalletSessionUrl = (
+  payload: newnewapi.TopUpWalletRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.TopUpWalletRequest,
+    newnewapi.TopUpWalletResponse
+  >(
     newnewapi.TopUpWalletRequest,
     newnewapi.TopUpWalletResponse,
     `${BASE_URL_PAYMENTS}/top_up_wallet`,
@@ -60,8 +83,13 @@ export const getTopUpWalletSessionUrl = (payload: newnewapi.TopUpWalletRequest) 
     payload
   );
 
-export const getTopUpWalletWithPaymentPurposeUrl = (payload: newnewapi.TopUpWalletWithPurposeRequest) =>
-  fetchProtobuf<newnewapi.TopUpWalletWithPurposeRequest, newnewapi.TopUpWalletWithPurposeResponse>(
+export const getTopUpWalletWithPaymentPurposeUrl = (
+  payload: newnewapi.TopUpWalletWithPurposeRequest
+) =>
+  fetchProtobuf<
+    newnewapi.TopUpWalletWithPurposeRequest,
+    newnewapi.TopUpWalletWithPurposeResponse
+  >(
     newnewapi.TopUpWalletWithPurposeRequest,
     newnewapi.TopUpWalletWithPurposeResponse,
     `${BASE_URL_PAYMENTS}/top_up_wallet_with_purpose`,
@@ -76,7 +104,10 @@ export const getTopUpWalletWithPaymentPurposeUrl = (payload: newnewapi.TopUpWall
   );
 
 export const getMyEarnings = (payload: newnewapi.GetMyEarningsRequest) =>
-  fetchProtobufProtectedIntercepted<newnewapi.GetMyEarningsRequest, newnewapi.GetMyEarningsResponse>(
+  fetchProtobufProtectedIntercepted<
+    newnewapi.GetMyEarningsRequest,
+    newnewapi.GetMyEarningsResponse
+  >(
     newnewapi.GetMyEarningsRequest,
     newnewapi.GetMyEarningsResponse,
     `${BASE_URL_PAYMENTS}/get_my_earnings`,

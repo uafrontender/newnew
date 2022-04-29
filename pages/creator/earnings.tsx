@@ -16,9 +16,7 @@ export const Earnings = () => {
   return (
     <>
       <Head>
-        <title>
-          {t('earnings.meta.title')}
-        </title>
+        <title>{t('earnings.meta.title')}</title>
       </Head>
       <Content />
     </>
@@ -26,18 +24,16 @@ export const Earnings = () => {
 };
 
 (Earnings as NextPageWithLayout).getLayout = (page: ReactElement) => (
-  <SGeneral withChat>
-    {page}
-  </SGeneral>
+  <SGeneral withChat>{page}</SGeneral>
 );
 
 export default Earnings;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['common', 'creator'],
-  );
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'creator',
+  ]);
 
   return {
     props: {
@@ -47,9 +43,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const SGeneral = styled(General)`
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.secondary : props.theme.colorsThemed.background.primary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.secondary
+      : props.theme.colorsThemed.background.primary};
 
   ${({ theme }) => theme.media.laptop} {
-    background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary)};
+    background: ${(props) =>
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;

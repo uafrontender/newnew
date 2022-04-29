@@ -45,7 +45,8 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -88,7 +89,10 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
         const postsResponse = await getMyPosts(payload);
 
         if (postsResponse.data && postsResponse.data.posts) {
-          handleSetPosts((curr) => [...curr, ...(postsResponse.data?.posts as newnewapi.Post[])]);
+          handleSetPosts((curr) => [
+            ...curr,
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
           handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
 
           if (postsResponse.data.totalCount) {
@@ -103,7 +107,13 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
         console.error(err);
       }
     },
-    [handleSetPosts, handleUpdatePageToken, handleUpdateCount, postsFilter, isLoading]
+    [
+      handleSetPosts,
+      handleUpdatePageToken,
+      handleUpdateCount,
+      postsFilter,
+      isLoading,
+    ]
   );
 
   useEffect(() => {
@@ -137,7 +147,7 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
         <SCardsSection>
           {posts && (
             <List
-              category=""
+              category=''
               loading={isLoading}
               collection={posts}
               wrapperStyle={{
@@ -161,10 +171,12 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
   );
 };
 
-(MyProfileMyPosts as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(MyProfileMyPosts as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return (
     <MyProfileLayout
-      renderedPage="myposts"
+      renderedPage='myposts'
       postsCachedMyPosts={page.props.pagedPosts.posts}
       postsCachedMyPostsFilter={newnewapi.Post.Filter.ALL}
       postsCachedMyPostsCount={page.props.pagedPosts.totalCount}
@@ -177,7 +189,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
 
 export default MyProfileMyPosts;
 
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
+export async function getServerSideProps(
+  context: GetServerSidePropsContext
+): Promise<any> {
   try {
     const translationContext = await serverSideTranslations(context.locale!!, [
       'common',

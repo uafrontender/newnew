@@ -17,7 +17,10 @@ import PublishedModal from '../../../molecules/creation/PublishedModal';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
-import { clearCreation, setPostData } from '../../../../redux-store/slices/creationStateSlice';
+import {
+  clearCreation,
+  setPostData,
+} from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
 import {
@@ -44,7 +47,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const playerRef: any = useRef(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { post, auction, crowdfunding, multiplechoice, videoProcessing, fileProcessing } = useAppSelector((state) => state.creation);
+  const {
+    post,
+    auction,
+    crowdfunding,
+    multiplechoice,
+    videoProcessing,
+    fileProcessing,
+  } = useAppSelector((state) => state.creation);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text, min);
@@ -61,23 +71,45 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const {
     query: { tab },
   } = router;
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const titleIsValid = !validateText(post.title, CREATION_TITLE_MIN, CREATION_TITLE_MAX);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const titleIsValid = !validateText(
+    post.title,
+    CREATION_TITLE_MIN,
+    CREATION_TITLE_MAX
+  );
   const optionsAreValid =
     tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) ===
-      -1;
-  const disabled = loading || !titleIsValid || !post.title || !post.announcementVideoUrl || !optionsAreValid;
+    multiplechoice.choices.findIndex((item) =>
+      validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
+    ) === -1;
+  const disabled =
+    loading ||
+    !titleIsValid ||
+    !post.title ||
+    !post.announcementVideoUrl ||
+    !optionsAreValid;
 
   const formatStartsAt: () => any = useCallback(() => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+    const time = moment(
+      `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+      ['hh:mm a']
+    );
 
-    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+    return moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes());
   }, [post.startsAt]);
   const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
     (inSeconds = false) => {
-      const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-      const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+      const time = moment(
+        `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+        ['hh:mm a']
+      );
+      const dateValue = moment(post.startsAt.date)
+        .hours(time.hours())
+        .minutes(time.minutes());
       let seconds = 0;
 
       if (post.expiresAt === '1-hour') {
@@ -151,7 +183,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {
-          options: multiplechoice.choices.map((choice) => ({ text: choice.text })),
+          options: multiplechoice.choices.map((choice) => ({
+            text: choice.text,
+          })),
           isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
         };
       } else if (tab === 'crowdfunding') {
@@ -181,7 +215,18 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       toast.error(err);
       setLoading(false);
     }
-  }, [tab, post, router, auction, isMobile, dispatch, crowdfunding, multiplechoice, formatStartsAt, formatExpiresAt]);
+  }, [
+    tab,
+    post,
+    router,
+    auction,
+    isMobile,
+    dispatch,
+    crowdfunding,
+    multiplechoice,
+    formatStartsAt,
+    formatExpiresAt,
+  ]);
   const settings: any = useMemo(
     () =>
       _compact([
@@ -203,13 +248,21 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         },
         {
           key: 'comments',
-          value: t(`preview.values.${post.options.commentsEnabled ? 'comments-allowed' : 'comments-forbidden'}`),
+          value: t(
+            `preview.values.${
+              post.options.commentsEnabled
+                ? 'comments-allowed'
+                : 'comments-forbidden'
+            }`
+          ),
         },
         tab === 'multiple-choice' && {
           key: 'allowSuggestions',
           value: t(
             `preview.values.${
-              multiplechoice.options.allowSuggestions ? 'allowSuggestions-allowed' : 'allowSuggestions-forbidden'
+              multiplechoice.options.allowSuggestions
+                ? 'allowSuggestions-allowed'
+                : 'allowSuggestions-forbidden'
             }`
           ),
         },
@@ -256,23 +309,27 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               clickable
               svg={chevronLeftIcon}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
               {post.title}
             </SHeadlineMobile>
           </STopLine>
-          {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
+          {tab === 'multiple-choice' && (
+            <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
+          )}
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SPlayerWrapper>
             {fileProcessing.progress === 100 ? (
-              <BitmovinPlayer id="preview-mobile" muted={false} resources={videoProcessing?.targetUrls} />
+              <BitmovinPlayer
+                id='preview-mobile'
+                muted={false}
+                resources={videoProcessing?.targetUrls}
+              />
             ) : (
-              <SText
-                variant={2}
-              >
+              <SText variant={2}>
                 Your video will be available once processed
               </SText>
             )}
@@ -280,7 +337,12 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         </SContent>
         <SButtonWrapper>
           <SButtonContent>
-            <SButton view="primaryGrad" loading={loading} onClick={handleSubmit} disabled={disabled}>
+            <SButton
+              view='primaryGrad'
+              loading={loading}
+              onClick={handleSubmit}
+              disabled={disabled}
+            >
               {t('preview.button.submit')}
             </SButton>
           </SButtonContent>
@@ -301,16 +363,14 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
             {fileProcessing.progress === 100 ? (
               <BitmovinPlayer
                 withMuteControl
-                id="preview"
+                id='preview'
                 innerRef={playerRef}
                 resources={videoProcessing?.targetUrls}
-                mutePosition="left"
-                borderRadius="16px"
+                mutePosition='left'
+                borderRadius='16px'
               />
             ) : (
-              <SText
-                variant={2}
-              >
+              <SText variant={2}>
                 Your video will be available once processed
               </SText>
             )}
@@ -318,13 +378,20 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         </SLeftPart>
         <SRightPart>
           <SHeadline variant={5}>{post.title}</SHeadline>
-          {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
+          {tab === 'multiple-choice' && (
+            <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
+          )}
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SButtonsWrapper>
-            <Button view="secondary" onClick={handleClose} disabled={loading}>
+            <Button view='secondary' onClick={handleClose} disabled={loading}>
               {t('preview.button.edit')}
             </Button>
-            <Button view="primaryGrad" loading={loading} onClick={handleSubmit} disabled={disabled}>
+            <Button
+              view='primaryGrad'
+              loading={loading}
+              onClick={handleSubmit}
+              disabled={disabled}
+            >
               {t('preview.button.submit')}
             </Button>
           </SButtonsWrapper>

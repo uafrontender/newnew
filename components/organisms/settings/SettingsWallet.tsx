@@ -17,8 +17,7 @@ import WalletIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { formatNumber } from '../../../utils/format';
 
-interface ISettingsWallet {
-}
+interface ISettingsWallet {}
 
 const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
   const theme = useTheme();
@@ -41,7 +40,7 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
           }}
         />
       </SSettingsWalletContainer>
-    )
+    );
   }
 
   if (!walletBalance || walletBalance.usdCents === 0) {
@@ -51,32 +50,22 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
           <InlineSvg
             svg={WalletIcon}
             fill={theme.colorsThemed.text.primary}
-            width="24px"
-            height="24px"
+            width='24px'
+            height='24px'
           />
         </SIconConatainer>
-        <SBalanceText
-          variant={2}
-          weight={600}
-        >
-          { t('Settings.sections.Wallet.empty.balance') }
+        <SBalanceText variant={2} weight={600}>
+          {t('Settings.sections.Wallet.empty.balance')}
         </SBalanceText>
-        <Headline
-          variant={4}
-        >
-          $0.00
-        </Headline>
-        <SCaptionText
-          variant={2}
-          weight={600}
-        >
-          { t('Settings.sections.Wallet.empty.caption') }
+        <Headline variant={4}>$0.00</Headline>
+        <SCaptionText variant={2} weight={600}>
+          {t('Settings.sections.Wallet.empty.caption')}
         </SCaptionText>
         <Button
-          view="primaryGrad"
+          view='primaryGrad'
           onClick={() => setIsTopWalletModalOpen(true)}
         >
-          { t('Settings.sections.Wallet.empty.topUpBtn') }
+          {t('Settings.sections.Wallet.empty.topUpBtn')}
         </Button>
         <TopUpWalletModal
           zIndex={12}
@@ -89,24 +78,19 @@ const SettingsWallet: React.FunctionComponent<ISettingsWallet> = () => {
 
   return (
     <SSettingsWalletContainer>
-      <SText
-        variant={2}
-      >
-        { t('Settings.sections.Wallet.non-empty.balance') }
+      <SText variant={2}>
+        {t('Settings.sections.Wallet.non-empty.balance')}
       </SText>
       <SActionDiv>
-        <Headline
-          variant={4}
-        >
-          $
-          { formatNumber((walletBalance?.usdCents / 100) ?? 0, true) }
+        <Headline variant={4}>
+          ${formatNumber(walletBalance?.usdCents / 100 ?? 0, true)}
         </Headline>
-          <Button
-            view="primaryGrad"
-            onClick={() => setIsTopWalletModalOpen(true)}
-          >
-            { t('Settings.sections.Wallet.non-empty.topUpBtn') }
-          </Button>
+        <Button
+          view='primaryGrad'
+          onClick={() => setIsTopWalletModalOpen(true)}
+        >
+          {t('Settings.sections.Wallet.non-empty.topUpBtn')}
+        </Button>
       </SActionDiv>
       <TopUpWalletModal
         zIndex={12}

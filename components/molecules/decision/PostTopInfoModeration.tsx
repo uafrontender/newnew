@@ -36,7 +36,7 @@ const images = {
   ac: ACIcon.src,
   mc: MCIcon.src,
   cf: CFIcon.src,
-}
+};
 
 interface IPostTopInfoModeration {
   title: string;
@@ -52,228 +52,229 @@ interface IPostTopInfoModeration {
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
 
-const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> = ({
-  title,
-  postId,
-  postType,
-  postStatus,
-  totalVotes,
-  amountInBids,
-  totalPledges,
-  targetPledges,
-  hasResponse,
-  hasWinner,
-  handleUpdatePostStatus,
-}) => {
-  const theme = useTheme();
-  const router = useRouter();
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
+  ({
+    title,
+    postId,
+    postType,
+    postStatus,
+    totalVotes,
+    amountInBids,
+    totalPledges,
+    targetPledges,
+    hasResponse,
+    hasWinner,
+    handleUpdatePostStatus,
+  }) => {
+    const theme = useTheme();
+    const router = useRouter();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const failureReason = useMemo(() => {
-    if (postStatus !== 'failed') return '';
+    const failureReason = useMemo(() => {
+      if (postStatus !== 'failed') return '';
 
-    if (postType === 'ac') {
-      if (!hasWinner) {
-        return 'ac-no-winner';
+      if (postType === 'ac') {
+        if (!hasWinner) {
+          return 'ac-no-winner';
+        }
+        if (amountInBids === 0 || !amountInBids) {
+          return 'ac';
+        }
       }
-      if (amountInBids === 0 || !amountInBids) {
-        return 'ac';
+
+      if (postType === 'mc') {
+        if (totalVotes === 0 || !totalVotes) {
+          return 'mc';
+        }
       }
-    }
 
-    if (postType === 'mc') {
-      if (totalVotes === 0 || !totalVotes) {
-        return 'mc';
+      if (postType === 'cf') {
+        if (!totalPledges || totalPledges!! < targetPledges!!) {
+          return 'cf';
+        }
       }
-    }
 
-    if (postType === 'cf') {
-      if (!totalPledges || totalPledges!! < targetPledges!!) {
-        return 'cf';
+      return 'no-response';
+    }, [
+      postStatus,
+      postType,
+      hasWinner,
+      amountInBids,
+      totalVotes,
+      totalPledges,
+      targetPledges,
+    ]);
+
+    const showWinnerOption = useMemo(
+      () => postType === 'ac' && postStatus === 'wating_for_decision',
+      [postType, postStatus]
+    );
+
+    const [shareMenuOpen, setShareMenuOpen] = useState(false);
+    const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+    const [deletePostOpen, setDeletePostOpen] = useState(false);
+
+    const handleOpenShareMenu = () => setShareMenuOpen(true);
+    const handleCloseShareMenu = () => setShareMenuOpen(false);
+
+    const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
+    const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+
+    const handleOpenDeletePostModal = () => setDeletePostOpen(true);
+    const handleCloseDeletePostModal = () => setDeletePostOpen(false);
+
+    const handleDeletePost = async () => {
+      try {
+        const payload = new newnewapi.DeleteMyPostRequest({
+          postUuid: postId,
+        });
+
+        const res = await deleteMyPost(payload);
+
+        if (!res.error) {
+          console.log('Post deleted/cancelled');
+          handleUpdatePostStatus('DELETED');
+          handleCloseDeletePostModal();
+        }
+      } catch (err) {
+        console.error(err);
       }
-    }
+    };
 
-    return 'no-response';
-  }, [postStatus, postType, hasWinner, amountInBids, totalVotes, totalPledges, targetPledges]);
-
-  const showWinnerOption = useMemo(() => (
-    postType === 'ac' && postStatus === 'wating_for_decision'
-  ), [postType, postStatus]);
-
-  const [shareMenuOpen, setShareMenuOpen] = useState(false);
-  const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-  const [deletePostOpen, setDeletePostOpen] = useState(false);
-
-  const handleOpenShareMenu = () => setShareMenuOpen(true);
-  const handleCloseShareMenu = () => setShareMenuOpen(false);
-
-  const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
-  const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
-
-  const handleOpenDeletePostModal = () => setDeletePostOpen(true);
-  const handleCloseDeletePostModal = () => setDeletePostOpen(false);
-
-  const handleDeletePost = async () => {
-    try {
-      const payload = new newnewapi.DeleteMyPostRequest({
-        postUuid: postId,
-      });
-
-      const res = await deleteMyPost(payload);
-
-      if (!res.error) {
-        console.log('Post deleted/cancelled');
-        handleUpdatePostStatus('DELETED');
-        handleCloseDeletePostModal();
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  return (
-    <SContainer>
-      <SWrapper
-        showWinnerOption={showWinnerOption}
-      >
-        {postType === 'ac' && amountInBids ? (
-          <SBidsAmount>
-            <span>
-              $
-              {formatNumber((amountInBids / 100) ?? 0, true)}
-            </span>
-            {' '}
-            { t('AcPost.PostTopInfo.in_bids') }
-          </SBidsAmount>
-        ) : null}
-        {postType === 'mc' && totalVotes ? (
-          <SBidsAmount>
-            <span>
-              {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
-            </span>
-            {' '}
-            { totalVotes > 1 ? t('McPost.PostTopInfo.votes') : t('McPost.PostTopInfo.vote') }
-          </SBidsAmount>
-        ) : null}
-        <SActionsDiv>
-          <SShareButton
-            view="transparent"
-            iconOnly
-            withDim
-            withShrink
-            style={{
-              padding: '8px',
+    return (
+      <SContainer>
+        <SWrapper showWinnerOption={showWinnerOption}>
+          {postType === 'ac' && amountInBids ? (
+            <SBidsAmount>
+              <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
+              {t('AcPost.PostTopInfo.in_bids')}
+            </SBidsAmount>
+          ) : null}
+          {postType === 'mc' && totalVotes ? (
+            <SBidsAmount>
+              <span>
+                {formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}
+              </span>{' '}
+              {totalVotes > 1
+                ? t('McPost.PostTopInfo.votes')
+                : t('McPost.PostTopInfo.vote')}
+            </SBidsAmount>
+          ) : null}
+          <SActionsDiv>
+            <SShareButton
+              view='transparent'
+              iconOnly
+              withDim
+              withShrink
+              style={{
+                padding: '8px',
+              }}
+              onClick={() => handleOpenShareMenu()}
+            >
+              <InlineSvg
+                svg={ShareIconFilled}
+                fill={theme.colorsThemed.text.secondary}
+                width='20px'
+                height='20px'
+              />
+            </SShareButton>
+            <SMoreButton
+              view='transparent'
+              iconOnly
+              onClick={() => handleOpenEllipseMenu()}
+            >
+              <InlineSvg
+                svg={MoreIconFilled}
+                fill={theme.colorsThemed.text.secondary}
+                width='20px'
+                height='20px'
+              />
+            </SMoreButton>
+            {/* Share menu */}
+            {!isMobile && (
+              <PostShareMenu
+                postId={postId}
+                isVisible={shareMenuOpen}
+                handleClose={handleCloseShareMenu}
+              />
+            )}
+            {isMobile && shareMenuOpen ? (
+              <PostShareModal
+                isOpen={shareMenuOpen}
+                zIndex={11}
+                postId={postId}
+                onClose={handleCloseShareMenu}
+              />
+            ) : null}
+            {/* Ellipse menu */}
+            {!isMobile && (
+              <PostEllipseMenuModeration
+                postType={postType as string}
+                isVisible={ellipseMenuOpen}
+                canDeletePost={postStatus !== 'failed'}
+                handleClose={handleCloseEllipseMenu}
+                handleOpenDeletePostModal={handleOpenDeletePostModal}
+              />
+            )}
+            {isMobile && ellipseMenuOpen ? (
+              <PostEllipseModalModeration
+                postType={postType as string}
+                zIndex={11}
+                canDeletePost={postStatus !== 'failed'}
+                isOpen={ellipseMenuOpen}
+                onClose={handleCloseEllipseMenu}
+                handleOpenDeletePostModal={handleOpenDeletePostModal}
+              />
+            ) : null}
+          </SActionsDiv>
+          <SPostTitle variant={5}>{title}</SPostTitle>
+          {showWinnerOption ? (
+            <SSelectWinnerOption>
+              <SHeadline variant={4}>
+                {t('AcPostModeration.PostTopInfo.SelectWinner.title')}
+              </SHeadline>
+              <SText variant={3}>
+                {t('AcPostModeration.PostTopInfo.SelectWinner.body')}
+              </SText>
+              <STrophyImg src={AcSelectWinnerIcon.src} />
+            </SSelectWinnerOption>
+          ) : null}
+        </SWrapper>
+        {postStatus === 'failed' && (
+          <PostFailedBox
+            title={t('PostFailedBoxModeration.title', {
+              postType: t(`postType.${postType}`),
+            })}
+            body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
+            imageSrc={images[postType!!]}
+            buttonCaption={t('PostFailedBoxModeration.ctaButton', {
+              postType: t(`postType.${postType}`),
+            })}
+            handleButtonClick={() => {
+              if (postType === 'ac') {
+                router.push('/creation/auction');
+              } else if (postType === 'mc') {
+                router.push('/creation/multiple-choice');
+              } else {
+                router.push('/creation/crowdfunding');
+              }
             }}
-            onClick={() => handleOpenShareMenu()}
-          >
-            <InlineSvg
-              svg={ShareIconFilled}
-              fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
-            />
-          </SShareButton>
-          <SMoreButton
-            view="transparent"
-            iconOnly
-            onClick={() => handleOpenEllipseMenu()}
-          >
-            <InlineSvg
-              svg={MoreIconFilled}
-              fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
-            />
-          </SMoreButton>
-          {/* Share menu */}
-          {!isMobile && (
-            <PostShareMenu
-              postId={postId}
-              isVisible={shareMenuOpen}
-              handleClose={handleCloseShareMenu}
-            />
-          )}
-          {isMobile && shareMenuOpen ? (
-            <PostShareModal
-              isOpen={shareMenuOpen}
-              zIndex={11}
-              postId={postId}
-              onClose={handleCloseShareMenu}
-            />
-          ) : null}
-          {/* Ellipse menu */}
-          {!isMobile && (
-            <PostEllipseMenuModeration
-              postType={postType as string}
-              isVisible={ellipseMenuOpen}
-              canDeletePost={postStatus !== 'failed'}
-              handleClose={handleCloseEllipseMenu}
-              handleOpenDeletePostModal={handleOpenDeletePostModal}
-            />
-          )}
-          {isMobile && ellipseMenuOpen ? (
-            <PostEllipseModalModeration
-              postType={postType as string}
-              zIndex={11}
-              canDeletePost={postStatus !== 'failed'}
-              isOpen={ellipseMenuOpen}
-              onClose={handleCloseEllipseMenu}
-              handleOpenDeletePostModal={handleOpenDeletePostModal}
-            />
-          ) : null}
-        </SActionsDiv>
-        <SPostTitle
-          variant={5}
-        >
-          {title}
-        </SPostTitle>
-        {showWinnerOption ? (
-          <SSelectWinnerOption>
-            <SHeadline
-              variant={4}
-            >
-              { t('AcPostModeration.PostTopInfo.SelectWinner.title') }
-            </SHeadline>
-            <SText
-              variant={3}
-            >
-              { t('AcPostModeration.PostTopInfo.SelectWinner.body') }
-            </SText>
-            <STrophyImg
-              src={AcSelectWinnerIcon.src}
-            />
-          </SSelectWinnerOption>
-        ) : null}
-      </SWrapper>
-      {postStatus === 'failed' && (
-        <PostFailedBox
-          title={t('PostFailedBoxModeration.title', { postType: t(`postType.${postType}`) })}
-          body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
-          imageSrc={images[postType!!]}
-          buttonCaption={t('PostFailedBoxModeration.ctaButton', { postType: t(`postType.${postType}`) })}
-          handleButtonClick={() => {
-            if (postType === 'ac') {
-              router.push('/creation/auction');
-            } else if (postType === 'mc') {
-              router.push('/creation/multiple-choice');
-            } else {
-              router.push('/creation/crowdfunding');
-            }
-          }}
+          />
+        )}
+        {/* Confirm delete post */}
+        <PostConfirmDeleteModal
+          postType={postType as string}
+          isVisible={deletePostOpen}
+          closeModal={handleCloseDeletePostModal}
+          handleConfirmDelete={handleDeletePost}
         />
-      )}
-      {/* Confirm delete post */}
-      <PostConfirmDeleteModal
-        postType={postType as string}
-        isVisible={deletePostOpen}
-        closeModal={handleCloseDeletePostModal}
-        handleConfirmDelete={handleDeletePost}
-      />
-    </SContainer>
-  );
-};
+      </SContainer>
+    );
+  };
 
 PostTopInfoModeration.defaultProps = {
   postType: undefined,
@@ -296,21 +297,18 @@ const SWrapper = styled.div<{
 }>`
   display: grid;
 
-  ${({ showWinnerOption }) => (
+  ${({ showWinnerOption }) =>
     showWinnerOption
-    ? css`
-      grid-template-areas:
-        'title title title'
-        'stats stats actions'
-      ;
-    `
-    : css`
-      grid-template-areas:
-        'title title title'
-        'stats stats actions'
-      ;
-    `
-  )}
+      ? css`
+          grid-template-areas:
+            'title title title'
+            'stats stats actions';
+        `
+      : css`
+          grid-template-areas:
+            'title title title'
+            'stats stats actions';
+        `}
 
   height: fit-content;
 
@@ -319,22 +317,19 @@ const SWrapper = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
-    ${({ showWinnerOption }) => (
+    ${({ showWinnerOption }) =>
       showWinnerOption
-      ? css`
-        grid-template-areas:
-          'stats stats actions'
-          'title title title'
-          'selectWinner selectWinner selectWinner'
-        ;
-      `
-      : css`
-        grid-template-areas:
-          'stats stats actions'
-          'title title title'
-        ;
-      `
-    )}
+        ? css`
+            grid-template-areas:
+              'stats stats actions'
+              'title title title'
+              'selectWinner selectWinner selectWinner';
+          `
+        : css`
+            grid-template-areas:
+              'stats stats actions'
+              'title title title';
+          `}
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
@@ -360,10 +355,8 @@ const SShareButton = styled(Button)`
   background: none;
   padding: 0px;
   &:focus:enabled {
-    background: ${({
-    theme,
-    view,
-  }) => theme.colorsThemed.button.background[view!!]};
+    background: ${({ theme, view }) =>
+      theme.colorsThemed.button.background[view!!]};
   }
 `;
 
@@ -424,7 +417,12 @@ const SSelectWinnerOption = styled.div`
   padding: 24px 16px;
   padding-right: 134px;
 
-  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  background: linear-gradient(
+      315deg,
+      rgba(29, 180, 255, 0.85) 0%,
+      rgba(29, 180, 255, 0) 50%
+    ),
+    #1d6aff;
   border-radius: 24px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -435,7 +433,6 @@ const SSelectWinnerOption = styled.div`
     width: auto;
 
     margin-top: 32px;
-
   }
 `;
 
@@ -446,9 +443,9 @@ const STrophyImg = styled.img`
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SText = styled(Text)`
-  color:#FFFFFF;
+  color: #ffffff;
 `;

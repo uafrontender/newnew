@@ -1,12 +1,11 @@
-import { TPostType } from "./switchPostType";
-import { TPostStatusStringified } from "./switchPostStatus";
+import { TPostType } from './switchPostType';
+import { TPostStatusStringified } from './switchPostStatus';
 
 // TODO: Resolve stringification issue
 export default function switchPostStatusString(
   postType: TPostType,
-  status: string,
+  status: string
 ): TPostStatusStringified {
-
   if (postType === 'ac') {
     switch (status) {
       case 'SCHEDULED': {

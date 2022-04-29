@@ -398,7 +398,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   return (
     <>
       <STabContainer
-        key="bids"
+        key='bids'
         ref={(el) => {
           mainContainer.current = el!!;
         }}
@@ -409,7 +409,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
           <SNoOptionsYet>
             <SNoOptionsImgContainer>
-              <img src={NoContentYetImg.src} alt="No content yet" />
+              <img src={NoContentYetImg.src} alt='No content yet' />
             </SNoOptionsImgContainer>
             <SNoOptionsCaption variant={3}>
               {t('AcPost.OptionsTab.NoOptions.caption_1')}
@@ -428,12 +428,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask
-                gradientType="secondary"
+                gradientType='secondary'
                 positionTop
                 active={showTopGradient}
               />
               <GradientMask
-                gradientType="secondary"
+                gradientType='secondary'
                 positionBottom={gradientMaskBottomPosition}
                 active={showBottomGradient}
               />
@@ -463,7 +463,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <SLoaderDiv ref={loadingRef} />
           ) : pagingToken ? (
             <SLoadMoreBtn
-              view="secondary"
+              view='secondary'
               onClick={() => handleLoadBids(pagingToken)}
             >
               {t('loadMoreBtn')}
@@ -487,7 +487,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             />
             <BidAmountTextInput
               value={newBidAmount}
-              inputAlign="center"
+              inputAlign='center'
               disabled={optionBeingSupported !== ''}
               onChange={(newValue: string) => setNewBidAmount(newValue)}
               minAmount={minAmount}
@@ -500,8 +500,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               }}
             />
             <Button
-              view="primaryGrad"
-              size="sm"
+              view='primaryGrad'
+              size='sm'
               disabled={
                 !newBidText ||
                 !newBidAmount ||
@@ -562,7 +562,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             />
             <BidAmountTextInput
               value={newBidAmount}
-              inputAlign="left"
+              inputAlign='left'
               disabled={optionBeingSupported !== ''}
               style={{
                 textAlign: 'center',
@@ -572,8 +572,8 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               minAmount={minAmount}
             />
             <Button
-              view="primaryGrad"
-              size="sm"
+              view='primaryGrad'
+              size='sm'
               disabled={
                 !newBidText ||
                 !newBidAmount ||
@@ -632,7 +632,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       {isMobile && !suggestNewMobileOpen && postStatus === 'voting' ? (
         <>
           <SActionButton
-            view="primaryGrad"
+            view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
           >
             {t('AcPost.FloatingActionButton.suggestNewBtn')}

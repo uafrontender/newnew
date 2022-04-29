@@ -33,7 +33,6 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   const user = useAppSelector((state) => state.user);
   const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
-
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
@@ -53,9 +52,14 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           exit={{ opacity: 0 }}
         >
           <SButton
-            onClick={() => router.route === '/profile'
-              ? handleClose()
-              : handleClick(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile')
+            onClick={() =>
+              router.route === '/profile'
+                ? handleClose()
+                : handleClick(
+                    user.userData?.options?.isCreator
+                      ? '/profile/my-posts'
+                      : '/profile'
+                  )
             }
           >
             <SAvatar>
@@ -65,22 +69,38 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
                 draggable={false}
               />
             </SAvatar>
-            <Text variant={2}>
-              {t('mobile-top-navigation-profile')}
-            </Text>
+            <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
           </SButton>
-          <SButton onClick={() => router.route.includes('/profile/settings') ? handleClose() : handleClick('/profile/settings')}>
+          <SButton
+            onClick={() =>
+              router.route.includes('/profile/settings')
+                ? handleClose()
+                : handleClick('/profile/settings')
+            }
+          >
             <InlineSvg
-              svg={router.route.includes('profile/settings') ? WalletIconFilled : WalletIconOutlined}
-              fill={router.route.includes('profile/settings') ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
+              svg={
+                router.route.includes('profile/settings')
+                  ? WalletIconFilled
+                  : WalletIconOutlined
+              }
+              fill={
+                router.route.includes('profile/settings')
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
             />
             <Text variant={2}>
-            { !isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
-              ? t('mobile-top-navigation-my-balance', { value: formatNumber(Math.floor(walletBalance.usdCents / 100), true) })
-              : t('mobile-top-navigation-my-balance')
-            }
+              {!isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
+                ? t('mobile-top-navigation-my-balance', {
+                    value: formatNumber(
+                      Math.floor(walletBalance.usdCents / 100),
+                      true
+                    ),
+                  })
+                : t('mobile-top-navigation-my-balance')}
             </Text>
           </SButton>
         </SContainer>
@@ -106,7 +126,9 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;
@@ -141,7 +163,6 @@ const SButton = styled.button`
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   }
 `;
-
 
 const SAvatar = styled.div`
   overflow: hidden;

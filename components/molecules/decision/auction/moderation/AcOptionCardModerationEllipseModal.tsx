@@ -16,73 +16,75 @@ interface IAcOptionCardModerationEllipseModal {
   handleOpenRemoveOptionModal: () => void;
 }
 
-const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardModerationEllipseModal> = ({
-  isOpen,
-  zIndex,
-  canDeleteOption,
-  onClose,
-  handleOpenReportOptionModal,
-  handleOpenBlockUserModal,
-  handleOpenRemoveOptionModal,
-}) => {
-  const { t } = useTranslation('decision');
+const AcOptionCardModerationEllipseModal: React.FunctionComponent<IAcOptionCardModerationEllipseModal> =
+  ({
+    isOpen,
+    zIndex,
+    canDeleteOption,
+    onClose,
+    handleOpenReportOptionModal,
+    handleOpenBlockUserModal,
+    handleOpenRemoveOptionModal,
+  }) => {
+    const { t } = useTranslation('decision');
 
-  return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <SButton
-            view="secondary"
-            onClick={() => {
-              handleOpenReportOptionModal();
-              onClose();
+    return (
+      <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
             }}
           >
-             <Text variant={2} tone='error'>{ t('AcPostModeration.OptionsTab.OptionCard.ellipse.report') }</Text>
-          </SButton>
-          <SButton
-            view="secondary"
-            onClick={() => {
-              handleOpenBlockUserModal();
-              onClose();
+            <SButton
+              view='secondary'
+              onClick={() => {
+                handleOpenReportOptionModal();
+                onClose();
+              }}
+            >
+              <Text variant={2} tone='error'>
+                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.report')}
+              </Text>
+            </SButton>
+            <SButton
+              view='secondary'
+              onClick={() => {
+                handleOpenBlockUserModal();
+                onClose();
+              }}
+            >
+              <Text variant={2}>
+                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.block')}
+              </Text>
+            </SButton>
+            <SButton
+              view='secondary'
+              disabled={!canDeleteOption}
+              onClick={() => {
+                handleOpenRemoveOptionModal();
+                onClose();
+              }}
+            >
+              <Text variant={2}>
+                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove')}
+              </Text>
+            </SButton>
+          </SContentContainer>
+          <Button
+            view='secondary'
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
             }}
+            onClick={() => onClose()}
           >
-            <Text variant={2}>{ t('AcPostModeration.OptionsTab.OptionCard.ellipse.block') }</Text>
-          </SButton>
-          <SButton
-            view="secondary"
-            disabled={!canDeleteOption}
-            onClick={() => {
-              handleOpenRemoveOptionModal();
-              onClose();
-            }}
-          >
-            <Text variant={2}>{ t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove') }</Text>
-          </SButton>
-        </SContentContainer>
-        <Button
-          view="secondary"
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-          onClick={()=> onClose()}
-        >
-          <Text variant={2}>{ t('ellipse.cancel') }</Text>
-        </Button>
-      </SWrapper>
-    </Modal>
-  );
-};
+            <Text variant={2}>{t('ellipse.cancel')}</Text>
+          </Button>
+        </SWrapper>
+      </Modal>
+    );
+  };
 
 export default AcOptionCardModerationEllipseModal;
 
@@ -122,11 +124,13 @@ const SButton = styled(Button)`
 
   height: 56px;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
   }
 
-  &:focus:enabled, &:hover:enabled {
+  &:focus:enabled,
+  &:hover:enabled {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }

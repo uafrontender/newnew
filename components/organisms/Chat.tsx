@@ -22,10 +22,18 @@ export const Chat = () => {
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('chat');
-  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
+  const [chatListHidden, setChatListHidden] =
+    useState<boolean | undefined>(undefined);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
@@ -101,7 +109,10 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100%;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colors.black)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colors.black};
   flex-shrink: 0;
   ${(props) => {
     if (props.hidden === false) {

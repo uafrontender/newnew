@@ -39,10 +39,10 @@ const HeroPopup: React.FC<IHeroPopup> = ({
           <SImageWrapper>
             <Image
               src={IMAGES[postType]}
-              alt="Post type image"
+              alt='Post type image'
               width={150}
               height={130}
-              objectFit="contain"
+              objectFit='contain'
               priority
             />
           </SImageWrapper>
@@ -52,7 +52,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line1`)}</SText>
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line2`)}</SText>
           <SText variant={2}>{t(`tutorials.heroPopup${postType}.line3`)}</SText>
-          <SButton view="primary" onClick={closeModal}>
+          <SButton view='primary' onClick={closeModal}>
             {t('tutorials.heroPopupCommon.heroBtnText')}
           </SButton>
         </SModal>

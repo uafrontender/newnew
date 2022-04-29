@@ -52,12 +52,14 @@ const CommentEllipseModal: React.FunctionComponent<ICommentEllipseModal> = ({
           )}
           {!isMyComment && (
             <SButton onClick={reportUserHandler}>
-              <Text variant={2} tone='error'>{t('comments.report')}</Text>
+              <Text variant={2} tone='error'>
+                {t('comments.report')}
+              </Text>
             </SButton>
           )}
         </SContentContainer>
         <Button
-          view="modalSecondary"
+          view='modalSecondary'
           style={{
             height: '56px',
             width: 'calc(100% - 32px)',
@@ -93,7 +95,9 @@ const SContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 

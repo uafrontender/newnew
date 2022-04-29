@@ -58,7 +58,9 @@ const CommentEllipseMenu: React.FC<ICommentEllipseMenu> = ({
           )}
           {!isMyComment && (
             <SButton onClick={reportUserHandler}>
-              <Text variant={2} tone='error'>{t('comments.report')}</Text>
+              <Text variant={2} tone='error'>
+                {t('comments.report')}
+              </Text>
             </SButton>
           )}
         </SContainer>
@@ -83,7 +85,9 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;

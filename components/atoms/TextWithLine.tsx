@@ -11,13 +11,7 @@ interface ITextWithLine {
 const TextWithLine: React.FunctionComponent<ITextWithLine> = ({
   lineColor,
   innerSpan,
-}) => (
-  <STextWithLine
-    lineColor={lineColor}
-  >
-    { innerSpan }
-  </STextWithLine>
-);
+}) => <STextWithLine lineColor={lineColor}>{innerSpan}</STextWithLine>;
 
 export default TextWithLine;
 
@@ -43,11 +37,13 @@ const STextWithLine = styled.div<ISTextWithLine>`
   &:before {
     border-bottom: 1px solid;
     border-bottom-color: ${({ lineColor }) => lineColor};
-    content: "";
+    content: '';
 
     margin: 0 auto;
     position: absolute;
-    top: 45%; left: 0; right: 0;
+    top: 45%;
+    left: 0;
+    right: 0;
     width: 100%;
     z-index: -1;
   }

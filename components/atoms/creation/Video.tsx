@@ -1,9 +1,4 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import Button from '../Button';
 import InlineSVG from '../InlineSVG';
@@ -21,14 +16,7 @@ interface IVideo {
 }
 
 export const Video: React.FC<IVideo> = (props) => {
-  const {
-    src,
-    play,
-    loop,
-    muted,
-    thumbnails,
-    mutePosition,
-  } = props;
+  const { src, play, loop, muted, thumbnails, mutePosition } = props;
   const videoRef: any = useRef();
   const [isMuted, setIsMuted] = useState(muted);
   const theme = useTheme();
@@ -65,23 +53,14 @@ export const Video: React.FC<IVideo> = (props) => {
 
   return (
     <SWrapper>
-      <SVideo
-        src={src}
-        ref={videoRef}
-        loop={loop}
-        muted={isMuted}
-      />
+      <SVideo src={src} ref={videoRef} loop={loop} muted={isMuted} />
       <SModalSoundIcon position={mutePosition}>
-        <Button
-          iconOnly
-          view="transparent"
-          onClick={toggleThumbnailVideoMuted}
-        >
+        <Button iconOnly view='transparent' onClick={toggleThumbnailVideoMuted}>
           <InlineSVG
             svg={isMuted ? volumeOff : volumeOn}
             fill={theme.colors.white}
-            width="20px"
-            height="20px"
+            width='20px'
+            height='20px'
           />
         </Button>
       </SModalSoundIcon>
@@ -121,11 +100,14 @@ interface ISModalSoundIcon {
 }
 
 const SModalSoundIcon = styled.div<ISModalSoundIcon>`
-  ${(props) => (props.position === 'left' ? css`
-    left: 16px;
-  ` : css`
-    right: 16px;
-  `)}
+  ${(props) =>
+    props.position === 'left'
+      ? css`
+          left: 16px;
+        `
+      : css`
+          right: 16px;
+        `}
   bottom: 16px;
   position: absolute;
 

@@ -10,12 +10,7 @@ interface ICaption {
 }
 
 const Caption: React.FC<ICaption> = (props) => {
-  const {
-    variant,
-    children,
-    innerRef,
-    ...rest
-  } = props;
+  const { variant, children, innerRef, ...rest } = props;
 
   const components = {
     1: SCaption1,
@@ -24,7 +19,11 @@ const Caption: React.FC<ICaption> = (props) => {
   };
   const Component = components[variant ?? 1];
 
-  return <Component ref={innerRef} {...rest}>{children}</Component>;
+  return (
+    <Component ref={innerRef} {...rest}>
+      {children}
+    </Component>
+  );
 };
 
 Caption.defaultProps = {

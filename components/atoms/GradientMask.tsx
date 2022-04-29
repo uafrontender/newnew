@@ -10,14 +10,22 @@ interface IGradientMask {
 }
 
 const GradientMask: React.FC<IGradientMask> = ({
-  active, positionTop, positionBottom, gradientType,
+  active,
+  positionTop,
+  positionBottom,
+  gradientType,
 }) => (
-  <SGradientMask active={active} positionTop={positionTop} positionBottom={positionBottom} gradientType={gradientType ?? undefined} />
+  <SGradientMask
+    active={active}
+    positionTop={positionTop}
+    positionBottom={positionBottom}
+    gradientType={gradientType ?? undefined}
+  />
 );
 
 GradientMask.defaultProps = {
   gradientType: undefined,
-}
+};
 
 export default GradientMask;
 

@@ -47,140 +47,156 @@ interface ICommentForm {
   zIndex?: number;
   onBlur?: () => void;
   onSubmit: (text: string) => void;
-};
+}
 
-const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(({
-  position,
-  zIndex,
-  onBlur,
-  onSubmit,
-}, ref) => {
-  const theme = useTheme();
-  const router = useRouter();
-  const { t } = useTranslation('decision');
-  const user = useAppSelector((state) => state.user)
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
+  ({ position, zIndex, onBlur, onSubmit }, ref) => {
+    const theme = useTheme();
+    const router = useRouter();
+    const { t } = useTranslation('decision');
+    const user = useAppSelector((state) => state.user);
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const [focusedInput, setFocusedInput] = useState<boolean>(false);
+    const [focusedInput, setFocusedInput] = useState<boolean>(false);
 
-  const [commentText, setCommentText] = useState('');
-  const [commentTextError, setCommentTextError] = useState('');
-  const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
+    const [commentText, setCommentText] = useState('');
+    const [commentTextError, setCommentTextError] = useState('');
+    const [isAPIValidateLoading, setIsAPIValidateLoading] = useState(false);
 
-  const validateTextViaAPI = useCallback(async (
-    text: string,
-  ) => {
-    setIsAPIValidateLoading(true);
-    try {
-      const payload = new newnewapi.ValidateTextRequest({
-        kind: newnewapi.ValidateTextRequest.Kind.POST_COMMENT,
-        text,
-      });
+    const validateTextViaAPI = useCallback(async (text: string) => {
+      setIsAPIValidateLoading(true);
+      try {
+        const payload = new newnewapi.ValidateTextRequest({
+          kind: newnewapi.ValidateTextRequest.Kind.POST_COMMENT,
+          text,
+        });
 
-      const res = await validateText(
-        payload,
-      );
+        const res = await validateText(payload);
 
-      if (!res.data?.status) throw new Error('An error occured');
+        if (!res.data?.status) throw new Error('An error occured');
 
-      if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-        setCommentTextError(errorSwitch(res.data?.status!!));
-      } else {
-        setCommentTextError('');
-      }
-
-      setIsAPIValidateLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsAPIValidateLoading(false);
-    }
-  }, []);
-
-  const validateTextViaAPIDebounced = useMemo(() => debounce((
-    text: string,
-  ) => {
-    validateTextViaAPI(text);
-  }, 250),
-  [validateTextViaAPI]);
-
-  const handleChange = useCallback((id, value) => {
-    setCommentText(value);
-    validateTextViaAPIDebounced(value);
-  }, [validateTextViaAPIDebounced]);
-
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    if (isAPIValidateLoading) return;
-
-    if (!user.loggedIn) {
-      window?.history.replaceState({
-        fromPost: true,
-      }, '', '');
-      router.push(`/sign-up?reason=comment&redirect=${window.location.href}`);
-    }
-
-    await onSubmit(commentText);
-    setCommentText('');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentText, user.loggedIn, isAPIValidateLoading, onSubmit]);
-
-  const handleBlur = useCallback(() => {
-    setFocusedInput(false);
-    if (onBlur !== undefined) onBlur();
-  }, [onBlur]);
-
-  return (
-    <SCommentsForm
-      {...{
-        ...(ref ? {
-          ref,
-        } : {}),
-      }}
-      position={position}
-      zIndex={zIndex}
-      onKeyDown={(e) => {
-        if (e.shiftKey && e.key === 'Enter') {
-          handleSubmit(e);
+        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+          setCommentTextError(errorSwitch(res.data?.status!!));
+        } else {
+          setCommentTextError('');
         }
-      }}
-    >
-      <SInputWrapper>
-        <CommentTextArea
-          id="title"
-          maxlength={150}
-          value={commentText}
-          focus={focusedInput}
-          error={commentTextError ? t(`comments.errors.${commentTextError}`) : ''}
-          onFocus={() => {
-            setFocusedInput(true);
-          }}
-          onBlur={handleBlur}
-          onChange={handleChange}
-          placeholder={t('comments.placeholder')}
-        />
-      </SInputWrapper>
-      {(focusedInput || commentText) && (
-        <SButton
-          withShadow
-          view={commentText ? 'primaryGrad' : 'quaternary'}
-          onClick={handleSubmit}
-          disabled={!commentText || !!commentTextError}
-          style={{
-            ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-          }}
-        >
-          <SInlineSVG
-            svg={sendIcon}
-            fill={commentText ? theme.colors.white : theme.colorsThemed.text.primary}
-            width={isMobile ? '20px' : '24px'}
-            height={isMobile ? '20px' : '24px'}
+
+        setIsAPIValidateLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsAPIValidateLoading(false);
+      }
+    }, []);
+
+    const validateTextViaAPIDebounced = useMemo(
+      () =>
+        debounce((text: string) => {
+          validateTextViaAPI(text);
+        }, 250),
+      [validateTextViaAPI]
+    );
+
+    const handleChange = useCallback(
+      (id, value) => {
+        setCommentText(value);
+        validateTextViaAPIDebounced(value);
+      },
+      [validateTextViaAPIDebounced]
+    );
+
+    const handleSubmit = useCallback(
+      async (e) => {
+        e.preventDefault();
+        if (isAPIValidateLoading) return;
+
+        if (!user.loggedIn) {
+          window?.history.replaceState(
+            {
+              fromPost: true,
+            },
+            '',
+            ''
+          );
+          router.push(
+            `/sign-up?reason=comment&redirect=${window.location.href}`
+          );
+        }
+
+        await onSubmit(commentText);
+        setCommentText('');
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [commentText, user.loggedIn, isAPIValidateLoading, onSubmit]
+    );
+
+    const handleBlur = useCallback(() => {
+      setFocusedInput(false);
+      if (onBlur !== undefined) onBlur();
+    }, [onBlur]);
+
+    return (
+      <SCommentsForm
+        {...{
+          ...(ref
+            ? {
+                ref,
+              }
+            : {}),
+        }}
+        position={position}
+        zIndex={zIndex}
+        onKeyDown={(e) => {
+          if (e.shiftKey && e.key === 'Enter') {
+            handleSubmit(e);
+          }
+        }}
+      >
+        <SInputWrapper>
+          <CommentTextArea
+            id='title'
+            maxlength={150}
+            value={commentText}
+            focus={focusedInput}
+            error={
+              commentTextError ? t(`comments.errors.${commentTextError}`) : ''
+            }
+            onFocus={() => {
+              setFocusedInput(true);
+            }}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            placeholder={t('comments.placeholder')}
           />
-        </SButton>
-      )}
-    </SCommentsForm>
-  );
-});
+        </SInputWrapper>
+        {(focusedInput || commentText) && (
+          <SButton
+            withShadow
+            view={commentText ? 'primaryGrad' : 'quaternary'}
+            onClick={handleSubmit}
+            disabled={!commentText || !!commentTextError}
+            style={{
+              ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+            }}
+          >
+            <SInlineSVG
+              svg={sendIcon}
+              fill={
+                commentText
+                  ? theme.colors.white
+                  : theme.colorsThemed.text.primary
+              }
+              width={isMobile ? '20px' : '24px'}
+              height={isMobile ? '20px' : '24px'}
+            />
+          </SButton>
+        )}
+      </SCommentsForm>
+    );
+  }
+);
 
 export default CommentForm;
 
@@ -190,8 +206,7 @@ CommentForm.defaultProps = {
   position: undefined,
 };
 
-const SInlineSVG = styled(InlineSVG)`
-`;
+const SInlineSVG = styled(InlineSVG)``;
 
 const SButton = styled(Button)`
   padding: 12px;

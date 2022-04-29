@@ -13,8 +13,11 @@ import SubproductsSelect from '../../../molecules/creator/dashboard/SubproductsS
 export const EditSubscriptionRate = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const [mySubscriptionProduct, setMySubscriptionProduct] =
+    useState<newnewapi.ISubscriptionProduct | null>(null);
 
   const fetchMySubscriptionProduct = async () => {
     try {

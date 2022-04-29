@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useCallback, useContext, useEffect, useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
@@ -28,67 +26,68 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
   // Socket
   const socketConnection = useContext(SocketContext);
   // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
 
   // Bids history
-  const [
-    bidsHistory, setBidsHistory,
-  ] = useState<newnewapi.Auction.Bid[]>([]);
-  const [bidsNextPageToken, setBidsNextPageToken] = useState<string | undefined | null>('');
+  const [bidsHistory, setBidsHistory] = useState<newnewapi.Auction.Bid[]>([]);
+  const [bidsNextPageToken, setBidsNextPageToken] =
+    useState<string | undefined | null>('');
   const [bidsLoading, setBidsLoading] = useState(false);
   const [loadingBidsError, setLoadingBidsError] = useState('');
 
-  const fetchBids = useCallback(async (
-    pageToken?: string,
-  ) => {
-    if (bidsLoading) return;
-    try {
-      setBidsLoading(true);
-      setLoadingBidsError('');
+  const fetchBids = useCallback(
+    async (pageToken?: string) => {
+      if (bidsLoading) return;
+      try {
+        setBidsLoading(true);
+        setLoadingBidsError('');
 
-      const getCurrentBidsPayload = new newnewapi.GetAcBidsRequest({
-        postUuid,
-        optionId: overviewedOption.id,
-        ...(pageToken ? {
-          paging: {
-            pageToken,
-          },
-        } : {}),
-      });
-
-      const res = await fetchBidsForOption(getCurrentBidsPayload);
-
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (res.data && res.data.bids) {
-        setBidsHistory((curr) => {
-          const workingArr = [...curr, ...res.data?.bids as newnewapi.Auction.Bid[]];
-          return workingArr;
+        const getCurrentBidsPayload = new newnewapi.GetAcBidsRequest({
+          postUuid,
+          optionId: overviewedOption.id,
+          ...(pageToken
+            ? {
+                paging: {
+                  pageToken,
+                },
+              }
+            : {}),
         });
-        setBidsNextPageToken(res.data.paging?.nextPageToken);
-      }
 
-      setBidsLoading(false);
-    } catch (err) {
-      setBidsLoading(false);
-      setLoadingBidsError((err as Error).message);
-      console.error(err);
-    }
-  }, [
-    setBidsHistory, bidsLoading,
-    overviewedOption,
-    postUuid,
-  ]);
+        const res = await fetchBidsForOption(getCurrentBidsPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data && res.data.bids) {
+          setBidsHistory((curr) => {
+            const workingArr = [
+              ...curr,
+              ...(res.data?.bids as newnewapi.Auction.Bid[]),
+            ];
+            return workingArr;
+          });
+          setBidsNextPageToken(res.data.paging?.nextPageToken);
+        }
+
+        setBidsLoading(false);
+      } catch (err) {
+        setBidsLoading(false);
+        setLoadingBidsError((err as Error).message);
+        console.error(err);
+      }
+    },
+    [setBidsHistory, bidsLoading, overviewedOption, postUuid]
+  );
 
   // Close on back btn
   useEffect(() => {
     const verifyOptionHistoryOpen = () => {
       if (!isBrowser()) return;
 
-      const optionId = new URL(window.location.href).searchParams.get('suggestion');
+      const optionId = new URL(window.location.href).searchParams.get(
+        'suggestion'
+      );
 
       if (!optionId) {
         handleCloseOptionBidHistory();
@@ -97,20 +96,21 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
 
     window.addEventListener('popstate', verifyOptionHistoryOpen);
 
-    return () => window.removeEventListener('popstate', verifyOptionHistoryOpen);
+    return () =>
+      window.removeEventListener('popstate', verifyOptionHistoryOpen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchBids();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (inView && !bidsLoading && bidsNextPageToken) {
       fetchBids(bidsNextPageToken);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, bidsNextPageToken, bidsLoading]);
 
   useEffect(() => {
@@ -118,7 +118,10 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
       const arr = new Uint8Array(data);
       const decoded = newnewapi.AcBidCreated.decode(arr);
       if (decoded.optionId === overviewedOption.id && decoded.bid) {
-        setBidsHistory((curr) => ([(decoded.bid as newnewapi.Auction.Bid), ...curr]));
+        setBidsHistory((curr) => [
+          decoded.bid as newnewapi.Auction.Bid,
+          ...curr,
+        ]);
       }
     };
 
@@ -129,23 +132,14 @@ const OptionOverview: React.FunctionComponent<IOptionOverview> = ({
     return () => {
       socketConnection.off('AcBidCreated', socketHandler);
     };
-  }, [
-    socketConnection,
-    overviewedOption,
-    setBidsHistory,
-  ]);
+  }, [socketConnection, overviewedOption, setBidsHistory]);
 
   return (
     <SBidsContainer>
       {bidsHistory.map((bid) => (
-        <AcBidCard
-          key={bid.id.toString()}
-          bid={bid}
-        />
+        <AcBidCard key={bid.id.toString()} bid={bid} />
       ))}
-      <SLoaderDiv
-        ref={loadingRef}
-      />
+      <SLoaderDiv ref={loadingRef} />
     </SBidsContainer>
   );
 };

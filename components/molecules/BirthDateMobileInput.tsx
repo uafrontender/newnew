@@ -1,10 +1,6 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-plusplus */
-import React, {
-  useCallback,
-  useEffect,
-  useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -28,44 +24,60 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
 }) => {
   const theme = useTheme();
   const [innerDate, setInnerDate] = useState(
-    (currentDate.day && currentDate.month && currentDate.year) ? currentDate : {
-      day: 1,
-      month: 1,
-      year: years[0].value,
-    },
+    currentDate.day && currentDate.month && currentDate.year
+      ? currentDate
+      : {
+          day: 1,
+          month: 1,
+          year: years[0].value,
+        }
   );
   const [availableDays, setAvailableDays] = useState<
-    TDropdownSelectItem<number>[]>(() => {
-      if (!innerDate?.month || !innerDate?.year) {
-        return Array(31).fill('').map((_, i) => ({
+    TDropdownSelectItem<number>[]
+  >(() => {
+    if (!innerDate?.month || !innerDate?.year) {
+      return Array(31)
+        .fill('')
+        .map((_, i) => ({
           name: (i + 1).toString(),
           value: i + 1,
         }));
-      }
+    }
 
-      return Array(new Date(innerDate?.year, innerDate?.month, 0).getDate()).fill('').map((_, i) => ({
+    return Array(new Date(innerDate?.year, innerDate?.month, 0).getDate())
+      .fill('')
+      .map((_, i) => ({
         name: (i + 1).toString(),
         value: i + 1,
       }));
-    });
+  });
 
-  const handleUpdateDay = useCallback((day: number) => {
-    const working = { ...innerDate };
-    working.day = day;
-    setInnerDate(working);
-  }, [innerDate]);
+  const handleUpdateDay = useCallback(
+    (day: number) => {
+      const working = { ...innerDate };
+      working.day = day;
+      setInnerDate(working);
+    },
+    [innerDate]
+  );
 
-  const handleUpdateMonth = useCallback((month: number) => {
-    const working = { ...innerDate };
-    working.month = month;
-    setInnerDate(working);
-  }, [innerDate]);
+  const handleUpdateMonth = useCallback(
+    (month: number) => {
+      const working = { ...innerDate };
+      working.month = month;
+      setInnerDate(working);
+    },
+    [innerDate]
+  );
 
-  const handleUpdateYear = useCallback((year: number) => {
-    const working = { ...innerDate };
-    working.year = year;
-    setInnerDate(working);
-  }, [innerDate]);
+  const handleUpdateYear = useCallback(
+    (year: number) => {
+      const working = { ...innerDate };
+      working.year = year;
+      setInnerDate(working);
+    },
+    [innerDate]
+  );
 
   const daysScrollerRef = useRef<HTMLDivElement>();
   const monthsScrollerRef = useRef<HTMLDivElement>();
@@ -92,7 +104,9 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
     const updateMonth = () => {
       const boundingRect = monthsScrollerRef.current?.getBoundingClientRect();
       for (let i = 0; i < monthsRefs.current.length; i++) {
-        const pos = monthsRefs.current[i].getBoundingClientRect().top - boundingRect!!.top!!;
+        const pos =
+          monthsRefs.current[i].getBoundingClientRect().top -
+          boundingRect!!.top!!;
         if (pos > 48 && pos < 72) {
           handleUpdateMonth(months[i].value);
           break;
@@ -103,7 +117,9 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
     const updateYear = () => {
       const boundingRect = yearsScrollerRef.current?.getBoundingClientRect();
       for (let i = 0; i < yearsRefs.current.length; i++) {
-        const pos = yearsRefs.current[i].getBoundingClientRect().top - boundingRect!!.top!!;
+        const pos =
+          yearsRefs.current[i].getBoundingClientRect().top -
+          boundingRect!!.top!!;
         if (pos > 48 && pos < 72) {
           handleUpdateYear(years[i].value);
           break;
@@ -121,40 +137,52 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
       yearsScrollerRef.current?.removeEventListener('scroll', updateYear);
     };
   }, [
-    availableDays, handleUpdateDay, handleUpdateMonth, handleUpdateYear, months, years,
+    availableDays,
+    handleUpdateDay,
+    handleUpdateMonth,
+    handleUpdateYear,
+    months,
+    years,
   ]);
 
   useEffect(() => {
     daysScrollerRef.current?.scrollBy({
-      top: ((availableDays.findIndex((i) => i.value === currentDate.day)) * 28),
+      top: availableDays.findIndex((i) => i.value === currentDate.day) * 28,
     });
     monthsScrollerRef.current?.scrollBy({
-      top: ((months.findIndex((i) => i.value === currentDate.month)) * 28),
+      top: months.findIndex((i) => i.value === currentDate.month) * 28,
     });
     yearsScrollerRef.current?.scrollBy({
-      top: ((years.findIndex((i) => i.value === currentDate.year)) * 28),
+      top: years.findIndex((i) => i.value === currentDate.year) * 28,
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setAvailableDays(() => {
       if (!innerDate?.month || !innerDate?.year) {
-        return Array(31).fill('').map((_, i) => ({
+        return Array(31)
+          .fill('')
+          .map((_, i) => ({
+            name: (i + 1).toString(),
+            value: i + 1,
+          }));
+      }
+
+      return Array(new Date(innerDate?.year, innerDate?.month, 0).getDate())
+        .fill('')
+        .map((_, i) => ({
           name: (i + 1).toString(),
           value: i + 1,
         }));
-      }
-
-      return Array(new Date(innerDate?.year, innerDate?.month, 0).getDate()).fill('').map((_, i) => ({
-        name: (i + 1).toString(),
-        value: i + 1,
-      }));
     });
   }, [innerDate?.month, innerDate?.year, setAvailableDays]);
 
   useEffect(() => {
-    if (innerDate?.day && availableDays.findIndex((o) => o.value === innerDate.day) === -1) {
+    if (
+      innerDate?.day &&
+      availableDays.findIndex((o) => o.value === innerDate.day) === -1
+    ) {
       daysScrollerRef.current?.scrollTo({
         top: daysRefs.current[availableDays.length - 1].offsetTop,
       });
@@ -162,9 +190,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
   }, [availableDays, innerDate.day]);
 
   return (
-    <SContainer
-      onClick={(e) => e.stopPropagation()}
-    >
+    <SContainer onClick={(e) => e.stopPropagation()}>
       <SDateInputContainer>
         <SScroller
           ref={(el) => {
@@ -178,9 +204,11 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
               }}
               key={d.value}
               style={{
-                ...(innerDate.day === d.value ? {
-                  color: theme.colorsThemed.text.primary,
-                } : {}),
+                ...(innerDate.day === d.value
+                  ? {
+                      color: theme.colorsThemed.text.primary,
+                    }
+                  : {}),
               }}
             >
               {d.value}
@@ -199,9 +227,11 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
               }}
               key={m.value}
               style={{
-                ...(innerDate.month === m.value ? {
-                  color: theme.colorsThemed.text.primary,
-                } : {}),
+                ...(innerDate.month === m.value
+                  ? {
+                      color: theme.colorsThemed.text.primary,
+                    }
+                  : {}),
               }}
             >
               {m.name}
@@ -220,9 +250,11 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
               }}
               key={y.value}
               style={{
-                ...(innerDate.year === y.value ? {
-                  color: theme.colorsThemed.text.primary,
-                } : {}),
+                ...(innerDate.year === y.value
+                  ? {
+                      color: theme.colorsThemed.text.primary,
+                    }
+                  : {}),
               }}
             >
               {y.value}
@@ -231,7 +263,7 @@ const BirthDateMobileInput: React.FunctionComponent<IBirthDateMobileInput> = ({
         </SScroller>
       </SDateInputContainer>
       <SButton
-        view="primaryGrad"
+        view='primaryGrad'
         onClick={() => {
           handleChangeDate(innerDate);
           handleClose();
@@ -281,9 +313,11 @@ const SDateInputContainer = styled.div`
     top: 0px;
     content: '';
     width: 100%;
-    box-shadow:
-    0px 0px 32px 60px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : 'rgba(255, 255, 255, 1)')};
-    ;
+    box-shadow: 0px 0px 32px 60px
+      ${({ theme }) =>
+        theme.name === 'dark'
+          ? 'rgba(11, 10, 19, 1)'
+          : 'rgba(255, 255, 255, 1)'};
     clip-path: inset(0px 0px -100px 0px);
   }
   &::after {
@@ -291,9 +325,11 @@ const SDateInputContainer = styled.div`
     bottom: 0px;
     content: '';
     width: 100%;
-    box-shadow:
-    0px 0px 32px 60px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : 'rgba(255, 255, 255, 1)')};
-    ;
+    box-shadow: 0px 0px 32px 60px
+      ${({ theme }) =>
+        theme.name === 'dark'
+          ? 'rgba(11, 10, 19, 1)'
+          : 'rgba(255, 255, 255, 1)'};
     clip-path: inset(-100px 0px 0px 0px);
   }
 `;

@@ -27,7 +27,7 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
       return (
         <SMobileButtonContainer>
           <SMobileButton
-            view="primaryGrad"
+            view='primaryGrad'
             disabled={!hasScrolledDown}
             onClick={() => handleGoToNext()}
           >
@@ -50,7 +50,7 @@ const OnboardingTosSubmitForm: React.FunctionComponent<IOnboardingTosSubmitForm>
           handleChange={(e) => setAgreed(!agreed)}
         />
         <Button
-          view="primaryGrad"
+          view='primaryGrad'
           disabled={!agreed}
           onClick={() => handleGoToNext()}
         >

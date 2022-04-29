@@ -29,7 +29,9 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   let { sort = '' } = router.query;
   // const category = router.query.category as string;
 
@@ -39,43 +41,49 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
   }
 
   const sortEnabled = !!Object.keys(sort).length;
-  const sortOptions: any = useMemo(() => [
-    {
-      key: 'sortingtype',
-      options: [
-        {
-          key: 'all',
-        },
-        {
-          key: 'num_bids',
-        },
-        {
-          key: 'most_funded',
-        },
-      ],
-    },
-  ], []);
-  const collectionTypeOptions: any = useMemo(() => [
-    {
-      key: 'ac',
-    },
-    {
-      key: 'mc',
-    },
-    {
-      key: 'cf',
-    },
-    {
-      key: 'biggest',
-    },
-    ...(
-      authenticated ? [
-        {
-          key: 'for-you',
-        },
-      ] : []
-    ),
-  ], [authenticated]);
+  const sortOptions: any = useMemo(
+    () => [
+      {
+        key: 'sortingtype',
+        options: [
+          {
+            key: 'all',
+          },
+          {
+            key: 'num_bids',
+          },
+          {
+            key: 'most_funded',
+          },
+        ],
+      },
+    ],
+    []
+  );
+  const collectionTypeOptions: any = useMemo(
+    () => [
+      {
+        key: 'ac',
+      },
+      {
+        key: 'mc',
+      },
+      {
+        key: 'cf',
+      },
+      {
+        key: 'biggest',
+      },
+      ...(authenticated
+        ? [
+            {
+              key: 'for-you',
+            },
+          ]
+        : []),
+    ],
+    [authenticated]
+  );
 
   const handleCollectionTypeChange = (newCategory: string) => {
     const newQuery = {
@@ -87,21 +95,6 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       pathname: router.pathname,
     });
   };
-  const handleSortChange = useCallback((newSort: object = {}) => {
-    if ((newSort as any).sortingtype === 'all') {
-      handleClearSorting();
-      return;
-    }
-    const newQuery = {
-      ...router.query,
-      sort: JSON.stringify(newSort),
-    };
-    router.push({
-      query: newQuery,
-      pathname: router.pathname,
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
 
   const handleClearSorting = useCallback(() => {
     const newQuery = { ...router.query };
@@ -113,35 +106,58 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       pathname: router.pathname,
     });
   }, [router]);
-  const renderSortOption = useCallback((option: string, key: string) => {
-    const handleClick = () => {
-      const newSort: any = { ...(sort as object) };
 
-      delete newSort[key];
+  const handleSortChange = useCallback(
+    (newSort: object = {}) => {
+      if ((newSort as any).sortingtype === 'all') {
+        handleClearSorting();
+        return;
+      }
+      const newQuery = {
+        ...router.query,
+        sort: JSON.stringify(newSort),
+      };
+      router.push({
+        query: newQuery,
+        pathname: router.pathname,
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [router, handleClearSorting]
+  );
 
-      handleSortChange(newSort);
-    };
+  const renderSortOption = useCallback(
+    (option: string, key: string) => {
+      const handleClick = () => {
+        const newSort: any = { ...(sort as object) };
 
-    return (
-      <SButton
-        key={`${option}-${key}`}
-        view="primary"
-        disabled={disabled}
-        onClick={handleClick}
-      >
-        {t(`sort-title-option-${key}`)}
-        {' '}
-        (
-        {t(`sort-title-option-${key}-${option}${option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category) ? `-${category}` : ''}`)}
-        )
-        <InlineSVG
-          svg={closeCircleIcon}
-          width="16px"
-          height="16px"
-        />
-      </SButton>
-    );
-  }, [handleSortChange, sort, disabled, category, t]);
+        delete newSort[key];
+
+        handleSortChange(newSort);
+      };
+
+      return (
+        <SButton
+          key={`${option}-${key}`}
+          view='primary'
+          disabled={disabled}
+          onClick={handleClick}
+        >
+          {t(`sort-title-option-${key}`)} (
+          {t(
+            `sort-title-option-${key}-${option}${
+              option === 'num_bids' && ['ac', 'mc', 'cf'].includes(category)
+                ? `-${category}`
+                : ''
+            }`
+          )}
+          )
+          <InlineSVG svg={closeCircleIcon} width='16px' height='16px' />
+        </SButton>
+      );
+    },
+    [handleSortChange, sort, disabled, category, t]
+  );
 
   return (
     <SContainer>

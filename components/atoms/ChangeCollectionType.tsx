@@ -21,20 +21,19 @@ interface IChangeCollectionType {
   onChange: (newCategory: string) => void;
 }
 
-export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => {
-  const {
-    options,
-    selected,
-    disabled,
-    onChange,
-  } = props;
+export const ChangeCollectionType: React.FC<IChangeCollectionType> = (
+  props
+) => {
+  const { options, selected, disabled, onChange } = props;
   const theme = useTheme();
   const { t } = useTranslation('home');
   const ref: any = useRef();
   const [focused, setFocused] = useState(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleChangeCollectionTypeClick = () => {
     setFocused(!focused);
@@ -69,35 +68,26 @@ export const ChangeCollectionType: React.FC<IChangeCollectionType> = (props) => 
   return (
     <SContainer ref={ref}>
       <SWrapper onClick={handleChangeCollectionTypeClick}>
-        <Headline variant={4}>
-          {t(`${selected}-search-block-title`)}
-        </Headline>
+        <Headline variant={4}>{t(`${selected}-search-block-title`)}</Headline>
         <SInlineSVG
           svg={arrowDown}
           fill={theme.colorsThemed.text.primary}
-          width="32px"
-          height="32px"
+          width='32px'
+          height='32px'
           focused={focused}
         />
       </SWrapper>
       {isMobile ? (
         <Modal show={focused} onClose={handleCloseClick}>
           <SMobileListContainer focused={focused}>
-            <SMobileList>
-              {options.map(renderItem)}
-            </SMobileList>
-            <SCancelButton
-              view="modalSecondary"
-              onClick={handleCloseClick}
-            >
+            <SMobileList>{options.map(renderItem)}</SMobileList>
+            <SCancelButton view='modalSecondary' onClick={handleCloseClick}>
               {t('button-cancel')}
             </SCancelButton>
           </SMobileListContainer>
         </Modal>
       ) : (
-        <SListHolder focused={focused}>
-          {options.map(renderItem)}
-        </SListHolder>
+        <SListHolder focused={focused}>{options.map(renderItem)}</SListHolder>
       )}
     </SContainer>
   );
@@ -136,7 +126,8 @@ const SListHolder = styled.div<ISListHolder>`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   pointer-events: ${(props) => (props.focused ? 'unset' : 'none')};
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 `;
 
 interface ISMobileListContainer {
@@ -162,7 +153,8 @@ const SMobileList = styled.div`
   box-shadow: ${(props) => props.theme.shadows.mediumGrey};
   border-radius: 16px;
   flex-direction: column;
-  background-color: ${(props) => props.theme.colorsThemed.background.backgroundDD};
+  background-color: ${(props) =>
+    props.theme.colorsThemed.background.backgroundDD};
 `;
 
 const SCheckBox = styled(CheckBox)`
@@ -174,7 +166,8 @@ const SCheckBox = styled(CheckBox)`
     border-radius: 12px;
 
     :hover {
-      background-color: ${(props) => props.theme.colorsThemed.background.backgroundDDSelected};
+      background-color: ${(props) =>
+        props.theme.colorsThemed.background.backgroundDDSelected};
     }
   }
 `;

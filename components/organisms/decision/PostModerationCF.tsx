@@ -395,7 +395,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
             timestampSeconds={new Date(
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
-            postType="cf"
+            postType='cf'
           />
         )}
       </SExpiresSection>
@@ -411,7 +411,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         }
       />
       <PostTopInfoModeration
-        postType="cf"
+        postType='cf'
         postStatus={postStatus}
         title={post.title}
         postId={post.postUuid}
@@ -474,7 +474,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           user!!.userTutorialsProgress.remainingCfSteps!![0] ===
             newnewapi.CfTutorialStep.CF_HERO
         }
-        postType="CF"
+        postType='CF'
         closeModal={goToNextStep}
       />
     </SWrapper>

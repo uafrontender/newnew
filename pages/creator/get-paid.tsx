@@ -19,7 +19,8 @@ interface ICreatorOnboardingStripe {}
 const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
   const { t } = useTranslation('creator');
 
-  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -45,10 +46,14 @@ const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
     <>
       <Head>
         <title>{t('getPaid.meta.title')}</title>
-        <meta name="description" content={t('getPaid.meta.description')} />
+        <meta name='description' content={t('getPaid.meta.description')} />
       </Head>
       {!isLoading ? (
-        <DashboardSectionStripe isConnectedToStripe={onboardingState?.isCreatorConnectedToStripe ?? false} />
+        <DashboardSectionStripe
+          isConnectedToStripe={
+            onboardingState?.isCreatorConnectedToStripe ?? false
+          }
+        />
       ) : (
         <Lottie
           width={64}
@@ -64,14 +69,20 @@ const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
   );
 };
 
-(GetPaid as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(GetPaid as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return <CreatorStripeLayout hideProgressBar>{page}</CreatorStripeLayout>;
 };
 
 export default GetPaid;
 
-export async function getStaticProps(context: { locale: string }): Promise<any> {
-  const translationContext = await serverSideTranslations(context.locale, ['creator']);
+export async function getStaticProps(context: {
+  locale: string;
+}): Promise<any> {
+  const translationContext = await serverSideTranslations(context.locale, [
+    'creator',
+  ]);
 
   return {
     props: {

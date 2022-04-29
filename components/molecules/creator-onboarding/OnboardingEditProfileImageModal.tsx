@@ -27,189 +27,197 @@ interface IOnboardingEditProfileImageModal {
   onClose: () => void;
 }
 
-const OnboardingEditProfileImageModal: React.FunctionComponent<
-IOnboardingEditProfileImageModal> = ({
-  isOpen,
-  avatarUrlInEdit,
-  originalProfileImageWidth,
-  setAvatarUrlInEdit,
-  handleSetImageToSave,
-  onClose,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('creator-onboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const OnboardingEditProfileImageModal: React.FunctionComponent<IOnboardingEditProfileImageModal> =
+  ({
+    isOpen,
+    avatarUrlInEdit,
+    originalProfileImageWidth,
+    setAvatarUrlInEdit,
+    handleSetImageToSave,
+    onClose,
+  }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('creator-onboarding');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // Profile image
-  const [cropProfileImage, setCropProfileImage] = useState<Point>({ x: 0, y: 0 });
-  const [croppedAreaProfileImage, setCroppedAreaProfileImage] = useState<Area>();
-  const [zoomProfileImage, setZoomProfileImage] = useState(1);
-  const [loading, setLoading] = useState(false);
-
-  const handleSetStageToEditingGeneralUnsetPicture = () => {
-    onClose();
-    setAvatarUrlInEdit('');
-    setZoomProfileImage(1);
-  };
-
-  const handleZoomOutProfileImage = () => {
-    if (zoomProfileImage <= 1) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage - 0.2 <= 1) return 1;
-      return z - 0.2;
+    // Profile image
+    const [cropProfileImage, setCropProfileImage] = useState<Point>({
+      x: 0,
+      y: 0,
     });
-  };
+    const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
+      useState<Area>();
+    const [zoomProfileImage, setZoomProfileImage] = useState(1);
+    const [loading, setLoading] = useState(false);
 
-  const handleZoomInProfileImage = () => {
-    if (zoomProfileImage >= 3) return;
-
-    setZoomProfileImage((z) => {
-      if (zoomProfileImage + 0.2 >= 3) return 3;
-      return z + 0.2;
-    });
-  };
-
-  const onCropCompleteProfileImage = useCallback(
-    (_, croppedAreaPixels: Area) => {
-      setCroppedAreaProfileImage(croppedAreaPixels);
-    }, [],
-  );
-
-  const completeProfileImageCropAndUpdateImageToSave = useCallback(async () => {
-    try {
-      setLoading(true);
-      const croppedImage = await getCroppedImg(
-        avatarUrlInEdit,
-        croppedAreaProfileImage!!,
-        0,
-        'avatarImage.jpeg',
-      );
-      handleSetImageToSave(croppedImage);
-      setLoading(false);
+    const handleSetStageToEditingGeneralUnsetPicture = () => {
       onClose();
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
-    }
-  }, [avatarUrlInEdit, croppedAreaProfileImage, handleSetImageToSave, onClose]);
-
-  useEffect(() => {
-    const verify = () => {
-      if (!isBrowser()) return;
-
-      const { stage: currStage } = window.history.state;
-
-      if (!currStage) {
-        onClose();
-      }
+      setAvatarUrlInEdit('');
+      setZoomProfileImage(1);
     };
 
-    window.addEventListener('popstate', verify);
+    const handleZoomOutProfileImage = () => {
+      if (zoomProfileImage <= 1) return;
 
-    return () => window.removeEventListener('popstate', verify);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      setZoomProfileImage((z) => {
+        if (zoomProfileImage - 0.2 <= 1) return 1;
+        return z - 0.2;
+      });
+    };
 
-  return (
-    <Modal
-      show={isOpen}
-      onClose={onClose}
-    >
-      <SEditPictureMenu
-        initial={MInitial}
-        animate={MAnimation}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {isMobile ? (
-          <SGoBackButtonMobile
-            onClick={() => onClose()}
-          >
-            { t('DetailsSection.EditProfileImageModal.goBackButton') }
-          </SGoBackButtonMobile>
-        ) : (
-          <SGoBackButtonDesktop
-            onClick={() => onClose()}
-          >
-            <div>{ t('DetailsSection.EditProfileImageModal.goBackButton') }</div>
-            <InlineSvg
-              svg={CancelIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </SGoBackButtonDesktop>
-        )}
-        <ProfileImageCropper
-          crop={cropProfileImage}
-          zoom={zoomProfileImage}
-          avatarUrlInEdit={avatarUrlInEdit}
-          originalImageWidth={originalProfileImageWidth}
-          disabled={loading}
-          onCropChange={setCropProfileImage}
-          onCropComplete={onCropCompleteProfileImage}
-          onZoomChange={setZoomProfileImage}
-        />
-        <SSliderWrapper>
-          <Button
-            iconOnly
-            size="sm"
-            view="transparent"
-            disabled={zoomProfileImage <= 1 || loading}
-            onClick={handleZoomOutProfileImage}
-          >
-            <InlineSvg
-              svg={ZoomOutIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
-            />
-          </Button>
-          <ProfileImageZoomSlider
-            value={zoomProfileImage}
-            min={1}
-            max={3}
-            step={0.1}
-            ariaLabel="Zoom"
+    const handleZoomInProfileImage = () => {
+      if (zoomProfileImage >= 3) return;
+
+      setZoomProfileImage((z) => {
+        if (zoomProfileImage + 0.2 >= 3) return 3;
+        return z + 0.2;
+      });
+    };
+
+    const onCropCompleteProfileImage = useCallback(
+      (_, croppedAreaPixels: Area) => {
+        setCroppedAreaProfileImage(croppedAreaPixels);
+      },
+      []
+    );
+
+    const completeProfileImageCropAndUpdateImageToSave =
+      useCallback(async () => {
+        try {
+          setLoading(true);
+          const croppedImage = await getCroppedImg(
+            avatarUrlInEdit,
+            croppedAreaProfileImage!!,
+            0,
+            'avatarImage.jpeg'
+          );
+          handleSetImageToSave(croppedImage);
+          setLoading(false);
+          onClose();
+        } catch (err) {
+          console.error(err);
+          setLoading(false);
+        }
+      }, [
+        avatarUrlInEdit,
+        croppedAreaProfileImage,
+        handleSetImageToSave,
+        onClose,
+      ]);
+
+    useEffect(() => {
+      const verify = () => {
+        if (!isBrowser()) return;
+
+        const { stage: currStage } = window.history.state;
+
+        if (!currStage) {
+          onClose();
+        }
+      };
+
+      window.addEventListener('popstate', verify);
+
+      return () => window.removeEventListener('popstate', verify);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
+      <Modal show={isOpen} onClose={onClose}>
+        <SEditPictureMenu
+          initial={MInitial}
+          animate={MAnimation}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {isMobile ? (
+            <SGoBackButtonMobile onClick={() => onClose()}>
+              {t('DetailsSection.EditProfileImageModal.goBackButton')}
+            </SGoBackButtonMobile>
+          ) : (
+            <SGoBackButtonDesktop onClick={() => onClose()}>
+              <div>
+                {t('DetailsSection.EditProfileImageModal.goBackButton')}
+              </div>
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
+            </SGoBackButtonDesktop>
+          )}
+          <ProfileImageCropper
+            crop={cropProfileImage}
+            zoom={zoomProfileImage}
+            avatarUrlInEdit={avatarUrlInEdit}
+            originalImageWidth={originalProfileImageWidth}
             disabled={loading}
-            onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+            onCropChange={setCropProfileImage}
+            onCropComplete={onCropCompleteProfileImage}
+            onZoomChange={setZoomProfileImage}
           />
-          <Button
-            iconOnly
-            size="sm"
-            view="transparent"
-            disabled={zoomProfileImage >= 3 || loading}
-            onClick={handleZoomInProfileImage}
-          >
-            <InlineSvg
-              svg={ZoomInIcon}
-              fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
+          <SSliderWrapper>
+            <Button
+              iconOnly
+              size='sm'
+              view='transparent'
+              disabled={zoomProfileImage <= 1 || loading}
+              onClick={handleZoomOutProfileImage}
+            >
+              <InlineSvg
+                svg={ZoomOutIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
+            </Button>
+            <ProfileImageZoomSlider
+              value={zoomProfileImage}
+              min={1}
+              max={3}
+              step={0.1}
+              ariaLabel='Zoom'
+              disabled={loading}
+              onChange={(e) => setZoomProfileImage(Number(e.target.value))}
             />
-          </Button>
-        </SSliderWrapper>
-        <SControlsWrapperPicture>
-          <Button
-            view="secondary"
-            disabled={loading}
-            onClick={handleSetStageToEditingGeneralUnsetPicture}
-          >
-            { t('DetailsSection.EditProfileImageModal.cancelButton') }
-          </Button>
-          <Button
-            withShadow
-            disabled={loading}
-            onClick={completeProfileImageCropAndUpdateImageToSave}
-          >
-            { t('DetailsSection.EditProfileImageModal.saveButton') }
-          </Button>
-        </SControlsWrapperPicture>
-      </SEditPictureMenu>
-    </Modal>
-  );
-};
+            <Button
+              iconOnly
+              size='sm'
+              view='transparent'
+              disabled={zoomProfileImage >= 3 || loading}
+              onClick={handleZoomInProfileImage}
+            >
+              <InlineSvg
+                svg={ZoomInIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
+            </Button>
+          </SSliderWrapper>
+          <SControlsWrapperPicture>
+            <Button
+              view='secondary'
+              disabled={loading}
+              onClick={handleSetStageToEditingGeneralUnsetPicture}
+            >
+              {t('DetailsSection.EditProfileImageModal.cancelButton')}
+            </Button>
+            <Button
+              withShadow
+              disabled={loading}
+              onClick={completeProfileImageCropAndUpdateImageToSave}
+            >
+              {t('DetailsSection.EditProfileImageModal.saveButton')}
+            </Button>
+          </SControlsWrapperPicture>
+        </SEditPictureMenu>
+      </Modal>
+    );
+  };
 
 export default OnboardingEditProfileImageModal;
 

@@ -32,7 +32,8 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
         userUuid: user.uuid,
       });
       const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       blockUser(user.uuid!!);
       onUserBlock();
     } catch (err) {
@@ -48,12 +49,11 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
         <SModal>
           <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {getDisplayname(user)} {t('modal.block-user.message-second-part')}
+            {t('modal.block-user.message-first-part')} {getDisplayname(user)}{' '}
+            {t('modal.block-user.message-second-part')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton
-              onClick={closeModal}
-            >
+            <SCancelButton onClick={closeModal}>
               {t('modal.block-user.button-cancel')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
@@ -83,10 +83,14 @@ const SModal = styled.div`
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px;
   box-sizing: border-box;
   display: flex;
@@ -115,11 +119,15 @@ const SCancelButton = styled(Button)`
   margin-right: auto;
   flex-shrink: 0;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
   &:hover {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+      props.theme.name === 'light'
+        ? props.theme.colors.dark
+        : props.theme.colorsThemed.background.quaternary};
     color: ${(props) => props.theme.colors.white};
     background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }

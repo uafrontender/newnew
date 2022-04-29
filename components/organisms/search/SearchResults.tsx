@@ -63,8 +63,8 @@ export const SearchResults = () => {
                   ? theme.colorsThemed.text.primary
                   : theme.colorsThemed.text.secondary
               }
-              width="24px"
-              height="24px"
+              width='24px'
+              height='24px'
             />
             {tab.title}
           </STab>

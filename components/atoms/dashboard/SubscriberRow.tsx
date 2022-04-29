@@ -24,9 +24,12 @@ interface ISubscriberRow {
 const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-  const [isSubscriberBlocked, setIsSubscriberBlocked] = useState<boolean>(false);
+  const [isSubscriberBlocked, setIsSubscriberBlocked] =
+    useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
 
@@ -55,7 +58,8 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
         userUuid: subscriber.user?.uuid,
       });
       const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       unblockUser(subscriber.user?.uuid!!);
     } catch (err) {
       console.error(err);
@@ -78,17 +82,42 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
     <SContainer>
       <SUser>
         <SUserAvatar>
-          <UserAvatar avatarUrl={subscriber.user?.avatarUrl ? subscriber.user.avatarUrl : ''} />
+          <UserAvatar
+            avatarUrl={
+              subscriber.user?.avatarUrl ? subscriber.user.avatarUrl : ''
+            }
+          />
         </SUserAvatar>
-        {subscriber.user?.nickname ? subscriber.user?.nickname : subscriber.user?.username}
+        {subscriber.user?.nickname
+          ? subscriber.user?.nickname
+          : subscriber.user?.username}
       </SUser>
       {subscriber.firstSubscribedAt && (
-        <SDate>{moment((subscriber.firstSubscribedAt.seconds as number) * 1000).format('DD MMMM YYYY')}</SDate>
+        <SDate>
+          {moment(
+            (subscriber.firstSubscribedAt.seconds as number) * 1000
+          ).format('DD MMMM YYYY')}
+        </SDate>
       )}
       <SActions>
-        {!isMobile && <Link href={`/creator/dashboard?tab=direct-messages&roomID=${subscriber.chatRoomId}`}>DM</Link>}
-        <SMoreButton view="transparent" iconOnly onClick={() => handleOpenEllipseMenu()}>
-          <InlineSVG svg={MoreIconFilled} fill={theme.colorsThemed.text.secondary} width="20px" height="20px" />
+        {!isMobile && (
+          <Link
+            href={`/creator/dashboard?tab=direct-messages&roomID=${subscriber.chatRoomId}`}
+          >
+            DM
+          </Link>
+        )}
+        <SMoreButton
+          view='transparent'
+          iconOnly
+          onClick={() => handleOpenEllipseMenu()}
+        >
+          <InlineSVG
+            svg={MoreIconFilled}
+            fill={theme.colorsThemed.text.secondary}
+            width='20px'
+            height='20px'
+          />
         </SMoreButton>
         <SubscriberEllipseMenu
           user={subscriber.user!!}
@@ -98,19 +127,19 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           onUserBlock={onUserBlock}
           onUserReport={onUserReport}
         />
-        {subscriber.user && 
+        {subscriber.user && (
           <ReportModal
             show={confirmReportUser}
             reportedDisplayname={getDisplayname(subscriber.user)}
             onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({reason, message}) => {
+            onSubmit={async ({ reason, message }) => {
               if (subscriber.user?.uuid) {
-               await reportUser(subscriber.user.uuid, reason, message)
+                await reportUser(subscriber.user.uuid, reason, message);
               }
-              setConfirmReportUser(false)
+              setConfirmReportUser(false);
             }}
           />
-          }
+        )}
         {isSubscriberBlocked === true ||
           (confirmBlockUser && (
             <BlockUserModal
@@ -131,7 +160,8 @@ const SContainer = styled.div`
   display: flex;
   padding: 16px 0;
   align-items: center;
-  border-top: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-top: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
 `;
 
 const SUser = styled.div`

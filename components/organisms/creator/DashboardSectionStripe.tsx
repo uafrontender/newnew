@@ -21,12 +21,16 @@ interface IDashboardSectionStripe {
   isConnectedToStripe: boolean;
 }
 
-const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({ isConnectedToStripe }) => {
+const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({
+  isConnectedToStripe,
+}) => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleRedirectToStripesetup = async () => {
     try {
@@ -37,7 +41,8 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({ isConnected
 
       const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
 
       const url = res.data.setupUrl;
       window.location.href = url;
@@ -51,7 +56,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({ isConnected
       {isMobile && <SGoBackButton onClick={() => router.back()} />}
       <SHeadline variant={5}>
         <span>{t('stripe.title-set-up-stripe')}</span>
-        <InlineSvg svg={StripeLogo} width="80px" />
+        <InlineSvg svg={StripeLogo} width='80px' />
       </SHeadline>
       <SUl>
         <li>{t('stripe.bullets.1')}</li>
@@ -60,7 +65,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({ isConnected
       </SUl>
       <SButtons>
         <SButton
-          view="primaryGrad"
+          view='primaryGrad'
           isConnectedToStripe={isConnectedToStripe}
           style={{
             ...(isConnectedToStripe
@@ -75,11 +80,21 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({ isConnected
             }
           }}
         >
-          <InlineSvg svg={!isConnectedToStripe ? StripeLogoS : VerificationPassedInverted} width="24px" height="24px" />
-          <span>{isConnectedToStripe ? t('stripe.stripeConnectedLinkBtn') : t('stripe.requestSetupLinkBtn')}</span>
+          <InlineSvg
+            svg={
+              !isConnectedToStripe ? StripeLogoS : VerificationPassedInverted
+            }
+            width='24px'
+            height='24px'
+          />
+          <span>
+            {isConnectedToStripe
+              ? t('stripe.stripeConnectedLinkBtn')
+              : t('stripe.requestSetupLinkBtn')}
+          </span>
         </SButton>
         <SButtonUpdate
-          view="transparent"
+          view='transparent'
           onClick={() => {
             handleRedirectToStripesetup();
           }}
@@ -94,7 +109,7 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({ isConnected
           </GoBackButton>
         )}
         <Button
-          view="primaryGrad"
+          view='primaryGrad'
           disabled={!isConnectedToStripe}
           style={{
             width: isMobile ? '100%' : 'initial',
@@ -227,7 +242,9 @@ const SButton = styled(Button)<{
 `;
 
 const SButtonUpdate = styled(SButton)`
-  border: 1px solid ${(props) => (props.theme.name === 'light' ? '#2C2C33' : props.theme.colors.white)};
+  border: 1px solid
+    ${(props) =>
+      props.theme.name === 'light' ? '#2C2C33' : props.theme.colors.white};
   cursor: pointer;
   &:hover {
     background: ${(props) =>
