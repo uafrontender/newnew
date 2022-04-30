@@ -636,7 +636,10 @@ const STab = styled.div<ISTab>`
           left: 0;
           width: 100%;
           height: 4px;
-          background: ${({ theme }) => theme.colors.white};
+          background: ${props.theme.name === 'light'
+            ? props.theme.gradients.blueHorizontal
+            : props.theme.colors.white};
+          ${({ theme }) => theme.colors.white};
           border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
           border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
         }
