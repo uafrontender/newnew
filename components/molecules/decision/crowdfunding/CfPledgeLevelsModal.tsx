@@ -279,11 +279,12 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             </SItem>
           </SContentContainer>
           <Button
-            view="secondary"
+            view='secondary'
             style={{
               height: '56px',
               width: 'calc(100% - 32px)',
             }}
+            onClick={onClose}
           >
             {t('CfPost.BackersTab.cancel')}
           </Button>
@@ -306,14 +307,14 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
             </SCloseButton>
           </div>
           <BidAmountTextInput
             value={customPledgeAmount}
-            inputAlign="center"
+            inputAlign='center'
             autofocus={isFormOpen}
             minAmount={1}
             style={{
@@ -323,8 +324,8 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
             onChange={(newValue: string) => setCustomPledgeAmount(newValue)}
           />
           <Button
-            view="primaryGrad"
-            size="sm"
+            view='primaryGrad'
+            size='sm'
             disabled={customPledgeAmount === ''}
             onClick={() => handleCustomPledgePaymentModal()}
           >
@@ -339,11 +340,13 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           isOpen={paymentModalOpen}
           zIndex={14}
           amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
-          {...(
-            walletBalance?.usdCents && pledgeAmount && walletBalance.usdCents >= pledgeAmount ? {} : {
-              predefinedOption: 'card'
-            }
-          )}
+          {...(walletBalance?.usdCents &&
+          pledgeAmount &&
+          walletBalance.usdCents >= pledgeAmount
+            ? {}
+            : {
+                predefinedOption: 'card',
+              })}
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}

@@ -6,135 +6,121 @@ import InlineSvg from '../../atoms/InlineSVG';
 import AlertIcon from '../../../public/images/svg/icons/filled/Alert.svg';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
 
-type TOnboardingSectionUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
-  isValid?: boolean;
-  labelCaption: string;
-  popupCaption: ReactElement;
-  frequencyCaption: string;
-  errorCaption: string;
-}
+type TOnboardingSectionUsernameInput =
+  React.ComponentPropsWithoutRef<'input'> & {
+    isValid?: boolean;
+    labelCaption: string;
+    popupCaption: ReactElement;
+    frequencyCaption: string;
+    errorCaption: string;
+  };
 
-const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSectionUsernameInput> = ({
-  value,
-  popupCaption,
-  frequencyCaption,
-  labelCaption,
-  errorCaption,
-  isValid,
-  disabled,
-  onChange,
-  onFocus,
-  ...rest
-}) => {
-  const [errorBordersShown, setErrorBordersShown] = useState(false);
-  const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [focused, setFocused] = useState(false);
+const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSectionUsernameInput> =
+  ({
+    value,
+    popupCaption,
+    frequencyCaption,
+    labelCaption,
+    errorCaption,
+    isValid,
+    disabled,
+    onChange,
+    onFocus,
+    ...rest
+  }) => {
+    const [errorBordersShown, setErrorBordersShown] = useState(false);
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [focused, setFocused] = useState(false);
 
-  useEffect(() => {
-    if (focused) return;
-    if (isValid) setErrorBordersShown(false);
-  }, [focused, isValid]);
+    useEffect(() => {
+      if (focused) return;
+      if (isValid) setErrorBordersShown(false);
+    }, [focused, isValid]);
 
-  return (
-    <SWrapper>
-      <SLabel
-        isVisible={(value as string)?.length > 0}
-      >
-        { labelCaption }
-      </SLabel>
-      <SInputWrapper>
-        <SOnboardingSectionUsernameInput
-          value={value}
-          id="username_input"
-          disabled={disabled}
-          errorBordersShown={errorBordersShown}
-          onChange={onChange}
-          onBlur={() => {
-            setIsPopupVisible(false);
-            setFocused(false);
-            if (!isValid && errorCaption) {
-              setErrorBordersShown(true);
-            } else {
+    return (
+      <SWrapper>
+        <SLabel isVisible={(value as string)?.length > 0}>
+          {labelCaption}
+        </SLabel>
+        <SInputWrapper>
+          <SOnboardingSectionUsernameInput
+            value={value}
+            id='username_input'
+            disabled={disabled}
+            errorBordersShown={errorBordersShown}
+            onChange={onChange}
+            onBlur={() => {
+              setIsPopupVisible(false);
+              setFocused(false);
+              if (!isValid && errorCaption) {
+                setErrorBordersShown(true);
+              } else {
+                setErrorBordersShown(false);
+              }
+            }}
+            onFocus={(e) => {
+              if (onFocus) onFocus(e);
+              setFocused(true);
+              setIsPopupVisible(true);
               setErrorBordersShown(false);
-            }
-          }}
-          onFocus={(e) => {
-            if (onFocus) onFocus(e);
-            setFocused(true);
-            setIsPopupVisible(true);
-            setErrorBordersShown(false);
-          }}
-          {...rest}
-        />
-        <SStyledButton
-          disabled={disabled}
-          onClick={() => setIsPopupVisible((curr) => !curr)}
-        >
-          <InlineSvg
-            svg={AlertIcon}
-            width="24px"
-            height="24px"
+            }}
+            {...rest}
           />
-        </SStyledButton>
-        <AnimatePresence>
-          {isPopupVisible ? (
-            <SPopup
-              initial={{
-                y: 30,
-                opacity: 0,
-              }}
-              animate={{
-                y: 0,
-                opacity: 1,
-                transition: {
-                  opacity: {
+          <SStyledButton
+            disabled={disabled}
+            onClick={() => setIsPopupVisible((curr) => !curr)}
+          >
+            <InlineSvg svg={AlertIcon} width='24px' height='24px' />
+          </SStyledButton>
+          <AnimatePresence>
+            {isPopupVisible ? (
+              <SPopup
+                initial={{
+                  y: 30,
+                  opacity: 0,
+                }}
+                animate={{
+                  y: 0,
+                  opacity: 1,
+                  transition: {
+                    opacity: {
+                      duration: 0.1,
+                    },
+                    y: {
+                      type: 'spring',
+                      velocity: -300,
+                      stiffness: 100,
+                      delay: 0.1,
+                    },
+                  },
+                }}
+                exit={{
+                  y: 30,
+                  opacity: 0,
+                  transition: {
                     duration: 0.1,
                   },
-                  y: {
-                    type: 'spring',
-                    velocity: -300,
-                    stiffness: 100,
-                    delay: 0.1,
-                  },
-                },
-              }}
-              exit={{
-                y: 30,
-                opacity: 0,
-                transition: {
-                  duration: 0.1,
-                },
-              }}
-            >
-              {popupCaption}
-            </SPopup>
-          ) : null}
-        </AnimatePresence>
-      </SInputWrapper>
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
+                }}
+              >
+                {popupCaption}
+              </SPopup>
+            ) : null}
+          </AnimatePresence>
+        </SInputWrapper>
+        {errorBordersShown ? (
+          <AnimatedPresence animation='t-09'>
             <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
+              <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+              {errorCaption}
             </SErrorDiv>
           </AnimatedPresence>
-        ) : null
-      }
-      <SCaptionDiv
-        disabled={disabled ?? false}
-      >
-        { frequencyCaption }
-      </SCaptionDiv>
-    </SWrapper>
-  );
-};
+        ) : null}
+        <SCaptionDiv disabled={disabled ?? false}>
+          {frequencyCaption}
+        </SCaptionDiv>
+      </SWrapper>
+    );
+  };
 
 OnboardingSectionUsernameInput.defaultProps = {
   isValid: undefined,
@@ -168,7 +154,7 @@ const SLabel = styled.div<{
 
   opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
   height: ${({ isVisible }) => (isVisible ? 'fit-content' : 0)};
-  transition: linear .2s;
+  transition: linear 0.2s;
 
   ${({ theme }) => theme.media.laptop} {
     height: fit-content !important;
@@ -196,7 +182,6 @@ const SStyledButton = styled.button`
   background: transparent;
   box-shadow: none;
 
-
   cursor: pointer;
 
   svg {
@@ -205,7 +190,8 @@ const SStyledButton = styled.button`
     }
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
   }
 
@@ -216,7 +202,7 @@ const SStyledButton = styled.button`
 `;
 
 interface ISOnboardingSectionUsernameInput {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsernameInput>`
@@ -235,7 +221,8 @@ const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsername
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       return 'transparent';
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -251,15 +238,18 @@ const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsername
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled, &:focus:enabled, &:active:enabled {
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   &:disabled {
@@ -284,7 +274,7 @@ const SPopup = styled(motion.div)`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  transition: .2s linear;
+  transition: 0.2s linear;
   z-index: 6;
 
   &:after {
@@ -299,7 +289,9 @@ const SPopup = styled(motion.div)`
     display: inline-block;
 
     background-color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-    clip-path: path('M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z');
+    clip-path: path(
+      'M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z'
+    );
   }
 `;
 
@@ -316,7 +308,10 @@ const SCaptionDiv = styled.div<{
   margin-top: 6px;
 
   ${({ disabled }) => {
-    if (disabled) return css`opacity: 0.5;`;
+    if (disabled)
+      return css`
+        opacity: 0.5;
+      `;
     return null;
   }}
 `;

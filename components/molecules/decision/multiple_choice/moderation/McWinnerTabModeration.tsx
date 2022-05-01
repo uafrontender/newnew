@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -23,213 +29,213 @@ interface MAcWinnerTabModeration {
   postStatus: TPostStatusStringified;
 }
 
-const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> = ({
-  postId,
-  option,
-  postStatus,
-}) => {
-  const { t } = useTranslation('decision');
-  const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
+  ({ postId, option, postStatus }) => {
+    const { t } = useTranslation('decision');
+    const router = useRouter();
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const isCreatorsBid = useMemo(() => {
-    if (!option.creator) return true;
-    return false;
-  }, [option.creator]);
+    const isCreatorsBid = useMemo(() => {
+      if (!option.creator) return true;
+      return false;
+    }, [option.creator]);
 
-  const containerRef = useRef<HTMLDivElement>();
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
+    const containerRef = useRef<HTMLDivElement>();
+    const [isScrolledDown, setIsScrolledDown] = useState(false);
 
-  // Share
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+    // Share
+    const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
-    }
-  }
-
-  const handleCopyLink = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/post/${postId}`;
-
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            setIsCopiedUrl(false);
-          }, 1500);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [postId]);
-
-  const handleRedirectToUser = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
-    router.push(`/${option.creator?.username!!}`);
-  };
-
-  useEffect(() => {
-    if (isBrowser()) {
-      const currScroll = document.getElementById('post-modal-container')!!.scrollTop!!;
-      const targetScroll = (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
-
-      setIsScrolledDown(currScroll >= targetScroll!!);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      // @ts-ignore
-      const currScroll = e?.currentTarget?.scrollTop!!;
-      const targetScroll = (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
-
-      if (currScroll >= targetScroll!!) {
-        setIsScrolledDown(true);
+    async function copyPostUrlToClipboard(url: string) {
+      if ('clipboard' in navigator) {
+        await navigator.clipboard.writeText(url);
       } else {
-        setIsScrolledDown(false);
+        document.execCommand('copy', true, url);
       }
     }
 
-    if (isBrowser()) {
-      document?.getElementById('post-modal-container')?.addEventListener('scroll', handler);
-    }
+    const handleCopyLink = useCallback(() => {
+      if (window) {
+        const url = `${window.location.origin}/post/${postId}`;
 
-    return () => {
+        copyPostUrlToClipboard(url)
+          .then(() => {
+            setIsCopiedUrl(true);
+            setTimeout(() => {
+              setIsCopiedUrl(false);
+            }, 1500);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }, [postId]);
+
+    const handleRedirectToUser = () => {
+      window?.history.replaceState(
+        {
+          fromPost: true,
+        },
+        '',
+        ''
+      );
+      router.push(`/${option.creator?.username!!}`);
+    };
+
+    useEffect(() => {
       if (isBrowser()) {
-        document?.getElementById('post-modal-container')?.removeEventListener('scroll', handler);
-      }
-    }
-  }, [isMobile]);
+        const currScroll = document.getElementById('post-modal-container')!!
+          .scrollTop!!;
+        const targetScroll =
+          (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
-  return (
-    <>
-      <STabContainer
-        key="winner"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        ref={(el) => {
-          containerRef.current = el!!;
-        }}
-      >
-        <SWinnerOptionCard
-          style={{
-            ...(isMobile ? {
-              position: !isScrolledDown ? 'fixed' : 'relative',
-              bottom: !isScrolledDown ? '88px' : 'initial',
-              left: !isScrolledDown ? '16px' : 'initial',
-              width: !isScrolledDown ? 'calc(100% - 32px)' : '100%',
-            } : {}),
+        setIsScrolledDown(currScroll >= targetScroll!!);
+      }
+    }, []);
+
+    useEffect(() => {
+      const handler = (e: Event) => {
+        // @ts-ignore
+        const currScroll = e?.currentTarget?.scrollTop!!;
+        const targetScroll =
+          (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
+
+        if (currScroll >= targetScroll!!) {
+          setIsScrolledDown(true);
+        } else {
+          setIsScrolledDown(false);
+        }
+      };
+
+      if (isBrowser()) {
+        document
+          ?.getElementById('post-modal-container')
+          ?.addEventListener('scroll', handler);
+      }
+
+      return () => {
+        if (isBrowser()) {
+          document
+            ?.getElementById('post-modal-container')
+            ?.removeEventListener('scroll', handler);
+        }
+      };
+    }, [isMobile]);
+
+    return (
+      <>
+        <STabContainer
+          key='winner'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          ref={(el) => {
+            containerRef.current = el!!;
           }}
         >
-          <SOptionDetails>
-            <SNumBidders
-              variant={3}
-            >
-              <SSpanBold>
-                {formatNumber(
-                  option.supporterCount,
-                  true,
-                )}
-              </SSpanBold>
-              {' '}
-              <SSpanThin>
-                {option.supporterCount > 1
-                  ? t('McPostModeration.WinnerTab.WinnerOptionCard.voters_told_you')
-                  : t('McPostModeration.WinnerTab.WinnerOptionCard.voter_told_you')
-                }
-              </SSpanThin>
-            </SNumBidders>
-            <SHeadline
-              variant={4}
-            >
-              { option.text }
-            </SHeadline>
-            <SYouMade
-              variant={3}
-            >
-              { t('McPostModeration.WinnerTab.WinnerOptionCard.you_made') }
-            </SYouMade>
-            <SHeadline
-              variant={4}
-            >
-              $
-              {formatNumber(
-                option.voteCount * 5,
-                true,
-              )}
-            </SHeadline>
-            <SOptionCreator
-              variant={3}
-            >
-              <SSpanThin>
-                { t('McPostModeration.WinnerTab.WinnerOptionCard.created_by') }
-              </SSpanThin>
-              {' '}
-              <SSpanBold
-                onClick={() => {
-                  if (isCreatorsBid) return;
-                  handleRedirectToUser();
-                }}
-                style={{
-                  ...(!isCreatorsBid ? {
-                    cursor: 'pointer',
-                  } : {}),
-                }}
-              >
-                {isCreatorsBid ? t('McPost.OptionsTab.me') : (option.creator?.nickname ?? option.creator?.username)}
-              </SSpanBold>
-            </SOptionCreator>
-          </SOptionDetails>
-          <STrophyImg
-            src={WinnerIcon.src}
-          />
-          {!isMobile && (
-            <>
-              <STrophyGlow />
-              <SMainScoop />
-              <STopScoop>
-                <mask id='mask-STopScoop'>
-                  <svg>
-                    <circle id='circle-STopScoop' r='50' fill='#0DEE59'/>
-                  </svg>
-                </mask>
-              </STopScoop>
-              <SBottomScoop>
-                <mask id='mask-SBottomScoop'>
-                  <svg>
-                    <circle id='circle-SBottomScoop' r='50' fill='#08e171'/>
-                  </svg>
-                </mask>
-              </SBottomScoop>
-            </>
-          )}
-        </SWinnerOptionCard>
-        {postStatus === 'succeeded' ? (
-          <PostSuccessBoxModeration
-            title={t('PostSuccessModeration.title')}
-            body={t('PostSuccessModeration.body')}
-            buttonCaption={isCopiedUrl ? t('PostSuccessModeration.ctaButton-copied') : t('PostSuccessModeration.ctaButton')}
+          <SWinnerOptionCard
             style={{
-              marginTop: '24px',
+              ...(isMobile
+                ? {
+                    position: !isScrolledDown ? 'fixed' : 'relative',
+                    bottom: !isScrolledDown ? '88px' : 'initial',
+                    left: !isScrolledDown ? '16px' : 'initial',
+                    width: !isScrolledDown ? 'calc(100% - 32px)' : '100%',
+                  }
+                : {}),
             }}
-            handleButtonClick={() => {
-              handleCopyLink();
-            }}
-          />
-        ) : null}
-      </STabContainer>
-    </>
-  );
-};
+          >
+            <SOptionDetails>
+              <SNumBidders variant={3}>
+                <SSpanBold>
+                  {formatNumber(option.supporterCount, true)}
+                </SSpanBold>{' '}
+                <SSpanThin>
+                  {option.supporterCount > 1
+                    ? t(
+                        'McPostModeration.WinnerTab.WinnerOptionCard.voters_told_you'
+                      )
+                    : t(
+                        'McPostModeration.WinnerTab.WinnerOptionCard.voter_told_you'
+                      )}
+                </SSpanThin>
+              </SNumBidders>
+              <SHeadline variant={4}>{option.text}</SHeadline>
+              <SYouMade variant={3}>
+                {t('McPostModeration.WinnerTab.WinnerOptionCard.you_made')}
+              </SYouMade>
+              <SHeadline variant={4}>
+                ${formatNumber(option.voteCount * 5, true)}
+              </SHeadline>
+              <SOptionCreator variant={3}>
+                <SSpanThin>
+                  {t('McPostModeration.WinnerTab.WinnerOptionCard.created_by')}
+                </SSpanThin>{' '}
+                <SSpanBold
+                  onClick={() => {
+                    if (isCreatorsBid) return;
+                    handleRedirectToUser();
+                  }}
+                  style={{
+                    ...(!isCreatorsBid
+                      ? {
+                          cursor: 'pointer',
+                        }
+                      : {}),
+                  }}
+                >
+                  {isCreatorsBid
+                    ? t('McPost.OptionsTab.me')
+                    : option.creator?.nickname ?? option.creator?.username}
+                </SSpanBold>
+              </SOptionCreator>
+            </SOptionDetails>
+            <STrophyImg src={WinnerIcon.src} />
+            {!isMobile && (
+              <>
+                <STrophyGlow />
+                <SMainScoop />
+                <STopScoop>
+                  <mask id='mask-STopScoop'>
+                    <svg>
+                      <circle id='circle-STopScoop' r='50' fill='#0DEE59' />
+                    </svg>
+                  </mask>
+                </STopScoop>
+                <SBottomScoop>
+                  <mask id='mask-SBottomScoop'>
+                    <svg>
+                      <circle id='circle-SBottomScoop' r='50' fill='#08e171' />
+                    </svg>
+                  </mask>
+                </SBottomScoop>
+              </>
+            )}
+          </SWinnerOptionCard>
+          {postStatus === 'succeeded' ? (
+            <PostSuccessBoxModeration
+              title={t('PostSuccessModeration.title')}
+              body={t('PostSuccessModeration.body')}
+              buttonCaption={
+                isCopiedUrl
+                  ? t('PostSuccessModeration.ctaButton-copied')
+                  : t('PostSuccessModeration.ctaButton')
+              }
+              style={{
+                marginTop: '24px',
+              }}
+              handleButtonClick={() => {
+                handleCopyLink();
+              }}
+            />
+          ) : null}
+        </STabContainer>
+      </>
+    );
+  };
 
 McWinnerTabModeration.defaultProps = {};
 
@@ -252,7 +258,12 @@ const SWinnerOptionCard = styled.div`
   padding: 16px;
   padding-right: 114px;
 
-  background: linear-gradient(76.09deg, #00C291 2.49%, #07DF74 50.67%, #0FF34F 102.41%);
+  background: linear-gradient(
+    76.09deg,
+    #00c291 2.49%,
+    #07df74 50.67%,
+    #0ff34f 102.41%
+  );
   border-radius: 24px;
 
   display: flex;
@@ -316,13 +327,14 @@ const STopScoop = styled.div`
   right: 0px;
   bottom: 70px;
 
-	width: 50px;
-	height: 80px;
+  width: 50px;
+  height: 80px;
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   svg {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -331,13 +343,14 @@ const SBottomScoop = styled.div`
   right: 26px;
   bottom: 0px;
 
-	width: 150px;
-	height: 50px;
+  width: 150px;
+  height: 50px;
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   svg {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -349,30 +362,30 @@ const SOptionDetails = styled.div`
 `;
 
 const SNumBidders = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SHeadline = styled(Headline)`
   margin-bottom: 8px;
-  color: #FFFFFF;
+  color: #ffffff;
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
   }
 `;
 
 const SYouMade = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SOptionCreator = styled(Text)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanBold = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SSpanThin = styled.span`
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.8;
 `;

@@ -15,56 +15,53 @@ interface IPostEllipseModalModeration {
   handleOpenDeletePostModal: () => void;
 }
 
-const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModeration> = ({
-  postType,
-  isOpen,
-  zIndex,
-  canDeletePost,
-  onClose,
-  handleOpenDeletePostModal,
-}) => {
-  const { t } = useTranslation('decision');
+const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModeration> =
+  ({
+    postType,
+    isOpen,
+    zIndex,
+    canDeletePost,
+    onClose,
+    handleOpenDeletePostModal,
+  }) => {
+    const { t } = useTranslation('decision');
 
-  return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <SButton
-            disabled={!canDeletePost}
-            onClick={() => {
-              handleOpenDeletePostModal();
-              onClose();
+    return (
+      <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
             }}
           >
-            <Text
-              variant={3}
+            <SButton
+              disabled={!canDeletePost}
+              onClick={() => {
+                handleOpenDeletePostModal();
+                onClose();
+              }}
             >
-              { t('ellipse.deleteDecision', { postType: t(`postType.${postType}`) })}
-            </Text>
-          </SButton>
-        </SContentContainer>
-        <Button
-          view="secondary"
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-        >
-          { t('ellipse.cancel') }
-        </Button>
-      </SWrapper>
-    </Modal>
-  );
-};
+              <Text variant={3}>
+                {t('ellipse.deleteDecision', {
+                  postType: t(`postType.${postType}`),
+                })}
+              </Text>
+            </SButton>
+          </SContentContainer>
+          <Button
+            view='secondary'
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
+            }}
+            onClick={onClose}
+          >
+            {t('ellipse.cancel')}
+          </Button>
+        </SWrapper>
+      </Modal>
+    );
+  };
 
 export default PostEllipseModalModeration;
 
@@ -93,6 +90,8 @@ const SContentContainer = styled.div`
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;

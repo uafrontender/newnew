@@ -9,29 +9,20 @@ interface IUploadPictureErrorModal {
   onClose: () => void;
 }
 
-const UploadPictureErrorModal: React.FunctionComponent<IUploadPictureErrorModal> = ({
-  isOpen,
-  zIndex,
-  onClose,
-  children,
-}) => (
-  <Modal
-    show={isOpen}
-    overlayDim
-    additionalZ={zIndex}
-    onClose={onClose}
-  >
-    <SWrapper>
-      <SContentContainer
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        { children }
-      </SContentContainer>
-    </SWrapper>
-  </Modal>
-);
+const UploadPictureErrorModal: React.FunctionComponent<IUploadPictureErrorModal> =
+  ({ isOpen, zIndex, onClose, children }) => (
+    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+      <SWrapper>
+        <SContentContainer
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {children}
+        </SContentContainer>
+      </SWrapper>
+    </Modal>
+  );
 
 export default UploadPictureErrorModal;
 

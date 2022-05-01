@@ -9,9 +9,7 @@ interface IAcOptionTitle {
   option: newnewapi.Auction.Option;
 }
 
-const AcOptionTitle: React.FunctionComponent<IAcOptionTitle> = ({
-  option,
-}) => {
+const AcOptionTitle: React.FunctionComponent<IAcOptionTitle> = ({ option }) => {
   const [isEllipsed, setIsEllipsed] = useState(true);
 
   return (
@@ -21,14 +19,11 @@ const AcOptionTitle: React.FunctionComponent<IAcOptionTitle> = ({
         ellipsed={isEllipsed}
         onClick={() => setIsEllipsed((c) => !c)}
       >
-        { !isEllipsed ? (
-          option.title
-        ) : (
-          (option.title as string).length > 100
-            ? (
-              `${(option.title as string).slice(0, 100)}...`
-            ) : option.title
-        ) }
+        {!isEllipsed
+          ? option.title
+          : (option.title as string).length > 100
+          ? `${(option.title as string).slice(0, 100)}...`
+          : option.title}
       </SHeadline>
     </>
   );

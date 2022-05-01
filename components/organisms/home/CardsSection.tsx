@@ -66,7 +66,9 @@ export const CardsSection: React.FC<ICardSection> = ({
   const [mouseIsDown, setMouseIsDown] = useState(false);
 
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
   // const isLaptop = ['laptop'].includes(resizeMode);
   // const isDesktop = ['laptopL'].includes(resizeMode);
@@ -98,8 +100,12 @@ export const CardsSection: React.FC<ICardSection> = ({
 
     if (to < 0) {
       scrollTo = 0;
-    } else if (scrollTo > (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1) {
-      scrollTo = (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
+    } else if (
+      scrollTo >
+      (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1
+    ) {
+      scrollTo =
+        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
     }
 
     scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
@@ -146,14 +152,16 @@ export const CardsSection: React.FC<ICardSection> = ({
       return (
         <>
           <SItemWrapper
-            key="tutorial-card"
+            key='tutorial-card'
             name={`cards-section-${category}-${0}`}
           >
             {tutorialCard}
           </SItemWrapper>
           <SItemWrapper
             key={switchPostType(item)[0].postUuid}
-            name={`cards-section-${category}-${tutorialCard !== undefined ? index + 1 : index}`}
+            name={`cards-section-${category}-${
+              tutorialCard !== undefined ? index + 1 : index
+            }`}
             onClick={handleItemClick}
           >
             <Card
@@ -164,13 +172,15 @@ export const CardsSection: React.FC<ICardSection> = ({
             />
           </SItemWrapper>
         </>
-      )
+      );
     }
 
     return (
       <SItemWrapper
         key={switchPostType(item)[0].postUuid}
-        name={`cards-section-${category}-${tutorialCard !== undefined ? index + 1 : index}`}
+        name={`cards-section-${category}-${
+          tutorialCard !== undefined ? index + 1 : index
+        }`}
         onClick={handleItemClick}
       >
         <Card
@@ -192,68 +202,66 @@ export const CardsSection: React.FC<ICardSection> = ({
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch(`/see-more?category=${category}`);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     scrollContainerRef.current.addEventListener('scroll', () => {
       const currentScrollPosition = scrollContainerRef.current.scrollLeft;
-      const childWidth = scrollContainerRef.current.firstChild.getBoundingClientRect().width;
+      const childWidth =
+        scrollContainerRef.current.firstChild.getBoundingClientRect().width;
 
       setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
     });
   }, []);
   useEffect(() => {
     setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem + 1 <= (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - scrollStep);
+    setCanScrollRight(
+      visibleListItem + 1 <=
+        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
+          scrollStep
+    );
   }, [visibleListItem, collection, scrollStep]);
 
   return (
     <SWrapper name={category}>
       <STopWrapper>
         {type === 'default' ? (
-          <Headline
-            variant={4}
-            animation="t-01"
-          >
+          <Headline variant={4} animation='t-01'>
             {title}
           </Headline>
         ) : (
-          <AnimatedPresence
-            animation="t-01"
-          >
-            <SHeadline
-              variant={4}
-              animation="t-01"
-            >
+          <AnimatedPresence animation='t-01'>
+            <SHeadline variant={4} animation='t-01'>
               <SHeadlineInner>
-                <div>
-                  {t('button-creator-on-the-rise')}
-                </div>
+                <div>{t('button-creator-on-the-rise')}</div>
                 <SCreatorsAvatars>
-                  { collection
-                      .map((post) => switchPostType(post)[0].creator)
-                      .filter((value, index, arr) => arr.indexOf(value) === index)
-                      .map((creator, i) => (
-                        <SUserAvatar
-                          key={creator?.uuid}
-                          index={i}
-                          avatarUrl={creator?.avatarUrl!!}
-                          onClick={() => handleUserClick(creator?.username as string)}
-                        />
-                      ))
-                  }
+                  {collection
+                    .map((post) => switchPostType(post)[0].creator)
+                    .filter((value, index, arr) => arr.indexOf(value) === index)
+                    .map((creator, i) => (
+                      <SUserAvatar
+                        key={creator?.uuid}
+                        index={i}
+                        avatarUrl={creator?.avatarUrl!!}
+                        onClick={() =>
+                          handleUserClick(creator?.username as string)
+                        }
+                      />
+                    ))}
                 </SCreatorsAvatars>
               </SHeadlineInner>
             </SHeadline>
           </AnimatedPresence>
         )}
         {!isMobile && type === 'default' && (
-          <SCaption
-            weight={700}
-            onClick={handleSeeMoreCLick}
-          >
-            {t(type === 'default' ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
+          <SCaption weight={700} onClick={handleSeeMoreCLick}>
+            {t(
+              type === 'default'
+                ? 'button-show-more'
+                : 'button-show-more-creator',
+              { name: formatString(user?.username, true) }
+            )}
           </SCaption>
         )}
       </STopWrapper>
@@ -266,27 +274,25 @@ export const CardsSection: React.FC<ICardSection> = ({
           onMouseMove={mouseMoveHandler}
           onMouseLeave={mouseUpHandler}
         >
-          {!loading
-            ? collectionToRender?.map(renderItem)
-            : (
-              <CardSkeletonSection
-                count={5}
-              />
-            )}
+          {!loading ? (
+            collectionToRender?.map(renderItem)
+          ) : (
+            <CardSkeletonSection count={5} />
+          )}
         </SListWrapper>
         {!isMobile && (
           <>
             {!isDragging && canScrollLeft && (
               <ScrollArrowPermanent
                 active
-                position="left"
+                position='left'
                 handleClick={handleLeftClick}
               />
             )}
             {!isDragging && canScrollRight && (
               <ScrollArrowPermanent
                 active
-                position="right"
+                position='right'
                 handleClick={handleRightClick}
               />
             )}
@@ -295,12 +301,13 @@ export const CardsSection: React.FC<ICardSection> = ({
       </SListContainer>
       {renderShowMore && type === 'default' && (
         <SButtonHolder>
-          <Button
-            size="lg"
-            view="secondary"
-            onClick={handleSeeMoreCLick}
-          >
-            {t(type === 'default' || isMobile ? 'button-show-more' : 'button-show-more-creator', { name: formatString(user?.username, true) })}
+          <Button size='lg' view='secondary' onClick={handleSeeMoreCLick}>
+            {t(
+              type === 'default' || isMobile
+                ? 'button-show-more'
+                : 'button-show-more-creator',
+              { name: formatString(user?.username, true) }
+            )}
           </Button>
         </SButtonHolder>
       )}
@@ -357,12 +364,10 @@ const SListContainer = styled.div`
 `;
 
 const SListWrapper = styled.div`
-
   width: 100%;
   cursor: grab;
   display: flex;
   padding: 8px 0 0 0;
-
 
   position: relative;
   overflow-x: auto;
@@ -380,7 +385,6 @@ const SListWrapper = styled.div`
     /* padding: 24px 24px 0 24px; */
     /* padding: 32px 56px 0 64px; */
     width: calc(100% - 64px);
-
 
     flex-direction: row;
   }
@@ -474,7 +478,7 @@ const SUserAvatar = styled(UserAvatar)<{
   height: 36px;
 
   border: 4px solid ${({ theme }) => theme.colorsThemed.background.primary};
-  background:${({ theme }) => theme.colorsThemed.background.primary};
+  background: ${({ theme }) => theme.colorsThemed.background.primary};
 
   cursor: pointer;
 

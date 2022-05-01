@@ -32,8 +32,8 @@ const Notification: React.FC<INotification> = ({
                   : MessageCircle
               }
               fill={theme.colors.white}
-              width="14px"
-              height="14px"
+              width='14px'
+              height='14px'
             />
           </SIcon>
         )}

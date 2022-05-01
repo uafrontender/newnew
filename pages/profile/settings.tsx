@@ -442,7 +442,7 @@ const MyProfileSettginsIndex: NextPage = () => {
           {/* <SBlockOptionButton>
             {commonT(`selected-language-title-${router.locale}`)}
           </SBlockOptionButton> */}
-          <Link href="/help">
+          <Link href='/help'>
             <SBlockOption>{t('Settings.bottomDiv.help')}</SBlockOption>
           </Link>
           <SBlockOptionButton

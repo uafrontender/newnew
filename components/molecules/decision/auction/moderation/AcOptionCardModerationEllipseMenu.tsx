@@ -17,73 +17,68 @@ interface IAcOptionCardModerationEllipseMenu {
   handleOpenRemoveOptionModal: () => void;
 }
 
-const AcOptionCardModerationEllipseMenu: React.FunctionComponent<IAcOptionCardModerationEllipseMenu> = ({
-  isVisible,
-  canDeleteOption,
-  handleClose,
-  handleOpenReportOptionModal,
-  handleOpenBlockUserModal,
-  handleOpenRemoveOptionModal,
-}) => {
-  const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
+const AcOptionCardModerationEllipseMenu: React.FunctionComponent<IAcOptionCardModerationEllipseMenu> =
+  ({
+    isVisible,
+    canDeleteOption,
+    handleClose,
+    handleOpenReportOptionModal,
+    handleOpenBlockUserModal,
+    handleOpenRemoveOptionModal,
+  }) => {
+    const { t } = useTranslation('decision');
+    const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+    useOnClickEsc(containerRef, handleClose);
+    useOnClickOutside(containerRef, handleClose);
 
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <SButton
-            onClick={() => {
-              handleOpenReportOptionModal();
-              handleClose();
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <Text
-              variant={3}
+            <SButton
+              onClick={() => {
+                handleOpenReportOptionModal();
+                handleClose();
+              }}
             >
-              { t('AcPostModeration.OptionsTab.OptionCard.ellipse.report') }
-            </Text>
-          </SButton>
-          <SButton
-            onClick={() => {
-              handleOpenBlockUserModal();
-              handleClose();
-            }}
-          >
-            <Text
-              variant={3}
+              <Text variant={3} tone='error'>
+                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.report')}
+              </Text>
+            </SButton>
+            <SButton
+              onClick={() => {
+                handleOpenBlockUserModal();
+                handleClose();
+              }}
             >
-              { t('AcPostModeration.OptionsTab.OptionCard.ellipse.block') }
-            </Text>
-          </SButton>
-          <SButton
-            disabled={!canDeleteOption}
-            onClick={() => {
-              handleOpenRemoveOptionModal();
-              handleClose();
-            }}
-          >
-            <Text
-              variant={3}
+              <Text variant={3}>
+                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.block')}
+              </Text>
+            </SButton>
+            <SButton
+              disabled={!canDeleteOption}
+              onClick={() => {
+                handleOpenRemoveOptionModal();
+                handleClose();
+              }}
             >
-              { t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove') }
-            </Text>
-          </SButton>
-        </SContainer>
-      )}
-    </AnimatePresence>
-  );
-};
+              <Text variant={3}>
+                {t('AcPostModeration.OptionsTab.OptionCard.ellipse.remove')}
+              </Text>
+            </SButton>
+          </SContainer>
+        )}
+      </AnimatePresence>
+    );
+  };
 
 export default AcOptionCardModerationEllipseMenu;
 
@@ -123,11 +118,13 @@ const SButton = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
   }
 
-  &:focus:enabled, &:hover:enabled {
+  &:focus:enabled,
+  &:hover:enabled {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.background.quinary};
   }

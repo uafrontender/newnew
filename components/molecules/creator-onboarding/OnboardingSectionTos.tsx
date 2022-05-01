@@ -1,11 +1,7 @@
 /* eslint-disable react/no-danger */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
@@ -26,7 +22,9 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
 }) => {
   const { t } = useTranslation('creator-onboarding');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const [shadowTop, setShadowTop] = useState(false);
   const [shadowBottom, setShadowBottom] = useState(!isMobile);
@@ -38,9 +36,9 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolledToBottom = (
-        (document.body.scrollHeight - (window.innerHeight + window.pageYOffset)) < 10
-      );
+      const isScrolledToBottom =
+        document.body.scrollHeight - (window.innerHeight + window.pageYOffset) <
+        10;
 
       if (isScrolledToBottom) {
         setHasRead(true);
@@ -55,9 +53,10 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
   useEffect(() => {
     const handleScroll = () => {
       const isScrolledToTop = (containerRef.current?.scrollTop ?? 0) < 10;
-      const isScrolledToBottom = (
-        (containerRef.current?.scrollTop ?? 0) + (containerRef.current?.clientHeight ?? 0))
-        >= (containerRef.current?.scrollHeight ?? 0);
+      const isScrolledToBottom =
+        (containerRef.current?.scrollTop ?? 0) +
+          (containerRef.current?.clientHeight ?? 0) >=
+        (containerRef.current?.scrollHeight ?? 0);
 
       if (!isScrolledToTop) {
         setShadowTop(true);
@@ -75,20 +74,14 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
 
     containerRef.current?.addEventListener('scroll', handleScroll);
 
-    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
+    return () =>
+      containerRef.current?.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <>
-      <SHeading
-        variant={5}
-      >
-        {t('TosSection.heading')}
-      </SHeading>
-      <SSubheading
-        variant={1}
-        weight={600}
-      >
+      <SHeading variant={5}>{t('TosSection.heading')}</SHeading>
+      <SSubheading variant={1} weight={600}>
         {t('TosSection.subheading')}
       </SSubheading>
       <SContainer
@@ -96,24 +89,20 @@ const OnboardingSectionTos: React.FunctionComponent<IOnboardingSectionTos> = ({
           containerRef.current = el!!;
         }}
       >
-        {
-          !isMobile && (
-            <SShadowTop
-              style={{
-                opacity: shadowTop ? 1 : 0,
-              }}
-            />
-          )
-        }
-        {
-          !isMobile && (
-            <SShadowBottom
-              style={{
-                opacity: shadowBottom ? 1 : 0,
-              }}
-            />
-          )
-        }
+        {!isMobile && (
+          <SShadowTop
+            style={{
+              opacity: shadowTop ? 1 : 0,
+            }}
+          />
+        )}
+        {!isMobile && (
+          <SShadowBottom
+            style={{
+              opacity: shadowBottom ? 1 : 0,
+            }}
+          />
+        )}
         <STosText
           dangerouslySetInnerHTML={{
             __html: mockToS,
@@ -201,12 +190,12 @@ const SShadowTop = styled.div`
   height: 0px;
 
   z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff')};
-  ;
+  box-shadow: 0px 0px 32px 40px
+    ${({ theme }) =>
+      theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff'};
   clip-path: inset(0px 0px -100px 0px);
 
-  transition: linear .2s;
+  transition: linear 0.2s;
 
   ${({ theme }) => theme.media.laptop} {
     top: 200px;
@@ -222,11 +211,11 @@ const SShadowBottom = styled.div`
   height: 0px;
 
   z-index: 1;
-  box-shadow:
-    0px 0px 32px 40px ${({ theme }) => (theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff')};
-  ;
+  box-shadow: 0px 0px 32px 40px
+    ${({ theme }) =>
+      theme.name === 'dark' ? 'rgba(11, 10, 19, 1)' : '#ffffff'};
   clip-path: inset(-100px 0px 0px 0px);
-  transition: linear .2s;
+  transition: linear 0.2s;
 
   ${({ theme }) => theme.media.laptop} {
     bottom: 118px;
@@ -241,6 +230,4 @@ const STosText = styled.div`
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
-
-
 `;

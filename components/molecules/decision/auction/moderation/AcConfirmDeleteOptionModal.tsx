@@ -4,13 +4,13 @@ import styled from 'styled-components';
 import Modal from '../../../../organisms/Modal';
 import Button from '../../../../atoms/Button';
 
-interface IAcConfirmDeleteOption {
-  isVisible: boolean,
+interface IAcConfirmDeleteOptionModal {
+  isVisible: boolean;
   closeModal: () => void;
   handleConfirmDelete: () => void;
 }
 
-const AcConfirmDeleteOption: React.FC<IAcConfirmDeleteOption> = ({
+const AcConfirmDeleteOptionModal: React.FC<IAcConfirmDeleteOptionModal> = ({
   isVisible,
   closeModal,
   handleConfirmDelete,
@@ -18,19 +18,17 @@ const AcConfirmDeleteOption: React.FC<IAcConfirmDeleteOption> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal
-      show={isVisible}
-      additionalZ={12}
-      onClose={closeModal}
-    >
+    <Modal show={isVisible} additionalZ={12} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{t('AcPostModeration.DeleteOptionModal.title')}</SModalTitle>
+          <SModalTitle>
+            {t('AcPostModeration.DeleteOptionModal.title')}
+          </SModalTitle>
           <SModalMessage>
             {t('AcPostModeration.DeleteOptionModal.body')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>
+            <SCancelButton onClick={closeModal}>
               {t('AcPostModeration.DeleteOptionModal.cancelBtn')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
@@ -43,7 +41,7 @@ const AcConfirmDeleteOption: React.FC<IAcConfirmDeleteOption> = ({
   );
 };
 
-export default AcConfirmDeleteOption;
+export default AcConfirmDeleteOptionModal;
 
 const SContainer = styled.div`
   display: flex;
@@ -56,10 +54,14 @@ const SModal = styled.div`
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px;
   box-sizing: border-box;
   display: flex;
@@ -88,11 +90,15 @@ const SCancelButton = styled(Button)`
   margin-right: auto;
   flex-shrink: 0;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
   &:hover {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+      props.theme.name === 'light'
+        ? props.theme.colors.dark
+        : props.theme.colorsThemed.background.quaternary};
     color: ${(props) => props.theme.colors.white};
     background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }

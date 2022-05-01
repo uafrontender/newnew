@@ -22,190 +22,190 @@ interface IAcWaitingOptionsSection {
   heightDelta: number;
 }
 
-const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection> = ({
-  post,
-  heightDelta,
-}) => {
-  const { t } = useTranslation('decision');
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection> =
+  ({ post, heightDelta }) => {
+    const { t } = useTranslation('decision');
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // Options
-  const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-  const [optionsNextPageToken, setOptionsNextPageToken] =
-    useState<string | undefined | null>('');
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const [loadingOptionsError, setLoadingOptionsError] = useState('');
+    // Options
+    const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
+    const [optionsNextPageToken, setOptionsNextPageToken] =
+      useState<string | undefined | null>('');
+    const [optionsLoading, setOptionsLoading] = useState(false);
+    const [loadingOptionsError, setLoadingOptionsError] = useState('');
 
-  // Infinite load
-  const { ref: loadingRef, inView } = useInView();
+    // Infinite load
+    const { ref: loadingRef, inView } = useInView();
 
-  const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } =
-    useScrollGradients(containerRef);
+    const containerRef = useRef<HTMLDivElement>();
+    const { showTopGradient, showBottomGradient } =
+      useScrollGradients(containerRef);
 
-  const sortOptions = useCallback(
-    (unsortedArr: TAcOptionWithHighestField[]) => {
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < unsortedArr.length; i++) {
-        // eslint-disable-next-line no-param-reassign
-        unsortedArr[i].isHighest = false;
-      }
-
-      const highestOption = unsortedArr.sort(
-        (a, b) =>
-          (b?.totalAmount?.usdCents as number) -
-          (a?.totalAmount?.usdCents as number)
-      )[0];
-
-      unsortedArr.forEach((option, i) => {
-        if (i > 0) {
+    const sortOptions = useCallback(
+      (unsortedArr: TAcOptionWithHighestField[]) => {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < unsortedArr.length; i++) {
           // eslint-disable-next-line no-param-reassign
-          option.isHighest = false;
+          unsortedArr[i].isHighest = false;
         }
-      });
 
-      const optionsByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            .sort((a, b) => {
-              return (b.id as number) - (a.id as number);
-            })
-        : [];
+        const highestOption = unsortedArr.sort(
+          (a, b) =>
+            (b?.totalAmount?.usdCents as number) -
+            (a?.totalAmount?.usdCents as number)
+        )[0];
 
-      const optionsSupportedByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.isSupportedByMe)
-            .sort((a, b) => {
-              return (b.id as number) - (a.id as number);
-            })
-        : [];
+        unsortedArr.forEach((option, i) => {
+          if (i > 0) {
+            // eslint-disable-next-line no-param-reassign
+            option.isHighest = false;
+          }
+        });
 
-      const optionsByVipUsers = unsortedArr
-        .filter((o) => o.isCreatedBySubscriber)
-        .sort((a, b) => {
+        const optionsByUser = user.userData?.userUuid
+          ? unsortedArr
+              .filter((o) => o.creator?.uuid === user.userData?.userUuid)
+              .sort((a, b) => {
+                return (b.id as number) - (a.id as number);
+              })
+          : [];
+
+        const optionsSupportedByUser = user.userData?.userUuid
+          ? unsortedArr
+              .filter((o) => o.isSupportedByMe)
+              .sort((a, b) => {
+                return (b.id as number) - (a.id as number);
+              })
+          : [];
+
+        const optionsByVipUsers = unsortedArr
+          .filter((o) => o.isCreatedBySubscriber)
+          .sort((a, b) => {
+            return (b.id as number) - (a.id as number);
+          });
+
+        const workingArrSorted = unsortedArr.sort((a, b) => {
+          // Sort the rest by newest first
           return (b.id as number) - (a.id as number);
         });
 
-      const workingArrSorted = unsortedArr.sort((a, b) => {
-        // Sort the rest by newest first
-        return (b.id as number) - (a.id as number);
-      });
+        const joinedArr = [
+          ...(highestOption &&
+          (highestOption.creator?.uuid === user.userData?.userUuid ||
+            highestOption.isSupportedByMe)
+            ? [highestOption]
+            : []),
+          ...optionsByUser,
+          ...optionsSupportedByUser,
+          ...optionsByVipUsers,
+          ...(highestOption &&
+          highestOption.creator?.uuid !== user.userData?.userUuid
+            ? [highestOption]
+            : []),
+          ...workingArrSorted,
+        ];
 
-      const joinedArr = [
-        ...(highestOption &&
-        (highestOption.creator?.uuid === user.userData?.userUuid ||
-          highestOption.isSupportedByMe)
-          ? [highestOption]
-          : []),
-        ...optionsByUser,
-        ...optionsSupportedByUser,
-        ...optionsByVipUsers,
-        ...(highestOption &&
-        highestOption.creator?.uuid !== user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...workingArrSorted,
-      ];
+        const workingSortedUnique =
+          joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
 
-      const workingSortedUnique =
-        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+        const highestOptionIdx = (
+          workingSortedUnique as TAcOptionWithHighestField[]
+        ).findIndex((o) => o.id === highestOption.id);
 
-      const highestOptionIdx = (
-        workingSortedUnique as TAcOptionWithHighestField[]
-      ).findIndex((o) => o.id === highestOption.id);
-
-      if (workingSortedUnique[highestOptionIdx]) {
-        (
-          workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
-        ).isHighest = true;
-      }
-
-      return workingSortedUnique;
-    },
-    [user.userData?.userUuid]
-  );
-
-  const fetchBids = useCallback(
-    async (pageToken?: string) => {
-      if (optionsLoading) return;
-      try {
-        setOptionsLoading(true);
-        setLoadingOptionsError('');
-
-        const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
-          postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.options) {
-          setOptions((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.options as TAcOptionWithHighestField[]),
-            ];
-
-            return sortOptions(workingArr);
-          });
-          setOptionsNextPageToken(res.data.paging?.nextPageToken);
+        if (workingSortedUnique[highestOptionIdx]) {
+          (
+            workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
+          ).isHighest = true;
         }
 
-        setOptionsLoading(false);
-      } catch (err) {
-        setOptionsLoading(false);
-        setLoadingOptionsError((err as Error).message);
-        console.error(err);
+        return workingSortedUnique;
+      },
+      [user.userData?.userUuid]
+    );
+
+    const fetchBids = useCallback(
+      async (pageToken?: string) => {
+        if (optionsLoading) return;
+        try {
+          setOptionsLoading(true);
+          setLoadingOptionsError('');
+
+          const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
+            postUuid: post.postUuid,
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
+          });
+
+          const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
+
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          if (res.data && res.data.options) {
+            setOptions((curr) => {
+              const workingArr = [
+                ...curr,
+                ...(res.data?.options as TAcOptionWithHighestField[]),
+              ];
+
+              return sortOptions(workingArr);
+            });
+            setOptionsNextPageToken(res.data.paging?.nextPageToken);
+          }
+
+          setOptionsLoading(false);
+        } catch (err) {
+          setOptionsLoading(false);
+          setLoadingOptionsError((err as Error).message);
+          console.error(err);
+        }
+      },
+      [post, setOptions, sortOptions, optionsLoading]
+    );
+
+    useEffect(() => {
+      setOptions([]);
+      setOptionsNextPageToken('');
+      fetchBids();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [post.postUuid]);
+
+    useEffect(() => {
+      if (inView && !optionsLoading && optionsNextPageToken) {
+        fetchBids(optionsNextPageToken);
       }
-    },
-    [post, setOptions, sortOptions, optionsLoading]
-  );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, optionsNextPageToken, optionsLoading]);
 
-  useEffect(() => {
-    setOptions([]);
-    setOptionsNextPageToken('');
-    fetchBids();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.postUuid]);
-
-  useEffect(() => {
-    if (inView && !optionsLoading && optionsNextPageToken) {
-      fetchBids(optionsNextPageToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, optionsNextPageToken, optionsLoading]);
-
-  return (
-    <SWrapper
-      // heightDelta={isMobile ? 24 : 60}
-      heightDelta={isMobile ? 0 : heightDelta}
-    >
-      {!isMobile ? (
-        <>
-          <GradientMask
-            gradientType="secondary"
-            positionTop
-            active={showTopGradient}
-          />
-          <GradientMask
-            gradientType="secondary"
-            positionBottom={0}
-            active={showBottomGradient}
-          />
-        </>
-      ) : null}
-      <SBidsContainer
+    return (
+      <SWrapper
+        // heightDelta={isMobile ? 24 : 60}
+        heightDelta={isMobile ? 0 : heightDelta}
+      >
+        {!isMobile ? (
+          <>
+            <GradientMask
+              gradientType='secondary'
+              positionTop
+              active={showTopGradient}
+            />
+            <GradientMask
+              gradientType='secondary'
+              positionBottom={0}
+              active={showBottomGradient}
+            />
+          </>
+        ) : null}
+        <SBidsContainer
           ref={(el) => {
             containerRef.current = el!!;
           }}
@@ -216,7 +216,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection>
               option={option as TAcOptionWithHighestField}
               postId={post.postUuid}
               postCreator={post.creator?.nickname!!}
-              postDeadline=""
+              postDeadline=''
               index={i}
               minAmount={0}
               votingAllowed={false}
@@ -228,16 +228,16 @@ const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection>
             <SLoaderDiv ref={loadingRef} />
           ) : optionsNextPageToken ? (
             <SLoadMoreBtn
-              view="secondary"
+              view='secondary'
               onClick={() => fetchBids(optionsNextPageToken)}
             >
               {t('loadMoreBtn')}
             </SLoadMoreBtn>
           ) : null}
         </SBidsContainer>
-    </SWrapper>
-  )
-};
+      </SWrapper>
+    );
+  };
 
 export default AcWaitingOptionsSection;
 
@@ -263,6 +263,9 @@ const SBidsContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
 
     // Scrollbar
     &::-webkit-scrollbar {

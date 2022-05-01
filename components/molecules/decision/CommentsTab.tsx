@@ -469,7 +469,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   return (
     <>
       <STabContainer
-        key="comments"
+        key='comments'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -483,7 +483,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
-            position="sticky"
+            position='sticky'
             zIndex={1}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
@@ -491,7 +491,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             {comments.length === 0 && !commentsLoading ? (
               <SNoCommentsYet>
                 <SNoCommentsImgContainer>
-                  <img src={NoContentYetImg.src} alt="No content yet" />
+                  <img src={NoContentYetImg.src} alt='No content yet' />
                 </SNoCommentsImgContainer>
                 <SNoCommentsCaption variant={3}>
                   {t('comments.noCommentsCaption')}
@@ -500,7 +500,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
                   <SMakeBidArrowSvg
                     svg={MakeFirstBidArrow}
                     fill={theme.colorsThemed.background.quinary}
-                    width="36px"
+                    width='36px'
                   />
                 )}
               </SNoCommentsYet>
@@ -555,11 +555,11 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask
-          gradientType="secondary"
+          gradientType='secondary'
           positionTop={heightDelta}
           active={showTopGradient}
         />
-        <GradientMask gradientType="secondary" active={showBottomGradient} />
+        <GradientMask gradientType='secondary' active={showBottomGradient} />
       </STabContainer>
     </>
   );
@@ -589,6 +589,10 @@ const SActionSection = styled.div`
   max-height: 500px;
 
   overflow-y: auto;
+
+  padding-right: 12px;
+  margin-right: -14px;
+  width: calc(100% + 14px);
 
   // Scrollbar
   &::-webkit-scrollbar {

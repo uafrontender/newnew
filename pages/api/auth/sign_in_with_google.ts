@@ -4,13 +4,12 @@ import { newnewapi } from 'newnew-api';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Uint8Array | any>,
+  res: NextApiResponse<Uint8Array | any>
 ): any {
   if (req.method === 'POST') {
-    const resBytes = newnewapi.SignInResponse
-      .encode({
-        status: newnewapi.SignInResponse.Status.SUCCESS,
-      }).finish();
+    const resBytes = newnewapi.SignInResponse.encode({
+      status: newnewapi.SignInResponse.Status.SUCCESS,
+    }).finish();
 
     res.send(resBytes);
   }

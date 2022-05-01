@@ -268,7 +268,10 @@ export const Notifications = () => {
     []
   );
 
-  const renderNotification = useCallback((item) => <Notification {...item} />, []);
+  const renderNotification = useCallback(
+    (item) => <Notification {...item} />,
+    []
+  );
 
   return (
     <>
@@ -283,12 +286,17 @@ export const Notifications = () => {
   );
 };
 
-(Notifications as NextPageWithLayout).getLayout = (page: ReactElement) => <SGeneral>{page}</SGeneral>;
+(Notifications as NextPageWithLayout).getLayout = (page: ReactElement) => (
+  <SGeneral>{page}</SGeneral>
+);
 
 export default Notifications;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const translationContext = await serverSideTranslations(context.locale!!, ['common', 'notifications']);
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'common',
+    'notifications',
+  ]);
 
   return {
     props: {
@@ -305,7 +313,9 @@ const SGeneral = styled(General)`
 
   ${({ theme }) => theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.primary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.primary};
   }
 `;
 

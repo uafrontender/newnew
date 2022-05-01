@@ -16,7 +16,7 @@ import { TAcOptionWithHighestField } from '../../../../organisms/decision/PostVi
 import Text from '../../../../atoms/Text';
 import Button from '../../../../atoms/Button';
 import InlineSvg from '../../../../atoms/InlineSVG';
-import AcConfirmDeleteOption from './AcConfirmDeleteOption';
+import AcConfirmDeleteOptionModal from './AcConfirmDeleteOptionModal';
 import AcPickWinningOptionModal from './AcPickWinningOptionModal';
 import AcOptionCardModerationEllipseMenu from './AcOptionCardModerationEllipseMenu';
 
@@ -27,8 +27,12 @@ import { deleteAcOption } from '../../../../../api/endpoints/auction';
 import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
+
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 import BlockUserModalPost from '../../BlockUserModalPost';
+import { reportEventOption } from '../../../../../api/endpoints/report';
+import ReportModal from '../../../chat/ReportModal';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcOptionCardModeration {
   index: number;
@@ -38,290 +42,282 @@ interface IAcOptionCardModeration {
   handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
 }
 
-const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> = ({
-  index,
-  option,
-  postStatus,
-  handleConfirmWinningOption,
-  handleRemoveOption,
-}) => {
-  const theme = useTheme();
-  const router = useRouter();
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
+  ({
+    index,
+    option,
+    postStatus,
+    handleConfirmWinningOption,
+    handleRemoveOption,
+  }) => {
+    const theme = useTheme();
+    const router = useRouter();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+    const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isPickOptionModalOpen, setIsPickOptionModalOpen] = useState(false);
 
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isPickOptionModalOpen, setIsPickOptionModalOpen] = useState(false);
+    // Redirect to user's page
+    const handleRedirectToOptionCreator = () => {
+      window?.history.replaceState(
+        {
+          fromPost: true,
+        },
+        '',
+        ''
+      );
+      router.push(`/${option.creator?.username}`);
+    };
 
-  // Redirect to user's page
-  const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
-    router.push(`/${option.creator?.username}`);
-  }
+    const handleConfirmDelete = async () => {
+      try {
+        const payload = new newnewapi.DeleteAcOptionRequest({
+          optionId: option.id,
+        });
 
-  const handleConfirmDelete = async () => {
-    try {
-      const payload = new newnewapi.DeleteAcOptionRequest({
-        optionId: option.id,
-      });
+        const res = await deleteAcOption(payload);
 
-      const res = await deleteAcOption(payload);
-
-      if (!res.error) {
-        handleRemoveOption(option);
+        if (!res.error) {
+          handleRemoveOption(option);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    };
 
-  return (
-    <>
-      <motion.div
-        key={index}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          marginBottom: '16px',
-        }}
-      >
-        <SContainer>
-        <SBidDetails>
-            <SBidAmount>
-              <SCoinImg
-                src={CoinIcon.src}
+    return (
+      <>
+        <motion.div
+          key={index}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginBottom: '16px',
+          }}
+        >
+          <SContainer>
+            <SBidDetails>
+              <SBidAmount>
+                <SCoinImg src={CoinIcon.src} />
+                <div>
+                  {option.totalAmount?.usdCents
+                    ? `$${formatNumber(
+                        option?.totalAmount?.usdCents / 100 ?? 0,
+                        true
+                      )}`
+                    : '$0'}
+                </div>
+              </SBidAmount>
+              <SOptionInfo variant={3}>{option.title}</SOptionInfo>
+              <SBiddersInfo variant={3}>
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={() => handleRedirectToOptionCreator()}
+                  style={{
+                    ...(option.isCreatedBySubscriber
+                      ? {
+                          color:
+                            theme.name === 'dark'
+                              ? theme.colorsThemed.accent.yellow
+                              : theme.colors.dark,
+                          cursor: 'pointer',
+                        }
+                      : {}),
+                  }}
+                >
+                  {option.creator?.nickname ?? option.creator?.username}
+                </SSpanBiddersHighlighted>
+                {option.supporterCount > 1 ? (
+                  <>
+                    <SSpanBiddersRegular className='spanRegular'>
+                      {` & `}
+                    </SSpanBiddersRegular>
+                    <SSpanBiddersHighlighted className='spanHighlighted'>
+                      {formatNumber(option.supporterCount - 1, true)}{' '}
+                      {t('AcPost.OptionsTab.OptionCard.others')}
+                    </SSpanBiddersHighlighted>
+                  </>
+                ) : null}{' '}
+                <SSpanBiddersRegular className='spanRegular'>
+                  {t('AcPost.OptionsTab.OptionCard.bid')}
+                </SSpanBiddersRegular>
+              </SBiddersInfo>
+            </SBidDetails>
+            {postStatus === 'wating_for_decision' ? (
+              !isMobile ? (
+                <SSelectOptionWidget>
+                  <SPickOptionButton
+                    onClick={() => setIsPickOptionModalOpen(true)}
+                  >
+                    {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
+                  </SPickOptionButton>
+                  <SDropdownButton onClick={() => setIsEllipseMenuOpen(true)}>
+                    <InlineSvg
+                      svg={ChevronDown}
+                      fill={theme.colorsThemed.text.primary}
+                      width='20px'
+                      height='20px'
+                    />
+                  </SDropdownButton>
+                </SSelectOptionWidget>
+              ) : (
+                <>
+                  <SPickOptionButtonMobile
+                    onClick={() => setIsPickOptionModalOpen(true)}
+                  >
+                    {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
+                  </SPickOptionButtonMobile>
+                  <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
+                    <InlineSvg
+                      svg={MoreIconFilled}
+                      fill={theme.colorsThemed.text.secondary}
+                      width='20px'
+                      height='20px'
+                    />
+                  </SEllipseButton>
+                </>
+              )
+            ) : !isMobile ? (
+              <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width='20px'
+                  height='20px'
+                />
+              </SEllipseButton>
+            ) : (
+              <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+                {t('AcPost.OptionsTab.OptionCard.moreBtn')}
+              </SEllipseButtonMobile>
+            )}
+            {!isMobile && (
+              <AcOptionCardModerationEllipseMenu
+                isVisible={isEllipseMenuOpen}
+                canDeleteOption={
+                  postStatus === 'voting' ||
+                  postStatus === 'wating_for_decision'
+                }
+                handleClose={() => setIsEllipseMenuOpen(false)}
+                handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+                handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+                handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
               />
+            )}
+          </SContainer>
+        </motion.div>
+        {/* Modals */}
+        {/* Pick winning option */}
+        <AcPickWinningOptionModal
+          isVisible={isPickOptionModalOpen}
+          closeModal={() => setIsPickOptionModalOpen(false)}
+          handleConfirm={() => {
+            setIsPickOptionModalOpen(false);
+            handleConfirmWinningOption();
+          }}
+        >
+          <SBidDetailsModal>
+            <SBidAmount>
+              <SCoinImg src={CoinIcon.src} />
               <div>
-                {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
+                {option.totalAmount?.usdCents
+                  ? `$${formatNumber(
+                      option?.totalAmount?.usdCents / 100 ?? 0,
+                      true
+                    )}`
+                  : '$0'}
               </div>
             </SBidAmount>
-            <SOptionInfo
-              variant={3}
-            >
-              {option.title}
-            </SOptionInfo>
-            <SBiddersInfo
-              variant={3}
-            >
+            <SOptionInfo variant={3}>{option.title}</SOptionInfo>
+            <SBiddersInfo variant={3}>
               <SSpanBiddersHighlighted
-                className="spanHighlighted"
+                className='spanHighlighted'
                 onClick={() => handleRedirectToOptionCreator()}
                 style={{
-                  ...(option.isCreatedBySubscriber ? {
-                    color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
-                    cursor: 'pointer',
-                  } : {}),
+                  ...(option.isCreatedBySubscriber
+                    ? {
+                        color:
+                          theme.name === 'dark'
+                            ? theme.colorsThemed.accent.yellow
+                            : theme.colors.dark,
+                        cursor: 'pointer',
+                      }
+                    : {}),
                 }}
               >
                 {option.creator?.nickname ?? option.creator?.username}
               </SSpanBiddersHighlighted>
               {option.supporterCount > 1 ? (
                 <>
-                  <SSpanBiddersRegular
-                    className="spanRegular"
-                  >
+                  <SSpanBiddersRegular className='spanRegular'>
                     {` & `}
                   </SSpanBiddersRegular>
-                  <SSpanBiddersHighlighted
-                    className="spanHighlighted"
-                  >
-                    {formatNumber(
-                      option.supporterCount - 1,
-                      true,
-                    )}
-                    { ' ' }
+                  <SSpanBiddersHighlighted className='spanHighlighted'>
+                    {formatNumber(option.supporterCount - 1, true)}{' '}
                     {t('AcPost.OptionsTab.OptionCard.others')}
                   </SSpanBiddersHighlighted>
                 </>
-              ) : null}
-              {' '}
-              <SSpanBiddersRegular
-                className="spanRegular"
-              >
+              ) : null}{' '}
+              <SSpanBiddersRegular className='spanRegular'>
                 {t('AcPost.OptionsTab.OptionCard.bid')}
               </SSpanBiddersRegular>
             </SBiddersInfo>
-          </SBidDetails>
-          {postStatus === 'wating_for_decision' ? (
-            !isMobile ? (
-              <SSelectOptionWidget>
-                <SPickOptionButton
-                  onClick={() => setIsPickOptionModalOpen(true)}
-                >
-                  {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
-                </SPickOptionButton>
-                <SDropdownButton
-                  onClick={() => setIsEllipseMenuOpen(true)}
-                >
-                  <InlineSvg
-                    svg={ChevronDown}
-                    fill={theme.colorsThemed.text.primary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SDropdownButton>
-              </SSelectOptionWidget>
-            ) : (
-              <>
-                <SPickOptionButtonMobile
-                  onClick={() => setIsPickOptionModalOpen(true)}
-                >
-                  {t('AcPostModeration.OptionsTab.OptionCard.pickBtn')}
-                </SPickOptionButtonMobile>
-                <SEllipseButton
-                  onClick={() => setIsEllipseMenuOpen(true)}
-                >
-                  <InlineSvg
-                    svg={MoreIconFilled}
-                    fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
-                  />
-                </SEllipseButton>
-              </>
-            )
-          ) : (
-            !isMobile ? (
-              <SEllipseButton
-                onClick={() => setIsEllipseMenuOpen(true)}
-              >
-                <InlineSvg
-                  svg={MoreIconFilled}
-                  fill={theme.colorsThemed.text.secondary}
-                  width="20px"
-                  height="20px"
-                />
-              </SEllipseButton>
-            ) : (
-              <SEllipseButtonMobile
-                onClick={() => setIsEllipseMenuOpen(true)}
-              >
-                { t('AcPost.OptionsTab.OptionCard.moreBtn') }
-              </SEllipseButtonMobile>
-            )
-          )}
-          {!isMobile && (
-            <AcOptionCardModerationEllipseMenu
-              isVisible={isEllipseMenuOpen}
-              canDeleteOption={postStatus === 'voting' || postStatus === 'wating_for_decision'}
-              handleClose={() => setIsEllipseMenuOpen(false)}
-              handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-              handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-              handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-            />
-          )}
-        </SContainer>
-      </motion.div>
-      {/* Modals */}
-      {/* Pick winning option */}
-      <AcPickWinningOptionModal
-        isVisible={isPickOptionModalOpen}
-        closeModal={() => setIsPickOptionModalOpen(false)}
-        handleConfirm={() => {
-          setIsPickOptionModalOpen(false);
-          handleConfirmWinningOption();
-        }}
-      >
-        <SBidDetailsModal>
-          <SBidAmount>
-            <SCoinImg
-              src={CoinIcon.src}
-            />
-            <div>
-              {option.totalAmount?.usdCents ? `$${formatNumber(option?.totalAmount?.usdCents / 100 ?? 0, true)}` : '$0'}
-            </div>
-          </SBidAmount>
-          <SOptionInfo
-            variant={3}
-          >
-            {option.title}
-          </SOptionInfo>
-          <SBiddersInfo
-            variant={3}
-          >
-            <SSpanBiddersHighlighted
-              className="spanHighlighted"
-              onClick={() => handleRedirectToOptionCreator()}
-              style={{
-                ...(option.isCreatedBySubscriber ? {
-                  color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
-                  cursor: 'pointer',
-                } : {}),
-              }}
-            >
-              {option.creator?.nickname ?? option.creator?.username}
-            </SSpanBiddersHighlighted>
-            {option.supporterCount > 1 ? (
-              <>
-                <SSpanBiddersRegular
-                  className="spanRegular"
-                >
-                  {` & `}
-                </SSpanBiddersRegular>
-                <SSpanBiddersHighlighted
-                  className="spanHighlighted"
-                >
-                  {formatNumber(
-                    option.supporterCount - 1,
-                    true,
-                  )}
-                  { ' ' }
-                  {t('AcPost.OptionsTab.OptionCard.others')}
-                </SSpanBiddersHighlighted>
-              </>
-            ) : null}
-            {' '}
-            <SSpanBiddersRegular
-              className="spanRegular"
-            >
-              {t('AcPost.OptionsTab.OptionCard.bid')}
-            </SSpanBiddersRegular>
-          </SBiddersInfo>
-        </SBidDetailsModal>
-      </AcPickWinningOptionModal>
-      {/* Delete option */}
-      <AcConfirmDeleteOption
-        isVisible={isDeleteModalOpen}
-        closeModal={() => setIsDeleteModalOpen(false)}
-        handleConfirmDelete={handleConfirmDelete}
-      />
-      {/* Ellipse modal */}
-      {isMobile && (
-        <AcOptionCardModerationEllipseModal
-          isOpen={isEllipseMenuOpen}
-          zIndex={16}
-          canDeleteOption={postStatus === 'voting'}
-          onClose={() => setIsEllipseMenuOpen(false)}
-          handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-          handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-          handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          </SBidDetailsModal>
+        </AcPickWinningOptionModal>
+        {/* Delete option */}
+        <AcConfirmDeleteOptionModal
+          isVisible={isDeleteModalOpen}
+          closeModal={() => setIsDeleteModalOpen(false)}
+          handleConfirmDelete={handleConfirmDelete}
         />
-      )}
-      {/* Confirm block user modal */}
-      <BlockUserModalPost
-        confirmBlockUser={isBlockModalOpen}
-        onUserBlock={() => {}}
-        user={option.creator!!}
-        closeModal={() => setIsBlockModalOpen(false)}
-      />
-      {/* Report modal */}
-    </>
-  );
-};
+        {/* Ellipse modal */}
+        {isMobile && (
+          <AcOptionCardModerationEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={16}
+            canDeleteOption={postStatus === 'voting'}
+            onClose={() => setIsEllipseMenuOpen(false)}
+            handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+            handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+            handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          />
+        )}
+        {/* Confirm block user modal */}
+        <BlockUserModalPost
+          confirmBlockUser={isBlockModalOpen}
+          onUserBlock={() => {}}
+          user={option.creator!!}
+          closeModal={() => setIsBlockModalOpen(false)}
+        />
+        {/* Report modal */}
+        {option.creator && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedDisplayname={getDisplayname(option.creator)}
+            onSubmit={async ({ reason, message }) => {
+              await reportEventOption(option.id, reason, message);
+              setIsReportModalOpen(false);
+            }}
+            onClose={() => {
+              setIsReportModalOpen(false);
+            }}
+          />
+        )}
+      </>
+    );
+  };
 
-AcOptionCardModeration.defaultProps = {
-};
+AcOptionCardModeration.defaultProps = {};
 
 export default AcOptionCardModeration;
-
 
 const SContainer = styled(motion.div)`
   position: relative;
@@ -363,8 +359,8 @@ const SBidDetails = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'amount bidders'
-    'optionInfo optionInfo';
+      'amount bidders'
+      'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
 
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
@@ -474,7 +470,8 @@ const SPickOptionButton = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
@@ -494,7 +491,8 @@ const SDropdownButton = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
@@ -517,7 +515,8 @@ const SPickOptionButtonMobile = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
@@ -540,7 +539,8 @@ const SEllipseButtonMobile = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }
@@ -567,8 +567,8 @@ const SBidDetailsModal = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'amount bidders'
-    'optionInfo optionInfo';
+      'amount bidders'
+      'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
   }
 `;

@@ -24,15 +24,22 @@ import { getMyUrgentPosts } from '../../../api/endpoints/post';
 export const Dashboard = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const { mySubscribers } = useGetSubscriptions();
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const [mySubscriptionProduct, setMySubscriptionProduct] =
+    useState<newnewapi.ISubscriptionProduct | null>(null);
   const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
-  const [isTodosCompletedLoading, setIsTodosCompletedLoading] = useState<boolean>(true);
+  const [isTodosCompletedLoading, setIsTodosCompletedLoading] =
+    useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>([]);
-  const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] = useState(true);
+  const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>(
+    []
+  );
+  const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
+    useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
 
   const fetchMySubscriptionProduct = async () => {
@@ -113,8 +120,11 @@ export const Dashboard = () => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        <SBlock name="your-todos">
-          <YourTodos todosCompleted={todosCompleted} todosCompletedLoading={todosCompletedLoading} />
+        <SBlock name='your-todos'>
+          <YourTodos
+            todosCompleted={todosCompleted}
+            todosCompletedLoading={todosCompletedLoading}
+          />
         </SBlock>
         {isLoadingExpirationPosts ? (
           <SBlock>
@@ -145,7 +155,13 @@ export const Dashboard = () => {
             <EnableSubscription />
           </SBlock>
         ) : (
-          <SBlock noMargin>{mySubscribers.length > 0 ? <SubscriptionStats /> : <EmptySubscriptionStats />}</SBlock>
+          <SBlock noMargin>
+            {mySubscribers.length > 0 ? (
+              <SubscriptionStats />
+            ) : (
+              <EmptySubscriptionStats />
+            )}
+          </SBlock>
         )}
       </SContent>
     </SContainer>

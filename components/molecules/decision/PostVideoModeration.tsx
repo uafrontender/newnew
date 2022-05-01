@@ -18,7 +18,12 @@ import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
 
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
-import { getVideoUploadUrl, removeUploadedFile, startVideoProcessing, stopVideoProcessing } from '../../../api/endpoints/upload';
+import {
+  getVideoUploadUrl,
+  removeUploadedFile,
+  startVideoProcessing,
+  stopVideoProcessing,
+} from '../../../api/endpoints/upload';
 import { SocketContext } from '../../../contexts/socketContext';
 import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
 import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
@@ -50,14 +55,24 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 }) => {
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   const socketConnection = useContext(SocketContext);
 
   // Tabs
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
-    response || postStatus === 'waiting_for_response' ? 'response' : 'announcement'
+    response || postStatus === 'waiting_for_response'
+      ? 'response'
+      : 'announcement'
   );
 
   // File upload
@@ -68,8 +83,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     targetUrls: {},
   });
   const [responseFileUploadETA, setResponseFileUploadETA] = useState(0);
-  const [responseFileUploadProgress, setResponseFileUploadProgress] = useState(0);
-  const [responseFileUploadLoading, setResponseFileUploadLoading] = useState(false);
+  const [responseFileUploadProgress, setResponseFileUploadProgress] =
+    useState(0);
+  const [responseFileUploadLoading, setResponseFileUploadLoading] =
+    useState(false);
   const [responseFileUploadError, setResponseFileUploadError] = useState(false);
 
   const handleVideoUpload = useCallback(async (value: File) => {
@@ -89,16 +106,13 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         throw new Error(res.error?.message ?? 'An error occurred');
       }
 
-      const uploadResponse = await fetch(
-        res.data.uploadUrl,
-        {
-          method: 'PUT',
-          body: value,
-          headers: {
-            'Content-Type': value.type,
-          },
+      const uploadResponse = await fetch(res.data.uploadUrl, {
+        method: 'PUT',
+        body: value,
+        headers: {
+          'Content-Type': value.type,
         },
-      );
+      });
 
       if (!uploadResponse.ok) {
         throw new Error('Upload failed');
@@ -132,7 +146,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
     } catch (error: any) {
       setResponseFileUploadError(true);
-      setResponseFileUploadLoading(false)
+      setResponseFileUploadLoading(false);
       toast.error(error?.message);
     }
   }, []);
@@ -193,7 +207,8 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         // @ts-ignore
         let responseObj;
         if (res.data.auction) responseObj = res.data.auction.response;
-        if (res.data.multipleChoice) responseObj = res.data.multipleChoice.response;
+        if (res.data.multipleChoice)
+          responseObj = res.data.multipleChoice.response;
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         handleUpdateResponseVideo(responseObj!!);
@@ -202,30 +217,29 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [
-    postId,
-    uploadedResponseVideoUrl,
-    handleUpdateResponseVideo,
-  ]);
+  }, [postId, uploadedResponseVideoUrl, handleUpdateResponseVideo]);
 
-  const handlerSocketUpdated = useCallback((data: any) => {
-    const arr = new Uint8Array(data);
-    const decoded = newnewapi.VideoProcessingProgress.decode(arr);
+  const handlerSocketUpdated = useCallback(
+    (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.VideoProcessingProgress.decode(arr);
 
-    if (!decoded) return;
+      if (!decoded) return;
 
-    if (decoded.taskUuid === videoProcessing?.taskUuid) {
-      setResponseFileUploadETA(decoded.estimatedTimeLeft?.seconds as number);
+      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+        setResponseFileUploadETA(decoded.estimatedTimeLeft?.seconds as number);
 
-      if (decoded.fractionCompleted > responseFileUploadProgress) {
-        setResponseFileUploadProgress(decoded.fractionCompleted);
+        if (decoded.fractionCompleted > responseFileUploadProgress) {
+          setResponseFileUploadProgress(decoded.fractionCompleted);
+        }
+
+        if (decoded.fractionCompleted === 100) {
+          setResponseFileUploadLoading(false);
+        }
       }
-
-      if (decoded.fractionCompleted === 100) {
-        setResponseFileUploadLoading(false);
-      }
-    }
-  }, [videoProcessing, responseFileUploadProgress]);
+    },
+    [videoProcessing, responseFileUploadProgress]
+  );
 
   useEffect(() => {
     if (socketConnection) {
@@ -252,12 +266,16 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             />
             <SSoundButton
               iconOnly
-              view="transparent"
+              view='transparent'
               onClick={(e) => {
                 e.stopPropagation();
                 handleToggleMuted();
                 if (isSafari()) {
-                  (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                  (
+                    document?.getElementById(
+                      `bitmovinplayer-video-${postId}`
+                    ) as HTMLVideoElement
+                  )?.play();
                 }
               }}
             >
@@ -265,49 +283,51 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
                 svg={isMuted ? VolumeOff : VolumeOn}
                 width={isMobileOrTablet ? '20px' : '24px'}
                 height={isMobileOrTablet ? '20px' : '24px'}
-                fill="#FFFFFF"
+                fill='#FFFFFF'
+              />
+            </SSoundButton>
+          </>
+        ) : response ? (
+          <>
+            <PostBitmovinPlayer
+              id={postId}
+              resources={response}
+              muted={isMuted}
+            />
+            <SSoundButton
+              iconOnly
+              view='transparent'
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleMuted();
+                if (isSafari()) {
+                  (
+                    document?.getElementById(
+                      `bitmovinplayer-video-${postId}`
+                    ) as HTMLVideoElement
+                  )?.play();
+                }
+              }}
+            >
+              <InlineSvg
+                svg={isMuted ? VolumeOff : VolumeOn}
+                width={isMobileOrTablet ? '20px' : '24px'}
+                height={isMobileOrTablet ? '20px' : '24px'}
+                fill='#FFFFFF'
               />
             </SSoundButton>
           </>
         ) : (
-          response ? (
-            <>
-              <PostBitmovinPlayer
-                id={postId}
-                resources={response}
-                muted={isMuted}
-              />
-              <SSoundButton
-                iconOnly
-                view="transparent"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleMuted();
-                  if (isSafari()) {
-                    (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
-                  }
-                }}
-              >
-                <InlineSvg
-                  svg={isMuted ? VolumeOff : VolumeOn}
-                  width={isMobileOrTablet ? '20px' : '24px'}
-                  height={isMobileOrTablet ? '20px' : '24px'}
-                  fill="#FFFFFF"
-                />
-              </SSoundButton>
-            </>
-          ) : (
-            <PostVideoResponseUpload
-              id="video"
-              eta={responseFileUploadETA}
-              error={responseFileUploadError}
-              loading={responseFileUploadLoading}
-              progress={responseFileUploadProgress}
-              value={videoProcessing?.targetUrls!!}
-              onChange={handleItemChange}
-              thumbnails={{}}
-            />
-          )
+          <PostVideoResponseUpload
+            id='video'
+            eta={responseFileUploadETA}
+            error={responseFileUploadError}
+            loading={responseFileUploadLoading}
+            progress={responseFileUploadProgress}
+            value={videoProcessing?.targetUrls!!}
+            onChange={handleItemChange}
+            thumbnails={{}}
+          />
         )}
         {response || postStatus === 'waiting_for_response' ? (
           <ToggleVideoWidget
@@ -325,14 +345,16 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           />
         )}
       </SVideoWrapper>
-      {isMobile && postStatus === 'waiting_for_response' && !responseFileUploadLoading ? (
+      {isMobile &&
+      postStatus === 'waiting_for_response' &&
+      !responseFileUploadLoading ? (
         <SUploadResponseButton
-          view="primaryGrad"
+          view='primaryGrad'
           onClick={() => {
             document.getElementById('upload-response-btn')?.click();
           }}
         >
-          { t('AcPostModeration.floatingUploadResponseBtn') }
+          {t('AcPostModeration.floatingUploadResponseBtn')}
         </SUploadResponseButton>
       ) : null}
     </>

@@ -9,7 +9,7 @@ import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../Text';
 
-interface IChatEllipseMenu {
+interface ISubscriberEllipseMenu {
   user: newnewapi.IUser;
   isVisible: boolean;
   handleClose: () => void;
@@ -18,7 +18,7 @@ interface IChatEllipseMenu {
   userBlocked?: boolean;
 }
 
-const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
+const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
   isVisible,
   handleClose,
   userBlocked,
@@ -62,11 +62,15 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
             <Text variant={2}>{t('subscriptions.table.menu.view')}</Text>
           </SButton>
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{t('subscriptions.table.menu.report')}</Text>
+            <Text variant={2} tone='error'>
+              {t('subscriptions.table.menu.report')}
+            </Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
             <Text variant={2}>
-              {userBlocked ? t('subscriptions.table.menu.unblock') : t('subscriptions.table.menu.block')}
+              {userBlocked
+                ? t('subscriptions.table.menu.unblock')
+                : t('subscriptions.table.menu.block')}
             </Text>
           </SButton>
         </SContainer>
@@ -75,11 +79,11 @@ const ChatEllipseMenu: React.FC<IChatEllipseMenu> = ({
   );
 };
 
-ChatEllipseMenu.defaultProps = {
+SubscriberEllipseMenu.defaultProps = {
   userBlocked: false,
 };
 
-export default ChatEllipseMenu;
+export default SubscriberEllipseMenu;
 
 const SContainer = styled(motion.div)`
   position: absolute;
@@ -96,7 +100,9 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;

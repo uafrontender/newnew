@@ -466,7 +466,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   return (
     <>
       <STabContainer
-        key="options"
+        key='options'
         ref={(el) => {
           mainContainer.current = el!!;
         }}
@@ -483,12 +483,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask
-                gradientType="secondary"
+                gradientType='secondary'
                 positionTop
                 active={showTopGradient}
               />
               <GradientMask
-                gradientType="secondary"
+                gradientType='secondary'
                 positionBottom={heightDelta}
                 active={showBottomGradient}
               />
@@ -549,7 +549,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               onChange={handleUpdateNewOptionText}
             />
             <SAddFreeVoteButton
-              size="sm"
+              size='sm'
               disabled={
                 !newOptionText ||
                 optionBeingSupported !== '' ||
@@ -634,11 +634,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               value={newOptionText}
               disabled={optionBeingSupported !== ''}
               autofocus={suggestNewMobileOpen}
-              placeholder="Add a option ..."
+              placeholder='Add a option ...'
               onChange={handleUpdateNewOptionText}
             />
             <SAddFreeVoteButton
-              size="sm"
+              size='sm'
               disabled={
                 !newOptionText ||
                 optionBeingSupported !== '' ||
@@ -712,7 +712,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       postStatus === 'voting' ? (
         <>
           <SActionButton
-            view="primaryGrad"
+            view='primaryGrad'
             onClick={() => setSuggestNewMobileOpen(true)}
           >
             {t('McPost.FloatingActionButton.suggestNewBtn')}
@@ -770,6 +770,10 @@ const SBidsContainer = styled.div<{
   ${({ theme }) => theme.media.tablet} {
     height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px)`};
     padding-top: 0px;
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
+
     // Scrollbar
     &::-webkit-scrollbar {
       width: 4px;

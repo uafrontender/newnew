@@ -1,12 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -23,170 +18,164 @@ import WaitingForResponseBox from '../../molecules/decision/waiting/WaitingForRe
 import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import AcWaitingOptionsSection from '../../molecules/decision/auction/waiting/AcWaitingOptionsSection';
 
-
 interface IPostAwaitingResponseAC {
   post: newnewapi.Auction;
 }
 
-const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> = ({
-  post,
-}) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isTablet = ['tablet'].includes(resizeMode);
+const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isTablet = ['tablet'].includes(resizeMode);
 
-  const waitingTime = useMemo(() => {
-    const end = (post.responseUploadDeadline?.seconds as number) * 1000;
-    const parsed = (end - Date.now()) / 1000;
-    const dhms = secondsToDHMS(parsed, 'noTrim');
+    const waitingTime = useMemo(() => {
+      const end = (post.responseUploadDeadline?.seconds as number) * 1000;
+      const parsed = (end - Date.now()) / 1000;
+      const dhms = secondsToDHMS(parsed, 'noTrim');
 
-    let countdownsrt = `${dhms.days} ${t('AcPostAwaiting.hero.expires.days')} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
+      let countdownsrt = `${dhms.days} ${t(
+        'AcPostAwaiting.hero.expires.days'
+      )} ${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')}`;
 
-    if (dhms.days === '0') {
-      countdownsrt = `${dhms.hours} ${t('AcPostAwaiting.hero.expires.hours')} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
-      if (dhms.hours === '0') {
-        countdownsrt = `${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
-        if (dhms.minutes === '0') {
-          countdownsrt = `${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+      if (dhms.days === '0') {
+        countdownsrt = `${dhms.hours} ${t(
+          'AcPostAwaiting.hero.expires.hours'
+        )} ${dhms.minutes} ${t('AcPostAwaiting.hero.expires.minutes')}`;
+        if (dhms.hours === '0') {
+          countdownsrt = `${dhms.minutes} ${t(
+            'AcPostAwaiting.hero.expires.minutes'
+          )} ${dhms.seconds} ${t('AcPostAwaiting.hero.expires.seconds')}`;
+          if (dhms.minutes === '0') {
+            countdownsrt = `${dhms.seconds} ${t(
+              'AcPostAwaiting.hero.expires.seconds'
+            )}`;
+          }
         }
       }
-    }
-    countdownsrt = `${countdownsrt} `;
-    return countdownsrt;
-  }, [post.responseUploadDeadline?.seconds, t]);
+      countdownsrt = `${countdownsrt} `;
+      return countdownsrt;
+    }, [post.responseUploadDeadline?.seconds, t]);
 
     // Video
-  // Open video tab
-  const [videoTab, setVideoTab] = useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
     // Comments
-  const {
-    ref: commentsSectionRef,
-    inView
-  } = useInView({
-    threshold: 0.8
-  });
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
 
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
       }
-      const parsedHash = hash.substring(1);
+    }, [inView, post.postUuid]);
 
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
-
-    handleCommentsInitialHash();
-  }, []);
-
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          <WaitingForResponseBox
-            title={t('AcPostAwaiting.hero.title')}
-            body={t(
-              'AcPostAwaiting.hero.body',
-              {
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
+          />
+          <SActivitesContainer>
+            <WaitingForResponseBox
+              title={t('AcPostAwaiting.hero.title')}
+              body={t('AcPostAwaiting.hero.body', {
                 creator: post.creator?.nickname,
-                time: waitingTime
-              })
-            }
-          />
-          <SMainSectionWrapper>
-            <SCreatorInfoDiv>
-              <SCreator>
-                <SCreatorImage
-                  src={post.creator?.avatarUrl!!}
-                />
-                <SWantsToKnow>
-                  {t('AcPostAwaiting.wants_to_know', { creator: post.creator?.nickname })}
-                </SWantsToKnow>
-              </SCreator>
-              <STotal>
-                {`$${formatNumber(post.totalAmount?.usdCents!! / 100 ?? 0, true)}`}
-                {' '}
-                <span>
-                  {t('AcPostAwaiting.in_total_bids')}
-                </span>
-              </STotal>
-            </SCreatorInfoDiv>
-            <SPostTitle
-              variant={4}
-            >
-              {post.title}
-            </SPostTitle>
-            <SSeparator />
-            <AcWaitingOptionsSection
-              post={post}
-              heightDelta={isTablet ? 142 : 182}
+                time: waitingTime,
+              })}
             />
-          </SMainSectionWrapper>
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection
-          id="comments"
-          ref={commentsSectionRef}
-        >
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
-          />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+            <SMainSectionWrapper>
+              <SCreatorInfoDiv>
+                <SCreator>
+                  <SCreatorImage src={post.creator?.avatarUrl!!} />
+                  <SWantsToKnow>
+                    {t('AcPostAwaiting.wants_to_know', {
+                      creator: post.creator?.nickname,
+                    })}
+                  </SWantsToKnow>
+                </SCreator>
+                <STotal>
+                  {`$${formatNumber(
+                    post.totalAmount?.usdCents!! / 100 ?? 0,
+                    true
+                  )}`}{' '}
+                  <span>{t('AcPostAwaiting.in_total_bids')}</span>
+                </STotal>
+              </SCreatorInfoDiv>
+              <SPostTitle variant={4}>{post.title}</SPostTitle>
+              <SSeparator />
+              <AcWaitingOptionsSection
+                post={post}
+                heightDelta={isTablet ? 142 : 182}
+              />
+            </SMainSectionWrapper>
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  };
 
 export default PostAwaitingResponseAC;
 
@@ -199,8 +188,7 @@ const SWrapper = styled.div`
     min-height: 0;
 
     display: inline-grid;
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 284px 1fr;
     grid-template-rows: minmax(0, 1fr);
 
@@ -212,12 +200,10 @@ const SWrapper = styled.div`
   ${({ theme }) => theme.media.laptop} {
     height: 728px;
 
-    grid-template-areas:
-      'video activities';
+    grid-template-areas: 'video activities';
     grid-template-columns: 410px 1fr;
   }
 `;
-
 
 const SActivitesContainer = styled.div`
   grid-area: activities;
@@ -259,7 +245,8 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 100%;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
 
 // Creator info
@@ -328,7 +315,6 @@ const STotal = styled.div`
     font-weight: 700;
     font-size: 12px;
     line-height: 16px;
-
   }
   ${({ theme }) => theme.media.laptop} {
     position: relative;
@@ -370,6 +356,4 @@ const SCommentsHeadline = styled(Headline)`
   }
 `;
 
-const SCommentsSection = styled.div`
-
-`;
+const SCommentsSection = styled.div``;

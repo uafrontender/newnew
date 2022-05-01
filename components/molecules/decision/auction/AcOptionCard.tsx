@@ -7,7 +7,13 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
@@ -382,7 +388,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           </SOptionInfo>
           <SBiddersInfo variant={3}>
             <SSpanBiddersHighlighted
-              className="spanHighlighted"
+              className='spanHighlighted'
               onClick={(e) => {
                 e.stopPropagation();
                 if (!isMyBid) {
@@ -410,14 +416,14 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 : option.creator?.nickname ?? option.creator?.username}
             </SSpanBiddersHighlighted>
             {isSupportedByMe && !isMyBid ? (
-              <SSpanBiddersHighlighted className="spanHighlighted">{`, ${t(
+              <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
                 'me'
               )}`}</SSpanBiddersHighlighted>
             ) : null}
             {option.supporterCount > (isSupportedByMe && !isMyBid ? 2 : 1) ? (
               <>
-                <SSpanBiddersRegular className="spanRegular">{` & `}</SSpanBiddersRegular>
-                <SSpanBiddersHighlighted className="spanHighlighted">
+                <SSpanBiddersRegular className='spanRegular'>{` & `}</SSpanBiddersRegular>
+                <SSpanBiddersHighlighted className='spanHighlighted'>
                   {formatNumber(
                     option.supporterCount -
                       (isSupportedByMe && !isMyBid ? 2 : 1),
@@ -427,7 +433,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 </SSpanBiddersHighlighted>
               </>
             ) : null}{' '}
-            <SSpanBiddersRegular className="spanRegular">
+            <SSpanBiddersRegular className='spanRegular'>
               {t('AcPost.OptionsTab.OptionCard.bid')}
             </SSpanBiddersRegular>
           </SBiddersInfo>
@@ -435,7 +441,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
         {(optionBeingSupported && !disabled) ||
         !votingAllowed ? null : isMobile ? (
           <SSupportButton
-            view="quaternary"
+            view='quaternary'
             disabled={disabled}
             isBlue={isBlue}
             onClick={() => handleOpenSupportForm()}
@@ -448,7 +454,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           </SSupportButton>
         ) : (
           <SSupportButtonDesktop
-            view="secondary"
+            view='secondary'
             disabled={disabled}
             isBlue={isBlue}
             onClick={() => handleOpenSupportForm()}
@@ -475,7 +481,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       </SContainer>
       <SSupportBidForm
         // layout
-        layout="size"
+        layout='size'
         transition={{
           type: 'spring',
           damping: 20,
@@ -486,7 +492,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <>
             <BidAmountTextInput
               value={supportBidAmount}
-              inputAlign="left"
+              inputAlign='left'
               onChange={(newValue: string) => setSupportBidAmount(newValue)}
               minAmount={minAmount}
               placeholder={t(
@@ -498,7 +504,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               }}
             />
             <Button
-              view="primaryGrad"
+              view='primaryGrad'
               disabled={
                 !supportBidAmount
                   ? true
@@ -509,15 +515,15 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               {t('AcPost.OptionsTab.OptionCard.raiseBidBtn')}
             </Button>
             <SCancelButton
-              view="transparent"
+              view='transparent'
               iconOnly
               onClick={() => handleCloseSupportForm()}
             >
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
             </SCancelButton>
           </>
@@ -532,7 +538,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
               <div>{option.title}</div>
               <BidAmountTextInput
                 value={supportBidAmount}
-                inputAlign="left"
+                inputAlign='left'
                 autofocus={isSupportFormOpen}
                 minAmount={minAmount}
                 style={{
@@ -542,8 +548,8 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
                 onChange={(newValue: string) => setSupportBidAmount(newValue)}
               />
               <Button
-                view="primaryGrad"
-                size="sm"
+                view='primaryGrad'
+                size='sm'
                 disabled={!supportBidAmount}
                 onClick={() => handleTogglePaymentModalOpen()}
               >

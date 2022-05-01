@@ -1,8 +1,5 @@
 /* eslint-disable no-plusplus */
-const imgExtenstions = [
-  '.webp',
-  '.WEBP',
-];
+const imgExtenstions = ['.webp', '.WEBP'];
 
 const isAnimatedImage = (name: string) => {
   let result = false;

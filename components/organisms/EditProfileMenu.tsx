@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -14,7 +12,10 @@ import { Area, Point } from 'react-easy-crop/types';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
-import { logoutUserClearCookiesAndRedirect, setUserData } from '../../redux-store/slices/userStateSlice';
+import {
+  logoutUserClearCookiesAndRedirect,
+  setUserData,
+} from '../../redux-store/slices/userStateSlice';
 
 // Components
 import Button from '../atoms/Button';
@@ -44,10 +45,10 @@ import { CropperObjectFit } from '../molecules/profile/ProfileBackgroundCropper'
 import isBrowser from '../../utils/isBrowser';
 import isAnimatedImage from '../../utils/isAnimatedImage';
 
-export type TEditingStage = 'edit-general' | 'edit-profile-picture'
+export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 
 interface IEditProfileMenu {
-  stage: TEditingStage,
+  stage: TEditingStage;
   wasModified: boolean;
   handleClose: () => void;
   handleSetWasModified: (newState: boolean) => void;
@@ -60,7 +61,7 @@ type ModalMenuUserData = {
   username: string;
   nickname: string;
   bio: string;
-}
+};
 
 type TFormErrors = {
   nicknameError?: string;
@@ -68,8 +69,7 @@ type TFormErrors = {
   bioError?: string;
 };
 
-const errorSwitch = (
-  status: newnewapi.ValidateTextResponse.Status) => {
+const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
 
   switch (status) {
@@ -98,7 +98,8 @@ const errorSwitch = (
 };
 
 const errorSwitchUsername = (
-  status: newnewapi.ValidateUsernameResponse.Status) => {
+  status: newnewapi.ValidateUsernameResponse.Status
+) => {
   let errorMsg = 'generic';
 
   switch (status) {
@@ -145,7 +146,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   const dispatch = useAppDispatch();
   const { user, ui } = useAppSelector((state) => state);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(ui.resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    ui.resizeMode
+  );
 
   // Common
   const [isLoading, setIsLoading] = useState(false);
@@ -164,165 +167,167 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     bioError: '',
   });
 
-  const validateUsernameViaAPI = useCallback(async (
-    text: string,
-  ) => {
-    setIsAPIValidateLoading(true);
-    try {
-      const payload = new newnewapi.ValidateUsernameRequest({
-        username: text,
-      });
-
-      const res = await validateUsernameTextField(
-        payload,
-      );
-
-      if (!res.data?.status) throw new Error('An error occured');
-      if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
-        setFormErrors((errors) => {
-          const errorsWorking = { ...errors };
-          errorsWorking.usernameError = errorSwitchUsername(res.data?.status!!);
-          return errorsWorking;
+  const validateUsernameViaAPI = useCallback(
+    async (text: string) => {
+      setIsAPIValidateLoading(true);
+      try {
+        const payload = new newnewapi.ValidateUsernameRequest({
+          username: text,
         });
-      } else {
-        setFormErrors((errors) => {
-          const errorsWorking = { ...errors };
-          errorsWorking.usernameError = '';
-          return errorsWorking;
-        });
-      }
 
-      setIsAPIValidateLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsAPIValidateLoading(false);
-      if ((err as Error).message === 'No token') {
-        dispatch(logoutUserClearCookiesAndRedirect());
-      }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
-        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
-      }
-    }
-  }, [setFormErrors, dispatch]);
+        const res = await validateUsernameTextField(payload);
 
-  const validateUsernameViaAPIDebounced = useMemo(() => debounce((
-    text: string,
-  ) => {
-    validateUsernameViaAPI(text);
-  }, 250),
-  [validateUsernameViaAPI]);
-
-  const validateTextViaAPI = useCallback(async (
-    kind: newnewapi.ValidateTextRequest.Kind,
-    text: string,
-  ) => {
-    setIsAPIValidateLoading(true);
-    try {
-      const payload = new newnewapi.ValidateTextRequest({
-        kind,
-        text,
-      });
-
-      const res = await validateText(
-        payload,
-      );
-
-      if (!res.data?.status) throw new Error('An error occured');
-
-      if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
-        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+        if (!res.data?.status) throw new Error('An error occured');
+        if (res.data?.status !== newnewapi.ValidateUsernameResponse.Status.OK) {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
-            errorsWorking.nicknameError = errorSwitch(res.data?.status!!);
+            errorsWorking.usernameError = errorSwitchUsername(
+              res.data?.status!!
+            );
             return errorsWorking;
           });
         } else {
           setFormErrors((errors) => {
             const errorsWorking = { ...errors };
-            errorsWorking.nicknameError = '';
+            errorsWorking.usernameError = '';
             return errorsWorking;
           });
         }
-      } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
-        if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.bioError = errorSwitch(res.data?.status!!);
-            return errorsWorking;
-          });
-        } else {
-          setFormErrors((errors) => {
-            const errorsWorking = { ...errors };
-            errorsWorking.bioError = '';
-            return errorsWorking;
-          });
+
+        setIsAPIValidateLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsAPIValidateLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(
+            logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+          );
         }
       }
+    },
+    [setFormErrors, dispatch]
+  );
 
-      setIsAPIValidateLoading(false);
-    } catch (err) {
-      console.error(err);
-      setIsAPIValidateLoading(false);
-      if ((err as Error).message === 'No token') {
-        dispatch(logoutUserClearCookiesAndRedirect());
+  const validateUsernameViaAPIDebounced = useMemo(
+    () =>
+      debounce((text: string) => {
+        validateUsernameViaAPI(text);
+      }, 250),
+    [validateUsernameViaAPI]
+  );
+
+  const validateTextViaAPI = useCallback(
+    async (kind: newnewapi.ValidateTextRequest.Kind, text: string) => {
+      setIsAPIValidateLoading(true);
+      try {
+        const payload = new newnewapi.ValidateTextRequest({
+          kind,
+          text,
+        });
+
+        const res = await validateText(payload);
+
+        if (!res.data?.status) throw new Error('An error occured');
+
+        if (kind === newnewapi.ValidateTextRequest.Kind.USER_NICKNAME) {
+          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.nicknameError = errorSwitch(res.data?.status!!);
+              return errorsWorking;
+            });
+          } else {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.nicknameError = '';
+              return errorsWorking;
+            });
+          }
+        } else if (kind === newnewapi.ValidateTextRequest.Kind.USER_BIO) {
+          if (res.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.bioError = errorSwitch(res.data?.status!!);
+              return errorsWorking;
+            });
+          } else {
+            setFormErrors((errors) => {
+              const errorsWorking = { ...errors };
+              errorsWorking.bioError = '';
+              return errorsWorking;
+            });
+          }
+        }
+
+        setIsAPIValidateLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsAPIValidateLoading(false);
+        if ((err as Error).message === 'No token') {
+          dispatch(logoutUserClearCookiesAndRedirect());
+        }
+        // Refresh token was present, session probably expired
+        // Redirect to sign up page
+        if ((err as Error).message === 'Refresh token invalid') {
+          dispatch(
+            logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+          );
+        }
       }
-      // Refresh token was present, session probably expired
-      // Redirect to sign up page
-      if ((err as Error).message === 'Refresh token invalid') {
-        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+    },
+    [setFormErrors, dispatch]
+  );
+
+  const validateTextViaAPIDebounced = useMemo(
+    () =>
+      debounce((kind: newnewapi.ValidateTextRequest.Kind, text: string) => {
+        validateTextViaAPI(kind, text);
+      }, 250),
+    [validateTextViaAPI]
+  );
+
+  const handleUpdateDataInEdit = useCallback(
+    (key: keyof ModalMenuUserData, value: any) => {
+      setIsDataValid(false);
+
+      const workingData = { ...dataInEdit };
+      workingData[key] = value;
+      setDataInEdit({ ...workingData });
+
+      if (key === 'nickname') {
+        validateTextViaAPIDebounced(
+          newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
+          value
+        );
+      } else if (key === 'username' && value !== user.userData?.username) {
+        validateUsernameViaAPIDebounced(value);
+      } else if (key === 'bio') {
+        validateTextViaAPIDebounced(
+          newnewapi.ValidateTextRequest.Kind.USER_BIO,
+          value
+        );
       }
-    }
-  }, [setFormErrors, dispatch]);
-
-  const validateTextViaAPIDebounced = useMemo(() => debounce((
-    kind: newnewapi.ValidateTextRequest.Kind,
-    text: string,
-  ) => {
-    validateTextViaAPI(kind, text);
-  }, 250),
-  [validateTextViaAPI]);
-
-  const handleUpdateDataInEdit = useCallback((
-    key: keyof ModalMenuUserData,
-    value: any,
-  ) => {
-    setIsDataValid(false);
-
-    const workingData = { ...dataInEdit };
-    workingData[key] = value;
-    setDataInEdit({ ...workingData });
-
-    if (key === 'nickname') {
-      validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.USER_NICKNAME,
-        value,
-      );
-    } else if (key === 'username' && value !== user.userData?.username) {
-      validateUsernameViaAPIDebounced(
-        value,
-      );
-    } else if (key === 'bio') {
-      validateTextViaAPIDebounced(
-        newnewapi.ValidateTextRequest.Kind.USER_BIO,
-        value,
-      );
-    }
-  },
-  [
-    dataInEdit, user.userData?.username,
-    setDataInEdit, validateTextViaAPIDebounced,
-    validateUsernameViaAPIDebounced,
-    setIsDataValid,
-  ]);
+    },
+    [
+      dataInEdit,
+      user.userData?.username,
+      setDataInEdit,
+      validateTextViaAPIDebounced,
+      validateUsernameViaAPIDebounced,
+      setIsDataValid,
+    ]
+  );
 
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
   const [coverUrlInEditAnimated, setCoverUrlInEditAinmated] = useState(false);
-  const [
-    coverImageInitialObjectFit, setCoverImageInitialObjectFit,
-  ] = useState<CropperObjectFit>('horizontal-cover');
+  const [coverImageInitialObjectFit, setCoverImageInitialObjectFit] =
+    useState<CropperObjectFit>('horizontal-cover');
   const [cropCoverImage, setCropCoverImage] = useState<Point>({ x: 0, y: 0 });
   const [croppedAreaCoverImage, setCroppedAreaCoverImage] = useState<Area>();
   const [zoomCoverImage, setZoomCoverImage] = useState(1);
@@ -368,11 +373,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setCropCoverImage(location);
   };
 
-  const onCropCompleteCoverImage = useCallback(
-    (_, croppedAreaPixels: Area) => {
-      setCroppedAreaCoverImage(croppedAreaPixels);
-    }, [],
-  );
+  const onCropCompleteCoverImage = useCallback((_, croppedAreaPixels: Area) => {
+    setCroppedAreaCoverImage(croppedAreaPixels);
+  }, []);
 
   // Update textual data and cover URL
   const handleUpdateTextualDataAndCover = useCallback(async () => {
@@ -384,41 +387,33 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       let croppedCoverImage: File;
       let newCoverImgURL;
 
-      if (coverUrlInEdit && (coverUrlInEdit !== user.userData?.coverUrl)) {
+      if (coverUrlInEdit && coverUrlInEdit !== user.userData?.coverUrl) {
         croppedCoverImage = !coverUrlInEditAnimated
           ? await getCroppedImg(
-            coverUrlInEdit,
-            croppedAreaCoverImage!!,
-            0,
-            'coverImage.jpeg',
-          )
-          : await urlToFile(
-            coverUrlInEdit,
-            'coverImage.webp',
-            'image/webp',
-          )
+              coverUrlInEdit,
+              croppedAreaCoverImage!!,
+              0,
+              'coverImage.jpeg'
+            )
+          : await urlToFile(coverUrlInEdit, 'coverImage.webp', 'image/webp');
 
         // API request would be here
         const imageUrlPayload = new newnewapi.GetImageUploadUrlRequest({
           filename: croppedCoverImage.name,
         });
 
-        const res = await getImageUploadUrl(
-          imageUrlPayload,
-        );
+        const res = await getImageUploadUrl(imageUrlPayload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'An error occured');
 
-        const uploadResponse = await fetch(
-          res.data.uploadUrl,
-          {
-            method: 'PUT',
-            body: croppedCoverImage,
-            headers: {
-              'Content-Type': 'image/png',
-            },
+        const uploadResponse = await fetch(res.data.uploadUrl, {
+          method: 'PUT',
+          body: croppedCoverImage,
+          headers: {
+            'Content-Type': 'image/png',
           },
-        );
+        });
 
         if (!uploadResponse.ok) throw new Error('Upload failed');
 
@@ -430,29 +425,30 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         bio: dataInEdit.bio,
         // Send username only if it was updated
         ...(dataInEdit.username !== user.userData?.username
-          ? { username: dataInEdit.username } : {}),
+          ? { username: dataInEdit.username }
+          : {}),
         // Update cover image, if it was updated
         ...(newCoverImgURL ? { coverUrl: newCoverImgURL } : {}),
         // Delete cover image, if it was deleted and no new image provided
         ...(!coverUrlInEdit ? { coverUrl: '' } : {}),
       });
 
-      const res = await updateMe(
-        payload,
-      );
+      const res = await updateMe(payload);
 
       if (!res.data || res.error) throw new Error('Request failed');
 
-      dispatch(setUserData({
-        username: res.data.me?.username,
-        nickname: res.data.me?.nickname,
-        bio: res.data.me?.bio,
-        coverUrl: res.data.me?.coverUrl,
-        options: {
-          ...user.userData?.options,
-          canChangeUsername: res.data.me?.options?.canChangeUsername
-        }
-      }));
+      dispatch(
+        setUserData({
+          username: res.data.me?.username,
+          nickname: res.data.me?.nickname,
+          bio: res.data.me?.bio,
+          coverUrl: res.data.me?.coverUrl,
+          options: {
+            ...user.userData?.options,
+            canChangeUsername: res.data.me?.options?.canChangeUsername,
+          },
+        })
+      );
 
       setIsLoading(false);
       handleClose();
@@ -465,13 +461,21 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+        dispatch(
+          logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+        );
       }
     }
   }, [
-    setIsLoading, handleClose, dispatch,
-    dataInEdit, coverUrlInEdit, coverUrlInEditAnimated, croppedAreaCoverImage,
-    user.userData?.username, user.userData?.coverUrl,
+    setIsLoading,
+    handleClose,
+    dispatch,
+    dataInEdit,
+    coverUrlInEdit,
+    coverUrlInEditAnimated,
+    croppedAreaCoverImage,
+    user.userData?.username,
+    user.userData?.coverUrl,
     user.userData?.options,
     isAPIValidateLoading,
   ]);
@@ -479,13 +483,20 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   // Profile image
   const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
   const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
-  const [cropProfileImage, setCropProfileImage] = useState<Point>({ x: 0, y: 0 });
-  const [croppedAreaProfileImage, setCroppedAreaProfileImage] = useState<Area>();
+  const [cropProfileImage, setCropProfileImage] = useState<Point>({
+    x: 0,
+    y: 0,
+  });
+  const [croppedAreaProfileImage, setCroppedAreaProfileImage] =
+    useState<Area>();
   const [zoomProfileImage, setZoomProfileImage] = useState(1);
-  const [updateProfileImageLoading, setUpdateProfileImageLoading] = useState(false);
+  const [updateProfileImageLoading, setUpdateProfileImageLoading] =
+    useState(false);
 
   // Profile picture
-  const handleSetProfilePictureInEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSetProfilePictureInEdit = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { files } = e.target;
 
     if (files?.length === 1) {
@@ -542,7 +553,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
   const onCropCompleteProfileImage = useCallback(
     (_, croppedAreaPixels: Area) => {
       setCroppedAreaProfileImage(croppedAreaPixels);
-    }, [],
+    },
+    []
   );
 
   const completeProfileImageCropAndSave = useCallback(async () => {
@@ -552,7 +564,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         avatarUrlInEdit,
         croppedAreaProfileImage!!,
         0,
-        'avatarImage.jpeg',
+        'avatarImage.jpeg'
       );
 
       // Get upload and public URLs
@@ -560,22 +572,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         filename: croppedImage.name,
       });
 
-      const res = await getImageUploadUrl(
-        imageUrlPayload,
-      );
+      const res = await getImageUploadUrl(imageUrlPayload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'An error occured');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'An error occured');
 
-      const uploadResponse = await fetch(
-        res.data.uploadUrl,
-        {
-          method: 'PUT',
-          body: croppedImage,
-          headers: {
-            'Content-Type': 'image/png',
-          },
+      const uploadResponse = await fetch(res.data.uploadUrl, {
+        method: 'PUT',
+        body: croppedImage,
+        headers: {
+          'Content-Type': 'image/png',
         },
-      );
+      });
 
       if (!uploadResponse.ok) throw new Error('Upload failed');
 
@@ -583,17 +591,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         avatarUrl: res.data.publicUrl,
       });
 
-      const updateMeRes = await updateMe(
-        updateMePayload,
-      );
+      const updateMeRes = await updateMe(updateMePayload);
 
-      if (!updateMeRes.data || updateMeRes.error) throw new Error('Request failed');
+      if (!updateMeRes.data || updateMeRes.error)
+        throw new Error('Request failed');
 
       // Update Redux state
-      dispatch(setUserData({
-        ...user.userData,
-        avatarUrl: updateMeRes.data.me?.avatarUrl,
-      }));
+      dispatch(
+        setUserData({
+          ...user.userData,
+          avatarUrl: updateMeRes.data.me?.avatarUrl,
+        })
+      );
 
       setUpdateProfileImageLoading(false);
       handleSetStageToEditingGeneral();
@@ -606,12 +615,16 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       // Refresh token was present, session probably expired
       // Redirect to sign up page
       if ((err as Error).message === 'Refresh token invalid') {
-        dispatch(logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired'));
+        dispatch(
+          logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+        );
       }
     }
   }, [
     croppedAreaProfileImage,
-    avatarUrlInEdit, handleSetStageToEditingGeneral, dispatch,
+    avatarUrlInEdit,
+    handleSetStageToEditingGeneral,
+    dispatch,
     user.userData,
   ]);
 
@@ -644,7 +657,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       bio: user.userData?.bio ?? '',
     };
 
-    if (isEqual(dataInEdit, initialData) && isEqual(coverUrlInEdit, user.userData?.coverUrl)) {
+    if (
+      isEqual(dataInEdit, initialData) &&
+      isEqual(coverUrlInEdit, user.userData?.coverUrl)
+    ) {
       handleSetWasModified(false);
     } else {
       handleSetWasModified(true);
@@ -653,10 +669,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
   // Check fields validity
   useEffect(() => {
-    const isUsernameValid = dataInEdit.username.length >= 8
-      && dataInEdit.username.length <= 15
-      && validator.isAlphanumeric(dataInEdit.username)
-      && validator.isLowercase(dataInEdit.username);
+    const isUsernameValid =
+      dataInEdit.username.length >= 2 &&
+      dataInEdit.username.length <= 25 &&
+      validator.isAlphanumeric(dataInEdit.username) &&
+      validator.isLowercase(dataInEdit.username);
     const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
 
     if (!isNicknameValid || !isUsernameValid) {
@@ -681,10 +698,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     if (Object.values(formErrors).some((v) => v !== '')) {
       setIsDataValid(false);
     } else {
-      const isUsernameValid = dataInEdit.username.length >= 8
-        && dataInEdit.username.length <= 15
-        && validator.isAlphanumeric(dataInEdit.username)
-        && validator.isLowercase(dataInEdit.username);
+      const isUsernameValid =
+        dataInEdit.username.length >= 2 &&
+        dataInEdit.username.length <= 25 &&
+        validator.isAlphanumeric(dataInEdit.username) &&
+        validator.isLowercase(dataInEdit.username);
       const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
 
       if (!isNicknameValid || !isUsernameValid) {
@@ -708,241 +726,243 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       onClick={(e) => e.stopPropagation()}
     >
       <AnimatePresence>
-        {stage === 'edit-general'
-          ? (
-            <motion.div
-              key="edit-general"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              {isMobile ? (
-                <SGoBackButtonMobile
-                  onClick={handleClosePreventDiscarding}
-                >
-                  { t('EditProfileMenu.goBackBtn.general') }
-                </SGoBackButtonMobile>
-              ) : (
-                <SGoBackButtonDesktop
-                  onClick={handleClosePreventDiscarding}
-                >
-                  <div>{ t('EditProfileMenu.goBackBtn.general') }</div>
-                  <InlineSvg
-                    svg={CancelIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width="24px"
-                    height="24px"
-                  />
-                </SGoBackButtonDesktop>
-              )}
-              <SImageInputsWrapper>
-                <ProfileBackgroundInput
-                  originalPictureUrl={user?.userData?.coverUrl ?? ''}
-                  pictureInEditUrl={coverUrlInEdit ?? ''}
-                  coverUrlInEditAnimated={coverUrlInEditAnimated}
-                  crop={cropCoverImage}
-                  zoom={zoomCoverImage}
-                  initialObjectFit={coverImageInitialObjectFit}
-                  disabled={isLoading}
-                  handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
-                  handleUnsetPictureInEdit={handleUnsetPictureInEdit}
-                  onCropChange={handleCoverImageCropChange}
-                  onCropComplete={onCropCompleteCoverImage}
-                  onZoomChange={setZoomCoverImage}
+        {stage === 'edit-general' ? (
+          <motion.div
+            key='edit-general'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {isMobile ? (
+              <SGoBackButtonMobile onClick={handleClosePreventDiscarding}>
+                {t('EditProfileMenu.goBackBtn.general')}
+              </SGoBackButtonMobile>
+            ) : (
+              <SGoBackButtonDesktop onClick={handleClosePreventDiscarding}>
+                <div>{t('EditProfileMenu.goBackBtn.general')}</div>
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
                 />
-                <ProfileImageInput
-                  publicUrl={user.userData?.avatarUrl!!}
-                  disabled={isLoading}
-                  handleImageInputChange={handleSetProfilePictureInEdit}
-                />
-              </SImageInputsWrapper>
-              <STextInputsWrapper>
-                <NicknameInput
-                  type="text"
-                  value={dataInEdit.nickname as string}
-                  disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
-                  errorCaption={t(`EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`)}
-                  isValid={!formErrors.nicknameError}
-                  onChange={(e) => handleUpdateDataInEdit('nickname', e.target.value)}
-                />
-                <UsernameInput
-                  type="text"
-                  value={dataInEdit.username}
-                  disabled={isLoading || !user.userData?.options?.canChangeUsername}
-                  popupCaption={(
-                    <UsernamePopupList
-                      points={[
-                        {
-                          text: t('EditProfileMenu.inputs.username.points.1'),
-                          isValid: dataInEdit.username ? (
-                            dataInEdit.username.length >= 8 && dataInEdit.username.length <= 15
-                          ) : false,
-                        },
-                        {
-                          text: t('EditProfileMenu.inputs.username.points.2'),
-                          isValid: dataInEdit.username ? (
-                            validator.isLowercase(dataInEdit.username)
-                          ) : false,
-                        },
-                        {
-                          text: t('EditProfileMenu.inputs.username.points.3'),
-                          isValid: dataInEdit.username ? (
-                            validator.isAlphanumeric(dataInEdit.username)
-                          ) : false,
-                        },
-                      ]}
-                    />
-                  )}
-                  frequencyCaption={
-                    user.userData?.options?.canChangeUsername
-                    ? (
-                      t('EditProfileMenu.inputs.username.frequencyCaption',
+              </SGoBackButtonDesktop>
+            )}
+            <SImageInputsWrapper>
+              <ProfileBackgroundInput
+                originalPictureUrl={user?.userData?.coverUrl ?? ''}
+                pictureInEditUrl={coverUrlInEdit ?? ''}
+                coverUrlInEditAnimated={coverUrlInEditAnimated}
+                crop={cropCoverImage}
+                zoom={zoomCoverImage}
+                initialObjectFit={coverImageInitialObjectFit}
+                disabled={isLoading}
+                handleSetPictureInEdit={handleSetBackgroundPictureInEdit}
+                handleUnsetPictureInEdit={handleUnsetPictureInEdit}
+                onCropChange={handleCoverImageCropChange}
+                onCropComplete={onCropCompleteCoverImage}
+                onZoomChange={setZoomCoverImage}
+              />
+              <ProfileImageInput
+                publicUrl={user.userData?.avatarUrl!!}
+                disabled={isLoading}
+                handleImageInputChange={handleSetProfilePictureInEdit}
+              />
+            </SImageInputsWrapper>
+            <STextInputsWrapper>
+              <NicknameInput
+                type='text'
+                value={dataInEdit.nickname as string}
+                disabled={isLoading}
+                placeholder={t('EditProfileMenu.inputs.nickname.placeholder')}
+                errorCaption={t(
+                  `EditProfileMenu.inputs.nickname.errors.${formErrors.nicknameError}`
+                )}
+                isValid={!formErrors.nicknameError}
+                onChange={(e) =>
+                  handleUpdateDataInEdit('nickname', e.target.value)
+                }
+              />
+              <UsernameInput
+                type='text'
+                value={dataInEdit.username}
+                disabled={
+                  isLoading || !user.userData?.options?.canChangeUsername
+                }
+                popupCaption={
+                  <UsernamePopupList
+                    points={[
                       {
-                        domain: (
-                          process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL[(process.env.NEXT_PUBLIC_APP_URL?.length ?? 1) - 1] === '/'
-                          ? process.env.NEXT_PUBLIC_APP_URL
-                          : `${process.env.NEXT_PUBLIC_APP_URL}/`
-                        ),
+                        text: t('EditProfileMenu.inputs.username.points.1'),
+                        isValid: dataInEdit.username
+                          ? dataInEdit.username.length >= 2 &&
+                            dataInEdit.username.length <= 25
+                          : false,
+                      },
+                      {
+                        text: t('EditProfileMenu.inputs.username.points.2'),
+                        isValid: dataInEdit.username
+                          ? validator.isLowercase(dataInEdit.username)
+                          : false,
+                      },
+                      {
+                        text: t('EditProfileMenu.inputs.username.points.3'),
+                        isValid: dataInEdit.username
+                          ? validator.isAlphanumeric(dataInEdit.username)
+                          : false,
+                      },
+                    ]}
+                  />
+                }
+                frequencyCaption={
+                  user.userData?.options?.canChangeUsername
+                    ? t('EditProfileMenu.inputs.username.frequencyCaption', {
+                        domain:
+                          process.env.NEXT_PUBLIC_APP_URL &&
+                          process.env.NEXT_PUBLIC_APP_URL[
+                            (process.env.NEXT_PUBLIC_APP_URL?.length ?? 1) - 1
+                          ] === '/'
+                            ? process.env.NEXT_PUBLIC_APP_URL
+                            : `${process.env.NEXT_PUBLIC_APP_URL}/`,
                         username: dataInEdit.username,
                       })
-                    ) : (
-                      t('EditProfileMenu.inputs.username.cannotBeChangedCaption')
-                    )
-                  }
-                  errorCaption={t(`EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`)}
-                  placeholder={t('EditProfileMenu.inputs.username.placeholder')}
-                  isValid={!formErrors.usernameError}
-                  onChange={(value) => {
-                    handleUpdateDataInEdit('username', value);
-                  }}
-                />
-                <BioTextarea
-                  maxChars={150}
-                  value={dataInEdit.bio}
-                  disabled={isLoading}
-                  placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
-                  errorCaption={t(`EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`)}
-                  isValid={!formErrors.bioError}
-                  onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
-                />
-              </STextInputsWrapper>
-              <SControlsWrapper>
-                {!isMobile
-                  ? (
-                    <Button
-                      view="secondary"
-                      onClick={handleClose}
-                    >
-                      { t('EditProfileMenu.cancelButton') }
-                    </Button>
-                  ) : null}
-                <Button
-                  withShadow
-                  disabled={!wasModified || !isDataValid || isLoading}
-                  style={{
-                    width: isMobile ? '100%' : 'initial',
-                    ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
-                  }}
-                  onClick={() => handleUpdateTextualDataAndCover()}
-                >
-                  { t('EditProfileMenu.saveButton') }
-                </Button>
-              </SControlsWrapper>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="edit-picture"
-              initial={{ x: 300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
-              exit={{ x: 300, opacity: 0 }}
-            >
-              {isMobile ? (
-                <SGoBackButtonMobile
-                  onClick={handleSetStageToEditingGeneralUnsetPicture}
-                >
-                  { t('EditProfileMenu.goBackBtn.profilePicture') }
-                </SGoBackButtonMobile>
-              ) : (
-                <SGoBackButtonDesktop
-                  onClick={handleSetStageToEditingGeneralUnsetPicture}
-                >
-                  <div>{ t('EditProfileMenu.goBackBtn.profilePicture') }</div>
-                  <InlineSvg
-                    svg={CancelIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width="24px"
-                    height="24px"
-                  />
-                </SGoBackButtonDesktop>
-              )}
-              <ProfileImageCropper
-                crop={cropProfileImage}
-                zoom={zoomProfileImage}
-                avatarUrlInEdit={avatarUrlInEdit}
-                originalImageWidth={originalProfileImageWidth}
-                disabled={updateProfileImageLoading}
-                onCropChange={setCropProfileImage}
-                onCropComplete={onCropCompleteProfileImage}
-                onZoomChange={setZoomProfileImage}
+                    : t(
+                        'EditProfileMenu.inputs.username.cannotBeChangedCaption'
+                      )
+                }
+                errorCaption={t(
+                  `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`
+                )}
+                placeholder={t('EditProfileMenu.inputs.username.placeholder')}
+                isValid={!formErrors.usernameError}
+                onChange={(value) => {
+                  handleUpdateDataInEdit('username', value);
+                }}
               />
-              <SSliderWrapper>
-                <Button
-                  iconOnly
-                  size="sm"
-                  view="transparent"
-                  disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
-                  onClick={handleZoomOutProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomOutIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width="24px"
-                    height="24px"
-                  />
+              <BioTextarea
+                maxChars={150}
+                value={dataInEdit.bio}
+                disabled={isLoading}
+                placeholder={t('EditProfileMenu.inputs.bio.placeholder')}
+                errorCaption={t(
+                  `EditProfileMenu.inputs.bio.errors.${formErrors.bioError}`
+                )}
+                isValid={!formErrors.bioError}
+                onChange={(e) => handleUpdateDataInEdit('bio', e.target.value)}
+              />
+            </STextInputsWrapper>
+            <SControlsWrapper>
+              {!isMobile ? (
+                <Button view='secondary' onClick={handleClose}>
+                  {t('EditProfileMenu.cancelButton')}
                 </Button>
-                <ProfileImageZoomSlider
-                  value={zoomProfileImage}
-                  min={1}
-                  max={3}
-                  step={0.1}
-                  ariaLabel="Zoom"
-                  disabled={updateProfileImageLoading}
-                  onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+              ) : null}
+              <Button
+                withShadow
+                disabled={!wasModified || !isDataValid || isLoading}
+                style={{
+                  width: isMobile ? '100%' : 'initial',
+                  ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
+                }}
+                onClick={() => handleUpdateTextualDataAndCover()}
+              >
+                {t('EditProfileMenu.saveButton')}
+              </Button>
+            </SControlsWrapper>
+          </motion.div>
+        ) : (
+          <motion.div
+            key='edit-picture'
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1, transition: { delay: 0.5 } }}
+            exit={{ x: 300, opacity: 0 }}
+          >
+            {isMobile ? (
+              <SGoBackButtonMobile
+                onClick={handleSetStageToEditingGeneralUnsetPicture}
+              >
+                {t('EditProfileMenu.goBackBtn.profilePicture')}
+              </SGoBackButtonMobile>
+            ) : (
+              <SGoBackButtonDesktop
+                onClick={handleSetStageToEditingGeneralUnsetPicture}
+              >
+                <div>{t('EditProfileMenu.goBackBtn.profilePicture')}</div>
+                <InlineSvg
+                  svg={CancelIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
                 />
-                <Button
-                  iconOnly
-                  size="sm"
-                  view="transparent"
-                  disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
-                  onClick={handleZoomInProfileImage}
-                >
-                  <InlineSvg
-                    svg={ZoomInIcon}
-                    fill={theme.colorsThemed.text.primary}
-                    width="24px"
-                    height="24px"
-                  />
-                </Button>
-              </SSliderWrapper>
-              <SControlsWrapperPicture>
-                <Button
-                  view="secondary"
-                  disabled={updateProfileImageLoading}
-                  onClick={handleSetStageToEditingGeneralUnsetPicture}
-                >
-                  { t('EditProfileMenu.cancelButton') }
-                </Button>
-                <Button
-                  withShadow
-                  disabled={updateProfileImageLoading}
-                  onClick={completeProfileImageCropAndSave}
-                >
-                  { t('EditProfileMenu.saveButton') }
-                </Button>
-              </SControlsWrapperPicture>
-            </motion.div>
-          )}
+              </SGoBackButtonDesktop>
+            )}
+            <ProfileImageCropper
+              crop={cropProfileImage}
+              zoom={zoomProfileImage}
+              avatarUrlInEdit={avatarUrlInEdit}
+              originalImageWidth={originalProfileImageWidth}
+              disabled={updateProfileImageLoading}
+              onCropChange={setCropProfileImage}
+              onCropComplete={onCropCompleteProfileImage}
+              onZoomChange={setZoomProfileImage}
+            />
+            <SSliderWrapper>
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={zoomProfileImage <= 1 || updateProfileImageLoading}
+                onClick={handleZoomOutProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomOutIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+              <ProfileImageZoomSlider
+                value={zoomProfileImage}
+                min={1}
+                max={3}
+                step={0.1}
+                ariaLabel='Zoom'
+                disabled={updateProfileImageLoading}
+                onChange={(e) => setZoomProfileImage(Number(e.target.value))}
+              />
+              <Button
+                iconOnly
+                size='sm'
+                view='transparent'
+                disabled={zoomProfileImage >= 3 || updateProfileImageLoading}
+                onClick={handleZoomInProfileImage}
+              >
+                <InlineSvg
+                  svg={ZoomInIcon}
+                  fill={theme.colorsThemed.text.primary}
+                  width='24px'
+                  height='24px'
+                />
+              </Button>
+            </SSliderWrapper>
+            <SControlsWrapperPicture>
+              <Button
+                view='secondary'
+                disabled={updateProfileImageLoading}
+                onClick={handleSetStageToEditingGeneralUnsetPicture}
+              >
+                {t('EditProfileMenu.cancelButton')}
+              </Button>
+              <Button
+                withShadow
+                disabled={updateProfileImageLoading}
+                onClick={completeProfileImageCropAndSave}
+              >
+                {t('EditProfileMenu.saveButton')}
+              </Button>
+            </SControlsWrapperPicture>
+          </motion.div>
+        )}
       </AnimatePresence>
     </SEditProfileMenu>
   );
@@ -1036,7 +1056,7 @@ const SGoBackButtonDesktop = styled.button`
 `;
 
 const SImageInputsWrapper = styled.div`
-position: relative;
+  position: relative;
 
   ${({ theme }) => theme.media.tablet} {
     padding-left: 24px;
@@ -1117,16 +1137,17 @@ const SControlsWrapperPicture = styled.div`
 type TUsernamePopupListItem = {
   text: string;
   isValid: boolean;
-}
+};
 
-const UsernamePopupList = ({ points } : { points: TUsernamePopupListItem[] }) => (
+const UsernamePopupList = ({
+  points,
+}: {
+  points: TUsernamePopupListItem[];
+}) => (
   <SUsernamePopupList>
     {points.map((p) => (
-      <SUsernamePopupListItem
-        key={p.text}
-        isValid={p.isValid}
-      >
-        { p.text }
+      <SUsernamePopupListItem key={p.text} isValid={p.isValid}>
+        {p.text}
       </SUsernamePopupListItem>
     ))}
   </SUsernamePopupList>
@@ -1157,11 +1178,13 @@ const SUsernamePopupListItem = styled.div<{
     border-radius: 50%;
     border-width: 1.5px;
     border-style: solid;
-    border-color: ${({ theme, isValid }) => (isValid ? 'transparent' : theme.colorsThemed.text.secondary)};
+    border-color: ${({ theme, isValid }) =>
+      isValid ? 'transparent' : theme.colorsThemed.text.secondary};
 
-    background-color: ${({ theme, isValid }) => (isValid ? theme.colorsThemed.accent.success : 'transparent')};
+    background-color: ${({ theme, isValid }) =>
+      isValid ? theme.colorsThemed.accent.success : 'transparent'};
 
-    transition: .2s ease-in-out;
+    transition: 0.2s ease-in-out;
   }
 `;
 
@@ -1174,5 +1197,5 @@ const SUsernamePopupList = styled.div`
   font-size: 12px;
   line-height: 16px;
 
-  color: #FFFFFF;
+  color: #ffffff;
 `;

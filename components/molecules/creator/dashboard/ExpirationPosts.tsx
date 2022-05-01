@@ -26,13 +26,17 @@ interface IExpirationPosts {
   expirationPosts: newnewapi.IPost[];
 }
 
-export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts }) => {
+export const ExpirationPosts: React.FC<IExpirationPosts> = ({
+  expirationPosts,
+}) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const ref: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
   const isDesktop = !isMobile && !isTablet;
   const router = useRouter();
@@ -48,23 +52,37 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
     }
   }, [expirationPosts]);
 
-  const getCountdown = (data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice) => {
+  const getCountdown = (
+    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
+  ) => {
     const end = (data.responseUploadDeadline?.seconds as number) * 1000;
     const parsed = (end - Date.now()) / 1000;
     const dhms = secondsToDHMS(parsed, 'noTrim');
 
-    let countdownsrt = `${dhms.days}${t('dashboard.expirationPosts.expiresTime.days')} ${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')}`;
+    let countdownsrt = `${dhms.days}${t(
+      'dashboard.expirationPosts.expiresTime.days'
+    )} ${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')}`;
 
     if (dhms.days === '0') {
-      countdownsrt = `${dhms.hours}${t('dashboard.expirationPosts.expiresTime.hours')} ${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')}`;
+      countdownsrt = `${dhms.hours}${t(
+        'dashboard.expirationPosts.expiresTime.hours'
+      )} ${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')}`;
       if (dhms.hours === '0') {
-        countdownsrt = `${dhms.minutes}${t('dashboard.expirationPosts.expiresTime.minutes')} ${dhms.seconds}${t('dashboard.expirationPosts.expiresTime.seconds')}`;
+        countdownsrt = `${dhms.minutes}${t(
+          'dashboard.expirationPosts.expiresTime.minutes'
+        )} ${dhms.seconds}${t(
+          'dashboard.expirationPosts.expiresTime.seconds'
+        )}`;
         if (dhms.minutes === '0') {
-          countdownsrt = `${dhms.seconds}${t('dashboard.expirationPosts.expiresTime.seconds')}`;
+          countdownsrt = `${dhms.seconds}${t(
+            'dashboard.expirationPosts.expiresTime.seconds'
+          )}`;
         }
       }
     }
-    countdownsrt = `${countdownsrt} ${t('dashboard.expirationPosts.expiresTime.left_to_respond')}`;
+    countdownsrt = `${countdownsrt} ${t(
+      'dashboard.expirationPosts.expiresTime.left_to_respond'
+    )}`;
     return countdownsrt;
   };
 
@@ -76,8 +94,10 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
 
     postType === 'multipleChoice'
       ? (centsQty =
-          (data as newnewapi.MultipleChoice).totalVotes * (data as newnewapi.MultipleChoice).votePrice!!.usdCents!!)
-      : (centsQty = (data as newnewapi.Crowdfunding | newnewapi.Auction).totalAmount?.usdCents!!);
+          (data as newnewapi.MultipleChoice).totalVotes *
+          (data as newnewapi.MultipleChoice).votePrice!!.usdCents!!)
+      : (centsQty = (data as newnewapi.Crowdfunding | newnewapi.Auction)
+          .totalAmount?.usdCents!!);
 
     return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
   };
@@ -117,7 +137,10 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
   const renderItem = useCallback(
     (item, index) => {
       const postType = Object.keys(item)[0];
-      const data = Object.values(item)[0] as newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
+      const data = Object.values(item)[0] as
+        | newnewapi.Auction
+        | newnewapi.Crowdfunding
+        | newnewapi.MultipleChoice;
 
       const handleDecideClick = () => {
         router.push(`/post/${data.postUuid}`);
@@ -140,13 +163,17 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
           <SListItem>
             {isDesktop ? (
               <>
-                <SListBodyItem width="calc(100% - 300px)" align="flex-start">
+                <SListBodyItem width='calc(100% - 300px)' align='flex-start'>
                   {!data.announcement?.thumbnailImageUrl ? (
                     <SAvatar />
                   ) : (
                     <SImg
-                      src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''}
-                      alt=""
+                      src={
+                        data.announcement?.thumbnailImageUrl
+                          ? data.announcement?.thumbnailImageUrl
+                          : ''
+                      }
+                      alt=''
                     />
                   )}
                   <SListItemTitleWrapper>
@@ -158,18 +185,18 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
                     </SListItemDate>
                   </SListItemTitleWrapper>
                 </SListBodyItem>
-                <SListBodyItem width="100px" align="flex-start">
+                <SListBodyItem width='100px' align='flex-start'>
                   <SListBodyItemText variant={3} weight={600}>
                     {money}
                   </SListBodyItemText>
                 </SListBodyItem>
-                <SListBodyItem width="100px" align="flex-start">
+                <SListBodyItem width='100px' align='flex-start'>
                   <SListBodyItemText variant={3} weight={600}>
                     {contributors}
                   </SListBodyItemText>
                 </SListBodyItem>
-                <SListBodyItem width="100px" align="center">
-                  <SListDecideButton view="primary" onClick={handleDecideClick}>
+                <SListBodyItem width='100px' align='center'>
+                  <SListDecideButton view='primary' onClick={handleDecideClick}>
                     {t('dashboard.expirationPosts.decide')}
                   </SListDecideButton>
                 </SListBodyItem>
@@ -179,7 +206,14 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
                 {!data.announcement?.thumbnailImageUrl ? (
                   <SAvatar />
                 ) : (
-                  <SImg src={data.announcement?.thumbnailImageUrl ? data.announcement?.thumbnailImageUrl : ''} alt="" />
+                  <SImg
+                    src={
+                      data.announcement?.thumbnailImageUrl
+                        ? data.announcement?.thumbnailImageUrl
+                        : ''
+                    }
+                    alt=''
+                  />
                 )}
                 <SListItemTitleWrapper>
                   <SListItemTitle variant={3} weight={600}>
@@ -189,12 +223,25 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
                     {countdownsrt}
                   </SListItemDate>
                 </SListItemTitleWrapper>
-                <SListShareButton view="secondary" onClick={handleShareClick}>
-                  <InlineSVG svg={shareIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                <SListShareButton view='secondary' onClick={handleShareClick}>
+                  <InlineSVG
+                    svg={shareIcon}
+                    fill={theme.colorsThemed.text.primary}
+                    width='20px'
+                    height='20px'
+                  />
                 </SListShareButton>
                 {!isMobile && (
-                  <SListShareButton view="secondary" onClick={() => setShowInfoTooltip(index)}>
-                    <InlineSVG svg={infoIcon} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                  <SListShareButton
+                    view='secondary'
+                    onClick={() => setShowInfoTooltip(index)}
+                  >
+                    <InlineSVG
+                      svg={infoIcon}
+                      fill={theme.colorsThemed.text.primary}
+                      width='20px'
+                      height='20px'
+                    />
                     {showInfoTooltip === index && (
                       <InfoTooltipItem
                         money={money}
@@ -204,7 +251,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
                     )}
                   </SListShareButton>
                 )}
-                <SListDecideButton view="secondary" onClick={handleDecideClick}>
+                <SListDecideButton view='secondary' onClick={handleDecideClick}>
                   {t('dashboard.expirationPosts.decide')}
                 </SListDecideButton>
               </>
@@ -215,7 +262,15 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t, isMobile, isDesktop, posts.length, theme.colorsThemed.text.primary, router, showInfoTooltip]
+    [
+      t,
+      isMobile,
+      isDesktop,
+      posts.length,
+      theme.colorsThemed.text.primary,
+      router,
+      showInfoTooltip,
+    ]
   );
 
   return (
@@ -227,16 +282,36 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({ expirationPosts })
         {isDesktop && (
           <>
             <SListHeader>
-              <SListHeaderItem width="calc(100% - 300px)" align="start" weight={600} variant={2}>
+              <SListHeaderItem
+                width='calc(100% - 300px)'
+                align='start'
+                weight={600}
+                variant={2}
+              >
                 {t('dashboard.expirationPosts.table.header.post')}
               </SListHeaderItem>
-              <SListHeaderItem width="100px" align="start" weight={600} variant={2}>
+              <SListHeaderItem
+                width='100px'
+                align='start'
+                weight={600}
+                variant={2}
+              >
                 {t('dashboard.expirationPosts.table.header.total')}
               </SListHeaderItem>
-              <SListHeaderItem width="100px" align="start" weight={600} variant={2}>
+              <SListHeaderItem
+                width='100px'
+                align='start'
+                weight={600}
+                variant={2}
+              >
                 {t('dashboard.expirationPosts.table.header.contributions')}
               </SListHeaderItem>
-              <SListHeaderItem width="100px" align="center" weight={600} variant={2}>
+              <SListHeaderItem
+                width='100px'
+                align='center'
+                weight={600}
+                variant={2}
+              >
                 {t('dashboard.expirationPosts.table.header.actions')}
               </SListHeaderItem>
             </SListHeader>
@@ -272,7 +347,9 @@ const SContainer = styled.div`
 
   ${(props) => props.theme.media.laptop} {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.background.secondary};
   }
 `;
 

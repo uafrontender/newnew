@@ -496,7 +496,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         <>
           <SItemWrapper>
             <TextArea
-              id="title"
+              id='title'
               value={post?.title}
               error={titleError}
               onBlur={handleItemBlur}
@@ -507,24 +507,24 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           </SItemWrapper>
           {tab === 'multiple-choice' && (
             <>
-              <SSeparator margin="16px 0" />
+              <SSeparator margin='16px 0' />
               <DraggableMobileOptions
-                id="choices"
+                id='choices'
                 min={2}
                 options={multiplechoice.choices}
                 onChange={handleItemChange}
                 validation={validateT}
               />
-              {isMobile && <SSeparator margin="16px 0" />}
+              {isMobile && <SSeparator margin='16px 0' />}
             </>
           )}
           {tab === 'auction' && !isMobile && (
             <>
-              <SSeparator margin="16px 0" />
+              <SSeparator margin='16px 0' />
               <SItemWrapper>
                 <TabletFieldBlock
-                  id="minimalBid"
-                  type="input"
+                  id='minimalBid'
+                  type='input'
                   value={auction.minimalBid}
                   onChange={handleItemChange}
                   formattedDescription={auction.minimalBid}
@@ -539,11 +539,11 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
           )}
           {tab === 'crowdfunding' && !isMobile && (
             <>
-              <SSeparator margin="16px 0" />
+              <SSeparator margin='16px 0' />
               <SItemWrapper>
                 <TabletFieldBlock
-                  id="targetBackerCount"
-                  type="input"
+                  id='targetBackerCount'
+                  type='input'
                   value={crowdfunding.targetBackerCount}
                   onChange={handleItemChange}
                   formattedDescription={crowdfunding.targetBackerCount}
@@ -583,8 +583,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 {tab === 'auction' && (
                   <SFieldWrapper>
                     <MobileFieldBlock
-                      id="minimalBid"
-                      type="input"
+                      id='minimalBid'
+                      type='input'
                       value={auction.minimalBid}
                       onChange={handleItemChange}
                       formattedDescription={auction.minimalBid}
@@ -599,8 +599,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 {tab === 'crowdfunding' && (
                   <SFieldWrapper>
                     <MobileFieldBlock
-                      id="targetBackerCount"
-                      type="input"
+                      id='targetBackerCount'
+                      type='input'
                       value={crowdfunding.targetBackerCount}
                       onChange={handleItemChange}
                       formattedDescription={crowdfunding.targetBackerCount}
@@ -614,8 +614,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 )}
                 <SFieldWrapper>
                   <MobileFieldBlock
-                    id="expiresAt"
-                    type="select"
+                    id='expiresAt'
+                    type='select'
                     value={post.expiresAt}
                     options={expireOptions}
                     onChange={handleItemChange}
@@ -629,8 +629,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 </SFieldWrapper>
                 <SFieldWrapper>
                   <MobileFieldBlock
-                    id="startsAt"
-                    type="date"
+                    id='startsAt'
+                    type='date'
                     value={post.startsAt}
                     onChange={handleItemChange}
                     formattedValue={t(
@@ -648,8 +648,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
             <>
               <SItemWrapper>
                 <TabletFieldBlock
-                  id="expiresAt"
-                  type="select"
+                  id='expiresAt'
+                  type='select'
                   value={post.expiresAt}
                   options={expireOptions}
                   maxItems={5}
@@ -662,31 +662,31 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   )}
                 />
               </SItemWrapper>
-              <SSeparator margin="16px 0" />
+              <SSeparator margin='16px 0' />
               <STabletBlockTitle variant={1} weight={700}>
                 {t('secondStep.field.startsAt.tablet.title')}
               </STabletBlockTitle>
               <TabletStartDate
-                id="startsAt"
+                id='startsAt'
                 value={post.startsAt}
                 onChange={handleItemChange}
               />
-              <SSeparator margin="16px 0" />
+              <SSeparator margin='16px 0' />
             </>
           )}
           {tab === 'multiple-choice' && mySubscribers.length > 0 && (
             <SMobileFieldWrapper>
               <MobileField
-                id="allowSuggestions"
-                type="toggle"
+                id='allowSuggestions'
+                type='toggle'
                 value={multiplechoice.options.allowSuggestions}
                 onChange={handleItemChange}
               />
             </SMobileFieldWrapper>
           )}
           <MobileField
-            id="comments"
-            type="toggle"
+            id='comments'
+            type='toggle'
             value={post.options.commentsEnabled}
             onChange={handleItemChange}
           />
@@ -871,8 +871,8 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   clickable
                   svg={closeIcon}
                   fill={theme.colorsThemed.text.secondary}
-                  width="24px"
-                  height="24px"
+                  width='24px'
+                  height='24px'
                   onClick={handleCloseClick}
                 />
               </SCloseIconWrapper>
@@ -887,7 +887,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   </STabletBlockTitle>
                 )}
                 <FileUpload
-                  id="video"
+                  id='video'
                   value={videoProcessing?.targetUrls}
                   thumbnails={post.thumbnailParameters}
                   etaUpload={fileUpload.eta}
@@ -939,7 +939,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 <SButtonWrapper>
                   <SButtonContent>
                     <SButton
-                      view="primaryGrad"
+                      view='primaryGrad'
                       onClick={handleSubmit}
                       disabled={disabled}
                     >
@@ -951,13 +951,13 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                 <SItemWrapper>
                   <STabletButtonsWrapper>
                     <div>
-                      <SButton view="secondary" onClick={handleCloseClick}>
+                      <SButton view='secondary' onClick={handleCloseClick}>
                         {t('secondStep.button.cancel')}
                       </SButton>
                     </div>
                     <div>
                       <SButton
-                        view="primaryGrad"
+                        view='primaryGrad'
                         onClick={handleSubmit}
                         disabled={disabled}
                       >
@@ -982,11 +982,11 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                         <SFloatingSubSectionPlayer>
                           <BitmovinPlayer
                             withMuteControl
-                            id="floating-preview"
+                            id='floating-preview'
                             innerRef={playerRef}
                             resources={videoProcessing?.targetUrls}
-                            borderRadius="16px"
-                            mutePosition="left"
+                            borderRadius='16px'
+                            mutePosition='left'
                           />
                         </SFloatingSubSectionPlayer>
                         <SFloatingSubSectionUser>
@@ -996,7 +996,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                           </SUserTitle>
                         </SFloatingSubSectionUser>
                         <SBottomEnd>
-                          <SButtonUser view="primary">
+                          <SButtonUser view='primary'>
                             {t(`secondStep.button.card.${typeOfPost}`)}
                           </SButtonUser>
                           <SCaption variant={2} weight={700}>

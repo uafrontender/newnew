@@ -16,73 +16,68 @@ interface IProfilePostTypeFilterMenu {
   handleClose: () => void;
 }
 
-const ProfilePostTypeFilterMenu: React.FunctionComponent<IProfilePostTypeFilterMenu> = ({
-  isVisible,
-  selected,
-  handleSelect,
-  handleClose,
-}) => {
-  const { t } = useTranslation('profile');
-  const containerRef = useRef<HTMLDivElement>();
+const ProfilePostTypeFilterMenu: React.FunctionComponent<IProfilePostTypeFilterMenu> =
+  ({ isVisible, selected, handleSelect, handleClose }) => {
+    const { t } = useTranslation('profile');
+    const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+    useOnClickEsc(containerRef, handleClose);
+    useOnClickOutside(containerRef, handleClose);
 
-  const options: PostsFilterOption[] = useMemo(() => (
-    [
-      {
-        nameToken: '0',
-        value: newnewapi.Post.Filter.ALL,
-      },
-      {
-        nameToken: '1',
-        value: newnewapi.Post.Filter.AUCTIONS,
-      },
-      {
-        nameToken: '3',
-        value: newnewapi.Post.Filter.MULTIPLE_CHOICES,
-      },
-      {
-        nameToken: '2',
-        value: newnewapi.Post.Filter.CROWDFUNDINGS,
-      },
-    ]
-  ), []);
+    const options: PostsFilterOption[] = useMemo(
+      () => [
+        {
+          nameToken: '0',
+          value: newnewapi.Post.Filter.ALL,
+        },
+        {
+          nameToken: '1',
+          value: newnewapi.Post.Filter.AUCTIONS,
+        },
+        {
+          nameToken: '3',
+          value: newnewapi.Post.Filter.MULTIPLE_CHOICES,
+        },
+        {
+          nameToken: '2',
+          value: newnewapi.Post.Filter.CROWDFUNDINGS,
+        },
+      ],
+      []
+    );
 
-  const handleClick = (value: newnewapi.Post.Filter) => {
-    // @ts-ignore
-    handleSelect(value.toString());
-    handleClose();
-  };
+    const handleClick = (value: newnewapi.Post.Filter) => {
+      // @ts-ignore
+      handleSelect(value.toString());
+      handleClose();
+    };
 
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {options.map((o) => (
-            <SButton
-              selected={o.value.toString() === (selected?.toString() ?? '0')}
-              onClick={() => handleClick(o.value)}
-            >
-              <Text
-                variant={3}
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {options.map((o) => (
+              <SButton
+                selected={o.value.toString() === (selected?.toString() ?? '0')}
+                onClick={() => handleClick(o.value)}
               >
-                { t(`posts-filter.filter-${o.nameToken}`) }
-              </Text>
-            </SButton>
-          ))}
-        </SContainer>
-      )}
-    </AnimatePresence>
-  );
-};
+                <Text variant={3}>
+                  {t(`posts-filter.filter-${o.nameToken}`)}
+                </Text>
+              </SButton>
+            ))}
+          </SContainer>
+        )}
+      </AnimatePresence>
+    );
+  };
 
 export default ProfilePostTypeFilterMenu;
 
@@ -123,8 +118,10 @@ const SButton = styled.button<{
   border-radius: 8px;
   padding: 8px;
 
-  color: ${({ selected, theme }) => (selected ? theme.colorsThemed.text.primary : 'initial')} !important;
-  background: ${({ selected, theme }) => (selected ? theme.colorsThemed.background.quinary : 'initial')} !important;
+  color: ${({ selected, theme }) =>
+    selected ? theme.colorsThemed.text.primary : 'initial'} !important;
+  background: ${({ selected, theme }) =>
+    selected ? theme.colorsThemed.background.quinary : 'initial'} !important;
 
   &:focus {
     outline: none;

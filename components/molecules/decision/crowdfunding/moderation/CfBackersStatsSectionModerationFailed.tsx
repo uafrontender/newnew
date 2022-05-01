@@ -1,6 +1,4 @@
-import React, {
-  useRef,
-} from 'react';
+import React, { useRef } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { motion } from 'framer-motion';
@@ -17,53 +15,47 @@ interface ICfBackersStatsSectionModerationFailed {
   currentNumBackers: number;
 }
 
-const CfBackersStatsSectionModerationFailed: React.FunctionComponent<ICfBackersStatsSectionModerationFailed> = ({
-  targetBackerCount,
-  currentNumBackers,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isTablet = ['tablet'].includes(resizeMode);
-  const size = isTablet ? 240 : 280
-  const radius = (size - 12) / 2;
-  const bgRingCircleRef = useRef<SVGCircleElement>();
+const CfBackersStatsSectionModerationFailed: React.FunctionComponent<ICfBackersStatsSectionModerationFailed> =
+  ({ targetBackerCount, currentNumBackers }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isTablet = ['tablet'].includes(resizeMode);
+    const size = isTablet ? 240 : 280;
+    const radius = (size - 12) / 2;
+    const bgRingCircleRef = useRef<SVGCircleElement>();
 
-  return (
-    <SSectionContainer>
-      <SProgressRingSvg
-        key={`key_${isTablet ? 'tablet' : ''}`}
-        width={size}
-        height={size}
-      >
-        <SBgRingCircle
-          ref={(el) => {
-            bgRingCircleRef.current = el!!;
-          }}
-          stroke={theme.colorsThemed.accent.pink}
-          strokeWidth="12px"
-          strokeLinecap="round"
-          fill="transparent"
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-        />
-      </SProgressRingSvg>
-      <SCaptionSection>
-        <SHeadline
-          variant={3}
+    return (
+      <SSectionContainer>
+        <SProgressRingSvg
+          key={`key_${isTablet ? 'tablet' : ''}`}
+          width={size}
+          height={size}
         >
-          {currentNumBackers}
-        </SHeadline>
-        <STarget>
-          {t('CfPost.BackersStatsSection.of_backers', {
-            targetBackers: formatNumber(targetBackerCount, true),
-          })}
-        </STarget>
-      </SCaptionSection>
-    </SSectionContainer>
-  );
-};
+          <SBgRingCircle
+            ref={(el) => {
+              bgRingCircleRef.current = el!!;
+            }}
+            stroke={theme.colorsThemed.accent.pink}
+            strokeWidth='12px'
+            strokeLinecap='round'
+            fill='transparent'
+            r={radius}
+            cx={size / 2}
+            cy={size / 2}
+          />
+        </SProgressRingSvg>
+        <SCaptionSection>
+          <SHeadline variant={3}>{currentNumBackers}</SHeadline>
+          <STarget>
+            {t('CfPost.BackersStatsSection.of_backers', {
+              targetBackers: formatNumber(targetBackerCount, true),
+            })}
+          </STarget>
+        </SCaptionSection>
+      </SSectionContainer>
+    );
+  };
 
 export default CfBackersStatsSectionModerationFailed;
 

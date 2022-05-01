@@ -11,24 +11,17 @@ interface ITimePicker {
 }
 
 export const TimePicker: React.FC<ITimePicker> = (props) => {
-  const {
-    value,
-    onChange,
-  } = props;
+  const { value, onChange } = props;
   const theme = useTheme();
 
   return (
     <SWrapper>
-      <SInput
-        type="time"
-        value={value}
-        onChange={onChange}
-      />
+      <SInput type='time' value={value} onChange={onChange} />
       <SInlineSVG
         svg={chevronDown}
         fill={theme.colorsThemed.text.secondary}
-        width="20px"
-        height="20px"
+        width='20px'
+        height='20px'
       />
     </SWrapper>
   );

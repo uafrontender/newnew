@@ -42,27 +42,30 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = ({
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
 
-  const socialButtons = useMemo(() => [
-    {
-      key: 'twitter',
-    },
-    {
-      key: 'facebook',
-    },
-    {
-      key: 'instagram',
-    },
-    {
-      key: 'tiktok',
-    },
-  ], []);
+  const socialButtons = useMemo(
+    () => [
+      {
+        key: 'twitter',
+      },
+      {
+        key: 'facebook',
+      },
+      {
+        key: 'instagram',
+      },
+      {
+        key: 'tiktok',
+      },
+    ],
+    []
+  );
   const renderItem = (item: any) => (
     <SItem key={item.key}>
       <SItemButton type={item.key}>
         <InlineSvg
           svg={SOCIAL_ICONS[item.key] as string}
-          width="50%"
-          height="50%"
+          width='50%'
+          height='50%'
         />
       </SItemButton>
       <SItemTitle variant={3} weight={600}>
@@ -114,14 +117,11 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = ({
           </SSocials> */}
           {/* <SSeparator /> */}
           <SItem>
-            <SItemButtonWide
-              type="copy"
-              onClick={() => handlerCopy()}
-            >
+            <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
               <InlineSvg
                 svg={SOCIAL_ICONS.copy as string}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
               {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
             </SItemButtonWide>
@@ -163,7 +163,8 @@ const SSocials = styled.div`
 `;
 
 const SSeparator = styled.div`
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
   margin-top: 16px;
   margin-bottom: 16px;
 `;
@@ -210,6 +211,6 @@ const SItemButtonWide = styled.div<ISItemButton>`
   font-size: 14px;
   line-height: 24px;
 
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
 `;

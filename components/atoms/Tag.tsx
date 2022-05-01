@@ -2,18 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ITag {
-  size?: 'sm',
-  view?: 'primary',
+  size?: 'sm';
+  view?: 'primary';
 }
 
 const Tag: React.FC<ITag> = (props) => {
   const { children, ...rest } = props;
 
-  return (
-    <STag {...rest}>
-      {children}
-    </STag>
-  );
+  return <STag {...rest}>{children}</STag>;
 };
 
 Tag.defaultProps = {
@@ -30,7 +26,7 @@ const STag = styled.div<ITag>`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   white-space: nowrap;
 
   font-size: 12px;
@@ -41,8 +37,10 @@ const STag = styled.div<ITag>`
 
   border-radius: ${(props) => props.theme.borderRadius.medium};
 
-  color: ${(props) => props.theme.colorsThemed.tag.color[props.view ?? 'primary']};
-  background: ${(props) => props.theme.colorsThemed.tag.background[props.view ?? 'primary']};
+  color: ${(props) =>
+    props.theme.colorsThemed.tag.color[props.view ?? 'primary']};
+  background: ${(props) =>
+    props.theme.colorsThemed.tag.background[props.view ?? 'primary']};
 
   /* No select */
   -webkit-touch-callout: none;

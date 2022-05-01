@@ -24,11 +24,7 @@ interface IFullPreview {
 }
 
 export const FullPreview: React.FC<IFullPreview> = (props) => {
-  const {
-    open,
-    value,
-    handleClose,
-  } = props;
+  const { open, value, handleClose } = props;
 
   const theme = useTheme();
   const { t } = useTranslation('creation');
@@ -41,10 +37,7 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
   };
 
   return (
-    <Modal
-      show={open}
-      onClose={handleClose}
-    >
+    <Modal show={open} onClose={handleClose}>
       <SMobileContainer onClick={preventCLick}>
         {!isMobile && (
           <SModalTopLine>
@@ -55,8 +48,8 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
               clickable
               svg={closeIcon}
               fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
+              width='24px'
+              height='24px'
               onClick={handleClose}
             />
           </SModalTopLine>
@@ -65,7 +58,7 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
           {open && (
             <BitmovinPlayer
               withMuteControl
-              id="full-preview"
+              id='full-preview'
               resources={value}
               borderRadius={isMobile ? '0' : '16px'}
             />
@@ -73,16 +66,12 @@ export const FullPreview: React.FC<IFullPreview> = (props) => {
         </SModalVideoWrapper>
         {isMobile && (
           <SModalCloseIcon>
-            <Button
-              iconOnly
-              view="transparent"
-              onClick={handleClose}
-            >
+            <Button iconOnly view='transparent' onClick={handleClose}>
               <InlineSVG
                 svg={chevronLeft}
                 fill={theme.colors.white}
-                width="20px"
-                height="20px"
+                width='20px'
+                height='20px'
               />
             </Button>
           </SModalCloseIcon>

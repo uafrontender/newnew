@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useContext, useEffect,
-} from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -25,6 +23,7 @@ interface IPostViewProcessing {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
@@ -32,11 +31,14 @@ const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -120,6 +122,7 @@ const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
         hasResponse={false}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
         startsAtSeconds={post.startsAt?.seconds as number}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer>
         <SAnimationContainer>
@@ -196,7 +199,6 @@ const SActivitesContainer = styled.div`
   align-self: bottom;
 
   height: 100%;
-
 
   ${({ theme }) => theme.media.tablet} {
     min-height: initial;

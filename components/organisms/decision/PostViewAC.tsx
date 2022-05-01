@@ -62,6 +62,7 @@ interface IPostViewAC {
   resetSessionId: () => void;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
@@ -72,6 +73,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   postStatus,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -635,7 +637,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           timestampSeconds={new Date(
             (post.expiresAt?.seconds as number) * 1000
           ).getTime()}
-          postType="ac"
+          postType='ac'
         />
       </SExpiresSection>
       <PostVideo
@@ -648,7 +650,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
-        postType="ac"
+        postType='ac'
         postId={post.postUuid}
         postStatus={postStatus}
         title={post.title}
@@ -658,6 +660,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer
         decisionFailed={postStatus === 'failed'}
@@ -754,7 +757,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
           user!!.userTutorialsProgress.remainingAcSteps!![0] ===
             newnewapi.AcTutorialStep.AC_HERO
         }
-        postType="AC"
+        postType='AC'
         closeModal={goToNextStep}
       />
     </SWrapper>

@@ -9,7 +9,7 @@ type TBioTextarea = React.ComponentPropsWithoutRef<'textarea'> & {
   maxChars: number;
   isValid: boolean;
   errorCaption: string;
-}
+};
 
 const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
   maxChars,
@@ -62,27 +62,17 @@ const BioTextarea: React.FunctionComponent<TBioTextarea> = ({
           {...rest}
         />
         <SCharCounter>
-          { charCounter }
-          /
-          { maxChars }
+          {charCounter}/{maxChars}
         </SCharCounter>
       </SBioTextareaDiv>
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
     </SWrapper>
   );
 };
@@ -96,7 +86,7 @@ const SWrapper = styled.div`
 `;
 
 interface ISBioTextareaDiv {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
@@ -128,10 +118,11 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
     border-width: 1.5px;
     border-style: solid;
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      return 'transparent';
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        return 'transparent';
+      }
+      return theme.colorsThemed.accent.error;
+    }};
 
     color: ${({ theme }) => theme.colorsThemed.text.primary};
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
@@ -148,10 +139,12 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
       color: ${({ theme }) => theme.colorsThemed.text.quaternary};
     }
 
-    &:hover:enabled, &:focus:enabled, &:active:enabled {
+    &:hover:enabled,
+    &:focus:enabled,
+    &:active:enabled {
       outline: none;
 
-      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2}
+      border-color: ${({ theme }) => theme.colorsThemed.background.outlines2};
     }
 
     &:disabled {
@@ -162,7 +155,6 @@ const SBioTextareaDiv = styled.div<ISBioTextareaDiv>`
       height: 120px;
     }
   }
-
 `;
 
 const SCharCounter = styled.div`
@@ -174,7 +166,10 @@ const SCharCounter = styled.div`
   font-size: 16px;
   line-height: 24px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  /* background: ${({ theme }) => (theme.name === 'light' ? 'rgba(241, 243, 249, 0.8)' : 'rgba(20, 21, 31, 0.8)')}; */
+  /* background: ${({ theme }) =>
+    theme.name === 'light'
+      ? 'rgba(241, 243, 249, 0.8)'
+      : 'rgba(20, 21, 31, 0.8)'}; */
   background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 `;
 

@@ -9,31 +9,20 @@ interface IOptionActionMobileModal {
   onClose: () => void;
 }
 
-const OptionActionMobileModal: React.FunctionComponent<
-  IOptionActionMobileModal
-> = ({
-  isOpen,
-  zIndex,
-  onClose,
-  children,
-}) => (
-  <Modal
-    show={isOpen}
-    overlayDim
-    additionalZ={zIndex}
-    onClose={onClose}
-  >
-    <SWrapper>
-      <SContentContainer
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        { children }
-      </SContentContainer>
-    </SWrapper>
-  </Modal>
-);
+const OptionActionMobileModal: React.FunctionComponent<IOptionActionMobileModal> =
+  ({ isOpen, zIndex, onClose, children }) => (
+    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+      <SWrapper>
+        <SContentContainer
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {children}
+        </SContentContainer>
+      </SWrapper>
+    </Modal>
+  );
 
 export default OptionActionMobileModal;
 

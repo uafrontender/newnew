@@ -40,7 +40,7 @@ const images = {
   ac: ACIcon.src,
   mc: MCIcon.src,
   cf: CFIcon.src,
-}
+};
 
 interface IPostTopInfo {
   postId: string;
@@ -56,6 +56,7 @@ interface IPostTopInfo {
   amountInBids?: number;
   hasResponse: boolean;
   hasWinner: boolean;
+  handleReportOpen: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -72,6 +73,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   hasResponse,
   hasWinner,
   totalVotes,
+  handleReportOpen,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -79,7 +81,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const startingDateParsed = new Date(startsAtSeconds * 1000);
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const failureReason = useMemo(() => {
     if (postStatus !== 'failed') return '';
@@ -106,25 +110,40 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
 
     return 'no-response';
-  }, [postStatus, postType, hasWinner, amountInBids, totalVotes, totalPledges, targetPledges]);
+  }, [
+    postStatus,
+    postType,
+    hasWinner,
+    amountInBids,
+    totalVotes,
+    totalPledges,
+    targetPledges,
+  ]);
 
+  const showSelectingWinnerOption = useMemo(
+    () => postType === 'ac' && postStatus === 'wating_for_decision',
+    [postType, postStatus]
+  );
 
-  const showSelectingWinnerOption = useMemo(() => (
-    postType === 'ac' && postStatus === 'wating_for_decision'
-  ), [postType, postStatus]);
+  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
 
-  const { followingsIds, addId, removeId, } = useContext(FollowingsContext);
-
-  const [isFollowingDecision, setIsFollowingDecision] = useState(isFollowingDecisionInitial);
+  const [isFollowingDecision, setIsFollowingDecision] = useState(
+    isFollowingDecisionInitial
+  );
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
+  const [reportPostOpen, setReportPostOpen] = useState(false);
 
   const handleRedirectToUser = () => {
-    window?.history.replaceState({
-      ...{...window.history.state},
-      fromPost: true,
-    }, '', '');
+    window?.history.replaceState(
+      {
+        ...{ ...window.history.state },
+        fromPost: true,
+      },
+      '',
+      ''
+    );
     router.push(`/${creator.username}`);
   };
 
@@ -137,10 +156,16 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState({
-          fromPost: true,
-        }, '', '');
-        router.push(`/sign-up?reason=follow-decision&redirect=${window.location.href}`);
+        window?.history.replaceState(
+          {
+            fromPost: true,
+          },
+          '',
+          ''
+        );
+        router.push(
+          `/sign-up?reason=follow-decision&redirect=${window.location.href}`
+        );
       }
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
         markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
@@ -160,15 +185,23 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState({
-          fromPost: true,
-        }, '', '');
-        router.push(`/sign-up?reason=follow-creator&redirect=${window.location.href}`);
+        window?.history.replaceState(
+          {
+            fromPost: true,
+          },
+          '',
+          ''
+        );
+        router.push(
+          `/sign-up?reason=follow-creator&redirect=${window.location.href}`
+        );
       }
 
       const payload = new newnewapi.MarkUserRequest({
         userUuid: creator.uuid,
-        markAs: followingsIds.includes(creator.uuid as string) ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
+        markAs: followingsIds.includes(creator.uuid as string)
+          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
+          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
       });
 
       const res = await markUser(payload);
@@ -183,48 +216,34 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } catch (err) {
       console.error(err);
     }
-  }
+  };
 
   return (
     <SContainer>
-      <SWrapper
-        showSelectingWinnerOption={showSelectingWinnerOption}
-      >
+      <SWrapper showSelectingWinnerOption={showSelectingWinnerOption}>
         {postType === 'ac' && amountInBids ? (
           <SBidsAmount>
-            <span>
-              $
-              {formatNumber((amountInBids / 100) ?? 0, true)}
-            </span>
-            {' '}
-            { t('AcPost.PostTopInfo.in_bids') }
+            <span>${formatNumber(amountInBids / 100 ?? 0, true)}</span>{' '}
+            {t('AcPost.PostTopInfo.in_bids')}
           </SBidsAmount>
         ) : null}
         {postType === 'mc' && totalVotes ? (
           <SBidsAmount>
-            <span>
-              {formatNumber(totalVotes, true).replaceAll(/,/g, ' ') }
-            </span>
-            {' '}
-            { t('McPost.PostTopInfo.votes') }
+            <span>{formatNumber(totalVotes, true).replaceAll(/,/g, ' ')}</span>{' '}
+            {totalVotes > 1
+              ? t('McPost.PostTopInfo.votes')
+              : t('McPost.PostTopInfo.vote')}
           </SBidsAmount>
         ) : null}
-        <CreatorCard
-          onClick={() => handleRedirectToUser()}
-        >
+        <CreatorCard onClick={() => handleRedirectToUser()}>
           <SAvatarArea>
-            <img
-              src={creator.avatarUrl!! as string}
-              alt={creator.username!!}
-            />
+            <img src={creator.avatarUrl!! as string} alt={creator.username!!} />
           </SAvatarArea>
-          <SUsername>
-            { creator.nickname ?? `@${creator.username}` }
-          </SUsername>
+          <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
         </CreatorCard>
         <SActionsDiv>
           <SShareButton
-            view="transparent"
+            view='transparent'
             iconOnly
             withDim
             withShrink
@@ -236,20 +255,20 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <InlineSvg
               svg={ShareIconFilled}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
             />
           </SShareButton>
           <SMoreButton
-            view="transparent"
+            view='transparent'
             iconOnly
             onClick={() => handleOpenEllipseMenu()}
           >
             <InlineSvg
               svg={MoreIconFilled}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
             />
           </SMoreButton>
           {/* Share menu */}
@@ -277,7 +296,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
               handleToggleFollowingCreator={handleToggleFollowingCreator}
-              handleClose={handleCloseEllipseMenu}
+              handleReportOpen={handleReportOpen}
+              onClose={handleCloseEllipseMenu}
             />
           )}
           {isMobile && ellipseMenuOpen ? (
@@ -289,47 +309,44 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               isOpen={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
               handleToggleFollowingCreator={handleToggleFollowingCreator}
+              handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
             />
           ) : null}
         </SActionsDiv>
-        <SPostTitle
-        >
-          <Headline
-            variant={5}
-          >
-            {title}
-          </Headline>
+        <SPostTitle>
+          <Headline variant={5}>{title}</Headline>
         </SPostTitle>
         {showSelectingWinnerOption ? (
           <SSelectingWinnerOption>
-            <SHeadline
-              variant={4}
-            >
-              { t('AcPost.PostTopInfo.SelectWinner.title') }
+            <SHeadline variant={4}>
+              {t('AcPost.PostTopInfo.SelectWinner.title')}
             </SHeadline>
-            <SText
-              variant={3}
-            >
-              { t('AcPost.PostTopInfo.SelectWinner.body') }
+            <SText variant={3}>
+              {t('AcPost.PostTopInfo.SelectWinner.body')}
             </SText>
-            <STrophyImg
-              src={AcSelectWinnerIcon.src}
-            />
+            <STrophyImg src={AcSelectWinnerIcon.src} />
           </SSelectingWinnerOption>
         ) : null}
       </SWrapper>
       {postStatus === 'failed' && (
         <PostFailedBox
-          title={t('PostFailedBox.title', { postType: t(`postType.${postType}`) })}
-          body={t(`PostFailedBoxModeration.reason.${failureReason}`, { creator: getDisplayname(creator) })}
-          buttonCaption={t('PostFailedBox.ctaButton', { postTypeMultiple: t(`postType.multiple.${postType}`) })}
+          title={t('PostFailedBox.title', {
+            postType: t(`postType.${postType}`),
+          })}
+          body={t(`PostFailedBoxModeration.reason.${failureReason}`, {
+            creator: getDisplayname(creator),
+          })}
+          buttonCaption={t('PostFailedBox.ctaButton', {
+            postTypeMultiple: t(`postType.multiple.${postType}`),
+          })}
           imageSrc={images[postType!!]}
           handleButtonClick={() => {
             document.getElementById('post-modal-container')?.scrollTo({
-              top: document.getElementById('recommendations-section-heading')?.offsetTop,
+              top: document.getElementById('recommendations-section-heading')
+                ?.offsetTop,
               behavior: 'smooth',
-            })
+            });
           }}
         />
       )}
@@ -362,8 +379,6 @@ const SWrapper = styled.div<{
     'title title title'
     'userCard userCard actions'
     'stats stats stats';
-  ;
-
   height: fit-content;
 
   margin-top: 24px;
@@ -371,22 +386,19 @@ const SWrapper = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     width: 100%;
-    ${({ showSelectingWinnerOption }) => (
+    ${({ showSelectingWinnerOption }) =>
       showSelectingWinnerOption
-      ? css`
-        grid-template-areas:
-          'userCard stats actions'
-          'title title title'
-          'selectWinner selectWinner selectWinner'
-        ;
-      `
-      : css`
-        grid-template-areas:
-          'userCard stats actions'
-          'title title title'
-        ;
-      `
-    )}
+        ? css`
+            grid-template-areas:
+              'userCard stats actions'
+              'title title title'
+              'selectWinner selectWinner selectWinner';
+          `
+        : css`
+            grid-template-areas:
+              'userCard stats actions'
+              'title title title';
+          `}
     grid-template-rows: 40px;
     grid-template-columns: 1fr 1fr 100px;
     align-items: center;
@@ -414,9 +426,7 @@ const CreatorCard = styled.div`
 
   display: grid;
   align-items: center;
-  grid-template-areas:
-    'avatar username'
-  ;
+  grid-template-areas: 'avatar username';
   grid-template-columns: 36px 1fr;
 
   height: 36px;
@@ -424,7 +434,7 @@ const CreatorCard = styled.div`
   cursor: pointer;
 
   & > div:nth-child(2) {
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
 
   &:hover {
@@ -477,10 +487,8 @@ const SShareButton = styled(Button)`
   background: none;
   padding: 0px;
   &:focus:enabled {
-    background: ${({
-    theme,
-    view,
-  }) => theme.colorsThemed.button.background[view!!]};
+    background: ${({ theme, view }) =>
+      theme.colorsThemed.button.background[view!!]};
   }
 `;
 
@@ -523,7 +531,6 @@ const SBidsAmount = styled.div`
   }
 `;
 
-
 // Winner option
 const SSelectingWinnerOption = styled.div`
   position: fixed;
@@ -542,7 +549,12 @@ const SSelectingWinnerOption = styled.div`
   padding: 24px 16px;
   padding-right: 134px;
 
-  background: linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;
+  background: linear-gradient(
+      315deg,
+      rgba(29, 180, 255, 0.85) 0%,
+      rgba(29, 180, 255, 0) 50%
+    ),
+    #1d6aff;
   border-radius: 24px;
 
   ${({ theme }) => theme.media.tablet} {
@@ -555,7 +567,6 @@ const SSelectingWinnerOption = styled.div`
     margin-top: 32px;
 
     width: 100%;
-
   }
 `;
 
@@ -566,9 +577,9 @@ const STrophyImg = styled.img`
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SText = styled(Text)`
-  color:#FFFFFF;
+  color: #ffffff;
 `;

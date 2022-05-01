@@ -40,21 +40,32 @@ interface IChatroomsSorted {
   chats: IChatRoomUserNameWithoutEmoji[];
 }
 
-const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) => {
+const NewMessageModal: React.FC<INewMessageModal> = ({
+  showModal,
+  closeModal,
+}) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const scrollRef: any = useRef();
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [chatroomsSortedList, setChatroomsSortedList] = useState<IChatroomsSorted[]>([]);
+  const [chatroomsSortedList, setChatroomsSortedList] = useState<
+    IChatroomsSorted[]
+  >([]);
   const [searchValue, setSearchValue] = useState('');
-  const [filteredChatrooms, setFilteredChatrooms] = useState<IChatRoomUserNameWithoutEmoji[]>([]);
+  const [filteredChatrooms, setFilteredChatrooms] = useState<
+    IChatRoomUserNameWithoutEmoji[]
+  >([]);
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] = useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
-  const [myAnnouncement, setMyAnnouncement] = useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] =
+    useState<IChatRoomUserNameWithoutEmoji[] | null>(null);
+  const [myAnnouncement, setMyAnnouncement] =
+    useState<newnewapi.IChatRoom | null>(null);
 
   const passInputValue = (str: string) => {
     setSearchValue(str);
@@ -64,9 +75,12 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
     async function fetchMyRooms() {
       try {
         setLoadingRooms(true);
-        const payload = new newnewapi.GetMyRoomsRequest({ paging: { limit: 50 } });
+        const payload = new newnewapi.GetMyRoomsRequest({
+          paging: { limit: 50 },
+        });
         const res = await getMyRooms(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         const arr = [] as IChatRoomUserNameWithoutEmoji[];
         res.data.rooms.forEach((chat) => {
           if (chat.kind === 4) {
@@ -94,7 +108,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
     if (chatRooms) {
       const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
         if (c.visavis) {
-          const letter = clearNameFromEmoji(c.visavis?.username!!)[0].toLowerCase();
+          const letter = clearNameFromEmoji(
+            c.visavis?.username!!
+          )[0].toLowerCase();
           acc[letter] = (acc[letter] || []).concat(c);
         }
         return acc;
@@ -127,7 +143,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis) chat.userNameWithoutEmoji = clearNameFromEmoji(chat.visavis.username!!).toLowerCase();
+          if (chat.visavis)
+            chat.userNameWithoutEmoji = clearNameFromEmoji(
+              chat.visavis.username!!
+            ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
           if (chat.userNameWithoutEmoji.startsWith(searchValue)) arr.push(chat);
@@ -152,7 +171,10 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
   }, [searchValue, chatRooms]);
 
   const createNewAnnouncement = () => {
-    if (myAnnouncement) router.push(`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncement.id}`);
+    if (myAnnouncement)
+      router.push(
+        `/creator/dashboard?tab=direct-messages&roomID=${myAnnouncement.id}`
+      );
     closeModal();
   };
 
@@ -201,8 +223,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
                 clickable
                 svg={chevronLeftIcon}
                 fill={theme.colorsThemed.text.tertiary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
                 onClick={closeModal}
               />
             )}
@@ -210,7 +232,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
           <SearchInput
             placeholderText={t('modal.new-message.search-placeholder')}
             bgColor={theme.colorsThemed.background.tertiary}
-            fontSize="16px"
+            fontSize='16px'
             style={{ marginBottom: '16px' }}
             passInputValue={passInputValue}
           />
@@ -219,7 +241,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({ showModal, closeModal }) 
               /* eslint-disable no-nested-ternary */
               searchValue.length > 0 ? (
                 filteredChatrooms.length > 0 ? (
-                  <SSectionContent ref={scrollRef}>{filteredChatrooms.map(renderChatItem)}</SSectionContent>
+                  <SSectionContent ref={scrollRef}>
+                    {filteredChatrooms.map(renderChatItem)}
+                  </SSectionContent>
                 ) : (
                   <>
                     <NoResults text={searchValue} />
@@ -280,7 +304,9 @@ const SSectionContent = styled.div`
 const SModal = styled.div`
   width: 100%;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px 16px;
   box-sizing: border-box;
   display: flex;
@@ -288,7 +314,9 @@ const SModal = styled.div`
   line-height: 24px;
   height: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   max-width: 100%;
   max-height: 100vh;
 

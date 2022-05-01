@@ -20,9 +20,11 @@ export const SContainer = styled.div<ISContainer>`
   }
 
   ${(props) => props.theme.media.laptopL} {
-    ${(props) => props.noMaxContent && css`
-      max-width: unset;
-    `}
+    ${(props) =>
+      props.noMaxContent &&
+      css`
+        max-width: unset;
+      `}
   }
 `;
 

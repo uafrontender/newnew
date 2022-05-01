@@ -17,14 +17,19 @@ import { getMyOnboardingState } from '../../../../api/endpoints/user';
 export const Subscriptions = () => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const router = useRouter();
 
   const { mySubscribersTotal } = useGetSubscriptions();
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const [mySubscriptionProduct, setMySubscriptionProduct] =
+    useState<newnewapi.ISubscriptionProduct | null>(null);
 
-  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoadingOnboardingState, setIsLoadingOnboardingState] = useState(true);
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [isLoadingOnboardingState, setIsLoadingOnboardingState] =
+    useState(true);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -75,11 +80,16 @@ export const Subscriptions = () => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>
-            {t('subscriptions.title')} {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
+            {t('subscriptions.title')}{' '}
+            {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
           </STitle>
         </STitleBlock>
         {!mySubscribersTotal || mySubscribersTotal < 1 ? (
-          <NoResults isCreatorConnectedToStripe={onboardingState?.isCreatorConnectedToStripe} />
+          <NoResults
+            isCreatorConnectedToStripe={
+              onboardingState?.isCreatorConnectedToStripe
+            }
+          />
         ) : (
           <SubscribersTable />
         )}

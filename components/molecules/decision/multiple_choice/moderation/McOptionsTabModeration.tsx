@@ -1,9 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {
-  useEffect, useRef,
-} from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -28,85 +26,85 @@ interface IMcOptionsTabModeration {
   handleRemoveOption: (optionToRemove: newnewapi.MultipleChoice.Option) => void;
 }
 
-const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> = ({
-  post,
-  options,
-  optionsLoading,
-  pagingToken,
-  handleLoadOptions,
-  handleRemoveOption,
-}) => {
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
+  ({
+    post,
+    options,
+    optionsLoading,
+    pagingToken,
+    handleLoadOptions,
+    handleRemoveOption,
+  }) => {
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    // Infinite load
+    const { ref: loadingRef, inView } = useInView();
 
-  const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
+    const containerRef = useRef<HTMLDivElement>();
+    const { showTopGradient, showBottomGradient } =
+      useScrollGradients(containerRef);
 
-  useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadOptions(pagingToken);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+    useEffect(() => {
+      if (inView && !optionsLoading && pagingToken) {
+        handleLoadOptions(pagingToken);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, pagingToken, optionsLoading]);
 
-  return (
-    <>
-      <STabContainer
-        key="bids"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <SBidsContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
+    return (
+      <>
+        <STabContainer
+          key='bids'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         >
-          {!isMobile ? (
-            <>
-              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
-              <GradientMask gradientType="secondary" positionBottom={0} active={showBottomGradient} />
-            </>
-          ) : null}
-          {options.map((option, i) => (
-            <McOptionCardModeration
-              index={i}
-              key={option.id.toString()}
-              option={option as TMcOptionWithHighestField}
-              creator={option.creator ?? post.creator!!}
-              canBeDeleted={options.length > 2}
-              postId={post.postUuid}
-            />
-          ))}
-          {!isMobile ? (
-            <SLoaderDiv
-              ref={loadingRef}
-            />
-          ) : (
-            pagingToken ? (
-              (
-                <SLoadMoreBtn
-                  onClick={() => handleLoadOptions(pagingToken)}
-                >
-                  { t('loadMoreBtn') }
-                </SLoadMoreBtn>
-              )
-            ) : null
-          )}
-        </SBidsContainer>
-      </STabContainer>
-    </>
-  );
-};
+          <SBidsContainer
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+          >
+            {!isMobile ? (
+              <>
+                <GradientMask
+                  gradientType='secondary'
+                  positionTop
+                  active={showTopGradient}
+                />
+                <GradientMask
+                  gradientType='secondary'
+                  positionBottom={0}
+                  active={showBottomGradient}
+                />
+              </>
+            ) : null}
+            {options.map((option, i) => (
+              <McOptionCardModeration
+                index={i}
+                key={option.id.toString()}
+                option={option as TMcOptionWithHighestField}
+                creator={option.creator ?? post.creator!!}
+                canBeDeleted={options.length > 2}
+                postId={post.postUuid}
+              />
+            ))}
+            {!isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : pagingToken ? (
+              <SLoadMoreBtn onClick={() => handleLoadOptions(pagingToken)}>
+                {t('loadMoreBtn')}
+              </SLoadMoreBtn>
+            ) : null}
+          </SBidsContainer>
+        </STabContainer>
+      </>
+    );
+  };
 
-McOptionsTabModeration.defaultProps = {
-};
+McOptionsTabModeration.defaultProps = {};
 
 export default McOptionsTabModeration;
 
@@ -132,12 +130,12 @@ const SBidsContainer = styled.div`
   &::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 4px;
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
   &::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 4px;
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
 
   &:hover {
@@ -156,6 +154,4 @@ const SLoaderDiv = styled.div`
   height: 10px;
 `;
 
-const SLoadMoreBtn = styled(Button)`
-
-`;
+const SLoadMoreBtn = styled(Button)``;

@@ -1,7 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, {
-  ReactElement, useCallback, useEffect, useState,
-} from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
@@ -47,14 +45,12 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 }) => {
   // Display post
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] = useState<newnewapi.IPost | undefined>();
+  const [displayedPost, setDisplayedPost] =
+    useState<newnewapi.IPost | undefined>();
 
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+  const { ref: loadingRef, inView } = useInView();
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -72,50 +68,54 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   };
 
   // TODO: filters and other parameters
-  const loadPosts = useCallback(async (
-    token?: string,
-    needCount?: boolean,
-  ) => {
-    if (isLoading) return;
-    try {
-      setIsLoading(true);
-      setTriedLoading(true);
-      const payload = new newnewapi.GetRelatedToMePostsRequest({
-        relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_SUBSCRIPTIONS,
-        filter: postsFilter,
-        paging: {
-          ...(token ? { pageToken: token } : {}),
-        },
-        ...(needCount ? {
-          needTotalCount: true,
-        } : {}),
-      });
-      const postsResponse = await getMyPosts(
-        payload,
-      );
+  const loadPosts = useCallback(
+    async (token?: string, needCount?: boolean) => {
+      if (isLoading) return;
+      try {
+        setIsLoading(true);
+        setTriedLoading(true);
+        const payload = new newnewapi.GetRelatedToMePostsRequest({
+          relation:
+            newnewapi.GetRelatedToMePostsRequest.Relation.MY_SUBSCRIPTIONS,
+          filter: postsFilter,
+          paging: {
+            ...(token ? { pageToken: token } : {}),
+          },
+          ...(needCount
+            ? {
+                needTotalCount: true,
+              }
+            : {}),
+        });
+        const postsResponse = await getMyPosts(payload);
 
-      if (postsResponse.data && postsResponse.data.posts) {
-        handleSetPosts((curr) => [...curr, ...postsResponse.data?.posts as newnewapi.Post[]]);
-        handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
+        if (postsResponse.data && postsResponse.data.posts) {
+          handleSetPosts((curr) => [
+            ...curr,
+            ...(postsResponse.data?.posts as newnewapi.Post[]),
+          ]);
+          handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
 
-        if (postsResponse.data.totalCount) {
-          handleUpdateCount(postsResponse.data.totalCount);
-        } else if (needCount) {
-          handleUpdateCount(0);
+          if (postsResponse.data.totalCount) {
+            handleUpdateCount(postsResponse.data.totalCount);
+          } else if (needCount) {
+            handleUpdateCount(0);
+          }
         }
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        console.error(err);
       }
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      console.error(err);
-    }
-  }, [
-    handleSetPosts,
-    handleUpdatePageToken,
-    handleUpdateCount,
-    postsFilter,
-    isLoading,
-  ]);
+    },
+    [
+      handleSetPosts,
+      handleUpdatePageToken,
+      handleUpdateCount,
+      postsFilter,
+      isLoading,
+    ]
+  );
 
   useEffect(() => {
     if (inView && !isLoading) {
@@ -127,7 +127,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
     } else if (!triedLoading && posts?.length === 0) {
       loadPosts(undefined, true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
   // useUpdateEffect(() => {
@@ -148,7 +148,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
         <SCardsSection>
           {posts && (
             <List
-              category=""
+              category=''
               loading={isLoading}
               collection={posts}
               wrapperStyle={{
@@ -158,9 +158,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
             />
           )}
         </SCardsSection>
-        <div
-          ref={loadingRef}
-        />
+        <div ref={loadingRef} />
       </SMain>
       {displayedPost && (
         <PostModal
@@ -174,16 +172,18 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   );
 };
 
-(MyProfileSubscriptions as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(MyProfileSubscriptions as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return (
     <MyProfileLayout
-      renderedPage="subscriptions"
+      renderedPage='subscriptions'
       postsCachedSubscriptions={page.props.pagedPosts.posts}
       postsCachedSubscriptionsFilter={newnewapi.Post.Filter.ALL}
       postsCachedSubscriptionsPageToken={page.props.nextPageTokenFromServer}
       postsCachedSubscriptionsCount={page.props.pagedPosts.totalCount}
     >
-      { page }
+      {page}
     </MyProfileLayout>
   );
 };
@@ -191,13 +191,16 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
 export default MyProfileSubscriptions;
 
 export async function getServerSideProps(
-  context: GetServerSidePropsContext,
+  context: GetServerSidePropsContext
 ): Promise<any> {
   try {
-    const translationContext = await serverSideTranslations(
-      context.locale!!,
-      ['common', 'profile', 'home', 'decision', 'payment-modal'],
-    );
+    const translationContext = await serverSideTranslations(context.locale!!, [
+      'common',
+      'profile',
+      'home',
+      'decision',
+      'payment-modal',
+    ]);
 
     // const { req } = context;
     // // Try to fetch only if actual SSR needed

@@ -11,31 +11,18 @@ interface IWaitingForResponseBox {
   body: string;
 }
 
-const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> = ({
-  title,
-  body,
-}) => (
+const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> =
+  ({ title, body }) => (
     <SBox>
       <STextWrapper>
-        <SHeadline
-          variant={2}
-        >
-          { title }
-        </SHeadline>
-        <SText
-          variant={6}
-        >
-          { body }
-        </SText>
+        <SHeadline variant={2}>{title}</SHeadline>
+        <SText variant={6}>{body}</SText>
       </STextWrapper>
       <SImageContainer>
-        <img
-          src={HourGlassImage.src}
-          alt="decision"
-        />
+        <img src={HourGlassImage.src} alt='decision' />
       </SImageContainer>
     </SBox>
-  )
+  );
 
 export default WaitingForResponseBox;
 
@@ -63,11 +50,11 @@ const STextWrapper = styled.div`
 `;
 
 const SHeadline = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SText = styled(Headline)`
-  color: #FFFFFF;
+  color: #ffffff;
 `;
 
 const SImageContainer = styled.div`

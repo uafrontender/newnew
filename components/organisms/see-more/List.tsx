@@ -19,8 +19,8 @@ interface IList {
   collection: any;
   loading: boolean;
   wrapperStyle?: React.CSSProperties;
-  skeletonsBgColor?: string,
-  skeletonsHighlightColor?: string,
+  skeletonsBgColor?: string;
+  skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
@@ -34,7 +34,9 @@ export const List: React.FC<IList> = ({
   handlePostClicked,
 }) => {
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const renderItem = (item: any, index: number) => {
     const handleItemClick = () => {
@@ -49,7 +51,7 @@ export const List: React.FC<IList> = ({
         <Card
           item={item}
           index={index + 1}
-          width="100%"
+          width='100%'
           height={isMobile ? '564px' : '336px'}
         />
       </SItemWrapper>
@@ -58,19 +60,23 @@ export const List: React.FC<IList> = ({
 
   return (
     <SListWrapper
-      // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
+    // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
     >
       {collection?.map(renderItem)}
-      {collection.length > 0 && loading && Array(5).fill('_').map((_, i) => (
-        <CardSkeleton
-          key={i}
-          count={1}
-          cardWidth="100%"
-          cardHeight="100%"
-          bgColor={skeletonsBgColor}
-          highlightColor={skeletonsHighlightColor}
-        />
-      ))}
+      {collection.length > 0 &&
+        loading &&
+        Array(5)
+          .fill('_')
+          .map((_, i) => (
+            <CardSkeleton
+              key={i}
+              count={1}
+              cardWidth='100%'
+              cardHeight='100%'
+              bgColor={skeletonsBgColor}
+              highlightColor={skeletonsHighlightColor}
+            />
+          ))}
       {collection.length === 0 && loading && (
         <SAnimationContainer
           onClick={(e) => {
@@ -132,7 +138,6 @@ const SListWrapper = styled.div`
     max-width: 1248px;
   }
 
-
   .skeletonsContainer {
     display: block;
     height: 400px;
@@ -157,7 +162,6 @@ const SListWrapper = styled.div`
     ${(props) => props.theme.media.desktop} {
       width: calc(16.65% - 32px);
     }
-
 
     div {
       .skeletonSpan {
@@ -190,7 +194,6 @@ const SItemWrapper = styled.div`
   ${(props) => props.theme.media.desktop} {
     width: calc(16.65% - 32px);
   }
-
 `;
 
 const SAnimationContainer = styled.div`

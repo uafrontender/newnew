@@ -62,6 +62,7 @@ interface IPostViewMC {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleReportOpen: () => void;
 }
 
 const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
@@ -71,6 +72,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
   resetSessionId,
   handleGoBack,
   handleUpdatePostStatus,
+  handleReportOpen,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
@@ -615,7 +617,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           timestampSeconds={new Date(
             (post.expiresAt?.seconds as number) * 1000
           ).getTime()}
-          postType="mc"
+          postType='mc'
         />
       </SExpiresSection>
       <PostVideo
@@ -628,7 +630,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         handleToggleMuted={() => handleToggleMutedMode()}
       />
       <PostTopInfo
-        postType="mc"
+        postType='mc'
         postId={post.postUuid}
         postStatus={postStatus}
         title={post.title}
@@ -638,6 +640,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         creator={post.creator!!}
         startsAtSeconds={post.startsAt?.seconds as number}
         isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        handleReportOpen={handleReportOpen}
       />
       <SActivitesContainer decisionFailed={postStatus === 'failed'}>
         <DecisionTabs
@@ -725,7 +728,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
           user!!.userTutorialsProgress.remainingMcSteps!![0] ===
             newnewapi.McTutorialStep.MC_HERO
         }
-        postType="MC"
+        postType='MC'
         closeModal={goToNextStep}
       />
     </SWrapper>

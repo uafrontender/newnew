@@ -42,18 +42,20 @@ const icons: any = {
 };
 
 export type TBottomNavigationItem = {
-  key: string,
-  url: string,
-  width: string,
-  counter?: number,
+  key: string;
+  url: string;
+  width: string;
+  counter?: number;
   actionHandler?: () => void;
-}
+};
 
 interface IBottomNavigationItem {
   item: TBottomNavigationItem;
 }
 
-export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
+export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (
+  props
+) => {
   const { item } = props;
   const theme = useTheme();
   const { t } = useTranslation();
@@ -79,9 +81,13 @@ export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => 
         <InlineSVG
           key={item.key}
           svg={icons?.[active ? 'filled' : 'outlined']?.[item.key]}
-          fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-          width="24px"
-          height="24px"
+          fill={
+            active
+              ? theme.colorsThemed.accent.blue
+              : theme.colorsThemed.text.tertiary
+          }
+          width='24px'
+          height='24px'
         />
         {!!item.counter && (
           <SIndicatorContainer>
@@ -120,7 +126,8 @@ interface ISTitle {
 }
 
 const SCaption = styled(Caption)<ISTitle>`
-  color: ${(props) => props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
+  color: ${(props) =>
+    props.theme.colorsThemed.text[props.active ? 'primary' : 'tertiary']};
   width: 100%;
   overflow: hidden;
   position: relative;

@@ -19,13 +19,15 @@ const AccountDeleted: React.FC = () => {
         <SBottomActionIcon>😞</SBottomActionIcon>
         <SBottomActionText>
           <SBottomActionTitle>{t('account-deleted.title')}</SBottomActionTitle>
-          <SBottomActionMessage>{t('account-deleted.message')}</SBottomActionMessage>
+          <SBottomActionMessage>
+            {t('account-deleted.message')}
+          </SBottomActionMessage>
         </SBottomActionText>
       </SBottomActionLeft>
       <SBottomActionButton
         withDim
         withShrink
-        view="quaternary"
+        view='quaternary'
         onClick={() => {
           console.log('Delete chat');
         }}

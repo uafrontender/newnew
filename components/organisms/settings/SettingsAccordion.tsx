@@ -2,9 +2,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
 /* eslint-disable padded-blocks */
-import React, {
-  ReactElement, useEffect, useRef, useState,
-} from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion, Variants } from 'framer-motion';
 
@@ -16,7 +14,7 @@ import ChevronDown from '../../../public/images/svg/icons/outlined/ChevronDown.s
 export type AccordionSectionItem = React.FunctionComponent & {
   isDimmed?: boolean;
   handleSetActive?: () => void;
-}
+};
 
 export interface AccordionSection {
   title: string;
@@ -32,7 +30,9 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
 }) => {
   const theme = useTheme();
   const [activeSection, setActiveSection] = useState(-1);
-  const [sectionsState, setSectionsState] = useState(Array(sections.length).fill(false));
+  const [sectionsState, setSectionsState] = useState(
+    Array(sections.length).fill(false)
+  );
   const sectionsRefs = useRef<HTMLDivElement[]>(Array(sections.length));
 
   const handleToggleSection = (idx: number) => {
@@ -52,68 +52,60 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
 
   return (
     <SSettingsAccrodionContainer>
-      {sections && sections.map((section, i) => (
-        <SSettingsAccordionItem
-          active={i === activeSection}
-          isDimmed={activeSection !== -1 && activeSection !== i}
-          key={section.title}
-          ref={(el) => {
-            sectionsRefs.current[i] = el!!;
-          }}
-        >
-          <SSettingsAccordionItemHeading
-            isOpen={sectionsState[i]}
-            onClick={() => handleToggleSection(i)}
+      {sections &&
+        sections.map((section, i) => (
+          <SSettingsAccordionItem
+            active={i === activeSection}
+            isDimmed={activeSection !== -1 && activeSection !== i}
+            key={section.title}
+            ref={(el) => {
+              sectionsRefs.current[i] = el!!;
+            }}
           >
-            <Headline
-              variant={6}
-            >
-              { section.title }
-            </Headline>
-            <SInlineSvg
-              svg={ChevronDown}
+            <SSettingsAccordionItemHeading
               isOpen={sectionsState[i]}
-              fill={theme.colorsThemed.text.secondary}
-              width="24px"
-              height="24px"
-            />
-          </SSettingsAccordionItemHeading>
-          <SSettingsAccordionItemContent
-            variants={variantsAccordionItemContent}
-            initial={sectionsState[i] ? 'open' : 'collapsed'}
-            animate={sectionsState[i] ? 'open' : 'collapsed'}
-          >
-            { React.cloneElement(
-              section.content,
-              {
+              onClick={() => handleToggleSection(i)}
+            >
+              <Headline variant={6}>{section.title}</Headline>
+              <SInlineSvg
+                svg={ChevronDown}
+                isOpen={sectionsState[i]}
+                fill={theme.colorsThemed.text.secondary}
+                width='24px'
+                height='24px'
+              />
+            </SSettingsAccordionItemHeading>
+            <SSettingsAccordionItemContent
+              variants={variantsAccordionItemContent}
+              initial={sectionsState[i] ? 'open' : 'collapsed'}
+              animate={sectionsState[i] ? 'open' : 'collapsed'}
+            >
+              {React.cloneElement(section.content, {
                 handleSetActive: () => setActiveSection(i),
-              },
-            ) }
-          </SSettingsAccordionItemContent>
-        </SSettingsAccordionItem>
-      ))}
+              })}
+            </SSettingsAccordionItemContent>
+          </SSettingsAccordionItem>
+        ))}
     </SSettingsAccrodionContainer>
   );
 };
 
 export default SettingsAccordion;
 
-const SSettingsAccrodionContainer = styled.div`
-
-`;
+const SSettingsAccrodionContainer = styled.div``;
 
 const SSettingsAccordionItem = styled.div<{
   isDimmed: boolean;
   active: boolean;
 }>`
-
   width: 100%;
 
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 
   opacity: ${({ isDimmed }) => (isDimmed ? 0.5 : 1)};
 
-  transition: opacity .2s linear;
+  transition: opacity 0.2s linear;
 `;
 
 const SSettingsAccordionItemHeading = styled.button<{
@@ -139,7 +131,7 @@ const SInlineSvg = styled(InlineSvg)<{
 }>`
   svg {
     transform: ${({ isOpen }) => (isOpen ? 'rotate(-180deg)' : 'unset')};
-    transition: .2s linear;
+    transition: 0.2s linear;
   }
 `;
 
@@ -161,6 +153,4 @@ const variantsAccordionItemContent: Variants = {
   },
 };
 
-const SSettingsAccordionItemContent = styled(motion.div)`
-
-`;
+const SSettingsAccordionItemContent = styled(motion.div)``;

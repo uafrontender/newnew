@@ -37,7 +37,9 @@ const SEmptyInboxTitle = styled.strong`
   margin-bottom: 4px;
   font-weight: 600;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
 `;
 
 const SEmptyInboxText = styled.div`

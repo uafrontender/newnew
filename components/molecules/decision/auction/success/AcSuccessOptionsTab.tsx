@@ -29,7 +29,9 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   const { t } = useTranslation('decision');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   // Options
   const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
@@ -188,68 +190,62 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
 
   return (
     <SWrapper>
-      <GoBackButton
-        onClick={handleGoBack}
-      >
+      <GoBackButton onClick={handleGoBack}>
         {t('AcPostSuccess.OptionsTab.backBtn')}
       </GoBackButton>
-      {!isMobile && (
-        <SSeparator />
-      )}
+      {!isMobile && <SSeparator />}
       <SBidsContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          heightDelta={isMobile ? 24 : 60}
-        >
-          {!isMobile ? (
-            <>
-              <GradientMask
-                gradientType="secondary"
-                positionTop
-                active={showTopGradient}
-              />
-              <GradientMask
-                gradientType="secondary"
-                positionBottom={0}
-                active={showBottomGradient}
-              />
-            </>
-          ) : null}
-          {options.map((option, i) => (
-            <AcOptionCard
-              key={option.id.toString()}
-              option={option as TAcOptionWithHighestField}
-              postId={post.postUuid}
-              postCreator={post.creator?.nickname!!}
-              postDeadline=""
-              index={i}
-              minAmount={0}
-              votingAllowed={false}
-              handleSetSupportedBid={() => {}}
-              handleAddOrUpdateOptionFromResponse={() => {}}
+        ref={(el) => {
+          containerRef.current = el!!;
+        }}
+        heightDelta={isMobile ? 24 : 60}
+      >
+        {!isMobile ? (
+          <>
+            <GradientMask
+              gradientType='secondary'
+              positionTop
+              active={showTopGradient}
             />
-          ))}
-          {!isMobile ? (
-            <SLoaderDiv ref={loadingRef} />
-          ) : optionsNextPageToken ? (
-            <SLoadMoreBtn
-              view="secondary"
-              onClick={() => fetchBids(optionsNextPageToken)}
-            >
-              {t('loadMoreBtn')}
-            </SLoadMoreBtn>
-          ) : null}
-        </SBidsContainer>
+            <GradientMask
+              gradientType='secondary'
+              positionBottom={0}
+              active={showBottomGradient}
+            />
+          </>
+        ) : null}
+        {options.map((option, i) => (
+          <AcOptionCard
+            key={option.id.toString()}
+            option={option as TAcOptionWithHighestField}
+            postId={post.postUuid}
+            postCreator={post.creator?.nickname!!}
+            postDeadline=''
+            index={i}
+            minAmount={0}
+            votingAllowed={false}
+            handleSetSupportedBid={() => {}}
+            handleAddOrUpdateOptionFromResponse={() => {}}
+          />
+        ))}
+        {!isMobile ? (
+          <SLoaderDiv ref={loadingRef} />
+        ) : optionsNextPageToken ? (
+          <SLoadMoreBtn
+            view='secondary'
+            onClick={() => fetchBids(optionsNextPageToken)}
+          >
+            {t('loadMoreBtn')}
+          </SLoadMoreBtn>
+        ) : null}
+      </SBidsContainer>
     </SWrapper>
-  )
+  );
 };
 
 export default AcSuccessOptionsTab;
 
-const SWrapper = styled.div`
-
-`;
+const SWrapper = styled.div``;
 
 const SSeparator = styled.div`
   margin: 16px auto;
@@ -257,9 +253,9 @@ const SSeparator = styled.div`
   height: 1.5px;
   width: 100%;
 
-  border-bottom: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1.5px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;
-
 
 const SBidsContainer = styled.div<{
   heightDelta: number;
@@ -277,6 +273,9 @@ const SBidsContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     height: ${({ heightDelta }) => `calc(100% - ${heightDelta}px + 10px)`};
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
 
     // Scrollbar
     &::-webkit-scrollbar {

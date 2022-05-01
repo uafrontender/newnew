@@ -20,21 +20,19 @@ const PostConfirmDeleteModal: React.FC<IPostConfirmDeleteModal> = ({
   const { t } = useTranslation('decision');
 
   return (
-    <Modal
-      show={isVisible}
-      additionalZ={12}
-      onClose={closeModal}
-    >
+    <Modal show={isVisible} additionalZ={12} onClose={closeModal}>
       <SContainer>
         <SModal>
           <SModalTitle>
-            {t('DeletePostModal.title', { postType: t(`postType.${postType}`) })}
+            {t('DeletePostModal.title', {
+              postType: t(`postType.${postType}`),
+            })}
           </SModalTitle>
           <SModalMessage>
             {t('DeletePostModal.body', { postType: t(`postType.${postType}`) })}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>
+            <SCancelButton onClick={closeModal}>
               {t('DeletePostModal.cancelBtn')}
             </SCancelButton>
             <SConfirmButton onClick={handleConfirmDelete}>
@@ -60,10 +58,14 @@ const SModal = styled.div`
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px;
   box-sizing: border-box;
   display: flex;
@@ -92,11 +94,15 @@ const SCancelButton = styled(Button)`
   margin-right: auto;
   flex-shrink: 0;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
   &:hover {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+      props.theme.name === 'light'
+        ? props.theme.colors.dark
+        : props.theme.colorsThemed.background.quaternary};
     color: ${(props) => props.theme.colors.white};
     background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }

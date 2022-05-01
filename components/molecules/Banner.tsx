@@ -11,44 +11,44 @@ import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 
-interface IBanner {
-}
+interface IBanner {}
 
 export const Banner: React.FC<IBanner> = () => {
-  const {
-    banner,
-    resizeMode,
-  } = useAppSelector((state) => state.ui);
+  const { banner, resizeMode } = useAppSelector((state) => state.ui);
 
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const onClose = () => {
-    dispatch(setBanner({
-      ...banner,
-      show: false,
-    }));
+    dispatch(
+      setBanner({
+        ...banner,
+        show: false,
+      })
+    );
   };
-  const handleBannerClick = () => {
-  };
+  const handleBannerClick = () => {};
 
   return (
-    <SContainer id="header-banner" active={banner?.show} onClick={handleBannerClick}>
+    <SContainer
+      id='header-banner'
+      active={banner?.show}
+      onClick={handleBannerClick}
+    >
       <SText variant={3} weight={600}>
         {banner?.title}
       </SText>
       {!isMobile && (
         <SIconHolder>
-          <AnimatedPresence
-            animation="t-10"
-            animateWhenInView={false}
-          >
+          <AnimatedPresence animation='t-10' animateWhenInView={false}>
             <InlineSVG
               svg={arrowIcon}
               fill={theme.colors.white}
-              width="24px"
-              height="24px"
+              width='24px'
+              height='24px'
             />
           </AnimatedPresence>
         </SIconHolder>
@@ -59,8 +59,8 @@ export const Banner: React.FC<IBanner> = () => {
           scaleOnClick
           svg={closeIcon}
           fill={theme.colors.white}
-          width="24px"
-          height="24px"
+          width='24px'
+          height='24px'
           onClick={onClose}
         />
       </SCloseIconHolder>
