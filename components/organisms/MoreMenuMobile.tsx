@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
@@ -14,6 +14,7 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
+import ShareMenu from './ShareMenu';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -28,6 +29,10 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
+
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+
+  const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
 
   const { unreadCount } = useGetChats();
 
@@ -49,48 +54,58 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SButton
-            onClick={() =>
-              router.route.includes('direct-messages')
-                ? handleClose()
-                : handleClick('/direct-messages')
-            }
-          >
-            {unreadCount && unreadCount > 0 ? (
-              <Indicator counter={unreadCount} animate={false} />
-            ) : null}
-            <SText
-              variant={2}
-              active={router.route.includes('direct-messages')}
-            >
-              {t('mobile-bottom-navigation-dms')}
-            </SText>
-            <InlineSvg
-              svg={ChatIconFilled}
-              fill={
-                router.route.includes('direct-messages')
-                  ? theme.colorsThemed.accent.blue
-                  : theme.colorsThemed.text.tertiary
-              }
-              width='24px'
-              height='24px'
+          {!shareMenuOpen ? (
+            <>
+              <SButton
+                onClick={() =>
+                  router.route.includes('direct-messages')
+                    ? handleClose()
+                    : handleClick('/direct-messages')
+                }
+              >
+                {unreadCount && unreadCount > 0 ? (
+                  <Indicator counter={unreadCount} animate={false} />
+                ) : null}
+                <SText
+                  variant={2}
+                  active={router.route.includes('direct-messages')}
+                >
+                  {t('mobile-bottom-navigation-dms')}
+                </SText>
+                <InlineSvg
+                  svg={ChatIconFilled}
+                  fill={
+                    router.route.includes('direct-messages')
+                      ? theme.colorsThemed.accent.blue
+                      : theme.colorsThemed.text.tertiary
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SButton>
+              <SButton onClick={handleShareMenuClick}>
+                <SText variant={2} active={router.route.includes('share')}>
+                  {t('mobile-bottom-navigation-share')}
+                </SText>
+                <InlineSvg
+                  svg={ShareIcon}
+                  fill={
+                    router.route.includes('share')
+                      ? theme.colorsThemed.accent.blue
+                      : theme.colorsThemed.text.tertiary
+                  }
+                  width='24px'
+                  height='24px'
+                />
+              </SButton>
+            </>
+          ) : (
+            <ShareMenu
+              noabsolute
+              isVisible={shareMenuOpen}
+              handleClose={() => setShareMenuOpen(false)}
             />
-          </SButton>
-          <SButton onClick={() => {}}>
-            <SText variant={2} active={router.route.includes('share')}>
-              {t('mobile-bottom-navigation-share')}
-            </SText>
-            <InlineSvg
-              svg={ShareIcon}
-              fill={
-                router.route.includes('share')
-                  ? theme.colorsThemed.accent.blue
-                  : theme.colorsThemed.text.tertiary
-              }
-              width='24px'
-              height='24px'
-            />
-          </SButton>
+          )}
         </SContainer>
       )}
     </AnimatePresence>

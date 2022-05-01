@@ -80,5 +80,9 @@
       "button-confirm": "Report user",
       "button-confirm-group": "Report group"
     }
+  },
+  "socials": {
+    "copy": "Copy Link",
+    "copied": "Link Copied!"
   }
 }
