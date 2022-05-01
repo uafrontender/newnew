@@ -105,7 +105,9 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 const payloadSetData =
                   new newnewapi.MarkTutorialStepAsCompletedRequest({
                     acCurrentStep:
-                      localUserTutorialsProgress.remainingAcSteps!![0],
+                      localUserTutorialsProgress.remainingAcSteps!![0]
+                        ? localUserTutorialsProgress.remainingAcSteps!![0]
+                        : newnewapi.AcTutorialStep.AC_TEXT_FIELD,
                   });
                 await markTutorialStepAsCompleted(payloadSetData);
               }
@@ -128,7 +130,9 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 const payloadSetData =
                   new newnewapi.MarkTutorialStepAsCompletedRequest({
                     mcCurrentStep:
-                      localUserTutorialsProgress.remainingMcSteps!![0],
+                      localUserTutorialsProgress.remainingMcSteps!![0]
+                        ? localUserTutorialsProgress.remainingMcSteps!![0]
+                        : newnewapi.McTutorialStep.MC_TEXT_FIELD,
                   });
                 await markTutorialStepAsCompleted(payloadSetData);
               }
@@ -151,7 +155,9 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 const payloadSetData =
                   new newnewapi.MarkTutorialStepAsCompletedRequest({
                     cfCurrentStep:
-                      localUserTutorialsProgress.remainingCfSteps!![0],
+                      localUserTutorialsProgress.remainingCfSteps!![0]
+                        ? localUserTutorialsProgress.remainingCfSteps!![0]
+                        : newnewapi.CfTutorialStep.CF_BACK_GOAL,
                   });
                 await markTutorialStepAsCompleted(payloadSetData);
               }
@@ -175,7 +181,9 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 const payloadSetData =
                   new newnewapi.MarkTutorialStepAsCompletedRequest({
                     acCrCurrentStep:
-                      localUserTutorialsProgress.remainingAcCrCurrentStep!![0],
+                      localUserTutorialsProgress.remainingAcCrCurrentStep!![0]
+                        ? localUserTutorialsProgress.remainingAcCrCurrentStep!![0]
+                        : newnewapi.AcCreationTutorialStep.AC_CR_HERO,
                   });
                 await markTutorialStepAsCompleted(payloadSetData);
               }
@@ -199,7 +207,9 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 const payloadSetData =
                   new newnewapi.MarkTutorialStepAsCompletedRequest({
                     cfCrCurrentStep:
-                      localUserTutorialsProgress.remainingCfCrCurrentStep!![0],
+                      localUserTutorialsProgress.remainingCfCrCurrentStep!![0]
+                        ? localUserTutorialsProgress.remainingCfCrCurrentStep!![0]
+                        : newnewapi.CfCreationTutorialStep.CF_CR_HERO,
                   });
                 await markTutorialStepAsCompleted(payloadSetData);
               }
@@ -223,7 +233,9 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 const payloadSetData =
                   new newnewapi.MarkTutorialStepAsCompletedRequest({
                     mcCrCurrentStep:
-                      localUserTutorialsProgress.remainingMcCrCurrentStep!![0],
+                      localUserTutorialsProgress.remainingMcCrCurrentStep!![0]
+                        ? localUserTutorialsProgress.remainingMcCrCurrentStep!![0]
+                        : newnewapi.McCreationTutorialStep.MC_CR_HERO,
                   });
                 await markTutorialStepAsCompleted(payloadSetData);
               }
