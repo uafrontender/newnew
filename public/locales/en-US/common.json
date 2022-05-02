@@ -58,7 +58,8 @@
     "text": {
       "min": "Text is too short, min {{value}} chars",
       "max": "Text is too long, max {{value}} chars",
-      "badWords": "Text contains swear words"
+      "badWords": "Text contains swear words",
+      "containsLinks": "Links not allowed"
     }
   },
   "modal": {

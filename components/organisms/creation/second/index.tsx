@@ -158,8 +158,18 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
           if (!res?.data?.status) throw new Error('An error occured');
 
-          if (res?.data?.status !== newnewapi.ValidateTextResponse.Status.OK) {
-            return tCommon('error.text.badWords');
+          switch (res.data.status) {
+            case newnewapi.ValidateTextResponse.Status.TOO_SHORT:
+              return tCommon('error.text.min');
+            case newnewapi.ValidateTextResponse.Status.TOO_LONG:
+              return tCommon('error.text.max');
+            case newnewapi.ValidateTextResponse.Status.INAPPROPRIATE:
+              return tCommon('error.text.badWords');
+            case newnewapi.ValidateTextResponse.Status.ATTEMPT_AT_REDIRECTION:
+              return tCommon('error.text.containsLinks');
+            case newnewapi.ValidateTextResponse.Status.OK:
+            default:
+              break;
           }
 
           return '';
