@@ -20,16 +20,16 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
 
   const [hasNoResults, setHasNoResults] = useState(true);
   const [initialLoad, setInitialLoad] = useState(false);
-  const [loadingPosts, setLoadingPosts] = useState(false);
-  const [creatorsPosts, setCreatorsPosts] = useState<newnewapi.IUser[]>([]);
-  const [postsNextPageToken, setPostsRoomsNextPageToken] =
+  const [loadingCreators, setLoadingCreators] = useState(false);
+  const [creators, setCreators] = useState<newnewapi.IUser[]>([]);
+  const [creatorsNextPageToken, setCreatorsRoomsNextPageToken] =
     useState<string | undefined | null>('');
 
   const getSearchResult = useCallback(
     async (pageToken?: string) => {
-      if (loadingPosts) return;
+      if (loadingCreators) return;
       try {
-        setLoadingPosts(true);
+        setLoadingCreators(true);
         const payload = new newnewapi.SearchCreatorsRequest({
           query,
           paging: {
@@ -47,42 +47,42 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
         if (res.data.creators && res.data.creators.length > 0) {
           if (hasNoResults) setHasNoResults(false);
           if (!initialLoad) setInitialLoad(true);
-          setCreatorsPosts((curr) => {
+          setCreators((curr) => {
             const arr = [...curr, ...(res.data?.creators as newnewapi.IUser[])];
             return arr;
           });
-          setPostsRoomsNextPageToken(res.data.paging?.nextPageToken);
+          setCreatorsRoomsNextPageToken(res.data.paging?.nextPageToken);
         } else {
           setHasNoResults(true);
         }
 
-        if (!res.data.paging?.nextPageToken && postsNextPageToken) {
-          setPostsRoomsNextPageToken(null);
+        if (!res.data.paging?.nextPageToken && creatorsNextPageToken) {
+          setCreatorsRoomsNextPageToken(null);
         }
-        setLoadingPosts(false);
+        setLoadingCreators(false);
       } catch (err) {
-        setLoadingPosts(false);
+        setLoadingCreators(false);
         console.error(err);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingPosts, query]
+    [loadingCreators, query]
   );
 
   useEffect(() => {
     if (query.length > 0) {
-      setCreatorsPosts([]);
+      setCreators([]);
       getSearchResult();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   useEffect(() => {
-    if (inView && !loadingPosts && postsNextPageToken) {
-      getSearchResult(postsNextPageToken);
+    if (inView && !loadingCreators && creatorsNextPageToken) {
+      getSearchResult(creatorsNextPageToken);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, loadingPosts, postsNextPageToken]);
+  }, [inView, loadingCreators, creatorsNextPageToken]);
 
   return (
     <div>
@@ -90,10 +90,10 @@ export const SearchCreators: React.FC<IFunction> = ({ query }) => {
         <>
           <SCardsSection>
             {initialLoad && (
-              <CreatorsList loading={loadingPosts} collection={creatorsPosts} />
+              <CreatorsList loading={loadingCreators} collection={creators} />
             )}
           </SCardsSection>
-          {postsNextPageToken && !loadingPosts && (
+          {creatorsNextPageToken && !loadingCreators && (
             <SRef ref={loadingRef}>Loading...</SRef>
           )}
         </>
