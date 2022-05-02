@@ -11,9 +11,6 @@ const useSynchronizedHistory = () => {
     const idx = window?.history?.state?.idx ?? 0;
     const { locale } = router;
 
-    console.log(window.history.state)
-    console.log(window.history.length)
-
     window.history.pushState({
       ...data,
       url: url,

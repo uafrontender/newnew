@@ -72,6 +72,7 @@ import getDisplayname from '../../../utils/getDisplayname';
 import ReportModal from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { usePostModalState } from '../../../contexts/postModalContext';
 
 const images = {
   ac: ACIcon.src,
@@ -104,6 +105,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     resizeMode
   );
 
+  const { handleSetPostOverlayOpen } = usePostModalState();
   const { syncedHistoryPushState } = useSynchronizedHistory();
 
   const [postParsed, typeOfPost] = post
@@ -523,6 +525,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         additionalHash = '#winner';
       }
       setOpen(true);
+      handleSetPostOverlayOpen(true);
       syncedHistoryPushState(
         {
           postId: postParsed.postUuid,
@@ -533,6 +536,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
     return () => {
       setOpen(false);
+      handleSetPostOverlayOpen(false);
       innerHistoryStack.current = [];
       dispatch(setOverlay(false));
       // eslint-disable-next-line no-useless-return

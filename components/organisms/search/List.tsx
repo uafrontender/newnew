@@ -13,6 +13,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import { usePostModalState } from '../../../contexts/postModalContext';
 
 interface IList {
   collection: any;
@@ -29,7 +30,8 @@ export const List: React.FC<IList> = ({
   skeletonsHighlightColor,
   handlePostClicked,
 }) => {
-  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
+  const { postOverlayOpen } = usePostModalState();
+  const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -49,7 +51,7 @@ export const List: React.FC<IList> = ({
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
-          shouldStop={overlay}
+          shouldStop={postOverlayOpen}
         />
       </SItemWrapper>
     );

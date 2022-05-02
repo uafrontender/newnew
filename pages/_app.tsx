@@ -73,6 +73,7 @@ import HeroDarkPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-D
 import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Light.webp';
 import HeroDarkMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
 import HeroLightMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
+import PostModalContextProvider from '../contexts/postModalContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -162,23 +163,25 @@ const MyApp = (props: IMyApp): ReactElement => {
                         <SubscriptionsProvider>
                           <ChatsProvider>
                             <ResizeMode>
-                              <GlobalTheme>
-                                <div>
-                                  <ToastContainer />
-                                  <VideoProcessingWrapper>
-                                    {!pageProps.error ? (
-                                      getLayout(<Component {...pageProps} />)
-                                    ) : (
-                                      <Error
-                                        errorMsg={pageProps.error?.message}
-                                        statusCode={
-                                          pageProps.error?.statusCode ?? 500
-                                        }
-                                      />
-                                    )}
-                                  </VideoProcessingWrapper>
-                                </div>
-                              </GlobalTheme>
+                              <PostModalContextProvider>
+                                <GlobalTheme>
+                                  <div>
+                                    <ToastContainer />
+                                    <VideoProcessingWrapper>
+                                      {!pageProps.error ? (
+                                        getLayout(<Component {...pageProps} />)
+                                      ) : (
+                                        <Error
+                                          errorMsg={pageProps.error?.message}
+                                          statusCode={
+                                            pageProps.error?.statusCode ?? 500
+                                          }
+                                        />
+                                      )}
+                                    </VideoProcessingWrapper>
+                                  </div>
+                                </GlobalTheme>
+                              </PostModalContextProvider>
                             </ResizeMode>
                           </ChatsProvider>
                         </SubscriptionsProvider>
