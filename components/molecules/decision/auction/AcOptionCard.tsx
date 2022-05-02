@@ -15,6 +15,7 @@ import React, {
   useState,
 } from 'react';
 import styled, { css, useTheme } from 'styled-components';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { WalletContext } from '../../../../contexts/walletContext';
@@ -44,6 +45,7 @@ import AcIcon from '../../../../public/images/creation/AC-static.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -117,18 +119,6 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
   const handleCloseSupportForm = () => {
     setIsSupportFormOpen(false);
     handleSetSupportedBid('');
-  };
-
-  // Redirect to user's page
-  const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${option.creator?.username}`);
   };
 
   // Payment and Loading modals
@@ -387,34 +377,31 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             {option.title}
           </SOptionInfo>
           <SBiddersInfo variant={3}>
-            <SSpanBiddersHighlighted
-              className='spanHighlighted'
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isMyBid) {
-                  handleRedirectToOptionCreator();
-                }
-              }}
-              style={{
-                ...(!isMyBid && option.isCreatedBySubscriber
-                  ? {
-                      color:
-                        theme.name === 'dark'
-                          ? theme.colorsThemed.accent.yellow
-                          : theme.colors.dark,
-                    }
-                  : {}),
-                ...(!isMyBid
-                  ? {
-                      cursor: 'pointer',
-                    }
-                  : {}),
-              }}
-            >
-              {isMyBid
-                ? t('my')
-                : option.creator?.nickname ?? option.creator?.username}
-            </SSpanBiddersHighlighted>
+            <Link href={`/${option.creator?.username}`}>
+              <SSpanBiddersHighlighted
+                className='spanHighlighted'
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{
+                  ...(!isMyBid && option.isCreatedBySubscriber
+                    ? {
+                        color:
+                          theme.name === 'dark'
+                            ? theme.colorsThemed.accent.yellow
+                            : theme.colors.dark,
+                      }
+                    : {}),
+                  ...(!isMyBid
+                    ? {
+                        cursor: 'pointer',
+                      }
+                    : {}),
+                }}
+              >
+                {isMyBid ? t('my') : getDisplayname(option.creator!!)}
+              </SSpanBiddersHighlighted>
+            </Link>
             {isSupportedByMe && !isMyBid ? (
               <SSpanBiddersHighlighted className='spanHighlighted'>{`, ${t(
                 'me'

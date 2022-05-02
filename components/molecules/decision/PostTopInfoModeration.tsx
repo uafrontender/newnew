@@ -110,7 +110,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
     ]);
 
     const showWinnerOption = useMemo(
-      () => postType === 'ac' && postStatus === 'wating_for_decision',
+      () => postType === 'ac' && postStatus === 'waiting_for_decision',
       [postType, postStatus]
     );
 

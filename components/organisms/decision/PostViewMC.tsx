@@ -688,6 +688,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = ({
         ) : winningOption ? (
           <McWinnerTab
             postId={post.postUuid}
+            postCreator={post.creator as newnewapi.User}
             option={winningOption}
             postStatus={postStatus}
           />
