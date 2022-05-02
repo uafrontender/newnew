@@ -19,6 +19,11 @@ import NoSubscriptions from '../../public/images/profile/No-subscriptions.png';
 import VerificationPassedIcon from '../../public/images/svg/icons/filled/VerificationPassed.svg';
 import Button from '../../components/atoms/Button';
 import InlineSvg from '../../components/atoms/InlineSVG';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import {
+  NoContentDescription,
+  NoContentTitle,
+} from '../../components/atoms/profile/NoContentCommonElements';
 
 interface IMyProfileSubscriptions {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -64,60 +69,56 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
               subscribedTo
             />
           ) : (
-            <NoContentMessageContainer>
-              <NoContentGraphicsContainer>
-                <SImage src={NoSubscriptions.src} />
-              </NoContentGraphicsContainer>
-              <NoContentInfoContainer>
-                <NoContentTitle>
-                  {t('Subscriptions.no-content.title')}
-                </NoContentTitle>
-                <NoContentDescription>
-                  {t('Subscriptions.no-content.description')}:
-                </NoContentDescription>
-                <NoContentInstruction>
-                  <NoContentInstructionRecord>
-                    <NoContentInstructionPoint>
-                      <InlineSvg
-                        svg={VerificationPassedIcon}
-                        width='16px'
-                        height='16px'
-                      />
-                    </NoContentInstructionPoint>
-                    {t('Subscriptions.no-content.instruction1')}
-                  </NoContentInstructionRecord>
-                  <NoContentInstructionRecord>
-                    <NoContentInstructionPoint>
-                      <InlineSvg
-                        svg={VerificationPassedIcon}
-                        width='16px'
-                        height='16px'
-                      />
-                    </NoContentInstructionPoint>
-                    {t('Subscriptions.no-content.instruction2')}
-                  </NoContentInstructionRecord>
-                  <NoContentInstructionRecord>
-                    <NoContentInstructionPoint>
-                      <InlineSvg
-                        svg={VerificationPassedIcon}
-                        width='16px'
-                        height='16px'
-                      />
-                    </NoContentInstructionPoint>
-                    {t('Subscriptions.no-content.instruction3')}
-                  </NoContentInstructionRecord>
-                </NoContentInstruction>
-                <SButton
-                  withShadow
-                  view='primaryGrad'
-                  onClick={() => {
-                    router.push('/');
-                  }}
-                >
-                  {t('Subscriptions.no-content.button')}
-                </SButton>
-              </NoContentInfoContainer>
-            </NoContentMessageContainer>
+            <NoContentCard graphics={<SImage src={NoSubscriptions.src} />}>
+              <NoContentTitle>
+                {t('Subscriptions.no-content.title')}
+              </NoContentTitle>
+              <NoContentDescription>
+                {t('Subscriptions.no-content.description')}:
+              </NoContentDescription>
+              <NoContentInstruction>
+                <NoContentInstructionRecord>
+                  <NoContentInstructionPoint>
+                    <InlineSvg
+                      svg={VerificationPassedIcon}
+                      width='16px'
+                      height='16px'
+                    />
+                  </NoContentInstructionPoint>
+                  {t('Subscriptions.no-content.instruction1')}
+                </NoContentInstructionRecord>
+                <NoContentInstructionRecord>
+                  <NoContentInstructionPoint>
+                    <InlineSvg
+                      svg={VerificationPassedIcon}
+                      width='16px'
+                      height='16px'
+                    />
+                  </NoContentInstructionPoint>
+                  {t('Subscriptions.no-content.instruction2')}
+                </NoContentInstructionRecord>
+                <NoContentInstructionRecord>
+                  <NoContentInstructionPoint>
+                    <InlineSvg
+                      svg={VerificationPassedIcon}
+                      width='16px'
+                      height='16px'
+                    />
+                  </NoContentInstructionPoint>
+                  {t('Subscriptions.no-content.instruction3')}
+                </NoContentInstructionRecord>
+              </NoContentInstruction>
+              <Button
+                withShadow
+                view='primaryGrad'
+                onClick={() => {
+                  router.push('/');
+                }}
+                style={{ width: 'fit-content' }}
+              >
+                {t('Subscriptions.no-content.button')}
+              </Button>
+            </NoContentCard>
           )}
         </SCardsSection>
       </SMain>
@@ -188,46 +189,6 @@ const SCardsSection = styled.div`
   }
 `;
 
-const NoContentMessageContainer = styled.div`
-  margin: 8px 16px 30px !important;
-  padding: 16px 24px 30px !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-  width: 100%;
-  border-radius: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    flex-direction: row;
-    padding: 24px 32px 24px 16px !important;
-    margin: 56px auto 30px !important;
-    width: auto;
-  }
-`;
-
-const NoContentGraphicsContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-
-  ${({ theme }) => theme.media.tablet} {
-    width: auto;
-  }
-`;
-
-const NoContentInfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  ${({ theme }) => theme.media.tablet} {
-    align-items: flex-start;
-    margin-left: 24px;
-  }
-`;
-
 const SImage = styled.img`
   object-fit: contain;
   height: 165px;
@@ -239,38 +200,9 @@ const SImage = styled.img`
   }
 `;
 
-const NoContentTitle = styled.div`
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 28px;
-  color: ${({ theme }) => theme.colorsThemed.text.primary};
-  margin-bottom: 8px;
-  width: 100%;
-  text-align: start;
-
-  ${({ theme }) => theme.media.laptop} {
-    font-size: 24px;
-    line-height: 32px;
-  }
-`;
-
-const NoContentDescription = styled.div`
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  margin-bottom: 18px;
-  width: 100%;
-  text-align: start;
-
-  ${({ theme }) => theme.media.laptop} {
-    font-size: 16px;
-    line-height: 24px;
-  }
-`;
-
 const NoContentInstruction = styled.div`
   margin-bottom: 12px;
+  width: 100%;
 `;
 
 const NoContentInstructionPoint = styled.div`
@@ -287,8 +219,4 @@ const NoContentInstructionRecord = styled.div`
   line-height: 20px;
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   margin-bottom: 12px;
-`;
-
-const SButton = styled(Button)`
-  width: fit-content;
 `;

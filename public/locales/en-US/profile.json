@@ -213,5 +213,12 @@
       "instruction3": "Add custom suggestions to your Superpolls",
       "button": "Find creators"
     }
+  },
+  "Active": {
+    "no-content": {
+      "title": "Still noone decisions?",
+      "description": "Still didn’t make any decision? Let’s discover some decision you  want to support!",
+      "button": "Make some decisions"
+    }
   }
 }
