@@ -151,7 +151,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 </SSpanBiddersRegular>
               </SBiddersInfo>
             </SBidDetails>
-            {postStatus === 'wating_for_decision' ? (
+            {postStatus === 'waiting_for_decision' ? (
               !isMobile ? (
                 <SSelectOptionWidget>
                   <SPickOptionButton
@@ -204,7 +204,7 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
                 isVisible={isEllipseMenuOpen}
                 canDeleteOption={
                   postStatus === 'voting' ||
-                  postStatus === 'wating_for_decision'
+                  postStatus === 'waiting_for_decision'
                 }
                 handleClose={() => setIsEllipseMenuOpen(false)}
                 handleOpenReportOptionModal={() => setIsReportModalOpen(true)}

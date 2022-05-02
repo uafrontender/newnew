@@ -84,7 +84,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
   );
 
   const showSelectingWinnerOption = useMemo(
-    () => postStatus === 'wating_for_decision',
+    () => postStatus === 'waiting_for_decision',
     [postStatus]
   );
 

@@ -113,7 +113,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       return switchPostStatus(typeOfPost, postParsed?.status);
     }
-    return 'processing';
+    return 'processing_announcement';
   });
 
   // TODO: a way to determine if the post was deleted by the crator themselves
@@ -124,7 +124,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     () =>
       postStatus === 'succeeded' ||
       postStatus === 'waiting_for_response' ||
-      postStatus === 'wating_for_decision',
+      postStatus === 'waiting_for_decision' ||
+      postStatus === 'processing_response',
     [postStatus]
   );
 
@@ -357,7 +358,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       );
     }
 
-    if (postStatus === 'processing') {
+    if (postStatus === 'processing_announcement') {
       return (
         <PostViewProcessing
           key={postParsed?.postUuid}
@@ -473,7 +474,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostModeration = (postToRender: TPostType) => {
-    if (postStatus === 'processing') {
+    if (postStatus === 'processing_announcement') {
       return (
         <PostViewProcessing
           key={postParsed?.postUuid}
@@ -637,7 +638,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         }
         return switchPostStatus(typeOfPost, postParsed?.status);
       }
-      return 'processing';
+      return 'processing_announcement';
     });
   }, [postParsed, typeOfPost]);
 
@@ -762,7 +763,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 ? renderPostSuccess(typeOfPost)
                 : null}
               {postStatus === 'waiting_for_response' ||
-              postStatus === 'wating_for_decision'
+              postStatus === 'waiting_for_decision'
                 ? renderPostWaitingForResponse(typeOfPost)
                 : null}
             </SPostModalContainer>

@@ -72,7 +72,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   );
 
   const showSelectWinnerOption = useMemo(
-    () => postStatus === 'wating_for_decision',
+    () => postStatus === 'waiting_for_decision',
     [postStatus]
   );
 
@@ -556,7 +556,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           />
         )}
         {postStatus === 'waiting_for_response' ||
-        postStatus === 'wating_for_decision' ? (
+        postStatus === 'waiting_for_decision' ? (
           <ResponseTimer
             timestampSeconds={new Date(
               (post.responseUploadDeadline?.seconds as number) * 1000
