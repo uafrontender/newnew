@@ -5,6 +5,7 @@ import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 
 import { NextPageWithLayout } from '../_app';
 // import { TTokenCookie } from '../../api/apiConfigs';
@@ -49,8 +50,8 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   const { isCreatorsImSubscribedToLoading, creatorsImSubscribedTo } =
     useGetSubscriptions();
   const router = useRouter();
-  console.log(isCreatorsImSubscribedToLoading);
-  console.log(creatorsImSubscribedTo);
+  const { t } = useTranslation('profile');
+
   return (
     <div>
       <SMain>
@@ -69,10 +70,10 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
               </NoContentGraphicsContainer>
               <NoContentInfoContainer>
                 <NoContentTitle>
-                  You’re not subscribed to any creators
+                  {t('Subscriptions.no-content.title')}
                 </NoContentTitle>
                 <NoContentDescription>
-                  By subscribing to creators you will be able to:
+                  {t('Subscriptions.no-content.description')}:
                 </NoContentDescription>
                 <NoContentInstruction>
                   <NoContentInstructionRecord>
@@ -83,7 +84,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
                         height='16px'
                       />
                     </NoContentInstructionPoint>
-                    Direct message you
+                    {t('Subscriptions.no-content.instruction1')}
                   </NoContentInstructionRecord>
                   <NoContentInstructionRecord>
                     <NoContentInstructionPoint>
@@ -93,7 +94,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
                         height='16px'
                       />
                     </NoContentInstructionPoint>
-                    Get a free vote on your
+                    {t('Subscriptions.no-content.instruction2')}
                   </NoContentInstructionRecord>
                   <NoContentInstructionRecord>
                     <NoContentInstructionPoint>
@@ -103,7 +104,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
                         height='16px'
                       />
                     </NoContentInstructionPoint>
-                    Superpolls Add custom suggestions to your Superpolls
+                    {t('Subscriptions.no-content.instruction3')}
                   </NoContentInstructionRecord>
                 </NoContentInstruction>
                 <SButton
@@ -113,7 +114,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
                     router.push('/');
                   }}
                 >
-                  Find creators
+                  {t('Subscriptions.no-content.button')}
                 </SButton>
               </NoContentInfoContainer>
             </NoContentMessageContainer>

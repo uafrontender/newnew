@@ -203,5 +203,15 @@
       "help": "Help",
       "logout": "Log out"
     }
+  },
+  "Subscriptions": {
+    "no-content": {
+      "title": "You’re not subscribed to any creators",
+      "description": "By subscribing to creators you will be able to",
+      "instruction1": "Direct message you",
+      "instruction2": "Get a free vote on your Superpolls",
+      "instruction3": "Add custom suggestions to your Superpolls",
+      "button": "Find creators"
+    }
   }
 }
