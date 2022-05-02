@@ -11,14 +11,14 @@ import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
 
 interface IShareMenu {
   isVisible: boolean;
-  noabsolute?: boolean;
+  absolute?: boolean;
   handleClose: () => void;
 }
 
 const ShareMenu: React.FC<IShareMenu> = ({
   isVisible,
   handleClose,
-  noabsolute,
+  absolute,
 }) => {
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
@@ -58,7 +58,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
     <AnimatePresence>
       {isVisible && (
         <SContainer
-          absolute={noabsolute}
+          absolute={absolute ?? false}
           ref={(el) => {
             containerRef.current = el!!;
           }}
@@ -79,7 +79,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
 export default ShareMenu;
 
 ShareMenu.defaultProps = {
-  noabsolute: false,
+  absolute: false,
 };
 
 interface ISContainer {

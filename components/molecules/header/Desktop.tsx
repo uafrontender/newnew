@@ -83,6 +83,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 Share
               </SNavText>
               <ShareMenu
+                absolute
                 isVisible={shareMenuOpen}
                 handleClose={() => setShareMenuOpen(false)}
               />

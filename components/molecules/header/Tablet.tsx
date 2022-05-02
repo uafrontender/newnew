@@ -87,6 +87,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 Share
               </SNavText>
               <ShareMenu
+                absolute
                 isVisible={shareMenuOpen}
                 handleClose={() => setShareMenuOpen(false)}
               />

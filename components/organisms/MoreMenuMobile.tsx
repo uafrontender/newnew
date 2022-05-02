@@ -101,7 +101,6 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
             </>
           ) : (
             <ShareMenu
-              noabsolute
               isVisible={shareMenuOpen}
               handleClose={() => setShareMenuOpen(false)}
             />
