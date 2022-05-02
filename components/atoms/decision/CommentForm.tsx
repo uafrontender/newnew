@@ -113,13 +113,6 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         if (isAPIValidateLoading) return;
 
         if (!user.loggedIn) {
-          window?.history.replaceState(
-            {
-              fromPost: true,
-            },
-            '',
-            ''
-          );
           router.push(
             `/sign-up?reason=comment&redirect=${window.location.href}`
           );
