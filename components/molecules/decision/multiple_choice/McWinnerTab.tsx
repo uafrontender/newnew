@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, {
   useCallback,
   useEffect,
@@ -10,6 +11,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
@@ -23,15 +25,18 @@ import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import PostWaitingForResponseBox from '../PostWaitingForResponseBox';
 import { markPost } from '../../../../api/endpoints/post';
 import PostSuccessBox from '../PostSuccessBox';
+import getDisplayname from '../../../../utils/getDisplayname';
 
 interface IMcWinnerTab {
   postId: string;
+  postCreator: newnewapi.User;
   option: newnewapi.MultipleChoice.Option;
   postStatus: TPostStatusStringified;
 }
 
 const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
   postId,
+  postCreator,
   option,
   postStatus,
 }) => {
@@ -48,30 +53,17 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
     [user.loggedIn, option.creator?.uuid, user.userData?.userUuid]
   );
 
+  const isCreatorsBid = useMemo(() => {
+    if (!option.creator) return true;
+    return false;
+  }, [option.creator]);
+
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
-
-  const handleRedirectToUser = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${option.creator?.username!!}`);
-  };
 
   const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState(
-          {
-            fromPost: true,
-          },
-          '',
-          ''
-        );
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -169,23 +161,29 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
               <SSpanThin>
                 {t('McPost.WinnerTab.WinnerOptionCard.created_by')}
               </SSpanThin>{' '}
-              <SSpanBold
-                onClick={() => {
-                  if (isMySuggestion) return;
-                  handleRedirectToUser();
-                }}
-                style={{
-                  ...(!isMySuggestion
-                    ? {
-                        cursor: 'pointer',
-                      }
-                    : {}),
-                }}
+              <Link
+                href={
+                  !isCreatorsBid
+                    ? `/${option.creator?.username!!}`
+                    : `/${postCreator.username!!}`
+                }
               >
-                {isMySuggestion
-                  ? t('McPost.OptionsTab.me')
-                  : option.creator?.nickname ?? option.creator?.username}
-              </SSpanBold>
+                <SSpanBold
+                  style={{
+                    ...(!isMySuggestion
+                      ? {
+                          cursor: 'pointer',
+                        }
+                      : {}),
+                  }}
+                >
+                  {isMySuggestion
+                    ? t('McPost.OptionsTab.me')
+                    : isCreatorsBid
+                    ? getDisplayname(postCreator)
+                    : getDisplayname(option.creator!!)}
+                </SSpanBold>
+              </Link>
             </SOptionCreator>
           </SOptionDetails>
           <STrophyImg src={WinnerIcon.src} />

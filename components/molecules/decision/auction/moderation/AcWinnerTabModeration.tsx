@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 
@@ -25,7 +25,6 @@ interface IAcWinnerTabModeration {
 const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
   ({ postId, option, postStatus }) => {
     const { t } = useTranslation('decision');
-    const router = useRouter();
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -61,17 +60,6 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
           });
       }
     }, [postId]);
-
-    const handleRedirectToUser = () => {
-      window?.history.replaceState(
-        {
-          fromPost: true,
-        },
-        '',
-        ''
-      );
-      router.push(`/${option.creator?.username!!}`);
-    };
 
     useEffect(() => {
       if (isBrowser()) {
@@ -162,14 +150,15 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
                 <SSpanThin>
                   {t('AcPostModeration.WinnerTab.WinnerOptionCard.created_by')}
                 </SSpanThin>{' '}
-                <SSpanBold
-                  onClick={() => handleRedirectToUser()}
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                >
-                  {option.creator?.nickname ?? option.creator?.username}
-                </SSpanBold>
+                <Link href={`/${option.creator?.username!!}`}>
+                  <SSpanBold
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {option.creator?.nickname ?? option.creator?.username}
+                  </SSpanBold>
+                </Link>
               </SOptionCreator>
             </SOptionDetails>
             <STrophyImg src={WinnerIcon.src} />

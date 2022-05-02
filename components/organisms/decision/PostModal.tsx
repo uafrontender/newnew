@@ -71,6 +71,8 @@ import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
 import ReportModal from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+import { usePostModalState } from '../../../contexts/postModalContext';
 
 const images = {
   ac: ACIcon.src,
@@ -103,6 +105,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     resizeMode
   );
 
+  const { handleSetPostOverlayOpen } = usePostModalState();
+  const { syncedHistoryPushState } = useSynchronizedHistory();
+
   const [postParsed, typeOfPost] = post
     ? switchPostType(post)
     : [undefined, undefined];
@@ -113,7 +118,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       return switchPostStatus(typeOfPost, postParsed?.status);
     }
-    return 'processing';
+    return 'processing_announcement';
   });
 
   // TODO: a way to determine if the post was deleted by the crator themselves
@@ -124,7 +129,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     () =>
       postStatus === 'succeeded' ||
       postStatus === 'waiting_for_response' ||
-      postStatus === 'wating_for_decision',
+      postStatus === 'waiting_for_decision' ||
+      postStatus === 'processing_response',
     [postStatus]
   );
 
@@ -141,13 +147,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState(
-          {
-            fromPost: true,
-          },
-          '',
-          ''
-        );
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -170,13 +169,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState(
-          {
-            fromPost: true,
-          },
-          '',
-          ''
-        );
         router.push(
           `/sign-up?reason=follow-creator&redirect=${window.location.href}`
         );
@@ -226,9 +218,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
 
-  const [currLocation] = useState(
-    manualCurrLocation ?? (isBrowser() ? window.location.href : '')
-  );
+  // const [currLocation] = useState(
+  //   manualCurrLocation ?? (isBrowser() ? window.location.href : '')
+  // );
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] =
     useState<newnewapi.Auction.Option | undefined>(undefined);
   const acSuggestionIDFromUrl = isBrowser()
@@ -271,7 +263,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleCloseAndGoBack = () => {
     handleClose();
-    window.history.replaceState('', '', currLocation);
+    // syncedHistoryReplaceState({}, currLocation);
+    window.history.back();
     innerHistoryStack.current = [];
   };
 
@@ -280,7 +273,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       window.history.back();
     } else {
       handleClose();
-      window.history.replaceState('', '', currLocation);
+      // syncedHistoryReplaceState({}, currLocation);
+      window.history.back();
     }
   };
 
@@ -293,15 +287,15 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       top: 0,
       behavior: 'smooth',
     });
-    window.history.pushState(
+    syncedHistoryPushState(
       {
         postId: newPostParsed.postUuid,
       },
-      'Post',
       `/post/${newPostParsed.postUuid}`
     );
     setRecommenedPosts([]);
     setNextPageToken('');
+    setTriedLoading(false);
   };
 
   const loadRecommendedPosts = useCallback(
@@ -357,7 +351,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       );
     }
 
-    if (postStatus === 'processing') {
+    if (postStatus === 'processing_announcement') {
       return (
         <PostViewProcessing
           key={postParsed?.postUuid}
@@ -473,7 +467,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const renderPostModeration = (postToRender: TPostType) => {
-    if (postStatus === 'processing') {
+    if (postStatus === 'processing_announcement') {
       return (
         <PostViewProcessing
           key={postParsed?.postUuid}
@@ -531,17 +525,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         additionalHash = '#winner';
       }
       setOpen(true);
-      window.history.pushState(
+      handleSetPostOverlayOpen(true);
+      syncedHistoryPushState(
         {
           postId: postParsed.postUuid,
         },
-        'Post',
         `/post/${postParsed.postUuid}${additionalHash ?? ''}`
       );
     }
 
     return () => {
       setOpen(false);
+      handleSetPostOverlayOpen(false);
       innerHistoryStack.current = [];
       dispatch(setOverlay(false));
       // eslint-disable-next-line no-useless-return
@@ -584,6 +579,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         new URL(window.location.href).searchParams.get('post') ||
         window?.history?.state?.postId;
 
+      // const postId = window?.history?.state?.postId;
+
       if (
         innerHistoryStack.current &&
         innerHistoryStack.current[innerHistoryStack.current.length - 1]
@@ -601,6 +598,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         );
         setRecommenedPosts([]);
         setNextPageToken('');
+        setTriedLoading(false);
       }
 
       if (!postId) {
@@ -616,6 +614,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useEffect(() => {
     if (inView && !recommenedPostsLoading) {
+      console.log('loading recommended');
+      console.log(recommenedPosts.length);
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
       } else if (
@@ -627,7 +627,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, nextPageToken, recommenedPostsLoading, triedLoading]);
+  }, [
+    inView,
+    nextPageToken,
+    recommenedPostsLoading,
+    recommenedPosts.length,
+    triedLoading,
+  ]);
 
   useEffect(() => {
     setPostStatus(() => {
@@ -637,7 +643,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         }
         return switchPostStatus(typeOfPost, postParsed?.status);
       }
-      return 'processing';
+      return 'processing_announcement';
     });
   }, [postParsed, typeOfPost]);
 
@@ -647,6 +653,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     router.prefetch('/creation');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // useEffect(() => {
+  //   router.events.on('beforeHistoryChange', (e) => {
+  //     console.log('HEY');
+  //     console.log(e);
+  //     router.reload();
+  //   });
+  // }, [postParsed?.postUuid, router]);
 
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
@@ -762,7 +776,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 ? renderPostSuccess(typeOfPost)
                 : null}
               {postStatus === 'waiting_for_response' ||
-              postStatus === 'wating_for_decision'
+              postStatus === 'waiting_for_decision'
                 ? renderPostWaitingForResponse(typeOfPost)
                 : null}
             </SPostModalContainer>

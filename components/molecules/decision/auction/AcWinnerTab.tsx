@@ -8,6 +8,7 @@ import React, {
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
@@ -51,27 +52,9 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
-  const handleRedirectToUser = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${option.creator?.username!!}`);
-  };
-
   const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState(
-          {
-            fromPost: true,
-          },
-          '',
-          ''
-        );
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -166,22 +149,20 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
             </SHeadline>
             <SOptionCreator variant={3}>
               <SSpanThin>{t('AcPost.WinnerTab.WinnerOptionCard.on')}</SSpanThin>{' '}
-              <SSpanBold
-                onClick={() => {
-                  if (isMySuggestion) return;
-                  handleRedirectToUser();
-                }}
-                style={{
-                  cursor: !isMySuggestion ? 'pointer' : 'default',
-                }}
-              >
-                {isMySuggestion
-                  ? t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_me')
-                  : t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_user', {
-                      username:
-                        option.creator?.nickname ?? option.creator?.username,
-                    })}
-              </SSpanBold>{' '}
+              <Link href={`/${option.creator?.username!!}`}>
+                <SSpanBold
+                  style={{
+                    cursor: !isMySuggestion ? 'pointer' : 'default',
+                  }}
+                >
+                  {isMySuggestion
+                    ? t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_me')
+                    : t('AcPost.WinnerTab.WinnerOptionCard.suggested_by_user', {
+                        username:
+                          option.creator?.nickname ?? option.creator?.username,
+                      })}
+                </SSpanBold>{' '}
+              </Link>
               <SSpanThin>
                 {t('AcPost.WinnerTab.WinnerOptionCard.bid_to')}
               </SSpanThin>{' '}

@@ -63,7 +63,7 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
 
-    router.push('/');
+    router.replace('/');
   };
 
   useEffect(() => {

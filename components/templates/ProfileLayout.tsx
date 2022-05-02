@@ -387,23 +387,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   ]);
 
   useEffect(() => {
-    const handlerHistory = () => {
-      console.log('Popstate');
-
-      const postId = window?.history?.state?.postId;
-      if (postId && window?.history?.state?.fromPost) {
-        router.push(`/post/${postId}`);
-      }
-    };
-
-    window?.addEventListener('popstate', handlerHistory);
-
-    return () => {
-      window?.removeEventListener('popstate', handlerHistory);
-    };
-  }, [router]);
-
-  useEffect(() => {
     async function fetchIsSubscribed() {
       try {
         const getStatusPayload = new newnewapi.SubscriptionStatusRequest({

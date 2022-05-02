@@ -149,35 +149,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
 
   // Redirect to user's page
   const handleRedirectToPostCreator = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
     router.push(`/${post.creator?.username}/subscribe`);
   };
-
-  // const handleTogglePaymentModalOpen = async () => {
-  //   if (isAPIValidateLoading) return;
-  //   if (!user.loggedIn) {
-  //     router.push(`/${post?.creator?.username}/subscribe`);
-  //     return;
-  //   }
-  //   // Check if subscribed
-  //   const getStatusPayload = new newnewapi.SubscriptionStatusRequest({
-  //     creatorUuid: post.creator?.uuid,
-  //   });
-
-  //   const res = await getSubscriptionStatus(getStatusPayload);
-
-  //   if (res.data?.status?.notSubscribed || res.data?.status?.activeCancelsAt) {
-  //     router.push(`/${post.creator?.username}/subscribe`);
-  //     return;
-  //   }
-  //   setPaymentModalOpen(true);
-  // };
 
   const validateTextViaAPI = useCallback(async (text: string) => {
     setIsAPIValidateLoading(true);

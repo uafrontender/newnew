@@ -72,6 +72,8 @@ const SWrapper = styled.div`
   -ms-user-select: none;
   user-select: none;
 
+  cursor: default;
+
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
     max-height: 434px;
