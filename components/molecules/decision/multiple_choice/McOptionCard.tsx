@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -135,18 +136,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const handleCloseSupportForm = () => {
     setIsSupportMenuOpen(false);
     handleSetSupportedBid('');
-  };
-
-  // Redirect to user's page
-  const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${creator?.username}`);
   };
 
   // Payment and Loading modals
@@ -439,14 +428,23 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 optionCreator={
                   option.creator ? getDisplayname(option.creator) : undefined
                 }
+                optionCreatorUsername={
+                  option.creator
+                    ? (option.creator.username as string)
+                    : undefined
+                }
                 firstVoter={
                   option.firstVoter
                     ? getDisplayname(option.firstVoter)
                     : undefined
                 }
+                firstVoterUsername={
+                  option.firstVoter
+                    ? (option.firstVoter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubstracted={supporterCountSubstracted}
-                handleRedirectToOptionCreator={handleRedirectToOptionCreator}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -616,14 +614,23 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   optionCreator={
                     option.creator ? getDisplayname(option.creator) : undefined
                   }
+                  optionCreatorUsername={
+                    option.creator
+                      ? (option.creator.username as string)
+                      : undefined
+                  }
                   firstVoter={
                     option.firstVoter
                       ? getDisplayname(option.firstVoter)
                       : undefined
                   }
+                  firstVoterUsername={
+                    option.firstVoter
+                      ? (option.firstVoter.username as string)
+                      : undefined
+                  }
                   supporterCount={option.supporterCount}
                   supporterCountSubstracted={supporterCountSubstracted}
-                  handleRedirectToOptionCreator={handleRedirectToOptionCreator}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -662,8 +669,9 @@ const RenderSupportersInfo: React.FunctionComponent<{
   supporterCount: number;
   supporterCountSubstracted: number;
   optionCreator?: string;
+  optionCreatorUsername?: string;
   firstVoter?: string;
-  handleRedirectToOptionCreator: () => void;
+  firstVoterUsername?: string;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
@@ -671,8 +679,9 @@ const RenderSupportersInfo: React.FunctionComponent<{
   supporterCount,
   supporterCountSubstracted,
   optionCreator,
+  optionCreatorUsername,
   firstVoter,
-  handleRedirectToOptionCreator,
+  firstVoterUsername,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -683,9 +692,17 @@ const RenderSupportersInfo: React.FunctionComponent<{
         {supporterCount > 0 ? (
           <>
             {firstVoter && (
-              <SSpanBiddersHighlighted className='spanHighlighted'>
-                {firstVoter}
-              </SSpanBiddersHighlighted>
+              <Link href={`/${firstVoterUsername}`}>
+                <SSpanBiddersHighlighted
+                  onClick={(e) => e.stopPropagation()}
+                  className='spanHighlighted'
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  {firstVoter}
+                </SSpanBiddersHighlighted>
+              </Link>
             )}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubstracted > 0 ? ` & ` : ''}
@@ -733,22 +750,23 @@ const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
     return (
       <>
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRedirectToOptionCreator();
-          }}
-          style={{
-            color:
-              theme.name === 'dark'
-                ? theme.colorsThemed.accent.yellow
-                : theme.colors.dark,
-            cursor: 'pointer',
-          }}
-        >
-          {optionCreator}
-        </SSpanBiddersHighlighted>
+        <Link href={`/${optionCreatorUsername}`}>
+          <SSpanBiddersHighlighted
+            className='spanHighlighted'
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              color:
+                theme.name === 'dark'
+                  ? theme.colorsThemed.accent.yellow
+                  : theme.colors.dark,
+              cursor: 'pointer',
+            }}
+          >
+            {optionCreator}
+          </SSpanBiddersHighlighted>
+        </Link>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -770,19 +788,20 @@ const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
     return (
       <>
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRedirectToOptionCreator();
-          }}
-          style={{
-            color: theme.colorsThemed.accent.yellow,
-            cursor: 'pointer',
-          }}
-        >
-          {optionCreator}
-        </SSpanBiddersHighlighted>
+        <Link href={`/${optionCreatorUsername}`}>
+          <SSpanBiddersHighlighted
+            className='spanHighlighted'
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              color: theme.colorsThemed.accent.yellow,
+              cursor: 'pointer',
+            }}
+          >
+            {optionCreator}
+          </SSpanBiddersHighlighted>
+        </Link>
         <SSpanBiddersHighlighted className='spanHighlighted'>
           {', '}
           {`${t('me')}`}
@@ -808,19 +827,20 @@ const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && isSuggestedByMe) {
     return (
       <>
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRedirectToOptionCreator();
-          }}
-          style={{
-            color: theme.colorsThemed.accent.yellow,
-            cursor: 'pointer',
-          }}
-        >
-          {`${t('me')}`}
-        </SSpanBiddersHighlighted>
+        <Link href={`/${optionCreatorUsername}`}>
+          <SSpanBiddersHighlighted
+            className='spanHighlighted'
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              color: theme.colorsThemed.accent.yellow,
+              cursor: 'pointer',
+            }}
+          >
+            {`${t('me')}`}
+          </SSpanBiddersHighlighted>
+        </Link>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>

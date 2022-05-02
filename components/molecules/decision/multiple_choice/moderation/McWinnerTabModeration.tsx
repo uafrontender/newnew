@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 
@@ -22,17 +22,18 @@ import { formatNumber } from '../../../../../utils/format';
 import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
+import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface MAcWinnerTabModeration {
   postId: string;
+  postCreator: newnewapi.User;
   option: newnewapi.MultipleChoice.Option;
   postStatus: TPostStatusStringified;
 }
 
 const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
-  ({ postId, option, postStatus }) => {
+  ({ postId, postCreator, option, postStatus }) => {
     const { t } = useTranslation('decision');
-    const router = useRouter();
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
@@ -73,17 +74,6 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
           });
       }
     }, [postId]);
-
-    const handleRedirectToUser = () => {
-      window?.history.replaceState(
-        {
-          fromPost: true,
-        },
-        '',
-        ''
-      );
-      router.push(`/${option.creator?.username!!}`);
-    };
 
     useEffect(() => {
       if (isBrowser()) {
@@ -174,23 +164,27 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
                 <SSpanThin>
                   {t('McPostModeration.WinnerTab.WinnerOptionCard.created_by')}
                 </SSpanThin>{' '}
-                <SSpanBold
-                  onClick={() => {
-                    if (isCreatorsBid) return;
-                    handleRedirectToUser();
-                  }}
-                  style={{
-                    ...(!isCreatorsBid
-                      ? {
-                          cursor: 'pointer',
-                        }
-                      : {}),
-                  }}
+                <Link
+                  href={
+                    !isCreatorsBid
+                      ? `/${option.creator?.username!!}`
+                      : `/${postCreator.username!!}`
+                  }
                 >
-                  {isCreatorsBid
-                    ? t('McPost.OptionsTab.me')
-                    : option.creator?.nickname ?? option.creator?.username}
-                </SSpanBold>
+                  <SSpanBold
+                    style={{
+                      ...(!isCreatorsBid
+                        ? {
+                            cursor: 'pointer',
+                          }
+                        : {}),
+                    }}
+                  >
+                    {isCreatorsBid
+                      ? t('McPost.OptionsTab.me')
+                      : getDisplayname(option.creator!!)}
+                  </SSpanBold>
+                </Link>
               </SOptionCreator>
             </SOptionDetails>
             <STrophyImg src={WinnerIcon.src} />

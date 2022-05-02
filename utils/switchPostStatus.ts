@@ -5,13 +5,15 @@ import { TPostType } from './switchPostType';
 export type TPostStatusStringified =
   | 'scheduled'
   | 'voting'
-  | 'wating_for_decision'
+  | 'waiting_for_decision'
   | 'waiting_for_response'
   | 'flagged'
   | 'succeeded'
   | 'failed'
   | 'deleted'
-  | 'processing';
+  | 'deleted_by_admin'
+  | 'processing_announcement'
+  | 'processing_response';
 
 // TODO: Resolve stringification issue
 export default function switchPostStatus(
@@ -30,7 +32,7 @@ export default function switchPostStatus(
         return 'voting';
       }
       case newnewapi.Auction.Status.WAITING_FOR_DECISION: {
-        return 'wating_for_decision';
+        return 'waiting_for_decision';
       }
       case newnewapi.Auction.Status.WAITING_FOR_RESPONSE: {
         return 'waiting_for_response';
@@ -48,16 +50,16 @@ export default function switchPostStatus(
         return 'flagged';
       }
       case newnewapi.Auction.Status.PROCESSING_ANNOUNCE: {
-        return 'processing';
+        return 'processing_announcement';
       }
       case newnewapi.Auction.Status.PROCESSING_RESPONSE: {
-        return 'processing';
+        return 'processing_response';
       }
       case newnewapi.Auction.Status.FAILED: {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
@@ -86,16 +88,16 @@ export default function switchPostStatus(
         return 'flagged';
       }
       case newnewapi.Crowdfunding.Status.PROCESSING_ANNOUNCE: {
-        return 'processing';
+        return 'processing_announcement';
       }
       case newnewapi.Crowdfunding.Status.PROCESSING_RESPONSE: {
-        return 'processing';
+        return 'processing_response';
       }
       case newnewapi.Crowdfunding.Status.FAILED: {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
@@ -124,19 +126,19 @@ export default function switchPostStatus(
         return 'flagged';
       }
       case newnewapi.MultipleChoice.Status.PROCESSING_ANNOUNCE: {
-        return 'processing';
+        return 'processing_announcement';
       }
       case newnewapi.MultipleChoice.Status.PROCESSING_RESPONSE: {
-        return 'processing';
+        return 'processing_response';
       }
       case newnewapi.MultipleChoice.Status.FAILED: {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
 
-  return 'processing';
+  return 'processing_announcement';
 }
