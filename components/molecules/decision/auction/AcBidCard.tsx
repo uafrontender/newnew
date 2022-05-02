@@ -17,13 +17,6 @@ const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
   const createdAtParsed = new Date((bid.createdAt?.seconds as number) * 1000);
 
   const handleRedirectToUser = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
     router.push(`/${bid.bidder?.username}`);
   };
 

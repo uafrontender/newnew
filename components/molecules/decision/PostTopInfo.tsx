@@ -7,6 +7,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -135,18 +136,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [reportPostOpen, setReportPostOpen] = useState(false);
 
-  const handleRedirectToUser = () => {
-    window?.history.replaceState(
-      {
-        ...{ ...window.history.state },
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${creator.username}`);
-  };
-
   const handleOpenShareMenu = () => setShareMenuOpen(true);
   const handleCloseShareMenu = () => setShareMenuOpen(false);
 
@@ -156,13 +145,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleFollowDecision = async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState(
-          {
-            fromPost: true,
-          },
-          '',
-          ''
-        );
         router.push(
           `/sign-up?reason=follow-decision&redirect=${window.location.href}`
         );
@@ -185,13 +167,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   const handleToggleFollowingCreator = async () => {
     try {
       if (!user.loggedIn) {
-        window?.history.replaceState(
-          {
-            fromPost: true,
-          },
-          '',
-          ''
-        );
         router.push(
           `/sign-up?reason=follow-creator&redirect=${window.location.href}`
         );
@@ -235,11 +210,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
               : t('McPost.PostTopInfo.vote')}
           </SBidsAmount>
         ) : null}
-        <CreatorCard onClick={() => handleRedirectToUser()}>
-          <SAvatarArea>
-            <img src={creator.avatarUrl!! as string} alt={creator.username!!} />
-          </SAvatarArea>
-          <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
+        <CreatorCard>
+          <Link href={`/${creator.username}`}>
+            <SAvatarArea>
+              <img
+                src={creator.avatarUrl!! as string}
+                alt={creator.username!!}
+              />
+            </SAvatarArea>
+          </Link>
+          <Link href={`/${creator.username}`}>
+            <SUsername>{creator.nickname ?? `@${creator.username}`}</SUsername>
+          </Link>
         </CreatorCard>
         <SActionsDiv>
           <SShareButton

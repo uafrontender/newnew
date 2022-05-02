@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
@@ -51,7 +52,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     handleRemoveOption,
   }) => {
     const theme = useTheme();
-    const router = useRouter();
     const { t } = useTranslation('decision');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -64,18 +64,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isPickOptionModalOpen, setIsPickOptionModalOpen] = useState(false);
-
-    // Redirect to user's page
-    const handleRedirectToOptionCreator = () => {
-      window?.history.replaceState(
-        {
-          fromPost: true,
-        },
-        '',
-        ''
-      );
-      router.push(`/${option.creator?.username}`);
-    };
 
     const handleConfirmDelete = async () => {
       try {
@@ -118,23 +106,25 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
               </SBidAmount>
               <SOptionInfo variant={3}>{option.title}</SOptionInfo>
               <SBiddersInfo variant={3}>
-                <SSpanBiddersHighlighted
-                  className='spanHighlighted'
-                  onClick={() => handleRedirectToOptionCreator()}
-                  style={{
-                    ...(option.isCreatedBySubscriber
-                      ? {
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                          cursor: 'pointer',
-                        }
-                      : {}),
-                  }}
-                >
-                  {option.creator?.nickname ?? option.creator?.username}
-                </SSpanBiddersHighlighted>
+                <Link href={`/${option.creator?.username}`}>
+                  <SSpanBiddersHighlighted
+                    className='spanHighlighted'
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      ...(option.isCreatedBySubscriber
+                        ? {
+                            color:
+                              theme.name === 'dark'
+                                ? theme.colorsThemed.accent.yellow
+                                : theme.colors.dark,
+                            cursor: 'pointer',
+                          }
+                        : {}),
+                    }}
+                  >
+                    {option.creator?.nickname ?? option.creator?.username}
+                  </SSpanBiddersHighlighted>
+                </Link>
                 {option.supporterCount > 1 ? (
                   <>
                     <SSpanBiddersRegular className='spanRegular'>
@@ -238,23 +228,25 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
             </SBidAmount>
             <SOptionInfo variant={3}>{option.title}</SOptionInfo>
             <SBiddersInfo variant={3}>
-              <SSpanBiddersHighlighted
-                className='spanHighlighted'
-                onClick={() => handleRedirectToOptionCreator()}
-                style={{
-                  ...(option.isCreatedBySubscriber
-                    ? {
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                        cursor: 'pointer',
-                      }
-                    : {}),
-                }}
-              >
-                {option.creator?.nickname ?? option.creator?.username}
-              </SSpanBiddersHighlighted>
+              <Link href={`/${option.creator?.username}`}>
+                <SSpanBiddersHighlighted
+                  className='spanHighlighted'
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    ...(option.isCreatedBySubscriber
+                      ? {
+                          color:
+                            theme.name === 'dark'
+                              ? theme.colorsThemed.accent.yellow
+                              : theme.colors.dark,
+                          cursor: 'pointer',
+                        }
+                      : {}),
+                  }}
+                >
+                  {option.creator?.nickname ?? option.creator?.username}
+                </SSpanBiddersHighlighted>
+              </Link>
               {option.supporterCount > 1 ? (
                 <>
                   <SSpanBiddersRegular className='spanRegular'>

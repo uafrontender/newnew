@@ -46,7 +46,7 @@ export const TopSection: React.FC<ITopSection> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [mouseIsDown, setMouseIsDown] = useState(false);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -121,7 +121,12 @@ export const TopSection: React.FC<ITopSection> = ({
         name={`top-section-${index}`}
         onClick={handleItemClick}
       >
-        <Card type='inside' item={item} index={index + 1} />
+        <Card
+          shouldStop={overlay}
+          type='inside'
+          item={item}
+          index={index + 1}
+        />
       </SItemWrapper>
     );
   };

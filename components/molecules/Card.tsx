@@ -75,9 +75,17 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
+  shouldStop?: boolean;
 }
 
-export const Card: React.FC<ICard> = ({ item, type, index, width, height }) => {
+export const Card: React.FC<ICard> = ({
+  item,
+  type,
+  index,
+  width,
+  height,
+  shouldStop,
+}) => {
   const { t } = useTranslation('home');
   const theme = useTheme();
   const router = useRouter();
@@ -144,7 +152,7 @@ export const Card: React.FC<ICard> = ({ item, type, index, width, height }) => {
   useEffect(() => {
     try {
       if (videoReady) {
-        if (inView) {
+        if (inView && !shouldStop) {
           videoRef.current?.play();
         } else {
           videoRef.current?.pause();
@@ -153,7 +161,7 @@ export const Card: React.FC<ICard> = ({ item, type, index, width, height }) => {
     } catch (err) {
       console.error(err);
     }
-  }, [inView, videoReady]);
+  }, [inView, videoReady, shouldStop]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -371,6 +379,7 @@ Card.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
+  shouldStop: false,
 };
 
 interface ISWrapper {

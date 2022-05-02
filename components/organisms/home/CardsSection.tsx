@@ -65,7 +65,7 @@ export const CardsSection: React.FC<ICardSection> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [mouseIsDown, setMouseIsDown] = useState(false);
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
+  const { resizeMode, overlay } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -166,6 +166,7 @@ export const CardsSection: React.FC<ICardSection> = ({
           >
             <Card
               item={item}
+              shouldStop={overlay}
               index={tutorialCard !== undefined ? index + 1 : index}
               width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
               height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
@@ -185,6 +186,7 @@ export const CardsSection: React.FC<ICardSection> = ({
       >
         <Card
           item={item}
+          shouldStop={overlay}
           index={tutorialCard !== undefined ? index + 1 : index}
           width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
           height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
