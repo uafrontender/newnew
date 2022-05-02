@@ -217,8 +217,15 @@
   "Active": {
     "no-content": {
       "title": "Still noone decisions?",
-      "description": "Still didn’t make any decision? Let’s discover some decision you  want to support!",
+      "description": "Still didn’t make any decision? Let’s discover some decision you want to support!",
       "button": "Make some decisions"
+    }
+  },
+  "MyPosts": {
+    "no-content": {
+      "title": "Still noone decisions?",
+      "description": "Still didn’t crate any decision? Let’s discover what you can create!",
+      "button": "Create some decisions"
     }
   }
 }
