@@ -17,7 +17,7 @@ import PostModal from '../../components/organisms/decision/PostModal';
 import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
-import HowItWorksDarkHoldFrame from '../../public/images/profile/How-it-Works-Dark-Hold-Frame.png';
+import HowItWorksDarkHoldFrameIcon from '../../public/images/profile/How-it-Works-Dark-Hold-Frame.png';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import {
   NoContentDescription,
@@ -158,7 +158,7 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
           )}
           {posts && posts.length === 0 && !isLoading && (
             <NoContentCard
-              graphics={<SImage src={HowItWorksDarkHoldFrame.src} />}
+              graphics={<SImage src={HowItWorksDarkHoldFrameIcon.src} />}
             >
               <NoContentTitle>{t('MyPosts.no-content.title')}</NoContentTitle>
               <NoContentDescription>
@@ -291,8 +291,8 @@ const SCardsSection = styled.div`
 
 const SImage = styled.img`
   object-fit: contain;
-  height: 193px;
   width: 282px;
+  height: 193px;
 
   ${({ theme }) => theme.media.laptop} {
     width: 330px;
