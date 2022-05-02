@@ -12,6 +12,7 @@
   "mobile-top-navigation-direct-messages": "DMs",
   "mobile-top-navigation-share": "Share",
   "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
+  "mobile-top-navigation-my-balance-tablet": "${{value}}",
   "mobile-top-navigation-my-balance-empty": "Wallet balance",
   "mobile-top-navigation-profile": "Profile",
   "button-create-decision": "Create decision",

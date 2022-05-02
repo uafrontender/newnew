@@ -88,18 +88,16 @@ export const Desktop: React.FC<IDesktop> = () => {
                 handleClose={() => setShareMenuOpen(false)}
               />
             </SItemWithMargin>
-            {user.userData?.options?.isCreator && (
+            {user.userData?.options?.isCreator && !isBalanceLoading && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
-                    url: '/my-balance',
+                    url: '/profile/settings',
                     key: 'my-balance',
                     value:
-                      !isBalanceLoading &&
-                      walletBalance &&
-                      walletBalance?.usdCents !== undefined
+                      walletBalance && walletBalance?.usdCents !== undefined
                         ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          undefined
+                          0
                         : undefined,
                   }}
                 />

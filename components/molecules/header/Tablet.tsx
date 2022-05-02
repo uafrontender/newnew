@@ -92,17 +92,15 @@ export const Tablet: React.FC<ITablet> = () => {
                 handleClose={() => setShareMenuOpen(false)}
               />
             </SItemWithMargin>
-            {user.userData?.options?.isCreator && (
+            {user.userData?.options?.isCreator && !isBalanceLoading && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
-                    url: '/my-balance',
-                    key: 'my-balance',
-                    value:
-                      !isBalanceLoading && walletBalance?.usdCents
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          undefined
-                        : undefined,
+                    url: '/profile/settings',
+                    key: 'my-balance-tablet',
+                    value: walletBalance?.usdCents
+                      ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ?? 0
+                      : undefined,
                   }}
                 />
               </SItemWithMargin>
