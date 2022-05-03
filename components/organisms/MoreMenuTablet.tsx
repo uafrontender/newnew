@@ -1,17 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 import Text from '../atoms/Text';
-import InlineSvg from '../atoms/InlineSVG';
+// import InlineSvg from '../atoms/InlineSVG';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
-import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
+// import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
+// import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
 import { useAppSelector } from '../../redux-store/store';
 // import { WalletContext } from '../../contexts/walletContext';
 // import { formatNumber } from '../../utils/format';
@@ -25,7 +25,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   isVisible,
   handleClose,
 }) => {
-  const theme = useTheme();
+  // const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
@@ -71,7 +71,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
             </SAvatar>
             <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
           </SButton>
-          <SButton
+          {/* <SButton
             onClick={() =>
               router.route.includes('/profile/settings')
                 ? handleClose()
@@ -92,7 +92,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               width='24px'
               height='24px'
             />
-            {/* <Text variant={2}>
+            <Text variant={2}>
               {!isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
                 ? t('mobile-top-navigation-my-balance', {
                     value: formatNumber(
@@ -101,8 +101,8 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
                     ),
                   })
                 : t('mobile-top-navigation-my-balance')}
-            </Text> */}
-          </SButton>
+            </Text>
+          </SButton> */}
         </SContainer>
       )}
     </AnimatePresence>
