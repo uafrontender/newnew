@@ -29,6 +29,7 @@ import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg'
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
+import { useNotifications } from '../../../../contexts/notificationsContext';
 import NewMessageModal from './NewMessageModal';
 
 export const DynamicSection = () => {
@@ -41,6 +42,8 @@ export const DynamicSection = () => {
   const [animation, setAnimation] = useState('o-12');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { unreadCountForCreator } = useGetChats();
+  const { unreadNotificationCount } = useNotifications();
+  const [markReadNotifications, setMarkReadNotifications] = useState(false);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -62,7 +65,7 @@ export const DynamicSection = () => {
     () => [
       {
         url: '/creator/dashboard?tab=notifications',
-        counter: 12,
+        counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
       {
@@ -71,7 +74,7 @@ export const DynamicSection = () => {
         nameToken: 'chat',
       },
     ],
-    [unreadCountForCreator]
+    [unreadCountForCreator, unreadNotificationCount]
   );
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
@@ -88,7 +91,10 @@ export const DynamicSection = () => {
     setAnimate(false);
   }, []);
   const handleMarkAllAsRead = useCallback(() => {
-    console.log('mark all as read');
+    setMarkReadNotifications(true);
+    setTimeout(() => {
+      setMarkReadNotifications(false);
+    }, 1500);
   }, []);
   const handleSearchClick = useCallback(() => {
     console.log('search');
@@ -184,12 +190,14 @@ export const DynamicSection = () => {
                 <SSectionTopLineButtons>
                   {tab === 'notifications' ? (
                     <>
-                      <STopLineButton
-                        view='secondary'
-                        onClick={handleMarkAllAsRead}
-                      >
-                        {t('dashboard.button.markAllAsRead')}
-                      </STopLineButton>
+                      {unreadNotificationCount > 0 && (
+                        <STopLineButton
+                          view='secondary'
+                          onClick={handleMarkAllAsRead}
+                        >
+                          {t('dashboard.button.markAllAsRead')}
+                        </STopLineButton>
+                      )}
                       {!isDesktop && (
                         <STopLineButton
                           view='secondary'
@@ -228,7 +236,13 @@ export const DynamicSection = () => {
                   )}
                 </SSectionTopLineButtons>
               </SSectionTopLine>
-              {tab === 'notifications' ? <NotificationsList /> : <ChatList />}
+              {tab === 'notifications' ? (
+                <NotificationsList
+                  markReadNotifications={markReadNotifications}
+                />
+              ) : (
+                <ChatList />
+              )}
             </>
           )}
         </SAnimatedContainer>

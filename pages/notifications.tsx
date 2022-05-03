@@ -1,77 +1,93 @@
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
+/* eslint-disable no-nested-ternary */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-lonely-if */
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
-import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
-import { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import moment from 'moment';
 import { newnewapi } from 'newnew-api';
-import randomID from '../utils/randomIdGenerator';
-
-import General from '../components/templates/General';
-import Notification from '../components/molecules/Notification';
+import styled from 'styled-components';
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { useInView } from 'react-intersection-observer';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { NextPageWithLayout } from './_app';
-import { getMyNotifications } from '../api/endpoints/notification';
-// import { useAppSelector } from '../redux-store/store';
-
-// eslint-disable-next-line no-shadow
-export enum RoutingTarget {
-  Empty = 'NO TARGET',
-  PostAnnounce = 'POST ANNOUNCE',
-  PostResponse = 'POST RESPONSE',
-  PostModeration = 'POST MODERATION',
-  PostComments = 'POST COMMENTS',
-  ChatRoom = 'CHAT ROOM',
-  UserProfile = 'USER PROFILE',
-}
-
-export interface INotification {
-  id: string;
-  createdAt: moment.Moment;
-  content: {
-    message: string;
-    relatedPost?: {
-      uuid: string;
-      thumbnailImageUrl: string;
-      title: string;
-    };
-    relatedUser: {
-      uuid: string;
-      thumbnailAvatarUrl: string;
-      title: string;
-    };
-  };
-  isRead?: boolean;
-  routingTarget: RoutingTarget;
-}
+import Lottie from '../components/atoms/Lottie';
+import General from '../components/templates/General';
+import Notification from '../components/molecules/notifications/Notification';
+import { getMyNotifications, markAsRead } from '../api/endpoints/notification';
+import loadingAnimation from '../public/animations/logo-loading-blue.json';
+import NoResults from '../components/molecules/notifications/NoResults';
+import { useNotifications } from '../contexts/notificationsContext';
 
 export const Notifications = () => {
   const { t } = useTranslation('notifications');
-  // const { user } = useAppSelector((state) => state);
-  // const user = useAppSelector((state) => state.user);
-  const [notifications, setNotifications] = useState<newnewapi.INotification[] | null>(null);
-  // const [notificationsNextPageToken, setnotificationsNextPageToken] = useState<string | undefined | null>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const { ref: scrollRef, inView } = useInView();
+  const [notifications, setNotifications] =
+    useState<newnewapi.INotification[] | null>(null);
+  const [unreadNotifications, setUnreadNotifications] =
+    useState<number[] | null>(null);
+  const [notificationsNextPageToken, setNotificationsNextPageToken] =
+    useState<string | undefined | null>('');
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
+  const [defaultLimit, setDefaultLimit] = useState<number>(6);
+  const { unreadNotificationCount } = useNotifications();
+  const [localUnreadNotificationCount, setLocalUnreadNotificationCount] =
+    useState<number>(0);
 
   const fetchNotification = useCallback(
-    async (pageToken?: string) => {
+    async (args?) => {
       if (loading) return;
+      const limit: number = args && args.limit ? args.limit : defaultLimit;
+      const pageToken: string = args && args.pageToken ? args.pageToken : null;
       try {
-        if (!pageToken) setNotifications([]);
+        if (!pageToken && limit === defaultLimit) setNotifications([]);
         setLoading(true);
         const payload = new newnewapi.GetMyNotificationsRequest({
           paging: {
-            limit: 20,
+            limit,
             pageToken,
           },
         });
+
         const res = await getMyNotifications(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-        console.log(res.data.notifications);
-
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data.notifications.length > 0) {
+          if (limit === defaultLimit) {
+            setNotifications((curr) => {
+              const arr = curr ? [...curr] : [];
+              res.data?.notifications.forEach((item) => {
+                arr.push(item);
+              });
+              return arr;
+            });
+            setUnreadNotifications((curr) => {
+              const arr = curr ? [...curr] : [];
+              res.data?.notifications.forEach((item) => {
+                if (!item.isRead) {
+                  arr.push(item.id as number);
+                }
+              });
+              return arr;
+            });
+            setNotificationsNextPageToken(res.data.paging?.nextPageToken);
+          } else {
+            setNotifications((curr) => {
+              const arr = [...curr!!];
+              arr.unshift(res.data!!.notifications[0]);
+              return arr;
+            });
+            setUnreadNotifications((curr) => {
+              const arr = curr ? [...curr] : [];
+              arr.push(res.data!!.notifications[0].id as number);
+              return arr;
+            });
+          }
+        }
+        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
+          setNotificationsNextPageToken(null);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -82,194 +98,59 @@ export const Notifications = () => {
     [loading]
   );
 
-  useEffect(() => {
-    // console.log(user);
+  const readNotification = useCallback(
+    async () => {
+      try {
+        const payload = new newnewapi.MarkAsReadRequest({
+          notificationIds: unreadNotifications,
+        });
+        const res = await markAsRead(payload);
+        if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setUnreadNotifications(null);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unreadNotifications]
+  );
 
+  useEffect(() => {
     if (!notifications) {
       fetchNotification();
     }
   }, [notifications, fetchNotification]);
 
-  const collection = useMemo(
-    () =>
-      [
-        {
-          id: randomID(),
-          createdAt: moment().subtract(1, 'day'),
-          content: {
-            message: 'your card was declined click here to retry',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'NewNew',
-              thumbnailAvatarUrl: '/images/mock/test_user_1.jpg',
-            },
-          },
-          routingTarget: RoutingTarget.Empty,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(1, 'day'),
-          content: {
-            message:
-              'this is a multi-line comment that wraps on a second line just in case we need to have a longer comment',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Bugaboo👻😈',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'I don’t beleive...',
-            },
-          },
-          routingTarget: RoutingTarget.Empty,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(2, 'day'),
-          content: {
-            message: 'Sent you a message',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'SandyCandy',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-          },
-          routingTarget: RoutingTarget.ChatRoom,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: 'posted a new comment on',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'SugarDaddy',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostComments,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: '',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Dark Moon 🌚 ',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostAnnounce,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: '',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Dark Moon 🌚 ',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostAnnounce,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: '',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Dark Moon 🌚 ',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostAnnounce,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: '',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Dark Moon 🌚 ',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostAnnounce,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: '',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Dark Moon 🌚 ',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostAnnounce,
-        },
-        {
-          id: randomID(),
-          createdAt: moment().subtract(4, 'day'),
-          content: {
-            message: '',
-            relatedUser: {
-              uuid: randomID(),
-              title: 'Dark Moon 🌚 ',
-              thumbnailAvatarUrl: '/images/mock/test_user_2.jpg',
-            },
-            relatedPost: {
-              uuid: randomID(),
-              thumbnailImageUrl: '/images/mock/test_user_1.jpg',
-              title: 'Where to dine tonight?',
-            },
-          },
-          routingTarget: RoutingTarget.PostAnnounce,
-        },
-      ] as INotification[],
-    []
-  );
+  useEffect(() => {
+    if (unreadNotifications && unreadNotifications.length > 0) {
+      readNotification();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unreadNotifications]);
+
+  useEffect(() => {
+    if (initialLoad) {
+      setLocalUnreadNotificationCount(unreadNotificationCount);
+      setInitialLoad(false);
+    } else {
+      if (unreadNotificationCount > localUnreadNotificationCount) {
+        fetchNotification({ limit: 1 });
+      } else {
+        setLocalUnreadNotificationCount(unreadNotificationCount);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLoad, unreadNotificationCount]);
+
+  useEffect(() => {
+    if (inView && !loading && notificationsNextPageToken) {
+      fetchNotification({ pageToken: notificationsNextPageToken });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, loading, notificationsNextPageToken]);
 
   const renderNotification = useCallback(
-    (item) => <Notification {...item} />,
+    (item) => <Notification key={item.id} {...item} />,
     []
   );
 
@@ -280,7 +161,44 @@ export const Notifications = () => {
       </Head>
       <SContent>
         <SHeading>{t('meta.title')}</SHeading>
-        {collection.map(renderNotification)}
+        {loading === undefined ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : !notifications && loading ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : notifications!!.length < 1 ? (
+          <NoResults />
+        ) : (
+          notifications!!.map(renderNotification)
+        )}
+        {notificationsNextPageToken && !loading && (
+          <SRef ref={scrollRef}>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SRef>
+        )}
       </SContent>
     </>
   );
@@ -338,4 +256,9 @@ const SHeading = styled.h2`
     font-size: 32px;
     line-height: 40px;
   }
+`;
+
+const SRef = styled.span`
+  overflow: hidden;
+  text-align: center;
 `;

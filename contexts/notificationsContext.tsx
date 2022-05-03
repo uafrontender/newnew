@@ -8,73 +8,80 @@ import React, {
 } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useAppSelector } from '../redux-store/store';
-import { getMyBlockedUsers } from '../api/endpoints/user';
+import { getUnreadNotificationCount } from '../api/endpoints/notification';
+import { SocketContext } from './socketContext';
 
-const BlockedUsersContext = createContext({
-  usersBlockedMe: [] as string[],
-  usersIBlocked: [] as string[],
-  blockUser: (uuid: string) => {},
-  unblockUser: (uuid: string) => {},
-  usersBlockedLoading: false,
+const NotificationsContext = createContext({
+  unreadNotificationCount: 0,
 });
 
-export const BlockedUsersProvider: React.FC = ({ children }) => {
+export const NotificationsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
-  const [usersBlockedMe, setUsersBlockedMe] = useState<string[]>([]);
-  const [usersIBlocked, setUsersIBlocked] = useState<string[]>([]);
-  const [usersBlockedLoading, setUsersBlockedLoading] = useState(false);
-
-  const blockUser = (uuid: string) => {
-    setUsersIBlocked((curr) => [...curr, uuid]);
-  };
-
-  const unblockUser = (uuid: string) => {
-    setUsersIBlocked((curr) => curr.filter((i) => i !== uuid));
-  };
+  const [unreadNotificationCount, setUnreadNotificationCount] =
+    useState<number>(0);
+  const [notificationsLodaing, setNotificationsLodaing] = useState(false);
+  const socketConnection = useContext(SocketContext);
 
   const contextValue = useMemo(
     () => ({
-      usersBlockedMe,
-      usersIBlocked,
-      usersBlockedLoading,
-      blockUser,
-      unblockUser,
+      unreadNotificationCount,
+      notificationsLodaing,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [usersBlockedMe, usersIBlocked, blockUser, unblockUser]
+    [unreadNotificationCount]
   );
 
   useEffect(() => {
-    async function fetchBlockedUsers() {
+    async function fetchNotificationCount() {
       if (!user.loggedIn) return;
       try {
-        setUsersBlockedLoading(true);
+        setNotificationsLodaing(true);
         const payload = new newnewapi.EmptyRequest();
-        const res = await getMyBlockedUsers(payload);
+        const res = await getUnreadNotificationCount(payload);
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        setUsersIBlocked(res.data.userUuidsIBlocked);
-        setUsersBlockedMe(res.data.userUuidsBlockedMe);
+        if (res.data.unreadNotificationCount) {
+          setUnreadNotificationCount(res.data.unreadNotificationCount);
+        } else {
+          setUnreadNotificationCount(0);
+        }
       } catch (err) {
         console.error(err);
-        setUsersBlockedLoading(false);
+        setNotificationsLodaing(false);
       }
     }
-    fetchBlockedUsers();
+    fetchNotificationCount();
   }, [user.loggedIn]);
 
+  useEffect(() => {
+    const socketHandlerNotificationUnreadCountsChanged = async (data: any) => {
+      const arr = new Uint8Array(data);
+      const decoded = newnewapi.NotificationUnreadCountsChanged.decode(arr);
+      if (!decoded) return;
+      setUnreadNotificationCount(decoded.unreadCount);
+    };
+
+    if (socketConnection) {
+      socketConnection.on(
+        'NotificationUnreadCountsChanged',
+        socketHandlerNotificationUnreadCountsChanged
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketConnection]);
+
   return (
-    <BlockedUsersContext.Provider value={contextValue}>
+    <NotificationsContext.Provider value={contextValue}>
       {children}
-    </BlockedUsersContext.Provider>
+    </NotificationsContext.Provider>
   );
 };
 
-export function useGetBlockedUsers() {
-  const context = useContext(BlockedUsersContext);
+export function useNotifications() {
+  const context = useContext(NotificationsContext);
   if (!context)
     throw new Error(
-      'useGetBlockedUsers must be used inside a `BlockedUsersProvider`'
+      'useNotifications must be used inside a `NotificationsProvider`'
     );
   return context;
 }

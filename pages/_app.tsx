@@ -74,6 +74,7 @@ import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-
 import HeroDarkMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
 import HeroLightMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
 import PostModalContextProvider from '../contexts/postModalContext';
+import { NotificationsProvider } from '../contexts/notificationsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -157,37 +158,39 @@ const MyApp = (props: IMyApp): ReactElement => {
                 persistor={(store as EnhancedStoreWithPersistor).__persistor}
               >
                 <SyncUserWrapper>
-                  <BlockedUsersProvider>
-                    <FollowingsContextProvider>
-                      {/* <WalletContextProvider> */}
-                      <SubscriptionsProvider>
-                        <ChatsProvider>
-                          <ResizeMode>
-                            <PostModalContextProvider>
-                              <GlobalTheme>
-                                <div>
-                                  <ToastContainer />
-                                  <VideoProcessingWrapper>
-                                    {!pageProps.error ? (
-                                      getLayout(<Component {...pageProps} />)
-                                    ) : (
-                                      <Error
-                                        errorMsg={pageProps.error?.message}
-                                        statusCode={
-                                          pageProps.error?.statusCode ?? 500
-                                        }
-                                      />
-                                    )}
-                                  </VideoProcessingWrapper>
-                                </div>
-                              </GlobalTheme>
-                            </PostModalContextProvider>
-                          </ResizeMode>
-                        </ChatsProvider>
-                      </SubscriptionsProvider>
-                      {/* </WalletContextProvider> */}
-                    </FollowingsContextProvider>
-                  </BlockedUsersProvider>
+                  <NotificationsProvider>
+                    <BlockedUsersProvider>
+                      <FollowingsContextProvider>
+                        {/* <WalletContextProvider> */}
+                        <SubscriptionsProvider>
+                          <ChatsProvider>
+                            <ResizeMode>
+                              <PostModalContextProvider>
+                                <GlobalTheme>
+                                  <div>
+                                    <ToastContainer />
+                                    <VideoProcessingWrapper>
+                                      {!pageProps.error ? (
+                                        getLayout(<Component {...pageProps} />)
+                                      ) : (
+                                        <Error
+                                          errorMsg={pageProps.error?.message}
+                                          statusCode={
+                                            pageProps.error?.statusCode ?? 500
+                                          }
+                                        />
+                                      )}
+                                    </VideoProcessingWrapper>
+                                  </div>
+                                </GlobalTheme>
+                              </PostModalContextProvider>
+                            </ResizeMode>
+                          </ChatsProvider>
+                        </SubscriptionsProvider>
+                        {/* </WalletContextProvider> */}
+                      </FollowingsContextProvider>
+                    </BlockedUsersProvider>
+                  </NotificationsProvider>
                 </SyncUserWrapper>
               </PersistGate>
             </ChannelsContextProvider>
