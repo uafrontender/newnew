@@ -15,6 +15,7 @@ import CreatorCard from '../../molecules/search/CreatorCard';
 interface IList {
   collection: any;
   loading: boolean;
+  subscribedTo?: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
 }
@@ -22,6 +23,7 @@ interface IList {
 export const CreatorsList: React.FC<IList> = ({
   collection,
   loading,
+  subscribedTo = false,
   skeletonsBgColor,
   skeletonsHighlightColor,
 }) => {
@@ -30,9 +32,11 @@ export const CreatorsList: React.FC<IList> = ({
       router.push(`/${item.username}`);
     };
 
+    const sign = subscribedTo ? 'subscribed' : undefined;
+
     return (
       <SItemWrapper key={item.uuid} onClick={handleItemClick}>
-        <CreatorCard creator={item} />
+        <CreatorCard creator={item} sign={sign} />
       </SItemWrapper>
     );
   };
@@ -76,6 +80,7 @@ export const CreatorsList: React.FC<IList> = ({
 };
 
 CreatorsList.defaultProps = {
+  subscribedTo: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };

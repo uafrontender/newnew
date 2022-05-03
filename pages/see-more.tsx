@@ -12,7 +12,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 
 import { NextPageWithLayout } from './_app';
-import List from '../components/organisms/see-more/List';
+import PostList from '../components/organisms/see-more/PostList';
 import TitleBlock from '../components/organisms/see-more/TitleBlock';
 import HomeLayout from '../components/templates/HomeLayout';
 import TopSection from '../components/organisms/home/TopSection';
@@ -370,7 +370,7 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           disabled={isCollectionLoading}
         />
         <SListContainer>
-          <List
+          <PostList
             category={router.query.category?.toString() ?? ''}
             collection={collectionLoaded}
             loading={isCollectionLoading}

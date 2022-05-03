@@ -161,8 +161,8 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
                         username:
                           option.creator?.nickname ?? option.creator?.username,
                       })}
-                </SSpanBold>{' '}
-              </Link>
+                </SSpanBold>
+              </Link>{' '}
               <SSpanThin>
                 {t('AcPost.WinnerTab.WinnerOptionCard.bid_to')}
               </SSpanThin>{' '}
