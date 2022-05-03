@@ -5,7 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import Card from '../../molecules/Card';
+import PostCard from '../../molecules/PostCard';
 
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
@@ -45,7 +45,7 @@ export const ListPostModal: React.FC<IListPostModal> = ({
         key={switchPostType(item)[0].postUuid}
         onClick={handleItemClick}
       >
-        <Card
+        <PostCard
           item={item}
           index={index + 1}
           width='100%'
