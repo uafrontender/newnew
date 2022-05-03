@@ -13,10 +13,10 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
+// import { voteOnPostWithWallet } from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
-  getTopUpWalletWithPaymentPurposeUrl,
+  // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
@@ -103,7 +103,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
       setPaymentModalOpen(true);
     };
 
-    const handleDoubleVoteWithWallet = useCallback(() => {}, []);
+    // const handleDoubleVoteWithWallet = useCallback(() => {}, []);
 
     const handleDoubleVoteWithCardStripeRedirect = useCallback(() => {}, []);
 
@@ -244,7 +244,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
             isOpen={paymentModalOpen}
             amount={`$${parseInt(doubleVoteAmount) * 5}`}
             onClose={() => setPaymentModalOpen(false)}
-            handlePayWithWallet={handleDoubleVoteWithWallet}
+            // handlePayWithWallet={handleDoubleVoteWithWallet}
             handlePayWithCardStripeRedirect={
               handleDoubleVoteWithCardStripeRedirect
             }

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useContext, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { useRouter } from 'next/router';
@@ -13,8 +13,8 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
 import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
 import { useAppSelector } from '../../redux-store/store';
-import { WalletContext } from '../../contexts/walletContext';
-import { formatNumber } from '../../utils/format';
+// import { WalletContext } from '../../contexts/walletContext';
+// import { formatNumber } from '../../utils/format';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -31,7 +31,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   const containerRef = useRef<HTMLDivElement>();
 
   const user = useAppSelector((state) => state.user);
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -92,7 +92,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
               width='24px'
               height='24px'
             />
-            <Text variant={2}>
+            {/* <Text variant={2}>
               {!isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
                 ? t('mobile-top-navigation-my-balance', {
                     value: formatNumber(
@@ -101,7 +101,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
                     ),
                   })
                 : t('mobile-top-navigation-my-balance')}
-            </Text>
+            </Text> */}
           </SButton>
         </SContainer>
       )}

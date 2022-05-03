@@ -35,7 +35,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
-import WalletContextProvider from '../contexts/walletContext';
+// import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
@@ -159,33 +159,33 @@ const MyApp = (props: IMyApp): ReactElement => {
                 <SyncUserWrapper>
                   <BlockedUsersProvider>
                     <FollowingsContextProvider>
-                      <WalletContextProvider>
-                        <SubscriptionsProvider>
-                          <ChatsProvider>
-                            <ResizeMode>
-                              <PostModalContextProvider>
-                                <GlobalTheme>
-                                  <div>
-                                    <ToastContainer />
-                                    <VideoProcessingWrapper>
-                                      {!pageProps.error ? (
-                                        getLayout(<Component {...pageProps} />)
-                                      ) : (
-                                        <Error
-                                          errorMsg={pageProps.error?.message}
-                                          statusCode={
-                                            pageProps.error?.statusCode ?? 500
-                                          }
-                                        />
-                                      )}
-                                    </VideoProcessingWrapper>
-                                  </div>
-                                </GlobalTheme>
-                              </PostModalContextProvider>
-                            </ResizeMode>
-                          </ChatsProvider>
-                        </SubscriptionsProvider>
-                      </WalletContextProvider>
+                      {/* <WalletContextProvider> */}
+                      <SubscriptionsProvider>
+                        <ChatsProvider>
+                          <ResizeMode>
+                            <PostModalContextProvider>
+                              <GlobalTheme>
+                                <div>
+                                  <ToastContainer />
+                                  <VideoProcessingWrapper>
+                                    {!pageProps.error ? (
+                                      getLayout(<Component {...pageProps} />)
+                                    ) : (
+                                      <Error
+                                        errorMsg={pageProps.error?.message}
+                                        statusCode={
+                                          pageProps.error?.statusCode ?? 500
+                                        }
+                                      />
+                                    )}
+                                  </VideoProcessingWrapper>
+                                </div>
+                              </GlobalTheme>
+                            </PostModalContextProvider>
+                          </ResizeMode>
+                        </ChatsProvider>
+                      </SubscriptionsProvider>
+                      {/* </WalletContextProvider> */}
                     </FollowingsContextProvider>
                   </BlockedUsersProvider>
                 </SyncUserWrapper>
