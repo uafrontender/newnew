@@ -14,7 +14,7 @@ import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 import OptionCard from './OptionCard';
-import OptionWallet from './OptionWallet';
+// import OptionWallet from './OptionWallet';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
@@ -23,9 +23,10 @@ interface IPaymentModal {
   zIndex: number;
   amount?: string;
   showTocApply?: boolean;
-  predefinedOption?: 'wallet' | 'card';
+  // predefinedOption?: 'wallet' | 'card';
+  predefinedOption?: 'card';
   onClose: () => void;
-  handlePayWithWallet?: () => void;
+  // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
 }
 
@@ -36,7 +37,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   showTocApply,
   predefinedOption,
   onClose,
-  handlePayWithWallet,
+  // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
   children,
 }) => {
@@ -47,9 +48,11 @@ const PaymentModal: React.FC<IPaymentModal> = ({
     resizeMode
   );
 
-  const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(
-    predefinedOption ?? 'wallet'
-  );
+  // const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(
+  //   predefinedOption ?? 'wallet'
+  // );
+
+  const [selectedOption, setSelectedOption] = useState('card');
 
   useEffect(() => {
     if (predefinedOption) {
@@ -82,7 +85,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
             {t('paymentMethodTitle')}
           </SPaymentMethodTitle>
           <SOptionsContainer>
-            {!predefinedOption ? (
+            {/* {!predefinedOption ? (
               <>
                 <OptionWallet
                   selected={selectedOption === 'wallet'}
@@ -103,17 +106,33 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 selected={selectedOption === 'wallet'}
                 handleClick={() => setSelectedOption('wallet')}
               />
+            )} */}
+            {!predefinedOption ? (
+              <>
+                <OptionCard
+                  selected={selectedOption === 'card'}
+                  handleClick={() => setSelectedOption('card')}
+                />
+              </>
+            ) : (
+              <OptionCard
+                selected={selectedOption === 'card'}
+                handleClick={() => setSelectedOption('card')}
+              />
             )}
           </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
               view='primaryGrad'
+              // onClick={() => {
+              //   if (selectedOption === 'card') {
+              //     handlePayWithCardStripeRedirect?.();
+              //   } else {
+              //     handlePayWithWallet?.();
+              //   }
+              // }}
               onClick={() => {
-                if (selectedOption === 'card') {
-                  handlePayWithCardStripeRedirect?.();
-                } else {
-                  handlePayWithWallet?.();
-                }
+                handlePayWithCardStripeRedirect?.();
               }}
             >
               {t('payButton')}
@@ -141,7 +160,7 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   predefinedOption: undefined,
-  handlePayWithWallet: () => {},
+  // handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
 
