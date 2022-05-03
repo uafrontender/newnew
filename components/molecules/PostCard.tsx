@@ -101,8 +101,12 @@ export const PostCard: React.FC<ICard> = ({
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const { ref: cardRef, inView } = useInView({
-    threshold: 0.55,
+  const {
+    ref: cardRef,
+    inView,
+    entry: ioEntry,
+  } = useInView({
+    threshold: [0, 0.55],
   });
   const videoRef = useRef<HTMLVideoElement>();
 
@@ -147,12 +151,16 @@ export const PostCard: React.FC<ICard> = ({
       videoRef.current?.removeEventListener('canplay', handleCanplay);
       videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
     };
-  }, []);
+  }, [inView]);
 
   useEffect(() => {
     try {
       if (videoReady) {
-        if (inView && !shouldStop) {
+        if (
+          ioEntry?.intersectionRatio &&
+          ioEntry?.intersectionRatio > 0.55 &&
+          !shouldStop
+        ) {
           videoRef.current?.play();
         } else {
           videoRef.current?.pause();
@@ -161,7 +169,7 @@ export const PostCard: React.FC<ICard> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [inView, videoReady, shouldStop]);
+  }, [ioEntry?.intersectionRatio, videoReady, shouldStop]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -227,19 +235,27 @@ export const PostCard: React.FC<ICard> = ({
             </SNumberImageHolder>
           )}
           <SImageHolder index={index}>
-            <video
-              ref={(el) => {
-                videoRef.current = el!!;
-              }}
-              loop
-              muted
-              playsInline
-            >
-              <source
-                src={postParsed.announcement?.thumbnailUrl ?? ''}
-                type='video/mp4'
+            {ioEntry?.isIntersecting ? (
+              <video
+                ref={(el) => {
+                  videoRef.current = el!!;
+                }}
+                loop
+                muted
+                playsInline
+                poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
+              >
+                <source
+                  src={postParsed.announcement?.thumbnailUrl ?? ''}
+                  type='video/mp4'
+                />
+              </video>
+            ) : (
+              <img
+                src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                alt='Post'
               />
-            </video>
+            )}
             <SImageMask />
             <STopContent>
               <SButtonIcon iconOnly id='showMore' view='transparent'>
@@ -274,19 +290,27 @@ export const PostCard: React.FC<ICard> = ({
     <SWrapperOutside ref={cardRef} width={width}>
       <SImageBG id='backgroundPart' height={height}>
         <SImageHolderOutside id='animatedPart'>
-          <video
-            ref={(el) => {
-              videoRef.current = el!!;
-            }}
-            loop
-            muted
-            playsInline
-          >
-            <source
-              src={postParsed.announcement?.thumbnailUrl ?? ''}
-              type='video/mp4'
+          {ioEntry?.isIntersecting ? (
+            <video
+              ref={(el) => {
+                videoRef.current = el!!;
+              }}
+              loop
+              muted
+              playsInline
+              poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
+            >
+              <source
+                src={postParsed.announcement?.thumbnailUrl ?? ''}
+                type='video/mp4'
+              />
+            </video>
+          ) : (
+            <img
+              src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+              alt='Post'
             />
-          </video>
+          )}
           <STopContent>
             <SButtonIcon
               iconOnly
@@ -512,6 +536,16 @@ const SImageHolder = styled.div<ISWrapper>`
     z-index: -1;
   }
 
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
   ${(props) => props.theme.media.tablet} {
     width: 212px;
     padding: 12px;
@@ -522,6 +556,16 @@ const SImageHolder = styled.div<ISWrapper>`
     padding: 18px;
 
     video {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      object-fit: cover;
+      width: calc(100% - 20px);
+      height: calc(100% - 20px);
+      border-radius: 10px;
+    }
+
+    img {
       position: absolute;
       top: 10px;
       left: 10px;
@@ -685,6 +729,16 @@ const SImageHolderOutside = styled.div`
   }
 
   video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  img {
     position: absolute;
     top: 0;
     left: 0;
