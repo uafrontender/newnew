@@ -37,15 +37,6 @@ export const fetchPledges = (payload: newnewapi.GetPledgesRequest) =>
       : {}
   );
 
-export const fetchPledgeLevels = (payload: newnewapi.EmptyRequest) =>
-  fetchProtobuf<newnewapi.EmptyRequest, newnewapi.StandardPledgeAmounts>(
-    newnewapi.EmptyRequest,
-    newnewapi.StandardPledgeAmounts,
-    `${BASE_URL_CROWDFUNDING}/get_pledge_levels`,
-    'post',
-    payload
-  );
-
 export const doPledgeCrowdfunding = (
   payload: newnewapi.FulfillPaymentPurposeRequest
 ) =>
