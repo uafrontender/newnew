@@ -19,7 +19,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 import Sort from '../../../public/images/svg/icons/outlined/Sort.svg';
 import Close from '../../../public/images/svg/icons/outlined/Close.svg';
 import CheckBox from '../../molecules/CheckBox';
-import List from './List';
+import PostList from './PostList';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { searchPosts } from '../../../api/endpoints/search';
 import NoResults from '../../atoms/search/NoResults';
@@ -381,7 +381,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
         <>
           <SCardsSection>
             {initialLoad && (
-              <List
+              <PostList
                 loading={loadingPosts}
                 collection={resultsPosts}
                 handlePostClicked={handleOpenPostModal}

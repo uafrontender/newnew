@@ -13,7 +13,7 @@ import { getUserByUsername } from '../../api/endpoints/user';
 import { fetchUsersPosts } from '../../api/endpoints/post';
 
 import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/see-more/List';
+import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import Text from '../../components/atoms/Text';
@@ -139,12 +139,6 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
 
-  // useUpdateEffect(() => {
-  //   handleUpdatePageToken('');
-  //   handleSetPosts([]);
-  //   loadPosts(undefined, true);
-  // }, [postsFilter]);
-
   return (
     <div>
       {user.options?.isActivityPrivate ? (
@@ -167,15 +161,10 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
         </SMain>
       ) : (
         <SMain>
-          <PostsFilterSection
-            numDecisions={totalCount}
-            isLoading={isLoading}
-            postsFilter={postsFilter}
-            handleUpdateFilter={handleUpdateFilter}
-          />
+          <PostsFilterSection numDecisions={totalCount} />
           <SCardsSection>
             {posts && (
-              <List
+              <PostList
                 category=''
                 loading={isLoading}
                 collection={posts}

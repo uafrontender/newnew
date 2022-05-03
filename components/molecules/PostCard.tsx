@@ -78,7 +78,7 @@ interface ICard {
   shouldStop?: boolean;
 }
 
-export const Card: React.FC<ICard> = ({
+export const PostCard: React.FC<ICard> = ({
   item,
   type,
   index,
@@ -373,9 +373,9 @@ export const Card: React.FC<ICard> = ({
   );
 };
 
-export default Card;
+export default PostCard;
 
-Card.defaultProps = {
+PostCard.defaultProps = {
   type: 'outside',
   width: '',
   height: '',

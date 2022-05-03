@@ -5,7 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
-import Card from '../../molecules/Card';
+import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
@@ -13,26 +13,24 @@ import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
 
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import { usePostModalState } from '../../../contexts/postModalContext';
 
 interface IList {
-  category: string;
   collection: any;
   loading: boolean;
-  wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const List: React.FC<IList> = ({
-  category,
+export const PostList: React.FC<IList> = ({
   collection,
   loading,
-  wrapperStyle,
   skeletonsBgColor,
   skeletonsHighlightColor,
   handlePostClicked,
 }) => {
+  const { postOverlayOpen } = usePostModalState();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -48,20 +46,19 @@ export const List: React.FC<IList> = ({
         key={switchPostType(item)[0].postUuid}
         onClick={handleItemClick}
       >
-        <Card
+        <PostCard
           item={item}
           index={index + 1}
           width='100%'
           height={isMobile ? '564px' : '336px'}
+          shouldStop={postOverlayOpen}
         />
       </SItemWrapper>
     );
   };
 
   return (
-    <SListWrapper
-    // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
-    >
+    <SListWrapper>
       {collection?.map(renderItem)}
       {collection.length > 0 &&
         loading &&
@@ -98,13 +95,12 @@ export const List: React.FC<IList> = ({
   );
 };
 
-List.defaultProps = {
-  wrapperStyle: {},
+PostList.defaultProps = {
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };
 
-export default List;
+export default PostList;
 
 const SListWrapper = styled.div`
   width: 100%;
@@ -118,24 +114,18 @@ const SListWrapper = styled.div`
   flex-direction: row;
 
   ${(props) => props.theme.media.tablet} {
-    left: 16px;
     width: calc(100% + 26px);
-    padding: 24px 0 0 0;
-
-    margin: 0 auto !important;
-    max-width: 768px;
+    padding: 0;
   }
 
   ${(props) => props.theme.media.laptop} {
-    left: -16px;
     width: calc(100% + 32px);
-    padding: 32px 0 0 0;
-
-    max-width: 1248px;
+    padding: 0 !important;
+    margin: 0 -16px;
   }
 
   ${(props) => props.theme.media.laptopL} {
-    max-width: 1248px;
+    margin: 0 -16px;
   }
 
   .skeletonsContainer {

@@ -1,20 +1,29 @@
 /* eslint-disable no-unused-vars */
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
-import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 
 import { NextPageWithLayout } from '../_app';
-import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import PostModal from '../../components/organisms/decision/PostModal';
-import List from '../../components/organisms/see-more/List';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
+import CreatorsList from '../../components/organisms/search/CreatorsList';
+import NoSubscriptions from '../../public/images/profile/No-subscriptions.png';
+import VerificationPassedIcon from '../../public/images/svg/icons/filled/VerificationPassed.svg';
+import Button from '../../components/atoms/Button';
+import InlineSvg from '../../components/atoms/InlineSVG';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import {
+  NoContentDescription,
+  NoContentTitle,
+} from '../../components/atoms/profile/NoContentCommonElements';
 
 interface IMyProfileSubscriptions {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -43,131 +52,77 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   handleUpdateFilter,
   handleSetPosts,
 }) => {
-  // Display post
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [displayedPost, setDisplayedPost] =
-    useState<newnewapi.IPost | undefined>();
-
-  // Loading state
-  const [isLoading, setIsLoading] = useState(false);
-  const { ref: loadingRef, inView } = useInView();
-  const [triedLoading, setTriedLoading] = useState(false);
-
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
-
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-  };
-
-  const handleClosePostModal = () => {
-    setPostModalOpen(false);
-    setDisplayedPost(undefined);
-  };
-
-  // TODO: filters and other parameters
-  const loadPosts = useCallback(
-    async (token?: string, needCount?: boolean) => {
-      if (isLoading) return;
-      try {
-        setIsLoading(true);
-        setTriedLoading(true);
-        const payload = new newnewapi.GetRelatedToMePostsRequest({
-          relation:
-            newnewapi.GetRelatedToMePostsRequest.Relation.MY_SUBSCRIPTIONS,
-          filter: postsFilter,
-          paging: {
-            ...(token ? { pageToken: token } : {}),
-          },
-          ...(needCount
-            ? {
-                needTotalCount: true,
-              }
-            : {}),
-        });
-        const postsResponse = await getMyPosts(payload);
-
-        if (postsResponse.data && postsResponse.data.posts) {
-          handleSetPosts((curr) => [
-            ...curr,
-            ...(postsResponse.data?.posts as newnewapi.Post[]),
-          ]);
-          handleUpdatePageToken(postsResponse.data.paging?.nextPageToken);
-
-          if (postsResponse.data.totalCount) {
-            handleUpdateCount(postsResponse.data.totalCount);
-          } else if (needCount) {
-            handleUpdateCount(0);
-          }
-        }
-        setIsLoading(false);
-      } catch (err) {
-        setIsLoading(false);
-        console.error(err);
-      }
-    },
-    [
-      handleSetPosts,
-      handleUpdatePageToken,
-      handleUpdateCount,
-      postsFilter,
-      isLoading,
-    ]
-  );
-
-  useEffect(() => {
-    if (inView && !isLoading) {
-      if (pageToken) {
-        loadPosts(pageToken);
-      } else if (!triedLoading && !pageToken && posts?.length === 0) {
-        loadPosts(undefined, true);
-      }
-    } else if (!triedLoading && posts?.length === 0) {
-      loadPosts(undefined, true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pageToken, isLoading, triedLoading, posts?.length]);
-
-  // useUpdateEffect(() => {
-  //   handleUpdatePageToken('');
-  //   handleSetPosts([]);
-  //   loadPosts(undefined, true);
-  // }, [postsFilter]);
+  const { isCreatorsImSubscribedToLoading, creatorsImSubscribedTo } =
+    useGetSubscriptions();
+  const router = useRouter();
+  const { t } = useTranslation('profile');
 
   return (
     <div>
       <SMain>
-        <PostsFilterSection
-          numDecisions={totalCount}
-          isLoading={isLoading}
-          postsFilter={postsFilter}
-          handleUpdateFilter={handleUpdateFilter}
-        />
+        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
-          {posts && (
-            <List
-              category=''
-              loading={isLoading}
-              collection={posts}
-              wrapperStyle={{
-                left: 0,
-              }}
-              handlePostClicked={handleOpenPostModal}
+          {creatorsImSubscribedTo.length > 0 ? (
+            <CreatorsList
+              loading={isCreatorsImSubscribedToLoading}
+              collection={creatorsImSubscribedTo}
+              subscribedTo
             />
+          ) : (
+            <NoContentCard graphics={<SImage src={NoSubscriptions.src} />}>
+              <NoContentTitle>
+                {t('Subscriptions.no-content.title')}
+              </NoContentTitle>
+              <NoContentDescription>
+                {t('Subscriptions.no-content.description')}:
+              </NoContentDescription>
+              <NoContentInstruction>
+                <NoContentInstructionRecord>
+                  <NoContentInstructionPoint>
+                    <InlineSvg
+                      svg={VerificationPassedIcon}
+                      width='16px'
+                      height='16px'
+                    />
+                  </NoContentInstructionPoint>
+                  {t('Subscriptions.no-content.instruction1')}
+                </NoContentInstructionRecord>
+                <NoContentInstructionRecord>
+                  <NoContentInstructionPoint>
+                    <InlineSvg
+                      svg={VerificationPassedIcon}
+                      width='16px'
+                      height='16px'
+                    />
+                  </NoContentInstructionPoint>
+                  {t('Subscriptions.no-content.instruction2')}
+                </NoContentInstructionRecord>
+                <NoContentInstructionRecord>
+                  <NoContentInstructionPoint>
+                    <InlineSvg
+                      svg={VerificationPassedIcon}
+                      width='16px'
+                      height='16px'
+                    />
+                  </NoContentInstructionPoint>
+                  {t('Subscriptions.no-content.instruction3')}
+                </NoContentInstructionRecord>
+              </NoContentInstruction>
+              <Button
+                withShadow
+                view='primaryGrad'
+                onClick={() => {
+                  router.push('/');
+                }}
+                style={{ width: 'fit-content' }}
+              >
+                {t('Subscriptions.no-content.button')}
+              </Button>
+            </NoContentCard>
           )}
         </SCardsSection>
-        <div ref={loadingRef} />
       </SMain>
-      {displayedPost && (
-        <PostModal
-          isOpen={postModalOpen}
-          post={displayedPost}
-          handleClose={() => handleClosePostModal()}
-          handleOpenAnotherPost={handleSetDisplayedPost}
-        />
-      )}
+      {/* Displayed creator modal? */}
     </div>
   );
 };
@@ -202,42 +157,6 @@ export async function getServerSideProps(
       'payment-modal',
     ]);
 
-    // const { req } = context;
-    // // Try to fetch only if actual SSR needed
-    // if (!context.req.url?.startsWith('/_next')) {
-    //   const payload = new newnewapi.GetRelatedToMePostsRequest({
-    //     relation: newnewapi.GetRelatedToMePostsRequest.Relation.MY_SUBSCRIPTIONS,
-    //     filter: newnewapi.Post.Filter.ALL,
-    //     needTotalCount: true,
-    //   });
-    //   const res = await getMyPosts(
-    //     payload,
-    //     {
-    //       accessToken: req.cookies?.accessToken,
-    //       refreshToken: req.cookies?.refreshToken,
-    //     },
-    //     (tokens: TTokenCookie[]) => {
-    //       const parsedTokens = tokens.map((t) => `${t.name}=${t.value}; ${t.expires ? `expires=${t.expires}; ` : ''} ${t.maxAge ? `max-age=${t.maxAge}; ` : ''}`);
-    //       context.res.setHeader(
-    //         'set-cookie',
-    //         parsedTokens,
-    //       );
-    //     },
-    //   );
-
-    //   if (res.data) {
-    //     return {
-    //       props: {
-    //         pagedPosts: res.data.toJSON(),
-    //         ...(res.data.paging?.nextPageToken ? {
-    //           nextPageTokenFromServer: res.data.paging?.nextPageToken,
-    //         } : {}),
-    //         ...translationContext,
-    //       },
-    //     };
-    //   }
-    // }
-
     return {
       props: {
         pagedPosts: {},
@@ -268,4 +187,36 @@ const SCardsSection = styled.div`
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
   }
+`;
+
+const SImage = styled.img`
+  object-fit: contain;
+  height: 165px;
+  width: 165px;
+
+  ${({ theme }) => theme.media.laptop} {
+    width: 245px;
+    height: 245px;
+  }
+`;
+
+const NoContentInstruction = styled.div`
+  margin-bottom: 12px;
+  width: 100%;
+`;
+
+const NoContentInstructionPoint = styled.div`
+  flex-shrink: 0;
+  margin-right: 6px !important;
+`;
+
+const NoContentInstructionRecord = styled.div`
+  display: flex;
+  align-items: center;
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
+  margin-bottom: 12px;
 `;
