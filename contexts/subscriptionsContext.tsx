@@ -122,6 +122,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
         setCreatorsImSubscribedTo(res.data.creators as []);
       } catch (err) {
         console.error(err);
+      } finally {
         setCreatorsImSubscribedToLoading(false);
       }
     }

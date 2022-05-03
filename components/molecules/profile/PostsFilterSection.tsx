@@ -13,16 +13,10 @@ export type PostsFilterOption = {
 
 interface IPostsFilterSection {
   numDecisions?: number;
-  isLoading?: boolean;
-  postsFilter: newnewapi.Post.Filter;
-  handleUpdateFilter: (value: newnewapi.Post.Filter) => void;
 }
 
 const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
   numDecisions,
-  isLoading,
-  postsFilter,
-  handleUpdateFilter,
 }) => {
   const { t } = useTranslation('profile');
 
@@ -34,9 +28,6 @@ const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
             {numDecisions} {t('posts-filter.decisions')}
           </>
         ) : null}
-        {(!numDecisions || numDecisions === 0) && !isLoading ? (
-          <>{t('posts-filter.no-decisions')}</>
-        ) : null}{' '}
       </SText>
     </SFiltersSection>
   );
@@ -44,7 +35,6 @@ const PostsFilterSection: React.FunctionComponent<IPostsFilterSection> = ({
 
 PostsFilterSection.defaultProps = {
   numDecisions: undefined,
-  isLoading: undefined,
 };
 
 export default PostsFilterSection;
