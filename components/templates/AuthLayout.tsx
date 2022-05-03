@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, { useState, createContext, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
@@ -27,11 +27,7 @@ import RightGlassSphereImage from '../../public/images/signup/floating-assets/Ri
 import TopGlassSphereImage from '../../public/images/signup/floating-assets/Top-Glass-Sphere.png';
 import TopMiddleSphereImage from '../../public/images/signup/floating-assets/Top-Middle-Sphere.png';
 import VotesImage from '../../public/images/signup/floating-assets/Votes.png';
-
-export const AuthLayoutContext = createContext({
-  shouldHeroUnmount: false,
-  setShouldHeroUnmount: (newValue: boolean) => {},
-});
+import AuthLayoutContext from './AuthLayoutContext';
 
 const AuthLayoutContextProvider: React.FC = ({ children }) => {
   const [shouldHeroUnmount, setShouldHeroUnmount] = useState(false);

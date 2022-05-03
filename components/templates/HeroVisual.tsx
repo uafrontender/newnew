@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
-import { AuthLayoutContext } from './AuthLayout';
 
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 
@@ -12,6 +11,7 @@ import SignInOutro from '../../public/images/signup/hero-visual/Dark/sign-in-out
 import SignInIntroLight from '../../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
 import SignInHoldLight from '../../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
 import SignInOutroLight from '../../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
+import AuthLayoutContext from './AuthLayoutContext';
 
 interface IHeroVisual {
   style?: React.CSSProperties;

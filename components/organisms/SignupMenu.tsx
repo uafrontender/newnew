@@ -40,7 +40,7 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 
 // Utils
 import isBrowser from '../../utils/isBrowser';
-import { AuthLayoutContext } from '../templates/AuthLayout';
+import AuthLayoutContext from '../templates/AuthLayoutContext';
 
 export interface ISignupMenu {
   reason?: SignupReason;
