@@ -30,7 +30,7 @@ import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
-import isBroswer from '../../utils/isBrowser';
+import isBrowser from '../../utils/isBrowser';
 
 type TPageType =
   | 'activelyBidding'
@@ -467,7 +467,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   );
 
   const handleCloseEditProfileMenu = useCallback(() => {
-    if (isBroswer()) {
+    if (isBrowser()) {
       // window.history.back();
     }
     setIsEditProfileMenuOpen(false);
@@ -475,7 +475,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleOpenEditProfileMenu = () => {
     // Allow closing with browser back button
-    if (isBroswer()) {
+    if (isBrowser()) {
       window.history.pushState(
         {
           stage: 'edit-general',
@@ -488,7 +488,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   };
 
   const handleSetStageToEditingProfilePicture = () => {
-    if (isBroswer()) {
+    if (isBrowser()) {
       window.history.pushState(
         {
           stage: 'edit-profile-picture',
@@ -500,7 +500,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   };
 
   const handleSetStageToEditingGeneral = () => {
-    if (isBroswer()) {
+    if (isBrowser()) {
       window.history.replaceState(
         {
           stage: 'edit-general',
@@ -556,23 +556,6 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     router.prefetch('/profile/settings');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const handlerHistory = () => {
-      console.log('Popstate');
-
-      const postId = window?.history?.state?.postId;
-      if (postId && window?.history?.state?.fromPost) {
-        router.push(`/post/${postId}`);
-      }
-    };
-
-    window?.addEventListener('popstate', handlerHistory);
-
-    return () => {
-      window?.removeEventListener('popstate', handlerHistory);
-    };
-  }, [router]);
 
   return (
     <ErrorBoundary>

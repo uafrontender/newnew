@@ -49,6 +49,7 @@ import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -83,8 +84,11 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = ({
     resizeMode
   );
 
+  const { syncedHistoryPushState, syncedHistoryReplaceState } =
+    useSynchronizedHistory();
+
   const showSelectingWinnerOption = useMemo(
-    () => postStatus === 'wating_for_decision',
+    () => postStatus === 'waiting_for_decision',
     [postStatus]
   );
 

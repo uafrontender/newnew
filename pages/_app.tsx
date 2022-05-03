@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import React, { ReactElement, ReactNode, useEffect } from 'react';
+import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import App from 'next/app';
 import Head from 'next/head';
 import { useStore } from 'react-redux';
@@ -35,7 +35,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ChannelsContextProvider from '../contexts/channelsContext';
 import { SubscriptionsProvider } from '../contexts/subscriptionsContext';
 import FollowingsContextProvider from '../contexts/followingContext';
-import WalletContextProvider from '../contexts/walletContext';
+// import WalletContextProvider from '../contexts/walletContext';
 import { BlockedUsersProvider } from '../contexts/blockedUsersContext';
 import { ChatsProvider } from '../contexts/chatContext';
 import SyncUserWrapper from '../contexts/syncUserWrapper';
@@ -73,6 +73,7 @@ import HeroDarkPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-D
 import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Light.webp';
 import HeroDarkMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
 import HeroLightMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
+import PostModalContextProvider from '../contexts/postModalContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -111,6 +112,15 @@ const MyApp = (props: IMyApp): ReactElement => {
     return resizeMode;
   };
 
+  // Pre-fetch images after all loading for initial page is done
+  const [preFetchImages, setPreFetchImages] = useState(false);
+  const PRE_FETCHING_DELAY = 2500;
+  useEffect(() => {
+    setTimeout(() => {
+      setPreFetchImages(true);
+    }, PRE_FETCHING_DELAY);
+  }, []);
+
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
     const hotjarSvVariable = process.env.NEXT_PUBLIC_HOTJAR_SNIPPET_VERSION;
@@ -136,189 +146,7 @@ const MyApp = (props: IMyApp): ReactElement => {
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
         />
-        {/* Preload assets */}
-        {/* Sign up screen hero */}
-        {/* Dark */}
-        <link
-          rel='prefetch'
-          href={SignInHold.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={SignInIntro.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={SignInOutro.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        {/* Light */}
-        <link
-          rel='prefetch'
-          href={SignInHoldLight.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={SignInIntroLight.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={SignInOutroLight.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        {/* Email verification screen */}
-        <link
-          rel='prefetch'
-          href={BottomGlassSphereImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={BottomSphereImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={CrowdfundingImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={LeftGlassSphereImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={BulbImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={ChoiceImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={RightGlassSphereImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={TopGlassSphereImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={TopMiddleSphereImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        <link
-          rel='prefetch'
-          href={VotesImage.src}
-          as='image'
-          crossOrigin='anonymous'
-          media='(min-width: 760px)'
-        />
-        {/* Landing page */}
-        {/* NB! Video is not supported, so preload placeholders */}
-        {/* Dark */}
-        {/* <link rel="preload" href="/images/home/Landing-Page-Dark.mp4" as="video" crossOrigin="anonymous" /> */}
-        <link
-          rel='prefetch'
-          href={HeroDarkPlaceholder.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={HeroLightPlaceholder.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        {/* Light */}
-        <link
-          rel='prefetch'
-          href={HeroDarkMobilePlaceholder.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={HeroLightMobilePlaceholder.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        {/* Creation screen */}
-        <link
-          rel='prefetch'
-          href={acImage.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={mcImage.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={cfImage.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={acImageStatic.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={mcImageStatic.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='prefetch'
-          href={cfImageStatic.src}
-          as='image'
-          crossOrigin='anonymous'
-        />
+        {preFetchImages && PRE_FETCH_LINKS}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
         <AppConstantsContextProvider>
@@ -331,10 +159,11 @@ const MyApp = (props: IMyApp): ReactElement => {
                 <SyncUserWrapper>
                   <BlockedUsersProvider>
                     <FollowingsContextProvider>
-                      <WalletContextProvider>
-                        <SubscriptionsProvider>
-                          <ChatsProvider>
-                            <ResizeMode>
+                      {/* <WalletContextProvider> */}
+                      <SubscriptionsProvider>
+                        <ChatsProvider>
+                          <ResizeMode>
+                            <PostModalContextProvider>
                               <GlobalTheme>
                                 <div>
                                   <ToastContainer />
@@ -352,10 +181,11 @@ const MyApp = (props: IMyApp): ReactElement => {
                                   </VideoProcessingWrapper>
                                 </div>
                               </GlobalTheme>
-                            </ResizeMode>
-                          </ChatsProvider>
-                        </SubscriptionsProvider>
-                      </WalletContextProvider>
+                            </PostModalContextProvider>
+                          </ResizeMode>
+                        </ChatsProvider>
+                      </SubscriptionsProvider>
+                      {/* </WalletContextProvider> */}
                     </FollowingsContextProvider>
                   </BlockedUsersProvider>
                 </SyncUserWrapper>
@@ -385,3 +215,191 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
 };
 
 export default MyAppWithTranslationAndRedux;
+
+const PRE_FETCH_LINKS = (
+  <>
+    {/* Preload assets */}
+    {/* Sign up screen hero */}
+    {/* Dark */}
+    <link
+      rel='prefetch'
+      href={SignInHold.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInIntro.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInOutro.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    {/* Light */}
+    <link
+      rel='prefetch'
+      href={SignInHoldLight.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInIntroLight.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInOutroLight.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    {/* Email verification screen */}
+    <link
+      rel='prefetch'
+      href={BottomGlassSphereImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={BottomSphereImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={CrowdfundingImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={LeftGlassSphereImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={BulbImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={ChoiceImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={RightGlassSphereImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={TopGlassSphereImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={TopMiddleSphereImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={VotesImage.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    {/* Landing page */}
+    {/* NB! Video is not supported, so preload placeholders */}
+    {/* Dark */}
+    {/* <link rel="preload" href="/images/home/Landing-Page-Dark.mp4" as="video" crossOrigin="anonymous" /> */}
+    <link
+      rel='prefetch'
+      href={HeroDarkPlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={HeroLightPlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    {/* Light */}
+    <link
+      rel='prefetch'
+      href={HeroDarkMobilePlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={HeroLightMobilePlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    {/* Creation screen */}
+    <link
+      rel='prefetch'
+      href={acImage.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={mcImage.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={cfImage.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={acImageStatic.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={mcImageStatic.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={cfImageStatic.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+  </>
+);

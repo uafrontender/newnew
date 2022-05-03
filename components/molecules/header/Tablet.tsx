@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -8,14 +8,16 @@ import Button from '../../atoms/Button';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
+import Text from '../../atoms/Text';
 import NavigationItem from '../NavigationItem';
 import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { WalletContext } from '../../../contexts/walletContext';
+// import { WalletContext } from '../../../contexts/walletContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
+import ShareMenu from '../../organisms/ShareMenu';
 
 interface ITablet {}
 
@@ -27,11 +29,13 @@ export const Tablet: React.FC<ITablet> = () => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
+  const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
 
   const handleCreateClick = () => {
     if (!user.userData?.options?.isCreator) {
@@ -78,32 +82,29 @@ export const Tablet: React.FC<ITablet> = () => {
                 />
               </SItemWithMargin>
             )}
-            {user.userData?.options?.isCreator ? (
-              <>
-                <SItemWithMargin>
-                  <NavigationItem
-                    item={{
-                      url: '/share',
-                      key: 'share',
-                    }}
-                  />
-                </SItemWithMargin>
-              </>
-            ) : (
+            <SItemWithMargin>
+              <SNavText variant={3} weight={600} onClick={handleShareMenuClick}>
+                Share
+              </SNavText>
+              <ShareMenu
+                absolute
+                isVisible={shareMenuOpen}
+                handleClose={() => setShareMenuOpen(false)}
+              />
+            </SItemWithMargin>
+            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
-                    url: '/my-balance',
-                    key: 'my-balance',
-                    value:
-                      !isBalanceLoading && walletBalance?.usdCents
-                        ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          undefined
-                        : undefined,
+                    url: '/profile/settings',
+                    key: 'my-balance-tablet',
+                    value: walletBalance?.usdCents
+                      ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ?? 0
+                      : undefined,
                   }}
                 />
               </SItemWithMargin>
-            )}
+            )} */}
           </>
         )}
         {user.loggedIn && user.userData?.options?.isCreator && (
@@ -206,6 +207,12 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
-
   position: relative;
+`;
+
+const SNavText = styled(Text)`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  opacity: 0.5;
+  transition: opacity ease 0.5s;
+  cursor: pointer;
 `;

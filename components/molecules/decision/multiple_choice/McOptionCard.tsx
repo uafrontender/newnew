@@ -4,21 +4,22 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
   doFreeVote,
-  voteOnPostWithWallet,
+  // voteOnPostWithWallet,
 } from '../../../../api/endpoints/multiple_choice';
 import {
   createPaymentSession,
-  getTopUpWalletWithPaymentPurposeUrl,
+  // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
 import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewMC';
@@ -43,7 +44,7 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
-import { WalletContext } from '../../../../contexts/walletContext';
+// import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
@@ -90,7 +91,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   );
 
   const { appConstants } = useGetAppConstants();
-  const { walletBalance } = useContext(WalletContext);
+  // const { walletBalance } = useContext(WalletContext);
 
   const isBlue = useMemo(
     () => !!option.isSupportedByMe,
@@ -137,18 +138,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     handleSetSupportedBid('');
   };
 
-  // Redirect to user's page
-  const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${creator?.username}`);
-  };
-
   // Payment and Loading modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [loadingModalOpen, setLoadingModalOpen] = useState(false);
@@ -176,124 +165,124 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     setIsAmountPredefined(false);
   };
 
-  const handlePayWithWallet = useCallback(async () => {
-    setLoadingModalOpen(true);
-    handleCloseConfirmVoteModal();
-    try {
-      // Check if user is logged in
-      if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload =
-          new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${postId}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${postId}`,
-            ...(!user.loggedIn
-              ? {
-                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-                }
-              : {}),
-            mcVoteRequest: {
-              votesCount: parseInt(supportBidAmount),
-              optionId: option.id,
-              postUuid: postId,
-            },
-          });
+  // const handlePayWithWallet = useCallback(async () => {
+  //   setLoadingModalOpen(true);
+  //   handleCloseConfirmVoteModal();
+  //   try {
+  //     // Check if user is logged in
+  //     if (!user.loggedIn) {
+  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //         new newnewapi.TopUpWalletWithPurposeRequest({
+  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${postId}`,
+  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${postId}`,
+  //           ...(!user.loggedIn
+  //             ? {
+  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+  //               }
+  //             : {}),
+  //           mcVoteRequest: {
+  //             votesCount: parseInt(supportBidAmount),
+  //             optionId: option.id,
+  //             postUuid: postId,
+  //           },
+  //         });
 
-        const res = await getTopUpWalletWithPaymentPurposeUrl(
-          getTopUpWalletWithPaymentPurposeUrlPayload
-        );
+  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
+  //         getTopUpWalletWithPaymentPurposeUrlPayload
+  //       );
 
-        if (!res.data || !res.data.sessionUrl || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (!res.data || !res.data.sessionUrl || res.error)
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        window.location.href = res.data.sessionUrl;
-      } else {
-        const makeBidPayload = new newnewapi.VoteOnPostRequest({
-          votesCount: parseInt(supportBidAmount),
-          optionId: option.id,
-          postUuid: postId,
-        });
+  //       window.location.href = res.data.sessionUrl;
+  //     } else {
+  //       const makeBidPayload = new newnewapi.VoteOnPostRequest({
+  //         votesCount: parseInt(supportBidAmount),
+  //         optionId: option.id,
+  //         postUuid: postId,
+  //       });
 
-        const res = await voteOnPostWithWallet(makeBidPayload);
+  //       const res = await voteOnPostWithWallet(makeBidPayload);
 
-        if (
-          res.data &&
-          res.data.status ===
-            newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
-        ) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload =
-            new newnewapi.TopUpWalletWithPurposeRequest({
-              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${postId}`,
-              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${postId}`,
-              mcVoteRequest: {
-                votesCount: parseInt(supportBidAmount),
-                optionId: option.id,
-                postUuid: postId,
-              },
-            });
+  //       if (
+  //         res.data &&
+  //         res.data.status ===
+  //           newnewapi.VoteOnPostResponse.Status.INSUFFICIENT_WALLET_BALANCE
+  //       ) {
+  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //           new newnewapi.TopUpWalletWithPurposeRequest({
+  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${postId}`,
+  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${postId}`,
+  //             mcVoteRequest: {
+  //               votesCount: parseInt(supportBidAmount),
+  //               optionId: option.id,
+  //               postUuid: postId,
+  //             },
+  //           });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-            getTopUpWalletWithPaymentPurposeUrlPayload
-          );
+  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+  //           getTopUpWalletWithPaymentPurposeUrlPayload
+  //         );
 
-          if (
-            !resStripeRedirect.data ||
-            !resStripeRedirect.data.sessionUrl ||
-            resStripeRedirect.error
-          )
-            throw new Error(
-              resStripeRedirect.error?.message ?? 'Request failed'
-            );
+  //         if (
+  //           !resStripeRedirect.data ||
+  //           !resStripeRedirect.data.sessionUrl ||
+  //           resStripeRedirect.error
+  //         )
+  //           throw new Error(
+  //             resStripeRedirect.error?.message ?? 'Request failed'
+  //           );
 
-          window.location.href = resStripeRedirect.data.sessionUrl;
-          return;
-        }
+  //         window.location.href = resStripeRedirect.data.sessionUrl;
+  //         return;
+  //       }
 
-        if (
-          !res.data ||
-          res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
-          res.error
-        )
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (
+  //         !res.data ||
+  //         res.data.status !== newnewapi.VoteOnPostResponse.Status.SUCCESS ||
+  //         res.error
+  //       )
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        const optionFromResponse = (res.data
-          .option as newnewapi.MultipleChoice.Option)!!;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+  //       const optionFromResponse = (res.data
+  //         .option as newnewapi.MultipleChoice.Option)!!;
+  //       optionFromResponse.isSupportedByMe = true;
+  //       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        handleSetSupportedBid('');
-        setSupportBidAmount('');
-        setIsSupportMenuOpen(false);
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
-        handleSetPaymentSuccesModalOpen(true);
-      }
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-    }
-  }, [
-    setPaymentModalOpen,
-    setLoadingModalOpen,
-    setIsSupportMenuOpen,
-    setSupportBidAmount,
-    handleSetSupportedBid,
-    handleSetPaymentSuccesModalOpen,
-    handleAddOrUpdateOptionFromResponse,
-    supportBidAmount,
-    option.id,
-    postId,
-    user.loggedIn,
-    router.locale,
-  ]);
+  //       handleSetSupportedBid('');
+  //       setSupportBidAmount('');
+  //       setIsSupportMenuOpen(false);
+  //       setPaymentModalOpen(false);
+  //       setLoadingModalOpen(false);
+  //       handleSetPaymentSuccesModalOpen(true);
+  //     }
+  //   } catch (err) {
+  //     setPaymentModalOpen(false);
+  //     setLoadingModalOpen(false);
+  //     console.error(err);
+  //   }
+  // }, [
+  //   setPaymentModalOpen,
+  //   setLoadingModalOpen,
+  //   setIsSupportMenuOpen,
+  //   setSupportBidAmount,
+  //   handleSetSupportedBid,
+  //   handleSetPaymentSuccesModalOpen,
+  //   handleAddOrUpdateOptionFromResponse,
+  //   supportBidAmount,
+  //   option.id,
+  //   postId,
+  //   user.loggedIn,
+  //   router.locale,
+  // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -439,14 +428,23 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 optionCreator={
                   option.creator ? getDisplayname(option.creator) : undefined
                 }
+                optionCreatorUsername={
+                  option.creator
+                    ? (option.creator.username as string)
+                    : undefined
+                }
                 firstVoter={
                   option.firstVoter
                     ? getDisplayname(option.firstVoter)
                     : undefined
                 }
+                firstVoterUsername={
+                  option.firstVoter
+                    ? (option.firstVoter.username as string)
+                    : undefined
+                }
                 supporterCount={option.supporterCount}
                 supporterCountSubstracted={supporterCountSubstracted}
-                handleRedirectToOptionCreator={handleRedirectToOptionCreator}
               />
             </SBiddersInfo>
           </SBidDetails>
@@ -562,16 +560,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             showTocApply={!user?.loggedIn}
             isOpen={paymentModalOpen}
             amount={`$${parseInt(supportBidAmount) * votePrice}`}
-            {...(walletBalance?.usdCents &&
-            walletBalance.usdCents >=
-              parseInt(supportBidAmount) * votePrice * 100
-              ? {}
-              : {
-                  predefinedOption: 'card',
-                })}
+            // {...(walletBalance?.usdCents &&
+            // walletBalance.usdCents >=
+            //   parseInt(supportBidAmount) * votePrice * 100
+            //   ? {}
+            //   : {
+            //       predefinedOption: 'card',
+            //     })}
+            predefinedOption='card'
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-            handlePayWithWallet={handlePayWithWallet}
+            // handlePayWithWallet={handlePayWithWallet}
           >
             <SPaymentModalHeader>
               <SPaymentModalTitle variant={3}>
@@ -616,14 +615,23 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   optionCreator={
                     option.creator ? getDisplayname(option.creator) : undefined
                   }
+                  optionCreatorUsername={
+                    option.creator
+                      ? (option.creator.username as string)
+                      : undefined
+                  }
                   firstVoter={
                     option.firstVoter
                       ? getDisplayname(option.firstVoter)
                       : undefined
                   }
+                  firstVoterUsername={
+                    option.firstVoter
+                      ? (option.firstVoter.username as string)
+                      : undefined
+                  }
                   supporterCount={option.supporterCount}
                   supporterCountSubstracted={supporterCountSubstracted}
-                  handleRedirectToOptionCreator={handleRedirectToOptionCreator}
                 />
               </SBiddersInfo>
             </SBidDetails>
@@ -662,8 +670,9 @@ const RenderSupportersInfo: React.FunctionComponent<{
   supporterCount: number;
   supporterCountSubstracted: number;
   optionCreator?: string;
+  optionCreatorUsername?: string;
   firstVoter?: string;
-  handleRedirectToOptionCreator: () => void;
+  firstVoterUsername?: string;
 }> = ({
   isCreatorsBid,
   isSupportedByMe,
@@ -671,8 +680,9 @@ const RenderSupportersInfo: React.FunctionComponent<{
   supporterCount,
   supporterCountSubstracted,
   optionCreator,
+  optionCreatorUsername,
   firstVoter,
-  handleRedirectToOptionCreator,
+  firstVoterUsername,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('decision');
@@ -683,9 +693,17 @@ const RenderSupportersInfo: React.FunctionComponent<{
         {supporterCount > 0 ? (
           <>
             {firstVoter && (
-              <SSpanBiddersHighlighted className='spanHighlighted'>
-                {firstVoter}
-              </SSpanBiddersHighlighted>
+              <Link href={`/${firstVoterUsername}`}>
+                <SSpanBiddersHighlighted
+                  onClick={(e) => e.stopPropagation()}
+                  className='spanHighlighted'
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  {firstVoter}
+                </SSpanBiddersHighlighted>
+              </Link>
             )}
             <SSpanBiddersRegular className='spanRegular'>
               {supporterCountSubstracted > 0 ? ` & ` : ''}
@@ -733,22 +751,23 @@ const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && !isSupportedByMe) {
     return (
       <>
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRedirectToOptionCreator();
-          }}
-          style={{
-            color:
-              theme.name === 'dark'
-                ? theme.colorsThemed.accent.yellow
-                : theme.colors.dark,
-            cursor: 'pointer',
-          }}
-        >
-          {optionCreator}
-        </SSpanBiddersHighlighted>
+        <Link href={`/${optionCreatorUsername}`}>
+          <SSpanBiddersHighlighted
+            className='spanHighlighted'
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              color:
+                theme.name === 'dark'
+                  ? theme.colorsThemed.accent.yellow
+                  : theme.colors.dark,
+              cursor: 'pointer',
+            }}
+          >
+            {optionCreator}
+          </SSpanBiddersHighlighted>
+        </Link>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>
@@ -770,19 +789,20 @@ const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && !isSuggestedByMe && isSupportedByMe) {
     return (
       <>
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRedirectToOptionCreator();
-          }}
-          style={{
-            color: theme.colorsThemed.accent.yellow,
-            cursor: 'pointer',
-          }}
-        >
-          {optionCreator}
-        </SSpanBiddersHighlighted>
+        <Link href={`/${optionCreatorUsername}`}>
+          <SSpanBiddersHighlighted
+            className='spanHighlighted'
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              color: theme.colorsThemed.accent.yellow,
+              cursor: 'pointer',
+            }}
+          >
+            {optionCreator}
+          </SSpanBiddersHighlighted>
+        </Link>
         <SSpanBiddersHighlighted className='spanHighlighted'>
           {', '}
           {`${t('me')}`}
@@ -808,19 +828,20 @@ const RenderSupportersInfo: React.FunctionComponent<{
   if (!isCreatorsBid && isSuggestedByMe) {
     return (
       <>
-        <SSpanBiddersHighlighted
-          className='spanHighlighted'
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRedirectToOptionCreator();
-          }}
-          style={{
-            color: theme.colorsThemed.accent.yellow,
-            cursor: 'pointer',
-          }}
-        >
-          {`${t('me')}`}
-        </SSpanBiddersHighlighted>
+        <Link href={`/${optionCreatorUsername}`}>
+          <SSpanBiddersHighlighted
+            className='spanHighlighted'
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              color: theme.colorsThemed.accent.yellow,
+              cursor: 'pointer',
+            }}
+          >
+            {`${t('me')}`}
+          </SSpanBiddersHighlighted>
+        </Link>
         <SSpanBiddersRegular className='spanRegular'>
           {supporterCountSubstracted > 0 ? ` & ` : ''}
         </SSpanBiddersRegular>

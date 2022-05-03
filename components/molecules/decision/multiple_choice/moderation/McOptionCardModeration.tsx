@@ -10,7 +10,7 @@ import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
@@ -43,7 +43,6 @@ interface IMcOptionCardModeration {
 
 const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
   ({ option, creator, postId, index, canBeDeleted }) => {
-    const router = useRouter();
     const theme = useTheme();
     const { t } = useTranslation('decision');
     const { resizeMode } = useAppSelector((state) => state.ui);
@@ -66,18 +65,6 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-    // Redirect to user's page
-    const handleRedirectToOptionCreator = () => {
-      window?.history.replaceState(
-        {
-          fromPost: true,
-        },
-        '',
-        ''
-      );
-      router.push(`/${creator?.username}`);
-    };
 
     const handleConfirmDelete = async () => {
       try {
@@ -149,22 +136,27 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                   </>
                 ) : (
                   <>
-                    <SSpanBiddersHighlighted
-                      onClick={() => {
-                        handleRedirectToOptionCreator();
-                      }}
-                      style={{
-                        color:
-                          theme.name === 'dark'
-                            ? theme.colorsThemed.accent.yellow
-                            : theme.colors.dark,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {t('McPost.OptionsTab.OptionCard.subscriber_suggestion', {
-                        nickname: getDisplayname(option?.creator!!),
-                      })}
-                    </SSpanBiddersHighlighted>
+                    <Link href={`/${creator?.username}`}>
+                      <SSpanBiddersHighlighted
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        style={{
+                          color:
+                            theme.name === 'dark'
+                              ? theme.colorsThemed.accent.yellow
+                              : theme.colors.dark,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {t(
+                          'McPost.OptionsTab.OptionCard.subscriber_suggestion',
+                          {
+                            nickname: getDisplayname(option?.creator!!),
+                          }
+                        )}
+                      </SSpanBiddersHighlighted>
+                    </Link>
                     {supporterCountSubstracted > 0 ? (
                       <>
                         {', '}

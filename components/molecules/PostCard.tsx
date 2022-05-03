@@ -75,6 +75,7 @@ interface ICard {
   index: number;
   width?: string;
   height?: string;
+  shouldStop?: boolean;
 }
 
 export const PostCard: React.FC<ICard> = ({
@@ -83,6 +84,7 @@ export const PostCard: React.FC<ICard> = ({
   index,
   width,
   height,
+  shouldStop,
 }) => {
   const { t } = useTranslation('home');
   const theme = useTheme();
@@ -150,7 +152,7 @@ export const PostCard: React.FC<ICard> = ({
   useEffect(() => {
     try {
       if (videoReady) {
-        if (inView) {
+        if (inView && !shouldStop) {
           videoRef.current?.play();
         } else {
           videoRef.current?.pause();
@@ -159,7 +161,7 @@ export const PostCard: React.FC<ICard> = ({
     } catch (err) {
       console.error(err);
     }
-  }, [inView, videoReady]);
+  }, [inView, videoReady, shouldStop]);
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -377,6 +379,7 @@ PostCard.defaultProps = {
   type: 'outside',
   width: '',
   height: '',
+  shouldStop: false,
 };
 
 interface ISWrapper {

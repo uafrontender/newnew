@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
 
@@ -44,7 +44,6 @@ const Comment: React.FC<IComment> = ({
   handleDeleteComment,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -82,17 +81,6 @@ const Comment: React.FC<IComment> = ({
     setIsReplyFormOpen(!isReplyFormOpen);
   };
 
-  const handleRedirectToUser = () => {
-    window?.history.replaceState(
-      {
-        fromPost: true,
-      },
-      '',
-      ''
-    );
-    router.push(`/${comment.sender?.username}`);
-  };
-
   useEffect(() => {
     if (comment.isOpen) {
       setIsReplyFormOpen(true);
@@ -103,30 +91,27 @@ const Comment: React.FC<IComment> = ({
     <>
       <SComment key={comment.id.toString()} id={`comment_id_${comment.id}`}>
         {!comment.isDeleted ? (
-          <SUserAvatar
-            avatarUrl={
-              comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''
-            }
-            onClick={() => handleRedirectToUser()}
-          />
+          <Link href={`/${comment.sender?.username}`}>
+            <SUserAvatar
+              avatarUrl={
+                comment.sender?.avatarUrl ? comment.sender?.avatarUrl : ''
+              }
+            />
+          </Link>
         ) : (
           <SUserAvatar avatarUrl='' onClick={() => {}} />
         )}
         <SCommentContent>
           <SCommentHeader>
-            <SNickname
-              onClick={() => {
-                if (!comment.isDeleted) {
-                  handleRedirectToUser();
-                }
-              }}
-            >
-              {!comment.isDeleted
-                ? comment.sender?.uuid === user.userData?.userUuid
-                  ? t('comments.me')
-                  : comment.sender?.nickname ?? comment.sender?.username
-                : t('comments.comment_deleted')}
-            </SNickname>
+            <Link href={`/${comment.sender?.username}`}>
+              <SNickname>
+                {!comment.isDeleted
+                  ? comment.sender?.uuid === user.userData?.userUuid
+                    ? t('comments.me')
+                    : comment.sender?.nickname ?? comment.sender?.username
+                  : t('comments.comment_deleted')}
+              </SNickname>
+            </Link>
             <SBid> </SBid>
             <SDate>
               {/* &bull; {moment(comment.createdAt?.seconds as number * 1000).format('MMM DD')} */}
