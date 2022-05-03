@@ -12,6 +12,7 @@
   "mobile-top-navigation-direct-messages": "DMs",
   "mobile-top-navigation-share": "Share",
   "mobile-top-navigation-my-balance": "My Balance: ${{value}}",
+  "mobile-top-navigation-my-balance-tablet": "${{value}}",
   "mobile-top-navigation-my-balance-empty": "Wallet balance",
   "mobile-top-navigation-profile": "Profile",
   "button-create-decision": "Create decision",
@@ -58,7 +59,8 @@
     "text": {
       "min": "Text is too short, min {{value}} chars",
       "max": "Text is too long, max {{value}} chars",
-      "badWords": "Text contains swear words"
+      "badWords": "Text contains swear words",
+      "containsLinks": "Links not allowed"
     }
   },
   "modal": {
@@ -80,5 +82,9 @@
       "button-confirm": "Report user",
       "button-confirm-group": "Report group"
     }
+  },
+  "socials": {
+    "copy": "Copy Link",
+    "copied": "Link Copied!"
   }
 }

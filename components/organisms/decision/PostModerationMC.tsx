@@ -561,6 +561,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         ) : winningOption ? (
           <McWinnerTabModeration
             postId={post.postUuid}
+            postCreator={post.creator as newnewapi.User}
             option={winningOption}
             postStatus={postStatus}
           />
