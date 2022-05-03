@@ -38,7 +38,7 @@ interface IListItem {
   };
 }
 
-export const ListItem: React.FC<IListItem> = (props) => {
+const ListItem: React.FC<IListItem> = (props) => {
   const { item } = props;
   const { t } = useTranslation('creation');
   const router = useRouter();

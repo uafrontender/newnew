@@ -6,7 +6,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-export const BASE_URL_MULTICHOICE = `${BASE_URL}/multiple_choice`;
+const BASE_URL_MULTICHOICE = `${BASE_URL}/multiple_choice`;
 
 export const fetchTopMultipleChoices = (
   payload: newnewapi.PagedMultipleChoicesRequest

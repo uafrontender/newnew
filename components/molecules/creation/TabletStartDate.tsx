@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 
 import CheckBox from '../CheckBox';
 import TimePicker from '../../atoms/creation/TimePicker';
-import CalendarPicker from '../../atoms/creation/calendar/Simple';
+import CalendarSimple from '../../atoms/creation/calendar/CalendarSimple';
 import AnimatedPresence, { TAnimation } from '../../atoms/AnimatedPresence';
 
 interface ITabletStartDate {
@@ -14,7 +14,7 @@ interface ITabletStartDate {
   onChange: (key: string, value: string | number | boolean | object) => void;
 }
 
-export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
+const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
   const { id, value, onChange } = props;
   const { t } = useTranslation('creation');
   const [animate, setAnimate] = useState(value.type === 'schedule');
@@ -74,7 +74,7 @@ export const TabletStartDate: React.FC<ITabletStartDate> = (props) => {
       >
         <SCalendarWrapper>
           <SCalendarInput>
-            <CalendarPicker date={value?.date} onChange={handleDateChange} />
+            <CalendarSimple date={value?.date} onChange={handleDateChange} />
           </SCalendarInput>
           <STimeInput>
             <TimePicker

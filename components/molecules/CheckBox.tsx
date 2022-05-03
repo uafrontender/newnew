@@ -13,7 +13,7 @@ interface ICheckBox {
   handleChange: (e: any, id?: string) => void;
 }
 
-export const CheckBox: React.FC<ICheckBox> = (props) => {
+const CheckBox: React.FC<ICheckBox> = (props) => {
   const { id, label, selected, handleChange, ...rest } = props;
   const ref: any = useRef();
 

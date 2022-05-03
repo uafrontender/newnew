@@ -6,7 +6,7 @@ import {
   cookiesInstance,
 } from '../apiConfigs';
 
-export const BASE_URL_CHAT = `${BASE_URL}/chat`;
+const BASE_URL_CHAT = `${BASE_URL}/chat`;
 
 export const markRoomAsRead = (payload: newnewapi.MarkRoomAsReadRequest) =>
   fetchProtobufProtectedIntercepted<

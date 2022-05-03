@@ -8,7 +8,7 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import Caption from '../../atoms/Caption';
 import Headline from '../../atoms/Headline';
-import Calendar from '../../atoms/creation/calendar/ScrollableVertically';
+import CalendarScrollableVertically from '../../atoms/creation/calendar/CalendarScrollableVertically';
 import InlineSVG from '../../atoms/InlineSVG';
 import CustomToggle from '../CustomToggle';
 import TimePicker from './TimePicker';
@@ -32,7 +32,7 @@ interface IMobileFieldBlock {
   formattedDescription?: any;
 }
 
-export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
+const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
   const {
     id,
     type,
@@ -184,7 +184,7 @@ export const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               <SCalendarWrapper>
                 <SCalendarTopGrad />
                 <SCalendarContent>
-                  <Calendar
+                  <CalendarScrollableVertically
                     minDate={moment()}
                     maxDate={
                       value?.type === 'right-away'

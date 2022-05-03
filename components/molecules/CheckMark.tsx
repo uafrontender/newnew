@@ -14,7 +14,7 @@ interface ICheckMark {
   handleChange: (e: any, id?: string) => void;
 }
 
-export const CheckMark: React.FC<ICheckMark> = (props) => {
+const CheckMark: React.FC<ICheckMark> = (props) => {
   const { id, label, selected, disabled, handleChange, ...rest } = props;
   const theme = useTheme();
 

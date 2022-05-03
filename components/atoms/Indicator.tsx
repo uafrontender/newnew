@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import styled from 'styled-components';
-import CountUp from 'react-countup';
 
 export interface IIndicator {
   counter?: number;
@@ -11,7 +10,7 @@ export interface IIndicator {
   onAnimationEnd?: () => void;
 }
 
-export const Indicator: React.FC<IIndicator> = (props) => {
+const Indicator: React.FC<IIndicator> = (props) => {
   const { counter = 0, animate, minified, onAnimationEnd, ...rest } = props;
 
   const bigCounter = counter >= 100;

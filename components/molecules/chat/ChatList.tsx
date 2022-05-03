@@ -38,10 +38,7 @@ interface IFunctionProps {
   searchText: string;
 }
 
-export const ChatList: React.FC<IFunctionProps> = ({
-  openChat,
-  searchText,
-}) => {
+const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);

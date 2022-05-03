@@ -43,6 +43,7 @@ export interface INotification {
   routingTarget: RoutingTarget;
 }
 
+// UNUSED
 export const Notifications = () => {
   const { t } = useTranslation('notifications');
 
