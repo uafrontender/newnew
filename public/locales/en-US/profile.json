@@ -215,7 +215,7 @@
   "MyPosts": {
     "no-content": {
       "title": "Still noone decisions?",
-      "description": "Still didn’t crate any decision? Let’s discover what you can create!",
+      "description": "Still didn’t create any decision? Let’s discover what you can create!",
       "button": "Create some decisions"
     }
   },
