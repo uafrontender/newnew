@@ -20,6 +20,7 @@ import HeroSection from '../../components/organisms/home/HeroSection';
 import switchPostType from '../../utils/switchPostType';
 import isSafari from '../../utils/isSafari';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
+import isBrowser from '../../utils/isBrowser';
 
 interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -63,7 +64,12 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
 
-    router.replace('/');
+    if (isBrowser()) {
+      const { idx } = window.history.state;
+      if (idx < 2) {
+        router.replace('/');
+      }
+    }
   };
 
   useEffect(() => {
@@ -104,7 +110,8 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
         <PostModal
           isOpen
           post={displayedPost}
-          manualCurrLocation='/'
+          // Required to avoid wierd cases when navigating back to the post using browser back button
+          manualCurrLocation='forced_redirect_to_home'
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
         />
