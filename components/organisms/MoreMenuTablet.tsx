@@ -1,20 +1,20 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useContext, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 import Text from '../atoms/Text';
-import InlineSvg from '../atoms/InlineSVG';
+// import InlineSvg from '../atoms/InlineSVG';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
-import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
+// import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
+// import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
 import { useAppSelector } from '../../redux-store/store';
-import { WalletContext } from '../../contexts/walletContext';
-import { formatNumber } from '../../utils/format';
+// import { WalletContext } from '../../contexts/walletContext';
+// import { formatNumber } from '../../utils/format';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -25,13 +25,13 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   isVisible,
   handleClose,
 }) => {
-  const theme = useTheme();
+  // const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   const user = useAppSelector((state) => state.user);
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -71,7 +71,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
             </SAvatar>
             <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
           </SButton>
-          <SButton
+          {/* <SButton
             onClick={() =>
               router.route.includes('/profile/settings')
                 ? handleClose()
@@ -102,7 +102,7 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
                   })
                 : t('mobile-top-navigation-my-balance')}
             </Text>
-          </SButton>
+          </SButton> */}
         </SContainer>
       )}
     </AnimatePresence>
