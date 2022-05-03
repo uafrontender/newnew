@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { scroller } from 'react-scroll';
 import { useTranslation } from 'next-i18next';
 
-import Card from '../../molecules/Card';
+import PostCard from '../../molecules/PostCard';
 import Headline from '../../atoms/Headline';
 import ScrollArrow from '../../atoms/ScrollArrow';
 
@@ -124,7 +124,7 @@ export const TopSection: React.FC<ITopSection> = ({
         name={`top-section-${index}`}
         onClick={handleItemClick}
       >
-        <Card
+        <PostCard
           shouldStop={postOverlayOpen}
           type='inside'
           item={item}
