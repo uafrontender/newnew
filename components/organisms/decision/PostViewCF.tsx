@@ -17,7 +17,6 @@ import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import {
   doPledgeCrowdfunding,
-  fetchPledgeLevels,
   fetchPledges,
 } from '../../../api/endpoints/crowdfunding';
 
@@ -47,6 +46,7 @@ import TutorialTooltip, {
   DotPositionEnum,
 } from '../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+import { useGetAppConstants } from '../../../contexts/appConstantsContext';
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -169,11 +169,10 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   );
 
   // Pledge levels
+  const { standardPledgeAmounts } = useGetAppConstants().appConstants;
   const [pledgeLevels, setPledgeLevels] = useState<newnewapi.IMoneyAmount[]>(
-    []
+    standardPledgeAmounts ?? []
   );
-  const [pledgeLevelsLoading, setPledgeLevelsLoading] = useState(false);
-  const [loadingPledgeLevelsError, setLoadingPledgeLevelsError] = useState('');
 
   // Pledges
   const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
@@ -249,28 +248,6 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
     },
     [user.userData?.userUuid]
   );
-
-  const fetchPledgeLevelsForPost = useCallback(async () => {
-    try {
-      setPledgeLevelsLoading(true);
-      setLoadingPledgeLevelsError('');
-
-      const fetchPledgeLevelsPayload = new newnewapi.EmptyRequest({});
-
-      const res = await fetchPledgeLevels(fetchPledgeLevelsPayload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      setPledgeLevels(res.data.amounts);
-
-      setPledgeLevelsLoading(false);
-    } catch (err) {
-      console.error(err);
-      setPledgeLevelsLoading(false);
-      setLoadingPledgeLevelsError((err as Error).message);
-    }
-  }, []);
 
   const fetchPledgesForPost = useCallback(
     async (pageToken?: string) => {
@@ -525,11 +502,16 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
   useEffect(() => {
     setPledges([]);
     setPledgesNextPageToken('');
-    fetchPledgeLevelsForPost();
     fetchPledgesForPost();
     fetchPostLatestData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.postUuid]);
+
+  useEffect(() => {
+    if (standardPledgeAmounts) {
+      setPledgeLevels(standardPledgeAmounts);
+    }
+  }, [standardPledgeAmounts]);
 
   useEffect(() => {
     const makePledgeFromSessionId = async () => {
@@ -552,6 +534,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = ({
         handleAddPledgeFromResponse(
           res.data.pledge as newnewapi.Crowdfunding.Pledge
         );
+        await fetchPostLatestData();
         setLoadingModalOpen(false);
         setPaymentSuccesModalOpen(true);
       } catch (err) {
