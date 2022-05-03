@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -11,7 +11,7 @@ import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { WalletContext } from '../../../contexts/walletContext';
+// import { WalletContext } from '../../../contexts/walletContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import ShareMenu from '../../organisms/ShareMenu';
 
@@ -24,7 +24,7 @@ export const Desktop: React.FC<IDesktop> = () => {
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const { unreadCount } = useGetChats();
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
@@ -88,7 +88,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 handleClose={() => setShareMenuOpen(false)}
               />
             </SItemWithMargin>
-            {user.userData?.options?.isCreator && !isBalanceLoading && (
+            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
@@ -102,7 +102,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                   }}
                 />
               </SItemWithMargin>
-            )}
+            )} */}
           </>
         )}
         {user.loggedIn && user.userData?.options?.isCreator && (

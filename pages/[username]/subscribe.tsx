@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../redux-store/store';
-import { WalletContext } from '../../contexts/walletContext';
+// import { WalletContext } from '../../contexts/walletContext';
 import { getUserByUsername } from '../../api/endpoints/user';
 import {
   getSubscriptionStatus,
@@ -57,7 +57,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     'tablet',
   ].includes(resizeMode);
 
-  const { walletBalance } = useContext(WalletContext);
+  // const { walletBalance } = useContext(WalletContext);
 
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const topSectionRef = useRef<HTMLDivElement>();
@@ -66,12 +66,18 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     useState<number | undefined>(undefined);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
+  // const predefinedOption = useMemo(() => {
+  //   if (walletBalance && subscriptionPrice) {
+  //     return walletBalance.usdCents >= subscriptionPrice ? 'wallet' : 'card';
+  //   }
+  //   return undefined;
+  // }, [walletBalance, subscriptionPrice]);
   const predefinedOption = useMemo(() => {
-    if (walletBalance && subscriptionPrice) {
-      return walletBalance.usdCents >= subscriptionPrice ? 'wallet' : 'card';
+    if (subscriptionPrice) {
+      return 'card';
     }
     return undefined;
-  }, [walletBalance, subscriptionPrice]);
+  }, [subscriptionPrice]);
 
   const subPriceFormatted = useMemo(
     () =>
@@ -334,7 +340,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
         amount={`$${subPriceFormatted}`}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
-        handlePayWithWallet={handlePayRegistered}
+        // handlePayWithWallet={handlePayRegistered}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant={3}>
