@@ -75,6 +75,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = ({ user }) => {
       </SBottomActionButton>
 
       <PaymentModal
+        predefinedOption='card'
         isOpen={paymentModalOpen}
         zIndex={10}
         showTocApply
