@@ -1,3 +1,4 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -16,7 +17,11 @@ import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 
-import { fetchMoreLikePosts, markPost } from '../../../api/endpoints/post';
+import {
+  fetchMoreLikePosts,
+  fetchPostByUUID,
+  markPost,
+} from '../../../api/endpoints/post';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
@@ -106,7 +111,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const { handleSetPostOverlayOpen } = usePostModalState();
-  const { syncedHistoryPushState } = useSynchronizedHistory();
+  const { syncedHistoryPushState, syncedHistoryReplaceState } =
+    useSynchronizedHistory();
 
   const [postParsed, typeOfPost] = post
     ? switchPostType(post)
@@ -218,9 +224,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postParsed?.creator?.uuid, user.loggedIn, user.userData?.userUuid]
   );
 
-  // const [currLocation] = useState(
-  //   manualCurrLocation ?? (isBrowser() ? window.location.href : '')
-  // );
+  const [currLocation] = useState(
+    manualCurrLocation ?? (isBrowser() ? window.location.href : '')
+  );
   const [acSuggestionFromUrl, setAcSuggestionFromUrl] =
     useState<newnewapi.Auction.Option | undefined>(undefined);
   const acSuggestionIDFromUrl = isBrowser()
@@ -262,19 +268,25 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const { ref: loadingRef, inView } = useInView();
 
   const handleCloseAndGoBack = () => {
+    // Required to avoid wierd cases when navigating back to the post using browser back button
+    if (currLocation === 'forced_redirect_to_home') {
+      innerHistoryStack.current = [];
+      handleClose();
+      router.push('/');
+      return;
+    }
+
     handleClose();
-    // syncedHistoryReplaceState({}, currLocation);
-    window.history.back();
+    syncedHistoryPushState({}, currLocation);
     innerHistoryStack.current = [];
   };
 
   const handleGoBackInsidePost = () => {
     if (innerHistoryStack.current.length !== 0) {
-      window.history.back();
+      router.back();
     } else {
       handleClose();
-      // syncedHistoryReplaceState({}, currLocation);
-      window.history.back();
+      syncedHistoryPushState({}, currLocation);
     }
   };
 
@@ -526,12 +538,25 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
       setOpen(true);
       handleSetPostOverlayOpen(true);
-      syncedHistoryPushState(
-        {
-          postId: postParsed.postUuid,
-        },
-        `/post/${postParsed.postUuid}${additionalHash ?? ''}`
-      );
+
+      // Push if opening fresh
+      // Replace if coming back from a different page
+      const isFromPostPage = !!router?.query?.post_uuid;
+      if (!isFromPostPage) {
+        syncedHistoryPushState(
+          {
+            postId: postParsed.postUuid,
+          },
+          `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+        );
+      } else {
+        syncedHistoryReplaceState(
+          {
+            postId: postParsed.postUuid,
+          },
+          `/post/${postParsed.postUuid}${additionalHash ?? ''}`
+        );
+      }
     }
 
     return () => {
@@ -541,6 +566,35 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       dispatch(setOverlay(false));
       // eslint-disable-next-line no-useless-return
       return;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Override next/router default onPopState
+  // More: https://nextjs.org/docs/api-reference/next/router#routerbeforepopstate
+  useEffect(() => {
+    router.beforePopState((state: any) => {
+      if (!state.postId) {
+        return true;
+      }
+
+      if (state.postId && innerHistoryStack.current.length === 0) {
+        syncedHistoryReplaceState(
+          {
+            postId: state.postId,
+          },
+          `/post/${state.postId}`
+        );
+        return false;
+      }
+
+      return false;
+    });
+
+    return () => {
+      router.beforePopState(() => {
+        return true;
+      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -572,15 +626,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   // Close modal on back btn
   useEffect(() => {
-    const verify = () => {
+    const verify = async () => {
       if (!isBrowser()) return;
 
       const postId =
         new URL(window.location.href).searchParams.get('post') ||
         window?.history?.state?.postId;
 
-      // const postId = window?.history?.state?.postId;
-
+      // Opening a post when navigating back in browser and having `innerHistoryStack` non-empty
       if (
         innerHistoryStack.current &&
         innerHistoryStack.current[innerHistoryStack.current.length - 1]
@@ -601,6 +654,29 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         setTriedLoading(false);
       }
 
+      // Opening a post when navigating back in browser and having `innerHistoryStack` empty
+      if (postId && !innerHistoryStack.current.length) {
+        const getPostPayload = new newnewapi.GetPostRequest({
+          postUuid: postId,
+        });
+
+        const { data, error } = await fetchPostByUUID(getPostPayload);
+
+        if (!data || error) {
+          handleClose();
+          return;
+        }
+
+        handleOpenAnotherPost?.(data);
+        modalContainerRef.current?.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+        setRecommenedPosts([]);
+        setNextPageToken('');
+        setTriedLoading(false);
+      }
+
       if (!postId) {
         handleClose();
       }
@@ -614,8 +690,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   useEffect(() => {
     if (inView && !recommenedPostsLoading) {
-      console.log('loading recommended');
-      console.log(recommenedPosts.length);
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
       } else if (
@@ -653,14 +727,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     router.prefetch('/creation');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // useEffect(() => {
-  //   router.events.on('beforeHistoryChange', (e) => {
-  //     console.log('HEY');
-  //     console.log(e);
-  //     router.reload();
-  //   });
-  // }, [postParsed?.postUuid, router]);
 
   if (shouldRenderVotingFinishedModal && !isMyPost) {
     return (
