@@ -231,9 +231,6 @@ export const PostCard: React.FC<ICard> = ({
               ref={(el) => {
                 videoRef.current = el!!;
               }}
-              // NB! Might use this one to avoid waisting user's resources
-              // and use a poster here NB!
-              // preload="none"
               loop
               muted
               playsInline
@@ -281,7 +278,6 @@ export const PostCard: React.FC<ICard> = ({
             ref={(el) => {
               videoRef.current = el!!;
             }}
-            // preload="none"
             loop
             muted
             playsInline
