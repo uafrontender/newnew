@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -13,7 +13,7 @@ import NavigationItem from '../NavigationItem';
 import { useGetChats } from '../../../contexts/chatContext';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { WalletContext } from '../../../contexts/walletContext';
+// import { WalletContext } from '../../../contexts/walletContext';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
@@ -29,7 +29,7 @@ export const Tablet: React.FC<ITablet> = () => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
@@ -92,7 +92,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 handleClose={() => setShareMenuOpen(false)}
               />
             </SItemWithMargin>
-            {user.userData?.options?.isCreator && !isBalanceLoading && (
+            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
@@ -104,7 +104,7 @@ export const Tablet: React.FC<ITablet> = () => {
                   }}
                 />
               </SItemWithMargin>
-            )}
+            )} */}
           </>
         )}
         {user.loggedIn && user.userData?.options?.isCreator && (

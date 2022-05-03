@@ -9,7 +9,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, {
   useCallback,
-  useContext,
+  // useContext,
   useEffect,
   useMemo,
   useState,
@@ -18,11 +18,11 @@ import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { WalletContext } from '../../../../contexts/walletContext';
-import { placeBidWithWallet } from '../../../../api/endpoints/auction';
+// import { WalletContext } from '../../../../contexts/walletContext';
+// import { placeBidWithWallet } from '../../../../api/endpoints/auction';
 import {
   createPaymentSession,
-  getTopUpWalletWithPaymentPurposeUrl,
+  // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 import { TAcOptionWithHighestField } from '../../../organisms/decision/PostViewAC';
 
@@ -86,7 +86,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     resizeMode
   );
 
-  const { walletBalance } = useContext(WalletContext);
+  // const { walletBalance } = useContext(WalletContext);
 
   // const highest = useMemo(() => option.isHighest, [option.isHighest]);
   const isSupportedByMe = useMemo(
@@ -131,133 +131,133 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
     setPaymentModalOpen(true);
   };
 
-  const handlePayWithWallet = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      // Check if user is logged and if the wallet balance is sufficient
-      if (
-        !user.loggedIn ||
-        (walletBalance &&
-          walletBalance?.usdCents < parseInt(supportBidAmount) * 100)
-      ) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload =
-          new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${postId}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${postId}`,
-            ...(!user.loggedIn
-              ? {
-                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-                }
-              : {}),
-            acBidRequest: {
-              amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(supportBidAmount) * 100,
-              }),
-              optionId: option.id,
-              postUuid: postId,
-            },
-          });
+  // const handlePayWithWallet = useCallback(async () => {
+  //   setLoadingModalOpen(true);
+  //   try {
+  //     // Check if user is logged and if the wallet balance is sufficient
+  //     if (
+  //       !user.loggedIn ||
+  //       (walletBalance &&
+  //         walletBalance?.usdCents < parseInt(supportBidAmount) * 100)
+  //     ) {
+  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //         new newnewapi.TopUpWalletWithPurposeRequest({
+  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${postId}`,
+  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${postId}`,
+  //           ...(!user.loggedIn
+  //             ? {
+  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+  //               }
+  //             : {}),
+  //           acBidRequest: {
+  //             amount: new newnewapi.MoneyAmount({
+  //               usdCents: parseInt(supportBidAmount) * 100,
+  //             }),
+  //             optionId: option.id,
+  //             postUuid: postId,
+  //           },
+  //         });
 
-        const res = await getTopUpWalletWithPaymentPurposeUrl(
-          getTopUpWalletWithPaymentPurposeUrlPayload
-        );
+  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
+  //         getTopUpWalletWithPaymentPurposeUrlPayload
+  //       );
 
-        if (!res.data || !res.data.sessionUrl || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (!res.data || !res.data.sessionUrl || res.error)
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        window.location.href = res.data.sessionUrl;
-      } else {
-        const makeBidPayload = new newnewapi.PlaceBidRequest({
-          amount: new newnewapi.MoneyAmount({
-            usdCents: parseInt(supportBidAmount) * 100,
-          }),
-          optionId: option.id,
-          postUuid: postId,
-        });
+  //       window.location.href = res.data.sessionUrl;
+  //     } else {
+  //       const makeBidPayload = new newnewapi.PlaceBidRequest({
+  //         amount: new newnewapi.MoneyAmount({
+  //           usdCents: parseInt(supportBidAmount) * 100,
+  //         }),
+  //         optionId: option.id,
+  //         postUuid: postId,
+  //       });
 
-        const res = await placeBidWithWallet(makeBidPayload);
+  //       const res = await placeBidWithWallet(makeBidPayload);
 
-        if (
-          res.data &&
-          res.data.status ===
-            newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE
-        ) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload =
-            new newnewapi.TopUpWalletWithPurposeRequest({
-              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${postId}`,
-              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${postId}`,
-              acBidRequest: {
-                amount: new newnewapi.MoneyAmount({
-                  usdCents: parseInt(supportBidAmount) * 100,
-                }),
-                optionId: option.id,
-                postUuid: postId,
-              },
-            });
+  //       if (
+  //         res.data &&
+  //         res.data.status ===
+  //           newnewapi.PlaceBidResponse.Status.INSUFFICIENT_WALLET_BALANCE
+  //       ) {
+  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //           new newnewapi.TopUpWalletWithPurposeRequest({
+  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${postId}`,
+  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${postId}`,
+  //             acBidRequest: {
+  //               amount: new newnewapi.MoneyAmount({
+  //                 usdCents: parseInt(supportBidAmount) * 100,
+  //               }),
+  //               optionId: option.id,
+  //               postUuid: postId,
+  //             },
+  //           });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-            getTopUpWalletWithPaymentPurposeUrlPayload
-          );
+  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+  //           getTopUpWalletWithPaymentPurposeUrlPayload
+  //         );
 
-          if (
-            !resStripeRedirect.data ||
-            !resStripeRedirect.data.sessionUrl ||
-            resStripeRedirect.error
-          )
-            throw new Error(
-              resStripeRedirect.error?.message ?? 'Request failed'
-            );
+  //         if (
+  //           !resStripeRedirect.data ||
+  //           !resStripeRedirect.data.sessionUrl ||
+  //           resStripeRedirect.error
+  //         )
+  //           throw new Error(
+  //             resStripeRedirect.error?.message ?? 'Request failed'
+  //           );
 
-          window.location.href = resStripeRedirect.data.sessionUrl;
-          return;
-        }
+  //         window.location.href = resStripeRedirect.data.sessionUrl;
+  //         return;
+  //       }
 
-        if (
-          !res.data ||
-          res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
-          res.error
-        )
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (
+  //         !res.data ||
+  //         res.data.status !== newnewapi.PlaceBidResponse.Status.SUCCESS ||
+  //         res.error
+  //       )
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        const optionFromResponse = (res.data
-          .option as newnewapi.Auction.Option)!!;
-        optionFromResponse.isSupportedByMe = true;
-        handleAddOrUpdateOptionFromResponse(optionFromResponse);
+  //       const optionFromResponse = (res.data
+  //         .option as newnewapi.Auction.Option)!!;
+  //       optionFromResponse.isSupportedByMe = true;
+  //       handleAddOrUpdateOptionFromResponse(optionFromResponse);
 
-        handleSetSupportedBid('');
-        setSupportBidAmount('');
-        setIsSupportFormOpen(false);
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
-        setPaymentSuccesModalOpen(true);
-      }
-    } catch (err) {
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-      console.error(err);
-    }
-  }, [
-    setPaymentModalOpen,
-    setLoadingModalOpen,
-    setIsSupportFormOpen,
-    setSupportBidAmount,
-    handleSetSupportedBid,
-    handleAddOrUpdateOptionFromResponse,
-    supportBidAmount,
-    option.id,
-    postId,
-    user.loggedIn,
-    walletBalance,
-    router.locale,
-  ]);
+  //       handleSetSupportedBid('');
+  //       setSupportBidAmount('');
+  //       setIsSupportFormOpen(false);
+  //       setPaymentModalOpen(false);
+  //       setLoadingModalOpen(false);
+  //       setPaymentSuccesModalOpen(true);
+  //     }
+  //   } catch (err) {
+  //     setPaymentModalOpen(false);
+  //     setLoadingModalOpen(false);
+  //     console.error(err);
+  //   }
+  // }, [
+  //   setPaymentModalOpen,
+  //   setLoadingModalOpen,
+  //   setIsSupportFormOpen,
+  //   setSupportBidAmount,
+  //   handleSetSupportedBid,
+  //   handleAddOrUpdateOptionFromResponse,
+  //   supportBidAmount,
+  //   option.id,
+  //   postId,
+  //   user.loggedIn,
+  //   walletBalance,
+  //   router.locale,
+  // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -552,16 +552,17 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           isOpen={paymentModalOpen}
           zIndex={12}
           amount={`$${supportBidAmount}`}
-          {...(walletBalance?.usdCents &&
-          walletBalance.usdCents >= parseInt(supportBidAmount) * 100
-            ? {}
-            : {
-                predefinedOption: 'card',
-              })}
+          // {...(walletBalance?.usdCents &&
+          // walletBalance.usdCents >= parseInt(supportBidAmount) * 100
+          //   ? {}
+          //   : {
+          //       predefinedOption: 'card',
+          //     })}
+          predefinedOption='card'
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={handlePayWithWallet}
+          // handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>

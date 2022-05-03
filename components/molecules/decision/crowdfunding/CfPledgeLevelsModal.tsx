@@ -1,16 +1,16 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '../../../../redux-store/store';
-import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
+// import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
 import {
   createPaymentSession,
-  getTopUpWalletWithPaymentPurposeUrl,
+  // getTopUpWalletWithPaymentPurposeUrl,
 } from '../../../../api/endpoints/payments';
 
 import Text from '../../../atoms/Text';
@@ -23,7 +23,7 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
-import { WalletContext } from '../../../../contexts/walletContext';
+// import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
   zIndex: number;
@@ -51,7 +51,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
 
-  const { walletBalance } = useContext(WalletContext);
+  // const { walletBalance } = useContext(WalletContext);
 
   const [pledgeAmount, setPledgeAmount] =
     useState<number | undefined>(undefined);
@@ -85,122 +85,122 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
   };
 
   // Make a pledge and close all forms and modals
-  const handlePayWithWallet = useCallback(async () => {
-    setLoadingModalOpen(true);
-    try {
-      // Check if user is logged in
-      if (!user.loggedIn) {
-        const getTopUpWalletWithPaymentPurposeUrlPayload =
-          new newnewapi.TopUpWalletWithPurposeRequest({
-            successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-              router.locale !== 'en-US' ? `${router.locale}/` : ''
-            }post/${post.postUuid}`,
-            ...(!user.loggedIn
-              ? {
-                  nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
-                }
-              : {}),
-            cfPledgeRequest: {
-              amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(pledgeAmount?.toString()!!),
-              }),
-              postUuid: post.postUuid,
-            },
-          });
+  // const handlePayWithWallet = useCallback(async () => {
+  //   setLoadingModalOpen(true);
+  //   try {
+  //     // Check if user is logged in
+  //     if (!user.loggedIn) {
+  //       const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //         new newnewapi.TopUpWalletWithPurposeRequest({
+  //           successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${post.postUuid}`,
+  //           cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //             router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //           }post/${post.postUuid}`,
+  //           ...(!user.loggedIn
+  //             ? {
+  //                 nonAuthenticatedSignUpUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up-payment`,
+  //               }
+  //             : {}),
+  //           cfPledgeRequest: {
+  //             amount: new newnewapi.MoneyAmount({
+  //               usdCents: parseInt(pledgeAmount?.toString()!!),
+  //             }),
+  //             postUuid: post.postUuid,
+  //           },
+  //         });
 
-        const res = await getTopUpWalletWithPaymentPurposeUrl(
-          getTopUpWalletWithPaymentPurposeUrlPayload
-        );
+  //       const res = await getTopUpWalletWithPaymentPurposeUrl(
+  //         getTopUpWalletWithPaymentPurposeUrlPayload
+  //       );
 
-        if (!res.data || !res.data.sessionUrl || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (!res.data || !res.data.sessionUrl || res.error)
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        window.location.href = res.data.sessionUrl;
-      } else {
-        const makePledgePayload = new newnewapi.DoPledgeRequest({
-          amount: new newnewapi.MoneyAmount({
-            usdCents: parseInt(pledgeAmount?.toString()!!),
-          }),
-          postUuid: post.postUuid,
-        });
+  //       window.location.href = res.data.sessionUrl;
+  //     } else {
+  //       const makePledgePayload = new newnewapi.DoPledgeRequest({
+  //         amount: new newnewapi.MoneyAmount({
+  //           usdCents: parseInt(pledgeAmount?.toString()!!),
+  //         }),
+  //         postUuid: post.postUuid,
+  //       });
 
-        const res = await doPledgeWithWallet(makePledgePayload);
+  //       const res = await doPledgeWithWallet(makePledgePayload);
 
-        if (
-          res.data &&
-          res.data.status ===
-            newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE
-        ) {
-          const getTopUpWalletWithPaymentPurposeUrlPayload =
-            new newnewapi.TopUpWalletWithPurposeRequest({
-              successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${post.postUuid}`,
-              cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
-                router.locale !== 'en-US' ? `${router.locale}/` : ''
-              }post/${post.postUuid}`,
-              cfPledgeRequest: {
-                amount: new newnewapi.MoneyAmount({
-                  usdCents: parseInt(pledgeAmount?.toString()!!),
-                }),
-                postUuid: post.postUuid,
-              },
-            });
+  //       if (
+  //         res.data &&
+  //         res.data.status ===
+  //           newnewapi.DoPledgeResponse.Status.INSUFFICIENT_WALLET_BALANCE
+  //       ) {
+  //         const getTopUpWalletWithPaymentPurposeUrlPayload =
+  //           new newnewapi.TopUpWalletWithPurposeRequest({
+  //             successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${post.postUuid}`,
+  //             cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${
+  //               router.locale !== 'en-US' ? `${router.locale}/` : ''
+  //             }post/${post.postUuid}`,
+  //             cfPledgeRequest: {
+  //               amount: new newnewapi.MoneyAmount({
+  //                 usdCents: parseInt(pledgeAmount?.toString()!!),
+  //               }),
+  //               postUuid: post.postUuid,
+  //             },
+  //           });
 
-          const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
-            getTopUpWalletWithPaymentPurposeUrlPayload
-          );
+  //         const resStripeRedirect = await getTopUpWalletWithPaymentPurposeUrl(
+  //           getTopUpWalletWithPaymentPurposeUrlPayload
+  //         );
 
-          if (
-            !resStripeRedirect.data ||
-            !resStripeRedirect.data.sessionUrl ||
-            resStripeRedirect.error
-          )
-            throw new Error(
-              resStripeRedirect.error?.message ?? 'Request failed'
-            );
+  //         if (
+  //           !resStripeRedirect.data ||
+  //           !resStripeRedirect.data.sessionUrl ||
+  //           resStripeRedirect.error
+  //         )
+  //           throw new Error(
+  //             resStripeRedirect.error?.message ?? 'Request failed'
+  //           );
 
-          window.location.href = resStripeRedirect.data.sessionUrl;
-          return;
-        }
+  //         window.location.href = resStripeRedirect.data.sessionUrl;
+  //         return;
+  //       }
 
-        if (
-          !res.data ||
-          res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
-          res.error
-        )
-          throw new Error(res.error?.message ?? 'Request failed');
+  //       if (
+  //         !res.data ||
+  //         res.data.status !== newnewapi.DoPledgeResponse.Status.SUCCESS ||
+  //         res.error
+  //       )
+  //         throw new Error(res.error?.message ?? 'Request failed');
 
-        setIsFormOpen(false);
-        setCustomPledgeAmount('');
-        handleAddPledgeFromResponse(
-          res.data.pledge as newnewapi.Crowdfunding.Pledge
-        );
+  //       setIsFormOpen(false);
+  //       setCustomPledgeAmount('');
+  //       handleAddPledgeFromResponse(
+  //         res.data.pledge as newnewapi.Crowdfunding.Pledge
+  //       );
 
-        setCustomPledgeAmount('');
-        setIsFormOpen(false);
-        setPaymentModalOpen(false);
-        setLoadingModalOpen(false);
-        handleSetPaymentSuccesModalOpen(true);
-        onClose();
-      }
-    } catch (err) {
-      console.error(err);
-      setPaymentModalOpen(false);
-      setLoadingModalOpen(false);
-    }
-  }, [
-    pledgeAmount,
-    post.postUuid,
-    user.loggedIn,
-    router.locale,
-    handleAddPledgeFromResponse,
-    handleSetPaymentSuccesModalOpen,
-    onClose,
-  ]);
+  //       setCustomPledgeAmount('');
+  //       setIsFormOpen(false);
+  //       setPaymentModalOpen(false);
+  //       setLoadingModalOpen(false);
+  //       handleSetPaymentSuccesModalOpen(true);
+  //       onClose();
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     setPaymentModalOpen(false);
+  //     setLoadingModalOpen(false);
+  //   }
+  // }, [
+  //   pledgeAmount,
+  //   post.postUuid,
+  //   user.loggedIn,
+  //   router.locale,
+  //   handleAddPledgeFromResponse,
+  //   handleSetPaymentSuccesModalOpen,
+  //   onClose,
+  // ]);
 
   const handlePayWithCardStripeRedirect = useCallback(async () => {
     setLoadingModalOpen(true);
@@ -340,17 +340,18 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           isOpen={paymentModalOpen}
           zIndex={14}
           amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
-          {...(walletBalance?.usdCents &&
-          pledgeAmount &&
-          walletBalance.usdCents >= pledgeAmount
-            ? {}
-            : {
-                predefinedOption: 'card',
-              })}
+          // {...(walletBalance?.usdCents &&
+          // pledgeAmount &&
+          // walletBalance.usdCents >= pledgeAmount
+          //   ? {}
+          //   : {
+          //       predefinedOption: 'card',
+          //     })}
+          predefinedOption='card'
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
-          handlePayWithWallet={handlePayWithWallet}
+          // handlePayWithWallet={handlePayWithWallet}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
