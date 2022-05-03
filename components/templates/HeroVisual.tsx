@@ -11,7 +11,7 @@ import SignInOutro from '../../public/images/signup/hero-visual/Dark/sign-in-out
 import SignInIntroLight from '../../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
 import SignInHoldLight from '../../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
 import SignInOutroLight from '../../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
-import AuthLayoutContext from './AuthLayoutContext';
+import AuthLayoutContext from '../../contexts/authLayoutContext';
 
 interface IHeroVisual {
   style?: React.CSSProperties;

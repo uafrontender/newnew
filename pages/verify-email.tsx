@@ -11,7 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
-import AuthLayoutContext from '../components/templates/AuthLayoutContext';
+import AuthLayoutContext from '../contexts/authLayoutContext';
 
 interface IVerifyEmail {}
 
