@@ -30,15 +30,22 @@ import { useAppSelector } from '../../../redux-store/store';
 import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import InlineSVG from '../../atoms/InlineSVG';
 import { useGetChats } from '../../../contexts/chatContext';
+import Lottie from '../../atoms/Lottie';
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
 
 interface IFunctionProps {
   openChat: (arg: IChatData) => void;
   searchText: string;
+  username?: string;
 }
 
-const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
+const ChatList: React.FC<IFunctionProps> = ({
+  openChat,
+  searchText,
+  username,
+}) => {
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
@@ -47,6 +54,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   const [activeChatIndex, setActiveChatIndex] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('chatRoomsSubs');
 
+  const [isInitialLoaded, setIsInitialLoaded] = useState<boolean>(false);
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
   const [chatRooms, setChatRooms] =
     useState<newnewapi.IChatRoom[] | null>(null);
@@ -56,7 +64,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
     newnewapi.IChatRoom[]
   >([]);
   const [chatRoomsSubs, setChatRoomsSubs] = useState<newnewapi.IChatRoom[]>([]);
-  const [displayAllRooms, setDisplayAllRooms] = useState(false);
+  const [displayAllRooms, setDisplayAllRooms] = useState(false); // if there are only subs or only creators
   const [searchedRooms, setSearchedRooms] =
     useState<newnewapi.IChatRoom[] | null>(null);
   const [updatedChat, setUpdatedChat] =
@@ -146,6 +154,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
               )
                 arr.push(chat);
             });
+
             return arr;
           });
 
@@ -193,24 +202,64 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
     }
   };
 
+  const fetchRoomByUsername = async (name: string, roomKind: number) => {
+    try {
+      const payload = new newnewapi.GetMyRoomsRequest({
+        searchQuery: name,
+        roomKind,
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error) {
+        setIsInitialLoaded(true);
+        throw new Error(res.error?.message ?? 'Request failed');
+      }
+      if (res.data && res.data.rooms.length > 0) {
+        if (res.data.rooms[0].myRole === 1) {
+          setActiveTab('chatRoomsCreators');
+        }
+        openRoom(res.data.rooms[0]);
+        setUpdatedChat(res.data.rooms[0]);
+        setIsInitialLoaded(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setIsInitialLoaded(true);
+    }
+  };
+
   useEffect(() => {
     if (!chatRooms) {
-      fetchMyRooms();
+      (async () => {
+        await fetchMyRooms();
+        if (username) {
+          const isAnnouncementRequested = username.split('-');
+          if (
+            isAnnouncementRequested.length > 0 &&
+            isAnnouncementRequested[isAnnouncementRequested.length - 1] ===
+              'announcement'
+          ) {
+            fetchRoomByUsername(isAnnouncementRequested[0], 4);
+          } else {
+            fetchRoomByUsername(username, 1);
+          }
+        }
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (chatRooms && !searchedRooms) {
+    if (chatRooms && !searchedRooms && isInitialLoaded) {
       fetchLastActiveRoom();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unreadCountForCreator, unreadCountForUser]);
+  }, [unreadCountForCreator, unreadCountForUser, isInitialLoaded]);
 
   useEffect(() => {
-    if (updatedChat) {
+    if (updatedChat && isInitialLoaded) {
       let isAlreadyAdded: number | undefined;
-      const isChatWithSub = updatedChat.myRole === 1;
+      const isChatWithSub = updatedChat.myRole === 2;
 
       if (displayAllRooms) {
         isAlreadyAdded = chatRooms?.findIndex(
@@ -232,7 +281,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
           ? chatRoomsSubs
           : chatRoomsCreators;
         arr?.splice(isAlreadyAdded, 1);
-
+        // console.log(updatedChat.id!!.toString() === activeChatIndex);
         if (updatedChat.id!!.toString() === activeChatIndex) {
           arr?.splice(0, 0, updatedChat);
           markChatAsRead(updatedChat.id as number);
@@ -261,7 +310,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
       setUpdatedChat(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatedChat]);
+  }, [updatedChat, isInitialLoaded]);
 
   useEffect(() => {
     if (inView && !loadingRooms && chatRoomsNextPageToken) {
@@ -301,10 +350,8 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
   useEffect(() => {
     if (!loadingRooms && chatRooms && chatRooms[0])
       if (chatRoomsCreators.length > 0 && chatRoomsSubs.length > 0) {
-        openRoom(chatRoomsSubs[0]);
         if (displayAllRooms) setDisplayAllRooms(false);
       } else {
-        openRoom(chatRooms[0]);
         setDisplayAllRooms(true);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -495,30 +542,46 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
   return (
     <>
-      <SSectionContent>
-        {chatRooms && chatRooms.length > 0 ? (
-          <>
-            {chatRoomsCreators.length > 0 &&
-              chatRoomsSubs.length > 0 &&
-              !searchedRooms && <Tabs />}
-            {!searchedRooms
-              ? !displayAllRooms
-                ? eval(activeTab).map(renderChatItem)
-                : chatRooms.map(renderChatItem)
-              : searchedRooms.map(renderChatItem)}
-            {chatRoomsNextPageToken && !loadingRooms && !searchedRooms && (
-              <SRef ref={scrollRef}>Loading...</SRef>
-            )}
-          </>
-        ) : (
-          <EmptyInbox />
-        )}
-      </SSectionContent>
+      {isInitialLoaded ? (
+        <SSectionContent>
+          {chatRooms && chatRooms.length > 0 ? (
+            <>
+              {chatRoomsCreators.length > 0 &&
+                chatRoomsSubs.length > 0 &&
+                !searchedRooms && <Tabs />}
+              {!searchedRooms
+                ? !displayAllRooms
+                  ? eval(activeTab).map(renderChatItem)
+                  : chatRooms.map(renderChatItem)
+                : searchedRooms.map(renderChatItem)}
+              {chatRoomsNextPageToken && !loadingRooms && !searchedRooms && (
+                <SRef ref={scrollRef}>Loading...</SRef>
+              )}
+            </>
+          ) : (
+            <EmptyInbox />
+          )}
+        </SSectionContent>
+      ) : (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
+      )}
     </>
   );
 };
 
 export default ChatList;
+
+ChatList.defaultProps = {
+  username: '',
+};
 
 const SSectionContent = styled.div`
   height: calc(100% - 74px);
@@ -573,7 +636,10 @@ const STab = styled.div<ISTab>`
           left: 0;
           width: 100%;
           height: 4px;
-          background: ${({ theme }) => theme.colors.white};
+          background: ${props.theme.name === 'light'
+            ? props.theme.gradients.blueHorizontal
+            : props.theme.colors.white};
+          ${({ theme }) => theme.colors.white};
           border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
           border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
         }

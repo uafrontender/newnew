@@ -14,16 +14,16 @@ import { useAppSelector } from '../../../redux-store/store';
 // import { WalletContext } from '../../../contexts/walletContext';
 import { useGetChats } from '../../../contexts/chatContext';
 import ShareMenu from '../../organisms/ShareMenu';
+import { useNotifications } from '../../../contexts/notificationsContext';
 
-interface IDesktop {}
-
-export const Desktop: React.FC<IDesktop> = () => {
+export const Desktop: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const { unreadCount } = useGetChats();
+  const { unreadNotificationCount } = useNotifications();
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
@@ -63,7 +63,7 @@ export const Desktop: React.FC<IDesktop> = () => {
                 item={{
                   url: '/notifications',
                   key: 'notifications',
-                  counter: user.notificationsCount,
+                  counter: unreadNotificationCount,
                 }}
               />
             </SItemWithMargin>

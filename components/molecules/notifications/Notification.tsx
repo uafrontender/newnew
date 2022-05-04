@@ -1,18 +1,19 @@
 import React from 'react';
 import moment from 'moment';
+import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
-import UserAvatar from './UserAvatar';
-import InlineSVG from '../atoms/InlineSVG';
+import UserAvatar from '../UserAvatar';
+import InlineSVG from '../../atoms/InlineSVG';
 
-import MessageIcon from '../../public/images/svg/icons/filled/MessageIcon.svg';
-import MessageCircle from '../../public/images/svg/icons/filled/MessageCircle.svg';
-import { useAppSelector } from '../../redux-store/store';
-import { INotification, RoutingTarget } from '../../pages/notifications';
+import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
+import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
+import { useAppSelector } from '../../../redux-store/store';
 
-const Notification: React.FC<INotification> = ({
+const Notification: React.FC<newnewapi.INotification> = ({
   content,
-  routingTarget,
   createdAt,
+  target,
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -22,12 +23,18 @@ const Notification: React.FC<INotification> = ({
   return (
     <SWrapper>
       <SAvatarHolder>
-        <SUserAvatar avatarUrl={content.relatedUser.thumbnailAvatarUrl} />
-        {routingTarget !== RoutingTarget.Empty && (
+        <SUserAvatar
+          avatarUrl={
+            content?.relatedUser?.thumbnailAvatarUrl
+              ? content?.relatedUser?.thumbnailAvatarUrl
+              : ''
+          }
+        />
+        {target && (
           <SIcon>
             <SInlineSVG
               svg={
-                routingTarget === RoutingTarget.ChatRoom
+                target === newnewapi.RoutingTarget.ChatRoomTarget
                   ? MessageIcon
                   : MessageCircle
               }
@@ -39,15 +46,19 @@ const Notification: React.FC<INotification> = ({
         )}
       </SAvatarHolder>
       <SText>
-        <STitle>{content.relatedUser.title}</STitle>
-        <p>
-          {content.message} {content.relatedPost && content.relatedPost.title}
-        </p>
-        <SDate>{moment(createdAt).fromNow()}</SDate>
+        <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
+        <p>{content!!.message}</p>
+        <SDate>{moment((createdAt?.seconds as number) * 1000).fromNow()}</SDate>
       </SText>
-      {content.relatedPost && !isMobile && (
-        <SPostThumbnail avatarUrl={content.relatedPost.thumbnailImageUrl} />
-      )}
+      {content!!.relatedPost &&
+        content!!.relatedPost.thumbnailImageUrl &&
+        !isMobile && (
+          <Link href={`/post/${content?.relatedPost.uuid}`}>
+            <SPostThumbnail
+              avatarUrl={content!!.relatedPost.thumbnailImageUrl}
+            />
+          </Link>
+        )}
     </SWrapper>
   );
 };
@@ -89,7 +100,7 @@ const SAvatarHolder = styled.div`
 `;
 
 const STitle = styled.div`
-  color: ${(props) => props.theme.colors.white};
+  color: ${(props) => props.theme.colorsThemed.text.primary};
   margin-bottom: 0;
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
@@ -102,7 +113,7 @@ const SText = styled.div`
   line-height: 20px;
   font-weight: 600;
   width: 100%;
-  color: ${(props) => props.theme.colorsThemed.text.secondary};
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
   border-bottom: 1px solid
     ${(props) => props.theme.colorsThemed.background.outlines1};
   ${({ theme }) => theme.media.tablet} {
@@ -125,6 +136,7 @@ const SPostThumbnail = styled(UserAvatar)`
   flex-shrink: 0;
   margin-left: auto;
   border-radius: 20px;
+  cursor: pointer;
 `;
 
 const SDate = styled.div`
@@ -140,7 +152,7 @@ const SIcon = styled.span`
   width: 40px;
   height: 40px;
   background: ${(props) => props.theme.colors.blue};
-  border: 8px solid ${(props) => props.theme.colors.dark};
+  border: 8px solid ${(props) => props.theme.colorsThemed.background.primary};
   border-radius: 50%;
   display: flex;
   align-items: center;
