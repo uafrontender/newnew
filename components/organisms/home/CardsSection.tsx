@@ -42,283 +42,315 @@ interface ICardSection {
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const CardsSection: React.FC<ICardSection> = ({
-  user,
-  type,
-  title,
-  category,
-  collection,
-  loading,
-  tutorialCard,
-  handlePostClicked,
-}) => {
-  const { t } = useTranslation('home');
-  const router = useRouter();
-  const ref: any = useRef();
-  const scrollContainerRef: any = useRef();
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const [visibleListItem, setVisibleListItem] = useState(0);
+export const CardsSection: React.FC<ICardSection> = React.memo(
+  ({
+    user,
+    type,
+    title,
+    category,
+    collection,
+    loading,
+    tutorialCard,
+    handlePostClicked,
+  }) => {
+    const { t } = useTranslation('home');
+    const router = useRouter();
+    const ref: any = useRef();
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+    const [visibleListItem, setVisibleListItem] = useState(0);
 
-  // Dragging state
-  const [clientX, setClientX] = useState<number>(0);
-  const [scrollX, setScrollX] = useState<number>(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [mouseIsDown, setMouseIsDown] = useState(false);
+    // Dragging state
+    const [clientX, setClientX] = useState<number>(0);
+    const [scrollX, setScrollX] = useState<number>(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [mouseIsDown, setMouseIsDown] = useState(false);
 
-  const { postOverlayOpen } = usePostModalState();
+    const { postOverlayOpen } = usePostModalState();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-  const isTablet = ['tablet'].includes(resizeMode);
-  // const isLaptop = ['laptop'].includes(resizeMode);
-  // const isDesktop = ['laptopL'].includes(resizeMode);
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    const isTablet = ['tablet'].includes(resizeMode);
+    // const isLaptop = ['laptop'].includes(resizeMode);
+    // const isDesktop = ['laptopL'].includes(resizeMode);
 
-  let collectionToRender = collection;
-  let renderShowMore = false;
-  let scrollStep = SCROLL_STEP.desktop;
+    let collectionToRender = collection;
+    let renderShowMore = false;
+    let scrollStep = SCROLL_STEP.desktop;
 
-  if (isMobile && collection?.length > 3) {
-    renderShowMore = true;
-    collectionToRender = collection.slice(0, 3);
-  }
-
-  if (resizeMode === 'tablet' || resizeMode === 'laptop') {
-    scrollStep = SCROLL_STEP.tablet;
-  }
-
-  const handleUserClick = (username: string) => {
-    router.push(`/${username}`);
-  };
-  const handleLeftClick = () => {
-    scrollListTo(visibleListItem - scrollStep - 1);
-  };
-  const handleRightClick = () => {
-    scrollListTo(visibleListItem + scrollStep);
-  };
-  const scrollListTo = (to: number) => {
-    let scrollTo = to;
-
-    if (to < 0) {
-      scrollTo = 0;
-    } else if (
-      scrollTo >
-      (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1
-    ) {
-      scrollTo =
-        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
+    if (isMobile && collection?.length > 3) {
+      renderShowMore = true;
+      collectionToRender = collection.slice(0, 3);
     }
 
-    scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
-      offset: -32,
-      smooth: 'easeOutQuad',
-      duration: SCROLL_CARDS_SECTIONS,
-      horizontal: true,
-      containerId: `${category}-scrollContainer`,
-    });
-  };
-  const mouseDownHandler = (e: any) => {
-    setMouseIsDown(true);
-    setClientX(e.clientX);
-    setScrollX(scrollContainerRef.current.scrollLeft);
-  };
-  const mouseMoveHandler = (e: any) => {
-    if (!mouseIsDown) {
-      return;
+    if (resizeMode === 'tablet' || resizeMode === 'laptop') {
+      scrollStep = SCROLL_STEP.tablet;
     }
 
-    scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
-    setClientX(e.clientX);
-    setScrollX(scrollX - e.clientX + clientX);
-    setIsDragging(true);
-  };
-  const mouseUpHandler = () => {
-    setMouseIsDown(false);
+    const handleUserClick = (username: string) => {
+      router.push(`/${username}`);
+    };
+    const handleLeftClick = () => {
+      scrollListTo(visibleListItem - scrollStep - 1);
+    };
+    const handleRightClick = () => {
+      scrollListTo(visibleListItem + scrollStep);
+    };
+    const scrollListTo = (to: number) => {
+      let scrollTo = to;
 
-    if (isDragging) {
-      setTimeout(() => {
-        setIsDragging(false);
-      }, 0);
-    }
-  };
+      if (to < 0) {
+        scrollTo = 0;
+      } else if (
+        scrollTo >
+        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1
+      ) {
+        scrollTo =
+          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) - 1;
+      }
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      if (!isDragging) {
-        handlePostClicked(item);
+      scroller.scrollTo(`cards-section-${category}-${scrollTo}`, {
+        offset: -32,
+        smooth: 'easeOutQuad',
+        duration: SCROLL_CARDS_SECTIONS,
+        horizontal: true,
+        containerId: `${category}-scrollContainer`,
+      });
+    };
+
+    const mouseDownHandler = (e: any) => {
+      if (!scrollContainerRef.current) {
+        return;
+      }
+
+      setMouseIsDown(true);
+      setClientX(e.clientX);
+      setScrollX(scrollContainerRef.current.scrollLeft);
+    };
+
+    const mouseMoveHandler = (e: any) => {
+      if (!mouseIsDown) {
+        return;
+      }
+
+      if (!scrollContainerRef.current) {
+        return;
+      }
+
+      scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
+      setClientX(e.clientX);
+      setScrollX(scrollX - e.clientX + clientX);
+      setIsDragging(true);
+    };
+
+    const mouseUpHandler = () => {
+      setMouseIsDown(false);
+
+      if (isDragging) {
+        setTimeout(() => {
+          setIsDragging(false);
+        }, 0);
       }
     };
 
-    if (tutorialCard !== undefined && index === 0) {
+    const renderItem = (item: any, index: number) => {
+      const handleItemClick = () => {
+        if (!isDragging) {
+          handlePostClicked(item);
+        }
+      };
+
+      if (tutorialCard !== undefined && index === 0) {
+        return (
+          <>
+            <SItemWrapper
+              key='tutorial-card'
+              name={`cards-section-${category}-${0}`}
+            >
+              {tutorialCard}
+            </SItemWrapper>
+            <SItemWrapper
+              key={switchPostType(item)[0].postUuid}
+              name={`cards-section-${category}-${
+                tutorialCard !== undefined ? index + 1 : index
+              }`}
+              onClick={handleItemClick}
+            >
+              <PostCard
+                item={item}
+                shouldStop={postOverlayOpen}
+                index={tutorialCard !== undefined ? index + 1 : index}
+                width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
+                height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+              />
+            </SItemWrapper>
+          </>
+        );
+      }
+
       return (
-        <>
-          <SItemWrapper
-            key='tutorial-card'
-            name={`cards-section-${category}-${0}`}
-          >
-            {tutorialCard}
-          </SItemWrapper>
-          <SItemWrapper
-            key={switchPostType(item)[0].postUuid}
-            name={`cards-section-${category}-${
-              tutorialCard !== undefined ? index + 1 : index
-            }`}
-            onClick={handleItemClick}
-          >
-            <PostCard
-              item={item}
-              shouldStop={postOverlayOpen}
-              index={tutorialCard !== undefined ? index + 1 : index}
-              width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-              height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
-            />
-          </SItemWrapper>
-        </>
+        <SItemWrapper
+          key={switchPostType(item)[0].postUuid}
+          name={`cards-section-${category}-${
+            tutorialCard !== undefined ? index + 1 : index
+          }`}
+          onClick={handleItemClick}
+        >
+          <PostCard
+            item={item}
+            shouldStop={postOverlayOpen}
+            index={tutorialCard !== undefined ? index + 1 : index}
+            width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
+            height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
+          />
+        </SItemWrapper>
       );
-    }
+    };
+
+    const handleSeeMoreClick = () => {
+      if (type === 'default') {
+        router.push(`/see-more?category=${category}`);
+      }
+    };
+
+    // Try to pre-fetch the content
+    useEffect(() => {
+      router.prefetch(`/see-more?category=${category}`);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      function onScroll() {
+        if (!scrollContainerRef.current) {
+          return;
+        }
+
+        const currentScrollPosition = scrollContainerRef.current.scrollLeft;
+        const { firstChild } = scrollContainerRef.current;
+
+        if (!firstChild) {
+          return;
+        }
+
+        const childWidth = (firstChild as Element).getBoundingClientRect()
+          .width;
+
+        setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
+      }
+
+      const scrollContainerElement = scrollContainerRef.current;
+      scrollContainerElement?.addEventListener('scroll', onScroll);
+      return () => {
+        scrollContainerElement?.removeEventListener('scroll', onScroll);
+      };
+    }, []);
+
+    useEffect(() => {
+      setCanScrollLeft(visibleListItem !== 0);
+      setCanScrollRight(
+        visibleListItem + 1 <=
+          (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
+            scrollStep
+      );
+    }, [visibleListItem, collection, scrollStep]);
 
     return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        name={`cards-section-${category}-${
-          tutorialCard !== undefined ? index + 1 : index
-        }`}
-        onClick={handleItemClick}
-      >
-        <PostCard
-          item={item}
-          shouldStop={postOverlayOpen}
-          index={tutorialCard !== undefined ? index + 1 : index}
-          width={isMobile ? '100%' : isTablet ? '200px' : '224px'}
-          height={isMobile ? '564px' : isTablet ? '300px' : '336px'}
-        />
-      </SItemWrapper>
-    );
-  };
-
-  const handleSeeMoreCLick = () => {
-    if (type === 'default') {
-      router.push(`/see-more?category=${category}`);
-    }
-  };
-
-  // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch(`/see-more?category=${category}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    scrollContainerRef.current.addEventListener('scroll', () => {
-      const currentScrollPosition = scrollContainerRef.current.scrollLeft;
-      const childWidth =
-        scrollContainerRef.current.firstChild.getBoundingClientRect().width;
-
-      setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
-    });
-  }, []);
-  useEffect(() => {
-    setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(
-      visibleListItem + 1 <=
-        (collection?.length || 0 + (TutorialCard !== undefined ? 1 : 0)) -
-          scrollStep
-    );
-  }, [visibleListItem, collection, scrollStep]);
-
-  return (
-    <SWrapper name={category}>
-      <STopWrapper>
-        {type === 'default' ? (
-          <Headline variant={4} animation='t-01'>
-            {title}
-          </Headline>
-        ) : (
-          <AnimatedPresence animation='t-01'>
-            <SHeadline variant={4} animation='t-01'>
-              <SHeadlineInner>
-                <div>{t('button-creator-on-the-rise')}</div>
-                <SCreatorsAvatars>
-                  {collection
-                    .map((post) => switchPostType(post)[0].creator)
-                    .filter((value, index, arr) => arr.indexOf(value) === index)
-                    .map((creator, i) => (
-                      <SUserAvatar
-                        key={creator?.uuid}
-                        index={i}
-                        avatarUrl={creator?.avatarUrl!!}
-                        onClick={() =>
-                          handleUserClick(creator?.username as string)
-                        }
-                      />
-                    ))}
-                </SCreatorsAvatars>
-              </SHeadlineInner>
-            </SHeadline>
-          </AnimatedPresence>
-        )}
-        {!isMobile && type === 'default' && (
-          <SCaption weight={700} onClick={handleSeeMoreCLick}>
-            {t(
-              type === 'default'
-                ? 'button-show-more'
-                : 'button-show-more-creator',
-              { name: formatString(user?.username, true) }
-            )}
-          </SCaption>
-        )}
-      </STopWrapper>
-      <SListContainer ref={ref}>
-        <SListWrapper
-          id={`${category}-scrollContainer`}
-          ref={scrollContainerRef}
-          onMouseUp={mouseUpHandler}
-          onMouseDown={mouseDownHandler}
-          onMouseMove={mouseMoveHandler}
-          onMouseLeave={mouseUpHandler}
-        >
-          {!loading ? (
-            collectionToRender?.map(renderItem)
+      <SWrapper name={category}>
+        <STopWrapper>
+          {type === 'default' ? (
+            <Headline variant={4} animation='t-01'>
+              {title}
+            </Headline>
           ) : (
-            <CardSkeletonSection count={5} />
+            <AnimatedPresence animation='t-01'>
+              <SHeadline variant={4} animation='t-01'>
+                <SHeadlineInner>
+                  <div>{t('button-creator-on-the-rise')}</div>
+                  <SCreatorsAvatars>
+                    {collection
+                      .map((post) => switchPostType(post)[0].creator)
+                      .filter(
+                        (value, index, arr) => arr.indexOf(value) === index
+                      )
+                      .map((creator, i) => (
+                        <SUserAvatar
+                          key={creator?.uuid}
+                          index={i}
+                          avatarUrl={creator?.avatarUrl!!}
+                          onClick={() =>
+                            handleUserClick(creator?.username as string)
+                          }
+                        />
+                      ))}
+                  </SCreatorsAvatars>
+                </SHeadlineInner>
+              </SHeadline>
+            </AnimatedPresence>
           )}
-        </SListWrapper>
-        {!isMobile && (
-          <>
-            {!isDragging && canScrollLeft && (
-              <ScrollArrowPermanent
-                active
-                position='left'
-                handleClick={handleLeftClick}
-              />
+          {!isMobile && type === 'default' && (
+            <SCaption weight={700} onClick={handleSeeMoreClick}>
+              {t(
+                type === 'default'
+                  ? 'button-show-more'
+                  : 'button-show-more-creator',
+                { name: formatString(user?.username, true) }
+              )}
+            </SCaption>
+          )}
+        </STopWrapper>
+        <SListContainer ref={ref}>
+          <SListWrapper
+            id={`${category}-scrollContainer`}
+            ref={scrollContainerRef}
+            onMouseUp={mouseUpHandler}
+            onMouseDown={mouseDownHandler}
+            onMouseMove={mouseMoveHandler}
+            onMouseLeave={mouseUpHandler}
+          >
+            {!loading ? (
+              collectionToRender?.map(renderItem)
+            ) : (
+              <CardSkeletonSection count={5} />
             )}
-            {!isDragging && canScrollRight && (
-              <ScrollArrowPermanent
-                active
-                position='right'
-                handleClick={handleRightClick}
-              />
-            )}
-          </>
+          </SListWrapper>
+          {!isMobile && (
+            <>
+              {!isDragging && canScrollLeft && (
+                <ScrollArrowPermanent
+                  active
+                  position='left'
+                  handleClick={handleLeftClick}
+                />
+              )}
+              {!isDragging && canScrollRight && (
+                <ScrollArrowPermanent
+                  active
+                  position='right'
+                  handleClick={handleRightClick}
+                />
+              )}
+            </>
+          )}
+        </SListContainer>
+        {renderShowMore && type === 'default' && (
+          <SButtonHolder>
+            <Button size='lg' view='secondary' onClick={handleSeeMoreClick}>
+              {t(
+                type === 'default' || isMobile
+                  ? 'button-show-more'
+                  : 'button-show-more-creator',
+                { name: formatString(user?.username, true) }
+              )}
+            </Button>
+          </SButtonHolder>
         )}
-      </SListContainer>
-      {renderShowMore && type === 'default' && (
-        <SButtonHolder>
-          <Button size='lg' view='secondary' onClick={handleSeeMoreCLick}>
-            {t(
-              type === 'default' || isMobile
-                ? 'button-show-more'
-                : 'button-show-more-creator',
-              { name: formatString(user?.username, true) }
-            )}
-          </Button>
-        </SButtonHolder>
-      )}
-    </SWrapper>
-  );
-};
+      </SWrapper>
+    );
+  }
+);
 
 export default CardsSection;
 
