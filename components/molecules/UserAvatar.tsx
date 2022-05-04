@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import styled, { css, useTheme } from 'styled-components';
 
 import Button from '../atoms/Button';
@@ -41,13 +40,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
 
   return (
     <SContainer {...rest} onClick={onClick} withClick={withClick ?? false}>
-      <Image
-        src={avatarUrl}
-        alt='User avatar'
-        width='100%'
-        height='100%'
-        objectFit='cover'
-      />
+      <img src={avatarUrl} alt='User avatar' />
     </SContainer>
   );
 };
@@ -72,6 +65,12 @@ const SContainer = styled.div<ISContainer>`
   min-width: 36px;
   min-height: 36px;
   border-radius: 18px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   ${(props) =>
     props.withClick &&
