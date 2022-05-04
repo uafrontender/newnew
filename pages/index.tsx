@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -29,9 +29,6 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import acImage from '../public/images/creation/AC.webp';
 import mcImage from '../public/images/creation/MC.webp';
 import cfImage from '../public/images/creation/CF.webp';
-import acImageStatic from '../public/images/creation/AC-static.png';
-import mcImageStatic from '../public/images/creation/MC-static.png';
-import cfImageStatic from '../public/images/creation/CF-static.png';
 
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
@@ -93,10 +90,13 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     newnewapi.IPost | undefined
   >(postFromQuery ?? undefined);
 
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
+  const handleOpenPostModal = useCallback(
+    (post: newnewapi.IPost) => {
+      setDisplayedPost(post);
+      setPostModalOpen(true);
+    },
+    [setDisplayedPost, setPostModalOpen]
+  );
 
   const handleSetDisplayedPost = (post: newnewapi.IPost) => {
     setDisplayedPost(post);

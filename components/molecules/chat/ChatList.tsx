@@ -41,7 +41,7 @@ interface IFunctionProps {
   username?: string;
 }
 
-export const ChatList: React.FC<IFunctionProps> = ({
+const ChatList: React.FC<IFunctionProps> = ({
   openChat,
   searchText,
   username,
