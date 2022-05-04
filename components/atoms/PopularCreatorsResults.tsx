@@ -8,7 +8,7 @@ interface IFunction {
   keyword: string;
 }
 
-export const PopularCreatorsResults: React.FC<IFunction> = ({ keyword }) => {
+const PopularCreatorsResults: React.FC<IFunction> = ({ keyword }) => {
   const creators = useMemo(
     () => [
       {

@@ -3,37 +3,20 @@
 import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/dist/client/router';
-import { useUpdateEffect } from 'react-use';
+import type { NextPage } from 'next';
 import { motion } from 'framer-motion';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
-import AuthLayout, {
-  AuthLayoutContext,
-} from '../components/templates/AuthLayout';
+import AuthLayout from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
+import AuthLayoutContext from '../contexts/authLayoutContext';
 
 interface IVerifyEmail {}
 
 const VerifyEmail: NextPage<IVerifyEmail> = () => {
   const { t } = useTranslation('verify-email');
-
-  const { loggedIn, signupEmailInput } = useAppSelector((state) => state.user);
-  const router = useRouter();
-
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-  ].includes(resizeMode);
-
   const authLayoutContext = useContext(AuthLayoutContext);
 
   // Redirect if the user is logged in

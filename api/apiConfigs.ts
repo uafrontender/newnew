@@ -28,7 +28,7 @@ interface JsonConvertible {
 /**
  * All the protobufjs-generated class **objects** conform to this interface.
  */
-export interface EncDec<T = keyof NewnewapiType> {
+interface EncDec<T = keyof NewnewapiType> {
   encode(message: T, writer?: $protobuf.Writer): $protobuf.Writer;
   decode(
     reader: $protobuf.Reader | Uint8Array,
@@ -42,9 +42,7 @@ export interface EncDec<T = keyof NewnewapiType> {
  * returns an Array Buffer that can be decoded in the outer function.
  * @param response browser Fetch API response
  */
-export const handleProtobufResponse = (
-  response: Response
-): Promise<ArrayBuffer> => {
+const handleProtobufResponse = (response: Response): Promise<ArrayBuffer> => {
   const contentType = response.headers.get('content-type');
 
   return new Promise((resolve, reject) => {
@@ -120,9 +118,7 @@ export async function fetchProtobuf<
 }
 
 // Tries to refresh credentials if access token has expired
-export const refreshCredentials = (
-  payload: newnewapi.RefreshCredentialRequest
-) =>
+const refreshCredentials = (payload: newnewapi.RefreshCredentialRequest) =>
   fetchProtobuf<
     newnewapi.RefreshCredentialRequest,
     newnewapi.RefreshCredentialResponse

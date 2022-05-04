@@ -17,7 +17,7 @@ interface IScrollArrow {
   handleClick: () => void;
 }
 
-export const ScrollArrow: React.FC<IScrollArrow> = (props) => {
+const ScrollArrow: React.FC<IScrollArrow> = (props) => {
   const { active, position, handleClick } = props;
   const theme = useTheme();
 

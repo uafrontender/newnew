@@ -10,7 +10,7 @@ interface IFunction {
   creators: newnewapi.IUser[];
 }
 
-export const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
+const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
   const router = useRouter();
   return (
     <SContainer>

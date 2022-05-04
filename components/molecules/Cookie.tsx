@@ -10,7 +10,7 @@ import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
 
-export const Cookie = () => {
+const Cookie = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();

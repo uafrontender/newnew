@@ -6,7 +6,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-export const BASE_URL_AUCTION = `${BASE_URL}/auction`;
+const BASE_URL_AUCTION = `${BASE_URL}/auction`;
 
 export const fetchLiveAuctions = (payload: newnewapi.PagedAuctionsRequest) =>
   fetchProtobuf<

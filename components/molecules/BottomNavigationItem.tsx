@@ -53,9 +53,7 @@ interface IBottomNavigationItem {
   item: TBottomNavigationItem;
 }
 
-export const BottomNavigationItem: React.FC<IBottomNavigationItem> = (
-  props
-) => {
+const BottomNavigationItem: React.FC<IBottomNavigationItem> = (props) => {
   const { item } = props;
   const theme = useTheme();
   const { t } = useTranslation();
