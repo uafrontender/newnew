@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
 import { useAppSelector } from '../../../redux-store/store';
@@ -9,14 +9,19 @@ import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Headline from '../../atoms/Headline';
 
-// Images
-import Hourglass from '../../../public/images/decision/hourglass-mock.png';
-
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import { TPostType } from '../../../utils/switchPostType';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import Button from '../../atoms/Button';
+
+// Images
+import HourglassDarkHoldFrame from '../../../public/images/decision/Hourglass-Dark-Hold-Frame.webp';
+import HourglassLightHoldFrame from '../../../public/images/decision/Hourglass-Light-Hold-Frame.webp';
+
+// Videos
+const HourglassDarkUrl = '/images/decision/Hourglass-Dark.webm';
+const HourglassLightUrl = '/images/decision/Hourglass-Light.webm';
 
 interface IPostScheduledSection {
   postType: string;
@@ -31,6 +36,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
   isFollowing,
   handleFollowDecision,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -65,7 +71,25 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     <SContainer>
       <SHeadingContainer>
         <SImgContainer>
-          <SHourglassImg src={Hourglass.src} />
+          <video
+            className='hourglass-video'
+            loop
+            muted
+            autoPlay
+            playsInline
+            poster={
+              theme.name === 'light'
+                ? HourglassLightHoldFrame.src
+                : HourglassDarkHoldFrame.src
+            }
+          >
+            <source
+              src={
+                theme.name === 'light' ? HourglassLightUrl : HourglassDarkUrl
+              }
+              type='video/mp4'
+            />
+          </video>
         </SImgContainer>
         {!isMobile && (
           <STitle variant={6}>
@@ -187,6 +211,12 @@ const SImgContainer = styled.div`
   width: 48px;
   height: 48px;
 
+  .hourglass-video {
+    width: 100%;
+    object-fit: contain;
+    position: relative;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     width: 120px;
     height: 120px;
@@ -199,6 +229,9 @@ const SImgContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     width: 160px;
     height: 160px;
+    .hourglass-video {
+      top: -32px;
+    }
   }
 `;
 
