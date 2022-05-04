@@ -78,163 +78,214 @@ interface ICard {
   shouldStop?: boolean;
 }
 
-export const PostCard: React.FC<ICard> = ({
-  item,
-  type,
-  index,
-  width,
-  height,
-  shouldStop,
-}) => {
-  const { t } = useTranslation('home');
-  const theme = useTheme();
-  const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+export const PostCard: React.FC<ICard> = React.memo(
+  ({ item, type, index, width, height, shouldStop }) => {
+    const { t } = useTranslation('home');
+    const theme = useTheme();
+    const router = useRouter();
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // Check if video is ready to avoid errors
-  const [videoReady, setVideoReady] = useState(false);
+    // Check if video is ready to avoid errors
+    const [videoReady, setVideoReady] = useState(false);
 
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
+    // Socket
+    const socketConnection = useContext(SocketContext);
+    const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const {
-    ref: cardRef,
-    inView,
-    entry: ioEntry,
-  } = useInView({
-    threshold: [0, 0.55],
-  });
-  const videoRef = useRef<HTMLVideoElement>();
-
-  const [postParsed, typeOfPost] = switchPostType(item);
-  // Live updates stored in local state
-  const [totalAmount, setTotalAmount] = useState<number>(() =>
-    typeOfPost === 'ac'
-      ? (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0
-      : 0
-  );
-  const [totalVotes, setTotalVotes] = useState<number>(() =>
-    typeOfPost === 'mc'
-      ? (postParsed as newnewapi.MultipleChoice).totalVotes ?? 0
-      : 0
-  );
-  const [currentBackerCount, setCurrentBackerCount] = useState<number>(() =>
-    typeOfPost === 'cf'
-      ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
-      : 0
-  );
-
-  const timestampSeconds = useMemo(
-    () => new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime(),
-    [postParsed.expiresAt?.seconds]
-  );
-
-  const handleUserClick = (username: string) => {
-    router.push(`/${username}`);
-  };
-  const handleMoreClick = () => {};
-  const handleBidClick = () => {};
-
-  useEffect(() => {
-    const handleCanplay = () => {
-      setVideoReady(true);
-    };
-
-    videoRef.current?.addEventListener('canplay', handleCanplay);
-    videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
-
-    return () => {
-      videoRef.current?.removeEventListener('canplay', handleCanplay);
-      videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
-    };
-  }, [inView]);
-
-  useEffect(() => {
-    try {
-      if (videoReady) {
-        if (
-          ioEntry?.intersectionRatio &&
-          ioEntry?.intersectionRatio > 0.55 &&
-          !shouldStop
-        ) {
-          videoRef.current?.play();
-        } else {
-          videoRef.current?.pause();
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [ioEntry?.intersectionRatio, videoReady, shouldStop]);
-
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    addChannel(postParsed.postUuid, {
-      postUpdates: {
-        postUuid: postParsed.postUuid,
-      },
+    const {
+      ref: cardRef,
+      inView,
+      entry: ioEntry,
+    } = useInView({
+      threshold: [0, 0.55],
     });
+    const videoRef = useRef<HTMLVideoElement>();
 
-    return () => {
-      removeChannel(postParsed.postUuid);
+    const [postParsed, typeOfPost] = switchPostType(item);
+    // Live updates stored in local state
+    const [totalAmount, setTotalAmount] = useState<number>(() =>
+      typeOfPost === 'ac'
+        ? (postParsed as newnewapi.Auction).totalAmount?.usdCents ?? 0
+        : 0
+    );
+    const [totalVotes, setTotalVotes] = useState<number>(() =>
+      typeOfPost === 'mc'
+        ? (postParsed as newnewapi.MultipleChoice).totalVotes ?? 0
+        : 0
+    );
+    const [currentBackerCount, setCurrentBackerCount] = useState<number>(() =>
+      typeOfPost === 'cf'
+        ? (postParsed as newnewapi.Crowdfunding).currentBackerCount ?? 0
+        : 0
+    );
+
+    const timestampSeconds = useMemo(
+      () =>
+        new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime(),
+      [postParsed.expiresAt?.seconds]
+    );
+
+    const handleUserClick = (username: string) => {
+      router.push(`/${username}`);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const handleMoreClick = () => {};
+    const handleBidClick = () => {};
 
-  // Subscribe to post updates event
-  useEffect(() => {
-    const handlerSocketPostUpdated = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostUpdated.decode(arr);
+    useEffect(() => {
+      const handleCanplay = () => {
+        setVideoReady(true);
+      };
 
-      if (!decoded) return;
-      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === postParsed.postUuid) {
-        if (typeOfPost === 'ac') {
-          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+      videoRef.current?.addEventListener('canplay', handleCanplay);
+      videoRef.current?.addEventListener('loadedmetadata', handleCanplay);
+
+      return () => {
+        videoRef.current?.removeEventListener('canplay', handleCanplay);
+        videoRef.current?.removeEventListener('loadedmetadata', handleCanplay);
+      };
+    }, [inView]);
+
+    useEffect(() => {
+      try {
+        if (videoReady) {
+          if (
+            ioEntry?.intersectionRatio &&
+            ioEntry?.intersectionRatio > 0.55 &&
+            !shouldStop
+          ) {
+            videoRef.current?.play();
+          } else {
+            videoRef.current?.pause();
+          }
         }
-        if (typeOfPost === 'cf') {
-          setCurrentBackerCount(
-            decoded.post?.crowdfunding?.currentBackerCount!!
-          );
-        }
-        if (typeOfPost === 'mc') {
-          setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
-        }
+      } catch (err) {
+        console.error(err);
       }
-    };
+    }, [ioEntry?.intersectionRatio, videoReady, shouldStop]);
 
-    if (socketConnection) {
-      socketConnection.on('PostUpdated', handlerSocketPostUpdated);
+    // Increment channel subs after mounting
+    // Decrement when unmounting
+    useEffect(() => {
+      addChannel(postParsed.postUuid, {
+        postUpdates: {
+          postUuid: postParsed.postUuid,
+        },
+      });
+
+      return () => {
+        removeChannel(postParsed.postUuid);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Subscribe to post updates event
+    useEffect(() => {
+      const handlerSocketPostUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostUpdated.decode(arr);
+
+        if (!decoded) return;
+        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
+        if (decodedParsed.postUuid === postParsed.postUuid) {
+          if (typeOfPost === 'ac') {
+            setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+          }
+          if (typeOfPost === 'cf') {
+            setCurrentBackerCount(
+              decoded.post?.crowdfunding?.currentBackerCount!!
+            );
+          }
+          if (typeOfPost === 'mc') {
+            setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
+          }
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection.on('PostUpdated', handlerSocketPostUpdated);
+      }
+
+      return () => {
+        if (socketConnection && socketConnection.connected) {
+          socketConnection.off('PostUpdated', handlerSocketPostUpdated);
+        }
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socketConnection]);
+
+    if (type === 'inside') {
+      return (
+        <SWrapper ref={cardRef} index={index} width={width}>
+          <SContent>
+            {!isMobile && (
+              <SNumberImageHolder index={index}>
+                <InlineSVG
+                  svg={NUMBER_ICONS[theme.name][index]}
+                  width='100%'
+                  height='100%'
+                />
+              </SNumberImageHolder>
+            )}
+            <SImageHolder index={index}>
+              {ioEntry?.isIntersecting ? (
+                <video
+                  ref={(el) => {
+                    videoRef.current = el!!;
+                  }}
+                  loop
+                  muted
+                  playsInline
+                  poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                >
+                  <source
+                    src={postParsed.announcement?.thumbnailUrl ?? ''}
+                    type='video/mp4'
+                  />
+                </video>
+              ) : (
+                <img
+                  className='thumnailHolder'
+                  src={postParsed.announcement?.thumbnailImageUrl ?? ''}
+                  alt='Post'
+                />
+              )}
+              <SImageMask />
+              <STopContent>
+                <SButtonIcon iconOnly id='showMore' view='transparent'>
+                  <InlineSVG
+                    svg={moreIcon}
+                    fill={theme.colors.white}
+                    width='20px'
+                    height='20px'
+                  />
+                </SButtonIcon>
+              </STopContent>
+              <SBottomContent>
+                <SUserAvatar
+                  withClick
+                  avatarUrl={postParsed.creator?.avatarUrl!!}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUserClick(postParsed.creator?.username!!);
+                  }}
+                />
+                <SText variant={3} weight={600}>
+                  {postParsed.title}
+                </SText>
+              </SBottomContent>
+            </SImageHolder>
+          </SContent>
+        </SWrapper>
+      );
     }
 
-    return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('PostUpdated', handlerSocketPostUpdated);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection]);
-
-  if (type === 'inside') {
     return (
-      <SWrapper ref={cardRef} index={index} width={width}>
-        <SContent>
-          {!isMobile && (
-            <SNumberImageHolder index={index}>
-              <InlineSVG
-                svg={NUMBER_ICONS[theme.name][index]}
-                width='100%'
-                height='100%'
-              />
-            </SNumberImageHolder>
-          )}
-          <SImageHolder index={index}>
+      <SWrapperOutside ref={cardRef} width={width}>
+        <SImageBG id='backgroundPart' height={height}>
+          <SImageHolderOutside id='animatedPart'>
             {ioEntry?.isIntersecting ? (
               <video
                 ref={(el) => {
@@ -257,9 +308,13 @@ export const PostCard: React.FC<ICard> = ({
                 alt='Post'
               />
             )}
-            <SImageMask />
             <STopContent>
-              <SButtonIcon iconOnly id='showMore' view='transparent'>
+              <SButtonIcon
+                iconOnly
+                id='showMore'
+                view='transparent'
+                onClick={handleMoreClick}
+              >
                 <InlineSVG
                   svg={moreIcon}
                   fill={theme.colors.white}
@@ -268,132 +323,75 @@ export const PostCard: React.FC<ICard> = ({
                 />
               </SButtonIcon>
             </STopContent>
-            <SBottomContent>
-              <SUserAvatar
-                withClick
-                avatarUrl={postParsed.creator?.avatarUrl!!}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleUserClick(postParsed.creator?.username!!);
-                }}
-              />
-              <SText variant={3} weight={600}>
-                {postParsed.title}
-              </SText>
-            </SBottomContent>
-          </SImageHolder>
-        </SContent>
-      </SWrapper>
+          </SImageHolderOutside>
+        </SImageBG>
+        <SBottomContentOutside>
+          <SBottomStart hasEnded={Date.now() > timestampSeconds}>
+            <SUserAvatarOutside
+              avatarUrl={postParsed?.creator?.avatarUrl!!}
+              withClick
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUserClick(postParsed.creator?.username!!);
+              }}
+            />
+            <SUsername variant={2}>
+              {Date.now() > timestampSeconds
+                ? postParsed.creator?.nickname &&
+                  postParsed.creator?.nickname?.length > 5
+                  ? `${postParsed.creator?.nickname?.substring(0, 3)}...`
+                  : postParsed.creator?.nickname
+                : postParsed.creator?.nickname &&
+                  postParsed.creator?.nickname?.length > 7
+                ? `${postParsed.creator?.nickname?.substring(0, 6)}...`
+                : postParsed.creator?.nickname}
+            </SUsername>
+            <CardTimer timestampSeconds={timestampSeconds} />
+          </SBottomStart>
+          <STextOutside variant={3} weight={600}>
+            {postParsed.title}
+          </STextOutside>
+          <SBottomEnd type={typeOfPost}>
+            {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
+              <SButton
+                withDim
+                withShrink
+                view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
+                onClick={handleBidClick}
+                cardType={typeOfPost}
+                progress={
+                  typeOfPost === 'cf'
+                    ? Math.floor(
+                        (currentBackerCount * 100) /
+                          (postParsed as newnewapi.Crowdfunding)
+                            .targetBackerCount
+                      )
+                    : 0
+                }
+                withProgress={typeOfPost === 'cf'}
+              >
+                {t(`button-card-${typeOfPost}`, {
+                  votes: totalVotes,
+                  total: formatNumber(
+                    (postParsed as newnewapi.Crowdfunding).targetBackerCount ??
+                      0,
+                    true
+                  ),
+                  backed: formatNumber(currentBackerCount ?? 0, true),
+                  amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
+                })}
+              </SButton>
+            ) : (
+              <SButtonFirst withShrink onClick={handleBidClick}>
+                {t(`button-card-first-${typeOfPost}`)}
+              </SButtonFirst>
+            )}
+          </SBottomEnd>
+        </SBottomContentOutside>
+      </SWrapperOutside>
     );
   }
-
-  return (
-    <SWrapperOutside ref={cardRef} width={width}>
-      <SImageBG id='backgroundPart' height={height}>
-        <SImageHolderOutside id='animatedPart'>
-          {ioEntry?.isIntersecting ? (
-            <video
-              ref={(el) => {
-                videoRef.current = el!!;
-              }}
-              loop
-              muted
-              playsInline
-              poster={postParsed.announcement?.thumbnailImageUrl ?? ''}
-            >
-              <source
-                src={postParsed.announcement?.thumbnailUrl ?? ''}
-                type='video/mp4'
-              />
-            </video>
-          ) : (
-            <img
-              className='thumnailHolder'
-              src={postParsed.announcement?.thumbnailImageUrl ?? ''}
-              alt='Post'
-            />
-          )}
-          <STopContent>
-            <SButtonIcon
-              iconOnly
-              id='showMore'
-              view='transparent'
-              onClick={handleMoreClick}
-            >
-              <InlineSVG
-                svg={moreIcon}
-                fill={theme.colors.white}
-                width='20px'
-                height='20px'
-              />
-            </SButtonIcon>
-          </STopContent>
-        </SImageHolderOutside>
-      </SImageBG>
-      <SBottomContentOutside>
-        <SBottomStart hasEnded={Date.now() > timestampSeconds}>
-          <SUserAvatarOutside
-            avatarUrl={postParsed?.creator?.avatarUrl!!}
-            withClick
-            onClick={(e) => {
-              e.stopPropagation();
-              handleUserClick(postParsed.creator?.username!!);
-            }}
-          />
-          <SUsername variant={2}>
-            {Date.now() > timestampSeconds
-              ? postParsed.creator?.nickname &&
-                postParsed.creator?.nickname?.length > 5
-                ? `${postParsed.creator?.nickname?.substring(0, 3)}...`
-                : postParsed.creator?.nickname
-              : postParsed.creator?.nickname &&
-                postParsed.creator?.nickname?.length > 7
-              ? `${postParsed.creator?.nickname?.substring(0, 6)}...`
-              : postParsed.creator?.nickname}
-          </SUsername>
-          <CardTimer timestampSeconds={timestampSeconds} />
-        </SBottomStart>
-        <STextOutside variant={3} weight={600}>
-          {postParsed.title}
-        </STextOutside>
-        <SBottomEnd type={typeOfPost}>
-          {totalVotes > 0 || totalAmount > 0 || currentBackerCount > 0 ? (
-            <SButton
-              withDim
-              withShrink
-              view={typeOfPost === 'cf' ? 'primaryProgress' : 'primary'}
-              onClick={handleBidClick}
-              cardType={typeOfPost}
-              progress={
-                typeOfPost === 'cf'
-                  ? Math.floor(
-                      (currentBackerCount * 100) /
-                        (postParsed as newnewapi.Crowdfunding).targetBackerCount
-                    )
-                  : 0
-              }
-              withProgress={typeOfPost === 'cf'}
-            >
-              {t(`button-card-${typeOfPost}`, {
-                votes: totalVotes,
-                total: formatNumber(
-                  (postParsed as newnewapi.Crowdfunding).targetBackerCount ?? 0,
-                  true
-                ),
-                backed: formatNumber(currentBackerCount ?? 0, true),
-                amount: `$${formatNumber(totalAmount / 100 ?? 0, true)}`,
-              })}
-            </SButton>
-          ) : (
-            <SButtonFirst withShrink onClick={handleBidClick}>
-              {t(`button-card-first-${typeOfPost}`)}
-            </SButtonFirst>
-          )}
-        </SBottomEnd>
-      </SBottomContentOutside>
-    </SWrapperOutside>
-  );
-};
+);
 
 export default PostCard;
 
