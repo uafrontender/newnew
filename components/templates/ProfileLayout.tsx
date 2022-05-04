@@ -11,6 +11,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../redux-store/store';
 
@@ -264,19 +265,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     [renderedPage]
   );
 
-  // TODO: Handle clicking "Send message" -> sign in | subscribe | DMs
-  const handleClickSendMessage = useCallback(() => {
-    try {
-      if (!isSubscribed) {
-        router.push(`/${user.username}/subscribe`);
-      } else if (isSubscribed) {
-        router.push(`/direct-messages?user=${user.uuid}`);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [router, user, isSubscribed]);
-
   const renderChildren = () => {
     let postsForPage = {};
     let postsForPageFilter;
@@ -528,16 +516,23 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               </SShareButton>
             </SShareDiv>
             {user.options?.isCreator ? (
-              <Button
-                withShadow
-                view='primaryGrad'
-                style={{
-                  marginBottom: '16px',
-                }}
-                onClick={handleClickSendMessage}
+              <Link
+                href={
+                  !isSubscribed
+                    ? `/${user.username}/subscribe`
+                    : `/direct-messages/${user.username}`
+                }
               >
-                {t('ProfileLayout.buttons.sendMessage')}
-              </Button>
+                <Button
+                  withShadow
+                  view='primaryGrad'
+                  style={{
+                    marginBottom: '16px',
+                  }}
+                >
+                  {t('ProfileLayout.buttons.sendMessage')}
+                </Button>
+              </Link>
             ) : null}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
           </div>
