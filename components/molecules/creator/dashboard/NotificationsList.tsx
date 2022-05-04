@@ -1,173 +1,247 @@
-import React, { useMemo, useCallback, useRef } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-lonely-if */
+/* eslint-disable no-nested-ternary */
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useTranslation } from 'next-i18next';
+import { newnewapi } from 'newnew-api';
+import moment from 'moment';
+import { useInView } from 'react-intersection-observer';
 
 import Text from '../../../atoms/Text';
+import UserAvatar from '../../UserAvatar';
+import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
-import UserAvatar from '../../UserAvatar';
-
+import NoResults from '../../notifications/NoResults';
 import { useAppSelector } from '../../../../redux-store/store';
-import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
+import {
+  getMyNotifications,
+  markAsRead,
+} from '../../../../api/endpoints/notification';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
+import { useNotifications } from '../../../../contexts/notificationsContext';
 
-export const NotificationsList = () => {
-  const { t } = useTranslation('creator');
+interface IFunction {
+  markReadNotifications: boolean;
+}
+
+export const NotificationsList: React.FC<IFunction> = ({
+  markReadNotifications,
+}) => {
   const scrollRef: any = useRef();
+  const { ref: scrollRefNotifications, inView } = useInView();
   const user = useAppSelector((state) => state.user);
+  const [notifications, setNotifications] =
+    useState<newnewapi.INotification[] | null>(null);
+  const [unreadNotifications, setUnreadNotifications] =
+    useState<number[] | null>(null);
+  const [notificationsNextPageToken, setNotificationsNextPageToken] =
+    useState<string | undefined | null>('');
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
+  const [defaultLimit, setDefaultLimit] = useState<number>(11);
+  const { unreadNotificationCount } = useNotifications();
+  const [localUnreadNotificationCount, setLocalUnreadNotificationCount] =
+    useState<number>(0);
 
-  const collection = useMemo(
-    () => ({
-      new: [
-        {
-          id: '1',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '2',
-          text: 'Bugaboo👻😈 subscribed on you.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '3',
-          text: 'SandyCandy posted a new comment on  ‘Where to dine tonight’?. ',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '4',
-          text: 'SugarDaddy subscribed on you.',
-          time: '30m ago',
-          unread: true,
-        },
-      ],
-      earlier: [
-        {
-          id: '5',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-        {
-          id: '6',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '7',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-        {
-          id: '8',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '9',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-        {
-          id: '10',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '11',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-        {
-          id: '12',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '13',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-        {
-          id: '14',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '15',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-        {
-          id: '16',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: true,
-        },
-        {
-          id: '17',
-          text: 'Dark Moon 🌚 posted a new comment on  ‘Where to dine tonight’?.',
-          time: '30m ago',
-          unread: false,
-        },
-      ],
-    }),
+  const fetchNotification = useCallback(
+    async (args?) => {
+      if (loading) return;
+      setLoading(true);
+      const limit: number = args && args.limit ? args.limit : defaultLimit;
+      const pageToken: string = args && args.pageToken ? args.pageToken : null;
+      try {
+        if (!pageToken && limit === defaultLimit) setNotifications([]);
+        const payload = new newnewapi.GetMyNotificationsRequest({
+          paging: {
+            limit,
+            pageToken,
+          },
+        });
+        const res = await getMyNotifications(payload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+        if (res.data.notifications.length > 0) {
+          console.log(res.data.notifications);
+
+          if (limit === defaultLimit) {
+            setNotifications((curr) => {
+              const arr = [...curr!!];
+              res.data?.notifications.forEach((item) => {
+                arr.push(item);
+              });
+              return arr;
+            });
+            setUnreadNotifications((curr) => {
+              const arr = curr ? [...curr] : [];
+              res.data?.notifications.forEach((item) => {
+                if (!item.isRead) {
+                  arr.push(item.id as number);
+                }
+              });
+              return arr;
+            });
+            setNotificationsNextPageToken(res.data.paging?.nextPageToken);
+          } else {
+            setNotifications((curr) => {
+              const arr = [...curr!!];
+              arr.unshift(res.data!!.notifications[0]);
+              return arr;
+            });
+            setUnreadNotifications((curr) => {
+              const arr = curr ? [...curr] : [];
+              arr.push(res.data!!.notifications[0].id as number);
+              return arr;
+            });
+          }
+        }
+        if (!res.data.paging?.nextPageToken && notificationsNextPageToken)
+          setNotificationsNextPageToken(null);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loading]
+  );
+
+  const readNotification = useCallback(
+    async () => {
+      try {
+        const payload = new newnewapi.MarkAsReadRequest({
+          notificationIds: unreadNotifications,
+        });
+        const res = await markAsRead(payload);
+        console.log(res);
+
+        if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+        setUnreadNotifications(null);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unreadNotifications, markReadNotifications]
+  );
+
+  useEffect(() => {
+    if (!notifications) {
+      fetchNotification();
+    }
+  }, [notifications, fetchNotification]);
+
+  useEffect(() => {
+    if (
+      markReadNotifications &&
+      unreadNotifications &&
+      unreadNotifications.length > 0
+    ) {
+      console.log(unreadNotifications);
+
+      readNotification();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markReadNotifications]);
+
+  useEffect(() => {
+    if (inView && !loading && notificationsNextPageToken) {
+      fetchNotification({ pageToken: notificationsNextPageToken });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, loading, notificationsNextPageToken]);
+
+  useEffect(() => {
+    if (!notifications) {
+      fetchNotification();
+    }
+  }, [notifications, fetchNotification]);
+
+  useEffect(() => {
+    if (initialLoad) {
+      setLocalUnreadNotificationCount(unreadNotificationCount);
+      setInitialLoad(false);
+    } else {
+      if (unreadNotificationCount > localUnreadNotificationCount) {
+        fetchNotification({ limit: 1 });
+      } else {
+        setLocalUnreadNotificationCount(unreadNotificationCount);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLoad, unreadNotificationCount]);
+
+  const renderNotificationItem = useCallback(
+    (item: newnewapi.INotification) => (
+      <SNotificationItem key={`notification-item-${item.id}`}>
+        <SNotificationItemAvatar
+          withClick
+          // onClick={handleUserClick}
+          avatarUrl={
+            item.content?.relatedUser?.thumbnailAvatarUrl
+              ? item.content?.relatedUser?.thumbnailAvatarUrl
+              : ''
+          }
+        />
+        <SNotificationItemCenter>
+          <SNotificationItemText variant={3} weight={600}>
+            {item.content!!.message}
+          </SNotificationItemText>
+          <SNotificationItemTime variant={2} weight={600}>
+            {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
+          </SNotificationItemTime>
+        </SNotificationItemCenter>
+        {!item.isRead && <SNotificationItemIndicator minified />}
+      </SNotificationItem>
+    ),
+
     []
   );
-  const renderNotificationItem = useCallback(
-    (item) => {
-      const handleUserClick = () => {};
-
-      return (
-        <SNotificationItem key={`notification-item-${item.id}`}>
-          <SNotificationItemAvatar
-            withClick
-            onClick={handleUserClick}
-            avatarUrl={user.userData?.avatarUrl}
-          />
-          <SNotificationItemCenter>
-            <SNotificationItemText variant={3} weight={600}>
-              {item.text}
-            </SNotificationItemText>
-            <SNotificationItemTime variant={2} weight={600}>
-              {item.time}
-            </SNotificationItemTime>
-          </SNotificationItemCenter>
-          {!!item.unread && <SNotificationItemIndicator minified />}
-        </SNotificationItem>
-      );
-    },
-    [user.userData?.avatarUrl]
-  );
-
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   return (
     <>
       <SSectionContent ref={scrollRef}>
-        <SSectionTitle variant={2} weight={600}>
-          {t('dashboard.button.new')}
-        </SSectionTitle>
-        {collection.new.map(renderNotificationItem)}
-        <SSectionTitle variant={2} weight={600}>
-          {t('dashboard.button.earlier')}
-        </SSectionTitle>
-        {collection.earlier.map(renderNotificationItem)}
+        {loading === undefined ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : !notifications && loading ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        ) : notifications!!.length < 1 ? (
+          <NoResults />
+        ) : (
+          notifications!!.map(renderNotificationItem)
+        )}
+        {notificationsNextPageToken && !loading && (
+          <SRef ref={scrollRefNotifications}>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SRef>
+        )}
       </SSectionContent>
-      <SGradientMaskTop active={showTopGradient} />
-      <SGradientMaskBottom active={showBottomGradient} />
     </>
   );
 };
@@ -218,50 +292,7 @@ const SNotificationItemIndicator = styled(Indicator)`
   padding: 5px;
 `;
 
-const SSectionTitle = styled(Text)`
-  padding: 16px 0 8px 0;
-`;
-
-interface ISGradientMask {
-  active: boolean;
-}
-
-const SGradientMaskTop = styled.div<ISGradientMask>`
-  top: 76px;
-  left: 0;
-  right: 0;
-  height: ${(props) => (props.active ? '40px' : 0)};
-  z-index: 1;
-  position: absolute;
-  transition: height ease 0.5s;
-  background: ${(props) => props.theme.gradients.listTop};
-  pointer-events: none;
-
-  ${(props) => props.theme.media.tablet} {
-    height: ${(props) => (props.active ? '60px' : 0)};
-  }
-
-  ${(props) => props.theme.media.laptopL} {
-    height: ${(props) => (props.active ? '80px' : 0)};
-  }
-`;
-
-const SGradientMaskBottom = styled.div<ISGradientMask>`
-  left: 0;
-  right: 0;
-  bottom: 20px;
-  height: ${(props) => (props.active ? '40px' : 0)};
-  z-index: 1;
-  position: absolute;
-  transition: height ease 0.5s;
-  background: ${(props) => props.theme.gradients.listBottom};
-  pointer-events: none;
-
-  ${(props) => props.theme.media.tablet} {
-    height: ${(props) => (props.active ? '60px' : 0)};
-  }
-
-  ${(props) => props.theme.media.laptopL} {
-    height: ${(props) => (props.active ? '80px' : 0)};
-  }
+const SRef = styled.span`
+  overflow: hidden;
+  text-align: center;
 `;
