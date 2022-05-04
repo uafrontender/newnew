@@ -25,7 +25,7 @@ interface ILottie {
   style?: object;
 }
 
-export class Lottie extends React.Component<ILottie> {
+class Lottie extends React.Component<ILottie> {
   static defaultProps = {
     eventListeners: [],
     isStopped: false,

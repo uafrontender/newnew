@@ -9,7 +9,7 @@ interface IFunction {
   keyword: string;
 }
 
-export const TopDecisionsResults: React.FC<IFunction> = ({ keyword }) => {
+const TopDecisionsResults: React.FC<IFunction> = ({ keyword }) => {
   const posts = useMemo(
     () => [
       {

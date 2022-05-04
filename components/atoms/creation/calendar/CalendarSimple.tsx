@@ -6,7 +6,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../../Text';
 import InlineSVG from '../../InlineSVG';
-import { RenderDays } from './ScrollableVertically';
+import { RenderDays } from './CalendarScrollableVertically';
 import AnimatedPresence, { TAnimation } from '../../AnimatedPresence';
 
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';

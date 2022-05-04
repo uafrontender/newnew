@@ -1,7 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
-export const BASE_URL_CHAT = `${BASE_URL}/reporting`;
+const BASE_URL_CHAT = `${BASE_URL}/reporting`;
 
 const reportContent = (payload: newnewapi.ReportContentRequest) =>
   fetchProtobufProtectedIntercepted<

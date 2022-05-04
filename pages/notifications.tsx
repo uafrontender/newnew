@@ -19,6 +19,7 @@ import loadingAnimation from '../public/animations/logo-loading-blue.json';
 import NoResults from '../components/molecules/notifications/NoResults';
 import { useNotifications } from '../contexts/notificationsContext';
 
+// UNUSED
 export const Notifications = () => {
   const { t } = useTranslation('notifications');
   const { ref: scrollRef, inView } = useInView();

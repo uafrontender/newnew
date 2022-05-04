@@ -187,7 +187,6 @@ export default TimePicker;
 const SWrapper = styled.div`
   width: 100%;
   position: relative;
-  h
 `;
 
 const SContainer = styled.div`
