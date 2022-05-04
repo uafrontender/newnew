@@ -349,18 +349,7 @@ export const CardsSection: React.FC<ICardSection> = React.memo(
         )}
       </SWrapper>
     );
-  },
-  (prevProps, nextProps) =>
-    prevProps.user?.avatarUrl === nextProps.user?.avatarUrl &&
-    prevProps.user?.username === nextProps.user?.username &&
-    prevProps.type === nextProps.type &&
-    prevProps.title === nextProps.title &&
-    JSON.stringify(prevProps.collection) ===
-      JSON.stringify(nextProps.collection) &&
-    prevProps.category === nextProps.category &&
-    prevProps.loading === nextProps.loading &&
-    prevProps.tutorialCard === nextProps.tutorialCard &&
-    prevProps.handlePostClicked === nextProps.handlePostClicked
+  }
 );
 
 export default CardsSection;

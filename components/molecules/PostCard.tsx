@@ -390,14 +390,7 @@ export const PostCard: React.FC<ICard> = React.memo(
         </SBottomContentOutside>
       </SWrapperOutside>
     );
-  },
-  (prevProps, nextProps) =>
-    JSON.stringify(prevProps.item) === JSON.stringify(nextProps.item) &&
-    prevProps.type === nextProps.type &&
-    prevProps.index === nextProps.index &&
-    prevProps.width === nextProps.width &&
-    prevProps.height === nextProps.height &&
-    prevProps.shouldStop === nextProps.shouldStop
+  }
 );
 
 export default PostCard;
