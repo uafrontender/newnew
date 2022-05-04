@@ -212,7 +212,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [usersBlockedMe, chatRoom, isMessagingDisabled]);
 
   useEffect(() => {
-    if (newMessage) {
+    if (newMessage && newMessage.roomId === chatRoom?.id) {
       setMessages((curr) => {
         if (curr.length === 0) {
           return [newMessage, ...curr];
@@ -582,7 +582,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                   (e) => console.error(e)
                 );
               }
-
               setConfirmReportUser(false);
             }}
           />
