@@ -353,9 +353,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewScheduled
           key={postParsed?.postUuid}
-          postType={postToRender}
+          postType={typeOfPost as string}
           post={postParsed!!}
           postStatus={postStatus}
+          variant='decision'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
@@ -485,6 +486,21 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
+          handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
+        />
+      );
+    }
+
+    if (postStatus === 'scheduled') {
+      return (
+        <PostViewScheduled
+          key={postParsed?.postUuid}
+          postType={typeOfPost as string}
+          post={postParsed!!}
+          postStatus={postStatus}
+          variant='moderation'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}

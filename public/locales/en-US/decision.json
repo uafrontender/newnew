@@ -224,17 +224,30 @@
   },
   "PostScheduled": {
     "PostScheduledSection": {
-      "title": "Coming soon",
-      "subtitle_1": "{{ postType }} is not active yet.",
-      "subtitle_2": "Follow to not miss the update.",
-      "timer": {
-        "days": "Days",
-        "hours": "Hours",
-        "minutes": "Minutes",
-        "seconds": "Seconds"
+      "decision": {
+        "title": "Coming soon",
+        "subtitle_1": "{{ postType }} is not active yet.",
+        "subtitle_2": "Follow to not miss the update.",
+        "timer": {
+          "days": "Days",
+          "hours": "Hours",
+          "minutes": "Minutes",
+          "seconds": "Seconds"
+        },
+        "followBtn": "Follow {{ postType }}",
+        "unfollowBtn": "Unfollow {{ postType }}"
       },
-      "followBtn": "Follow {{ postType }}",
-      "unfollowBtn": "Unfollow {{ postType }}"
+      "moderation": {
+        "title": "Coming soon",
+        "subtitle_1": "Your {{ postType }} is not active yet.",
+        "subtitle_2": "It will start in",
+        "timer": {
+          "days": "Days",
+          "hours": "Hours",
+          "minutes": "Minutes",
+          "seconds": "Seconds"
+        }
+      }
     }
   },
   "AcPost": {
