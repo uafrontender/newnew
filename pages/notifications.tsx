@@ -181,7 +181,7 @@ export const Notifications = () => {
               animationData: loadingAnimation,
             }}
           />
-        ) : notifications!!.length < 1 ? (
+        ) : notifications!!.length < 1 && !loading ? (
           <NoResults />
         ) : (
           notifications!!.map(renderNotification)
