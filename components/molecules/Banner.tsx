@@ -13,7 +13,7 @@ import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 
 interface IBanner {}
 
-export const Banner: React.FC<IBanner> = () => {
+const Banner: React.FC<IBanner> = () => {
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
 
   const theme = useTheme();

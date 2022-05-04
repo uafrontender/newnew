@@ -12,7 +12,7 @@ interface IFunction {
   posts: newnewapi.IPost[];
 }
 
-export const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
+const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
   const router = useRouter();
   const renderItem = useCallback(
     (post: newnewapi.IPost) => {

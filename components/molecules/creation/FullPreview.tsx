@@ -23,7 +23,7 @@ interface IFullPreview {
   handleClose: () => void;
 }
 
-export const FullPreview: React.FC<IFullPreview> = (props) => {
+const FullPreview: React.FC<IFullPreview> = (props) => {
   const { open, value, handleClose } = props;
 
   const theme = useTheme();

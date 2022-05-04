@@ -25,7 +25,7 @@ interface ITabletFieldBlock {
   formattedDescription?: any;
 }
 
-export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
+const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
   const {
     id,
     type,
