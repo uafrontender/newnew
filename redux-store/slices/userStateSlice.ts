@@ -15,9 +15,6 @@ export type TUserData = Omit<
 export interface IUserStateInterface {
   loggedIn: boolean;
   signupEmailInput: string;
-  // TODO: remove notificationsCount & directMessagesCount from Redux, as they will be stored in Context
-  notificationsCount: number;
-  directMessagesCount: number;
   userData?: TUserData;
   userTutorialsProgress: newnewapi.IGetTutorialsStatusResponse;
   userTutorialsProgressSynced: boolean;
@@ -26,9 +23,6 @@ export interface IUserStateInterface {
 const defaultUIState: IUserStateInterface = {
   loggedIn: false,
   signupEmailInput: '',
-  // TODO: remove notificationsCount & directMessagesCount from Redux, as they will be stored in Context
-  notificationsCount: 150,
-  directMessagesCount: 12,
   userTutorialsProgress: {
     // AC
     remainingAcSteps: [

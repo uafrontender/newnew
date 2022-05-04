@@ -18,6 +18,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
 import ShareMenu from '../../organisms/ShareMenu';
+import { useNotifications } from '../../../contexts/notificationsContext';
 
 interface ITablet {}
 
@@ -28,6 +29,7 @@ export const Tablet: React.FC<ITablet> = () => {
   const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
+  const { unreadNotificationCount } = useNotifications();
 
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
@@ -67,7 +69,7 @@ export const Tablet: React.FC<ITablet> = () => {
                 item={{
                   url: '/notifications',
                   key: 'notifications',
-                  counter: user.notificationsCount,
+                  counter: unreadNotificationCount,
                 }}
               />
             </SItemWithMargin>
