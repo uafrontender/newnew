@@ -9,7 +9,7 @@ interface Props extends SVGMotionProps<any> {
   strokeWidth?: string | number;
 }
 
-export const SortIconAnimated: React.FC<Props> = (props) => {
+const SortIconAnimated: React.FC<Props> = (props) => {
   const {
     width,
     color,

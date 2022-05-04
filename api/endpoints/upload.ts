@@ -1,7 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
-export const BASE_URL_UPLOAD = `${BASE_URL}/upload`;
+const BASE_URL_UPLOAD = `${BASE_URL}/upload`;
 
 export const getImageUploadUrl = (
   payload: newnewapi.GetImageUploadUrlRequest

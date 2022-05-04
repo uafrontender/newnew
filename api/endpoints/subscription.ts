@@ -6,7 +6,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-export const BASE_URL_SUBSCRIPTIONS = `${BASE_URL}/subscription`;
+const BASE_URL_SUBSCRIPTIONS = `${BASE_URL}/subscription`;
 
 export const subscribeToCreator = (
   payload: newnewapi.SubscribeToCreatorRequest

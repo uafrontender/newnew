@@ -35,7 +35,7 @@ interface IOptionItem {
   handleChange: (index: number, item: object | null) => void;
 }
 
-export const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
+const DraggableOptionItem: React.FC<IOptionItem> = (props) => {
   const { item, index, withDelete, validation, handleChange } = props;
   const [value, setValue] = useState(item.text);
   const [error, setError] = useState('');

@@ -1,7 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import { BASE_URL, fetchProtobufProtectedIntercepted } from '../apiConfigs';
 
-export const BASE_URL_CHAT = `${BASE_URL}/search`;
+const BASE_URL_CHAT = `${BASE_URL}/search`;
 
 export const quickSearchPostsAndCreators = (
   payload: newnewapi.QuickSearchPostsAndCreatorsRequest

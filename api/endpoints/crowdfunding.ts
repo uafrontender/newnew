@@ -6,7 +6,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-export const BASE_URL_CROWDFUNDING = `${BASE_URL}/crowdfunding`;
+const BASE_URL_CROWDFUNDING = `${BASE_URL}/crowdfunding`;
 
 export const fetchTopCrowdfundings = (
   payload: newnewapi.PagedCrowdfundingsRequest
