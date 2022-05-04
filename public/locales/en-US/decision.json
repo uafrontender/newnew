@@ -210,6 +210,18 @@
     "winner": "Winner",
     "history": "History"
   },
+  "PostViewProcessingAnnouncement": {
+    "videoHolder": {
+      "decision": {
+        "title": "Processing video...",
+        "body": "Hang tight as we process the video."
+      },
+      "moderation": {
+        "title": "Processing video...",
+        "body": "Hang tight as we process your video."
+      }
+    }
+  },
   "PostScheduled": {
     "PostScheduledSection": {
       "title": "Coming soon",

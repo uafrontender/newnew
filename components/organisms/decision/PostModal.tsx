@@ -39,7 +39,7 @@ import PostModerationAC from './PostModerationAC';
 import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
-import PostViewProcessing from './PostViewProcessing';
+import PostViewProcessingAnnouncement from './PostViewProcessingAnnouncement';
 import PostSuccessAC from './PostSuccessAC';
 import PostSuccessMC from './PostSuccessMC';
 import PostSuccessCF from './PostSuccessCF';
@@ -365,7 +365,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
     if (postStatus === 'processing_announcement') {
       return (
-        <PostViewProcessing
+        <PostViewProcessingAnnouncement
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
@@ -481,7 +481,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const renderPostModeration = (postToRender: TPostType) => {
     if (postStatus === 'processing_announcement') {
       return (
-        <PostViewProcessing
+        <PostViewProcessingAnnouncement
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
