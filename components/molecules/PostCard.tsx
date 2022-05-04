@@ -247,6 +247,7 @@ export const PostCard: React.FC<ICard> = React.memo(
                 </video>
               ) : (
                 <img
+                  className='thumnailHolder'
                   src={postParsed.announcement?.thumbnailImageUrl ?? ''}
                   alt='Post'
                 />
@@ -302,6 +303,7 @@ export const PostCard: React.FC<ICard> = React.memo(
               </video>
             ) : (
               <img
+                className='thumnailHolder'
                 src={postParsed.announcement?.thumbnailImageUrl ?? ''}
                 alt='Post'
               />
@@ -541,7 +543,7 @@ const SImageHolder = styled.div<ISWrapper>`
     z-index: -1;
   }
 
-  img {
+  .thumnailHolder {
     position: absolute;
     top: 0;
     left: 0;
@@ -570,7 +572,7 @@ const SImageHolder = styled.div<ISWrapper>`
       border-radius: 10px;
     }
 
-    img {
+    .thumnailHolder {
       position: absolute;
       top: 10px;
       left: 10px;
@@ -743,7 +745,7 @@ const SImageHolderOutside = styled.div`
     z-index: -1;
   }
 
-  img {
+  .thumnailHolder {
     position: absolute;
     top: 0;
     left: 0;
