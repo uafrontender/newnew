@@ -109,7 +109,11 @@ export const Chat: React.FC<IChat> = ({ username }) => {
         />
       </SSidebar>
       <SContent>
-        <ChatArea {...chatData} showChatList={showChatList} />
+        <ChatArea
+          key={chatData.chatRoom?.id?.toString()}
+          {...chatData}
+          showChatList={showChatList}
+        />
       </SContent>
     </SContainer>
   );
