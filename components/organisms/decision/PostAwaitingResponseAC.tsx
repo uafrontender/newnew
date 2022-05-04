@@ -22,6 +22,7 @@ interface IPostAwaitingResponseAC {
   post: newnewapi.Auction;
 }
 
+// TODO: memorize
 const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
   ({ post }) => {
     const { t } = useTranslation('decision');

@@ -32,6 +32,7 @@ interface IPostSuccessAC {
   post: newnewapi.Auction;
 }
 
+// TODO: memorize
 const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({ post }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();

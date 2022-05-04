@@ -519,8 +519,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
-          handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -530,8 +530,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
-          handleUpdatePostStatus={handleUpdatePostStatus}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -541,8 +541,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
-          handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
