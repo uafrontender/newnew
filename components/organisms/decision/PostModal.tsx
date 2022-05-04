@@ -74,7 +74,7 @@ import CommentFromUrlContextProvider, {
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
-import ReportModal from '../../molecules/chat/ReportModal';
+import ReportModal, { ReportData } from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import { usePostModalState } from '../../../contexts/postModalContext';
@@ -93,6 +93,7 @@ interface IPostModal {
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
 }
 
+// Memorization does not work
 const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
@@ -216,6 +217,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleReportOpen = useCallback(() => {
     setReportPostOpen(true);
+  }, []);
+
+  const handleReportClose = useCallback(() => {
+    setReportPostOpen(false);
   }, []);
 
   const isMyPost = useMemo(
@@ -349,6 +354,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       }
     },
     [setRecommenedPosts, recommenedPostsLoading, postParsed]
+  );
+
+  const handleReportSubmit = useCallback(
+    async ({ reason, message }: ReportData) => {
+      if (postParsed) {
+        await reportPost(postParsed.postUuid, reason, message).catch((e) =>
+          console.error(e)
+        );
+      }
+
+      setReportPostOpen(false);
+    },
+    [postParsed]
   );
 
   const renderPostView = (postToRender: TPostType) => {
@@ -1005,16 +1023,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <ReportModal
           show={reportPostOpen}
           reportedDisplayname={getDisplayname(postParsed?.creator)}
-          onSubmit={async ({ reason, message }) => {
-            if (postParsed) {
-              await reportPost(postParsed.postUuid, reason, message).catch(
-                (e) => console.error(e)
-              );
-            }
-
-            setReportPostOpen(false);
-          }}
-          onClose={() => setReportPostOpen(false)}
+          onSubmit={handleReportSubmit}
+          onClose={handleReportClose}
         />
       )}
     </>
