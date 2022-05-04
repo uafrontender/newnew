@@ -252,7 +252,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const resetSessionId = () => setSessionId(undefined);
+  const resetSessionId = useCallback(
+    () => setSessionId(undefined),
+    [setSessionId]
+  );
 
   const [open, setOpen] = useState(false);
 
@@ -281,14 +284,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     innerHistoryStack.current = [];
   };
 
-  const handleGoBackInsidePost = () => {
+  const handleGoBackInsidePost = useCallback(() => {
     if (innerHistoryStack.current.length !== 0) {
       router.back();
     } else {
       handleClose();
       syncedHistoryPushState({}, currLocation);
     }
-  };
+  }, [currLocation, handleClose, router, syncedHistoryPushState]);
 
   const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
     const newPostParsed = switchPostType(newPost)[0];

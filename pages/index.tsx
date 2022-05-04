@@ -102,10 +102,10 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     setDisplayedPost(post);
   };
 
-  const handleClosePostModal = () => {
+  const handleClosePostModal = useCallback(() => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
-  };
+  }, []);
 
   // Fetch top posts of various types
   // FY posts
@@ -392,7 +392,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           isOpen={postModalOpen}
           post={displayedPost}
           manualCurrLocation={isBrowser() ? window.location.pathname : ''}
-          handleClose={() => handleClosePostModal()}
+          handleClose={handleClosePostModal}
           handleOpenAnotherPost={handleSetDisplayedPost}
         />
       )}
