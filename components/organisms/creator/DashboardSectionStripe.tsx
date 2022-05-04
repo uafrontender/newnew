@@ -21,107 +21,107 @@ interface IDashboardSectionStripe {
   isConnectedToStripe: boolean;
 }
 
-const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = ({
-  isConnectedToStripe,
-}) => {
-  const router = useRouter();
-  const theme = useTheme();
-  const { t } = useTranslation('creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
+  ({ isConnectedToStripe }) => {
+    const router = useRouter();
+    const theme = useTheme();
+    const { t } = useTranslation('creator');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const handleRedirectToStripesetup = async () => {
-    try {
-      const payload = new newnewapi.SetupStripeCreatorAccountRequest({
-        refreshUrl: window.location.href,
-        returnUrl: window.location.href,
-      });
+    const handleRedirectToStripesetup = async () => {
+      try {
+        const payload = new newnewapi.SetupStripeCreatorAccountRequest({
+          refreshUrl: window.location.href,
+          returnUrl: window.location.href,
+        });
 
-      const res = await fetchSetStripeLinkCreator(payload);
+        const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      const url = res.data.setupUrl;
-      window.location.href = url;
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        const url = res.data.setupUrl;
+        window.location.href = url;
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  return (
-    <SContainer>
-      {isMobile && <SGoBackButton onClick={() => router.back()} />}
-      <SHeadline variant={5}>
-        <span>{t('stripe.title-set-up-stripe')}</span>
-        <InlineSvg svg={StripeLogo} width='80px' />
-      </SHeadline>
-      <SUl>
-        <li>{t('stripe.bullets.1')}</li>
-        <li>{t('stripe.bullets.2')}</li>
-        <li>{t('stripe.bullets.3')}</li>
-      </SUl>
-      <SButtons>
-        <SButton
-          view='primaryGrad'
-          isConnectedToStripe={isConnectedToStripe}
-          style={{
-            ...(isConnectedToStripe
-              ? {
-                  background: theme.colorsThemed.accent.success,
-                }
-              : {}),
-          }}
-          onClick={() => {
-            if (!isConnectedToStripe) {
+    return (
+      <SContainer>
+        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        <SHeadline variant={5}>
+          <span>{t('stripe.title-set-up-stripe')}</span>
+          <InlineSvg svg={StripeLogo} width='80px' />
+        </SHeadline>
+        <SUl>
+          <li>{t('stripe.bullets.1')}</li>
+          <li>{t('stripe.bullets.2')}</li>
+          <li>{t('stripe.bullets.3')}</li>
+        </SUl>
+        <SButtons>
+          <SButton
+            view='primaryGrad'
+            isConnectedToStripe={isConnectedToStripe}
+            style={{
+              ...(isConnectedToStripe
+                ? {
+                    background: theme.colorsThemed.accent.success,
+                  }
+                : {}),
+            }}
+            onClick={() => {
+              if (!isConnectedToStripe) {
+                handleRedirectToStripesetup();
+              }
+            }}
+          >
+            <InlineSvg
+              svg={
+                !isConnectedToStripe ? StripeLogoS : VerificationPassedInverted
+              }
+              width='24px'
+              height='24px'
+            />
+            <span>
+              {isConnectedToStripe
+                ? t('stripe.stripeConnectedLinkBtn')
+                : t('stripe.requestSetupLinkBtn')}
+            </span>
+          </SButton>
+          <SButtonUpdate
+            view='transparent'
+            onClick={() => {
               handleRedirectToStripesetup();
-            }
-          }}
-        >
-          <InlineSvg
-            svg={
-              !isConnectedToStripe ? StripeLogoS : VerificationPassedInverted
-            }
-            width='24px'
-            height='24px'
-          />
-          <span>
-            {isConnectedToStripe
-              ? t('stripe.stripeConnectedLinkBtn')
-              : t('stripe.requestSetupLinkBtn')}
-          </span>
-        </SButton>
-        <SButtonUpdate
-          view='transparent'
-          onClick={() => {
-            handleRedirectToStripesetup();
-          }}
-        >
-          {t('stripe.updateButton')}
-        </SButtonUpdate>
-      </SButtons>
-      <SControlsDiv>
-        {!isMobile && (
-          <GoBackButton noArrow onClick={() => router.back()}>
-            {t('stripe.backButton')}
-          </GoBackButton>
-        )}
-        <Button
-          view='primaryGrad'
-          disabled={!isConnectedToStripe}
-          style={{
-            width: isMobile ? '100%' : 'initial',
-          }}
-          onClick={() => router.back()}
-        >
-          {isMobile ? t('stripe.submitMobile') : t('stripe.submitDesktop')}
-        </Button>
-      </SControlsDiv>
-    </SContainer>
-  );
-};
+            }}
+          >
+            {t('stripe.updateButton')}
+          </SButtonUpdate>
+        </SButtons>
+        <SControlsDiv>
+          {!isMobile && (
+            <GoBackButton noArrow onClick={() => router.back()}>
+              {t('stripe.backButton')}
+            </GoBackButton>
+          )}
+          <Button
+            view='primaryGrad'
+            disabled={!isConnectedToStripe}
+            style={{
+              width: isMobile ? '100%' : 'initial',
+            }}
+            onClick={() => router.back()}
+          >
+            {isMobile ? t('stripe.submitMobile') : t('stripe.submitDesktop')}
+          </Button>
+        </SControlsDiv>
+      </SContainer>
+    );
+  }
+);
 
 export default DashboardSectionStripe;
 

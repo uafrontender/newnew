@@ -14,7 +14,7 @@ import NoResults from '../../../molecules/creator/dashboard/NoResults';
 import SubscribersTable from '../../../molecules/creator/dashboard/SubscribersTable';
 import { getMyOnboardingState } from '../../../../api/endpoints/user';
 
-export const Subscriptions = () => {
+export const Subscriptions: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -96,7 +96,7 @@ export const Subscriptions = () => {
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Subscriptions;
 
