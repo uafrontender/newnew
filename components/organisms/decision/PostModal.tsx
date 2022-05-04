@@ -537,7 +537,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         additionalHash = '#winner';
       }
       setOpen(true);
-      handleSetPostOverlayOpen(true);
 
       // Push if opening fresh
       // Replace if coming back from a different page
@@ -557,6 +556,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           `/post/${postParsed.postUuid}${additionalHash ?? ''}`
         );
       }
+
+      setTimeout(() => {
+        handleSetPostOverlayOpen(true);
+      }, 400);
     }
 
     return () => {
