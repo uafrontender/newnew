@@ -44,9 +44,9 @@ import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 
 // Images to be prefetched
 // Sign in
-import SignInIntro from '../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
-import SignInHold from '../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
-import SignInOutro from '../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
+import SignInIntroDark from '../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
+import SignInHoldDark from '../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
+import SignInOutroDark from '../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
 import SignInIntroLight from '../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
 import SignInHoldLight from '../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
 import SignInOutroLight from '../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
@@ -74,6 +74,7 @@ import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-
 import HeroDarkMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
 import HeroLightMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
 import PostModalContextProvider from '../contexts/postModalContext';
+import getColorMode from '../utils/getColorMode';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -113,13 +114,14 @@ const MyApp = (props: IMyApp): ReactElement => {
   };
 
   // Pre-fetch images after all loading for initial page is done
-  const [preFetchImages, setPreFetchImages] = useState(false);
+  const [preFetchImages, setPreFetchImages] = useState<string>('');
   const PRE_FETCHING_DELAY = 2500;
   useEffect(() => {
     setTimeout(() => {
-      setPreFetchImages(true);
+      const currentTheme = getColorMode(store.getState()?.ui?.colorMode);
+      setPreFetchImages(currentTheme);
     }, PRE_FETCHING_DELAY);
-  }, []);
+  }, [store]);
 
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
@@ -146,7 +148,9 @@ const MyApp = (props: IMyApp): ReactElement => {
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
         />
-        {preFetchImages && PRE_FETCH_LINKS}
+        {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
+        {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
+        {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
         <AppConstantsContextProvider>
@@ -216,55 +220,11 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
 
 export default MyAppWithTranslationAndRedux;
 
-const PRE_FETCH_LINKS = (
+// Preload assets
+const PRE_FETCH_LINKS_COMMON = (
   <>
-    {/* Preload assets */}
-    {/* Sign up screen hero */}
-    {/* Dark */}
-    <link
-      rel='prefetch'
-      href={SignInHold.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInIntro.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInOutro.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    {/* Light */}
-    <link
-      rel='prefetch'
-      href={SignInHoldLight.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInIntroLight.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInOutroLight.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
     {/* Email verification screen */}
+    {/* Sign up screen hero */}
     <link
       rel='prefetch'
       href={BottomGlassSphereImage.src}
@@ -335,35 +295,6 @@ const PRE_FETCH_LINKS = (
       crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
-    {/* Landing page */}
-    {/* NB! Video is not supported, so preload placeholders */}
-    {/* Dark */}
-    {/* <link rel="preload" href="/images/home/Landing-Page-Dark.mp4" as="video" crossOrigin="anonymous" /> */}
-    <link
-      rel='prefetch'
-      href={HeroDarkPlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={HeroLightPlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    {/* Light */}
-    <link
-      rel='prefetch'
-      href={HeroDarkMobilePlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={HeroLightMobilePlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
     {/* Creation screen */}
     <link
       rel='prefetch'
@@ -398,6 +329,82 @@ const PRE_FETCH_LINKS = (
     <link
       rel='prefetch'
       href={cfImageStatic.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+  </>
+);
+
+const PRE_FETCH_LINKS_DARK = (
+  <>
+    <link
+      rel='prefetch'
+      href={SignInHoldDark.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInIntroDark.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInOutroDark.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={HeroDarkPlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={HeroDarkMobilePlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+  </>
+);
+
+const PRE_FETCH_LINKS_LIGHT = (
+  <>
+    <link
+      rel='prefetch'
+      href={SignInHoldLight.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInIntroLight.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={SignInOutroLight.src}
+      as='image'
+      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={HeroLightPlaceholder.src}
+      as='image'
+      crossOrigin='anonymous'
+    />
+    <link
+      rel='prefetch'
+      href={HeroLightMobilePlaceholder.src}
       as='image'
       crossOrigin='anonymous'
     />
