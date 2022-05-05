@@ -29,16 +29,12 @@ interface IPostAwaitingResponseCF {
   post: newnewapi.Crowdfunding;
 }
 
-// TODO: memorize
 const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
-  ({ post }) => {
+  React.memo(({ post }) => {
     const { t } = useTranslation('decision');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+    const { mutedMode } = useAppSelector((state) => state.ui);
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -300,7 +296,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
         )}
       </>
     );
-  };
+  });
 
 export default PostAwaitingResponseCF;
 

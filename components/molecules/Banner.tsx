@@ -13,7 +13,7 @@ import arrowIcon from '../../public/images/svg/icons/outlined/ArrowRight.svg';
 
 interface IBanner {}
 
-const Banner: React.FC<IBanner> = () => {
+const Banner: React.FC<IBanner> = React.memo(() => {
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
 
   const theme = useTheme();
@@ -66,7 +66,7 @@ const Banner: React.FC<IBanner> = () => {
       </SCloseIconHolder>
     </SContainer>
   );
-};
+});
 
 export default Banner;
 

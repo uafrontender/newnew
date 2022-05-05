@@ -13,7 +13,7 @@ import { SCROLL_TO_TOP } from '../../../constants/timings';
 
 interface IMobile {}
 
-export const Mobile: React.FC<IMobile> = () => {
+export const Mobile: React.FC<IMobile> = React.memo(() => {
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
 
@@ -59,7 +59,7 @@ export const Mobile: React.FC<IMobile> = () => {
       </SRightBlock>
     </SContainer>
   );
-};
+});
 
 export default Mobile;
 

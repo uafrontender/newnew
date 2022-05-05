@@ -22,7 +22,6 @@ import {
   fetchPostByUUID,
   markPost,
 } from '../../../api/endpoints/post';
-import { fetchAcOptionById } from '../../../api/endpoints/auction';
 import { setOverlay } from '../../../redux-store/slices/uiStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
@@ -240,11 +239,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [currLocation] = useState(
     manualCurrLocation ?? (isBrowser() ? window.location.href : '')
   );
-  const [acSuggestionFromUrl, setAcSuggestionFromUrl] =
-    useState<newnewapi.Auction.Option | undefined>(undefined);
-  const acSuggestionIDFromUrl = isBrowser()
-    ? new URL(window.location.href).searchParams.get('suggestion')
-    : undefined;
 
   const [sessionId, setSessionId] = useState(() =>
     isBrowser()
@@ -430,7 +424,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
-          optionFromUrl={acSuggestionFromUrl}
           sessionId={sessionId ?? undefined}
           resetSessionId={resetSessionId}
           handleGoBack={handleGoBackInsidePost}
@@ -633,31 +626,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         return true;
       });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const fetchSuggestionFromUrl = async () => {
-      if (!acSuggestionIDFromUrl) return;
-      try {
-        const payload = new newnewapi.GetAcOptionRequest({
-          optionId: parseInt(acSuggestionIDFromUrl),
-        });
-
-        const res = await fetchAcOptionById(payload);
-
-        if (res.data?.option) {
-          setAcSuggestionFromUrl(res.data.option as newnewapi.Auction.Option);
-          return;
-        }
-        throw new Error('Could not fetch option from URL');
-      } catch (err) {
-        console.error(err);
-        setAcSuggestionFromUrl(undefined);
-      }
-    };
-
-    fetchSuggestionFromUrl();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -13,7 +13,6 @@ import React, {
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
-import { useTranslation } from 'next-i18next';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -40,7 +39,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
-import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
@@ -56,43 +55,53 @@ interface IPostModerationAC {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
-// TODO: memorize
-const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
-  post,
-  postStatus,
-  handleUpdatePostStatus,
-  handleGoBack,
-}) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
 
-  const showSelectWinnerOption = useMemo(
-    () => postStatus === 'waiting_for_decision',
-    [postStatus]
-  );
+const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
+  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
+    const showSelectWinnerOption = useMemo(
+      () => postStatus === 'waiting_for_decision',
+      [postStatus]
+    );
 
-  const [winningOptionId, setWinningOptionId] = useState(
-    post.winningOptionId ?? undefined
-  );
+    // Socket
+    const socketConnection = useContext(SocketContext);
+    const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  // Tabs
-  const tabs = useMemo(() => {
-    // NB! Will a check for winner option here
-    if (winningOptionId) {
+    const [winningOptionId, setWinningOptionId] = useState(
+      post.winningOptionId ?? undefined
+    );
+
+    // Tabs
+    const tabs = useMemo(() => {
+      // NB! Will a check for winner option here
+      if (winningOptionId) {
+        return [
+          {
+            label: 'winner',
+            value: 'winner',
+          },
+          {
+            label: 'bids',
+            value: 'bids',
+          },
+          ...(post.isCommentsAllowed
+            ? [
+                {
+                  label: 'comments',
+                  value: 'comments',
+                },
+              ]
+            : []),
+        ];
+      }
       return [
-        {
-          label: 'winner',
-          value: 'winner',
-        },
         {
           label: 'bids',
           value: 'bids',
@@ -106,25 +115,11 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
             ]
           : []),
       ];
-    }
-    return [
-      {
-        label: 'bids',
-        value: 'bids',
-      },
-      ...(post.isCommentsAllowed
-        ? [
-            {
-              label: 'comments',
-              value: 'comments',
-            },
-          ]
-        : []),
-    ];
-  }, [winningOptionId, post.isCommentsAllowed]);
+    }, [winningOptionId, post.isCommentsAllowed]);
 
-  const [currentTab, setCurrentTab] = useState<'bids' | 'comments' | 'winner'>(
-    () => {
+    const [currentTab, setCurrentTab] = useState<
+      'bids' | 'comments' | 'winner'
+    >(() => {
       if (!isBrowser()) {
         return 'bids';
       }
@@ -137,520 +132,520 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       }
       if (winningOptionId) return 'winner';
       return 'bids';
-    }
-  );
+    });
 
-  const handleChangeTab = (tab: string) => {
-    if (tab === 'comments' && isMobile) {
-      window.history.pushState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#${tab}`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#${tab}`
-      );
-    }
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
-  };
-
-  // Respone upload
-  const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
-    useState<newnewapi.IVideoUrls | undefined>(undefined);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        setCurrentTab('bids');
-        return;
+    const handleChangeTab = (tab: string) => {
+      if (tab === 'comments' && isMobile) {
+        window.history.pushState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#${tab}`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#${tab}`
+        );
       }
-      const parsedHash = hash.substring(1);
-      if (
-        parsedHash === 'bids' ||
-        parsedHash === 'comments' ||
-        parsedHash === 'winner'
-      ) {
-        setCurrentTab(parsedHash);
-      }
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
     };
 
-    window.addEventListener('hashchange', handleHashChange, false);
+    // Respone upload
+    const [responseFreshlyUploaded, setResponseFreshlyUploaded] =
+      useState<newnewapi.IVideoUrls | undefined>(undefined);
 
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange, false);
-    };
-  }, []);
-
-  // Total amount
-  const [totalAmount, setTotalAmount] = useState(
-    post.totalAmount?.usdCents ?? 0
-  );
-
-  // Options
-  const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
-  const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
-    post.optionCount ?? ''
-  );
-  const [optionsNextPageToken, setOptionsNextPageToken] =
-    useState<string | undefined | null>('');
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const [loadingOptionsError, setLoadingOptionsError] = useState('');
-
-  // Winning option
-  const [winningOption, setWinningOption] =
-    useState<newnewapi.Auction.Option | undefined>();
-
-  const handleUpdateWinningOption = (
-    selectedOption: newnewapi.Auction.Option
-  ) => {
-    setWinningOption(selectedOption);
-    setWinningOptionId(selectedOption.id);
-    handleChangeTab('winner');
-  };
-
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
-
-  const sortOptions = useCallback(
-    (unsortedArr: TAcOptionWithHighestField[]) => {
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < unsortedArr.length; i++) {
-        // eslint-disable-next-line no-param-reassign
-        unsortedArr[i].isHighest = false;
-      }
-
-      const highestOption = unsortedArr.sort(
-        (a, b) =>
-          (b?.totalAmount?.usdCents as number) -
-          (a?.totalAmount?.usdCents as number)
-      )[0];
-
-      unsortedArr.forEach((option, i) => {
-        if (i > 0) {
-          // eslint-disable-next-line no-param-reassign
-          option.isHighest = false;
+    useEffect(() => {
+      const handleHashChange = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          setCurrentTab('bids');
+          return;
         }
-      });
+        const parsedHash = hash.substring(1);
+        if (
+          parsedHash === 'bids' ||
+          parsedHash === 'comments' ||
+          parsedHash === 'winner'
+        ) {
+          setCurrentTab(parsedHash);
+        }
+      };
 
-      const optionsByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.creator?.uuid === user.userData?.userUuid)
-            .sort((a, b) => {
-              return (b.id as number) - (a.id as number);
-            })
-        : [];
+      window.addEventListener('hashchange', handleHashChange, false);
 
-      const optionsSupportedByUser = user.userData?.userUuid
-        ? unsortedArr
-            .filter((o) => o.isSupportedByMe)
-            .sort((a, b) => {
-              return (b.id as number) - (a.id as number);
-            })
-        : [];
+      return () => {
+        window.removeEventListener('hashchange', handleHashChange, false);
+      };
+    }, []);
 
-      const optionsByVipUsers = unsortedArr
-        .filter((o) => o.isCreatedBySubscriber)
-        .sort((a, b) => {
+    // Total amount
+    const [totalAmount, setTotalAmount] = useState(
+      post.totalAmount?.usdCents ?? 0
+    );
+
+    // Options
+    const [options, setOptions] = useState<TAcOptionWithHighestField[]>([]);
+    const [numberOfOptions, setNumberOfOptions] = useState<number | undefined>(
+      post.optionCount ?? ''
+    );
+    const [optionsNextPageToken, setOptionsNextPageToken] =
+      useState<string | undefined | null>('');
+    const [optionsLoading, setOptionsLoading] = useState(false);
+    const [loadingOptionsError, setLoadingOptionsError] = useState('');
+
+    // Winning option
+    const [winningOption, setWinningOption] =
+      useState<newnewapi.Auction.Option | undefined>();
+
+    const handleUpdateWinningOption = (
+      selectedOption: newnewapi.Auction.Option
+    ) => {
+      setWinningOption(selectedOption);
+      setWinningOptionId(selectedOption.id);
+      handleChangeTab('winner');
+    };
+
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
+
+    const sortOptions = useCallback(
+      (unsortedArr: TAcOptionWithHighestField[]) => {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < unsortedArr.length; i++) {
+          // eslint-disable-next-line no-param-reassign
+          unsortedArr[i].isHighest = false;
+        }
+
+        const highestOption = unsortedArr.sort(
+          (a, b) =>
+            (b?.totalAmount?.usdCents as number) -
+            (a?.totalAmount?.usdCents as number)
+        )[0];
+
+        unsortedArr.forEach((option, i) => {
+          if (i > 0) {
+            // eslint-disable-next-line no-param-reassign
+            option.isHighest = false;
+          }
+        });
+
+        const optionsByUser = user.userData?.userUuid
+          ? unsortedArr
+              .filter((o) => o.creator?.uuid === user.userData?.userUuid)
+              .sort((a, b) => {
+                return (b.id as number) - (a.id as number);
+              })
+          : [];
+
+        const optionsSupportedByUser = user.userData?.userUuid
+          ? unsortedArr
+              .filter((o) => o.isSupportedByMe)
+              .sort((a, b) => {
+                return (b.id as number) - (a.id as number);
+              })
+          : [];
+
+        const optionsByVipUsers = unsortedArr
+          .filter((o) => o.isCreatedBySubscriber)
+          .sort((a, b) => {
+            return (b.id as number) - (a.id as number);
+          });
+
+        const workingArrSorted = unsortedArr.sort((a, b) => {
+          // Sort the rest by newest first
           return (b.id as number) - (a.id as number);
         });
 
-      const workingArrSorted = unsortedArr.sort((a, b) => {
-        // Sort the rest by newest first
-        return (b.id as number) - (a.id as number);
-      });
+        const joinedArr = [
+          ...(highestOption &&
+          (highestOption.creator?.uuid === user.userData?.userUuid ||
+            highestOption.isSupportedByMe)
+            ? [highestOption]
+            : []),
+          ...optionsByUser,
+          ...optionsSupportedByUser,
+          ...optionsByVipUsers,
+          ...(highestOption &&
+          highestOption.creator?.uuid !== user.userData?.userUuid
+            ? [highestOption]
+            : []),
+          ...workingArrSorted,
+        ];
 
-      const joinedArr = [
-        ...(highestOption &&
-        (highestOption.creator?.uuid === user.userData?.userUuid ||
-          highestOption.isSupportedByMe)
-          ? [highestOption]
-          : []),
-        ...optionsByUser,
-        ...optionsSupportedByUser,
-        ...optionsByVipUsers,
-        ...(highestOption &&
-        highestOption.creator?.uuid !== user.userData?.userUuid
-          ? [highestOption]
-          : []),
-        ...workingArrSorted,
-      ];
+        const workingSortedUnique =
+          joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
 
-      const workingSortedUnique =
-        joinedArr.length > 0 ? [...new Set(joinedArr)] : [];
+        const highestOptionIdx = (
+          workingSortedUnique as TAcOptionWithHighestField[]
+        ).findIndex((o) => o.id === highestOption.id);
 
-      const highestOptionIdx = (
-        workingSortedUnique as TAcOptionWithHighestField[]
-      ).findIndex((o) => o.id === highestOption.id);
+        if (workingSortedUnique[highestOptionIdx]) {
+          (
+            workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
+          ).isHighest = true;
+        }
 
-      if (workingSortedUnique[highestOptionIdx]) {
-        (
-          workingSortedUnique[highestOptionIdx] as TAcOptionWithHighestField
-        ).isHighest = true;
-      }
+        return workingSortedUnique;
+      },
+      [user.userData?.userUuid]
+    );
 
-      return workingSortedUnique;
-    },
-    [user.userData?.userUuid]
-  );
+    const fetchBids = useCallback(
+      async (pageToken?: string) => {
+        if (optionsLoading) return;
+        try {
+          setOptionsLoading(true);
+          setLoadingOptionsError('');
 
-  const fetchBids = useCallback(
-    async (pageToken?: string) => {
-      if (optionsLoading) return;
+          const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
+            postUuid: post.postUuid,
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
+          });
+
+          const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
+
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          if (res.data && res.data.options) {
+            setOptions((curr) => {
+              const workingArr = [
+                ...curr,
+                ...(res.data?.options as TAcOptionWithHighestField[]),
+              ];
+
+              return sortOptions(workingArr);
+            });
+            setOptionsNextPageToken(res.data.paging?.nextPageToken);
+          }
+
+          setOptionsLoading(false);
+        } catch (err) {
+          setOptionsLoading(false);
+          setLoadingOptionsError((err as Error).message);
+          console.error(err);
+        }
+      },
+      [post, setOptions, sortOptions, optionsLoading]
+    );
+
+    const fetchPostLatestData = useCallback(async () => {
       try {
-        setOptionsLoading(true);
-        setLoadingOptionsError('');
-
-        const getCurrentBidsPayload = new newnewapi.GetAcOptionsRequest({
+        const fetchPostPayload = new newnewapi.GetPostRequest({
           postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
         });
 
-        const res = await fetchCurrentBidsForPost(getCurrentBidsPayload);
+        const res = await fetchPostByUUID(fetchPostPayload);
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data && res.data.options) {
-          setOptions((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.options as TAcOptionWithHighestField[]),
-            ];
-
-            return sortOptions(workingArr);
-          });
-          setOptionsNextPageToken(res.data.paging?.nextPageToken);
+        if (res.data.auction?.winningOptionId && !winningOptionId) {
+          setWinningOptionId(res.data.auction?.winningOptionId);
+          handleChangeTab('winner');
         }
-
-        setOptionsLoading(false);
+        setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
+        setNumberOfOptions(res.data.auction!!.optionCount as number);
+        handleUpdatePostStatus(res.data.auction!!.status!!);
       } catch (err) {
-        setOptionsLoading(false);
-        setLoadingOptionsError((err as Error).message);
         console.error(err);
       }
-    },
-    [post, setOptions, sortOptions, optionsLoading]
-  );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  const fetchPostLatestData = useCallback(async () => {
-    try {
-      const fetchPostPayload = new newnewapi.GetPostRequest({
-        postUuid: post.postUuid,
-      });
-
-      const res = await fetchPostByUUID(fetchPostPayload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      if (res.data.auction?.winningOptionId && !winningOptionId) {
-        setWinningOptionId(res.data.auction?.winningOptionId);
-        handleChangeTab('winner');
-      }
-      setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
-      setNumberOfOptions(res.data.auction!!.optionCount as number);
-      handleUpdatePostStatus(res.data.auction!!.status!!);
-    } catch (err) {
-      console.error(err);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleRemoveOption = useCallback(
-    (optionToRemove: newnewapi.Auction.Option) => {
-      setOptions((curr) => {
-        const workingArr = [...curr];
-        const workingArrUnsorted = [
-          ...workingArr.filter((o) => o.id !== optionToRemove.id),
-        ];
-        return sortOptions(workingArrUnsorted);
-      });
-    },
-    [setOptions, sortOptions]
-  );
-
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    addChannel(post.postUuid, {
-      postUpdates: {
-        postUuid: post.postUuid,
-      },
-    });
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setOptions([]);
-    setOptionsNextPageToken('');
-    fetchBids();
-    fetchPostLatestData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.postUuid]);
-
-  useEffect(() => {
-    async function fetchAndSetWinningOption(id: number) {
-      try {
-        const payload = new newnewapi.GetAcOptionRequest({
-          optionId: id,
-        });
-
-        const res = await fetchAcOptionById(payload);
-
-        if (res.data?.option) {
-          setWinningOption(res.data.option as newnewapi.Auction.Option);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    if (winningOptionId && !winningOption?.id) {
-      fetchAndSetWinningOption(winningOptionId as number);
-    }
-  }, [winningOptionId, winningOption?.id]);
-
-  useEffect(() => {
-    const socketHandlerOptionCreatedOrUpdated = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
-      if (decoded.option && decoded.postUuid === post.postUuid) {
+    const handleRemoveOption = useCallback(
+      (optionToRemove: newnewapi.Auction.Option) => {
         setOptions((curr) => {
           const workingArr = [...curr];
-          let workingArrUnsorted;
-          const idx = workingArr.findIndex(
-            (op) => op.id === decoded.option?.id
-          );
-          if (idx === -1) {
-            workingArrUnsorted = [
-              ...workingArr,
-              decoded.option as TAcOptionWithHighestField,
-            ];
-          } else {
-            workingArr[idx].supporterCount = decoded.option
-              ?.supporterCount as number;
-            workingArr[idx].totalAmount = decoded.option
-              ?.totalAmount as newnewapi.IMoneyAmount;
-            workingArrUnsorted = workingArr;
-          }
-
+          const workingArrUnsorted = [
+            ...workingArr.filter((o) => o.id !== optionToRemove.id),
+          ];
           return sortOptions(workingArrUnsorted);
         });
+      },
+      [setOptions, sortOptions]
+    );
+
+    // Increment channel subs after mounting
+    // Decrement when unmounting
+    useEffect(() => {
+      addChannel(post.postUuid, {
+        postUpdates: {
+          postUuid: post.postUuid,
+        },
+      });
+
+      return () => {
+        removeChannel(post.postUuid);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+      setOptions([]);
+      setOptionsNextPageToken('');
+      fetchBids();
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [post.postUuid]);
+
+    useEffect(() => {
+      async function fetchAndSetWinningOption(id: number) {
+        try {
+          const payload = new newnewapi.GetAcOptionRequest({
+            optionId: id,
+          });
+
+          const res = await fetchAcOptionById(payload);
+
+          if (res.data?.option) {
+            setWinningOption(res.data.option as newnewapi.Auction.Option);
+          }
+        } catch (err) {
+          console.log(err);
+        }
       }
-    };
 
-    const socketHandlerOptionDeleted = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.AcOptionDeleted.decode(arr);
-
-      if (decoded.optionId) {
-        setOptions((curr) => {
-          const workingArr = [...curr];
-          return workingArr.filter((o) => o.id !== decoded.optionId);
-        });
+      if (winningOptionId && !winningOption?.id) {
+        fetchAndSetWinningOption(winningOptionId as number);
       }
-    };
+    }, [winningOptionId, winningOption?.id]);
 
-    const socketHandlerPostData = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostUpdated.decode(arr);
+    useEffect(() => {
+      const socketHandlerOptionCreatedOrUpdated = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.AcOptionCreatedOrUpdated.decode(arr);
+        if (decoded.option && decoded.postUuid === post.postUuid) {
+          setOptions((curr) => {
+            const workingArr = [...curr];
+            let workingArrUnsorted;
+            const idx = workingArr.findIndex(
+              (op) => op.id === decoded.option?.id
+            );
+            if (idx === -1) {
+              workingArrUnsorted = [
+                ...workingArr,
+                decoded.option as TAcOptionWithHighestField,
+              ];
+            } else {
+              workingArr[idx].supporterCount = decoded.option
+                ?.supporterCount as number;
+              workingArr[idx].totalAmount = decoded.option
+                ?.totalAmount as newnewapi.IMoneyAmount;
+              workingArrUnsorted = workingArr;
+            }
 
-      if (!decoded) return;
-      const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
-      if (decodedParsed.postUuid === post.postUuid) {
-        setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
-        setNumberOfOptions(decoded.post?.auction?.optionCount!!);
-      }
-    };
+            return sortOptions(workingArrUnsorted);
+          });
+        }
+      };
 
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+      const socketHandlerOptionDeleted = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.AcOptionDeleted.decode(arr);
 
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid) {
-        handleUpdatePostStatus(decoded.auction!!);
-      }
-    };
+        if (decoded.optionId) {
+          setOptions((curr) => {
+            const workingArr = [...curr];
+            return workingArr.filter((o) => o.id !== decoded.optionId);
+          });
+        }
+      };
 
-    if (socketConnection) {
-      socketConnection.on(
-        'AcOptionCreatedOrUpdated',
-        socketHandlerOptionCreatedOrUpdated
-      );
-      socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
-      socketConnection.on('PostUpdated', socketHandlerPostData);
-      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
-    }
+      const socketHandlerPostData = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostUpdated.decode(arr);
 
-    return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off(
+        if (!decoded) return;
+        const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
+        if (decodedParsed.postUuid === post.postUuid) {
+          setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
+          setNumberOfOptions(decoded.post?.auction?.optionCount!!);
+        }
+      };
+
+      const socketHandlerPostStatus = (data: any) => {
+        const arr = new Uint8Array(data);
+        const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+        if (!decoded) return;
+        if (decoded.postUuid === post.postUuid) {
+          handleUpdatePostStatus(decoded.auction!!);
+        }
+      };
+
+      if (socketConnection) {
+        socketConnection.on(
           'AcOptionCreatedOrUpdated',
           socketHandlerOptionCreatedOrUpdated
         );
-        socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
-        socketConnection.off('PostUpdated', socketHandlerPostData);
-        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+        socketConnection.on('AcOptionDeleted', socketHandlerOptionDeleted);
+        socketConnection.on('PostUpdated', socketHandlerPostData);
+        socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
       }
+
+      return () => {
+        if (socketConnection && socketConnection.connected) {
+          socketConnection.off(
+            'AcOptionCreatedOrUpdated',
+            socketHandlerOptionCreatedOrUpdated
+          );
+          socketConnection.off('AcOptionDeleted', socketHandlerOptionDeleted);
+          socketConnection.off('PostUpdated', socketHandlerPostData);
+          socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+        }
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+      socketConnection,
+      post,
+      user.userData?.userUuid,
+      setOptions,
+      sortOptions,
+    ]);
+
+    useEffect(() => {
+      if (loadingOptionsError) {
+        toast.error(loadingOptionsError);
+      }
+    }, [loadingOptionsError]);
+
+    const goToNextStep = () => {
+      if (user.loggedIn) {
+        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+          acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
+        });
+        markTutorialStepAsCompleted(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingAcSteps: [
+            ...user.userTutorialsProgress.remainingAcSteps!!,
+          ].slice(1),
+        })
+      );
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    socketConnection,
-    post,
-    user.userData?.userUuid,
-    setOptions,
-    sortOptions,
-  ]);
 
-  useEffect(() => {
-    if (loadingOptionsError) {
-      toast.error(loadingOptionsError);
-    }
-  }, [loadingOptionsError]);
-
-  const goToNextStep = () => {
-    if (user.loggedIn) {
-      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-      });
-      markTutorialStepAsCompleted(payload);
-    }
-    dispatch(
-      setUserTutorialsProgress({
-        remainingAcSteps: [
-          ...user.userTutorialsProgress.remainingAcSteps!!,
-        ].slice(1),
-      })
-    );
-  };
-
-  return (
-    <SWrapper>
-      <SExpiresSection>
-        {isMobile && (
-          <SGoBackButton
-            style={{
-              gridArea: 'closeBtnMobile',
-            }}
-            onClick={handleGoBack}
-          />
-        )}
-        {postStatus === 'waiting_for_response' ||
-        postStatus === 'waiting_for_decision' ? (
-          <ResponseTimer
-            timestampSeconds={new Date(
-              (post.responseUploadDeadline?.seconds as number) * 1000
-            ).getTime()}
-          />
-        ) : (
-          <PostTimer
-            timestampSeconds={new Date(
-              (post.expiresAt?.seconds as number) * 1000
-            ).getTime()}
-            postType='ac'
-          />
-        )}
-      </SExpiresSection>
-      <PostVideoModeration
-        postId={post.postUuid}
-        announcement={post.announcement!!}
-        response={(post.response || responseFreshlyUploaded) ?? undefined}
-        postStatus={postStatus}
-        isMuted={mutedMode}
-        handleToggleMuted={() => handleToggleMutedMode()}
-        handleUpdateResponseVideo={(newValue) =>
-          setResponseFreshlyUploaded(newValue)
-        }
-      />
-      <PostTopInfoModeration
-        postType='ac'
-        postStatus={postStatus}
-        title={post.title}
-        postId={post.postUuid}
-        amountInBids={totalAmount}
-        hasWinner={!!winningOptionId}
-        hasResponse={!!post.response}
-        handleUpdatePostStatus={handleUpdatePostStatus}
-      />
-      <SActivitesContainer
-        decisionFailed={postStatus === 'failed'}
-        showSelectWinnerOption={showSelectWinnerOption}
-      >
-        <DecisionTabs
-          tabs={tabs}
-          activeTab={currentTab}
-          handleChangeTab={handleChangeTab}
-        />
-        {currentTab === 'bids' ? (
-          <AcOptionsTabModeration
-            postId={post.postUuid}
-            postStatus={postStatus}
-            options={options}
-            optionsLoading={optionsLoading}
-            pagingToken={optionsNextPageToken}
-            handleLoadBids={fetchBids}
-            handleRemoveOption={handleRemoveOption}
-            handleUpdatePostStatus={handleUpdatePostStatus}
-            handleUpdateWinningOption={handleUpdateWinningOption}
-          />
-        ) : currentTab === 'comments' && post.isCommentsAllowed ? (
-          <CommentsTab
-            canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => handleChangeTab('bids')}
-          />
-        ) : winningOption ? (
-          <AcWinnerTabModeration
-            postId={post.postUuid}
-            option={winningOption}
-            postStatus={postStatus}
-          />
-        ) : (
-          <SAnimationContainer>
-            <Lottie
-              width={64}
-              height={64}
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: loadingAnimation,
+    return (
+      <SWrapper>
+        <SExpiresSection>
+          {isMobile && (
+            <SGoBackButton
+              style={{
+                gridArea: 'closeBtnMobile',
               }}
+              onClick={handleGoBack}
             />
-          </SAnimationContainer>
-        )}
-      </SActivitesContainer>
-      <HeroPopup
-        isPopupVisible={
-          user!!.userTutorialsProgressSynced &&
-          user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-            newnewapi.AcTutorialStep.AC_HERO
-        }
-        postType='AC'
-        closeModal={goToNextStep}
-      />
-    </SWrapper>
-  );
-};
+          )}
+          {postStatus === 'waiting_for_response' ||
+          postStatus === 'waiting_for_decision' ? (
+            <ResponseTimer
+              timestampSeconds={new Date(
+                (post.responseUploadDeadline?.seconds as number) * 1000
+              ).getTime()}
+            />
+          ) : (
+            <PostTimer
+              timestampSeconds={new Date(
+                (post.expiresAt?.seconds as number) * 1000
+              ).getTime()}
+              postType='ac'
+            />
+          )}
+        </SExpiresSection>
+        <PostVideoModeration
+          postId={post.postUuid}
+          announcement={post.announcement!!}
+          response={(post.response || responseFreshlyUploaded) ?? undefined}
+          postStatus={postStatus}
+          isMuted={mutedMode}
+          handleToggleMuted={() => handleToggleMutedMode()}
+          handleUpdateResponseVideo={(newValue) =>
+            setResponseFreshlyUploaded(newValue)
+          }
+        />
+        <PostTopInfoModeration
+          postType='ac'
+          postStatus={postStatus}
+          title={post.title}
+          postId={post.postUuid}
+          amountInBids={totalAmount}
+          hasWinner={!!winningOptionId}
+          hasResponse={!!post.response}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+        />
+        <SActivitesContainer
+          decisionFailed={postStatus === 'failed'}
+          showSelectWinnerOption={showSelectWinnerOption}
+        >
+          <DecisionTabs
+            tabs={tabs}
+            activeTab={currentTab}
+            handleChangeTab={handleChangeTab}
+          />
+          {currentTab === 'bids' ? (
+            <AcOptionsTabModeration
+              postId={post.postUuid}
+              postStatus={postStatus}
+              options={options}
+              optionsLoading={optionsLoading}
+              pagingToken={optionsNextPageToken}
+              handleLoadBids={fetchBids}
+              handleRemoveOption={handleRemoveOption}
+              handleUpdatePostStatus={handleUpdatePostStatus}
+              handleUpdateWinningOption={handleUpdateWinningOption}
+            />
+          ) : currentTab === 'comments' && post.isCommentsAllowed ? (
+            <CommentsTab
+              canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => handleChangeTab('bids')}
+            />
+          ) : winningOption ? (
+            <AcWinnerTabModeration
+              postId={post.postUuid}
+              option={winningOption}
+              postStatus={postStatus}
+            />
+          ) : (
+            <SAnimationContainer>
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
+            </SAnimationContainer>
+          )}
+        </SActivitesContainer>
+        <HeroPopup
+          isPopupVisible={
+            user!!.userTutorialsProgressSynced &&
+            user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+              newnewapi.AcTutorialStep.AC_HERO
+          }
+          postType='AC'
+          closeModal={goToNextStep}
+        />
+      </SWrapper>
+    );
+  }
+);
 
 PostModerationAC.defaultProps = {};
 

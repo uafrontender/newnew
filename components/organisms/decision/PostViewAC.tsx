@@ -58,7 +58,6 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 interface IPostViewAC {
   post: newnewapi.Auction;
   postStatus: TPostStatusStringified;
-  optionFromUrl?: newnewapi.Auction.Option;
   sessionId?: string;
   resetSessionId: () => void;
   handleGoBack: () => void;
@@ -69,7 +68,6 @@ interface IPostViewAC {
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
   ({
     post,
-    optionFromUrl,
     sessionId,
     resetSessionId,
     postStatus,
@@ -772,7 +770,6 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
 );
 
 PostViewAC.defaultProps = {
-  optionFromUrl: undefined,
   sessionId: undefined,
 };
 

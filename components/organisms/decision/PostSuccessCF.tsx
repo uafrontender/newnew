@@ -29,273 +29,276 @@ interface IPostSuccessCF {
   post: newnewapi.Crowdfunding;
 }
 
-// TODO: memorize
-const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({ post }) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // My pledge amount
-  const [myPledgeAmount, setMyPledgeAmount] =
-    useState<newnewapi.MoneyAmount | undefined>(undefined);
-  const [pledges, setPledges] = useState<newnewapi.Crowdfunding.IPledge[]>([]);
-  const [pledgesNextPageToken, setPledgesNextPageToken] =
-    useState<string | undefined | null>('');
-  const [pledgesLoading, setPledgesLoading] = useState(false);
-  const [loadingPledgesError, setLoadingPledgesError] = useState('');
+    // My pledge amount
+    const [myPledgeAmount, setMyPledgeAmount] =
+      useState<newnewapi.MoneyAmount | undefined>(undefined);
+    const [pledges, setPledges] = useState<newnewapi.Crowdfunding.IPledge[]>(
+      []
+    );
+    const [pledgesNextPageToken, setPledgesNextPageToken] =
+      useState<string | undefined | null>('');
+    const [pledgesLoading, setPledgesLoading] = useState(false);
+    const [loadingPledgesError, setLoadingPledgesError] = useState('');
 
-  const fetchPledgesForPost = useCallback(
-    async (pageToken?: string) => {
-      if (pledgesLoading) return;
-      try {
-        setPledgesLoading(true);
-        setLoadingPledgesError('');
+    const fetchPledgesForPost = useCallback(
+      async (pageToken?: string) => {
+        if (pledgesLoading) return;
+        try {
+          setPledgesLoading(true);
+          setLoadingPledgesError('');
 
-        const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
-          postUuid: post.postUuid,
-          ...(pageToken
-            ? {
-                paging: {
-                  pageToken,
-                },
-              }
-            : {}),
-        });
-
-        const res = await fetchPledges(getCurrentPledgesPayload);
-
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-
-        if (res.data && res.data.pledges) {
-          setPledges((curr) => {
-            const workingArr = [
-              ...curr,
-              ...(res.data?.pledges as newnewapi.Crowdfunding.IPledge[]),
-            ];
-            return workingArr;
+          const getCurrentPledgesPayload = new newnewapi.GetPledgesRequest({
+            postUuid: post.postUuid,
+            ...(pageToken
+              ? {
+                  paging: {
+                    pageToken,
+                  },
+                }
+              : {}),
           });
-          setPledgesNextPageToken(res.data.paging?.nextPageToken);
+
+          const res = await fetchPledges(getCurrentPledgesPayload);
+
+          if (!res.data || res.error)
+            throw new Error(res.error?.message ?? 'Request failed');
+
+          if (res.data && res.data.pledges) {
+            setPledges((curr) => {
+              const workingArr = [
+                ...curr,
+                ...(res.data?.pledges as newnewapi.Crowdfunding.IPledge[]),
+              ];
+              return workingArr;
+            });
+            setPledgesNextPageToken(res.data.paging?.nextPageToken);
+          }
+
+          setPledgesLoading(false);
+        } catch (err) {
+          setPledgesLoading(false);
+          setLoadingPledgesError((err as Error).message);
+          console.error(err);
         }
+      },
+      [pledgesLoading, setPledges, post]
+    );
 
-        setPledgesLoading(false);
-      } catch (err) {
-        setPledgesLoading(false);
-        setLoadingPledgesError((err as Error).message);
-        console.error(err);
-      }
-    },
-    [pledgesLoading, setPledges, post]
-  );
+    // Video
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
-  // Video
-  // Open video tab
-  const [videoTab, setVideoTab] =
-    useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
 
-  // Comments
-  const { ref: commentsSectionRef, inView } = useInView({
-    threshold: 0.8,
-  });
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+        const parsedHash = hash.substring(1);
 
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
-      }
-      const parsedHash = hash.substring(1);
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
 
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
+      handleCommentsInitialHash();
+    }, []);
 
-    handleCommentsInitialHash();
-  }, []);
-
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  useEffect(() => {
-    fetchPledgesForPost();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (pledgesNextPageToken) {
-      fetchPledgesForPost(pledgesNextPageToken);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pledgesNextPageToken]);
-
-  useEffect(() => {
-    let workingAmount = 0;
-
-    if (user.userData?.userUuid) {
-      workingAmount = pledges
-        .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
-        .reduce(
-          (acc, myPledge) =>
-            myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc,
-          0
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
         );
-    }
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
+      }
+    }, [inView, post.postUuid]);
 
-    if (workingAmount !== 0 && workingAmount !== undefined) {
-      setMyPledgeAmount(
-        new newnewapi.MoneyAmount({
-          usdCents: workingAmount,
-        })
-      );
-    }
-  }, [pledges, user.userData?.userUuid]);
+    useEffect(() => {
+      fetchPledgesForPost();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          <>
-            <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
-              {t('CfPostSuccess.hero_text')}
-            </DecisionEndedBox>
-            <SMainSectionWrapper>
-              <SCreatorInfoDiv>
-                <SCreator>
-                  <SCreatorImage src={post.creator?.avatarUrl!!} />
-                  <SWantsToKnow>
-                    {t('CfPostSuccess.wants_to_know', {
-                      creator: post.creator?.nickname,
-                    })}
-                  </SWantsToKnow>
-                </SCreator>
-                {/* <STotal>
+    useEffect(() => {
+      if (pledgesNextPageToken) {
+        fetchPledgesForPost(pledgesNextPageToken);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pledgesNextPageToken]);
+
+    useEffect(() => {
+      let workingAmount = 0;
+
+      if (user.userData?.userUuid) {
+        workingAmount = pledges
+          .filter((pledge) => pledge.creator?.uuid === user.userData?.userUuid)
+          .reduce(
+            (acc, myPledge) =>
+              myPledge.amount?.usdCents ? myPledge.amount?.usdCents + acc : acc,
+            0
+          );
+      }
+
+      if (workingAmount !== 0 && workingAmount !== undefined) {
+        setMyPledgeAmount(
+          new newnewapi.MoneyAmount({
+            usdCents: workingAmount,
+          })
+        );
+      }
+    }, [pledges, user.userData?.userUuid]);
+
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
+          />
+          <SActivitesContainer>
+            <>
+              <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
+                {t('CfPostSuccess.hero_text')}
+              </DecisionEndedBox>
+              <SMainSectionWrapper>
+                <SCreatorInfoDiv>
+                  <SCreator>
+                    <SCreatorImage src={post.creator?.avatarUrl!!} />
+                    <SWantsToKnow>
+                      {t('CfPostSuccess.wants_to_know', {
+                        creator: post.creator?.nickname,
+                      })}
+                    </SWantsToKnow>
+                  </SCreator>
+                  {/* <STotal>
                   {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
                 </STotal> */}
-              </SCreatorInfoDiv>
-              <SPostTitle variant={4}>{post.title}</SPostTitle>
-              <SSeparator />
-              <SBackersInfo>
-                <SCreatorsBackers>
-                  {t('CfPostSuccess.creators_backers', {
-                    creator: post.creator?.nickname,
-                  })}
-                </SCreatorsBackers>
-                <SCurrentBackers variant={4}>
-                  {formatNumber(post.currentBackerCount, true)}
-                </SCurrentBackers>
-                <STargetBackers variant={6}>
-                  {t('CfPostSuccess.of_target_backers', {
-                    target_count: formatNumber(post.targetBackerCount, true),
-                  })}
-                </STargetBackers>
-              </SBackersInfo>
-              {user.loggedIn && myPledgeAmount && (
+                </SCreatorInfoDiv>
+                <SPostTitle variant={4}>{post.title}</SPostTitle>
+                <SSeparator />
+                <SBackersInfo>
+                  <SCreatorsBackers>
+                    {t('CfPostSuccess.creators_backers', {
+                      creator: post.creator?.nickname,
+                    })}
+                  </SCreatorsBackers>
+                  <SCurrentBackers variant={4}>
+                    {formatNumber(post.currentBackerCount, true)}
+                  </SCurrentBackers>
+                  <STargetBackers variant={6}>
+                    {t('CfPostSuccess.of_target_backers', {
+                      target_count: formatNumber(post.targetBackerCount, true),
+                    })}
+                  </STargetBackers>
+                </SBackersInfo>
+                {user.loggedIn && myPledgeAmount && (
+                  <>
+                    <SSeparator />
+                    <YouBackedInfo>
+                      <SYouBackedFor>
+                        {t('CfPostSuccess.you_backed_for')}
+                      </SYouBackedFor>
+                      <SYouBackedAmount variant={4}>
+                        {`$${formatNumber(
+                          Math.round(myPledgeAmount.usdCents / 100) ?? 0,
+                          true
+                        )}`}
+                      </SYouBackedAmount>
+                    </YouBackedInfo>
+                  </>
+                )}
+              </SMainSectionWrapper>
+              {!isMobile ? (
                 <>
-                  <SSeparator />
-                  <YouBackedInfo>
-                    <SYouBackedFor>
-                      {t('CfPostSuccess.you_backed_for')}
-                    </SYouBackedFor>
-                    <SYouBackedAmount variant={4}>
-                      {`$${formatNumber(
-                        Math.round(myPledgeAmount.usdCents / 100) ?? 0,
-                        true
-                      )}`}
-                    </SYouBackedAmount>
-                  </YouBackedInfo>
+                  {!responseViewed && videoTab === 'announcement' ? (
+                    <SWatchResponseWrapper>
+                      <SWatchResponseBtn
+                        shouldView={!responseViewed}
+                        onClick={() => setVideoTab('response')}
+                      >
+                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                      </SWatchResponseBtn>
+                    </SWatchResponseWrapper>
+                  ) : null}
+                  {responseViewed ? (
+                    <SToggleVideoWidget>
+                      <SChangeTabBtn
+                        shouldView={videoTab === 'announcement'}
+                        onClick={() => setVideoTab('announcement')}
+                      >
+                        {t('PostVideoSuccess.tabs.watch_original')}
+                      </SChangeTabBtn>
+                      <SChangeTabBtn
+                        shouldView={videoTab === 'response'}
+                        onClick={() => setVideoTab('response')}
+                      >
+                        {t('PostVideoSuccess.tabs.watch_response')}
+                      </SChangeTabBtn>
+                    </SToggleVideoWidget>
+                  ) : null}
                 </>
-              )}
-            </SMainSectionWrapper>
-            {!isMobile ? (
-              <>
-                {!responseViewed && videoTab === 'announcement' ? (
-                  <SWatchResponseWrapper>
-                    <SWatchResponseBtn
-                      shouldView={!responseViewed}
-                      onClick={() => setVideoTab('response')}
-                    >
-                      {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
-                    </SWatchResponseBtn>
-                  </SWatchResponseWrapper>
-                ) : null}
-                {responseViewed ? (
-                  <SToggleVideoWidget>
-                    <SChangeTabBtn
-                      shouldView={videoTab === 'announcement'}
-                      onClick={() => setVideoTab('announcement')}
-                    >
-                      {t('PostVideoSuccess.tabs.watch_original')}
-                    </SChangeTabBtn>
-                    <SChangeTabBtn
-                      shouldView={videoTab === 'response'}
-                      onClick={() => setVideoTab('response')}
-                    >
-                      {t('PostVideoSuccess.tabs.watch_response')}
-                    </SChangeTabBtn>
-                  </SToggleVideoWidget>
-                ) : null}
-              </>
-            ) : null}
-          </>
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection id='comments' ref={commentsSectionRef}>
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
-          />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+              ) : null}
+            </>
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  }
+);
 
 export default PostSuccessCF;
 

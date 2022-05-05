@@ -26,121 +26,123 @@ interface IPostViewProcessing {
   handleReportOpen: () => void;
 }
 
-// TODO: memorize
-const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
-  post,
-  postStatus,
-  handleGoBack,
-  handleUpdatePostStatus,
-  handleReportOpen,
-}) => {
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> =
+  React.memo(
+    ({
+      post,
+      postStatus,
+      handleGoBack,
+      handleUpdatePostStatus,
+      handleReportOpen,
+    }) => {
+      const dispatch = useAppDispatch();
+      const { user } = useAppSelector((state) => state);
+      const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+      const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+        resizeMode
+      );
 
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
+      // Socket
+      const socketConnection = useContext(SocketContext);
+      const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+      const handleToggleMutedMode = useCallback(() => {
+        dispatch(toggleMutedMode(''));
+      }, [dispatch]);
 
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    addChannel(post.postUuid, {
-      postUpdates: {
-        postUuid: post.postUuid,
-      },
-    });
+      // Increment channel subs after mounting
+      // Decrement when unmounting
+      useEffect(() => {
+        addChannel(post.postUuid, {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        });
 
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+        return () => {
+          removeChannel(post.postUuid);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
 
-  useEffect(() => {
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
+      useEffect(() => {
+        const socketHandlerPostStatus = (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid) {
-        if (decoded.auction) {
-          handleUpdatePostStatus(decoded.auction!!);
-        } else if (decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice!!);
-        } else {
-          handleUpdatePostStatus(decoded.crowdfunding!!);
+          if (!decoded) return;
+          if (decoded.postUuid === post.postUuid) {
+            if (decoded.auction) {
+              handleUpdatePostStatus(decoded.auction!!);
+            } else if (decoded.multipleChoice) {
+              handleUpdatePostStatus(decoded.multipleChoice!!);
+            } else {
+              handleUpdatePostStatus(decoded.crowdfunding!!);
+            }
+          }
+        };
+
+        if (socketConnection) {
+          socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
         }
-      }
-    };
 
-    if (socketConnection) {
-      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        return () => {
+          if (socketConnection && socketConnection.connected) {
+            socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [socketConnection, post, user.userData?.userUuid]);
+
+      return (
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <GoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
+                }}
+                onClick={handleGoBack}
+              />
+            )}
+          </SExpiresSection>
+          <PostVideo
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={false}
+            handleSetResponseViewed={() => {}}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+          />
+          <PostTopInfo
+            title={post.title}
+            postId={post.postUuid}
+            postStatus={postStatus}
+            creator={post.creator!!}
+            hasWinner={false}
+            hasResponse={false}
+            isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+            startsAtSeconds={post.startsAt?.seconds as number}
+            handleReportOpen={handleReportOpen}
+          />
+          <SActivitesContainer>
+            <SAnimationContainer>
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
+            </SAnimationContainer>
+          </SActivitesContainer>
+        </SWrapper>
+      );
     }
-
-    return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid]);
-
-  return (
-    <SWrapper>
-      <SExpiresSection>
-        {isMobile && (
-          <GoBackButton
-            style={{
-              gridArea: 'closeBtnMobile',
-            }}
-            onClick={handleGoBack}
-          />
-        )}
-      </SExpiresSection>
-      <PostVideo
-        postId={post.postUuid}
-        announcement={post.announcement!!}
-        response={post.response ?? undefined}
-        responseViewed={false}
-        handleSetResponseViewed={() => {}}
-        isMuted={mutedMode}
-        handleToggleMuted={() => handleToggleMutedMode()}
-      />
-      <PostTopInfo
-        title={post.title}
-        postId={post.postUuid}
-        postStatus={postStatus}
-        creator={post.creator!!}
-        hasWinner={false}
-        hasResponse={false}
-        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        startsAtSeconds={post.startsAt?.seconds as number}
-        handleReportOpen={handleReportOpen}
-      />
-      <SActivitesContainer>
-        <SAnimationContainer>
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
-        </SAnimationContainer>
-      </SActivitesContainer>
-    </SWrapper>
   );
-};
 
 export default PostViewProcessing;
 

@@ -16,7 +16,7 @@ interface IHeader {
   visible: boolean;
 }
 
-export const Header: React.FC<IHeader> = (props) => {
+export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
 
@@ -57,7 +57,7 @@ export const Header: React.FC<IHeader> = (props) => {
       </SContentWrapper>
     </SWrapper>
   );
-};
+});
 
 export default Header;
 
