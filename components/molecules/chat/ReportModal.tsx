@@ -9,7 +9,7 @@ import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
 import GoBackButton from '../GoBackButton';
 
-interface ReportData {
+export interface ReportData {
   reason: newnewapi.ReportingReason;
   message: string;
 }
@@ -21,139 +21,137 @@ interface IReportModal {
   onClose: () => void;
 }
 
-const ReportModal: React.FC<IReportModal> = ({
-  show,
-  reportedDisplayname,
-  onClose,
-  onSubmit,
-}) => {
-  const { t } = useTranslation('common');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const ReportModal: React.FC<IReportModal> = React.memo(
+  ({ show, reportedDisplayname, onClose, onSubmit }) => {
+    const { t } = useTranslation('common');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const [reason, setReason] = useState<newnewapi.ReportingReason | null>(null);
-  const [message, setMessage] = useState('');
+    const [reason, setReason] =
+      useState<newnewapi.ReportingReason | null>(null);
+    const [message, setMessage] = useState('');
 
-  const disabled = reason === null || message.length < 15;
+    const disabled = reason === null || message.length < 15;
 
-  const reportTypes = useMemo(
-    () => [
-      {
-        id: newnewapi.ReportingReason.SPAM,
-        title: t('modal.report-user.options.spam'),
+    const reportTypes = useMemo(
+      () => [
+        {
+          id: newnewapi.ReportingReason.SPAM,
+          title: t('modal.report-user.options.spam'),
+        },
+        {
+          id: newnewapi.ReportingReason.HARMFUL,
+          title: t('modal.report-user.options.abuse'),
+        },
+        {
+          id: newnewapi.ReportingReason.SUICIDE,
+          title: t('modal.report-user.options.suicide'),
+        },
+        {
+          id: newnewapi.ReportingReason.HATE,
+          title: t('modal.report-user.options.hate-speech'),
+        },
+        {
+          id: newnewapi.ReportingReason.HARRASMENT,
+          title: t('modal.report-user.options.harrasment'),
+        },
+        {
+          id: newnewapi.ReportingReason.OTHER,
+          title: t('modal.report-user.options.other'),
+        },
+      ],
+      [t]
+    );
+
+    const reportMaxLength = 150;
+
+    const submitReport = () => {
+      if (reason && message.length >= 15) {
+        onSubmit({
+          reason,
+          message,
+        });
+        setReason(null);
+        setMessage('');
+      }
+    };
+
+    const handleMessageChange = useCallback(
+      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMessage(e.target.value);
       },
-      {
-        id: newnewapi.ReportingReason.HARMFUL,
-        title: t('modal.report-user.options.abuse'),
-      },
-      {
-        id: newnewapi.ReportingReason.SUICIDE,
-        title: t('modal.report-user.options.suicide'),
-      },
-      {
-        id: newnewapi.ReportingReason.HATE,
-        title: t('modal.report-user.options.hate-speech'),
-      },
-      {
-        id: newnewapi.ReportingReason.HARRASMENT,
-        title: t('modal.report-user.options.harrasment'),
-      },
-      {
-        id: newnewapi.ReportingReason.OTHER,
-        title: t('modal.report-user.options.other'),
-      },
-    ],
-    [t]
-  );
+      []
+    );
 
-  const reportMaxLength = 150;
+    const handleTypeChange = useCallback(
+      (id: newnewapi.ReportingReason | undefined) => {
+        /* eslint-disable no-unused-expressions */
+        id && setReason(id);
+      },
+      []
+    );
 
-  const submitReport = () => {
-    if (reason && message.length >= 15) {
-      onSubmit({
-        reason,
-        message,
-      });
-      setReason(null);
-      setMessage('');
-    }
-  };
-
-  const handleMessageChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setMessage(e.target.value);
-    },
-    []
-  );
-
-  const handleTypeChange = useCallback(
-    (id: newnewapi.ReportingReason | undefined) => {
-      /* eslint-disable no-unused-expressions */
-      id && setReason(id);
-    },
-    []
-  );
-
-  return (
-    <Modal show={show} onClose={onClose}>
-      <SContainer>
-        <SModal onClick={preventParentClick()}>
-          <SModalHeader>
-            {isMobile && <GoBackButton onClick={onClose} />}
-            <SModalTitle>
-              {t('modal.report-user.title')} {reportedDisplayname}
-            </SModalTitle>
-          </SModalHeader>
-          <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
-          <SCheckBoxList>
-            {reportTypes.map((item) => (
-              <SCheckBoxWrapper key={item.id}>
-                <CheckBox
-                  id={item.id.toString()}
-                  label={item.title}
-                  selected={reason === item.id}
-                  handleChange={() => handleTypeChange(item.id)}
-                />
-              </SCheckBoxWrapper>
-            ))}
-          </SCheckBoxList>
-          <STextAreaWrapper>
-            <STextAreaTitle>
-              <span>
-                {message ? message.length : 0}/{reportMaxLength}
-              </span>
-            </STextAreaTitle>
-            <STextArea
-              id='report-additional-info'
-              maxLength={reportMaxLength}
-              value={message}
-              onChange={handleMessageChange}
-              placeholder={`${t(
-                'modal.report-user.additional-info.placeholder'
-              )}`}
-            />
-          </STextAreaWrapper>
-          <SModalButtons>
-            {!isMobile && (
-              <SCancelButton onClick={onClose}>
-                {t('modal.report-user.button-cancel')}
-              </SCancelButton>
-            )}
-            <SConfirmButton
-              view='primaryGrad'
-              disabled={disabled}
-              onClick={submitReport}
-            >
-              Report
-            </SConfirmButton>
-          </SModalButtons>
-        </SModal>
-      </SContainer>
-    </Modal>
-  );
-};
+    return (
+      <Modal show={show} onClose={onClose}>
+        <SContainer>
+          <SModal onClick={preventParentClick()}>
+            <SModalHeader>
+              {isMobile && <GoBackButton onClick={onClose} />}
+              <SModalTitle>
+                {t('modal.report-user.title')} {reportedDisplayname}
+              </SModalTitle>
+            </SModalHeader>
+            <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
+            <SCheckBoxList>
+              {reportTypes.map((item) => (
+                <SCheckBoxWrapper key={item.id}>
+                  <CheckBox
+                    id={item.id.toString()}
+                    label={item.title}
+                    selected={reason === item.id}
+                    handleChange={() => handleTypeChange(item.id)}
+                  />
+                </SCheckBoxWrapper>
+              ))}
+            </SCheckBoxList>
+            <STextAreaWrapper>
+              <STextAreaTitle>
+                <span>
+                  {message ? message.length : 0}/{reportMaxLength}
+                </span>
+              </STextAreaTitle>
+              <STextArea
+                id='report-additional-info'
+                maxLength={reportMaxLength}
+                value={message}
+                onChange={handleMessageChange}
+                placeholder={`${t(
+                  'modal.report-user.additional-info.placeholder'
+                )}`}
+              />
+            </STextAreaWrapper>
+            <SModalButtons>
+              {!isMobile && (
+                <SCancelButton onClick={onClose}>
+                  {t('modal.report-user.button-cancel')}
+                </SCancelButton>
+              )}
+              <SConfirmButton
+                view='primaryGrad'
+                disabled={disabled}
+                onClick={submitReport}
+              >
+                Report
+              </SConfirmButton>
+            </SModalButtons>
+          </SModal>
+        </SContainer>
+      </Modal>
+    );
+  }
+);
 
 export default ReportModal;
 

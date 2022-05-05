@@ -74,7 +74,7 @@ import CommentFromUrlContextProvider, {
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
-import ReportModal from '../../molecules/chat/ReportModal';
+import ReportModal, { ReportData } from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import { usePostModalState } from '../../../contexts/postModalContext';
@@ -93,6 +93,7 @@ interface IPostModal {
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
 }
 
+// Memorization does not work
 const PostModal: React.FunctionComponent<IPostModal> = ({
   isOpen,
   post,
@@ -150,7 +151,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [reportPostOpen, setReportPostOpen] = useState(false);
 
-  const handleFollowDecision = async () => {
+  const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
         router.push(
@@ -165,14 +166,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       const res = await markPost(markAsViewedPayload);
 
       if (!res.error) {
-        setIsFollowingDecision(!isFollowingDecision);
+        setIsFollowingDecision((currentValue) => !currentValue);
       }
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [postParsed, router, user.loggedIn]);
 
-  const handleToggleFollowingCreator = async () => {
+  const handleToggleFollowingCreator = useCallback(async () => {
     try {
       if (!user.loggedIn) {
         router.push(
@@ -199,7 +200,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [addId, followingsIds, postParsed, removeId, router, user.loggedIn]);
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
@@ -216,6 +217,18 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleReportOpen = useCallback(() => {
     setReportPostOpen(true);
+  }, []);
+
+  const handleReportClose = useCallback(() => {
+    setReportPostOpen(false);
+  }, []);
+
+  const handleShareClose = useCallback(() => {
+    setShareMenuOpen(false);
+  }, []);
+
+  const handleEllipseMenuClose = useCallback(() => {
+    setEllipseMenuOpen(false);
   }, []);
 
   const isMyPost = useMemo(
@@ -252,7 +265,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const resetSessionId = () => setSessionId(undefined);
+  const resetSessionId = useCallback(
+    () => setSessionId(undefined),
+    [setSessionId]
+  );
 
   const [open, setOpen] = useState(false);
 
@@ -260,10 +276,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   // Recommendations (with infinite scroll)
   const innerHistoryStack = useRef<newnewapi.Post[]>([]);
-  const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
+  const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
+    []
+  );
   const [nextPageToken, setNextPageToken] =
     useState<string | null | undefined>('');
-  const [recommenedPostsLoading, setRecommenedPostsLoading] = useState(false);
+  const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -281,40 +299,43 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     innerHistoryStack.current = [];
   };
 
-  const handleGoBackInsidePost = () => {
+  const handleGoBackInsidePost = useCallback(() => {
     if (innerHistoryStack.current.length !== 0) {
       router.back();
     } else {
       handleClose();
       syncedHistoryPushState({}, currLocation);
     }
-  };
+  }, [currLocation, handleClose, router, syncedHistoryPushState]);
 
-  const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
-    const newPostParsed = switchPostType(newPost)[0];
-    handleOpenAnotherPost?.(newPost);
-    if (post !== undefined)
-      innerHistoryStack.current.push(post as newnewapi.Post);
-    modalContainerRef.current?.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-    syncedHistoryPushState(
-      {
-        postId: newPostParsed.postUuid,
-      },
-      `/post/${newPostParsed.postUuid}`
-    );
-    setRecommenedPosts([]);
-    setNextPageToken('');
-    setTriedLoading(false);
-  };
+  const handleOpenRecommendedPost = useCallback(
+    (newPost: newnewapi.Post) => {
+      const newPostParsed = switchPostType(newPost)[0];
+      handleOpenAnotherPost?.(newPost);
+      if (post !== undefined)
+        innerHistoryStack.current.push(post as newnewapi.Post);
+      modalContainerRef.current?.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+      syncedHistoryPushState(
+        {
+          postId: newPostParsed.postUuid,
+        },
+        `/post/${newPostParsed.postUuid}`
+      );
+      setRecommendedPosts([]);
+      setNextPageToken('');
+      setTriedLoading(false);
+    },
+    [post, handleOpenAnotherPost, syncedHistoryPushState]
+  );
 
   const loadRecommendedPosts = useCallback(
     async (pageToken?: string) => {
-      if (recommenedPostsLoading) return;
+      if (recommendedPostsLoading) return;
       try {
-        setRecommenedPostsLoading(true);
+        setRecommendedPostsLoading(true);
         setTriedLoading(true);
 
         const fetchRecommenedPostsPayload =
@@ -333,19 +354,32 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         );
 
         if (postsResponse.data && postsResponse.data.posts) {
-          setRecommenedPosts((curr) => [
+          setRecommendedPosts((curr) => [
             ...curr,
             ...(postsResponse.data?.posts as newnewapi.Post[]),
           ]);
           setNextPageToken(postsResponse.data.paging?.nextPageToken);
         }
-        setRecommenedPostsLoading(false);
+        setRecommendedPostsLoading(false);
       } catch (err) {
-        setRecommenedPostsLoading(false);
+        setRecommendedPostsLoading(false);
         console.error(err);
       }
     },
-    [setRecommenedPosts, recommenedPostsLoading, postParsed]
+    [setRecommendedPosts, recommendedPostsLoading, postParsed]
+  );
+
+  const handleReportSubmit = useCallback(
+    async ({ reason, message }: ReportData) => {
+      if (postParsed) {
+        await reportPost(postParsed.postUuid, reason, message).catch((e) =>
+          console.error(e)
+        );
+      }
+
+      setReportPostOpen(false);
+    },
+    [postParsed]
   );
 
   const renderPostView = (postToRender: TPostType) => {
@@ -514,8 +548,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
-          handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -525,8 +559,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
-          handleUpdatePostStatus={handleUpdatePostStatus}
           handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
     }
@@ -536,8 +570,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
-          handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleGoBack={handleGoBackInsidePost}
         />
       );
     }
@@ -668,7 +702,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           0,
           innerHistoryStack.current.length - 1
         );
-        setRecommenedPosts([]);
+        setRecommendedPosts([]);
         setNextPageToken('');
         setTriedLoading(false);
       }
@@ -691,7 +725,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           top: 0,
           behavior: 'smooth',
         });
-        setRecommenedPosts([]);
+        setRecommendedPosts([]);
         setNextPageToken('');
         setTriedLoading(false);
       }
@@ -708,13 +742,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   }, [open]);
 
   useEffect(() => {
-    if (inView && !recommenedPostsLoading) {
+    if (inView && !recommendedPostsLoading) {
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
       } else if (
         !triedLoading &&
         !nextPageToken &&
-        recommenedPosts?.length === 0
+        recommendedPosts?.length === 0
       ) {
         loadRecommendedPosts();
       }
@@ -723,8 +757,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   }, [
     inView,
     nextPageToken,
-    recommenedPostsLoading,
-    recommenedPosts.length,
+    recommendedPostsLoading,
+    recommendedPosts.length,
     triedLoading,
   ]);
 
@@ -799,7 +833,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               <PostShareMenu
                 postId={postParsed?.postUuid!!}
                 isVisible={shareMenuOpen}
-                handleClose={() => setShareMenuOpen(false)}
+                onClose={handleShareClose}
               />
             )}
             {isMobile && shareMenuOpen ? (
@@ -807,7 +841,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 isOpen={shareMenuOpen}
                 zIndex={11}
                 postId={postParsed?.postUuid!!}
-                onClose={() => setShareMenuOpen(false)}
+                onClose={handleShareClose}
               />
             ) : null}
             {/* Ellipse menu */}
@@ -822,7 +856,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleFollowDecision={handleFollowDecision}
                 handleToggleFollowingCreator={handleToggleFollowingCreator}
                 handleReportOpen={handleReportOpen}
-                onClose={() => setEllipseMenuOpen(false)}
+                onClose={handleEllipseMenuClose}
               />
             )}
             {isMobile && ellipseMenuOpen ? (
@@ -837,7 +871,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleFollowDecision={handleFollowDecision}
                 handleToggleFollowingCreator={handleToggleFollowingCreator}
                 handleReportOpen={handleReportOpen}
-                onClose={() => setEllipseMenuOpen(false)}
+                onClose={handleEllipseMenuClose}
               />
             ) : null}
           </SPostSuccessWaitingControlsDiv>
@@ -871,16 +905,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <ReportModal
             show={reportPostOpen}
             reportedDisplayname={getDisplayname(postParsed?.creator)}
-            onSubmit={async ({ reason, message }) => {
-              if (postParsed) {
-                await reportPost(postParsed.postUuid, reason, message).catch(
-                  (e) => console.error(e)
-                );
-              }
-
-              setReportPostOpen(false);
-            }}
-            onClose={() => setReportPostOpen(false)}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
           />
         )}
       </>
@@ -978,18 +1004,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             {!isMyPost && (
               <SRecommendationsSection id='recommendations-section-heading'>
                 <Headline variant={4}>
-                  {recommenedPosts.length > 0
+                  {recommendedPosts.length > 0
                     ? t('RecommendationsSection.heading')
                     : null}
                 </Headline>
-                {recommenedPosts && (
+                {recommendedPosts && (
                   <ListPostModal
-                    category=''
-                    loading={recommenedPostsLoading}
-                    collection={recommenedPosts}
-                    wrapperStyle={{
-                      left: '-16px',
-                    }}
+                    loading={recommendedPostsLoading}
+                    collection={recommendedPosts}
                     skeletonsBgColor={theme.colorsThemed.background.tertiary}
                     skeletonsHighlightColor={
                       theme.colorsThemed.background.secondary
@@ -1002,7 +1024,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                   style={{
                     position: 'relative',
                     bottom: '10px',
-                    ...(recommenedPostsLoading
+                    ...(recommendedPostsLoading
                       ? {
                           display: 'none',
                         }
@@ -1018,16 +1040,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         <ReportModal
           show={reportPostOpen}
           reportedDisplayname={getDisplayname(postParsed?.creator)}
-          onSubmit={async ({ reason, message }) => {
-            if (postParsed) {
-              await reportPost(postParsed.postUuid, reason, message).catch(
-                (e) => console.error(e)
-              );
-            }
-
-            setReportPostOpen(false);
-          }}
-          onClose={() => setReportPostOpen(false)}
+          onSubmit={handleReportSubmit}
+          onClose={handleReportClose}
         />
       )}
     </>

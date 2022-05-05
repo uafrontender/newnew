@@ -52,16 +52,16 @@ export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
 
 interface IPostModerationAC {
   post: newnewapi.Auction;
-  handleGoBack: () => void;
   postStatus: TPostStatusStringified;
+  handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
 }
-
+// TODO: memorize
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   post,
-  handleGoBack,
   postStatus,
   handleUpdatePostStatus,
+  handleGoBack,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();

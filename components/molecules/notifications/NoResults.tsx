@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 
 import emptyFolder from '../../../public/images/notifications/no-results.png';
 
-const NoResults: React.FC = () => {
+const NoResults: React.FC = React.memo(() => {
   const { t } = useTranslation('notifications');
   return (
     <SContainer>
@@ -21,7 +21,7 @@ const NoResults: React.FC = () => {
       </SWrapper>
     </SContainer>
   );
-};
+});
 
 export default NoResults;
 

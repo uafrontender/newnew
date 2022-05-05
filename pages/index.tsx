@@ -39,6 +39,7 @@ interface IHome {
   postFromQuery?: newnewapi.Post;
 }
 
+// No sense to memorize
 const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const { t } = useTranslation('home');
   const user = useAppSelector((state) => state.user);
@@ -98,14 +99,14 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     [setDisplayedPost, setPostModalOpen]
   );
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
-  const handleClosePostModal = () => {
+  const handleClosePostModal = useCallback(() => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
-  };
+  }, []);
 
   // Fetch top posts of various types
   // FY posts
@@ -392,7 +393,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           isOpen={postModalOpen}
           post={displayedPost}
           manualCurrLocation={isBrowser() ? window.location.pathname : ''}
-          handleClose={() => handleClosePostModal()}
+          handleClose={handleClosePostModal}
           handleOpenAnotherPost={handleSetDisplayedPost}
         />
       )}

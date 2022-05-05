@@ -29,6 +29,7 @@ interface IPostSuccessCF {
   post: newnewapi.Crowdfunding;
 }
 
+// TODO: memorize
 const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = ({ post }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();

@@ -16,37 +16,39 @@ interface IMessagingDisabled {
   user: newnewapi.IUser;
 }
 
-const MessagingDisabled: React.FC<IMessagingDisabled> = ({ user }) => {
-  const { t } = useTranslation('chat');
-  const router = useRouter();
+const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
+  ({ user }) => {
+    const { t } = useTranslation('chat');
+    const router = useRouter();
 
-  return (
-    <SBottomAction>
-      <SBottomActionLeft>
-        <SBottomActionIcon>🙊</SBottomActionIcon>
-        <SBottomActionText>
-          <SBottomActionTitle>
-            {t('messaging-disabled.title')}
-          </SBottomActionTitle>
-          <SBottomActionMessage>
-            {user.nickname ? user.nickname : user.username}{' '}
-            {t('messaging-disabled.message')}
-          </SBottomActionMessage>
-        </SBottomActionText>
-      </SBottomActionLeft>
-      <SBottomActionButton
-        withDim
-        withShadow
-        withShrink
-        view='primaryGrad'
-        onClick={() => {
-          router.push(`/${user.username}`);
-        }}
-      >
-        {t('messaging-disabled.button-text')}
-      </SBottomActionButton>
-    </SBottomAction>
-  );
-};
+    return (
+      <SBottomAction>
+        <SBottomActionLeft>
+          <SBottomActionIcon>🙊</SBottomActionIcon>
+          <SBottomActionText>
+            <SBottomActionTitle>
+              {t('messaging-disabled.title')}
+            </SBottomActionTitle>
+            <SBottomActionMessage>
+              {user.nickname ? user.nickname : user.username}{' '}
+              {t('messaging-disabled.message')}
+            </SBottomActionMessage>
+          </SBottomActionText>
+        </SBottomActionLeft>
+        <SBottomActionButton
+          withDim
+          withShadow
+          withShrink
+          view='primaryGrad'
+          onClick={() => {
+            router.push(`/${user.username}`);
+          }}
+        >
+          {t('messaging-disabled.button-text')}
+        </SBottomActionButton>
+      </SBottomAction>
+    );
+  }
+);
 
 export default MessagingDisabled;

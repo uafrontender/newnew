@@ -14,35 +14,31 @@ interface ITutorialCard {
   imageStyle?: React.CSSProperties;
 }
 
-export const TutorialCard: React.FC<ITutorialCard> = ({
-  image,
-  title,
-  caption,
-  height,
-  imageStyle,
-}) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+export const TutorialCard: React.FC<ITutorialCard> = React.memo(
+  ({ image, title, caption, height, imageStyle }) => {
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  return (
-    <SWrapper>
-      <SImageBG id='backgroundPart' height={height}>
-        <SImageHolder>
-          <img
-            src={image.src}
-            alt={title}
-            style={imageStyle ?? {}}
-            draggable={false}
-          />
-        </SImageHolder>
-      </SImageBG>
-      <SHeadline variant={4}>{title}</SHeadline>
-      <SBottomContent variant={isMobile ? 1 : 3}>{caption}</SBottomContent>
-    </SWrapper>
-  );
-};
+    return (
+      <SWrapper>
+        <SImageBG id='backgroundPart' height={height}>
+          <SImageHolder>
+            <img
+              src={image.src}
+              alt={title}
+              style={imageStyle ?? {}}
+              draggable={false}
+            />
+          </SImageHolder>
+        </SImageBG>
+        <SHeadline variant={4}>{title}</SHeadline>
+        <SBottomContent variant={isMobile ? 1 : 3}>{caption}</SBottomContent>
+      </SWrapper>
+    );
+  }
+);
 
 export default TutorialCard;
 

@@ -47,15 +47,16 @@ export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
 interface IPostModerationCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
-  handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleGoBack: () => void;
 }
 
+// TODO: memorize
 const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
   post,
   postStatus,
-  handleGoBack,
   handleUpdatePostStatus,
+  handleGoBack,
 }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();

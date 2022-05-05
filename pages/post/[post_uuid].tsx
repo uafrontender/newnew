@@ -2,7 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
@@ -56,9 +62,9 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (postToOpen: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((postToOpen: newnewapi.IPost) => {
     setDisplayedPost(postToOpen);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);

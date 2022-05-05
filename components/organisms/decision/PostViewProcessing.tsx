@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
@@ -6,34 +6,30 @@ import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-import { markPost } from '../../../api/endpoints/post';
 
+import Lottie from '../../atoms/Lottie';
 import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
-import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
+
+// Assets
+import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import { TPostType } from '../../../utils/switchPostType';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 
-interface IPostViewScheduled {
+interface IPostViewProcessing {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
-  postType: string;
   postStatus: TPostStatusStringified;
-  variant: 'decision' | 'moderation';
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
 }
 
 // TODO: memorize
-const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
+const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
   post,
-  postType,
   postStatus,
-  variant,
   handleGoBack,
   handleUpdatePostStatus,
   handleReportOpen,
@@ -49,32 +45,9 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   const socketConnection = useContext(SocketContext);
   const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const [isFollowing, setIsFollowing] = useState(post.isFavoritedByMe ?? false);
-
   const handleToggleMutedMode = useCallback(() => {
     dispatch(toggleMutedMode(''));
   }, [dispatch]);
-
-  const handleFollowDecision = async () => {
-    if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-      return;
-    try {
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: !isFollowing
-          ? newnewapi.MarkPostRequest.Kind.FAVORITE
-          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-        postUuid: post.postUuid,
-      });
-
-      const res = await markPost(markAsViewedPayload);
-
-      if (!res.error) {
-        setIsFollowing(!isFollowing);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   // Increment channel subs after mounting
   // Decrement when unmounting
@@ -141,46 +114,35 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      {variant === 'decision' ? (
-        <PostTopInfo
-          title={post.title}
-          postId={post.postUuid}
-          postStatus={postStatus}
-          postType={postType as TPostType}
-          creator={post.creator!!}
-          hasWinner={false}
-          hasResponse={false}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-          startsAtSeconds={post.startsAt?.seconds as number}
-          handleReportOpen={handleReportOpen}
-        />
-      ) : (
-        <PostTopInfoModeration
-          title={post.title}
-          postId={post.postUuid}
-          postStatus={postStatus}
-          postType={postType as TPostType}
-          hasWinner={false}
-          hasResponse={false}
-          handleUpdatePostStatus={handleUpdatePostStatus}
-        />
-      )}
+      <PostTopInfo
+        title={post.title}
+        postId={post.postUuid}
+        postStatus={postStatus}
+        creator={post.creator!!}
+        hasWinner={false}
+        hasResponse={false}
+        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+        startsAtSeconds={post.startsAt?.seconds as number}
+        handleReportOpen={handleReportOpen}
+      />
       <SActivitesContainer>
-        <PostScheduledSection
-          postType={postType}
-          timestampSeconds={new Date(
-            (post.startsAt?.seconds as number) * 1000
-          ).getTime()}
-          isFollowing={isFollowing}
-          variant={variant}
-          handleFollowDecision={handleFollowDecision}
-        />
+        <SAnimationContainer>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
+        </SAnimationContainer>
       </SActivitesContainer>
     </SWrapper>
   );
 };
 
-export default PostViewScheduled;
+export default PostViewProcessing;
 
 const SWrapper = styled.div`
   display: grid;
@@ -251,4 +213,13 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px);
   }
+`;
+
+const SAnimationContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

@@ -28,109 +28,107 @@ const SOCIAL_ICONS: any = {
 interface IPostShareMenu {
   postId: string;
   isVisible: boolean;
-  handleClose: () => void;
+  onClose: () => void;
 }
 
-const PostShareMenu: React.FunctionComponent<IPostShareMenu> = ({
-  postId,
-  isVisible,
-  handleClose,
-}) => {
-  const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
+const PostShareMenu: React.FunctionComponent<IPostShareMenu> = React.memo(
+  ({ postId, isVisible, onClose }) => {
+    const { t } = useTranslation('decision');
+    const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+    useOnClickEsc(containerRef, onClose);
+    useOnClickOutside(containerRef, onClose);
 
-  const socialButtons = useMemo(
-    () => [
-      {
-        key: 'twitter',
-      },
-      {
-        key: 'facebook',
-      },
-      {
-        key: 'instagram',
-      },
-      {
-        key: 'tiktok',
-      },
-    ],
-    []
-  );
-  const renderItem = (item: any) => (
-    <SItem key={item.key}>
-      <SItemButton type={item.key}>
-        <InlineSvg
-          svg={SOCIAL_ICONS[item.key] as string}
-          width='50%'
-          height='50%'
-        />
-      </SItemButton>
-      <SItemTitle variant={3} weight={600}>
-        {t(`socials.${item.key}`)}
-      </SItemTitle>
-    </SItem>
-  );
+    const socialButtons = useMemo(
+      () => [
+        {
+          key: 'twitter',
+        },
+        {
+          key: 'facebook',
+        },
+        {
+          key: 'instagram',
+        },
+        {
+          key: 'tiktok',
+        },
+      ],
+      []
+    );
+    const renderItem = (item: any) => (
+      <SItem key={item.key}>
+        <SItemButton type={item.key}>
+          <InlineSvg
+            svg={SOCIAL_ICONS[item.key] as string}
+            width='50%'
+            height='50%'
+          />
+        </SItemButton>
+        <SItemTitle variant={3} weight={600}>
+          {t(`socials.${item.key}`)}
+        </SItemTitle>
+      </SItem>
+    );
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+    const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
+    async function copyPostUrlToClipboard(url: string) {
+      if ('clipboard' in navigator) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        document.execCommand('copy', true, url);
+      }
     }
-  }
 
-  const handlerCopy = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/post/${postId}`;
+    const handlerCopy = useCallback(() => {
+      if (window) {
+        const url = `${window.location.origin}/post/${postId}`;
 
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            setIsCopiedUrl(false);
-          }, 1500);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [postId]);
+        copyPostUrlToClipboard(url)
+          .then(() => {
+            setIsCopiedUrl(true);
+            setTimeout(() => {
+              setIsCopiedUrl(false);
+            }, 1500);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }, [postId]);
 
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* <SSocials>
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* <SSocials>
             {socialButtons.map(renderItem)}
           </SSocials> */}
-          {/* <SSeparator /> */}
-          <SItem>
-            <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
-              <InlineSvg
-                svg={SOCIAL_ICONS.copy as string}
-                width='24px'
-                height='24px'
-              />
-              {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
-            </SItemButtonWide>
-          </SItem>
-        </SContainer>
-      )}
-    </AnimatePresence>
-  );
-};
+            {/* <SSeparator /> */}
+            <SItem>
+              <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
+                <InlineSvg
+                  svg={SOCIAL_ICONS.copy as string}
+                  width='24px'
+                  height='24px'
+                />
+                {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
+              </SItemButtonWide>
+            </SItem>
+          </SContainer>
+        )}
+      </AnimatePresence>
+    );
+  }
+);
 
 export default PostShareMenu;
 

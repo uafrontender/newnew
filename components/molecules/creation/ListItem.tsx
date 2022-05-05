@@ -33,13 +33,10 @@ const IMAGES_STATIC: any = {
 };
 
 interface IListItem {
-  item: {
-    key: string;
-  };
+  key: string;
 }
 
-const ListItem: React.FC<IListItem> = (props) => {
-  const { item } = props;
+const ListItem: React.FC<IListItem> = React.memo(({ key }) => {
   const { t } = useTranslation('creation');
   const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -50,7 +47,7 @@ const ListItem: React.FC<IListItem> = (props) => {
 
   const [mouseEntered, setMouseEntered] = useState(false);
 
-  let link = `${router.pathname}/${item.key}`;
+  let link = `${router.pathname}/${key}`;
 
   if (router.query?.referer) {
     link += `?referer=${router.query.referer}`;
@@ -69,20 +66,20 @@ const ListItem: React.FC<IListItem> = (props) => {
         <SWrapper>
           <SContent>
             <STitle variant={1} weight={700}>
-              {t(`first-step-${item.key}-title`)}
+              {t(`first-step-${key}-title`)}
             </STitle>
             <SDescription variant={2} weight={600}>
-              {t(`first-step-${item.key}-sub-title`)}
+              {t(`first-step-${key}-sub-title`)}
             </SDescription>
           </SContent>
           <SImageWrapper>
             <Image
               src={
                 isMobile || isTablet
-                  ? IMAGES[item.key]
+                  ? IMAGES[key]
                   : mouseEntered
-                  ? IMAGES[item.key]
-                  : IMAGES_STATIC[item.key]
+                  ? IMAGES[key]
+                  : IMAGES_STATIC[key]
               }
               alt='Post type image'
               width={isMobile ? 80 : 120}
@@ -95,7 +92,7 @@ const ListItem: React.FC<IListItem> = (props) => {
       </a>
     </Link>
   );
-};
+});
 
 export default ListItem;
 

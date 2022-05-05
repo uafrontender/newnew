@@ -26,7 +26,7 @@ import HeroLightPlaceholder from '../../../public/images/home/Landing-Page-Hold-
 import HeroDarkMobilePlaceholder from '../../../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
 import HeroLightMobilePlaceholder from '../../../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
 
-export const HeroSection = () => {
+export const HeroSection = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('home');
@@ -181,7 +181,7 @@ export const HeroSection = () => {
       </SHeroImage>
     </SWrapper>
   );
-};
+});
 
 export default HeroSection;
 

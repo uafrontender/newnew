@@ -7,7 +7,7 @@ import Navigation from '../../molecules/creator/Navigation';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-export const Earnings = () => {
+export const Earnings: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -25,7 +25,7 @@ export const Earnings = () => {
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Earnings;
 
