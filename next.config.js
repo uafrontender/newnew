@@ -20,6 +20,7 @@ module.exports = {
       'd3hqmhx7uxxlrw.cloudfront.net',
       'd2ya8a6kszdsc6.cloudfront.net',
       'd2x9we5puoe468.cloudfront.net',
+      'd2ttpqwdet9svd.cloudfront.net',
     ],
   },
   async headers() {

@@ -13,7 +13,6 @@ import { useAppSelector } from '../../../redux-store/store';
 // import acImage from '../../../public/images/creation/AC.png';
 // import mcImage from '../../../public/images/creation/MC.png';
 // import cfImage from '../../../public/images/creation/CF.png';
-import acImage from '../../../public/images/creation/AC.webp';
 import mcImage from '../../../public/images/creation/MC.webp';
 import cfImage from '../../../public/images/creation/CF.webp';
 import acImageStatic from '../../../public/images/creation/AC-static.png';
@@ -21,7 +20,7 @@ import mcImageStatic from '../../../public/images/creation/MC-static.png';
 import cfImageStatic from '../../../public/images/creation/CF-static.png';
 
 const IMAGES: any = {
-  auction: acImage,
+  auction: 'https://d2ttpqwdet9svd.cloudfront.net/AC.webp',
   crowdfunding: cfImage,
   'multiple-choice': mcImage,
 };
