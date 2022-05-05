@@ -41,7 +41,9 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
@@ -362,6 +364,15 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         setWinningOptionId(res.data.auction?.winningOptionId);
         handleChangeTab('winner');
       }
+
+      if (
+        !responseFreshlyUploaded &&
+        switchPostStatus('ac', res.data.auction!!.status!!) === 'succeeded' &&
+        res.data?.auction?.response
+      ) {
+        setResponseFreshlyUploaded(res.data.auction.response);
+      }
+
       setTotalAmount(res.data.auction!!.totalAmount?.usdCents as number);
       setNumberOfOptions(res.data.auction!!.optionCount as number);
       handleUpdatePostStatus(res.data.auction!!.status!!);
@@ -420,7 +431,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           setWinningOption(res.data.option as newnewapi.Auction.Option);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
 
@@ -479,16 +490,36 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
         setNumberOfOptions(decoded.post?.auction?.optionCount!!);
+
+        if (!responseFreshlyUploaded && decoded.post?.auction?.response) {
+          setResponseFreshlyUploaded(decoded.post.auction.response);
+        }
       }
     };
 
-    const socketHandlerPostStatus = (data: any) => {
+    const socketHandlerPostStatus = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {
         handleUpdatePostStatus(decoded.auction!!);
+
+        if (
+          !responseFreshlyUploaded &&
+          postStatus === 'processing_response' &&
+          switchPostStatus('ac', decoded.auction!!) === 'succeeded'
+        ) {
+          const fetchPostPayload = new newnewapi.GetPostRequest({
+            postUuid: post.postUuid,
+          });
+
+          const res = await fetchPostByUUID(fetchPostPayload);
+
+          if (res.data?.auction?.response) {
+            setResponseFreshlyUploaded(res.data?.auction?.response);
+          }
+        }
       }
     };
 
@@ -517,6 +548,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   }, [
     socketConnection,
     post,
+    postStatus,
     user.userData?.userUuid,
     setOptions,
     sortOptions,
@@ -575,12 +607,17 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
         postId={post.postUuid}
         announcement={post.announcement!!}
         response={(post.response || responseFreshlyUploaded) ?? undefined}
+        thumbnails={{
+          startTime: 1,
+          endTime: 3,
+        }}
         postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
         handleUpdateResponseVideo={(newValue) =>
           setResponseFreshlyUploaded(newValue)
         }
+        handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <PostTopInfoModeration
         postType='ac'

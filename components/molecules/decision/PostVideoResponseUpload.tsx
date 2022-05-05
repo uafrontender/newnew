@@ -20,7 +20,14 @@ import {
 } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
+import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
 import Headline from '../../atoms/Headline';
+import {
+  removeUploadedFile,
+  stopVideoProcessing,
+} from '../../../api/endpoints/upload';
+import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
+import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 
 const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -28,24 +35,42 @@ const BitmovinPlayer = dynamic(() => import('../../atoms/BitmovinPlayer'), {
 
 interface IPostVideoResponseUpload {
   id: string;
-  eta?: number;
   value: newnewapi.IVideoUrls;
-  error?: boolean;
-  loading?: boolean;
-  onChange: (id: string, value: any) => void;
-  progress?: number;
+  etaUpload: number;
+  errorUpload: boolean;
+  loadingUpload: boolean;
+  progressUpload: number;
+  etaProcessing: number;
+  errorProcessing: boolean;
+  loadingProcessing: boolean;
+  progressProcessing: number;
   thumbnails: any;
+  videoProcessing?: TVideoProcessingData;
+  postStatus: TPostStatusStringified;
+  onChange: (id: string, value: any) => void;
+  handleCancelVideoUpload: () => void;
+  handleResetVideoUploadAndProcessingState: () => void;
+  handleUploadVideoNotProcessed: () => void;
 }
 
 export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   id,
-  eta,
   value,
-  error,
-  loading,
-  progress,
-  onChange,
+  etaUpload,
+  errorUpload,
+  loadingUpload,
+  progressUpload,
+  etaProcessing,
+  errorProcessing,
+  loadingProcessing,
+  progressProcessing,
   thumbnails,
+  videoProcessing,
+  postStatus,
+  onChange,
+  handleCancelVideoUpload,
+  handleResetVideoUploadAndProcessingState,
+  handleUploadVideoNotProcessed,
 }) => {
   const { t } = useTranslation('decision');
   const [showVideoDelete, setShowVideoDelete] = useState(false);
@@ -94,10 +119,36 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
   const handleRetryVideoUpload = useCallback(() => {
     onChange(id, localFile);
   }, [id, localFile, onChange]);
-  const handleCancelVideoUpload = useCallback(() => {
-    setLocalFile(null);
-    onChange(id, null);
-  }, [id, onChange]);
+
+  const handleCancelVideoProcessing = useCallback(async () => {
+    try {
+      const payload = new newnewapi.RemoveUploadedFileRequest({
+        publicUrl: videoProcessing?.targetUrls?.originalVideoUrl,
+      });
+
+      const res = await removeUploadedFile(payload);
+
+      if (res?.error) {
+        throw new Error(res.error?.message ?? 'An error occurred');
+      }
+
+      const payloadProcessing = new newnewapi.StopVideoProcessingRequest({
+        taskUuid: videoProcessing?.taskUuid,
+      });
+
+      const resProcessing = await stopVideoProcessing(payloadProcessing);
+
+      if (!resProcessing.data || resProcessing.error) {
+        throw new Error(resProcessing.error?.message ?? 'An error occurred');
+      }
+
+      setLocalFile(null);
+      onChange(id, null);
+      handleResetVideoUploadAndProcessingState();
+    } catch (err) {
+      console.error(err);
+    }
+  }, [id, onChange, videoProcessing, handleResetVideoUploadAndProcessingState]);
 
   const renderContent = useCallback(() => {
     let content = (
@@ -129,7 +180,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
       </SDropBox>
     );
 
-    if (loading) {
+    if (loadingUpload) {
       content = (
         <SLoadingBox>
           <SLoadingTitle variant={3} weight={600}>
@@ -141,24 +192,23 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('PostVideo.UploadResponseForm.video.loading.process', {
-                time: `${eta} seconds`,
-                progress,
+                time: `${etaUpload} seconds`,
+                progress: progressUpload,
               })}
             </SLoadingDescription>
             <SLoadingBottomBlockButton
               view='secondary'
               onClick={handleCancelVideoUpload}
-              disabled={!value?.hlsStreamUrl}
             >
               {t('PostVideo.UploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
           </SLoadingBottomBlock>
           <SLoadingProgress>
-            <SLoadingProgressFilled progress={progress} />
+            <SLoadingProgressFilled progress={progressUpload} />
           </SLoadingProgress>
         </SLoadingBox>
       );
-    } else if (error) {
+    } else if (errorUpload || errorProcessing) {
       content = (
         <SErrorBox>
           <SErrorTitleWrapper>
@@ -173,7 +223,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           <SErrorBottomBlock>
             <SLoadingBottomBlockButton
               view='secondary'
-              onClick={handleCancelVideoUpload}
+              onClick={handleCancelVideoProcessing}
             >
               {t('PostVideo.UploadResponseForm.button.cancel')}
             </SLoadingBottomBlockButton>
@@ -187,7 +237,77 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           </SErrorBottomBlock>
         </SErrorBox>
       );
-    } else if (progress === 100) {
+    } else if (postStatus === 'processing_response') {
+      content = (
+        <SLoadingBox>
+          <SLoadingTitle variant={3} weight={600}>
+            {t('PostVideo.UploadResponseForm.video.processingPublished.title')}
+          </SLoadingTitle>
+          <SLoadingDescription variant={2} weight={600}>
+            {t(
+              'PostVideo.UploadResponseForm.video.processingPublished.description'
+            )}
+          </SLoadingDescription>
+          <SLoadingBottomBlock>
+            {etaProcessing > 0 && (
+              <SLoadingDescription variant={2} weight={600}>
+                {t(
+                  'PostVideo.UploadResponseForm.video.processingPublished.process',
+                  {
+                    time: `${etaProcessing} seconds`,
+                    progress: progressProcessing,
+                  }
+                )}
+              </SLoadingDescription>
+            )}
+          </SLoadingBottomBlock>
+          <SSpinnerWrapper>
+            <InlineSVG svg={spinnerIcon} width='16px' />
+          </SSpinnerWrapper>
+        </SLoadingBox>
+      );
+    } else if (loadingProcessing) {
+      content = (
+        <SLoadingBox>
+          <SLoadingTitle variant={3} weight={600}>
+            {t('PostVideo.UploadResponseForm.video.processing.title')}
+          </SLoadingTitle>
+          <SLoadingDescription variant={2} weight={600}>
+            {t('PostVideo.UploadResponseForm.video.processing.description')}
+          </SLoadingDescription>
+          <SLoadingBottomBlock>
+            <SLoadingDescription variant={2} weight={600}>
+              {t('PostVideo.UploadResponseForm.video.processing.process', {
+                time: `${etaProcessing} seconds`,
+                progress: progressProcessing,
+              })}
+            </SLoadingDescription>
+            <SLoadingBottomBlockButton
+              view='secondary'
+              onClick={() => {
+                handleCancelVideoProcessing();
+              }}
+              disabled={!value?.hlsStreamUrl}
+            >
+              {t('PostVideo.UploadResponseForm.button.cancel')}
+            </SLoadingBottomBlockButton>
+            <SLoadingPublishButton
+              view='primary'
+              onClick={() => {
+                handleUploadVideoNotProcessed();
+              }}
+            >
+              {t(
+                'PostVideo.UploadResponseForm.video.processing.uploadNonProcessed'
+              )}
+            </SLoadingPublishButton>
+          </SLoadingBottomBlock>
+          <SSpinnerWrapper>
+            <InlineSVG svg={spinnerIcon} width='16px' />
+          </SSpinnerWrapper>
+        </SLoadingBox>
+      );
+    } else if (progressProcessing === 100) {
       content = (
         <SFileBox>
           <input
@@ -222,18 +342,25 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     return content;
   }, [
     t,
-    eta,
     value,
-    error,
-    loading,
-    progress,
-    localFile,
+    etaUpload,
+    errorUpload,
+    loadingUpload,
+    progressUpload,
+    etaProcessing,
+    errorProcessing,
+    loadingProcessing,
+    progressProcessing,
+    postStatus,
     thumbnails,
+    localFile,
     handleFileChange,
     handleButtonClick,
     handleDeleteVideoShow,
     handleRetryVideoUpload,
     handleCancelVideoUpload,
+    handleCancelVideoProcessing,
+    handleUploadVideoNotProcessed,
   ]);
 
   return (
@@ -251,10 +378,10 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
 export default PostVideoResponseUpload;
 
 PostVideoResponseUpload.defaultProps = {
-  eta: 0,
-  error: false,
-  loading: false,
-  progress: 0,
+  videoProcessing: {
+    taskUuid: '',
+    targetUrls: {},
+  },
 };
 
 const SWrapper = styled.div`
@@ -421,6 +548,8 @@ const SLoadingBottomBlockButton = styled(Button)`
   }
 `;
 
+const SLoadingPublishButton = styled(Button)``;
+
 const SLoadingProgress = styled.div`
   width: 100%;
   height: 6px;
@@ -429,6 +558,21 @@ const SLoadingProgress = styled.div`
   margin-top: 6px;
   background: ${(props) => props.theme.colorsThemed.background.outlines1};
   border-radius: 16px;
+`;
+
+const SSpinnerWrapper = styled.div`
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  div {
+    animation: spin 0.7s linear infinite;
+  }
 `;
 
 interface ISProgress {
