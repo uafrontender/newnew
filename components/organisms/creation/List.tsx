@@ -13,7 +13,7 @@ export const List: React.FC<IList> = React.memo((props) => {
   const renderItem = useCallback(
     (item) => (
       <SItemWrapper key={`creation-item-${item.key}`}>
-        <ListItem key={item.key} />
+        <ListItem item={item} />
       </SItemWrapper>
     ),
     []
