@@ -333,9 +333,9 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     setDisplayedPost(undefined);
   };
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
   return (
     <div>

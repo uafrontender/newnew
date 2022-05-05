@@ -5,7 +5,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
@@ -30,7 +30,7 @@ import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../BlockUserModalPost';
-import ReportModal from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 
 interface IMcOptionCardModeration {
@@ -83,6 +83,18 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         console.error(err);
       }
     };
+
+    const handleReportSubmit = useCallback(
+      async ({ reason, message }: ReportData) => {
+        await reportSuperpollOption(option.id, reason, message);
+        setIsReportModalOpen(false);
+      },
+      [option.id]
+    );
+
+    const handleReportClose = useCallback(() => {
+      setIsReportModalOpen(false);
+    }, []);
 
     return (
       <>
@@ -234,13 +246,8 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
           <ReportModal
             show={isReportModalOpen}
             reportedDisplayname={getDisplayname(option.creator)}
-            onSubmit={async ({ reason, message }) => {
-              await reportSuperpollOption(option.id, reason, message);
-              setIsReportModalOpen(false);
-            }}
-            onClose={() => {
-              setIsReportModalOpen(false);
-            }}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
           />
         )}
       </>

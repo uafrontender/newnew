@@ -39,7 +39,7 @@ import UserEllipseMenu from '../molecules/profile/UserEllipseMenu';
 import UserEllipseModal from '../molecules/profile/UserEllipseModal';
 import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
-import ReportModal from '../molecules/chat/ReportModal';
+import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
@@ -264,6 +264,19 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     },
     [renderedPage]
   );
+
+  const handleReportSubmit = useCallback(
+    async ({ reason, message }: ReportData) => {
+      if (currentUser.userData?.userUuid) {
+        await reportUser(currentUser.userData.userUuid, reason, message).catch(
+          (e) => console.error(e)
+        );
+      }
+      setConfirmReportUser(false);
+    },
+    [currentUser]
+  );
+  const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
   const renderChildren = () => {
     let postsForPage = {};
@@ -580,17 +593,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               `@${currentUser.userData.username}`
             : ''
         }
-        onClose={() => setConfirmReportUser(false)}
-        onSubmit={async ({ reason, message }) => {
-          if (currentUser.userData?.userUuid) {
-            await reportUser(
-              currentUser.userData.userUuid,
-              reason,
-              message
-            ).catch((e) => console.error(e));
-          }
-          setConfirmReportUser(false);
-        }}
+        onSubmit={handleReportSubmit}
+        onClose={handleReportClose}
       />
     </ErrorBoundary>
   );

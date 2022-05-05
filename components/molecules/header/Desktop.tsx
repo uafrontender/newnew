@@ -16,7 +16,7 @@ import { useGetChats } from '../../../contexts/chatContext';
 import ShareMenu from '../../organisms/ShareMenu';
 import { useNotifications } from '../../../contexts/notificationsContext';
 
-export const Desktop: React.FC = () => {
+export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -182,7 +182,7 @@ export const Desktop: React.FC = () => {
       </SRightBlock>
     </SContainer>
   );
-};
+});
 
 export default Desktop;
 
