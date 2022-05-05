@@ -397,7 +397,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        console.log(size);
         setHeightDelta(size);
       }
     });
@@ -684,7 +683,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {isMobile &&
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
-      postStatus === 'voting' ? (
+      postStatus === 'voting' &&
+      canVoteForFree ? (
         <>
           <SActionButton
             view='primaryGrad'

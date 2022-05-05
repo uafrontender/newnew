@@ -4,10 +4,13 @@ import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 
 import { SocketContext } from './socketContext';
+import { usePostModalState } from './postModalContext';
 
 const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
   const router = useRouter();
   const socketConnection = useContext(SocketContext);
+
+  const { postOverlayOpen } = usePostModalState();
 
   const handlerSocketUpdated = useCallback(
     (data: any) => {
@@ -26,11 +29,28 @@ const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
         decoded.fractionCompleted === 100 &&
         decoded.status === newnewapi.VideoProcessingProgress.Status.SUCCEEDED
       ) {
-        toast.success('Your video has been processed', {
-          onClick: () => {
-            router.push(`/post/${decoded.postUuid}`);
-          },
-        });
+        if (
+          decoded.videoType ===
+          newnewapi.VideoProcessingProgress.VideoType.ANNOUNCE
+        ) {
+          toast.success('Your video has been processed', {
+            onClick: () => {
+              router.push(`/post/${decoded.postUuid}`);
+            },
+          });
+        }
+
+        if (
+          decoded.videoType ===
+            newnewapi.VideoProcessingProgress.VideoType.RESPONSE &&
+          !postOverlayOpen
+        ) {
+          toast.success('Your response has been processed', {
+            onClick: () => {
+              router.push(`/post/${decoded.postUuid}`);
+            },
+          });
+        }
         return;
       }
 
@@ -45,7 +65,7 @@ const VideoProcessingWrapper: React.FunctionComponent = ({ children }) => {
         });
       }
     },
-    [router]
+    [router, postOverlayOpen]
   );
 
   useEffect(() => {
