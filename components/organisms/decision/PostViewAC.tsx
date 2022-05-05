@@ -644,6 +644,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
             postType='ac'
+            isTutorialVisible={options.length > 0}
           />
         </SExpiresSection>
         <PostVideo
@@ -759,6 +760,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         </PaymentSuccessModal>
         <HeroPopup
           isPopupVisible={
+            options.length > 0 &&
             user!!.userTutorialsProgressSynced &&
             user!!.userTutorialsProgress.remainingAcSteps!![0] ===
               newnewapi.AcTutorialStep.AC_HERO
