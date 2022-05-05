@@ -12,73 +12,70 @@ import switchPostType from '../../../utils/switchPostType';
 import CardSkeleton from '../../molecules/CardSkeleton';
 
 interface IListPostModal {
-  category: string;
   collection: any;
   loading: boolean;
-  wrapperStyle?: React.CSSProperties;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const ListPostModal: React.FC<IListPostModal> = ({
-  category,
-  collection,
-  loading,
-  wrapperStyle,
-  skeletonsBgColor,
-  skeletonsHighlightColor,
-  handlePostClicked,
-}) => {
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+export const ListPostModal: React.FC<IListPostModal> = React.memo(
+  ({
+    collection,
+    loading,
+    skeletonsBgColor,
+    skeletonsHighlightColor,
+    handlePostClicked,
+  }) => {
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      handlePostClicked(item);
+    const renderItem = (item: any, index: number) => {
+      const handleItemClick = () => {
+        handlePostClicked(item);
+      };
+
+      return (
+        <SItemWrapper
+          key={switchPostType(item)[0].postUuid}
+          onClick={handleItemClick}
+        >
+          <PostCard
+            item={item}
+            index={index + 1}
+            width='100%'
+            height={isMobile ? '564px' : '336px'}
+          />
+        </SItemWrapper>
+      );
     };
 
     return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        onClick={handleItemClick}
+      <SListPostModalWrapper
+      // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
       >
-        <PostCard
-          item={item}
-          index={index + 1}
-          width='100%'
-          height={isMobile ? '564px' : '336px'}
-        />
-      </SItemWrapper>
+        {collection?.map(renderItem)}
+        {loading &&
+          Array(5)
+            .fill('_')
+            .map((_, i) => (
+              <CardSkeleton
+                key={i}
+                count={1}
+                cardWidth='100%'
+                cardHeight='100%'
+                bgColor={skeletonsBgColor}
+                highlightColor={skeletonsHighlightColor}
+              />
+            ))}
+      </SListPostModalWrapper>
     );
-  };
-
-  return (
-    <SListPostModalWrapper
-    // style={wrapperStyle && isMobile ? { ...wrapperStyle } : {}}
-    >
-      {collection?.map(renderItem)}
-      {loading &&
-        Array(5)
-          .fill('_')
-          .map((_, i) => (
-            <CardSkeleton
-              key={i}
-              count={1}
-              cardWidth='100%'
-              cardHeight='100%'
-              bgColor={skeletonsBgColor}
-              highlightColor={skeletonsHighlightColor}
-            />
-          ))}
-    </SListPostModalWrapper>
-  );
-};
+  }
+);
 
 ListPostModal.defaultProps = {
-  wrapperStyle: {},
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
 };

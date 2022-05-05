@@ -65,9 +65,9 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);

@@ -29,6 +29,7 @@ interface IPostAwaitingResponseMC {
   post: newnewapi.MultipleChoice;
 }
 
+// TODO: memorize
 const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
   ({ post }) => {
     const { t } = useTranslation('decision');

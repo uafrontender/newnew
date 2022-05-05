@@ -23,7 +23,7 @@ import Button from '../Button';
 import Lottie from '../Lottie';
 import NoResults from './NoResults';
 
-const SearchInput: React.FC = () => {
+const SearchInput: React.FC = React.memo(() => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
@@ -288,7 +288,7 @@ const SearchInput: React.FC = () => {
       )}
     </>
   );
-};
+});
 
 SearchInput.defaultProps = {
   fixed: false,

@@ -261,9 +261,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);

@@ -18,72 +18,74 @@ interface IPostEllipseMenu {
   onClose: () => void;
 }
 
-const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
-  postType,
-  isVisible,
-  isFollowing,
-  isFollowingDecision,
-  handleFollowDecision,
-  handleToggleFollowingCreator,
-  handleReportOpen,
-  onClose,
-}) => {
-  const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
+const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
+  ({
+    postType,
+    isVisible,
+    isFollowing,
+    isFollowingDecision,
+    handleFollowDecision,
+    handleToggleFollowingCreator,
+    handleReportOpen,
+    onClose,
+  }) => {
+    const { t } = useTranslation('decision');
+    const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, onClose);
-  useOnClickOutside(containerRef, onClose);
+    useOnClickEsc(containerRef, onClose);
+    useOnClickOutside(containerRef, onClose);
 
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <SButton
-            onClick={() => handleToggleFollowingCreator()}
-            style={{
-              marginBottom: '16px',
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <Text variant={3}>
-              {!isFollowing
-                ? t('ellipse.follow-creator')
-                : t('ellipse.unfollow-creator')}
-            </Text>
-          </SButton>
-          <SButton onClick={() => handleFollowDecision()}>
-            <Text variant={3}>
-              {!isFollowingDecision
-                ? t('ellipse.follow-decision', {
-                    postType: t(`postType.${postType}`),
-                  })
-                : t('ellipse.unfollow-decision', {
-                    postType: t(`postType.${postType}`),
-                  })}
-            </Text>
-          </SButton>
-          <SSeparator />
-          <SButton
-            onClick={() => {
-              handleReportOpen();
-              onClose();
-            }}
-          >
-            <Text variant={3} tone='error'>
-              {t('ellipse.report')}
-            </Text>
-          </SButton>
-        </SContainer>
-      )}
-    </AnimatePresence>
-  );
-};
+            <SButton
+              onClick={() => handleToggleFollowingCreator()}
+              style={{
+                marginBottom: '16px',
+              }}
+            >
+              <Text variant={3}>
+                {!isFollowing
+                  ? t('ellipse.follow-creator')
+                  : t('ellipse.unfollow-creator')}
+              </Text>
+            </SButton>
+            <SButton onClick={() => handleFollowDecision()}>
+              <Text variant={3}>
+                {!isFollowingDecision
+                  ? t('ellipse.follow-decision', {
+                      postType: t(`postType.${postType}`),
+                    })
+                  : t('ellipse.unfollow-decision', {
+                      postType: t(`postType.${postType}`),
+                    })}
+              </Text>
+            </SButton>
+            <SSeparator />
+            <SButton
+              onClick={() => {
+                handleReportOpen();
+                onClose();
+              }}
+            >
+              <Text variant={3} tone='error'>
+                {t('ellipse.report')}
+              </Text>
+            </SButton>
+          </SContainer>
+        )}
+      </AnimatePresence>
+    );
+  }
+);
 
 export default PostEllipseMenu;
 
