@@ -50,15 +50,16 @@ export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
 interface IPostModerationMC {
   post: newnewapi.MultipleChoice;
   postStatus: TPostStatusStringified;
-  handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleGoBack: () => void;
 }
 
+// TODO: memorize
 const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   post,
   postStatus,
-  handleGoBack,
   handleUpdatePostStatus,
+  handleGoBack,
 }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);

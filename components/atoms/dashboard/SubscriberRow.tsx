@@ -11,7 +11,7 @@ import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import InlineSVG from '../InlineSVG';
 import SubscriberEllipseMenu from './SubscriberEllipseMenu';
 import { markUser } from '../../../api/endpoints/user';
-import ReportModal from '../../molecules/chat/ReportModal';
+import ReportModal, { ReportData } from '../../molecules/chat/ReportModal';
 import BlockUserModal from '../../molecules/chat/BlockUserModal';
 import { useAppSelector } from '../../../redux-store/store';
 import { reportUser } from '../../../api/endpoints/report';
@@ -37,6 +37,15 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
 
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+
+  const handleReportSubmit = async ({ reason, message }: ReportData) => {
+    if (subscriber.user?.uuid) {
+      await reportUser(subscriber.user.uuid, reason, message);
+    }
+    setConfirmReportUser(false);
+  };
+
+  const handleReportClose = () => setConfirmReportUser(false);
 
   useEffect(() => {
     if (usersIBlocked.length > 0) {
@@ -131,13 +140,8 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
           <ReportModal
             show={confirmReportUser}
             reportedDisplayname={getDisplayname(subscriber.user)}
-            onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reason, message }) => {
-              if (subscriber.user?.uuid) {
-                await reportUser(subscriber.user.uuid, reason, message);
-              }
-              setConfirmReportUser(false);
-            }}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
           />
         )}
         {isSubscriberBlocked === true ||

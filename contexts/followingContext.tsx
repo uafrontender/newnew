@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { newnewapi } from 'newnew-api';
-import React, { createContext, useState, useMemo, useEffect } from 'react';
+import React, {
+  createContext,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+} from 'react';
 
 import { getCreatorsIFollow } from '../api/endpoints/user';
 import { useAppDispatch, useAppSelector } from '../redux-store/store';
@@ -20,13 +26,13 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
   const [followingsIds, setFollowingsIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const addId = (id: string) => {
+  const addId = useCallback((id: string) => {
     setFollowingsIds((curr) => [...curr, id]);
-  };
+  }, []);
 
-  const removeId = (id: string) => {
+  const removeId = useCallback((id: string) => {
     setFollowingsIds((curr) => curr.filter((i) => i !== id));
-  };
+  }, []);
 
   const contextValue = useMemo(
     () => ({

@@ -31,113 +31,110 @@ interface IPostShareModal {
   onClose: () => void;
 }
 
-const PostShareModal: React.FunctionComponent<IPostShareModal> = ({
-  isOpen,
-  zIndex,
-  postId,
-  onClose,
-}) => {
-  const { t } = useTranslation('decision');
+const PostShareModal: React.FunctionComponent<IPostShareModal> = React.memo(
+  ({ isOpen, zIndex, postId, onClose }) => {
+    const { t } = useTranslation('decision');
 
-  // const socialButtons = useMemo(() => [
-  //   {
-  //     key: 'twitter',
-  //   },
-  //   {
-  //     key: 'facebook',
-  //   },
-  //   {
-  //     key: 'instagram',
-  //   },
-  //   {
-  //     key: 'tiktok',
-  //   },
-  //   {
-  //     key: 'copy',
-  //   },
-  // ], []);
-  // const renderItem = (item: any) => (
-  //   <SItem key={item.key}>
-  //     <SItemButton type={item.key}>
-  //       <InlineSVG
-  //         svg={SOCIAL_ICONS[item.key] as string}
-  //         width="50%"
-  //         height="50%"
-  //       />
-  //     </SItemButton>
-  //     <SItemTitle variant={3} weight={600}>
-  //       {t(`socials.${item.key}`)}
-  //     </SItemTitle>
-  //   </SItem>
-  // );
+    // const socialButtons = useMemo(() => [
+    //   {
+    //     key: 'twitter',
+    //   },
+    //   {
+    //     key: 'facebook',
+    //   },
+    //   {
+    //     key: 'instagram',
+    //   },
+    //   {
+    //     key: 'tiktok',
+    //   },
+    //   {
+    //     key: 'copy',
+    //   },
+    // ], []);
+    // const renderItem = (item: any) => (
+    //   <SItem key={item.key}>
+    //     <SItemButton type={item.key}>
+    //       <InlineSVG
+    //         svg={SOCIAL_ICONS[item.key] as string}
+    //         width="50%"
+    //         height="50%"
+    //       />
+    //     </SItemButton>
+    //     <SItemTitle variant={3} weight={600}>
+    //       {t(`socials.${item.key}`)}
+    //     </SItemTitle>
+    //   </SItem>
+    // );
 
-  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+    const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-  async function copyPostUrlToClipboard(url: string) {
-    if ('clipboard' in navigator) {
-      await navigator.clipboard.writeText(url);
-    } else {
-      document.execCommand('copy', true, url);
+    async function copyPostUrlToClipboard(url: string) {
+      if ('clipboard' in navigator) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        document.execCommand('copy', true, url);
+      }
     }
-  }
 
-  const handlerCopy = useCallback(() => {
-    if (window) {
-      const url = `${window.location.origin}/post/${postId}`;
+    const handlerCopy = useCallback(() => {
+      if (window) {
+        const url = `${window.location.origin}/post/${postId}`;
 
-      copyPostUrlToClipboard(url)
-        .then(() => {
-          setIsCopiedUrl(true);
-          setTimeout(() => {
-            setIsCopiedUrl(false);
-            onClose();
-          }, 1000);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [postId, onClose]);
+        copyPostUrlToClipboard(url)
+          .then(() => {
+            setIsCopiedUrl(true);
+            setTimeout(() => {
+              setIsCopiedUrl(false);
+              onClose();
+            }, 1000);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }, [postId, onClose]);
 
-  return (
-    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <Headline variant={6}>{t('socials.share-to')}</Headline>
-          <SSocialsSection>
-            {/* <SSocials>
+    return (
+      <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <Headline variant={6}>{t('socials.share-to')}</Headline>
+            <SSocialsSection>
+              {/* <SSocials>
               {socialButtons.map(renderItem)}
             </SSocials> */}
-            <SItem>
-              <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
-                <InlineSvg
-                  svg={SOCIAL_ICONS.copy as string}
-                  width='24px'
-                  height='24px'
-                />
-                {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
-              </SItemButtonWide>
-            </SItem>
-          </SSocialsSection>
-        </SContentContainer>
-        <Button
-          view='secondary'
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-          onClick={onClose}
-        >
-          {t('Cancel')}
-        </Button>
-      </SWrapper>
-    </Modal>
-  );
-};
+              <SItem>
+                <SItemButtonWide type='copy' onClick={() => handlerCopy()}>
+                  <InlineSvg
+                    svg={SOCIAL_ICONS.copy as string}
+                    width='24px'
+                    height='24px'
+                  />
+                  {isCopiedUrl ? t('socials.copied') : t('socials.copy')}
+                </SItemButtonWide>
+              </SItem>
+            </SSocialsSection>
+          </SContentContainer>
+          <Button
+            view='secondary'
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
+            }}
+            onClick={onClose}
+          >
+            {t('Cancel')}
+          </Button>
+        </SWrapper>
+      </Modal>
+    );
+  }
+);
 
 export default PostShareModal;
 

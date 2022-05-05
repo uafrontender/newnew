@@ -26,6 +26,7 @@ interface IPostViewProcessing {
   handleReportOpen: () => void;
 }
 
+// TODO: memorize
 const PostViewProcessing: React.FunctionComponent<IPostViewProcessing> = ({
   post,
   postStatus,
