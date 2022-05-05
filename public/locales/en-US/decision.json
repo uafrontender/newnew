@@ -426,7 +426,7 @@
   "PostVideoThumbnailEdit": {
     "title": "Set a thumbnail",
     "description": "Select a snippet from the video",
-    "submit": "Submit",
+    "submit": "Save",
     "cancel": "Cancel",
     "toast": {
       "success": "Success! Thumbnail will be changed once processed",

@@ -317,6 +317,7 @@ const SModalTopLine = styled.div`
 
 const SModalTopLineTitleTablet = styled(Headline)`
   margin: 0 auto;
+  margin-left: 0;
   color: ${(props) => props.theme.colorsThemed.text.primary};
 `;
 
