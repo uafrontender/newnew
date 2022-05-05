@@ -151,7 +151,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
   const [reportPostOpen, setReportPostOpen] = useState(false);
 
-  const handleFollowDecision = async () => {
+  const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
         router.push(
@@ -166,14 +166,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       const res = await markPost(markAsViewedPayload);
 
       if (!res.error) {
-        setIsFollowingDecision(!isFollowingDecision);
+        setIsFollowingDecision((currentValue) => !currentValue);
       }
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [postParsed, router, user.loggedIn]);
 
-  const handleToggleFollowingCreator = async () => {
+  const handleToggleFollowingCreator = useCallback(async () => {
     try {
       if (!user.loggedIn) {
         router.push(
@@ -200,7 +200,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [addId, followingsIds, postParsed, removeId, router, user.loggedIn]);
 
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
@@ -221,6 +221,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   const handleReportClose = useCallback(() => {
     setReportPostOpen(false);
+  }, []);
+
+  const handleShareClose = useCallback(() => {
+    setShareMenuOpen(false);
+  }, []);
+
+  const handleEllipseMenuClose = useCallback(() => {
+    setEllipseMenuOpen(false);
   }, []);
 
   const isMyPost = useMemo(
@@ -804,7 +812,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               <PostShareMenu
                 postId={postParsed?.postUuid!!}
                 isVisible={shareMenuOpen}
-                handleClose={() => setShareMenuOpen(false)}
+                onClose={handleShareClose}
               />
             )}
             {isMobile && shareMenuOpen ? (
@@ -812,7 +820,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 isOpen={shareMenuOpen}
                 zIndex={11}
                 postId={postParsed?.postUuid!!}
-                onClose={() => setShareMenuOpen(false)}
+                onClose={handleShareClose}
               />
             ) : null}
             {/* Ellipse menu */}
@@ -827,7 +835,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleFollowDecision={handleFollowDecision}
                 handleToggleFollowingCreator={handleToggleFollowingCreator}
                 handleReportOpen={handleReportOpen}
-                onClose={() => setEllipseMenuOpen(false)}
+                onClose={handleEllipseMenuClose}
               />
             )}
             {isMobile && ellipseMenuOpen ? (
@@ -842,7 +850,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 handleFollowDecision={handleFollowDecision}
                 handleToggleFollowingCreator={handleToggleFollowingCreator}
                 handleReportOpen={handleReportOpen}
-                onClose={() => setEllipseMenuOpen(false)}
+                onClose={handleEllipseMenuClose}
               />
             ) : null}
           </SPostSuccessWaitingControlsDiv>
