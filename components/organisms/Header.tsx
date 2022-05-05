@@ -24,7 +24,7 @@ export const Header: React.FC<IHeader> = (props) => {
 
   // Try to pre-fetch the content
   useEffect(() => {
-    router.prefetch('/');
+    // router.prefetch('/');
     router.prefetch('/sign-up');
     router.prefetch('/profile');
     router.prefetch('/creation');
