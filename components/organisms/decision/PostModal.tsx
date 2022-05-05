@@ -39,7 +39,7 @@ import PostModerationAC from './PostModerationAC';
 import PostModerationMC from './PostModerationMC';
 import PostModerationCF from './PostModerationCF';
 import PostViewScheduled from './PostViewScheduled';
-import PostViewProcessing from './PostViewProcessing';
+import PostViewProcessingAnnouncement from './PostViewProcessingAnnouncement';
 import PostSuccessAC from './PostSuccessAC';
 import PostSuccessMC from './PostSuccessMC';
 import PostSuccessCF from './PostSuccessCF';
@@ -51,7 +51,7 @@ import PostShareMenu from '../../molecules/decision/PostShareMenu';
 import PostEllipseModal from '../../molecules/decision/PostEllipseModal';
 import PostEllipseMenu from '../../molecules/decision/PostEllipseMenu';
 import PostFailedBox from '../../molecules/decision/PostFailedBox';
-import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
+import PostSuccessAnimationBackground from '../../molecules/decision/PostSuccessAnimationBackground';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
@@ -387,9 +387,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       return (
         <PostViewScheduled
           key={postParsed?.postUuid}
-          postType={postToRender}
+          postType={typeOfPost as string}
           post={postParsed!!}
           postStatus={postStatus}
+          variant='decision'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
@@ -399,7 +400,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
     if (postStatus === 'processing_announcement') {
       return (
-        <PostViewProcessing
+        <PostViewProcessingAnnouncement
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
@@ -515,10 +516,25 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const renderPostModeration = (postToRender: TPostType) => {
     if (postStatus === 'processing_announcement') {
       return (
-        <PostViewProcessing
+        <PostViewProcessingAnnouncement
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
+          handleGoBack={handleGoBackInsidePost}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+          handleReportOpen={handleReportOpen}
+        />
+      );
+    }
+
+    if (postStatus === 'scheduled') {
+      return (
+        <PostViewScheduled
+          key={postParsed?.postUuid}
+          postType={typeOfPost as string}
+          post={postParsed!!}
+          postStatus={postStatus}
+          variant='moderation'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
