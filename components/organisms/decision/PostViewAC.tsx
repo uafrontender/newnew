@@ -644,7 +644,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
             postType='ac'
-            itTutorialVisible={options.length > 0}
+            isTutorialVisible={options.length > 0}
           />
         </SExpiresSection>
         <PostVideo

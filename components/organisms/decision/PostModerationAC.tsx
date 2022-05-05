@@ -568,7 +568,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
             postType='ac'
-            itTutorialVisible={options.length > 0}
+            isTutorialVisible={options.length > 0}
           />
         )}
       </SExpiresSection>

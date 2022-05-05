@@ -19,13 +19,13 @@ import {
 interface IPostTimer {
   timestampSeconds: number;
   postType: TPostType;
-  itTutorialVisible?: boolean | undefined;
+  isTutorialVisible?: boolean | undefined;
 }
 
 const PostTimer: React.FunctionComponent<IPostTimer> = ({
   timestampSeconds,
   postType,
-  itTutorialVisible,
+  isTutorialVisible,
 }) => {
   const { t } = useTranslation('decision');
   const { user } = useAppSelector((state) => state);
@@ -66,7 +66,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   }, []);
 
   useEffect(() => {
-    if (itTutorialVisible === undefined || itTutorialVisible) {
+    if (isTutorialVisible === undefined || isTutorialVisible) {
       switch (postType) {
         case 'ac':
           if (
@@ -96,7 +96,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
           setIsTooltipVisible(false);
       }
     }
-  }, [postType, user.userTutorialsProgress, itTutorialVisible]);
+  }, [postType, user.userTutorialsProgress, isTutorialVisible]);
 
   const goToNextStep = () => {
     setIsTooltipVisible(false);
@@ -241,7 +241,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 export default PostTimer;
 
 PostTimer.defaultProps = {
-  itTutorialVisible: undefined,
+  isTutorialVisible: undefined,
 };
 
 const SWrapper = styled.div<{
