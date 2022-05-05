@@ -214,6 +214,8 @@ const STabContainer = styled(motion.div)`
   height: calc(100% - 112px);
 
   min-height: 300px;
+
+  position: relative;
 `;
 
 const SWinnerOptionCard = styled.div`

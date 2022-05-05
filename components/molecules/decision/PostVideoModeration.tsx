@@ -1,6 +1,13 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -15,6 +22,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
+import ThumbnailIcon from '../../../public/images/svg/icons/filled/AddImage.svg';
 
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
@@ -25,22 +33,37 @@ import {
   stopVideoProcessing,
 } from '../../../api/endpoints/upload';
 import { SocketContext } from '../../../contexts/socketContext';
-import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
+import {
+  TThumbnailParameters,
+  TVideoProcessingData,
+} from '../../../redux-store/slices/creationStateSlice';
 import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
-import { uploadPostResponse } from '../../../api/endpoints/post';
+import {
+  setPostThumbnail,
+  uploadPostResponse,
+} from '../../../api/endpoints/post';
 import isSafari from '../../../utils/isSafari';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
 });
 
+const PostVideoThumbnailEdit = dynamic(
+  () => import('./PostVideoThumbnailEdit'),
+  {
+    ssr: false,
+  }
+);
+
 interface IPostVideoModeration {
   postId: string;
   postStatus: TPostStatusStringified;
   announcement: newnewapi.IVideoUrls;
   response?: newnewapi.IVideoUrls;
+  thumbnails: any;
   isMuted: boolean;
   handleToggleMuted: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
 }
 
@@ -49,8 +72,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   postStatus,
   announcement,
   response,
+  thumbnails,
   isMuted,
   handleToggleMuted,
+  handleUpdatePostStatus,
   handleUpdateResponseVideo,
 }) => {
   const { t } = useTranslation('decision');
@@ -70,24 +95,74 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   // Tabs
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
-    response || postStatus === 'waiting_for_response'
+    response ||
+      postStatus === 'waiting_for_response' ||
+      postStatus === 'processing_response'
       ? 'response'
       : 'announcement'
   );
 
+  // Editing announcement video thumbnail
+  const [isEditThumbnailModalOpen, setIsEditThumbnailModalOpen] =
+    useState(false);
+
+  const isSetThumbnailButtonIconOnly = useMemo(
+    () =>
+      response ||
+      postStatus === 'waiting_for_response' ||
+      postStatus === 'processing_response',
+    [response, postStatus]
+  );
+
+  const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
+    try {
+      const payload = new newnewapi.SetPostThumbnailRequest({
+        postUuid: postId,
+        thumbnailParameters: {
+          startTime: {
+            seconds: params.startTime,
+          },
+          endTime: {
+            seconds: params.endTime,
+          },
+        },
+      });
+
+      const res = await setPostThumbnail(payload);
+
+      if (res.error) throw new Error('Request failed');
+
+      setIsEditThumbnailModalOpen(false);
+      toast.success(t('PostVideoThumbnailEdit.toast.success'));
+    } catch (err) {
+      console.error(err);
+      toast.error(t('PostVideoThumbnailEdit.toast.error'));
+    }
+  };
+
   // File upload
+  const xhrRef = useRef<XMLHttpRequest>();
   const [uploadedResponseVideoUrl, setUploadedResponseVideoUrl] = useState('');
 
   const [videoProcessing, setVideoProcessing] = useState<TVideoProcessingData>({
     taskUuid: '',
     targetUrls: {},
   });
+  // File upload
   const [responseFileUploadETA, setResponseFileUploadETA] = useState(0);
   const [responseFileUploadProgress, setResponseFileUploadProgress] =
     useState(0);
   const [responseFileUploadLoading, setResponseFileUploadLoading] =
     useState(false);
   const [responseFileUploadError, setResponseFileUploadError] = useState(false);
+  // File processing
+  const [responseFileProcessingETA, setResponseFileProcessingETA] = useState(0);
+  const [responseFileProcessingProgress, setResponseFileProcessingProgress] =
+    useState(0);
+  const [responseFileProcessingLoading, setResponseFileProcessingLoading] =
+    useState(false);
+  const [responseFileProcessingError, setResponseFileProcessingError] =
+    useState(false);
 
   const handleVideoUpload = useCallback(async (value: File) => {
     try {
@@ -106,20 +181,49 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         throw new Error(res.error?.message ?? 'An error occurred');
       }
 
-      const uploadResponse = await fetch(res.data.uploadUrl, {
-        method: 'PUT',
-        body: value,
-        headers: {
-          'Content-Type': value.type,
-        },
+      const xhr = new XMLHttpRequest();
+      xhrRef.current = xhr;
+      let uploadStartTimestamp: number;
+      const uploadResponse = await new Promise((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const uploadProgress = Math.round(
+              (event.loaded / event.total) * 100
+            );
+            const percentageLeft = 100 - uploadProgress;
+            const secondsPassed = Math.round(
+              (event.timeStamp - uploadStartTimestamp) / 1000
+            );
+            const factor = secondsPassed / uploadProgress;
+            const eta = Math.round(factor * percentageLeft);
+            setResponseFileUploadProgress(uploadProgress);
+            setResponseFileUploadETA(eta);
+          }
+        });
+        xhr.addEventListener('loadstart', (event) => {
+          uploadStartTimestamp = event.timeStamp;
+        });
+        xhr.addEventListener('loadend', () => {
+          setResponseFileUploadProgress(100);
+          resolve(xhr.readyState === 4 && xhr.status === 200);
+        });
+        xhr.addEventListener('error', () => {
+          setResponseFileUploadProgress(0);
+          reject(new Error('Upload failed'));
+        });
+        xhr.addEventListener('abort', () => {
+          console.log('Aborted');
+          setResponseFileUploadProgress(0);
+          reject(new Error('Upload aborted'));
+        });
+        xhr.open('PUT', res.data!.uploadUrl, true);
+        xhr.setRequestHeader('Content-Type', value.type);
+        xhr.send(value);
       });
 
-      if (!uploadResponse.ok) {
+      if (!uploadResponse) {
         throw new Error('Upload failed');
       }
-
-      setResponseFileUploadProgress(5);
-      setResponseFileUploadETA(90);
 
       const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
         publicUrl: res.data.publicUrl,
@@ -141,13 +245,24 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
         },
       });
-      setResponseFileUploadProgress(10);
-      setResponseFileUploadETA(80);
-      setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
-    } catch (error: any) {
-      setResponseFileUploadError(true);
+
       setResponseFileUploadLoading(false);
-      toast.error(error?.message);
+
+      setResponseFileProcessingProgress(10);
+      setResponseFileProcessingETA(80);
+      setResponseFileProcessingLoading(true);
+      setResponseFileProcessingError(false);
+      setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
+      xhrRef.current = undefined;
+    } catch (error: any) {
+      if (error.message === 'Upload failed') {
+        setResponseFileUploadError(true);
+        toast.error(error?.message);
+      } else {
+        console.log('Upload aborted');
+      }
+      xhrRef.current = undefined;
+      setResponseFileUploadLoading(false);
     }
   }, []);
 
@@ -174,13 +289,16 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       }
 
       setUploadedResponseVideoUrl('');
-      setResponseFileUploadError(false);
       setVideoProcessing({
         taskUuid: '',
         targetUrls: {},
       });
+      setResponseFileUploadError(false);
       setResponseFileUploadLoading(false);
       setResponseFileUploadProgress(0);
+      setResponseFileProcessingError(false);
+      setResponseFileProcessingLoading(false);
+      setResponseFileProcessingProgress(0);
     } catch (error: any) {
       toast.error(error?.message);
     }
@@ -194,7 +312,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     }
   };
 
-  const handleUploadVideo = useCallback(async () => {
+  const handleUploadVideoProcessed = useCallback(async () => {
     try {
       const payload = new newnewapi.UploadPostResponseRequest({
         postUuid: postId,
@@ -212,12 +330,37 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         handleUpdateResponseVideo(responseObj!!);
+        handleUpdatePostStatus('SUCCEEDED');
         setUploadedResponseVideoUrl('');
       }
     } catch (err) {
       console.error(err);
     }
-  }, [postId, uploadedResponseVideoUrl, handleUpdateResponseVideo]);
+  }, [
+    postId,
+    uploadedResponseVideoUrl,
+    handleUpdateResponseVideo,
+    handleUpdatePostStatus,
+  ]);
+
+  const handleUploadVideoNotProcessed = useCallback(async () => {
+    try {
+      const payload = new newnewapi.UploadPostResponseRequest({
+        postUuid: postId,
+        responseVideoUrl: uploadedResponseVideoUrl,
+      });
+
+      const res = await uploadPostResponse(payload);
+
+      if (res.data) {
+        toast.success(t('PostVideo.responseUploadedNonProcessed'));
+        handleUpdatePostStatus('PROCESSING_RESPONSE');
+        setUploadedResponseVideoUrl('');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
 
   const handlerSocketUpdated = useCallback(
     (data: any) => {
@@ -226,19 +369,24 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
       if (!decoded) return;
 
-      if (decoded.taskUuid === videoProcessing?.taskUuid) {
-        setResponseFileUploadETA(decoded.estimatedTimeLeft?.seconds as number);
+      if (
+        decoded.taskUuid === videoProcessing?.taskUuid ||
+        decoded.postUuid === postId
+      ) {
+        setResponseFileProcessingETA(
+          decoded.estimatedTimeLeft?.seconds as number
+        );
 
-        if (decoded.fractionCompleted > responseFileUploadProgress) {
-          setResponseFileUploadProgress(decoded.fractionCompleted);
+        if (decoded.fractionCompleted > responseFileProcessingProgress) {
+          setResponseFileProcessingProgress(decoded.fractionCompleted);
         }
 
         if (decoded.fractionCompleted === 100) {
-          setResponseFileUploadLoading(false);
+          setResponseFileProcessingLoading(false);
         }
       }
     },
-    [videoProcessing, responseFileUploadProgress]
+    [videoProcessing.taskUuid, postId, responseFileProcessingProgress]
   );
 
   useEffect(() => {
@@ -264,6 +412,27 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               resources={announcement}
               muted={isMuted}
             />
+            {isSetThumbnailButtonIconOnly ? (
+              <SSetThumbnailButtonIconOnly
+                iconOnly
+                view='transparent'
+                onClick={() => setIsEditThumbnailModalOpen(true)}
+              >
+                <InlineSvg
+                  svg={ThumbnailIcon}
+                  width={isMobileOrTablet ? '20px' : '24px'}
+                  height={isMobileOrTablet ? '20px' : '24px'}
+                  fill='#FFFFFF'
+                />
+              </SSetThumbnailButtonIconOnly>
+            ) : (
+              <SSetThumbnailButton
+                view='transparent'
+                onClick={() => setIsEditThumbnailModalOpen(true)}
+              >
+                {t('PostVideo.setThumbnail')}
+              </SSetThumbnailButton>
+            )}
             <SSoundButton
               iconOnly
               view='transparent'
@@ -320,43 +489,77 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         ) : (
           <PostVideoResponseUpload
             id='video'
-            eta={responseFileUploadETA}
-            error={responseFileUploadError}
-            loading={responseFileUploadLoading}
-            progress={responseFileUploadProgress}
-            value={videoProcessing?.targetUrls!!}
-            onChange={handleItemChange}
             thumbnails={{}}
+            postStatus={postStatus}
+            value={videoProcessing?.targetUrls!!}
+            videoProcessing={videoProcessing}
+            etaUpload={responseFileUploadETA}
+            errorUpload={responseFileUploadError}
+            loadingUpload={responseFileUploadLoading}
+            progressUpload={responseFileUploadProgress}
+            etaProcessing={responseFileProcessingETA}
+            errorProcessing={responseFileProcessingError}
+            loadingProcessing={responseFileProcessingLoading}
+            progressProcessing={responseFileProcessingProgress}
+            onChange={handleItemChange}
+            handleCancelVideoUpload={() => xhrRef.current?.abort()}
+            handleResetVideoUploadAndProcessingState={() => {
+              setUploadedResponseVideoUrl('');
+              setVideoProcessing({
+                taskUuid: '',
+                targetUrls: {},
+              });
+              setResponseFileUploadError(false);
+              setResponseFileUploadLoading(false);
+              setResponseFileUploadProgress(0);
+              setResponseFileProcessingError(false);
+              setResponseFileProcessingLoading(false);
+              setResponseFileProcessingProgress(0);
+            }}
+            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
           />
         )}
-        {response || postStatus === 'waiting_for_response' ? (
+        {response ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response' ? (
           <ToggleVideoWidget
             currentTab={openedTab}
             responseUploaded={response !== undefined}
             handleChangeTab={(newValue) => setOpenedTab(newValue)}
           />
         ) : null}
-        {uploadedResponseVideoUrl && !responseFileUploadLoading && (
-          <PostVideoResponsePreviewModal
-            value={videoProcessing.targetUrls!!}
-            open={uploadedResponseVideoUrl !== ''}
-            handleClose={() => handleVideoDelete()}
-            handleConfirm={() => handleUploadVideo()}
-          />
-        )}
+        {uploadedResponseVideoUrl &&
+          !responseFileUploadLoading &&
+          !responseFileProcessingLoading && (
+            <PostVideoResponsePreviewModal
+              value={videoProcessing.targetUrls!!}
+              open={uploadedResponseVideoUrl !== ''}
+              handleClose={() => handleVideoDelete()}
+              handleConfirm={() => handleUploadVideoProcessed()}
+            />
+          )}
       </SVideoWrapper>
       {isMobile &&
       postStatus === 'waiting_for_response' &&
-      !responseFileUploadLoading ? (
+      !responseFileUploadLoading &&
+      !responseFileProcessingLoading ? (
         <SUploadResponseButton
           view='primaryGrad'
           onClick={() => {
             document.getElementById('upload-response-btn')?.click();
           }}
         >
-          {t('AcPostModeration.floatingUploadResponseBtn')}
+          {t('PostVideo.floatingUploadResponseBtn')}
         </SUploadResponseButton>
       ) : null}
+      {/* Edit thumbnail */}
+      <PostVideoThumbnailEdit
+        open={isEditThumbnailModalOpen}
+        value={announcement}
+        thumbnails={thumbnails}
+        handleClose={() => setIsEditThumbnailModalOpen(false)}
+        handleSubmit={handleSubmitNewThumbnail}
+      />
     </>
   );
 };
@@ -418,17 +621,61 @@ const SSoundButton = styled(Button)`
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
-    right: initial;
-    left: 16px;
+    width: 36px;
+    height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    right: initial;
-    left: 24px;
-    bottom: 24px;
-
     padding: 12px;
     width: 48px;
+    height: 48px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
+
+const SSetThumbnailButtonIconOnly = styled(Button)`
+  position: absolute;
+  right: 64px;
+  bottom: 16px;
+
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  ${({ theme }) => theme.media.tablet} {
+    right: initial;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 72px;
+    padding: 12px;
+    width: 48px;
+    height: 48px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
+
+const SSetThumbnailButton = styled(Button)`
+  position: absolute;
+  right: 64px;
+  bottom: 16px;
+
+  padding: 8px;
+  height: 36px;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 72px;
+
+    padding: 12px;
     height: 48px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

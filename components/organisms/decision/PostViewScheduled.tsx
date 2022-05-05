@@ -15,11 +15,14 @@ import PostScheduledSection from '../../molecules/decision/PostScheduledSection'
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import { TPostType } from '../../../utils/switchPostType';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
   postType: string;
   postStatus: TPostStatusStringified;
+  variant: 'decision' | 'moderation';
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -30,6 +33,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   post,
   postType,
   postStatus,
+  variant,
   handleGoBack,
   handleUpdatePostStatus,
   handleReportOpen,
@@ -137,17 +141,30 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
       />
-      <PostTopInfo
-        title={post.title}
-        postId={post.postUuid}
-        postStatus={postStatus}
-        creator={post.creator!!}
-        hasWinner={false}
-        hasResponse={false}
-        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        startsAtSeconds={post.startsAt?.seconds as number}
-        handleReportOpen={handleReportOpen}
-      />
+      {variant === 'decision' ? (
+        <PostTopInfo
+          title={post.title}
+          postId={post.postUuid}
+          postStatus={postStatus}
+          postType={postType as TPostType}
+          creator={post.creator!!}
+          hasWinner={false}
+          hasResponse={false}
+          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+          startsAtSeconds={post.startsAt?.seconds as number}
+          handleReportOpen={handleReportOpen}
+        />
+      ) : (
+        <PostTopInfoModeration
+          title={post.title}
+          postId={post.postUuid}
+          postStatus={postStatus}
+          postType={postType as TPostType}
+          hasWinner={false}
+          hasResponse={false}
+          handleUpdatePostStatus={handleUpdatePostStatus}
+        />
+      )}
       <SActivitesContainer>
         <PostScheduledSection
           postType={postType}
@@ -155,6 +172,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
             (post.startsAt?.seconds as number) * 1000
           ).getTime()}
           isFollowing={isFollowing}
+          variant={variant}
           handleFollowDecision={handleFollowDecision}
         />
       </SActivitesContainer>
