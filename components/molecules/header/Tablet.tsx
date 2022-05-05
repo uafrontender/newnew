@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
+import Link from 'next/link';
 
 import Logo from '../Logo';
 import Button from '../../atoms/Button';
@@ -25,7 +25,6 @@ interface ITablet {}
 export const Tablet: React.FC<ITablet> = () => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const router = useRouter();
   const { unreadCount } = useGetChats();
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
@@ -38,25 +37,6 @@ export const Tablet: React.FC<ITablet> = () => {
 
   const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
-
-  const handleCreateClick = () => {
-    if (!user.userData?.options?.isCreator) {
-      router.push('/creator-onboarding');
-    } else {
-      router.push('/creation');
-    }
-  };
-  const handleUserClick = () => {
-    router.push(
-      user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile'
-    );
-  };
-  const handleSignInClick = () => {
-    router.push('/sign-up');
-  };
-  const handleSignUpClick = () => {
-    router.push('/sign-up');
-  };
 
   return (
     <SContainer>
@@ -123,13 +103,22 @@ export const Tablet: React.FC<ITablet> = () => {
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button
-                    view='primaryGrad'
-                    onClick={handleCreateClick}
-                    withShadow={!globalSearchActive}
+                  <Link
+                    href={
+                      !user.userData?.options?.isCreator
+                        ? '/creator-onboarding'
+                        : '/creation'
+                    }
                   >
-                    {t('button-create-decision')}
-                  </Button>
+                    <a>
+                      <Button
+                        view='primaryGrad'
+                        withShadow={!globalSearchActive}
+                      >
+                        {t('button-create-decision')}
+                      </Button>
+                    </a>
+                  </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
                   <Button iconOnly view='quaternary' onClick={handleMenuClick}>
@@ -149,20 +138,38 @@ export const Tablet: React.FC<ITablet> = () => {
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button
-                    view='primaryGrad'
-                    onClick={handleCreateClick}
-                    withShadow={!globalSearchActive}
+                  <Link
+                    href={
+                      !user.userData?.options?.isCreator
+                        ? '/creator-onboarding'
+                        : '/creation'
+                    }
                   >
-                    {t('button-create')}
-                  </Button>
+                    <a>
+                      <Button
+                        view='primaryGrad'
+                        withShadow={!globalSearchActive}
+                      >
+                        {t('button-create')}
+                      </Button>
+                    </a>
+                  </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar
-                    withClick
-                    avatarUrl={user.userData?.avatarUrl}
-                    onClick={handleUserClick}
-                  />
+                  <Link
+                    href={
+                      user.userData?.options?.isCreator
+                        ? '/profile/my-posts'
+                        : '/profile'
+                    }
+                  >
+                    <a>
+                      <UserAvatar
+                        withClick
+                        avatarUrl={user.userData?.avatarUrl}
+                      />
+                    </a>
+                  </Link>
                 </SItemWithMargin>
               </>
             )}
@@ -170,20 +177,25 @@ export const Tablet: React.FC<ITablet> = () => {
         ) : (
           <>
             <SItemWithMargin>
-              <Button view='quaternary' onClick={handleSignInClick}>
-                {t('button-login-in')}
-              </Button>
+              <Link href='/sign-up'>
+                <a>
+                  <Button view='quaternary'>{t('button-login-in')}</Button>
+                </a>
+              </Link>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button
-                withDim
-                withShrink
-                view='primaryGrad'
-                onClick={handleSignUpClick}
-                withShadow={!globalSearchActive}
-              >
-                {t('button-sign-up')}
-              </Button>
+              <Link href='/sign-up'>
+                <a>
+                  <Button
+                    withDim
+                    withShrink
+                    view='primaryGrad'
+                    withShadow={!globalSearchActive}
+                  >
+                    {t('button-sign-up')}
+                  </Button>
+                </a>
+              </Link>
             </SItemWithMargin>
           </>
         )}

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactEventHandler, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
