@@ -276,10 +276,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   // Recommendations (with infinite scroll)
   const innerHistoryStack = useRef<newnewapi.Post[]>([]);
-  const [recommenedPosts, setRecommenedPosts] = useState<newnewapi.Post[]>([]);
+  const [recommendedPosts, setRecommendedPosts] = useState<newnewapi.Post[]>(
+    []
+  );
   const [nextPageToken, setNextPageToken] =
     useState<string | null | undefined>('');
-  const [recommenedPostsLoading, setRecommenedPostsLoading] = useState(false);
+  const [recommendedPostsLoading, setRecommendedPostsLoading] = useState(false);
   const [triedLoading, setTriedLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
 
@@ -306,31 +308,34 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
   }, [currLocation, handleClose, router, syncedHistoryPushState]);
 
-  const handleOpenRecommendedPost = (newPost: newnewapi.Post) => {
-    const newPostParsed = switchPostType(newPost)[0];
-    handleOpenAnotherPost?.(newPost);
-    if (post !== undefined)
-      innerHistoryStack.current.push(post as newnewapi.Post);
-    modalContainerRef.current?.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-    syncedHistoryPushState(
-      {
-        postId: newPostParsed.postUuid,
-      },
-      `/post/${newPostParsed.postUuid}`
-    );
-    setRecommenedPosts([]);
-    setNextPageToken('');
-    setTriedLoading(false);
-  };
+  const handleOpenRecommendedPost = useCallback(
+    (newPost: newnewapi.Post) => {
+      const newPostParsed = switchPostType(newPost)[0];
+      handleOpenAnotherPost?.(newPost);
+      if (post !== undefined)
+        innerHistoryStack.current.push(post as newnewapi.Post);
+      modalContainerRef.current?.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+      syncedHistoryPushState(
+        {
+          postId: newPostParsed.postUuid,
+        },
+        `/post/${newPostParsed.postUuid}`
+      );
+      setRecommendedPosts([]);
+      setNextPageToken('');
+      setTriedLoading(false);
+    },
+    [post, handleOpenAnotherPost, syncedHistoryPushState]
+  );
 
   const loadRecommendedPosts = useCallback(
     async (pageToken?: string) => {
-      if (recommenedPostsLoading) return;
+      if (recommendedPostsLoading) return;
       try {
-        setRecommenedPostsLoading(true);
+        setRecommendedPostsLoading(true);
         setTriedLoading(true);
 
         const fetchRecommenedPostsPayload =
@@ -349,19 +354,19 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         );
 
         if (postsResponse.data && postsResponse.data.posts) {
-          setRecommenedPosts((curr) => [
+          setRecommendedPosts((curr) => [
             ...curr,
             ...(postsResponse.data?.posts as newnewapi.Post[]),
           ]);
           setNextPageToken(postsResponse.data.paging?.nextPageToken);
         }
-        setRecommenedPostsLoading(false);
+        setRecommendedPostsLoading(false);
       } catch (err) {
-        setRecommenedPostsLoading(false);
+        setRecommendedPostsLoading(false);
         console.error(err);
       }
     },
-    [setRecommenedPosts, recommenedPostsLoading, postParsed]
+    [setRecommendedPosts, recommendedPostsLoading, postParsed]
   );
 
   const handleReportSubmit = useCallback(
@@ -681,7 +686,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           0,
           innerHistoryStack.current.length - 1
         );
-        setRecommenedPosts([]);
+        setRecommendedPosts([]);
         setNextPageToken('');
         setTriedLoading(false);
       }
@@ -704,7 +709,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           top: 0,
           behavior: 'smooth',
         });
-        setRecommenedPosts([]);
+        setRecommendedPosts([]);
         setNextPageToken('');
         setTriedLoading(false);
       }
@@ -721,13 +726,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   }, [open]);
 
   useEffect(() => {
-    if (inView && !recommenedPostsLoading) {
+    if (inView && !recommendedPostsLoading) {
       if (nextPageToken) {
         loadRecommendedPosts(nextPageToken);
       } else if (
         !triedLoading &&
         !nextPageToken &&
-        recommenedPosts?.length === 0
+        recommendedPosts?.length === 0
       ) {
         loadRecommendedPosts();
       }
@@ -736,8 +741,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   }, [
     inView,
     nextPageToken,
-    recommenedPostsLoading,
-    recommenedPosts.length,
+    recommendedPostsLoading,
+    recommendedPosts.length,
     triedLoading,
   ]);
 
@@ -884,16 +889,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           <ReportModal
             show={reportPostOpen}
             reportedDisplayname={getDisplayname(postParsed?.creator)}
-            onSubmit={async ({ reason, message }) => {
-              if (postParsed) {
-                await reportPost(postParsed.postUuid, reason, message).catch(
-                  (e) => console.error(e)
-                );
-              }
-
-              setReportPostOpen(false);
-            }}
-            onClose={() => setReportPostOpen(false)}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
           />
         )}
       </>
@@ -991,18 +988,14 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             {!isMyPost && (
               <SRecommendationsSection id='recommendations-section-heading'>
                 <Headline variant={4}>
-                  {recommenedPosts.length > 0
+                  {recommendedPosts.length > 0
                     ? t('RecommendationsSection.heading')
                     : null}
                 </Headline>
-                {recommenedPosts && (
+                {recommendedPosts && (
                   <ListPostModal
-                    category=''
-                    loading={recommenedPostsLoading}
-                    collection={recommenedPosts}
-                    wrapperStyle={{
-                      left: '-16px',
-                    }}
+                    loading={recommendedPostsLoading}
+                    collection={recommendedPosts}
                     skeletonsBgColor={theme.colorsThemed.background.tertiary}
                     skeletonsHighlightColor={
                       theme.colorsThemed.background.secondary
@@ -1015,7 +1008,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                   style={{
                     position: 'relative',
                     bottom: '10px',
-                    ...(recommenedPostsLoading
+                    ...(recommendedPostsLoading
                       ? {
                           display: 'none',
                         }
