@@ -519,8 +519,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <STutorialTooltipTextAreaHolder>
               <TutorialTooltip
                 isTooltipVisible={
+                  options.length > 0 &&
                   user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                    newnewapi.AcTutorialStep.AC_TEXT_FIELD
                 }
                 closeTooltip={goToNextStep}
                 title={t('tutorials.ac.createYourBid.title')}
@@ -533,8 +534,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <STutorialTooltipHolder>
           <TutorialTooltip
             isTooltipVisible={
+              options.length > 0 &&
               user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-              newnewapi.AcTutorialStep.AC_ALL_BIDS
+                newnewapi.AcTutorialStep.AC_ALL_BIDS
             }
             closeTooltip={goToNextStep}
             title={t('tutorials.ac.peopleBids.title')}
@@ -641,8 +643,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           <STutorialTooltipHolderMobile>
             <TutorialTooltip
               isTooltipVisible={
+                options.length > 0 &&
                 user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
               }
               closeTooltip={goToNextStep}
               title={t('tutorials.ac.createYourBid.title')}
