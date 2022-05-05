@@ -51,7 +51,7 @@ import PostShareMenu from '../../molecules/decision/PostShareMenu';
 import PostEllipseModal from '../../molecules/decision/PostEllipseModal';
 import PostEllipseMenu from '../../molecules/decision/PostEllipseMenu';
 import PostFailedBox from '../../molecules/decision/PostFailedBox';
-import PostSuccessAnimationBackground from './PostSuccessAnimationBackground';
+import PostSuccessAnimationBackground from '../../molecules/decision/PostSuccessAnimationBackground';
 
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
