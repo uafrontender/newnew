@@ -641,7 +641,6 @@ const SMoreButton = styled(Button)`
 `;
 
 const SCenterPart = styled.div`
-  gap: 8px;
   flex: 1;
   margin: 0 0 24px;
   display: flex;
@@ -756,6 +755,7 @@ const SMessage = styled.div<ISMessage>`
   }}
   display: flex;
   flex-direction: row;
+  margin-bottom: 8px;
 `;
 
 interface ISMessageContent {
