@@ -137,7 +137,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
           </STimerItem>
         )}
       </STimer>
-      {variant === 'decision' && (
+      {/* {variant === 'decision' && (
         <SCTAButton view='primaryGrad' onClick={() => handleFollowDecision()}>
           {!isFollowing
             ? t(`PostScheduled.PostScheduledSection.${variant}.followBtn`, {
@@ -147,7 +147,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
                 postType: t(`postType.${postType}`),
               })}
         </SCTAButton>
-      )}
+      )} */}
     </SContainer>
   );
 };
