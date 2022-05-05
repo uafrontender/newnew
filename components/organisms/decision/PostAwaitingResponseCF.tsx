@@ -29,6 +29,7 @@ interface IPostAwaitingResponseCF {
   post: newnewapi.Crowdfunding;
 }
 
+// TODO: memorize
 const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
   ({ post }) => {
     const { t } = useTranslation('decision');

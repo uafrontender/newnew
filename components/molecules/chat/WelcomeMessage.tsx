@@ -6,20 +6,23 @@ interface IWelcomeMessage {
   userAlias: string;
 }
 
-const WelcomeMessage: React.FC<IWelcomeMessage> = ({ userAlias }) => {
-  const { t } = useTranslation('chat');
+const WelcomeMessage: React.FC<IWelcomeMessage> = React.memo(
+  ({ userAlias }) => {
+    const { t } = useTranslation('chat');
 
-  return (
-    <SWelcomeMessage>
-      <div>
-        <span>🎉</span>
-        <p>
-          {t('chat.welcome-message')} @{userAlias}.
-        </p>
-      </div>
-    </SWelcomeMessage>
-  );
-};
+    return (
+      <SWelcomeMessage>
+        <div>
+          <span>🎉</span>
+          <p>
+            {t('chat.welcome-message')} @{userAlias}.
+          </p>
+        </div>
+      </SWelcomeMessage>
+    );
+  }
+);
+
 const SWelcomeMessage = styled.div`
   position: absolute;
   left: 0;

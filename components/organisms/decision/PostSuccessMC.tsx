@@ -31,6 +31,7 @@ interface IPostSuccessMC {
   post: newnewapi.MultipleChoice;
 }
 
+// TODO: memorize
 const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({ post }) => {
   const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();

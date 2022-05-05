@@ -10,7 +10,7 @@ import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import SubproductsSelect from '../../../molecules/creator/dashboard/SubproductsSelect';
 
-export const EditSubscriptionRate = () => {
+export const EditSubscriptionRate: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -47,7 +47,7 @@ export const EditSubscriptionRate = () => {
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default EditSubscriptionRate;
 

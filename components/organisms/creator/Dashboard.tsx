@@ -21,7 +21,7 @@ import { getMyPosts } from '../../../api/endpoints/user';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
 
-export const Dashboard = () => {
+export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -166,7 +166,7 @@ export const Dashboard = () => {
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Dashboard;
 

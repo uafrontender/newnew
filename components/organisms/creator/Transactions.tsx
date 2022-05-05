@@ -7,7 +7,7 @@ import Navigation from '../../molecules/creator/Navigation';
 
 import { useAppSelector } from '../../../redux-store/store';
 
-export const Transactions = () => {
+export const Transactions: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -25,7 +25,7 @@ export const Transactions = () => {
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Transactions;
 

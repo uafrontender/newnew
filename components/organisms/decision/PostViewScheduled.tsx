@@ -25,6 +25,7 @@ interface IPostViewScheduled {
   handleReportOpen: () => void;
 }
 
+// TODO: memorize
 const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
   post,
   postType,
