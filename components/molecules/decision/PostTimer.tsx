@@ -19,11 +19,13 @@ import {
 interface IPostTimer {
   timestampSeconds: number;
   postType: TPostType;
+  itTutorialVisible?: boolean | undefined;
 }
 
 const PostTimer: React.FunctionComponent<IPostTimer> = ({
   timestampSeconds,
   postType,
+  itTutorialVisible,
 }) => {
   const { t } = useTranslation('decision');
   const { user } = useAppSelector((state) => state);
@@ -64,35 +66,37 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
   }, []);
 
   useEffect(() => {
-    switch (postType) {
-      case 'ac':
-        if (
-          user.userTutorialsProgress.remainingAcSteps &&
-          user.userTutorialsProgress.remainingAcSteps[0] ===
-            newnewapi.AcTutorialStep.AC_TIMER
-        )
-          setIsTooltipVisible(true);
-        break;
-      case 'cf':
-        if (
-          user.userTutorialsProgress.remainingCfSteps &&
-          user.userTutorialsProgress.remainingCfSteps[0] ===
-            newnewapi.CfTutorialStep.CF_TIMER
-        )
-          setIsTooltipVisible(true);
-        break;
-      case 'mc':
-        if (
-          user.userTutorialsProgress.remainingMcSteps &&
-          user.userTutorialsProgress.remainingMcSteps[0] ===
-            newnewapi.McTutorialStep.MC_TIMER
-        )
-          setIsTooltipVisible(true);
-        break;
-      default:
-        setIsTooltipVisible(false);
+    if (itTutorialVisible === undefined || itTutorialVisible) {
+      switch (postType) {
+        case 'ac':
+          if (
+            user.userTutorialsProgress.remainingAcSteps &&
+            user.userTutorialsProgress.remainingAcSteps[0] ===
+              newnewapi.AcTutorialStep.AC_TIMER
+          )
+            setIsTooltipVisible(true);
+          break;
+        case 'cf':
+          if (
+            user.userTutorialsProgress.remainingCfSteps &&
+            user.userTutorialsProgress.remainingCfSteps[0] ===
+              newnewapi.CfTutorialStep.CF_TIMER
+          )
+            setIsTooltipVisible(true);
+          break;
+        case 'mc':
+          if (
+            user.userTutorialsProgress.remainingMcSteps &&
+            user.userTutorialsProgress.remainingMcSteps[0] ===
+              newnewapi.McTutorialStep.MC_TIMER
+          )
+            setIsTooltipVisible(true);
+          break;
+        default:
+          setIsTooltipVisible(false);
+      }
     }
-  }, [postType, user.userTutorialsProgress]);
+  }, [postType, user.userTutorialsProgress, itTutorialVisible]);
 
   const goToNextStep = () => {
     setIsTooltipVisible(false);
@@ -235,6 +239,10 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 };
 
 export default PostTimer;
+
+PostTimer.defaultProps = {
+  itTutorialVisible: undefined,
+};
 
 const SWrapper = styled.div<{
   shouldTurnRed: boolean;

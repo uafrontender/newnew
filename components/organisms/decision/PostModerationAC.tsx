@@ -568,6 +568,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
             postType='ac'
+            itTutorialVisible={options.length > 0}
           />
         )}
       </SExpiresSection>
@@ -641,6 +642,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
       </SActivitesContainer>
       <HeroPopup
         isPopupVisible={
+          options.length > 0 &&
           user!!.userTutorialsProgressSynced &&
           user!!.userTutorialsProgress.remainingAcSteps!![0] ===
             newnewapi.AcTutorialStep.AC_HERO
