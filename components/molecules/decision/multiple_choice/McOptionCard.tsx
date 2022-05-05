@@ -1157,7 +1157,7 @@ const SPaymentModalOptionText = styled.div`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   right: 30px;
-  top: 95px;
+  top: 65px;
   text-align: left;
   div {
     width: 190px;
