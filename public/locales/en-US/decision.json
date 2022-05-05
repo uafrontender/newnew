@@ -647,21 +647,15 @@
   },
   "heroPopupAC": {
     "title": "Events",
-    "line1": "1. Open to ideas? Post a video and have the audience send you bids on what you should do",
-    "line2": "2. People send bids with their ideas, and how much they’ll pay to see you do it",
-    "line3": "3. Choose your favorite bid, then upload a video of yourself doing it!"
+    "text": "Control the outcome...\n Send the creator a bid with what you want them to do, how much you’d spend, then watch them do the bid!"
   },
   "heroPopupMC": {
     "title": "Superpolls",
-    "line1": "1. Post a video poll with a few options for the audience to choose from",
-    "line2": "2. People pay to vote on their favorite option",
-    "line3": "3. Upload a video response of you doing the option that gets the most votes!"
+    "text": "The creator makes a poll you pay to vote on.\n When the time’s up, watch the creator do the option that got the most amount of votes!"
   },
   "heroPopupCF": {
     "title": "Goals",
-    "line1": "1. Post a video goal and choose the number of backers you need to reach that goal",
-    "line2": "2. Every backer will contribute a custom dollar amount to your goal",
-    "line3": "3. Upload a video of you fulfilling your goal IRL when you get enough backers!"
+    "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
   },
   "tutorials": {
     "timer": {
