@@ -63,6 +63,7 @@ interface IPostVideoModeration {
   thumbnails: any;
   isMuted: boolean;
   handleToggleMuted: () => void;
+  handleUpdatePostStatus: (postStatus: number | string) => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
 }
 
@@ -74,6 +75,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   thumbnails,
   isMuted,
   handleToggleMuted,
+  handleUpdatePostStatus,
   handleUpdateResponseVideo,
 }) => {
   const { t } = useTranslation('decision');
@@ -93,7 +95,9 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
   // Tabs
   const [openedTab, setOpenedTab] = useState<'announcement' | 'response'>(
-    response || postStatus === 'waiting_for_response'
+    response ||
+      postStatus === 'waiting_for_response' ||
+      postStatus === 'processing_response'
       ? 'response'
       : 'announcement'
   );
@@ -103,7 +107,10 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     useState(false);
 
   const isSetThumbnailButtonIconOnly = useMemo(
-    () => response || postStatus === 'waiting_for_response',
+    () =>
+      response ||
+      postStatus === 'waiting_for_response' ||
+      postStatus === 'processing_response',
     [response, postStatus]
   );
 
@@ -218,9 +225,6 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         throw new Error('Upload failed');
       }
 
-      // console.log('return for now');
-      // return;
-
       const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
         publicUrl: res.data.publicUrl,
       });
@@ -241,13 +245,24 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           thumbnailImageUrl: resProcessing?.data?.targetUrls?.thumbnailImageUrl,
         },
       });
-      setResponseFileUploadProgress(10);
-      setResponseFileUploadETA(80);
-      setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
-    } catch (error: any) {
-      setResponseFileUploadError(true);
+
       setResponseFileUploadLoading(false);
-      toast.error(error?.message);
+
+      setResponseFileProcessingProgress(10);
+      setResponseFileProcessingETA(80);
+      setResponseFileProcessingLoading(true);
+      setResponseFileProcessingError(false);
+      setUploadedResponseVideoUrl(res.data.publicUrl ?? '');
+      xhrRef.current = undefined;
+    } catch (error: any) {
+      if (error.message === 'Upload failed') {
+        setResponseFileUploadError(true);
+        toast.error(error?.message);
+      } else {
+        console.log('Upload aborted');
+      }
+      xhrRef.current = undefined;
+      setResponseFileUploadLoading(false);
     }
   }, []);
 
@@ -274,13 +289,16 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       }
 
       setUploadedResponseVideoUrl('');
-      setResponseFileUploadError(false);
       setVideoProcessing({
         taskUuid: '',
         targetUrls: {},
       });
+      setResponseFileUploadError(false);
       setResponseFileUploadLoading(false);
       setResponseFileUploadProgress(0);
+      setResponseFileProcessingError(false);
+      setResponseFileProcessingLoading(false);
+      setResponseFileProcessingProgress(0);
     } catch (error: any) {
       toast.error(error?.message);
     }
@@ -294,7 +312,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     }
   };
 
-  const handleUploadVideo = useCallback(async () => {
+  const handleUploadVideoProcessed = useCallback(async () => {
     try {
       const payload = new newnewapi.UploadPostResponseRequest({
         postUuid: postId,
@@ -312,12 +330,37 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
         handleUpdateResponseVideo(responseObj!!);
+        handleUpdatePostStatus('SUCCEEDED');
         setUploadedResponseVideoUrl('');
       }
     } catch (err) {
       console.error(err);
     }
-  }, [postId, uploadedResponseVideoUrl, handleUpdateResponseVideo]);
+  }, [
+    postId,
+    uploadedResponseVideoUrl,
+    handleUpdateResponseVideo,
+    handleUpdatePostStatus,
+  ]);
+
+  const handleUploadVideoNotProcessed = useCallback(async () => {
+    try {
+      const payload = new newnewapi.UploadPostResponseRequest({
+        postUuid: postId,
+        responseVideoUrl: uploadedResponseVideoUrl,
+      });
+
+      const res = await uploadPostResponse(payload);
+
+      if (res.data) {
+        toast.success(t('PostVideo.responseUploadedNonProcessed'));
+        handleUpdatePostStatus('PROCESSING_RESPONSE');
+        setUploadedResponseVideoUrl('');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [postId, uploadedResponseVideoUrl, t, handleUpdatePostStatus]);
 
   const handlerSocketUpdated = useCallback(
     (data: any) => {
@@ -326,12 +369,15 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
 
       if (!decoded) return;
 
-      if (decoded.taskUuid === videoProcessing?.taskUuid) {
+      if (
+        decoded.taskUuid === videoProcessing?.taskUuid ||
+        decoded.postUuid === postId
+      ) {
         setResponseFileProcessingETA(
           decoded.estimatedTimeLeft?.seconds as number
         );
 
-        if (decoded.fractionCompleted > responseFileUploadProgress) {
+        if (decoded.fractionCompleted > responseFileProcessingProgress) {
           setResponseFileProcessingProgress(decoded.fractionCompleted);
         }
 
@@ -340,7 +386,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         }
       }
     },
-    [videoProcessing, responseFileUploadProgress]
+    [videoProcessing.taskUuid, postId, responseFileProcessingProgress]
   );
 
   useEffect(() => {
@@ -444,6 +490,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           <PostVideoResponseUpload
             id='video'
             thumbnails={{}}
+            postStatus={postStatus}
             value={videoProcessing?.targetUrls!!}
             videoProcessing={videoProcessing}
             etaUpload={responseFileUploadETA}
@@ -469,27 +516,33 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               setResponseFileProcessingLoading(false);
               setResponseFileProcessingProgress(0);
             }}
+            handleUploadVideoNotProcessed={handleUploadVideoNotProcessed}
           />
         )}
-        {response || postStatus === 'waiting_for_response' ? (
+        {response ||
+        postStatus === 'waiting_for_response' ||
+        postStatus === 'processing_response' ? (
           <ToggleVideoWidget
             currentTab={openedTab}
             responseUploaded={response !== undefined}
             handleChangeTab={(newValue) => setOpenedTab(newValue)}
           />
         ) : null}
-        {uploadedResponseVideoUrl && !responseFileUploadLoading && (
-          <PostVideoResponsePreviewModal
-            value={videoProcessing.targetUrls!!}
-            open={uploadedResponseVideoUrl !== ''}
-            handleClose={() => handleVideoDelete()}
-            handleConfirm={() => handleUploadVideo()}
-          />
-        )}
+        {uploadedResponseVideoUrl &&
+          !responseFileUploadLoading &&
+          !responseFileProcessingLoading && (
+            <PostVideoResponsePreviewModal
+              value={videoProcessing.targetUrls!!}
+              open={uploadedResponseVideoUrl !== ''}
+              handleClose={() => handleVideoDelete()}
+              handleConfirm={() => handleUploadVideoProcessed()}
+            />
+          )}
       </SVideoWrapper>
       {isMobile &&
       postStatus === 'waiting_for_response' &&
-      !responseFileUploadLoading ? (
+      !responseFileUploadLoading &&
+      !responseFileProcessingLoading ? (
         <SUploadResponseButton
           view='primaryGrad'
           onClick={() => {

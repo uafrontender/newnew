@@ -20,7 +20,9 @@ import {
   getMcOption,
 } from '../../../api/endpoints/multiple_choice';
 import isBrowser from '../../../utils/isBrowser';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { SocketContext } from '../../../contexts/socketContext';
@@ -331,6 +333,15 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
+      if (
+        !responseFreshlyUploaded &&
+        switchPostStatus('ac', res.data.multipleChoice!!.status!!) ===
+          'succeeded' &&
+        res.data?.multipleChoice?.response
+      ) {
+        setResponseFreshlyUploaded(res.data.multipleChoice.response);
+      }
+
       setTotalVotes(res.data.multipleChoice!!.totalVotes as number);
       setNumberOfOptions(res.data.multipleChoice!!.optionCount as number);
       handleUpdatePostStatus(res.data.multipleChoice!!.status!!);
@@ -376,7 +387,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
           setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
 
@@ -432,16 +443,39 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
       if (decodedParsed.postUuid === post.postUuid) {
         setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
         setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
+
+        if (
+          !responseFreshlyUploaded &&
+          decoded.post?.multipleChoice?.response
+        ) {
+          setResponseFreshlyUploaded(decoded.post.multipleChoice.response);
+        }
       }
     };
 
-    const socketHandlerPostStatus = (data: any) => {
+    const socketHandlerPostStatus = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {
         handleUpdatePostStatus(decoded.multipleChoice!!);
+
+        if (
+          !responseFreshlyUploaded &&
+          postStatus === 'processing_response' &&
+          switchPostStatus('mc', decoded.multipleChoice!!) === 'succeeded'
+        ) {
+          const fetchPostPayload = new newnewapi.GetPostRequest({
+            postUuid: post.postUuid,
+          });
+
+          const res = await fetchPostByUUID(fetchPostPayload);
+
+          if (res.data?.multipleChoice?.response) {
+            setResponseFreshlyUploaded(res.data?.multipleChoice?.response);
+          }
+        }
       }
     };
 
@@ -470,6 +504,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
   }, [
     socketConnection,
     post,
+    postStatus,
     user.userData?.userUuid,
     setOptions,
     sortOptions,
@@ -531,6 +566,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         handleUpdateResponseVideo={(newValue) =>
           setResponseFreshlyUploaded(newValue)
         }
+        handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <PostTopInfoModeration
         postType='mc'

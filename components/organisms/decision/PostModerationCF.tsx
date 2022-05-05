@@ -34,7 +34,9 @@ import CfCrowdfundingSuccessModeration from '../../molecules/decision/crowdfundi
 import switchPostType from '../../../utils/switchPostType';
 import isBrowser from '../../../utils/isBrowser';
 
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
@@ -262,6 +264,15 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
 
+      if (
+        !responseFreshlyUploaded &&
+        switchPostStatus('ac', res.data.crowdfunding!!.status!!) ===
+          'succeeded' &&
+        res.data?.crowdfunding?.response
+      ) {
+        setResponseFreshlyUploaded(res.data.crowdfunding.response);
+      }
+
       setCurrentBackers(res.data.crowdfunding!!.currentBackerCount as number);
       handleUpdatePostStatus(res.data.crowdfunding!!.status!!);
     } catch (err) {
@@ -329,16 +340,36 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
       if (decodedParsed.postUuid === post.postUuid) {
         setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
+
+        if (!responseFreshlyUploaded && decoded.post?.crowdfunding?.response) {
+          setResponseFreshlyUploaded(decoded.post.crowdfunding.response);
+        }
       }
     };
 
-    const socketHandlerPostStatus = (data: any) => {
+    const socketHandlerPostStatus = async (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
       if (!decoded) return;
       if (decoded.postUuid === post.postUuid) {
         handleUpdatePostStatus(decoded.crowdfunding!!);
+
+        if (
+          !responseFreshlyUploaded &&
+          postStatus === 'processing_response' &&
+          switchPostStatus('cf', decoded.crowdfunding!!) === 'succeeded'
+        ) {
+          const fetchPostPayload = new newnewapi.GetPostRequest({
+            postUuid: post.postUuid,
+          });
+
+          const res = await fetchPostByUUID(fetchPostPayload);
+
+          if (res.data?.crowdfunding?.response) {
+            setResponseFreshlyUploaded(res.data?.crowdfunding?.response);
+          }
+        }
       }
     };
 
@@ -356,7 +387,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, setPledges, sortPleges]);
+  }, [socketConnection, post, postStatus, setPledges, sortPleges]);
 
   const goToNextStep = () => {
     if (user.loggedIn) {
@@ -414,6 +445,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
         handleUpdateResponseVideo={(newValue) =>
           setResponseFreshlyUploaded(newValue)
         }
+        handleUpdatePostStatus={handleUpdatePostStatus}
       />
       <PostTopInfoModeration
         postType='cf'
