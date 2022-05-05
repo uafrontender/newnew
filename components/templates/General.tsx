@@ -19,7 +19,7 @@ import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
-import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
+// import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
@@ -114,7 +114,7 @@ export const General: React.FC<IGeneral> = (props) => {
 
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
-  useRefreshOnScrollTop();
+  // useRefreshOnScrollTop();
   const { scrollDirection } = useScrollDirection(wrapperRef);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
