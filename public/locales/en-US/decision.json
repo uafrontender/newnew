@@ -119,6 +119,8 @@
       "back_to_original": "Back to original",
       "back_to_response": "Watch response"
     },
+    "floatingUploadResponseBtn": "Make a response video",
+    "setThumbnail": "Set a thubmnail",
     "UploadResponseForm": {
       "fileUpload": {
         "title_1": "Your audience is waiting!",
@@ -421,6 +423,16 @@
       "choosePledgeBtn": "Make pledge"
     }
   },
+  "PostVideoThumbnailEdit": {
+    "title": "Set a thumbnail",
+    "description": "Select a snippet from the video",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "toast": {
+      "success": "Success! Thumbnail will be changed once processed",
+      "error": "An error occured"
+    }
+  },
   "AcPostModeration": {
     "PostTopInfo": {
       "SelectWinner": {
@@ -461,8 +473,7 @@
       "body": "Are you sure you want to delete this option?",
       "cancelBtn": "Cancel",
       "confirmBtn": "Delete"
-    },
-    "floatingUploadResponseBtn": "Make a response video"
+    }
   },
   "McPostModeration": {
     "OptionsTab": {

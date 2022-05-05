@@ -1,6 +1,12 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -15,6 +21,7 @@ import InlineSvg from '../../atoms/InlineSVG';
 
 import VolumeOff from '../../../public/images/svg/icons/filled/VolumeOFF1.svg';
 import VolumeOn from '../../../public/images/svg/icons/filled/VolumeON.svg';
+import ThumbnailIcon from '../../../public/images/svg/icons/filled/AddImage.svg';
 
 import PostVideoResponseUpload from './PostVideoResponseUpload';
 import ToggleVideoWidget from '../../atoms/moderation/ToggleVideoWidget';
@@ -25,20 +32,34 @@ import {
   stopVideoProcessing,
 } from '../../../api/endpoints/upload';
 import { SocketContext } from '../../../contexts/socketContext';
-import { TVideoProcessingData } from '../../../redux-store/slices/creationStateSlice';
+import {
+  TThumbnailParameters,
+  TVideoProcessingData,
+} from '../../../redux-store/slices/creationStateSlice';
 import PostVideoResponsePreviewModal from './PostVideoResponsePreviewModal';
-import { uploadPostResponse } from '../../../api/endpoints/post';
+import {
+  setPostThumbnail,
+  uploadPostResponse,
+} from '../../../api/endpoints/post';
 import isSafari from '../../../utils/isSafari';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
 });
 
+const PostVideoThumbnailEdit = dynamic(
+  () => import('./PostVideoThumbnailEdit'),
+  {
+    ssr: false,
+  }
+);
+
 interface IPostVideoModeration {
   postId: string;
   postStatus: TPostStatusStringified;
   announcement: newnewapi.IVideoUrls;
   response?: newnewapi.IVideoUrls;
+  thumbnails: any;
   isMuted: boolean;
   handleToggleMuted: () => void;
   handleUpdateResponseVideo: (newResponse: newnewapi.IVideoUrls) => void;
@@ -49,6 +70,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   postStatus,
   announcement,
   response,
+  thumbnails,
   isMuted,
   handleToggleMuted,
   handleUpdateResponseVideo,
@@ -74,6 +96,41 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       ? 'response'
       : 'announcement'
   );
+
+  // Editing announcement video thumbnail
+  const [isEditThumbnailModalOpen, setIsEditThumbnailModalOpen] =
+    useState(false);
+
+  const isSetThumbnailButtonIconOnly = useMemo(
+    () => response || postStatus === 'waiting_for_response',
+    [response, postStatus]
+  );
+
+  const handleSubmitNewThumbnail = async (params: TThumbnailParameters) => {
+    try {
+      const payload = new newnewapi.SetPostThumbnailRequest({
+        postUuid: postId,
+        thumbnailParameters: {
+          startTime: {
+            seconds: params.startTime,
+          },
+          endTime: {
+            seconds: params.endTime,
+          },
+        },
+      });
+
+      const res = await setPostThumbnail(payload);
+
+      if (res.error) throw new Error('Request failed');
+
+      setIsEditThumbnailModalOpen(false);
+      toast.success(t('PostVideoThumbnailEdit.toast.success'));
+    } catch (err) {
+      console.error(err);
+      toast.error(t('PostVideoThumbnailEdit.toast.error'));
+    }
+  };
 
   // File upload
   const [uploadedResponseVideoUrl, setUploadedResponseVideoUrl] = useState('');
@@ -264,6 +321,27 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
               resources={announcement}
               muted={isMuted}
             />
+            {isSetThumbnailButtonIconOnly ? (
+              <SSetThumbnailButtonIconOnly
+                iconOnly
+                view='transparent'
+                onClick={() => setIsEditThumbnailModalOpen(true)}
+              >
+                <InlineSvg
+                  svg={ThumbnailIcon}
+                  width={isMobileOrTablet ? '20px' : '24px'}
+                  height={isMobileOrTablet ? '20px' : '24px'}
+                  fill='#FFFFFF'
+                />
+              </SSetThumbnailButtonIconOnly>
+            ) : (
+              <SSetThumbnailButton
+                view='transparent'
+                onClick={() => setIsEditThumbnailModalOpen(true)}
+              >
+                {t('PostVideo.setThumbnail')}
+              </SSetThumbnailButton>
+            )}
             <SSoundButton
               iconOnly
               view='transparent'
@@ -354,9 +432,17 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
             document.getElementById('upload-response-btn')?.click();
           }}
         >
-          {t('AcPostModeration.floatingUploadResponseBtn')}
+          {t('PostVideo.floatingUploadResponseBtn')}
         </SUploadResponseButton>
       ) : null}
+      {/* Edit thumbnail */}
+      <PostVideoThumbnailEdit
+        open={isEditThumbnailModalOpen}
+        value={announcement}
+        thumbnails={thumbnails}
+        handleClose={() => setIsEditThumbnailModalOpen(false)}
+        handleSubmit={handleSubmitNewThumbnail}
+      />
     </>
   );
 };
@@ -418,17 +504,61 @@ const SSoundButton = styled(Button)`
   border-radius: ${({ theme }) => theme.borderRadius.small};
 
   ${({ theme }) => theme.media.tablet} {
-    right: initial;
-    left: 16px;
+    width: 36px;
+    height: 36px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    right: initial;
-    left: 24px;
-    bottom: 24px;
-
     padding: 12px;
     width: 48px;
+    height: 48px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
+
+const SSetThumbnailButtonIconOnly = styled(Button)`
+  position: absolute;
+  right: 64px;
+  bottom: 16px;
+
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  ${({ theme }) => theme.media.tablet} {
+    right: initial;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 72px;
+    padding: 12px;
+    width: 48px;
+    height: 48px;
+
+    border-radius: ${({ theme }) => theme.borderRadius.medium};
+  }
+`;
+
+const SSetThumbnailButton = styled(Button)`
+  position: absolute;
+  right: 64px;
+  bottom: 16px;
+
+  padding: 8px;
+  height: 36px;
+
+  border-radius: ${({ theme }) => theme.borderRadius.small};
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 72px;
+
+    padding: 12px;
     height: 48px;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};

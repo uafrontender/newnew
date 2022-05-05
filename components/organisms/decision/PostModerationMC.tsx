@@ -520,6 +520,10 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = ({
         postId={post.postUuid}
         announcement={post.announcement!!}
         response={(post.response || responseFreshlyUploaded) ?? undefined}
+        thumbnails={{
+          startTime: 1,
+          endTime: 3,
+        }}
         postStatus={postStatus}
         isMuted={mutedMode}
         handleToggleMuted={() => handleToggleMutedMode()}
