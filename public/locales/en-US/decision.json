@@ -172,6 +172,11 @@
           "title": "Uploading video",
           "description": "We're uploading your video response...hang tight!",
           "process": "{{progress}}% • {{time}} left"
+        },
+        "processing": {
+          "title": "Processing the video...",
+          "description": "You can publish the response while the video is being processed",
+          "process": "{{progress}}% • {{time}} left"
         }
       }
     }

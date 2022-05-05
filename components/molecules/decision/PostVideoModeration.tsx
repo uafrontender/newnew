@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useTranslation } from 'next-i18next';
@@ -133,18 +134,28 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
   };
 
   // File upload
+  const xhrRef = useRef<XMLHttpRequest>();
   const [uploadedResponseVideoUrl, setUploadedResponseVideoUrl] = useState('');
 
   const [videoProcessing, setVideoProcessing] = useState<TVideoProcessingData>({
     taskUuid: '',
     targetUrls: {},
   });
+  // File upload
   const [responseFileUploadETA, setResponseFileUploadETA] = useState(0);
   const [responseFileUploadProgress, setResponseFileUploadProgress] =
     useState(0);
   const [responseFileUploadLoading, setResponseFileUploadLoading] =
     useState(false);
   const [responseFileUploadError, setResponseFileUploadError] = useState(false);
+  // File processing
+  const [responseFileProcessingETA, setResponseFileProcessingETA] = useState(0);
+  const [responseFileProcessingProgress, setResponseFileProcessingProgress] =
+    useState(0);
+  const [responseFileProcessingLoading, setResponseFileProcessingLoading] =
+    useState(false);
+  const [responseFileProcessingError, setResponseFileProcessingError] =
+    useState(false);
 
   const handleVideoUpload = useCallback(async (value: File) => {
     try {
@@ -163,20 +174,52 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         throw new Error(res.error?.message ?? 'An error occurred');
       }
 
-      const uploadResponse = await fetch(res.data.uploadUrl, {
-        method: 'PUT',
-        body: value,
-        headers: {
-          'Content-Type': value.type,
-        },
+      const xhr = new XMLHttpRequest();
+      xhrRef.current = xhr;
+      let uploadStartTimestamp: number;
+      const uploadResponse = await new Promise((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const uploadProgress = Math.round(
+              (event.loaded / event.total) * 100
+            );
+            const percentageLeft = 100 - uploadProgress;
+            const secondsPassed = Math.round(
+              (event.timeStamp - uploadStartTimestamp) / 1000
+            );
+            const factor = secondsPassed / uploadProgress;
+            const eta = Math.round(factor * percentageLeft);
+            setResponseFileUploadProgress(uploadProgress);
+            setResponseFileUploadETA(eta);
+          }
+        });
+        xhr.addEventListener('loadstart', (event) => {
+          uploadStartTimestamp = event.timeStamp;
+        });
+        xhr.addEventListener('loadend', () => {
+          setResponseFileUploadProgress(100);
+          resolve(xhr.readyState === 4 && xhr.status === 200);
+        });
+        xhr.addEventListener('error', () => {
+          setResponseFileUploadProgress(0);
+          reject(new Error('Upload failed'));
+        });
+        xhr.addEventListener('abort', () => {
+          console.log('Aborted');
+          setResponseFileUploadProgress(0);
+          reject(new Error('Upload aborted'));
+        });
+        xhr.open('PUT', res.data!.uploadUrl, true);
+        xhr.setRequestHeader('Content-Type', value.type);
+        xhr.send(value);
       });
 
-      if (!uploadResponse.ok) {
+      if (!uploadResponse) {
         throw new Error('Upload failed');
       }
 
-      setResponseFileUploadProgress(5);
-      setResponseFileUploadETA(90);
+      // console.log('return for now');
+      // return;
 
       const payloadProcessing = new newnewapi.StartVideoProcessingRequest({
         publicUrl: res.data.publicUrl,
@@ -284,14 +327,16 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
       if (!decoded) return;
 
       if (decoded.taskUuid === videoProcessing?.taskUuid) {
-        setResponseFileUploadETA(decoded.estimatedTimeLeft?.seconds as number);
+        setResponseFileProcessingETA(
+          decoded.estimatedTimeLeft?.seconds as number
+        );
 
         if (decoded.fractionCompleted > responseFileUploadProgress) {
-          setResponseFileUploadProgress(decoded.fractionCompleted);
+          setResponseFileProcessingProgress(decoded.fractionCompleted);
         }
 
         if (decoded.fractionCompleted === 100) {
-          setResponseFileUploadLoading(false);
+          setResponseFileProcessingLoading(false);
         }
       }
     },
@@ -398,13 +443,32 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
         ) : (
           <PostVideoResponseUpload
             id='video'
-            eta={responseFileUploadETA}
-            error={responseFileUploadError}
-            loading={responseFileUploadLoading}
-            progress={responseFileUploadProgress}
-            value={videoProcessing?.targetUrls!!}
-            onChange={handleItemChange}
             thumbnails={{}}
+            value={videoProcessing?.targetUrls!!}
+            videoProcessing={videoProcessing}
+            etaUpload={responseFileUploadETA}
+            errorUpload={responseFileUploadError}
+            loadingUpload={responseFileUploadLoading}
+            progressUpload={responseFileUploadProgress}
+            etaProcessing={responseFileProcessingETA}
+            errorProcessing={responseFileProcessingError}
+            loadingProcessing={responseFileProcessingLoading}
+            progressProcessing={responseFileProcessingProgress}
+            onChange={handleItemChange}
+            handleCancelVideoUpload={() => xhrRef.current?.abort()}
+            handleResetVideoUploadAndProcessingState={() => {
+              setUploadedResponseVideoUrl('');
+              setVideoProcessing({
+                taskUuid: '',
+                targetUrls: {},
+              });
+              setResponseFileUploadError(false);
+              setResponseFileUploadLoading(false);
+              setResponseFileUploadProgress(0);
+              setResponseFileProcessingError(false);
+              setResponseFileProcessingLoading(false);
+              setResponseFileProcessingProgress(0);
+            }}
           />
         )}
         {response || postStatus === 'waiting_for_response' ? (
