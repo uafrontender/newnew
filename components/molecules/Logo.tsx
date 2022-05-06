@@ -47,7 +47,7 @@ export const Logo: React.FunctionComponent<{
   });
 
   return (
-    <Link href='/'>
+    <Link href='/' passHref>
       <SWrapper
         {...{
           ...(style
