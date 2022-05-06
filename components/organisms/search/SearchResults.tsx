@@ -5,12 +5,14 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 import StatisticsIcon from '../../../public/images/svg/icons/outlined/Statistics.svg';
 import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statistics.svg';
 import InlineSvg from '../../atoms/InlineSVG';
-import SearchDecisions from './SearchDecisions';
-import SearchCreators from './SearchCreators';
+
+const SearchDecisions = dynamic(() => import('./SearchDecisions'));
+const SearchCreators = dynamic(() => import('./SearchCreators'));
 
 export const SearchResults = () => {
   const router = useRouter();

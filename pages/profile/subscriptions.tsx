@@ -6,7 +6,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-
+import dynamic from 'next/dynamic';
 import { NextPageWithLayout } from '../_app';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
@@ -14,16 +14,21 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import CreatorsList from '../../components/organisms/search/CreatorsList';
 import NoSubscriptions from '../../public/images/profile/No-subscriptions.png';
 import VerificationPassedIcon from '../../public/images/svg/icons/filled/VerificationPassed.svg';
 import Button from '../../components/atoms/Button';
 import InlineSvg from '../../components/atoms/InlineSVG';
-import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import {
   NoContentDescription,
   NoContentTitle,
 } from '../../components/atoms/profile/NoContentCommonElements';
+
+const NoContentCard = dynamic(
+  () => import('../../components/atoms/profile/NoContentCard')
+);
+const CreatorsList = dynamic(
+  () => import('../../components/organisms/search/CreatorsList')
+);
 
 interface IMyProfileSubscriptions {
   user: Omit<newnewapi.User, 'toJSON'>;
