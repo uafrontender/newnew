@@ -30,9 +30,8 @@ interface IPostAwaitingResponseAC {
   post: newnewapi.Auction;
 }
 
-// TODO: memorize
 const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
-  ({ post }) => {
+  React.memo(({ post }) => {
     const { t } = useTranslation('decision');
     const dispatch = useAppDispatch();
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -184,7 +183,7 @@ const PostAwaitingResponseAC: React.FunctionComponent<IPostAwaitingResponseAC> =
         )}
       </>
     );
-  };
+  });
 
 export default PostAwaitingResponseAC;
 

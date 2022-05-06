@@ -122,11 +122,13 @@ export const PostCard: React.FC<ICard> = React.memo(
         : 0
     );
 
-    const timestampSeconds = useMemo(
-      () =>
-        new Date((postParsed.expiresAt?.seconds as number) * 1000).getTime(),
-      [postParsed.expiresAt?.seconds]
-    );
+    const timestampSeconds = useMemo(() => {
+      if (postParsed.expiresAt?.seconds) {
+        return (postParsed.expiresAt.seconds as number) * 1000;
+      }
+
+      return 0;
+    }, [postParsed.expiresAt?.seconds]);
 
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);

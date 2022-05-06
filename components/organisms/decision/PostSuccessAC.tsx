@@ -35,274 +35,276 @@ interface IPostSuccessAC {
   post: newnewapi.Auction;
 }
 
-// TODO: memorize
-const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({ post }) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // Winninfg option
-  const [winningOption, setWinningOption] =
-    useState<newnewapi.Auction.Option | undefined>();
+    // Winninfg option
+    const [winningOption, setWinningOption] =
+      useState<newnewapi.Auction.Option | undefined>();
 
-  // Video
-  // Open video tab
-  const [videoTab, setVideoTab] =
-    useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  const fetchPostLatestData = useCallback(async () => {
-    try {
-      const fetchPostPayload = new newnewapi.GetPostRequest({
-        postUuid: post.postUuid,
-      });
-
-      const res = await fetchPostByUUID(fetchPostPayload);
-
-      if (!res.data || res.error)
-        throw new Error(res.error?.message ?? 'Request failed');
-
-      if (res.data.auction?.isResponseViewedByMe) {
-        setResponseViewed(true);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
-
-  // Main screen vs all bids
-  const [openedMainSection, setOpenedMainSection] =
-    useState<'main' | 'bids'>('main');
-
-  // Comments
-  const { ref: commentsSectionRef, inView } = useInView({
-    threshold: 0.8,
-  });
-
-  // Check if the response has been viewed
-  useEffect(() => {
-    fetchPostLatestData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
-      }
-      const parsedHash = hash.substring(1);
-
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
-
-    handleCommentsInitialHash();
-  }, []);
-
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  // Load winning option
-  useEffect(() => {
-    async function fetchAndSetWinningOption(id: number) {
+    // Video
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    const fetchPostLatestData = useCallback(async () => {
       try {
-        const payload = new newnewapi.GetAcOptionRequest({
-          optionId: id,
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
         });
 
-        const res = await fetchAcOptionById(payload);
+        const res = await fetchPostByUUID(fetchPostPayload);
 
-        if (res.data?.option) {
-          setWinningOption(res.data.option as newnewapi.Auction.Option);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data.auction?.isResponseViewedByMe) {
+          setResponseViewed(true);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
-    }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    if (post.winningOptionId) {
-      fetchAndSetWinningOption(post.winningOptionId as number);
-    }
-  }, [post.winningOptionId]);
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          {openedMainSection === 'main' ? (
-            <>
-              <DecisionEndedBox imgSrc={BoxIcon.src}>
-                {t('AcPostSuccess.hero_text')}
-              </DecisionEndedBox>
-              <SMainSectionWrapper>
-                <SCreatorInfoDiv>
-                  <SCreator>
-                    <SCreatorImage src={post.creator?.avatarUrl!!} />
-                    <SWantsToKnow>
-                      {t('AcPostSuccess.wants_to_know', {
-                        creator: post.creator?.nickname,
-                      })}
-                    </SWantsToKnow>
-                  </SCreator>
-                  <STotal>
-                    {`$${formatNumber(
-                      post.totalAmount?.usdCents!! / 100 ?? 0,
-                      true
-                    )}`}{' '}
-                    <span>{t('AcPostSuccess.in_total_bids')}</span>
-                  </STotal>
-                </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
-                <SSeparator />
-                {winningOption && (
-                  <>
-                    <SWinningBidCreator>
-                      <SCreator>
-                        <SCreatorImage
-                          src={winningOption.creator?.avatarUrl!!}
-                        />
-                        <SWinningBidCreatorText>
-                          {winningOption.creator?.uuid ===
-                            user.userData?.userUuid ||
-                          winningOption.isSupportedByMe
-                            ? winningOption.supporterCount > 1
-                              ? t('me')
-                              : t('my')
-                            : getDisplayname(winningOption.creator!!)}
-                          {winningOption.supporterCount > 1 ? (
-                            <>
-                              {' & '}
-                              {formatNumber(
-                                winningOption.supporterCount,
-                                true
-                              )}{' '}
-                              {t('AcPostSuccess.others')}
-                            </>
-                          ) : null}{' '}
-                          {t('AcPostSuccess.bid')}
-                        </SWinningBidCreatorText>
-                      </SCreator>
-                    </SWinningBidCreator>
-                    <SWinningOptionAmount variant={4}>
-                      {`$${formatNumber(
-                        winningOption.totalAmount?.usdCents!! / 100 ?? 0,
-                        true
-                      )}`}
-                    </SWinningOptionAmount>
-                    <SSeparator />
-                    <SWinningOptionDetails>
-                      <SWinningOptionDetailsBidChosen>
-                        {t('AcPostSuccess.bid_chosen')}
-                      </SWinningOptionDetailsBidChosen>
-                      <SWinningOptionDetailsSeeAll
-                        onClick={() => setOpenedMainSection('bids')}
-                      >
-                        {t('AcPostSuccess.see_all')}
-                      </SWinningOptionDetailsSeeAll>
-                      <SWinningOptionDetailsTitle variant={4}>
-                        {winningOption.title}
-                      </SWinningOptionDetailsTitle>
-                    </SWinningOptionDetails>
-                  </>
-                )}
-              </SMainSectionWrapper>
-              {!isMobile ? (
-                <>
-                  {!responseViewed && videoTab === 'announcement' ? (
-                    <SWatchResponseWrapper>
-                      <SWatchResponseBtn
-                        shouldView={!responseViewed}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
-                      </SWatchResponseBtn>
-                    </SWatchResponseWrapper>
-                  ) : null}
-                  {responseViewed ? (
-                    <SToggleVideoWidget>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'announcement'}
-                        onClick={() => setVideoTab('announcement')}
-                      >
-                        {t('PostVideoSuccess.tabs.watch_original')}
-                      </SChangeTabBtn>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'response'}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        {t('PostVideoSuccess.tabs.watch_response')}
-                      </SChangeTabBtn>
-                    </SToggleVideoWidget>
-                  ) : null}
-                </>
-              ) : null}
-            </>
-          ) : (
-            <AcSuccessOptionsTab
-              post={post}
-              handleGoBack={() => setOpenedMainSection('main')}
-            />
-          )}
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection id='comments' ref={commentsSectionRef}>
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
+    // Main screen vs all bids
+    const [openedMainSection, setOpenedMainSection] =
+      useState<'main' | 'bids'>('main');
+
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
+
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
+      }
+    }, [inView, post.postUuid]);
+
+    // Load winning option
+    useEffect(() => {
+      async function fetchAndSetWinningOption(id: number) {
+        try {
+          const payload = new newnewapi.GetAcOptionRequest({
+            optionId: id,
+          });
+
+          const res = await fetchAcOptionById(payload);
+
+          if (res.data?.option) {
+            setWinningOption(res.data.option as newnewapi.Auction.Option);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      if (post.winningOptionId) {
+        fetchAndSetWinningOption(post.winningOptionId as number);
+      }
+    }, [post.winningOptionId]);
+
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+          <SActivitesContainer>
+            {openedMainSection === 'main' ? (
+              <>
+                <DecisionEndedBox imgSrc={BoxIcon.src}>
+                  {t('AcPostSuccess.hero_text')}
+                </DecisionEndedBox>
+                <SMainSectionWrapper>
+                  <SCreatorInfoDiv>
+                    <SCreator>
+                      <SCreatorImage src={post.creator?.avatarUrl!!} />
+                      <SWantsToKnow>
+                        {t('AcPostSuccess.wants_to_know', {
+                          creator: post.creator?.nickname,
+                        })}
+                      </SWantsToKnow>
+                    </SCreator>
+                    <STotal>
+                      {`$${formatNumber(
+                        post.totalAmount?.usdCents!! / 100 ?? 0,
+                        true
+                      )}`}{' '}
+                      <span>{t('AcPostSuccess.in_total_bids')}</span>
+                    </STotal>
+                  </SCreatorInfoDiv>
+                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SSeparator />
+                  {winningOption && (
+                    <>
+                      <SWinningBidCreator>
+                        <SCreator>
+                          <SCreatorImage
+                            src={winningOption.creator?.avatarUrl!!}
+                          />
+                          <SWinningBidCreatorText>
+                            {winningOption.creator?.uuid ===
+                              user.userData?.userUuid ||
+                            winningOption.isSupportedByMe
+                              ? winningOption.supporterCount > 1
+                                ? t('me')
+                                : t('my')
+                              : getDisplayname(winningOption.creator!!)}
+                            {winningOption.supporterCount > 1 ? (
+                              <>
+                                {' & '}
+                                {formatNumber(
+                                  winningOption.supporterCount,
+                                  true
+                                )}{' '}
+                                {t('AcPostSuccess.others')}
+                              </>
+                            ) : null}{' '}
+                            {t('AcPostSuccess.bid')}
+                          </SWinningBidCreatorText>
+                        </SCreator>
+                      </SWinningBidCreator>
+                      <SWinningOptionAmount variant={4}>
+                        {`$${formatNumber(
+                          winningOption.totalAmount?.usdCents!! / 100 ?? 0,
+                          true
+                        )}`}
+                      </SWinningOptionAmount>
+                      <SSeparator />
+                      <SWinningOptionDetails>
+                        <SWinningOptionDetailsBidChosen>
+                          {t('AcPostSuccess.bid_chosen')}
+                        </SWinningOptionDetailsBidChosen>
+                        <SWinningOptionDetailsSeeAll
+                          onClick={() => setOpenedMainSection('bids')}
+                        >
+                          {t('AcPostSuccess.see_all')}
+                        </SWinningOptionDetailsSeeAll>
+                        <SWinningOptionDetailsTitle variant={4}>
+                          {winningOption.title}
+                        </SWinningOptionDetailsTitle>
+                      </SWinningOptionDetails>
+                    </>
+                  )}
+                </SMainSectionWrapper>
+                {!isMobile ? (
+                  <>
+                    {!responseViewed && videoTab === 'announcement' ? (
+                      <SWatchResponseWrapper>
+                        <SWatchResponseBtn
+                          shouldView={!responseViewed}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                        </SWatchResponseBtn>
+                      </SWatchResponseWrapper>
+                    ) : null}
+                    {responseViewed ? (
+                      <SToggleVideoWidget>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'announcement'}
+                          onClick={() => setVideoTab('announcement')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_original')}
+                        </SChangeTabBtn>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'response'}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_response')}
+                        </SChangeTabBtn>
+                      </SToggleVideoWidget>
+                    ) : null}
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <AcSuccessOptionsTab
+                post={post}
+                handleGoBack={() => setOpenedMainSection('main')}
+              />
+            )}
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  }
+);
 
 export default PostSuccessAC;
 

@@ -32,7 +32,7 @@ type TItem = {
   external?: boolean;
 };
 
-export const Footer: React.FC<IFooter> = () => {
+export const Footer: React.FC<IFooter> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -221,7 +221,7 @@ export const Footer: React.FC<IFooter> = () => {
       </Container>
     </SWrapper>
   );
-};
+});
 
 export default Footer;
 
