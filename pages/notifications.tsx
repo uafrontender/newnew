@@ -8,16 +8,22 @@ import styled from 'styled-components';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { useInView } from 'react-intersection-observer';
+import dynamic from 'next/dynamic';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { NextPageWithLayout } from './_app';
 import Lottie from '../components/atoms/Lottie';
 import General from '../components/templates/General';
-import Notification from '../components/molecules/notifications/Notification';
 import { getMyNotifications, markAsRead } from '../api/endpoints/notification';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import NoResults from '../components/molecules/notifications/NoResults';
 import { useNotifications } from '../contexts/notificationsContext';
+
+const NoResults = dynamic(
+  () => import('../components/molecules/notifications/NoResults')
+);
+const Notification = dynamic(
+  () => import('../components/molecules/notifications/Notification')
+);
 
 // UNUSED
 export const Notifications = () => {

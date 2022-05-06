@@ -12,21 +12,23 @@ import React, {
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 import Sort from '../../../public/images/svg/icons/outlined/Sort.svg';
 import Close from '../../../public/images/svg/icons/outlined/Close.svg';
-import CheckBox from '../../molecules/CheckBox';
-import PostList from './PostList';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { searchPosts } from '../../../api/endpoints/search';
-import NoResults from '../../atoms/search/NoResults';
 import isBrowser from '../../../utils/isBrowser';
-import PostModal from '../decision/PostModal';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+
+const PostList = dynamic(() => import('./PostList'));
+const PostModal = dynamic(() => import('../decision/PostModal'));
+const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
+const CheckBox = dynamic(() => import('../../molecules/CheckBox'));
 
 interface IFunction {
   query: string;
@@ -391,7 +393,7 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
           {postsNextPageToken && !loadingPosts && (
             <SRef ref={loadingRef}>Loading...</SRef>
           )}
-          {displayedPost && (
+          {displayedPost && postModalOpen && (
             <PostModal
               isOpen={postModalOpen}
               post={displayedPost}

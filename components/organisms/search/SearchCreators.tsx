@@ -4,11 +4,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 import { searchCreators } from '../../../api/endpoints/search';
-import NoResults from '../../atoms/search/NoResults';
-import CreatorsList from './CreatorsList';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+
+const NoResults = dynamic(() => import('../../atoms/search/NoResults'));
+const CreatorsList = dynamic(() => import('./CreatorsList'));
 
 interface IFunction {
   query: string;
