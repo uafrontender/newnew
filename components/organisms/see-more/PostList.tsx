@@ -4,16 +4,17 @@
 import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import PostCard from '../../molecules/PostCard';
 import Lottie from '../../atoms/Lottie';
-import CardSkeleton from '../../molecules/CardSkeleton';
 
 import { useAppSelector } from '../../../redux-store/store';
 import switchPostType from '../../../utils/switchPostType';
-
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import { usePostModalState } from '../../../contexts/postModalContext';
+
+const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
   category: string;
