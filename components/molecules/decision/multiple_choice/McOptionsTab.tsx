@@ -559,11 +559,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               actionSectionContainer.current = el!!;
             }}
           >
-            <Text variant={3}>
+            <SText variant={3}>
               {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', {
                 creator: post.creator?.nickname,
               })}
-            </Text>
+            </SText>
             <SSubscribeButton
               onClick={() => {
                 handleRedirectToPostCreator();
@@ -898,6 +898,14 @@ const SActionSectionSubscribe = styled.div`
       max-width: 130px;
     }
   }
+`;
+
+const SText = styled(Text)`
+  height: 100%;
+  align-self: center;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
 `;
 
 const SSubscribeButton = styled(Button)`
