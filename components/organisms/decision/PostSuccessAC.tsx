@@ -8,6 +8,7 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -19,11 +20,16 @@ import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess'
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
 import BoxIcon from '../../../public/images/creation/AC.webp';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import AcSuccessOptionsTab from '../../molecules/decision/auction/success/AcSuccessOptionsTab';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const AcSuccessOptionsTab = dynamic(
+  () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
 
 interface IPostSuccessAC {
   post: newnewapi.Auction;

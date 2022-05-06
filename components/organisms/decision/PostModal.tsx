@@ -16,6 +16,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 
 import {
   fetchMoreLikePosts,
@@ -30,29 +31,6 @@ import Modal from '../Modal';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
-import ListPostModal from '../see-more/ListPostModal';
-// Posts views
-import PostViewAC from './PostViewAC';
-import PostViewMC from './PostViewMC';
-import PostViewCF from './PostViewCF';
-import PostModerationAC from './PostModerationAC';
-import PostModerationMC from './PostModerationMC';
-import PostModerationCF from './PostModerationCF';
-import PostViewScheduled from './PostViewScheduled';
-import PostViewProcessingAnnouncement from './PostViewProcessingAnnouncement';
-import PostSuccessAC from './PostSuccessAC';
-import PostSuccessMC from './PostSuccessMC';
-import PostSuccessCF from './PostSuccessCF';
-import PostAwaitingResponseAC from './PostAwaitingResponseAC';
-import PostAwaitingResponseMC from './PostAwaitingResponseMC';
-import PostAwaitingResponseCF from './PostAwaitingResponseCF';
-import PostShareModal from '../../molecules/decision/PostShareModal';
-import PostShareMenu from '../../molecules/decision/PostShareMenu';
-import PostEllipseModal from '../../molecules/decision/PostEllipseModal';
-import PostEllipseMenu from '../../molecules/decision/PostEllipseMenu';
-import PostFailedBox from '../../molecules/decision/PostFailedBox';
-import PostSuccessAnimationBackground from '../../molecules/decision/PostSuccessAnimationBackground';
-
 // Icons
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
@@ -74,10 +52,54 @@ import CommentFromUrlContextProvider, {
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
-import ReportModal, { ReportData } from '../../molecules/chat/ReportModal';
+import { ReportData } from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import { usePostModalState } from '../../../contexts/postModalContext';
+
+const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
+// Posts views
+const PostViewAC = dynamic(() => import('./PostViewAC'));
+const PostViewMC = dynamic(() => import('./PostViewMC'));
+const PostViewCF = dynamic(() => import('./PostViewCF'));
+const PostModerationAC = dynamic(() => import('./PostModerationAC'));
+const PostModerationMC = dynamic(() => import('./PostModerationMC'));
+const PostModerationCF = dynamic(() => import('./PostModerationCF'));
+const PostViewScheduled = dynamic(() => import('./PostViewScheduled'));
+const PostViewProcessingAnnouncement = dynamic(
+  () => import('./PostViewProcessingAnnouncement')
+);
+const PostSuccessAC = dynamic(() => import('./PostSuccessAC'));
+const PostSuccessMC = dynamic(() => import('./PostSuccessMC'));
+const PostSuccessCF = dynamic(() => import('./PostSuccessCF'));
+const PostAwaitingResponseAC = dynamic(
+  () => import('./PostAwaitingResponseAC')
+);
+const PostAwaitingResponseMC = dynamic(
+  () => import('./PostAwaitingResponseMC')
+);
+const PostAwaitingResponseCF = dynamic(
+  () => import('./PostAwaitingResponseCF')
+);
+const PostShareModal = dynamic(
+  () => import('../../molecules/decision/PostShareModal')
+);
+const PostShareMenu = dynamic(
+  () => import('../../molecules/decision/PostShareMenu')
+);
+const PostEllipseModal = dynamic(
+  () => import('../../molecules/decision/PostEllipseModal')
+);
+const PostEllipseMenu = dynamic(
+  () => import('../../molecules/decision/PostEllipseMenu')
+);
+const PostFailedBox = dynamic(
+  () => import('../../molecules/decision/PostFailedBox')
+);
+const PostSuccessAnimationBackground = dynamic(
+  () => import('../../molecules/decision/PostSuccessAnimationBackground')
+);
+const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
 const images = {
   ac: ACIcon.src,
@@ -901,7 +923,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             </SPostModalContainer>
           ) : null}
         </Modal>
-        {postParsed?.creator && (
+        {postParsed?.creator && reportPostOpen && (
           <ReportModal
             show={reportPostOpen}
             reportedDisplayname={getDisplayname(postParsed?.creator)}
@@ -1036,7 +1058,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           </SPostModalContainer>
         ) : null}
       </Modal>
-      {postParsed?.creator && (
+      {postParsed?.creator && reportPostOpen && (
         <ReportModal
           show={reportPostOpen}
           reportedDisplayname={getDisplayname(postParsed?.creator)}

@@ -1,17 +1,18 @@
 import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppSelector } from '../../../redux-store/store';
-
-import GoBackButton from '../../molecules/GoBackButton';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PostVideoProcessingHolder from '../../molecules/decision/PostVideoProcessingHolder';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 
 interface IPostViewProcessingAnnouncement {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
