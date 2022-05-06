@@ -13,6 +13,7 @@ import React, {
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -20,27 +21,45 @@ import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-
-import GoBackButton from '../../molecules/GoBackButton';
-import CommentsTab from '../../molecules/decision/CommentsTab';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import PostTimer from '../../molecules/decision/PostTimer';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import CfBackersStatsSectionModeration from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration';
-import CfCrowdfundingSuccessModeration from '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration';
-
 import switchPostType from '../../../utils/switchPostType';
 import isBrowser from '../../../utils/isBrowser';
 
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
-import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import CfBackersStatsSectionModerationFailed from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const ResponseTimer = dynamic(
+  () => import('../../molecules/decision/ResponseTimer')
+);
+const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
+const CfBackersStatsSectionModeration = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration'
+    )
+);
+const CfCrowdfundingSuccessModeration = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration'
+    )
+);
+const CfBackersStatsSectionModerationFailed = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed'
+    )
+);
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -405,6 +424,19 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
     );
   };
 
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  useEffect(() => {
+    if (
+      user!!.userTutorialsProgressSynced &&
+      user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+        newnewapi.CfTutorialStep.CF_HERO
+    ) {
+      setIsPopupVisible(true);
+    } else {
+      setIsPopupVisible(false);
+    }
+  }, [user]);
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -505,15 +537,13 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = ({
           />
         ) : null}
       </SActivitesContainer>
-      <HeroPopup
-        isPopupVisible={
-          user!!.userTutorialsProgressSynced &&
-          user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-            newnewapi.CfTutorialStep.CF_HERO
-        }
-        postType='CF'
-        closeModal={goToNextStep}
-      />
+      {isPopupVisible && (
+        <HeroPopup
+          isPopupVisible={isPopupVisible}
+          postType='CF'
+          closeModal={goToNextStep}
+        />
+      )}
     </SWrapper>
   );
 };

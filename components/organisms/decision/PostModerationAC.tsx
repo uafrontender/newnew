@@ -13,7 +13,7 @@ import React, {
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
-import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -25,15 +25,9 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import Lottie from '../../atoms/Lottie';
-import PostTimer from '../../molecules/decision/PostTimer';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import GoBackButton from '../../molecules/GoBackButton';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
-import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 // Icons
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -44,9 +38,26 @@ import { fetchPostByUUID, markPost } from '../../../api/endpoints/post';
 import switchPostStatus, {
   TPostStatusStringified,
 } from '../../../utils/switchPostStatus';
-import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const ResponseTimer = dynamic(
+  () => import('../../molecules/decision/ResponseTimer')
+);
+const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
+const AcWinnerTabModeration = dynamic(
+  () =>
+    import('../../molecules/decision/auction/moderation/AcWinnerTabModeration')
+);
+const AcOptionsTabModeration = dynamic(
+  () =>
+    import('../../molecules/decision/auction/moderation/AcOptionsTabModeration')
+);
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -65,7 +76,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
   handleUpdatePostStatus,
   handleGoBack,
 }) => {
-  const { t } = useTranslation('decision');
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state);
   const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -576,6 +586,20 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
     );
   };
 
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  useEffect(() => {
+    if (
+      options.length > 0 &&
+      user!!.userTutorialsProgressSynced &&
+      user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+        newnewapi.AcTutorialStep.AC_HERO
+    ) {
+      setIsPopupVisible(true);
+    } else {
+      setIsPopupVisible(false);
+    }
+  }, [options, user]);
+
   return (
     <SWrapper>
       <SExpiresSection>
@@ -677,16 +701,13 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = ({
           </SAnimationContainer>
         )}
       </SActivitesContainer>
-      <HeroPopup
-        isPopupVisible={
-          options.length > 0 &&
-          user!!.userTutorialsProgressSynced &&
-          user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-            newnewapi.AcTutorialStep.AC_HERO
-        }
-        postType='AC'
-        closeModal={goToNextStep}
-      />
+      {isPopupVisible && (
+        <HeroPopup
+          isPopupVisible={isPopupVisible}
+          postType='AC'
+          closeModal={goToNextStep}
+        />
+      )}
     </SWrapper>
   );
 };

@@ -1,22 +1,27 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { markPost } from '../../../api/endpoints/post';
-
-import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import { TPostType } from '../../../utils/switchPostType';
-import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const PostTopInfo = dynamic(
+  () => import('../../molecules/decision/PostTopInfo')
+);
+const PostTopInfoModeration = dynamic(
+  () => import('../../molecules/decision/PostTopInfoModeration')
+);
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;

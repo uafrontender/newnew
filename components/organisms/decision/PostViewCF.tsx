@@ -9,6 +9,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -21,32 +22,50 @@ import {
 } from '../../../api/endpoints/crowdfunding';
 
 import Button from '../../atoms/Button';
-import GoBackButton from '../../molecules/GoBackButton';
-import LoadingModal from '../../molecules/LoadingModal';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import PostSuccessBox from '../../molecules/decision/PostSuccessBox';
-import PostWaitingForResponseBox from '../../molecules/decision/PostWaitingForResponseBox';
-import CfPledgeLevelsModal from '../../molecules/decision/crowdfunding/CfPledgeLevelsModal';
-import CfPledgeLevelsSection from '../../molecules/decision/crowdfunding/CfPledgeLevelsSection';
-import CfBackersStatsSection from '../../molecules/decision/crowdfunding/CfBackersStatsSection';
-import CfCrowdfundingSuccess from '../../molecules/decision/crowdfunding/CfCrowdfundingSuccess';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
-import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-import TutorialTooltip, {
-  DotPositionEnum,
-} from '../../atoms/decision/TutorialTooltip';
+import { DotPositionEnum } from '../../atoms/decision/TutorialTooltip';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../contexts/appConstantsContext';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
+const PaymentSuccessModal = dynamic(
+  () => import('../../molecules/decision/PaymentSuccessModal')
+);
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
+const TutorialTooltip = dynamic(
+  () => import('../../atoms/decision/TutorialTooltip')
+);
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const PostSuccessBox = dynamic(
+  () => import('../../molecules/decision/PostSuccessBox')
+);
+const PostWaitingForResponseBox = dynamic(
+  () => import('../../molecules/decision/PostWaitingForResponseBox')
+);
+const CfPledgeLevelsModal = dynamic(
+  () => import('../../molecules/decision/crowdfunding/CfPledgeLevelsModal')
+);
+const CfPledgeLevelsSection = dynamic(
+  () => import('../../molecules/decision/crowdfunding/CfPledgeLevelsSection')
+);
+const CfBackersStatsSection = dynamic(
+  () => import('../../molecules/decision/crowdfunding/CfBackersStatsSection')
+);
+const CfCrowdfundingSuccess = dynamic(
+  () => import('../../molecules/decision/crowdfunding/CfCrowdfundingSuccess')
+);
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -376,18 +395,21 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
                   }
                 />
               ) : null}
-              <STutorialTooltipHolder>
-                <TutorialTooltip
-                  isTooltipVisible={
-                    user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-                    newnewapi.CfTutorialStep.CF_GOAL_PROGRESS
-                  }
-                  closeTooltip={goToNextStep}
-                  title={t('tutorials.cf.peopleBids.title')}
-                  text={t('tutorials.cf.peopleBids.text')}
-                  dotPosition={DotPositionEnum.BottomRight}
-                />
-              </STutorialTooltipHolder>
+              {user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                newnewapi.CfTutorialStep.CF_GOAL_PROGRESS && (
+                <STutorialTooltipHolder>
+                  <TutorialTooltip
+                    isTooltipVisible={
+                      user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                      newnewapi.CfTutorialStep.CF_GOAL_PROGRESS
+                    }
+                    closeTooltip={goToNextStep}
+                    title={t('tutorials.cf.peopleBids.title')}
+                    text={t('tutorials.cf.peopleBids.text')}
+                    dotPosition={DotPositionEnum.BottomRight}
+                  />
+                </STutorialTooltipHolder>
+              )}
             </SBackersHolder>
           );
         }
@@ -632,6 +654,19 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
       }
     }, [pledges, user.userData?.userUuid]);
 
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    useEffect(() => {
+      if (
+        user!!.userTutorialsProgressSynced &&
+        user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+          newnewapi.CfTutorialStep.CF_HERO
+      ) {
+        setIsPopupVisible(true);
+      } else {
+        setIsPopupVisible(false);
+      }
+    }, [user]);
+
     return (
       <SWrapper>
         <SExpiresSection>
@@ -702,7 +737,9 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           ) : null}
         </SActivitesContainer>
         {/* Loading Modal */}
-        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        {loadingModalOpen && (
+          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        )}
         {/* Payment success Modal */}
         <PaymentSuccessModal
           isVisible={paymentSuccesModalOpen}
@@ -741,29 +778,30 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             >
               {t('CfPost.FloatingActionButton.choosePledgeBtn')}
             </SActionButton>
-            <STutorialTooltipHolderMobile>
-              <TutorialTooltip
-                isTooltipVisible={
-                  user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-                  newnewapi.CfTutorialStep.CF_BACK_GOAL
-                }
-                closeTooltip={goToNextStep}
-                title={t('tutorials.cf.createYourBid.title')}
-                text={t('tutorials.cf.createYourBid.text')}
-                dotPosition={DotPositionEnum.BottomRight}
-              />
-            </STutorialTooltipHolderMobile>
+            {user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+              newnewapi.CfTutorialStep.CF_BACK_GOAL && (
+              <STutorialTooltipHolderMobile>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+                    newnewapi.CfTutorialStep.CF_BACK_GOAL
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.cf.createYourBid.title')}
+                  text={t('tutorials.cf.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipHolderMobile>
+            )}
           </>
         ) : null}
-        <HeroPopup
-          isPopupVisible={
-            user!!.userTutorialsProgressSynced &&
-            user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-              newnewapi.CfTutorialStep.CF_HERO
-          }
-          postType='CF'
-          closeModal={goToNextStep}
-        />
+        {isPopupVisible && (
+          <HeroPopup
+            isPopupVisible={isPopupVisible}
+            postType='CF'
+            closeModal={goToNextStep}
+          />
+        )}
       </SWrapper>
     );
   }
