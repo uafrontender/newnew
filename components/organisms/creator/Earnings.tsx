@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import Headline from '../../atoms/Headline';
-import Navigation from '../../molecules/creator/Navigation';
-
 import { useAppSelector } from '../../../redux-store/store';
+
+const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 
 export const Earnings: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
