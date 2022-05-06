@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -13,11 +14,17 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import { getMyOnboardingState } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import OnboardingSectionSubrate from '../components/molecules/creator-onboarding/OnboardingSectionSubrate';
 import {
   getMySubscriptionProduct,
   getStandardSubscriptionProducts,
 } from '../api/endpoints/subscription';
+
+const OnboardingSectionSubrate = dynamic(
+  () =>
+    import(
+      '../components/molecules/creator-onboarding/OnboardingSectionSubrate'
+    )
+);
 
 interface ICreatorOnboardingSubrate {}
 
