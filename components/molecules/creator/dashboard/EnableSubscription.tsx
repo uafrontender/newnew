@@ -10,7 +10,7 @@ import Headline from '../../../atoms/Headline';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
-import acImage from '../../../../public/images/creation/AC.png';
+import acImage from '../../../../public/images/creation/AC-static.png';
 
 export const EnableSubscription = () => {
   const { t } = useTranslation('creator');

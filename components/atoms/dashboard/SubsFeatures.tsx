@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { useAppSelector } from '../../../redux-store/store';
 import Headline from '../Headline';
 
-import acImage from '../../../public/images/creation/AC.png';
+import acImage from '../../../public/images/creation/AC-static.png';
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../InlineSVG';
 
