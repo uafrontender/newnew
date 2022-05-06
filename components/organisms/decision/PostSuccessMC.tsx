@@ -8,6 +8,7 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -16,14 +17,24 @@ import { getMcOption } from '../../../api/endpoints/multiple_choice';
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
 import BoxIcon from '../../../public/images/creation/MC.webp';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import McSuccessOptionsTab from '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const McSuccessOptionsTab = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+    )
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
+const DecisionEndedBox = dynamic(
+  () => import('../../molecules/decision/success/DecisionEndedBox')
+);
 
 interface IPostSuccessMC {
   post: newnewapi.MultipleChoice;
