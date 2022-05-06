@@ -20,7 +20,7 @@ export interface Tab {
   nameToken: string;
 }
 
-const Tabs: React.FunctionComponent<ITabs> = (props) => {
+const Tabs: React.FunctionComponent<ITabs> = React.memo((props) => {
   const { t, tabs, draggable, activeTabIndex, withTabIndicator } = props;
   const router = useRouter();
 
@@ -334,7 +334,7 @@ const Tabs: React.FunctionComponent<ITabs> = (props) => {
       </STabsContainer>
     </STabs>
   );
-};
+});
 
 export default Tabs;
 

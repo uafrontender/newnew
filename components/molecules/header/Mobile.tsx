@@ -8,7 +8,7 @@ import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import { useAppSelector } from '../../../redux-store/store';
 
-export const Mobile = () => {
+export const Mobile: React.FC = React.memo(() => {
   const user = useAppSelector((state) => state.user);
 
   return (
@@ -38,7 +38,7 @@ export const Mobile = () => {
       </SRightBlock>
     </SContainer>
   );
-};
+});
 
 export default Mobile;
 

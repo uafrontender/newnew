@@ -10,7 +10,7 @@ import AnimatedPresence, { TAnimation } from '../atoms/AnimatedPresence';
 import closeIcon from '../../public/images/svg/icons/outlined/Close.svg';
 import cookieIcon from '../../public/images/svg/icons/filled/Cookie.svg';
 
-const Cookie = () => {
+const Cookie = React.memo(() => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [cookies, setCookie] = useCookies();
@@ -71,7 +71,7 @@ const Cookie = () => {
       </SContainer>
     </AnimatedPresence>
   );
-};
+});
 
 export default Cookie;
 

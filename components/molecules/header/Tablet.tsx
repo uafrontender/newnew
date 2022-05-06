@@ -22,7 +22,7 @@ import { useNotifications } from '../../../contexts/notificationsContext';
 
 interface ITablet {}
 
-export const Tablet: React.FC<ITablet> = () => {
+export const Tablet: React.FC<ITablet> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { unreadCount } = useGetChats();
@@ -202,7 +202,7 @@ export const Tablet: React.FC<ITablet> = () => {
       </SRightBlock>
     </SContainer>
   );
-};
+});
 
 export default Tablet;
 
