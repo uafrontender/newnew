@@ -64,10 +64,6 @@ import VotesImage from '../public/images/signup/floating-assets/Votes.png';
 // Posts
 import assets from '../constants/assets';
 // Landing
-import HeroDarkPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
-import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Light.webp';
-import HeroDarkMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
-import HeroLightMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
 import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
 
@@ -300,6 +296,7 @@ const PRE_FETCH_LINKS_COMMON = (
   </>
 );
 
+// TODO: We should not preload Desktop assets on mobile and vice versa
 const PRE_FETCH_LINKS_DARK = (
   <>
     <link
@@ -323,21 +320,16 @@ const PRE_FETCH_LINKS_DARK = (
       crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
+    <link rel='prefetch' href={assets.home.darkLandingStatic} as='image' />
     <link
       rel='prefetch'
-      href={HeroDarkPlaceholder.src}
+      href={assets.home.darkMobileLandingStatic}
       as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={HeroDarkMobilePlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
     />
   </>
 );
 
+// TODO: We should not preload Desktop assets on mobile and vice versa
 const PRE_FETCH_LINKS_LIGHT = (
   <>
     <link
@@ -361,17 +353,11 @@ const PRE_FETCH_LINKS_LIGHT = (
       crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
+    <link rel='prefetch' href={assets.home.lightLandingStatic} as='image' />
     <link
       rel='prefetch'
-      href={HeroLightPlaceholder.src}
+      href={assets.home.lightMobileLandingStatic}
       as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={HeroLightMobilePlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
     />
   </>
 );

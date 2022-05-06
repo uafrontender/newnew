@@ -21,11 +21,7 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import { SCROLL_EXPLORE } from '../../../constants/timings';
 
-// Assets
-import HeroDarkPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
-import HeroLightPlaceholder from '../../../public/images/home/Landing-Page-Hold-Frame-Light.webp';
-import HeroDarkMobilePlaceholder from '../../../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
-import HeroLightMobilePlaceholder from '../../../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
+import assets from '../../../constants/assets';
 
 export const HeroSection = () => {
   const router = useRouter();
@@ -203,15 +199,15 @@ export const HeroSection = () => {
             playsInline
             poster={
               theme.name === 'light'
-                ? HeroLightMobilePlaceholder.src
-                : HeroDarkMobilePlaceholder.src
+                ? assets.home.lightMobileLandingStatic
+                : assets.home.darkMobileLandingStatic
             }
           >
             <source
               src={
                 theme.name === 'light'
-                  ? '/images/home/Landing-Page-Mobile-Light.mp4'
-                  : '/images/home/Landing-Page-Mobile-Dark.mp4'
+                  ? assets.home.lightMobileLandingAnimated
+                  : assets.home.darkMobileLandingAnimated
               }
               type='video/mp4'
             />
@@ -225,15 +221,15 @@ export const HeroSection = () => {
             playsInline
             poster={
               theme.name === 'light'
-                ? HeroLightPlaceholder.src
-                : HeroDarkPlaceholder.src
+                ? assets.home.lightLandingStatic
+                : assets.home.darkLandingStatic
             }
           >
             <source
               src={
                 theme.name === 'light'
-                  ? '/images/home/Landing-Page-Light.mp4'
-                  : '/images/home/Landing-Page-Dark.mp4'
+                  ? assets.home.lightLandingAnimated
+                  : assets.home.darkLandingAnimated
               }
               type='video/mp4'
             />
