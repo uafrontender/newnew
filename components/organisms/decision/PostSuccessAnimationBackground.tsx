@@ -1,8 +1,7 @@
 /* eslint-disable react/require-default-props */
 import React, { useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-
-import GoldImage from '../../../public/images/decision/Gold.png';
+import assets from '../../../constants/assets';
 
 const PostSuccessAnimationBackground: React.FunctionComponent = () => {
   const elements = useMemo(() => [1, 2, 3], []);
@@ -134,7 +133,7 @@ const GoldCoin: React.FunctionComponent<IGoldCoin> = ({
             }),
       }}
     >
-      <img src={GoldImage.src} alt='coin' draggable={false} />
+      <img src={assets.decision.gold} alt='coin' draggable={false} />
     </SGoldIcon>
   );
 };

@@ -25,7 +25,6 @@ import PostEllipseModal from './PostEllipseModal';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
@@ -305,7 +304,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <SText variant={3}>
               {t('AcPost.PostTopInfo.SelectWinner.body')}
             </SText>
-            <STrophyImg src={AcSelectWinnerIcon.src} />
+            <STrophyImg src={assets.decision.trophy} />
           </SSelectingWinnerOption>
         ) : null}
       </SWrapper>

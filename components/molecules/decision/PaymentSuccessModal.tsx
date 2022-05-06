@@ -1,15 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import Image from 'next/image';
 
 import Button from '../../atoms/Button';
 import Modal from '../../organisms/Modal';
 import Headline from '../../atoms/Headline';
 
-import PaymentSuccesIcon from '../../../public/images/decision/payment-success.png';
 import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../../atoms/InlineSVG';
+import assets from '../../../constants/assets';
 
 interface IPaymentSuccessModal {
   isVisible: boolean;
@@ -37,7 +36,12 @@ const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
             height='24px'
             onClick={closeModal}
           />
-          <Image src={PaymentSuccesIcon} height={140} objectFit='contain' />
+          <img
+            src={assets.decision.paymentSuccess}
+            alt='Payment successful'
+            height={140}
+            style={{ objectFit: 'contain' }}
+          />
           <SModalTitle variant={6}>
             {t('PaymentSuccessModal.title')}
           </SModalTitle>

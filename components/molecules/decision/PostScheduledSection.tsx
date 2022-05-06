@@ -9,14 +9,11 @@ import { useAppSelector } from '../../../redux-store/store';
 import Text from '../../atoms/Text';
 import Headline from '../../atoms/Headline';
 
-// Images
-import Hourglass from '../../../public/images/decision/hourglass-mock.png';
-
 // Utils
 import isBrowser from '../../../utils/isBrowser';
-import { TPostType } from '../../../utils/switchPostType';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import Button from '../../atoms/Button';
+import assets from '../../../constants/assets';
 
 interface IPostScheduledSection {
   postType: string;
@@ -65,7 +62,7 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     <SContainer>
       <SHeadingContainer>
         <SImgContainer>
-          <SHourglassImg src={Hourglass.src} />
+          <SHourglassImg src={assets.decision.hourglass} />
         </SImgContainer>
         {!isMobile && (
           <STitle variant={6}>

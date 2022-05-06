@@ -10,6 +10,13 @@ const assets = {
     McStatic: `${APP_ASSETS_ORIGIN}/creation/MC-static.png`,
     McAnimated: `${APP_ASSETS_ORIGIN}/creation/MC.webp`,
   },
+  decision: {
+    gold: `${APP_ASSETS_ORIGIN}/decision/gold.png`,
+    hourglass: `${APP_ASSETS_ORIGIN}/decision/hourglass.png`,
+    paymentSuccess: `${APP_ASSETS_ORIGIN}/decision/payment-success.png`,
+    trophy: `${APP_ASSETS_ORIGIN}/decision/trophy.png`,
+    votes: `${APP_ASSETS_ORIGIN}/decision/votes.png`,
+  },
 };
 
 export default assets;

@@ -9,12 +9,12 @@ import { useAppSelector } from '../../../../../redux-store/store';
 
 import isBrowser from '../../../../../utils/isBrowser';
 
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import { formatNumber } from '../../../../../utils/format';
 import Headline from '../../../../atoms/Headline';
 import Text from '../../../../atoms/Text';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
+import assets from '../../../../../constants/assets';
 
 interface IAcWinnerTabModeration {
   postId: string;
@@ -161,7 +161,7 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
                 </Link>
               </SOptionCreator>
             </SOptionDetails>
-            <STrophyImg src={WinnerIcon.src} />
+            <STrophyImg src={assets.decision.trophy} />
             {!isMobile && (
               <>
                 <STrophyGlow />

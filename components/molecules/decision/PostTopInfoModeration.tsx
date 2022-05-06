@@ -25,7 +25,6 @@ import PostConfirmDeleteModal from './PostConfirmDeleteModal';
 import PostEllipseMenuModeration from './PostEllipseMenuModeration';
 import PostEllipseModalModeration from './PostEllipseModalModeration';
 
-import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 import assets from '../../../constants/assets';
@@ -238,7 +237,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               <SText variant={3}>
                 {t('AcPostModeration.PostTopInfo.SelectWinner.body')}
               </SText>
-              <STrophyImg src={AcSelectWinnerIcon.src} />
+              <STrophyImg src={assets.decision.trophy} />
             </SSelectWinnerOption>
           ) : null}
         </SWrapper>
