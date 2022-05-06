@@ -12,11 +12,9 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import TextArea from '../../atoms/chat/TextArea';
 import InlineSVG from '../../atoms/InlineSVG';
-import UserAvatar from '../UserAvatar';
 import { IChatData } from '../../interfaces/ichat';
 import { useAppSelector } from '../../../redux-store/store';
 import { SUserAlias } from '../../atoms/chat/styles';
-import GoBackButton from '../GoBackButton';
 import { sendMessage, getMessages } from '../../../api/endpoints/chat';
 
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
@@ -27,6 +25,7 @@ import { SocketContext } from '../../../contexts/socketContext';
 import { reportUser } from '../../../api/endpoints/report';
 import getDisplayname from '../../../utils/getDisplayname';
 
+const UserAvatar = dynamic(() => import('../UserAvatar'));
 const ChatEllipseMenu = dynamic(() => import('./ChatEllipseMenu'));
 const ChatEllipseModal = dynamic(() => import('./ChatEllipseModal'));
 const BlockedUser = dynamic(() => import('./BlockedUser'));
@@ -36,6 +35,7 @@ const MessagingDisabled = dynamic(() => import('./MessagingDisabled'));
 const WelcomeMessage = dynamic(() => import('./WelcomeMessage'));
 const NoMessagesYet = dynamic(() => import('./NoMessagesYet'));
 const ReportModal = dynamic(() => import('./ReportModal'));
+const GoBackButton = dynamic(() => import('../GoBackButton'));
 
 const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const theme = useTheme();
