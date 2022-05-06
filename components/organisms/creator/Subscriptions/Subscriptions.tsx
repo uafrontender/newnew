@@ -3,16 +3,22 @@ import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-
+import dynamic from 'next/dynamic';
 import Headline from '../../../atoms/Headline';
-import Navigation from '../../../molecules/creator/Navigation';
-
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
-import NoResults from '../../../molecules/creator/dashboard/NoResults';
-import SubscribersTable from '../../../molecules/creator/dashboard/SubscribersTable';
 import { getMyOnboardingState } from '../../../../api/endpoints/user';
+
+const SubscribersTable = dynamic(
+  () => import('../../../molecules/creator/dashboard/SubscribersTable')
+);
+const NoResults = dynamic(
+  () => import('../../../molecules/creator/dashboard/NoResults')
+);
+const Navigation = dynamic(
+  () => import('../../../molecules/creator/Navigation')
+);
 
 export const Subscriptions: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');

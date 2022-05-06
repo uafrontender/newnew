@@ -2,24 +2,38 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 import { useAppSelector } from '../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
-
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
-import Navigation from '../../molecules/creator/Navigation';
-import Earnings from '../../molecules/creator/dashboard/Earnings';
-import YourTodos from '../../molecules/creator/dashboard/YourTodos';
-import DynamicSection from '../../molecules/creator/dashboard/DynamicSection';
-import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
-import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
-import EmptySubscriptionStats from '../../molecules/creator/dashboard/EmptySubscriptionStats';
-
 import { getMyPosts } from '../../../api/endpoints/user';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
+
+const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
+const DynamicSection = dynamic(
+  () => import('../../molecules/creator/dashboard/DynamicSection')
+);
+const ExpirationPosts = dynamic(
+  () => import('../../molecules/creator/dashboard/ExpirationPosts')
+);
+const EnableSubscription = dynamic(
+  () => import('../../molecules/creator/dashboard/EnableSubscription')
+);
+const SubscriptionStats = dynamic(
+  () => import('../../molecules/creator/dashboard/SubscriptionStats')
+);
+const EmptySubscriptionStats = dynamic(
+  () => import('../../molecules/creator/dashboard/EmptySubscriptionStats')
+);
+const Earnings = dynamic(
+  () => import('../../molecules/creator/dashboard/Earnings')
+);
+const YourTodos = dynamic(
+  () => import('../../molecules/creator/dashboard/YourTodos')
+);
 
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
