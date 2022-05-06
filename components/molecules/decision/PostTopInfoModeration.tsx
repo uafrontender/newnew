@@ -124,9 +124,15 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
     }, []);
 
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
-    const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+    const handleCloseEllipseMenu = useCallback(
+      () => setEllipseMenuOpen(false),
+      []
+    );
 
-    const handleOpenDeletePostModal = () => setDeletePostOpen(true);
+    const handleOpenDeletePostModal = useCallback(
+      () => setDeletePostOpen(true),
+      []
+    );
     const handleCloseDeletePostModal = () => setDeletePostOpen(false);
 
     const handleDeletePost = async () => {
