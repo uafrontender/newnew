@@ -28,14 +28,12 @@ import PostEllipseModalModeration from './PostEllipseModalModeration';
 import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import MCIcon from '../../../public/images/creation/MC.webp';
-import ACIcon from '../../../public/images/creation/AC.webp';
-import CFIcon from '../../../public/images/creation/CF.webp';
+import assets from '../../../constants/assets';
 
-const images = {
-  ac: ACIcon.src,
-  mc: MCIcon.src,
-  cf: CFIcon.src,
+const IMAGES = {
+  ac: assets.creation.AcAnimated,
+  cf: assets.creation.CfAnimated,
+  mc: assets.creation.McAnimated,
 };
 
 interface IPostTopInfoModeration {
@@ -250,7 +248,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               postType: t(`postType.${postType}`),
             })}
             body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
-            imageSrc={images[postType!!]}
+            imageSrc={IMAGES[postType!!]}
             buttonCaption={t('PostFailedBoxModeration.ctaButton', {
               postType: t(`postType.${postType}`),
             })}

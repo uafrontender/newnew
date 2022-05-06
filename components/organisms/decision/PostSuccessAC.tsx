@@ -22,11 +22,11 @@ import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import BoxIcon from '../../../public/images/creation/AC.webp';
 import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import AcSuccessOptionsTab from '../../molecules/decision/auction/success/AcSuccessOptionsTab';
+import assets from '../../../constants/assets';
 
 interface IPostSuccessAC {
   post: newnewapi.Auction;
@@ -145,7 +145,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = ({ post }) => {
         <SActivitesContainer>
           {openedMainSection === 'main' ? (
             <>
-              <DecisionEndedBox imgSrc={BoxIcon.src}>
+              <DecisionEndedBox imgSrc={assets.creation.AcAnimated}>
                 {t('AcPostSuccess.hero_text')}
               </DecisionEndedBox>
               <SMainSectionWrapper>

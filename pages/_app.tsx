@@ -62,12 +62,7 @@ import TopGlassSphereImage from '../public/images/signup/floating-assets/Top-Gla
 import TopMiddleSphereImage from '../public/images/signup/floating-assets/Top-Middle-Sphere.png';
 import VotesImage from '../public/images/signup/floating-assets/Votes.png';
 // Posts
-import acImage from '../public/images/creation/AC.webp';
-import mcImage from '../public/images/creation/MC.webp';
-import cfImage from '../public/images/creation/CF.webp';
-import acImageStatic from '../public/images/creation/AC-static.png';
-import mcImageStatic from '../public/images/creation/MC-static.png';
-import cfImageStatic from '../public/images/creation/CF-static.png';
+import assets from '../constants/assets';
 // Landing
 import HeroDarkPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
 import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Light.webp';
@@ -296,42 +291,12 @@ const PRE_FETCH_LINKS_COMMON = (
       media='(min-width: 760px)'
     />
     {/* Creation screen */}
-    <link
-      rel='prefetch'
-      href={acImage.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={mcImage.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={cfImage.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={acImageStatic.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={mcImageStatic.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={cfImageStatic.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
+    <link rel='prefetch' href={assets.creation.AcAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.McAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.CfAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.AcStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.McStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.CfStatic} as='image' />
   </>
 );
 

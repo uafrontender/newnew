@@ -26,16 +26,10 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
-import acImage from '../public/images/creation/AC.webp';
-import mcImage from '../public/images/creation/MC.webp';
-import cfImage from '../public/images/creation/CF.webp';
-import acImageStatic from '../public/images/creation/AC-static.png';
-import mcImageStatic from '../public/images/creation/MC-static.png';
-import cfImageStatic from '../public/images/creation/CF-static.png';
-
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
 import TutorialCard from '../components/molecules/TutorialCard';
+import assets from '../constants/assets';
 
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -310,7 +304,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={acImage}
+                image={assets.creation.AcAnimated}
                 title={t('ac-block-tutorial-card.title')}
                 caption={t('ac-block-tutorial-card.caption')}
                 imageStyle={{
@@ -332,7 +326,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={mcImage}
+                image={assets.creation.McAnimated}
                 title={t('mc-block-tutorial-card.title')}
                 caption={t('mc-block-tutorial-card.caption')}
               />
@@ -350,7 +344,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={cfImage}
+                image={assets.creation.CfAnimated}
                 title={t('cf-block-tutorial-card.title')}
                 caption={t('cf-block-tutorial-card.caption')}
                 imageStyle={{

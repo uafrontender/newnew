@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -9,8 +8,7 @@ import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
 import { useAppSelector } from '../../../../redux-store/store';
-
-import acImage from '../../../../public/images/creation/AC-static.png';
+import assets from '../../../../constants/assets';
 
 export const EnableSubscription = () => {
   const { t } = useTranslation('creator');
@@ -22,12 +20,12 @@ export const EnableSubscription = () => {
 
   return (
     <SContainer>
-      <Image
-        src={acImage}
+      <img
+        src={assets.creation.AcStatic}
         alt='Enable subscription'
         width={isMobile ? 232 : 206}
         height={isMobile ? 240 : 202}
-        objectFit='cover'
+        style={{ objectFit: 'cover' }}
       />
       <SContent>
         <STitle variant={6}>{t('dashboard.enableSubscription.title')}</STitle>

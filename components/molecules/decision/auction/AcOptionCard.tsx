@@ -41,7 +41,7 @@ import TutorialTooltip, {
 import { formatNumber } from '../../../../utils/format';
 
 // Icons
-import AcIcon from '../../../../public/images/creation/AC-static.png';
+import assets from '../../../../constants/assets';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
@@ -363,7 +363,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             ) : null} */}
           </SLottieAnimationContainer>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
-            <SCoinImg src={AcIcon.src} />
+            <SCoinImg src={assets.creation.AcStatic} />
             <div>
               {option.totalAmount?.usdCents
                 ? `$${formatNumber(

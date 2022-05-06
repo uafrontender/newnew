@@ -21,11 +21,11 @@ import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import BoxIcon from '../../../public/images/creation/MC.webp';
 import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
 import McSuccessOptionsTab from '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab';
+import assets from '../../../constants/assets';
 
 interface IPostSuccessMC {
   post: newnewapi.MultipleChoice;
@@ -148,7 +148,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({ post }) => {
         <SActivitesContainer>
           {openedMainSection === 'main' ? (
             <>
-              <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
+              <DecisionEndedBox type='mc' imgSrc={assets.creation.McAnimated}>
                 {t('McPostSuccess.hero_text')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
