@@ -2,12 +2,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
-import GoBackButton from '../GoBackButton';
+
+const GoBackButton = dynamic(() => import('../GoBackButton'));
 
 export interface ReportData {
   reason: newnewapi.ReportingReason;
