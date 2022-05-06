@@ -11,8 +11,8 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useInView } from 'react-intersection-observer';
 import UserAvatar from '../UserAvatar';
-import textTrim from '../../../utils/textTrim';
-import { IChatData } from '../../interfaces/ichat';
+import Lottie from '../../atoms/Lottie';
+import InlineSVG from '../../atoms/InlineSVG';
 
 import {
   SChatItemContainer,
@@ -27,10 +27,10 @@ import {
 } from '../../atoms/chat/styles';
 import { getMyRooms, markRoomAsRead } from '../../../api/endpoints/chat';
 import { useAppSelector } from '../../../redux-store/store';
-import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
-import InlineSVG from '../../atoms/InlineSVG';
+import textTrim from '../../../utils/textTrim';
+import { IChatData } from '../../interfaces/ichat';
 import { useGetChats } from '../../../contexts/chatContext';
-import Lottie from '../../atoms/Lottie';
+import megaphone from '../../../public/images/svg/icons/filled/Megaphone.svg';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 
 const EmptyInbox = dynamic(() => import('../../atoms/chat/EmptyInbox'));
