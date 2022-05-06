@@ -38,9 +38,8 @@ interface IPostAwaitingResponseMC {
   post: newnewapi.MultipleChoice;
 }
 
-// TODO: memorize
 const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
-  ({ post }) => {
+  React.memo(({ post }) => {
     const { t } = useTranslation('decision');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
@@ -288,7 +287,7 @@ const PostAwaitingResponseMC: React.FunctionComponent<IPostAwaitingResponseMC> =
         )}
       </>
     );
-  };
+  });
 
 export default PostAwaitingResponseMC;
 
