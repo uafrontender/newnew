@@ -8,14 +8,11 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { fetchAcOptionById } from '../../../api/endpoints/auction';
-
-// test post
-// http://localhost:4000/post/421e53e4-8297-4ac6-ac74-47366bc1c43b
-// http://localhost:4000/post/24d54ea4-a110-43da-99a2-3712c394e2ef
 
 // Utils
 import Headline from '../../atoms/Headline';
@@ -23,10 +20,16 @@ import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess'
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
 import BoxIcon from '../../../public/images/creation/AC.webp';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import AcSuccessOptionsTab from '../../molecules/decision/auction/success/AcSuccessOptionsTab';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const AcSuccessOptionsTab = dynamic(
+  () => import('../../molecules/decision/auction/success/AcSuccessOptionsTab')
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
 
 interface IPostSuccessAC {
   post: newnewapi.Auction;
@@ -54,6 +57,26 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
+    const fetchPostLatestData = useCallback(async () => {
+      try {
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
+        });
+
+        const res = await fetchPostByUUID(fetchPostPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data.auction?.isResponseViewedByMe) {
+          setResponseViewed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -68,6 +91,12 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
       threshold: 0.8,
     });
 
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Scroll to comments if hash is present
     useEffect(() => {
       const handleCommentsInitialHash = () => {
@@ -75,6 +104,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
         if (!hash) {
           return;
         }
+
         const parsedHash = hash.substring(1);
 
         if (parsedHash === 'comments') {

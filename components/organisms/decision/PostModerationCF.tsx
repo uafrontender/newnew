@@ -12,6 +12,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -19,25 +20,45 @@ import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-
-import GoBackButton from '../../molecules/GoBackButton';
-import CommentsTab from '../../molecules/decision/CommentsTab';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import PostTimer from '../../molecules/decision/PostTimer';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import CfBackersStatsSectionModeration from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration';
-import CfCrowdfundingSuccessModeration from '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration';
-
 import switchPostType from '../../../utils/switchPostType';
 import isBrowser from '../../../utils/isBrowser';
 
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import HeroPopup from '../../molecules/decision/HeroPopup';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
-import CfBackersStatsSectionModerationFailed from '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const ResponseTimer = dynamic(
+  () => import('../../molecules/decision/ResponseTimer')
+);
+const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
+const CfBackersStatsSectionModeration = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModeration'
+    )
+);
+const CfCrowdfundingSuccessModeration = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/crowdfunding/moderation/CfCrowdfundingSuccessModeration'
+    )
+);
+const CfBackersStatsSectionModerationFailed = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/crowdfunding/moderation/CfBackersStatsSectionModerationFailed'
+    )
+);
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
 export type TCfPledgeWithHighestField = newnewapi.Crowdfunding.Pledge & {
   isHighest: boolean;
@@ -322,16 +343,39 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         const [decodedParsed] = switchPostType(decoded.post as newnewapi.IPost);
         if (decodedParsed.postUuid === post.postUuid) {
           setCurrentBackers(decoded.post?.crowdfunding?.currentBackerCount!!);
+
+          if (
+            !responseFreshlyUploaded &&
+            decoded.post?.crowdfunding?.response
+          ) {
+            setResponseFreshlyUploaded(decoded.post.crowdfunding.response);
+          }
         }
       };
 
-      const socketHandlerPostStatus = (data: any) => {
+      const socketHandlerPostStatus = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid) {
           handleUpdatePostStatus(decoded.crowdfunding!!);
+
+          if (
+            !responseFreshlyUploaded &&
+            postStatus === 'processing_response' &&
+            switchPostStatus('cf', decoded.crowdfunding!!) === 'succeeded'
+          ) {
+            const fetchPostPayload = new newnewapi.GetPostRequest({
+              postUuid: post.postUuid,
+            });
+
+            const res = await fetchPostByUUID(fetchPostPayload);
+
+            if (res.data?.crowdfunding?.response) {
+              setResponseFreshlyUploaded(res.data?.crowdfunding?.response);
+            }
+          }
         }
       };
 
@@ -349,7 +393,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socketConnection, post, setPledges, sortPleges]);
+    }, [socketConnection, post, postStatus, setPledges, sortPleges]);
 
     const goToNextStep = () => {
       if (user.loggedIn) {
@@ -366,6 +410,19 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
         })
       );
     };
+
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    useEffect(() => {
+      if (
+        user!!.userTutorialsProgressSynced &&
+        user!!.userTutorialsProgress.remainingCfSteps!![0] ===
+          newnewapi.CfTutorialStep.CF_HERO
+      ) {
+        setIsPopupVisible(true);
+      } else {
+        setIsPopupVisible(false);
+      }
+    }, [user]);
 
     return (
       <SWrapper>
@@ -397,12 +454,17 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           postId={post.postUuid}
           announcement={post.announcement!!}
           response={(post.response || responseFreshlyUploaded) ?? undefined}
+          thumbnails={{
+            startTime: 1,
+            endTime: 3,
+          }}
           postStatus={postStatus}
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
           handleUpdateResponseVideo={(newValue) =>
             setResponseFreshlyUploaded(newValue)
           }
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
         <PostTopInfoModeration
           postType='cf'
@@ -462,15 +524,13 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             />
           ) : null}
         </SActivitesContainer>
-        <HeroPopup
-          isPopupVisible={
-            user!!.userTutorialsProgressSynced &&
-            user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-              newnewapi.CfTutorialStep.CF_HERO
-          }
-          postType='CF'
-          closeModal={goToNextStep}
-        />
+        {isPopupVisible && (
+          <HeroPopup
+            isPopupVisible={isPopupVisible}
+            postType='CF'
+            closeModal={goToNextStep}
+          />
+        )}
       </SWrapper>
     );
   }

@@ -6,17 +6,25 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { formatNumber } from '../../../utils/format';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import WaitingForResponseBox from '../../molecules/decision/waiting/WaitingForResponseBox';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
-import AcWaitingOptionsSection from '../../molecules/decision/auction/waiting/AcWaitingOptionsSection';
+
+const WaitingForResponseBox = dynamic(
+  () => import('../../molecules/decision/waiting/WaitingForResponseBox')
+);
+const AcWaitingOptionsSection = dynamic(
+  () =>
+    import('../../molecules/decision/auction/waiting/AcWaitingOptionsSection')
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
 
 interface IPostAwaitingResponseAC {
   post: newnewapi.Auction;

@@ -119,6 +119,9 @@
       "back_to_original": "Back to original",
       "back_to_response": "Watch response"
     },
+    "floatingUploadResponseBtn": "Make a response video",
+    "setThumbnail": "Set a thubmnail",
+    "responseUploadedNonProcessed": "Success! Your response will be available once the video was processed",
     "UploadResponseForm": {
       "fileUpload": {
         "title_1": "Your audience is waiting!",
@@ -170,6 +173,17 @@
           "title": "Uploading video",
           "description": "We're uploading your video response...hang tight!",
           "process": "{{progress}}% • {{time}} left"
+        },
+        "processing": {
+          "title": "Processing the video...",
+          "description": "You can publish the response while the video is being processed",
+          "process": "{{progress}}% • {{time}} left",
+          "uploadNonProcessed": "Publish"
+        },
+        "processingPublished": {
+          "title": "Processing the video...",
+          "description": "Your video will be available once it's processed",
+          "process": "{{progress}}% • {{time}} left"
         }
       }
     }
@@ -210,19 +224,44 @@
     "winner": "Winner",
     "history": "History"
   },
+  "PostViewProcessingAnnouncement": {
+    "videoHolder": {
+      "decision": {
+        "title": "Processing video...",
+        "body": "Hang tight as we process the video."
+      },
+      "moderation": {
+        "title": "Processing video...",
+        "body": "Hang tight as we process your video."
+      }
+    }
+  },
   "PostScheduled": {
     "PostScheduledSection": {
-      "title": "Coming soon",
-      "subtitle_1": "{{ postType }} is not active yet.",
-      "subtitle_2": "Follow to not miss the update.",
-      "timer": {
-        "days": "Days",
-        "hours": "Hours",
-        "minutes": "Minutes",
-        "seconds": "Seconds"
+      "decision": {
+        "title": "Coming soon",
+        "subtitle_1": "{{ postType }} is not active yet.",
+        "subtitle_2": "Follow to not miss the update.",
+        "timer": {
+          "days": "Days",
+          "hours": "Hours",
+          "minutes": "Minutes",
+          "seconds": "Seconds"
+        },
+        "followBtn": "Follow {{ postType }}",
+        "unfollowBtn": "Unfollow {{ postType }}"
       },
-      "followBtn": "Follow {{ postType }}",
-      "unfollowBtn": "Unfollow {{ postType }}"
+      "moderation": {
+        "title": "Coming soon",
+        "subtitle_1": "Your {{ postType }} is not active yet.",
+        "subtitle_2": "It will start in",
+        "timer": {
+          "days": "Days",
+          "hours": "Hours",
+          "minutes": "Minutes",
+          "seconds": "Seconds"
+        }
+      }
     }
   },
   "AcPost": {
@@ -396,6 +435,16 @@
       "choosePledgeBtn": "Make pledge"
     }
   },
+  "PostVideoThumbnailEdit": {
+    "title": "Set a thumbnail",
+    "description": "Select a snippet from the video",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "toast": {
+      "success": "Success! Thumbnail will be changed once processed",
+      "error": "An error occured"
+    }
+  },
   "AcPostModeration": {
     "PostTopInfo": {
       "SelectWinner": {
@@ -436,8 +485,7 @@
       "body": "Are you sure you want to delete this option?",
       "cancelBtn": "Cancel",
       "confirmBtn": "Delete"
-    },
-    "floatingUploadResponseBtn": "Make a response video"
+    }
   },
   "McPostModeration": {
     "OptionsTab": {
@@ -599,21 +647,15 @@
   },
   "heroPopupAC": {
     "title": "Events",
-    "line1": "1. Open to ideas? Post a video and have the audience send you bids on what you should do",
-    "line2": "2. People send bids with their ideas, and how much they’ll pay to see you do it",
-    "line3": "3. Choose your favorite bid, then upload a video of yourself doing it!"
+    "text": "Control the outcome...\n Send the creator a bid with what you want them to do, how much you’d spend, then watch them do the bid!"
   },
   "heroPopupMC": {
     "title": "Superpolls",
-    "line1": "1. Post a video poll with a few options for the audience to choose from",
-    "line2": "2. People pay to vote on their favorite option",
-    "line3": "3. Upload a video response of you doing the option that gets the most votes!"
+    "text": "The creator makes a poll you pay to vote on.\n When the time’s up, watch the creator do the option that got the most amount of votes!"
   },
   "heroPopupCF": {
     "title": "Goals",
-    "line1": "1. Post a video goal and choose the number of backers you need to reach that goal",
-    "line2": "2. Every backer will contribute a custom dollar amount to your goal",
-    "line3": "3. Upload a video of you fulfilling your goal IRL when you get enough backers!"
+    "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
   },
   "tutorials": {
     "timer": {

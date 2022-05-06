@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import Text from '../atoms/Text';
 // import InlineSvg from '../atoms/InlineSVG';
@@ -26,7 +26,6 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   handleClose,
 }) => {
   // const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
@@ -35,10 +34,6 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
-
-  const handleClick = (url: string) => {
-    router.push(`/${url}`);
-  };
 
   return (
     <AnimatePresence>
@@ -51,26 +46,26 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SButton
-            onClick={() =>
-              router.route === '/profile'
-                ? handleClose()
-                : handleClick(
-                    user.userData?.options?.isCreator
-                      ? '/profile/my-posts'
-                      : '/profile'
-                  )
+          <Link
+            href={
+              user.userData?.options?.isCreator
+                ? '/profile/my-posts'
+                : '/profile'
             }
           >
-            <SAvatar>
-              <img
-                src={user?.userData?.avatarUrl!! as string}
-                alt={user?.userData?.username!!}
-                draggable={false}
-              />
-            </SAvatar>
-            <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
-          </SButton>
+            <SLink>
+              <SButton>
+                <SAvatar>
+                  <img
+                    src={user?.userData?.avatarUrl!! as string}
+                    alt={user?.userData?.username!!}
+                    draggable={false}
+                  />
+                </SAvatar>
+                <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
+              </SButton>
+            </SLink>
+          </Link>
           {/* <SButton
             onClick={() =>
               router.route.includes('/profile/settings')
@@ -133,6 +128,11 @@ const SContainer = styled(motion.div)`
   ${({ theme }) => theme.media.laptop} {
     right: 16px;
   }
+`;
+
+const SLink = styled.a`
+  width: 100%;
+  display: block;
 `;
 
 const SButton = styled.button`

@@ -8,24 +8,33 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../api/endpoints/multiple_choice';
 
-// test post
-// http://localhost:4000/post/e32b056b-8d5e-4093-b8b2-bd3e147fc461
-
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
 import BoxIcon from '../../../public/images/creation/MC.webp';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import McSuccessOptionsTab from '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const McSuccessOptionsTab = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+    )
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
+const DecisionEndedBox = dynamic(
+  () => import('../../molecules/decision/success/DecisionEndedBox')
+);
 
 interface IPostSuccessMC {
   post: newnewapi.MultipleChoice;
@@ -53,6 +62,26 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
+    const fetchPostLatestData = useCallback(async () => {
+      try {
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
+        });
+
+        const res = await fetchPostByUUID(fetchPostPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data.multipleChoice?.isResponseViewedByMe) {
+          setResponseViewed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -66,6 +95,12 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
     });
+
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Scroll to comments if hash is present
     useEffect(() => {

@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -8,15 +9,14 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import Lottie from '../../atoms/Lottie';
-import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
-
 // Assets
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 
 interface IPostViewProcessing {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;

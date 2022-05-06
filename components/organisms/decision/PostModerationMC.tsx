@@ -12,6 +12,7 @@ import React, {
 } from 'react';
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -20,28 +21,43 @@ import {
   getMcOption,
 } from '../../../api/endpoints/multiple_choice';
 import isBrowser from '../../../utils/isBrowser';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
-
 import Lottie from '../../atoms/Lottie';
-import LoadingModal from '../../molecules/LoadingModal';
-import GoBackButton from '../../molecules/GoBackButton';
-import HeroPopup from '../../molecules/decision/HeroPopup';
-import PostTimer from '../../molecules/decision/PostTimer';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import McOptionsTabModeration from '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration';
-import McWinnerTabModeration from '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration';
-
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+
+const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
+const ResponseTimer = dynamic(
+  () => import('../../molecules/decision/ResponseTimer')
+);
+const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const McOptionsTabModeration = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/multiple_choice/moderation/McOptionsTabModeration'
+    )
+);
+const McWinnerTabModeration = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/multiple_choice/moderation/McWinnerTabModeration'
+    )
+);
 
 export type TMcOptionWithHighestField = newnewapi.MultipleChoice.Option & {
   isHighest: boolean;
@@ -377,7 +393,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
             );
           }
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       }
 
@@ -433,16 +449,39 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         if (decodedParsed.postUuid === post.postUuid) {
           setTotalVotes(decoded.post?.multipleChoice?.totalVotes!!);
           setNumberOfOptions(decoded.post?.multipleChoice?.optionCount!!);
+
+          if (
+            !responseFreshlyUploaded &&
+            decoded.post?.multipleChoice?.response
+          ) {
+            setResponseFreshlyUploaded(decoded.post.multipleChoice.response);
+          }
         }
       };
 
-      const socketHandlerPostStatus = (data: any) => {
+      const socketHandlerPostStatus = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid) {
           handleUpdatePostStatus(decoded.multipleChoice!!);
+
+          if (
+            !responseFreshlyUploaded &&
+            postStatus === 'processing_response' &&
+            switchPostStatus('mc', decoded.multipleChoice!!) === 'succeeded'
+          ) {
+            const fetchPostPayload = new newnewapi.GetPostRequest({
+              postUuid: post.postUuid,
+            });
+
+            const res = await fetchPostByUUID(fetchPostPayload);
+
+            if (res.data?.multipleChoice?.response) {
+              setResponseFreshlyUploaded(res.data?.multipleChoice?.response);
+            }
+          }
         }
       };
 
@@ -471,6 +510,7 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
     }, [
       socketConnection,
       post,
+      postStatus,
       user.userData?.userUuid,
       setOptions,
       sortOptions,
@@ -491,6 +531,19 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
         })
       );
     };
+
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    useEffect(() => {
+      if (
+        user!!.userTutorialsProgressSynced &&
+        user!!.userTutorialsProgress.remainingMcSteps!![0] ===
+          newnewapi.McTutorialStep.MC_HERO
+      ) {
+        setIsPopupVisible(true);
+      } else {
+        setIsPopupVisible(false);
+      }
+    }, [user]);
 
     return (
       <SWrapper>
@@ -522,12 +575,17 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           postId={post.postUuid}
           announcement={post.announcement!!}
           response={(post.response || responseFreshlyUploaded) ?? undefined}
+          thumbnails={{
+            startTime: 1,
+            endTime: 3,
+          }}
           postStatus={postStatus}
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
           handleUpdateResponseVideo={(newValue) =>
             setResponseFreshlyUploaded(newValue)
           }
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
         <PostTopInfoModeration
           postType='mc'
@@ -582,16 +640,17 @@ const PostModerationMC: React.FunctionComponent<IPostModerationMC> = React.memo(
           )}
         </SActivitesContainer>
         {/* Loading Modal */}
-        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-        <HeroPopup
-          isPopupVisible={
-            user!!.userTutorialsProgressSynced &&
-            user!!.userTutorialsProgress.remainingMcSteps!![0] ===
-              newnewapi.McTutorialStep.MC_HERO
-          }
-          postType='MC'
-          closeModal={goToNextStep}
-        />
+        {loadingModalOpen && (
+          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        )}
+
+        {isPopupVisible && (
+          <HeroPopup
+            isPopupVisible={isPopupVisible}
+            postType='MC'
+            closeModal={goToNextStep}
+          />
+        )}
       </SWrapper>
     );
   }

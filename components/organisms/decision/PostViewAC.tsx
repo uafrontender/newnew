@@ -15,6 +15,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -28,15 +29,10 @@ import {
 } from '../../../api/endpoints/auction';
 
 import Lottie from '../../atoms/Lottie';
-import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
 import PostTimer from '../../molecules/decision/PostTimer';
 import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import AcWinnerTab from '../../molecules/decision/auction/AcWinnerTab';
-import AcOptionsTab from '../../molecules/decision/auction/AcOptionsTab';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import LoadingModal from '../../molecules/LoadingModal';
 
 // Assets
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -45,11 +41,25 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import PaymentSuccessModal from '../../molecules/decision/PaymentSuccessModal';
-import HeroPopup from '../../molecules/decision/HeroPopup';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const AcOptionsTab = dynamic(
+  () => import('../../molecules/decision/auction/AcOptionsTab')
+);
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const AcWinnerTab = dynamic(
+  () => import('../../molecules/decision/auction/AcWinnerTab')
+);
+const LoadingModal = dynamic(() => import('../../molecules/LoadingModal'));
+const PaymentSuccessModal = dynamic(
+  () => import('../../molecules/decision/PaymentSuccessModal')
+);
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -626,6 +636,20 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
       }
     }, [loadingOptionsError]);
 
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    useEffect(() => {
+      if (
+        options.length > 0 &&
+        user!!.userTutorialsProgressSynced &&
+        user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+          newnewapi.AcTutorialStep.AC_HERO
+      ) {
+        setIsPopupVisible(true);
+      } else {
+        setIsPopupVisible(false);
+      }
+    }, [options, user]);
+
     return (
       <SWrapper>
         <SExpiresSection>
@@ -642,6 +666,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
               (post.expiresAt?.seconds as number) * 1000
             ).getTime()}
             postType='ac'
+            isTutorialVisible={options.length > 0}
           />
         </SExpiresSection>
         <PostVideo
@@ -739,31 +764,33 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         </SActivitesContainer>
 
         {/* Loading Modal */}
-        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        {loadingModalOpen && (
+          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        )}
         {/* Payment success Modal */}
-        <PaymentSuccessModal
-          isVisible={paymentSuccesModalOpen}
-          closeModal={() => setPaymentSuccesModalOpen(false)}
-        >
-          {t('PaymentSuccessModal.ac', {
-            postCreator:
-              (post.creator?.nickname as string) ?? post.creator?.username,
-            postDeadline: moment(
-              (post.responseUploadDeadline?.seconds as number) * 1000
-            )
-              .subtract(3, 'days')
-              .calendar(),
-          })}
-        </PaymentSuccessModal>
-        <HeroPopup
-          isPopupVisible={
-            user!!.userTutorialsProgressSynced &&
-            user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-              newnewapi.AcTutorialStep.AC_HERO
-          }
-          postType='AC'
-          closeModal={goToNextStep}
-        />
+        {paymentSuccesModalOpen && (
+          <PaymentSuccessModal
+            isVisible={paymentSuccesModalOpen}
+            closeModal={() => setPaymentSuccesModalOpen(false)}
+          >
+            {t('PaymentSuccessModal.ac', {
+              postCreator:
+                (post.creator?.nickname as string) ?? post.creator?.username,
+              postDeadline: moment(
+                (post.responseUploadDeadline?.seconds as number) * 1000
+              )
+                .subtract(3, 'days')
+                .calendar(),
+            })}
+          </PaymentSuccessModal>
+        )}
+        {isPopupVisible && (
+          <HeroPopup
+            isPopupVisible={isPopupVisible}
+            postType='AC'
+            closeModal={goToNextStep}
+          />
+        )}
       </SWrapper>
     );
   }

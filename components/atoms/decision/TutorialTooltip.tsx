@@ -55,6 +55,7 @@ const SContainer = styled.div`
   position: relative;
   background: ${(props) => props.theme.colorsThemed.accent.blue};
   color: ${(props) => props.theme.colors.white};
+  box-shadow: 0px 0px 20px rgba(11, 10, 19);
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;

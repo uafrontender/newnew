@@ -1,25 +1,33 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { markPost } from '../../../api/endpoints/post';
-
-import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import { TPostType } from '../../../utils/switchPostType';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const PostTopInfo = dynamic(
+  () => import('../../molecules/decision/PostTopInfo')
+);
+const PostTopInfoModeration = dynamic(
+  () => import('../../molecules/decision/PostTopInfoModeration')
+);
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
   postType: string;
   postStatus: TPostStatusStringified;
+  variant: 'decision' | 'moderation';
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
@@ -31,6 +39,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       post,
       postType,
       postStatus,
+      variant,
       handleGoBack,
       handleUpdatePostStatus,
       handleReportOpen,
@@ -140,17 +149,30 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
             isMuted={mutedMode}
             handleToggleMuted={() => handleToggleMutedMode()}
           />
-          <PostTopInfo
-            title={post.title}
-            postId={post.postUuid}
-            postStatus={postStatus}
-            creator={post.creator!!}
-            hasWinner={false}
-            hasResponse={false}
-            isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-            startsAtSeconds={post.startsAt?.seconds as number}
-            handleReportOpen={handleReportOpen}
-          />
+          {variant === 'decision' ? (
+            <PostTopInfo
+              title={post.title}
+              postId={post.postUuid}
+              postStatus={postStatus}
+              postType={postType as TPostType}
+              creator={post.creator!!}
+              hasWinner={false}
+              hasResponse={false}
+              isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+              startsAtSeconds={post.startsAt?.seconds as number}
+              handleReportOpen={handleReportOpen}
+            />
+          ) : (
+            <PostTopInfoModeration
+              title={post.title}
+              postId={post.postUuid}
+              postStatus={postStatus}
+              postType={postType as TPostType}
+              hasWinner={false}
+              hasResponse={false}
+              handleUpdatePostStatus={handleUpdatePostStatus}
+            />
+          )}
           <SActivitesContainer>
             <PostScheduledSection
               postType={postType}
@@ -158,6 +180,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
                 (post.startsAt?.seconds as number) * 1000
               ).getTime()}
               isFollowing={isFollowing}
+              variant={variant}
               handleFollowDecision={handleFollowDecision}
             />
           </SActivitesContainer>

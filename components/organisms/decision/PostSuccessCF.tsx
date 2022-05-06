@@ -8,12 +8,10 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
-
-// test post
-// http://localhost:4000/post/0fc01edb-c88a-4c70-b597-b60aea9e072a
 
 // Utils
 import Headline from '../../atoms/Headline';
@@ -21,9 +19,13 @@ import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess'
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
 import BoxIcon from '../../../public/images/creation/CF.webp';
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
 
 interface IPostSuccessCF {
   post: newnewapi.Crowdfunding;
@@ -102,6 +104,25 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
     const [responseViewed, setResponseViewed] = useState(
       post.isResponseViewedByMe ?? false
     );
+    const fetchPostLatestData = useCallback(async () => {
+      try {
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
+        });
+
+        const res = await fetchPostByUUID(fetchPostPayload);
+
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
+
+        if (res.data.crowdfunding?.isResponseViewedByMe) {
+          setResponseViewed(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     // Muted mode
     const handleToggleMutedMode = useCallback(() => {
       dispatch(toggleMutedMode(''));
@@ -111,6 +132,12 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
     const { ref: commentsSectionRef, inView } = useInView({
       threshold: 0.8,
     });
+
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Scroll to comments if hash is present
     useEffect(() => {
@@ -214,8 +241,8 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
                     </SWantsToKnow>
                   </SCreator>
                   {/* <STotal>
-                  {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
-                </STotal> */}
+                    {`$${formatNumber(post.totalAmount?.usdCents ?? 0, true)}`}
+                  </STotal> */}
                 </SCreatorInfoDiv>
                 <SPostTitle variant={4}>{post.title}</SPostTitle>
                 <SSeparator />

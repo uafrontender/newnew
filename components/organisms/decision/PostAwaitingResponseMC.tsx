@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -17,14 +18,22 @@ import { getMcOption } from '../../../api/endpoints/multiple_choice';
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import McSuccessOptionsTab from '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-import WaitingForResponseBox from '../../molecules/decision/waiting/WaitingForResponseBox';
 
+const WaitingForResponseBox = dynamic(
+  () => import('../../molecules/decision/waiting/WaitingForResponseBox')
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
+const McSuccessOptionsTab = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+    )
+);
 interface IPostAwaitingResponseMC {
   post: newnewapi.MultipleChoice;
 }

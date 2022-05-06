@@ -6,14 +6,10 @@ import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
-import TopSection from '../components/organisms/home/TopSection';
-import HeroSection from '../components/organisms/home/HeroSection';
-import CardsSection from '../components/organisms/home/CardsSection';
-import PostModal from '../components/organisms/decision/PostModal';
-
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
@@ -32,7 +28,22 @@ import cfImage from '../public/images/creation/CF.webp';
 
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
-import TutorialCard from '../components/molecules/TutorialCard';
+
+const TopSection = dynamic(
+  () => import('../components/organisms/home/TopSection')
+);
+const HeroSection = dynamic(
+  () => import('../components/organisms/home/HeroSection')
+);
+const CardsSection = dynamic(
+  () => import('../components/organisms/home/CardsSection')
+);
+const PostModal = dynamic(
+  () => import('../components/organisms/decision/PostModal')
+);
+const TutorialCard = dynamic(
+  () => import('../components/molecules/TutorialCard')
+);
 
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;

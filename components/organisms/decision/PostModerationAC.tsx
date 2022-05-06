@@ -13,6 +13,7 @@ import React, {
 import styled, { css } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { toast } from 'react-toastify';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
@@ -24,15 +25,9 @@ import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 
 import Lottie from '../../atoms/Lottie';
-import PostTimer from '../../molecules/decision/PostTimer';
 import DecisionTabs from '../../molecules/decision/PostTabs';
-import CommentsTab from '../../molecules/decision/CommentsTab';
-import GoBackButton from '../../molecules/GoBackButton';
 import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
-import AcWinnerTabModeration from '../../molecules/decision/auction/moderation/AcWinnerTabModeration';
-import AcOptionsTabModeration from '../../molecules/decision/auction/moderation/AcOptionsTabModeration';
 import PostVideoModeration from '../../molecules/decision/PostVideoModeration';
-import ResponseTimer from '../../molecules/decision/ResponseTimer';
 
 // Icons
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
@@ -40,10 +35,29 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import isBrowser from '../../../utils/isBrowser';
 import switchPostType from '../../../utils/switchPostType';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
-import { TPostStatusStringified } from '../../../utils/switchPostStatus';
-import HeroPopup from '../../molecules/decision/HeroPopup';
+import switchPostStatus, {
+  TPostStatusStringified,
+} from '../../../utils/switchPostStatus';
 import { setUserTutorialsProgress } from '../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../api/endpoints/user';
+
+const CommentsTab = dynamic(
+  () => import('../../molecules/decision/CommentsTab')
+);
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const ResponseTimer = dynamic(
+  () => import('../../molecules/decision/ResponseTimer')
+);
+const PostTimer = dynamic(() => import('../../molecules/decision/PostTimer'));
+const AcWinnerTabModeration = dynamic(
+  () =>
+    import('../../molecules/decision/auction/moderation/AcWinnerTabModeration')
+);
+const AcOptionsTabModeration = dynamic(
+  () =>
+    import('../../molecules/decision/auction/moderation/AcOptionsTabModeration')
+);
+const HeroPopup = dynamic(() => import('../../molecules/decision/HeroPopup'));
 
 export type TAcOptionWithHighestField = newnewapi.Auction.Option & {
   isHighest: boolean;
@@ -463,7 +477,6 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           });
         }
       };
-
       const socketHandlerPostData = (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostUpdated.decode(arr);
@@ -473,16 +486,36 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
         if (decodedParsed.postUuid === post.postUuid) {
           setTotalAmount(decoded.post?.auction?.totalAmount?.usdCents!!);
           setNumberOfOptions(decoded.post?.auction?.optionCount!!);
+
+          if (!responseFreshlyUploaded && decoded.post?.auction?.response) {
+            setResponseFreshlyUploaded(decoded.post.auction.response);
+          }
         }
       };
 
-      const socketHandlerPostStatus = (data: any) => {
+      const socketHandlerPostStatus = async (data: any) => {
         const arr = new Uint8Array(data);
         const decoded = newnewapi.PostStatusUpdated.decode(arr);
 
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid) {
           handleUpdatePostStatus(decoded.auction!!);
+
+          if (
+            !responseFreshlyUploaded &&
+            postStatus === 'processing_response' &&
+            switchPostStatus('ac', decoded.auction!!) === 'succeeded'
+          ) {
+            const fetchPostPayload = new newnewapi.GetPostRequest({
+              postUuid: post.postUuid,
+            });
+
+            const res = await fetchPostByUUID(fetchPostPayload);
+
+            if (res.data?.auction?.response) {
+              setResponseFreshlyUploaded(res.data?.auction?.response);
+            }
+          }
         }
       };
 
@@ -511,6 +544,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
     }, [
       socketConnection,
       post,
+      postStatus,
       user.userData?.userUuid,
       setOptions,
       sortOptions,
@@ -538,6 +572,20 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
       );
     };
 
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    useEffect(() => {
+      if (
+        options.length > 0 &&
+        user!!.userTutorialsProgressSynced &&
+        user!!.userTutorialsProgress.remainingAcSteps!![0] ===
+          newnewapi.AcTutorialStep.AC_HERO
+      ) {
+        setIsPopupVisible(true);
+      } else {
+        setIsPopupVisible(false);
+      }
+    }, [options, user]);
+
     return (
       <SWrapper>
         <SExpiresSection>
@@ -562,6 +610,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
                 (post.expiresAt?.seconds as number) * 1000
               ).getTime()}
               postType='ac'
+              isTutorialVisible={options.length > 0}
             />
           )}
         </SExpiresSection>
@@ -569,12 +618,17 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           postId={post.postUuid}
           announcement={post.announcement!!}
           response={(post.response || responseFreshlyUploaded) ?? undefined}
+          thumbnails={{
+            startTime: 1,
+            endTime: 3,
+          }}
           postStatus={postStatus}
           isMuted={mutedMode}
           handleToggleMuted={() => handleToggleMutedMode()}
           handleUpdateResponseVideo={(newValue) =>
             setResponseFreshlyUploaded(newValue)
           }
+          handleUpdatePostStatus={handleUpdatePostStatus}
         />
         <PostTopInfoModeration
           postType='ac'
@@ -633,15 +687,13 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             </SAnimationContainer>
           )}
         </SActivitesContainer>
-        <HeroPopup
-          isPopupVisible={
-            user!!.userTutorialsProgressSynced &&
-            user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-              newnewapi.AcTutorialStep.AC_HERO
-          }
-          postType='AC'
-          closeModal={goToNextStep}
-        />
+        {isPopupVisible && (
+          <HeroPopup
+            isPopupVisible={isPopupVisible}
+            postType='AC'
+            closeModal={goToNextStep}
+          />
+        )}
       </SWrapper>
     );
   }
