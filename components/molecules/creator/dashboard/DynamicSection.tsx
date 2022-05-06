@@ -9,16 +9,11 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { isString } from 'lodash';
+import dynamic from 'next/dynamic';
 
-import Chat from './Chat';
 import Button from '../../../atoms/Button';
-import ChatList from './ChatList';
-import InlineSVG from '../../../atoms/InlineSVG';
-import Indicator from '../../../atoms/Indicator';
-import Tabs, { Tab } from '../../Tabs';
-import NotificationsList from './NotificationsList';
+import { Tab } from '../../Tabs';
 import AnimatedPresence, { TAnimation } from '../../../atoms/AnimatedPresence';
-
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import { setOverlay } from '../../../../redux-store/slices/uiStateSlice';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
@@ -30,7 +25,14 @@ import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessag
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
-import NewMessageModal from './NewMessageModal';
+
+const NewMessageModal = dynamic(() => import('./NewMessageModal'));
+const NotificationsList = dynamic(() => import('./NotificationsList'));
+const ChatList = dynamic(() => import('./ChatList'));
+const Chat = dynamic(() => import('./Chat'));
+const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
+const Indicator = dynamic(() => import('../../../atoms/Indicator'));
+const Tabs = dynamic(() => import('../../Tabs'));
 
 export const DynamicSection = () => {
   const theme = useTheme();
