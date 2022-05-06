@@ -5,12 +5,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import router from 'next/router';
-
+import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
-import CardSkeleton from '../../molecules/CardSkeleton';
-
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
 import CreatorCard from '../../molecules/search/CreatorCard';
+
+const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
 interface IList {
   collection: any;

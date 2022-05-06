@@ -10,13 +10,12 @@ import { useInView } from 'react-intersection-observer';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
 import PostList from '../components/organisms/see-more/PostList';
 import TitleBlock from '../components/organisms/see-more/TitleBlock';
 import HomeLayout from '../components/templates/HomeLayout';
-import TopSection from '../components/organisms/home/TopSection';
-import PostModal from '../components/organisms/decision/PostModal';
 
 import { useAppSelector } from '../redux-store/store';
 import {
@@ -28,7 +27,13 @@ import { APIResponse } from '../api/apiConfigs';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
-import switchPostType from '../utils/switchPostType';
+
+const PostModal = dynamic(
+  () => import('../components/organisms/decision/PostModal')
+);
+const TopSection = dynamic(
+  () => import('../components/organisms/home/TopSection')
+);
 
 export type TCollectionType = 'ac' | 'mc' | 'cf' | 'biggest' | 'for-you';
 export type TSortingType = 'all' | 'num_bids' | 'most_funded' | 'newest';
@@ -39,7 +44,7 @@ interface ISearch {
 
 const Search: NextPage<ISearch> = ({ top10posts }) => {
   const { t } = useTranslation('home');
-  const { loggedIn, userData } = useAppSelector((state) => state.user);
+  const { loggedIn } = useAppSelector((state) => state.user);
 
   const router = useRouter();
   const categoryRef = useRef(router.query.category?.toString() ?? 'ac');

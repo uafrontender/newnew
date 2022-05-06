@@ -7,24 +7,30 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-
+import Button from '../../components/atoms/Button';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
-import PostModal from '../../components/organisms/decision/PostModal';
-import PostList from '../../components/organisms/see-more/PostList';
-import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import HowItWorksDarkHoldFrameIcon from '../../public/images/profile/How-it-Works-Dark-Hold-Frame.png';
 import {
   NoContentDescription,
   NoContentTitle,
 } from '../../components/atoms/profile/NoContentCommonElements';
 
-import Button from '../../components/atoms/Button';
+const PostModal = dynamic(
+  () => import('../../components/organisms/decision/PostModal')
+);
+const PostList = dynamic(
+  () => import('../../components/organisms/see-more/PostList')
+);
+const NoContentCard = dynamic(
+  () => import('../../components/atoms/profile/NoContentCard')
+);
 
 interface IMyProfileIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -180,7 +186,7 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
         </SCardsSection>
         <div ref={loadingRef} />
       </SMain>
-      {displayedPost && (
+      {displayedPost && postModalOpen && (
         <PostModal
           isOpen={postModalOpen}
           post={displayedPost}
