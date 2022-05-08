@@ -125,6 +125,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     }
   }, [emailInput, setEmailInputValid]);
 
+  const redirectUrlParam = redirectURL ? `?redirect_url=${encodeURIComponent(redirectURL)}` : '';
+
   return (
     <SSignupMenu
       isLoading={isSubmitLoading}
@@ -159,7 +161,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={GoogleIcon}
               hoverBgColor={theme.colorsThemed.social.google.hover}
               pressedBgColor={theme.colorsThemed.social.google.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google${redirectUrlParam}`)}
             >
               {t('signupOptions.google')}
             </SignInButton>
@@ -171,7 +173,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple${redirectUrlParam}`)}
             >
               {t('signupOptions.apple')}
             </SignInButton>
@@ -183,7 +185,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)}
             >
               {t('signupOptions.facebook')}
             </SignInButton>
@@ -194,7 +196,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
+              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter${redirectUrlParam}`)}
             >
               {t('signupOptions.twitter')}
             </SignInButton>
