@@ -333,6 +333,18 @@ const SExternalLink = styled.a`
   flex-direction: row;
   justify-content: flex-start;
   gap: 9px;
+
+  &:hover {
+    a {
+      color: ${(props) => props.theme.colorsThemed.text.primary};
+    }
+
+    div {
+      svg {
+        fill: ${(props) => props.theme.colorsThemed.text.primary};
+      }
+    }
+  }
 `;
 
 const SSvgHolder = styled.a``;
