@@ -334,17 +334,17 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       )}
       <PaymentModal
         zIndex={10}
-        showTocApply
         predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
         amount={`$${subPriceFormatted}`}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
         // handlePayWithWallet={handlePayRegistered}
+        payButtonCaptionKey={t('paymentModalPayButton')}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant={3}>
-            {t('paymenModalHeader.subtitle')}
+            {t('paymentModalHeader.subtitle')}
           </SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>

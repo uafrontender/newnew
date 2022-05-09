@@ -251,7 +251,7 @@ const McOptionCardDoubleVote: React.FunctionComponent<IMcOptionCardDoubleVote> =
           >
             <SPaymentModalHeader>
               <SPaymentModalTitle variant={3}>
-                {t('McPost.paymenModalHeader.subtitle')}
+                {t('McPost.paymentModalHeader.subtitle')}
               </SPaymentModalTitle>
               <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
             </SPaymentModalHeader>
