@@ -39,7 +39,14 @@ const assets = {
     topMiddleSphere: `${APP_ASSETS_ORIGIN}/floating-assets/top-middle-sphere.png`,
     votes: `${APP_ASSETS_ORIGIN}/floating-assets/votes.png`,
   },
-  signup: {},
+  signup: {
+    darkInto: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-dark.webp`,
+    darkOutro: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-dark.webp`,
+    darkStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-dark.png`,
+    lightInto: `${APP_ASSETS_ORIGIN}/signup/sign-in-intro-light.webp`,
+    lightOutro: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`,
+    lightStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-light.png`,
+  },
 };
 
 export default assets;

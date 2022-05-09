@@ -5,13 +5,7 @@ import { AuthLayoutContext } from './AuthLayout';
 
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 
-// Sign in
-import SignInIntro from '../../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
-import SignInHold from '../../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
-import SignInOutro from '../../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
-import SignInIntroLight from '../../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
-import SignInHoldLight from '../../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
-import SignInOutroLight from '../../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
+import assets from '../../constants/assets';
 
 interface IHeroVisual {
   style?: React.CSSProperties;
@@ -67,7 +61,11 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
           ref={(el) => {
             introRef.current = el!!;
           }}
-          src={theme.name === 'dark' ? SignInIntro.src : SignInIntroLight.src}
+          src={
+            theme.name === 'dark'
+              ? assets.signup.darkInto
+              : assets.signup.lightInto
+          }
           onLoad={onIntroLoaded}
         />
       </SImageWrapper>
@@ -77,7 +75,11 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
         }}
       >
         <SImage
-          src={theme.name === 'dark' ? SignInHold.src : SignInHoldLight.src}
+          src={
+            theme.name === 'dark'
+              ? assets.signup.darkStatic
+              : assets.signup.lightStatic
+          }
         />
       </SImageWrapper>
       <SImageWrapper
@@ -86,7 +88,11 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
         }}
       >
         <SImage
-          src={theme.name === 'dark' ? SignInOutro.src : SignInOutroLight.src}
+          src={
+            theme.name === 'dark'
+              ? assets.signup.darkOutro
+              : assets.signup.lightOutro
+          }
         />
       </SImageWrapper>
     </SHeroVisual>

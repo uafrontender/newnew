@@ -45,14 +45,6 @@ import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 // Images to be prefetched
 import assets from '../constants/assets';
 
-// Sign in
-import SignInIntroDark from '../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
-import SignInHoldDark from '../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
-import SignInOutroDark from '../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
-import SignInIntroLight from '../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
-import SignInHoldLight from '../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
-import SignInOutroLight from '../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
-
 // Landing
 import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
@@ -276,31 +268,32 @@ const PRE_FETCH_LINKS_COMMON = (
   </>
 );
 
-// TODO: We should not preload Desktop assets on mobile and vice versa
 const PRE_FETCH_LINKS_DARK = (
   <>
     <link
       rel='prefetch'
-      href={SignInHoldDark.src}
+      href={assets.signup.darkStatic}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={SignInIntroDark.src}
+      href={assets.signup.darkInto}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={SignInOutroDark.src}
+      href={assets.signup.darkOutro}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
-    <link rel='prefetch' href={assets.home.darkLandingStatic} as='image' />
+    <link
+      rel='prefetch'
+      href={assets.home.darkLandingStatic}
+      as='image'
+      media='(min-width: 760px)'
+    />
     <link
       rel='prefetch'
       href={assets.home.darkMobileLandingStatic}
@@ -309,31 +302,32 @@ const PRE_FETCH_LINKS_DARK = (
   </>
 );
 
-// TODO: We should not preload Desktop assets on mobile and vice versa
 const PRE_FETCH_LINKS_LIGHT = (
   <>
     <link
       rel='prefetch'
-      href={SignInHoldLight.src}
+      href={assets.signup.lightStatic}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={SignInIntroLight.src}
+      href={assets.signup.lightInto}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={SignInOutroLight.src}
+      href={assets.signup.lightOutro}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
-    <link rel='prefetch' href={assets.home.lightLandingStatic} as='image' />
+    <link
+      rel='prefetch'
+      href={assets.home.lightLandingStatic}
+      as='image'
+      media='(min-width: 760px)'
+    />
     <link
       rel='prefetch'
       href={assets.home.lightMobileLandingStatic}
