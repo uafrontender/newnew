@@ -23,7 +23,7 @@ import { SCROLL_EXPLORE } from '../../../constants/timings';
 
 import assets from '../../../constants/assets';
 
-export const HeroSection = () => {
+export const HeroSection = React.memo(() => {
   const router = useRouter();
   const theme = useTheme();
   const { t } = useTranslation('home');
@@ -238,7 +238,7 @@ export const HeroSection = () => {
       </SHeroImage>
     </SWrapper>
   );
-};
+});
 
 export default HeroSection;
 

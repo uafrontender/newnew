@@ -17,7 +17,7 @@ interface IUserAvatar {
   withClick?: boolean;
 }
 
-export const UserAvatar: React.FC<IUserAvatar> = (props) => {
+export const UserAvatar: React.FC<IUserAvatar> = React.memo((props) => {
   const { avatarUrl, onClick, withClick, ...rest } = props;
   const { resizeMode } = useAppSelector((state) => state.ui);
 
@@ -50,7 +50,7 @@ export const UserAvatar: React.FC<IUserAvatar> = (props) => {
       />
     </SContainer>
   );
-};
+});
 
 export default UserAvatar;
 
