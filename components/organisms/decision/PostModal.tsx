@@ -151,7 +151,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
   // TODO: a way to determine if the post was deleted by the crator themselves
   // pr by an admin
-  const deletedByCreator = useMemo(() => true, []);
+  const deletedByCreator = useMemo(
+    () => postStatus === 'deleted_by_creator',
+    [postStatus]
+  );
 
   const shouldRenderVotingFinishedModal = useMemo(
     () =>
@@ -932,7 +935,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
               modalContainerRef.current = el!!;
             }}
           >
-            {postStatus !== 'deleted' ? (
+            {postStatus !== 'deleted_by_admin' &&
+            postStatus !== 'deleted_by_creator' ? (
               isMyPost ? (
                 renderPostModeration(typeOfPost)
               ) : (

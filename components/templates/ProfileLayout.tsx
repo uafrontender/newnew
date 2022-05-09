@@ -581,7 +581,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
       )}
       <BlockUserModal
         confirmBlockUser={blockUserModalOpen}
-        onUserBlock={() => {}}
         user={user}
         closeModal={() => setBlockUserModalOpen(false)}
       />
