@@ -47,6 +47,11 @@ const assets = {
     lightOutro: `${APP_ASSETS_ORIGIN}/signup/sign-in-outro-light.webp`,
     lightStatic: `${APP_ASSETS_ORIGIN}/signup/sign-in-hold-frame-light.png`,
   },
+  subscription: {
+    subDm: `${APP_ASSETS_ORIGIN}/subscription/sub-DM.webp`,
+    subMC: `${APP_ASSETS_ORIGIN}/subscription/sub-MC.webp`,
+    subVotes: `${APP_ASSETS_ORIGIN}/subscription/sub-votes.webp`,
+  },
 };
 
 export default assets;
