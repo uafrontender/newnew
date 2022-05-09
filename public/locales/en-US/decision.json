@@ -265,9 +265,13 @@
     }
   },
   "AcPost": {
-    "paymenModalHeader": {
+    "paymentModalHeader": {
       "subtitle": "You bid on"
     },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid."
+    },
+    "paymentModalPayButton": "Bid",
     "PostTopInfo": {
       "SelectWinner": {
         "title": "Time's up!",
@@ -329,9 +333,13 @@
       "vote": "vote",
       "votes": "votes"
     },
-    "paymenModalHeader": {
+    "paymentModalHeader": {
       "subtitle": "You vote for"
     },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if your vote wins."
+    },
+    "paymentModalPayButton": "Vote for",
     "OptionsTab": {
       "me": "me",
       "tags": {
@@ -428,9 +436,13 @@
         "backer_founded": "backer successfully funded"
       }
     },
-    "paymenModalHeader": {
+    "paymentModalHeader": {
       "subtitle": "You pledge for"
     },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal."
+    },
+    "paymentModalPayButton": "Back it for",
     "FloatingActionButton": {
       "choosePledgeBtn": "Make pledge"
     }

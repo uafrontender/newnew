@@ -357,7 +357,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
-              {t('AcPost.paymenModalHeader.subtitle')}
+              {t('AcPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText>{option.title}</SPaymentModalOptionText>
           </SPaymentModalHeader>

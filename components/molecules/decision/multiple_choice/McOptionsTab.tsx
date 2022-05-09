@@ -658,10 +658,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
+          bottomCaption={
+            <SPaymentFooter variant={3}>
+              {t('McPost.paymentModalFooter.body')}
+            </SPaymentFooter>
+          }
+          payButtonCaptionKey={t('McPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
-              {t('McPost.paymenModalHeader.subtitle')}
+              {t('McPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText>{newOptionText}</SPaymentModalOptionText>
           </SPaymentModalHeader>
@@ -984,4 +990,12 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;
