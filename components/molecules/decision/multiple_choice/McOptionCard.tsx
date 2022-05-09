@@ -402,11 +402,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={disabled && votingAllowed}
           $isBlue={isBlue}
-          onClick={() => {
-            if (!isMobile && !disabled && !noAction && !isSupportMenuOpen) {
-              handleOpenSupportForm();
-            }
-          }}
         >
           <SBidDetails isBlue={isBlue} noAction={noAction}>
             <SBidAmount>
