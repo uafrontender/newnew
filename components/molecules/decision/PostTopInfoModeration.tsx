@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
@@ -116,12 +116,20 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
     const [deletePostOpen, setDeletePostOpen] = useState(false);
 
     const handleOpenShareMenu = () => setShareMenuOpen(true);
-    const handleCloseShareMenu = () => setShareMenuOpen(false);
+    const handleCloseShareMenu = useCallback(() => {
+      setShareMenuOpen(false);
+    }, []);
 
     const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
-    const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+    const handleCloseEllipseMenu = useCallback(
+      () => setEllipseMenuOpen(false),
+      []
+    );
 
-    const handleOpenDeletePostModal = () => setDeletePostOpen(true);
+    const handleOpenDeletePostModal = useCallback(
+      () => setDeletePostOpen(true),
+      []
+    );
     const handleCloseDeletePostModal = () => setDeletePostOpen(false);
 
     const handleDeletePost = async () => {
@@ -196,7 +204,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               <PostShareMenu
                 postId={postId}
                 isVisible={shareMenuOpen}
-                handleClose={handleCloseShareMenu}
+                onClose={handleCloseShareMenu}
               />
             )}
             {isMobile && shareMenuOpen ? (

@@ -19,10 +19,11 @@ import useOverlay from '../../utils/hooks/useOverlay';
 import useScrollPosition from '../../utils/hooks/useScrollPosition';
 import { useAppSelector } from '../../redux-store/store';
 import useScrollDirection from '../../utils/hooks/useScrollDirection';
-import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
+// import useRefreshOnScrollTop from '../../utils/hooks/useRefreshOnScrollTop';
 
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
+import { useNotifications } from '../../contexts/notificationsContext';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -37,6 +38,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
   const theme = useTheme();
   const [cookies] = useCookies();
+  const { unreadNotificationCount } = useNotifications();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -72,7 +74,7 @@ export const General: React.FC<IGeneral> = (props) => {
             key: 'notifications',
             url: '/notifications',
             width: '20%',
-            counter: user.notificationsCount,
+            counter: unreadNotificationCount,
           },
           {
             key: 'more',
@@ -97,7 +99,7 @@ export const General: React.FC<IGeneral> = (props) => {
             key: 'notifications',
             url: '/notifications',
             width: '33%',
-            counter: user.notificationsCount,
+            counter: unreadNotificationCount,
           },
         ];
       }
@@ -106,13 +108,13 @@ export const General: React.FC<IGeneral> = (props) => {
     return bottomNavigationShadow;
   }, [
     user.loggedIn,
-    user.notificationsCount,
+    unreadNotificationCount,
     user.userData?.options?.isCreator,
   ]);
 
   useOverlay(wrapperRef);
   useScrollPosition(wrapperRef);
-  useRefreshOnScrollTop();
+  // useRefreshOnScrollTop();
   const { scrollDirection } = useScrollDirection(wrapperRef);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode

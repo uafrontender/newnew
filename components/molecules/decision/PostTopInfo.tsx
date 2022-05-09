@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -131,15 +131,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
 
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [ellipseMenuOpen, setEllipseMenuOpen] = useState(false);
-  const [reportPostOpen, setReportPostOpen] = useState(false);
 
   const handleOpenShareMenu = () => setShareMenuOpen(true);
-  const handleCloseShareMenu = () => setShareMenuOpen(false);
+  const handleCloseShareMenu = useCallback(() => {
+    setShareMenuOpen(false);
+  }, []);
 
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
-  const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
+  const handleCloseEllipseMenu = useCallback(() => {
+    setEllipseMenuOpen(false);
+  }, []);
 
-  const handleFollowDecision = async () => {
+  const handleFollowDecision = useCallback(async () => {
     try {
       if (!user.loggedIn) {
         router.push(
@@ -159,9 +162,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [isFollowingDecision, postId, router, user.loggedIn]);
 
-  const handleToggleFollowingCreator = async () => {
+  const handleToggleFollowingCreator = useCallback(async () => {
     try {
       if (!user.loggedIn) {
         router.push(
@@ -188,7 +191,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [addId, removeId, creator.uuid, followingsIds, router, user.loggedIn]);
 
   return (
     <SContainer>
@@ -255,7 +258,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <PostShareMenu
               postId={postId}
               isVisible={shareMenuOpen}
-              handleClose={handleCloseShareMenu}
+              onClose={handleCloseShareMenu}
             />
           )}
           {isMobile && shareMenuOpen ? (

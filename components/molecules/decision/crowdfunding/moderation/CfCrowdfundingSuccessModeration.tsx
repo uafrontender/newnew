@@ -287,6 +287,8 @@ const SWinnerCard = styled.div`
     height: fit-content;
 
     padding: 24px;
+
+    z-index: 10;
   }
 `;
 

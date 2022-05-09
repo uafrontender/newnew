@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
-import { AuthLayoutContext } from './AuthLayout';
 
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 
 import assets from '../../constants/assets';
+import { AuthLayoutContext } from './AuthLayout';
 
 interface IHeroVisual {
   style?: React.CSSProperties;

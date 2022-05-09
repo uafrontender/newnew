@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import Button from '../Button';
 import Text from '../Text';
-import Indicator from '../Indicator';
 
 export const SBottomAction = styled.div`
   display: flex;
@@ -127,8 +126,6 @@ export const SChatItemTime = styled(Text)`
   white-space: nowrap;
   margin-bottom: 4px;
 `;
-
-export const SChatItemIndicator = styled(Indicator)``;
 
 export const SChatSeparator = styled.div`
   border-top: 1px solid

@@ -23,6 +23,7 @@ import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import getDisplayname from '../../../../utils/getDisplayname';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -352,10 +353,18 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
+          bottomCaption={
+            <SPaymentFooter variant={3}>
+              {t('CfPost.paymentModalFooter.body', {
+                creator: getDisplayname(post.creator!!),
+              })}
+            </SPaymentFooter>
+          }
+          payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
-              {t('CfPost.paymenModalHeader.subtitle')}
+              {t('CfPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText>{post.title}</SPaymentModalOptionText>
           </SPaymentModalHeader>
@@ -504,4 +513,12 @@ const SCloseButton = styled.button`
   text-transform: capitalize;
 
   cursor: pointer;
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;

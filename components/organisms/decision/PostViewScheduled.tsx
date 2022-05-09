@@ -1,165 +1,193 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { markPost } from '../../../api/endpoints/post';
-
-import GoBackButton from '../../molecules/GoBackButton';
 import PostVideo from '../../molecules/decision/PostVideo';
-import PostTopInfo from '../../molecules/decision/PostTopInfo';
 import PostScheduledSection from '../../molecules/decision/PostScheduledSection';
 
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
+import { TPostType } from '../../../utils/switchPostType';
+
+const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+const PostTopInfo = dynamic(
+  () => import('../../molecules/decision/PostTopInfo')
+);
+const PostTopInfoModeration = dynamic(
+  () => import('../../molecules/decision/PostTopInfoModeration')
+);
 
 interface IPostViewScheduled {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
   postType: string;
   postStatus: TPostStatusStringified;
+  variant: 'decision' | 'moderation';
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
 }
 
-const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> = ({
-  post,
-  postType,
-  postStatus,
-  handleGoBack,
-  handleUpdatePostStatus,
-  handleReportOpen,
-}) => {
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
+  React.memo(
+    ({
+      post,
+      postType,
+      postStatus,
+      variant,
+      handleGoBack,
+      handleUpdatePostStatus,
+      handleReportOpen,
+    }) => {
+      const dispatch = useAppDispatch();
+      const { user } = useAppSelector((state) => state);
+      const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+      const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+        resizeMode
+      );
 
-  // Socket
-  const socketConnection = useContext(SocketContext);
-  const { addChannel, removeChannel } = useContext(ChannelsContext);
+      // Socket
+      const socketConnection = useContext(SocketContext);
+      const { addChannel, removeChannel } = useContext(ChannelsContext);
 
-  const [isFollowing, setIsFollowing] = useState(post.isFavoritedByMe ?? false);
+      const [isFollowing, setIsFollowing] = useState(
+        post.isFavoritedByMe ?? false
+      );
 
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
+      const handleToggleMutedMode = useCallback(() => {
+        dispatch(toggleMutedMode(''));
+      }, [dispatch]);
 
-  const handleFollowDecision = async () => {
-    if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
-      return;
-    try {
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: !isFollowing
-          ? newnewapi.MarkPostRequest.Kind.FAVORITE
-          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
-        postUuid: post.postUuid,
-      });
+      const handleFollowDecision = async () => {
+        if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
+          return;
+        try {
+          const markAsViewedPayload = new newnewapi.MarkPostRequest({
+            markAs: !isFollowing
+              ? newnewapi.MarkPostRequest.Kind.FAVORITE
+              : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
+            postUuid: post.postUuid,
+          });
 
-      const res = await markPost(markAsViewedPayload);
+          const res = await markPost(markAsViewedPayload);
 
-      if (!res.error) {
-        setIsFollowing(!isFollowing);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Increment channel subs after mounting
-  // Decrement when unmounting
-  useEffect(() => {
-    addChannel(post.postUuid, {
-      postUpdates: {
-        postUuid: post.postUuid,
-      },
-    });
-
-    return () => {
-      removeChannel(post.postUuid);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const socketHandlerPostStatus = (data: any) => {
-      const arr = new Uint8Array(data);
-      const decoded = newnewapi.PostStatusUpdated.decode(arr);
-
-      if (!decoded) return;
-      if (decoded.postUuid === post.postUuid) {
-        if (decoded.auction) {
-          handleUpdatePostStatus(decoded.auction!!);
-        } else if (decoded.multipleChoice) {
-          handleUpdatePostStatus(decoded.multipleChoice!!);
-        } else {
-          handleUpdatePostStatus(decoded.crowdfunding!!);
+          if (!res.error) {
+            setIsFollowing(!isFollowing);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      }
-    };
+      };
 
-    if (socketConnection) {
-      socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
-    }
+      // Increment channel subs after mounting
+      // Decrement when unmounting
+      useEffect(() => {
+        addChannel(post.postUuid, {
+          postUpdates: {
+            postUuid: post.postUuid,
+          },
+        });
 
-    return () => {
-      if (socketConnection && socketConnection.connected) {
-        socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socketConnection, post, user.userData?.userUuid]);
+        return () => {
+          removeChannel(post.postUuid);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
 
-  return (
-    <SWrapper>
-      <SExpiresSection>
-        {isMobile && (
-          <GoBackButton
-            style={{
-              gridArea: 'closeBtnMobile',
-            }}
-            onClick={handleGoBack}
+      useEffect(() => {
+        const socketHandlerPostStatus = (data: any) => {
+          const arr = new Uint8Array(data);
+          const decoded = newnewapi.PostStatusUpdated.decode(arr);
+
+          if (!decoded) return;
+          if (decoded.postUuid === post.postUuid) {
+            if (decoded.auction) {
+              handleUpdatePostStatus(decoded.auction!!);
+            } else if (decoded.multipleChoice) {
+              handleUpdatePostStatus(decoded.multipleChoice!!);
+            } else {
+              handleUpdatePostStatus(decoded.crowdfunding!!);
+            }
+          }
+        };
+
+        if (socketConnection) {
+          socketConnection.on('PostStatusUpdated', socketHandlerPostStatus);
+        }
+
+        return () => {
+          if (socketConnection && socketConnection.connected) {
+            socketConnection.off('PostStatusUpdated', socketHandlerPostStatus);
+          }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [socketConnection, post, user.userData?.userUuid]);
+
+      return (
+        <SWrapper>
+          <SExpiresSection>
+            {isMobile && (
+              <GoBackButton
+                style={{
+                  gridArea: 'closeBtnMobile',
+                }}
+                onClick={handleGoBack}
+              />
+            )}
+          </SExpiresSection>
+          <PostVideo
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={false}
+            handleSetResponseViewed={() => {}}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
           />
-        )}
-      </SExpiresSection>
-      <PostVideo
-        postId={post.postUuid}
-        announcement={post.announcement!!}
-        response={post.response ?? undefined}
-        responseViewed={false}
-        handleSetResponseViewed={() => {}}
-        isMuted={mutedMode}
-        handleToggleMuted={() => handleToggleMutedMode()}
-      />
-      <PostTopInfo
-        title={post.title}
-        postId={post.postUuid}
-        postStatus={postStatus}
-        creator={post.creator!!}
-        hasWinner={false}
-        hasResponse={false}
-        isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-        startsAtSeconds={post.startsAt?.seconds as number}
-        handleReportOpen={handleReportOpen}
-      />
-      <SActivitesContainer>
-        <PostScheduledSection
-          postType={postType}
-          timestampSeconds={new Date(
-            (post.startsAt?.seconds as number) * 1000
-          ).getTime()}
-          isFollowing={isFollowing}
-          handleFollowDecision={handleFollowDecision}
-        />
-      </SActivitesContainer>
-    </SWrapper>
+          {variant === 'decision' ? (
+            <PostTopInfo
+              title={post.title}
+              postId={post.postUuid}
+              postStatus={postStatus}
+              postType={postType as TPostType}
+              creator={post.creator!!}
+              hasWinner={false}
+              hasResponse={false}
+              isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+              startsAtSeconds={post.startsAt?.seconds as number}
+              handleReportOpen={handleReportOpen}
+            />
+          ) : (
+            <PostTopInfoModeration
+              title={post.title}
+              postId={post.postUuid}
+              postStatus={postStatus}
+              postType={postType as TPostType}
+              hasWinner={false}
+              hasResponse={false}
+              handleUpdatePostStatus={handleUpdatePostStatus}
+            />
+          )}
+          <SActivitesContainer>
+            <PostScheduledSection
+              postType={postType}
+              timestampSeconds={new Date(
+                (post.startsAt?.seconds as number) * 1000
+              ).getTime()}
+              isFollowing={isFollowing}
+              variant={variant}
+              handleFollowDecision={handleFollowDecision}
+            />
+          </SActivitesContainer>
+        </SWrapper>
+      );
+    }
   );
-};
 
 export default PostViewScheduled;
 

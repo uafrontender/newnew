@@ -7,7 +7,7 @@ import {
   TTokenCookie,
 } from '../apiConfigs';
 
-export const BASE_URL_USER = `${BASE_URL}/user`;
+const BASE_URL_USER = `${BASE_URL}/user`;
 
 // Own data
 export const validateUsernameTextField = (

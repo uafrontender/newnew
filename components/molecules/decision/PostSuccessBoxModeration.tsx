@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Text from '../../atoms/Text';
 
 import PostSuccessIcon from '../../../public/images/decision/post-success-moderation-img.png';
+import Button from '../../atoms/Button';
 
 interface IPostSuccessBoxModeration {
   title: string;
@@ -20,7 +21,9 @@ const PostSuccessBoxModeration: React.FunctionComponent<IPostSuccessBoxModeratio
       <SHeadline variant={2}>{title}</SHeadline>
       <SBody variant={3}>{body}</SBody>
       <SCtaButtonContainer>
-        <SCTAButton onClick={handleButtonClick}>{buttonCaption}</SCTAButton>
+        <SCTAButton view='primaryGrad' onClick={handleButtonClick}>
+          {buttonCaption}
+        </SCTAButton>
       </SCtaButtonContainer>
     </SWaitingForResponseBox>
   );
@@ -32,6 +35,9 @@ PostSuccessBoxModeration.defaultProps = {
 export default PostSuccessBoxModeration;
 
 const SWaitingForResponseBox = styled.div`
+  z-index: 11;
+  position: relative;
+
   background: radial-gradient(
         100% 1411.13% at 0% 0%,
         rgba(54, 55, 74, 0.4) 0%,
@@ -99,18 +105,10 @@ const SCtaButtonContainer = styled.div`
   }
 `;
 
-const SCTAButton = styled.button`
-  background: #ffffff;
-
-  border: transparent;
-  border-radius: 16px;
-
-  padding: 12px 24px;
-
+const SCTAButton = styled(Button)`
   font-weight: 600;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colors.dark};
 
   width: 100%;
   margin-top: 12px;

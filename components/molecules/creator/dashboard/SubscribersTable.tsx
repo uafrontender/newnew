@@ -3,17 +3,22 @@ import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import Button from '../../../atoms/Button';
 import Lottie from '../../../atoms/Lottie';
-import InlineSVG from '../../../atoms/InlineSVG';
-import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import arrowDown from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import ChevronDown from '../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import ChevronFirstPage from '../../../../public/images/svg/icons/outlined/ChevronFirstPage.svg';
+
+const SubscriberRow = dynamic(
+  () => import('../../../atoms/dashboard/SubscriberRow')
+);
+
+const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 
 export const SubscribersTable = () => {
   const { t } = useTranslation('creator');

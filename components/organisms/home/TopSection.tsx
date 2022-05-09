@@ -30,185 +30,184 @@ interface ITopSection {
   handlePostClicked: (post: newnewapi.Post) => void;
 }
 
-export const TopSection: React.FC<ITopSection> = ({
-  collection,
-  handlePostClicked,
-}) => {
-  const { t } = useTranslation('home');
-  const ref: any = useRef();
-  const scrollContainerRef: any = useRef();
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const [visibleListItem, setVisibleListItem] = useState(0);
+export const TopSection: React.FC<ITopSection> = React.memo(
+  ({ collection, handlePostClicked }) => {
+    const { t } = useTranslation('home');
+    const ref: any = useRef();
+    const scrollContainerRef: any = useRef();
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
+    const [visibleListItem, setVisibleListItem] = useState(0);
 
-  // Dragging state
-  const [clientX, setClientX] = useState<number>(0);
-  const [scrollX, setScrollX] = useState<number>(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [mouseIsDown, setMouseIsDown] = useState(false);
+    // Dragging state
+    const [clientX, setClientX] = useState<number>(0);
+    const [scrollX, setScrollX] = useState<number>(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [mouseIsDown, setMouseIsDown] = useState(false);
 
-  const { postOverlayOpen } = usePostModalState();
+    const { postOverlayOpen } = usePostModalState();
 
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-  const isTablet = ['tablet'].includes(resizeMode);
-  const country = 'USA';
-  let scrollStep = SCROLL_STEP.desktop;
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    const isTablet = ['tablet'].includes(resizeMode);
+    const country = 'USA';
+    let scrollStep = SCROLL_STEP.desktop;
 
-  if (isMobile) {
-    scrollStep = SCROLL_STEP.mobile;
-  } else if (isTablet) {
-    scrollStep = SCROLL_STEP.tablet;
-  }
-
-  const handleLeftClick = () => {
-    scrollListTo(visibleListItem - scrollStep - 1);
-  };
-  const handleRightClick = () => {
-    scrollListTo(visibleListItem + scrollStep);
-  };
-  const scrollListTo = (to: number) => {
-    let scrollTo = to;
-
-    if (to < 0) {
-      scrollTo = 0;
-    } else if (scrollTo > (collection?.length || 0) - 1) {
-      scrollTo = (collection?.length || 0) - 1;
+    if (isMobile) {
+      scrollStep = SCROLL_STEP.mobile;
+    } else if (isTablet) {
+      scrollStep = SCROLL_STEP.tablet;
     }
 
-    scroller.scrollTo(`top-section-${scrollTo}`, {
-      offset: -32,
-      smooth: 'easeOutQuad',
-      duration: SCROLL_TOP_10,
-      horizontal: true,
-      containerId: 'topScrollContainer',
-    });
-  };
-  const mouseDownHandler = (e: any) => {
-    setMouseIsDown(true);
-    setClientX(e.clientX);
-    setScrollX(scrollContainerRef.current.scrollLeft);
-  };
-  const mouseMoveHandler = (e: any) => {
-    if (!mouseIsDown) {
-      return;
-    }
+    const handleLeftClick = () => {
+      scrollListTo(visibleListItem - scrollStep - 1);
+    };
+    const handleRightClick = () => {
+      scrollListTo(visibleListItem + scrollStep);
+    };
+    const scrollListTo = (to: number) => {
+      let scrollTo = to;
 
-    scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
-    setClientX(e.clientX);
-    setScrollX(scrollX - e.clientX + clientX);
-    setIsDragging(true);
-  };
-  const mouseUpHandler = () => {
-    setMouseIsDown(false);
+      if (to < 0) {
+        scrollTo = 0;
+      } else if (scrollTo > (collection?.length || 0) - 1) {
+        scrollTo = (collection?.length || 0) - 1;
+      }
 
-    if (isDragging) {
-      setTimeout(() => {
-        setIsDragging(false);
-      }, 0);
-    }
-  };
+      scroller.scrollTo(`top-section-${scrollTo}`, {
+        offset: -32,
+        smooth: 'easeOutQuad',
+        duration: SCROLL_TOP_10,
+        horizontal: true,
+        containerId: 'topScrollContainer',
+      });
+    };
+    const mouseDownHandler = (e: any) => {
+      setMouseIsDown(true);
+      setClientX(e.clientX);
+      setScrollX(scrollContainerRef.current.scrollLeft);
+    };
+    const mouseMoveHandler = (e: any) => {
+      if (!mouseIsDown) {
+        return;
+      }
 
-  const renderItem = (item: any, index: number) => {
-    const handleItemClick = () => {
-      if (!isDragging) {
-        handlePostClicked(item);
+      scrollContainerRef.current.scrollLeft = scrollX - e.clientX + clientX;
+      setClientX(e.clientX);
+      setScrollX(scrollX - e.clientX + clientX);
+      setIsDragging(true);
+    };
+    const mouseUpHandler = () => {
+      setMouseIsDown(false);
+
+      if (isDragging) {
+        setTimeout(() => {
+          setIsDragging(false);
+        }, 0);
       }
     };
 
-    return (
-      <SItemWrapper
-        key={switchPostType(item)[0].postUuid}
-        name={`top-section-${index}`}
-        onClick={handleItemClick}
-      >
-        <PostCard
-          shouldStop={postOverlayOpen}
-          type='inside'
-          item={item}
-          index={index + 1}
-        />
-      </SItemWrapper>
-    );
-  };
+    const renderItem = (item: any, index: number) => {
+      const handleItemClick = () => {
+        if (!isDragging) {
+          handlePostClicked(item);
+        }
+      };
 
-  const { renderLeftArrow, renderRightArrow } = useHoverArrows(ref);
-  const { showLeftGradient, showRightGradient } =
-    useScrollGradientsHorizontal(scrollContainerRef);
-
-  useEffect(() => {
-    scrollContainerRef.current.addEventListener('scroll', () => {
-      const currentScrollPosition = scrollContainerRef.current.scrollLeft;
-      const childWidth =
-        scrollContainerRef.current.firstChild.getBoundingClientRect().width;
-
-      setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
-    });
-  }, []);
-  useEffect(() => {
-    setCanScrollLeft(visibleListItem !== 0);
-    setCanScrollRight(visibleListItem + 1 < (collection?.length || 0) - 1);
-  }, [visibleListItem, collection]);
-
-  return (
-    <SWrapper
-      name='topSection'
-      layoutId='topSection'
-      transition={{
-        ease: 'easeInOut',
-        duration: 1,
-      }}
-    >
-      <SHeadline variant={4} animation='t-01'>
-        {t('top-block-title', { country })}
-      </SHeadline>
-      <SListContainer ref={ref}>
-        <SListWrapper
-          id='topScrollContainer'
-          ref={scrollContainerRef}
-          onMouseUp={mouseUpHandler}
-          onMouseDown={mouseDownHandler}
-          onMouseMove={mouseMoveHandler}
-          onMouseLeave={mouseUpHandler}
+      return (
+        <SItemWrapper
+          key={switchPostType(item)[0].postUuid}
+          name={`top-section-${index}`}
+          onClick={handleItemClick}
         >
-          {collection?.map(renderItem)}
-        </SListWrapper>
-        {!isDragging && canScrollLeft && (
-          <ScrollArrow
-            active={renderLeftArrow}
-            position='left'
-            handleClick={handleLeftClick}
+          <PostCard
+            shouldStop={postOverlayOpen}
+            type='inside'
+            item={item}
+            index={index + 1}
           />
+        </SItemWrapper>
+      );
+    };
+
+    const { renderLeftArrow, renderRightArrow } = useHoverArrows(ref);
+    const { showLeftGradient, showRightGradient } =
+      useScrollGradientsHorizontal(scrollContainerRef);
+
+    useEffect(() => {
+      scrollContainerRef.current.addEventListener('scroll', () => {
+        const currentScrollPosition = scrollContainerRef.current.scrollLeft;
+        const childWidth =
+          scrollContainerRef.current.firstChild.getBoundingClientRect().width;
+
+        setVisibleListItem(+(currentScrollPosition / childWidth).toFixed(0));
+      });
+    }, []);
+    useEffect(() => {
+      setCanScrollLeft(visibleListItem !== 0);
+      setCanScrollRight(visibleListItem + 1 < (collection?.length || 0) - 1);
+    }, [visibleListItem, collection]);
+
+    return (
+      <SWrapper
+        name='topSection'
+        layoutId='topSection'
+        transition={{
+          ease: 'easeInOut',
+          duration: 1,
+        }}
+      >
+        <SHeadline variant={4} animation='t-01'>
+          {t('top-block-title', { country })}
+        </SHeadline>
+        <SListContainer ref={ref}>
+          <SListWrapper
+            id='topScrollContainer'
+            ref={scrollContainerRef}
+            onMouseUp={mouseUpHandler}
+            onMouseDown={mouseDownHandler}
+            onMouseMove={mouseMoveHandler}
+            onMouseLeave={mouseUpHandler}
+          >
+            {collection?.map(renderItem)}
+          </SListWrapper>
+          {!isDragging && canScrollLeft && (
+            <ScrollArrow
+              active={renderLeftArrow}
+              position='left'
+              handleClick={handleLeftClick}
+            />
+          )}
+          {!isDragging && canScrollRight && (
+            <ScrollArrow
+              active={renderRightArrow}
+              position='right'
+              handleClick={handleRightClick}
+            />
+          )}
+        </SListContainer>
+        {!isMobile && !isTablet && (
+          <>
+            <GradientMaskHorizontal
+              gradientType='primary'
+              active={showLeftGradient}
+              positionLeft='-25px'
+              additonalZ={5}
+            />
+            <GradientMaskHorizontal
+              gradientType='primary'
+              active={showRightGradient}
+              positionRight='-25px'
+              additonalZ={5}
+            />
+          </>
         )}
-        {!isDragging && canScrollRight && (
-          <ScrollArrow
-            active={renderRightArrow}
-            position='right'
-            handleClick={handleRightClick}
-          />
-        )}
-      </SListContainer>
-      {!isMobile && !isTablet && (
-        <>
-          <GradientMaskHorizontal
-            gradientType='primary'
-            active={showLeftGradient}
-            positionLeft='-25px'
-            additonalZ={5}
-          />
-          <GradientMaskHorizontal
-            gradientType='primary'
-            active={showRightGradient}
-            positionRight='-25px'
-            additonalZ={5}
-          />
-        </>
-      )}
-    </SWrapper>
-  );
-};
+      </SWrapper>
+    );
+  }
+);
 
 export default TopSection;
 

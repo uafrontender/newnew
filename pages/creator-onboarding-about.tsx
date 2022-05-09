@@ -4,15 +4,13 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
-import { getSupportedCreatorCountries } from '../api/endpoints/payments';
 import {
   getAvailableCreatorTags,
   getMyCreatorTags,
@@ -20,7 +18,11 @@ import {
 } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
-import OnboardingSectionAbout from '../components/molecules/creator-onboarding/OnboardingSectionAbout';
+
+const OnboardingSectionAbout = dynamic(
+  () =>
+    import('../components/molecules/creator-onboarding/OnboardingSectionAbout')
+);
 
 interface ICreatorOnboardingAbout {
   availableTags: newnewapi.CreatorTags;

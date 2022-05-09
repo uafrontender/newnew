@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import type { NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import loadingAnimation from '../../public/animations/logo-loading-blue.json';
@@ -12,7 +13,10 @@ import { getMyOnboardingState } from '../../api/endpoints/user';
 import CreatorStripeLayout from '../../components/templates/CreatorStripeLayout';
 import { NextPageWithLayout } from '../_app';
 import Lottie from '../../components/atoms/Lottie';
-import DashboardSectionStripe from '../../components/organisms/creator/DashboardSectionStripe';
+
+const DashboardSectionStripe = dynamic(
+  () => import('../../components/organisms/creator/DashboardSectionStripe')
+);
 
 interface ICreatorOnboardingStripe {}
 

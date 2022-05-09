@@ -10,6 +10,7 @@ import { useTranslation } from 'next-i18next';
 import validator from 'validator';
 import { debounce, isEqual } from 'lodash';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
@@ -18,8 +19,7 @@ import OnboardingInput from './OnboardingInput';
 import OnboardingBirthDateInput from './OnboardingBirthDateInput';
 import OnboardingProfileImageInput from './OnboardingProfileImageInput';
 import isImage from '../../../utils/isImage';
-import OnboardingEditProfileImageModal from './OnboardingEditProfileImageModal';
-import LoadingModal from '../LoadingModal';
+
 import { getImageUploadUrl } from '../../../api/endpoints/upload';
 import {
   becomeCreator,
@@ -32,15 +32,20 @@ import {
   setUserData,
 } from '../../../redux-store/slices/userStateSlice';
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
-import GoBackButton from '../GoBackButton';
 import Button from '../../atoms/Button';
 import isBrowser from '../../../utils/isBrowser';
 import OnboardingCountrySelect from './OnboardingCountrySelect';
 import OnboardingSectionUsernameInput from './OnboardingUsernameInput';
 import OnboardingSectionNicknameInput from './OnboardingNicknameInput';
 import { validateText } from '../../../api/endpoints/infrastructure';
-import CheckboxWithALink from './CheckboxWithALink';
-import TermsOfServiceModal from './TermsOfServiceModal';
+
+const OnboardingEditProfileImageModal = dynamic(
+  () => import('./OnboardingEditProfileImageModal')
+);
+const LoadingModal = dynamic(() => import('../LoadingModal'));
+const CheckboxWithALink = dynamic(() => import('./CheckboxWithALink'));
+const GoBackButton = dynamic(() => import('../GoBackButton'));
+const TermsOfServiceModal = dynamic(() => import('./TermsOfServiceModal'));
 
 const maxDate = new Date();
 
@@ -899,27 +904,33 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             </SButton>
           </ControlsSection>
         </SControlsDiv>
-        <OnboardingEditProfileImageModal
-          isOpen={cropMenuOpen}
-          avatarUrlInEdit={avatarUrlInEdit}
-          originalProfileImageWidth={originalProfileImageWidth}
-          handleSetImageToSave={(val) => setImageToSave(val)}
-          setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
-          onClose={() => {
-            setCropMenuOpen(false);
-            // window.history.back();
-            if (isBrowser()) {
-              window.history.replaceState(null, '');
-            }
-          }}
-        />
+        {cropMenuOpen && (
+          <OnboardingEditProfileImageModal
+            isOpen={cropMenuOpen}
+            avatarUrlInEdit={avatarUrlInEdit}
+            originalProfileImageWidth={originalProfileImageWidth}
+            handleSetImageToSave={(val) => setImageToSave(val)}
+            setAvatarUrlInEdit={(val: string) => setAvatarUrlInEdit(val)}
+            onClose={() => {
+              setCropMenuOpen(false);
+              // window.history.back();
+              if (isBrowser()) {
+                window.history.replaceState(null, '');
+              }
+            }}
+          />
+        )}
         {/* Upload loading Modal */}
-        <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
-        <TermsOfServiceModal
-          isOpen={termsVisible}
-          zIndex={15}
-          onClose={() => setTermsVisible(false)}
-        />
+        {loadingModalOpen && (
+          <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+        )}
+        {termsVisible && (
+          <TermsOfServiceModal
+            isOpen={termsVisible}
+            zIndex={15}
+            onClose={() => setTermsVisible(false)}
+          />
+        )}
       </>
     );
   };

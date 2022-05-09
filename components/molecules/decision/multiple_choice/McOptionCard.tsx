@@ -402,11 +402,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={disabled && votingAllowed}
           $isBlue={isBlue}
-          onClick={() => {
-            if (!isMobile && !disabled && !noAction && !isSupportMenuOpen) {
-              handleOpenSupportForm();
-            }
-          }}
         >
           <SBidDetails isBlue={isBlue} noAction={noAction}>
             <SBidAmount>
@@ -571,10 +566,16 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
+            bottomCaption={
+              <SPaymentFooter variant={3}>
+                {t('McPost.paymentModalFooter.body')}
+              </SPaymentFooter>
+            }
+            payButtonCaptionKey={t('McPost.paymentModalPayButton')}
           >
             <SPaymentModalHeader>
               <SPaymentModalTitle variant={3}>
-                {t('McPost.paymenModalHeader.subtitle')}
+                {t('McPost.paymentModalHeader.subtitle')}
               </SPaymentModalTitle>
               <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
             </SPaymentModalHeader>
@@ -1157,9 +1158,17 @@ const SPaymentModalOptionText = styled.div`
 const STutorialTooltipHolder = styled.div`
   position: absolute;
   right: 30px;
-  top: 95px;
+  top: 65px;
   text-align: left;
   div {
     width: 190px;
   }
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;

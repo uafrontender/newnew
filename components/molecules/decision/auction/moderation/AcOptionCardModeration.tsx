@@ -4,7 +4,7 @@
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -32,7 +32,7 @@ import ChevronDown from '../../../../../public/images/svg/icons/outlined/Chevron
 import AcOptionCardModerationEllipseModal from './AcOptionCardModerationEllipseModal';
 import BlockUserModalPost from '../../BlockUserModalPost';
 import { reportEventOption } from '../../../../../api/endpoints/report';
-import ReportModal from '../../../chat/ReportModal';
+import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import getDisplayname from '../../../../../utils/getDisplayname';
 
 interface IAcOptionCardModeration {
@@ -80,6 +80,18 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         console.error(err);
       }
     };
+
+    const handleReportSubmit = useCallback(
+      async ({ reason, message }: ReportData) => {
+        await reportEventOption(option.id, reason, message);
+        setIsReportModalOpen(false);
+      },
+      [option.id]
+    );
+
+    const handleReportClose = useCallback(() => {
+      setIsReportModalOpen(false);
+    }, []);
 
     return (
       <>
@@ -285,7 +297,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         {/* Confirm block user modal */}
         <BlockUserModalPost
           confirmBlockUser={isBlockModalOpen}
-          onUserBlock={() => {}}
           user={option.creator!!}
           closeModal={() => setIsBlockModalOpen(false)}
         />
@@ -294,13 +305,8 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
           <ReportModal
             show={isReportModalOpen}
             reportedDisplayname={getDisplayname(option.creator)}
-            onSubmit={async ({ reason, message }) => {
-              await reportEventOption(option.id, reason, message);
-              setIsReportModalOpen(false);
-            }}
-            onClose={() => {
-              setIsReportModalOpen(false);
-            }}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
           />
         )}
       </>

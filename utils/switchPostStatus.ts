@@ -10,7 +10,7 @@ export type TPostStatusStringified =
   | 'flagged'
   | 'succeeded'
   | 'failed'
-  | 'deleted'
+  | 'deleted_by_creator'
   | 'deleted_by_admin'
   | 'processing_announcement'
   | 'processing_response';
@@ -40,8 +40,11 @@ export default function switchPostStatus(
       case newnewapi.Auction.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.Auction.Status.DELETED: {
-        return 'deleted';
+      case newnewapi.Auction.Status.DELETED_BY_CREATOR: {
+        return 'deleted_by_creator';
+      }
+      case newnewapi.Auction.Status.DELETED_BY_ADMIN: {
+        return 'deleted_by_admin';
       }
       case newnewapi.Auction.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -78,8 +81,11 @@ export default function switchPostStatus(
       case newnewapi.Crowdfunding.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.Crowdfunding.Status.DELETED: {
-        return 'deleted';
+      case newnewapi.Crowdfunding.Status.DELETED_BY_CREATOR: {
+        return 'deleted_by_creator';
+      }
+      case newnewapi.Crowdfunding.Status.DELETED_BY_ADMIN: {
+        return 'deleted_by_admin';
       }
       case newnewapi.Crowdfunding.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -116,8 +122,8 @@ export default function switchPostStatus(
       case newnewapi.MultipleChoice.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.MultipleChoice.Status.DELETED: {
-        return 'deleted';
+      case newnewapi.MultipleChoice.Status.DELETED_BY_CREATOR: {
+        return 'deleted_by_creator';
       }
       case newnewapi.MultipleChoice.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';

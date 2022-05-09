@@ -95,7 +95,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
     try {
       const payload = new newnewapi.SubscribeToCreatorRequest({
         creatorUuid: user.uuid,
-        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&`,
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/subscription-success?userId=${user.uuid}&username=${user.username}&`,
         cancelUrl: window.location.href,
       });
 
@@ -330,17 +330,17 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       )}
       <PaymentModal
         zIndex={10}
-        showTocApply
         predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
         amount={`$${subPriceFormatted}`}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
         // handlePayWithWallet={handlePayRegistered}
+        payButtonCaptionKey={t('paymentModalPayButton')}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant={3}>
-            {t('paymenModalHeader.subtitle')}
+            {t('paymentModalHeader.subtitle')}
           </SPaymentModalTitle>
           <SPaymentModalCreatorInfo>
             <SAvatar>

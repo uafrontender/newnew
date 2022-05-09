@@ -13,7 +13,6 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
-import PublishedModal from '../../../molecules/creation/PublishedModal';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
@@ -35,6 +34,9 @@ import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/Chevro
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
+const PublishedModal = dynamic(
+  () => import('../../../molecules/creation/PublishedModal')
+);
 
 interface IPreviewContent {}
 
@@ -353,7 +355,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   return (
     <>
-      <PublishedModal open={showModal} handleClose={handleCloseModal} />
+      {showModal && (
+        <PublishedModal open={showModal} handleClose={handleCloseModal} />
+      )}
       <SHeadLine variant={3} weight={600}>
         {t('preview.title')}
       </SHeadLine>

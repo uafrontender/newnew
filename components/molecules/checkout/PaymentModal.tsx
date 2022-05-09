@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
@@ -25,6 +25,8 @@ interface IPaymentModal {
   showTocApply?: boolean;
   // predefinedOption?: 'wallet' | 'card';
   predefinedOption?: 'card';
+  bottomCaption?: React.ReactNode;
+  payButtonCaptionKey?: string;
   onClose: () => void;
   // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
@@ -36,6 +38,8 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   amount,
   showTocApply,
   predefinedOption,
+  bottomCaption,
+  payButtonCaptionKey,
   onClose,
   // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
@@ -135,9 +139,10 @@ const PaymentModal: React.FC<IPaymentModal> = ({
                 handlePayWithCardStripeRedirect?.();
               }}
             >
-              {t('payButton')}
+              {payButtonCaptionKey ?? t('payButton')}
               {amount && ` ${amount}`}
             </SPayButton>
+            {bottomCaption || null}
             {showTocApply && (
               <STocApply>
                 *{' '}
@@ -160,6 +165,8 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   predefinedOption: undefined,
+  bottomCaption: null,
+  payButtonCaptionKey: undefined,
   // handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
@@ -197,14 +204,14 @@ const SContentContainer = styled.div<{
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
     height: fit-content;
-    min-height: 360px;
+    /* min-height: 360px; */
     max-height: ${({ showTocApply }) => (showTocApply ? '480px' : '412px')};
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
-    padding-bottom: 116px;
+    /* padding-bottom: 116px; */
   }
 `;
 
@@ -252,13 +259,15 @@ const SPaymentMethodTitle = styled(Text)`
 `;
 
 const SPayButtonDiv = styled.div`
-  position: absolute;
+  /* position: absolute;
   bottom: 16px;
   width: calc(100% - 32px);
 
   ${({ theme }) => theme.media.tablet} {
     width: calc(100% - 48px);
-  }
+  } */
+
+  width: 100%;
 `;
 
 const SPayButton = styled(Button)`
@@ -267,7 +276,7 @@ const SPayButton = styled(Button)`
 
 const STocApply = styled.div`
   margin-top: 16px;
-  padding-bottom: 16px;
+  /* padding-bottom: 16px; */
 
   text-align: center;
 

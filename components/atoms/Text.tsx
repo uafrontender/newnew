@@ -9,7 +9,7 @@ interface IText {
   children: React.ReactNode;
 }
 
-const Text: React.FC<IText> = (props) => {
+const Text: React.FC<IText> = React.memo((props) => {
   const { variant, children, ...rest } = props;
 
   const components = {
@@ -20,7 +20,7 @@ const Text: React.FC<IText> = (props) => {
   const Component = components[variant ?? 1];
 
   return <Component {...rest}>{children}</Component>;
-};
+});
 
 Text.defaultProps = {
   weight: 500,

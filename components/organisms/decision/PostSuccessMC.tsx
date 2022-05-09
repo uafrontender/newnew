@@ -8,277 +8,316 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 import { getMcOption } from '../../../api/endpoints/multiple_choice';
 
-// test post
-// http://localhost:4000/post/e32b056b-8d5e-4093-b8b2-bd3e147fc461
-
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
-import McSuccessOptionsTab from '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab';
 import assets from '../../../constants/assets';
+import { fetchPostByUUID } from '../../../api/endpoints/post';
+
+const McSuccessOptionsTab = dynamic(
+  () =>
+    import(
+      '../../molecules/decision/multiple_choice/success/McSuccessOptionsTab'
+    )
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
+const DecisionEndedBox = dynamic(
+  () => import('../../molecules/decision/success/DecisionEndedBox')
+);
 
 interface IPostSuccessMC {
   post: newnewapi.MultipleChoice;
 }
 
-const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = ({ post }) => {
-  const { t } = useTranslation('decision');
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state);
-  const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
+const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
+  ({ post }) => {
+    const { t } = useTranslation('decision');
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state);
+    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  // Winninfg option
-  const [winningOption, setWinningOption] =
-    useState<newnewapi.MultipleChoice.Option | undefined>();
+    // Winninfg option
+    const [winningOption, setWinningOption] =
+      useState<newnewapi.MultipleChoice.Option | undefined>();
 
-  // Video
-  // Open video tab
-  const [videoTab, setVideoTab] =
-    useState<'announcement' | 'response'>('announcement');
-  // Response viewed
-  const [responseViewed, setResponseViewed] = useState(
-    post.isResponseViewedByMe ?? false
-  );
-  // Muted mode
-  const handleToggleMutedMode = useCallback(() => {
-    dispatch(toggleMutedMode(''));
-  }, [dispatch]);
-
-  // Main screen vs all options
-  const [openedMainSection, setOpenedMainSection] =
-    useState<'main' | 'options'>('main');
-
-  // Comments
-  const { ref: commentsSectionRef, inView } = useInView({
-    threshold: 0.8,
-  });
-
-  // Scroll to comments if hash is present
-  useEffect(() => {
-    const handleCommentsInitialHash = () => {
-      const { hash } = window.location;
-      if (!hash) {
-        return;
-      }
-      const parsedHash = hash.substring(1);
-
-      if (parsedHash === 'comments') {
-        document.getElementById('comments')?.scrollIntoView();
-      }
-    };
-
-    handleCommentsInitialHash();
-  }, []);
-
-  // Replace hash once scrolled to comments
-  useEffect(() => {
-    if (inView) {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}#comments`
-      );
-    } else {
-      window.history.replaceState(
-        {
-          postId: post.postUuid,
-        },
-        'Post',
-        `/post/${post.postUuid}`
-      );
-    }
-  }, [inView, post.postUuid]);
-
-  // Load winning option
-  useEffect(() => {
-    async function fetchAndSetWinningOption(id: number) {
+    // Video
+    // Open video tab
+    const [videoTab, setVideoTab] =
+      useState<'announcement' | 'response'>('announcement');
+    // Response viewed
+    const [responseViewed, setResponseViewed] = useState(
+      post.isResponseViewedByMe ?? false
+    );
+    const fetchPostLatestData = useCallback(async () => {
       try {
-        const payload = new newnewapi.GetMcOptionRequest({
-          optionId: id,
+        const fetchPostPayload = new newnewapi.GetPostRequest({
+          postUuid: post.postUuid,
         });
 
-        const res = await getMcOption(payload);
+        const res = await fetchPostByUUID(fetchPostPayload);
 
-        console.log(res);
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-        if (res.data?.option) {
-          setWinningOption(res.data.option as newnewapi.MultipleChoice.Option);
+        if (res.data.multipleChoice?.isResponseViewedByMe) {
+          setResponseViewed(true);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
-    }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    console.log(post.winningOptionId);
+    // Muted mode
+    const handleToggleMutedMode = useCallback(() => {
+      dispatch(toggleMutedMode(''));
+    }, [dispatch]);
 
-    if (post.winningOptionId) {
-      fetchAndSetWinningOption(post.winningOptionId as number);
-    }
-  }, [post.winningOptionId]);
+    // Main screen vs all options
+    const [openedMainSection, setOpenedMainSection] =
+      useState<'main' | 'options'>('main');
 
-  return (
-    <>
-      <SWrapper>
-        <PostVideoSuccess
-          postId={post.postUuid}
-          announcement={post.announcement!!}
-          response={post.response ?? undefined}
-          responseViewed={responseViewed}
-          openedTab={videoTab}
-          setOpenedTab={(tab) => setVideoTab(tab)}
-          isMuted={mutedMode}
-          handleToggleMuted={() => handleToggleMutedMode()}
-          handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
-        />
-        <SActivitesContainer>
-          {openedMainSection === 'main' ? (
-            <>
-              <DecisionEndedBox type='mc' imgSrc={assets.creation.McAnimated}>
-                {t('McPostSuccess.hero_text')}
-              </DecisionEndedBox>
-              <SMainSectionWrapper>
-                <SCreatorInfoDiv>
-                  <SCreator>
-                    <SCreatorImage src={post.creator?.avatarUrl!!} />
-                    <SWantsToKnow>
-                      {t('McPostSuccess.wants_to_know', {
-                        creator: post.creator?.nickname,
-                      })}
-                    </SWantsToKnow>
-                  </SCreator>
-                  <STotal>
-                    {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
-                    <span>{t('McPostSuccess.in_total_votes')}</span>
-                  </STotal>
-                </SCreatorInfoDiv>
-                <SPostTitle variant={4}>{post.title}</SPostTitle>
-                <SSeparator />
-                {winningOption && (
-                  <>
-                    <SWinningBidCreator>
-                      <SCreator>
-                        <SCreatorImage
-                          src={
-                            winningOption.creator?.avatarUrl ??
-                            winningOption.firstVoter?.avatarUrl!!
-                          }
-                        />
-                        <SWinningBidCreatorText>
-                          {winningOption.creator?.uuid ===
-                            user.userData?.userUuid ||
-                          winningOption.isSupportedByMe
-                            ? winningOption.supporterCount > 1
-                              ? t('me')
-                              : t('I')
-                            : getDisplayname(
-                                winningOption.creator ??
-                                  winningOption.firstVoter!!
-                              )}
-                          {winningOption.supporterCount > 1 ? (
-                            <>
-                              {' & '}
-                              {formatNumber(
-                                winningOption.supporterCount,
-                                true
-                              )}{' '}
-                              {t('McPostSuccess.others')}
-                            </>
-                          ) : null}{' '}
-                          {t('McPostSuccess.voted')}
-                        </SWinningBidCreatorText>
-                      </SCreator>
-                    </SWinningBidCreator>
-                    <SWinningOptionAmount variant={4}>
-                      {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
-                      {winningOption.voteCount > 1
-                        ? t('McPostSuccess.votes')
-                        : t('McPostSuccess.vote')}
-                    </SWinningOptionAmount>
-                    <SSeparator />
-                    <SWinningOptionDetails>
-                      <SWinningOptionDetailsBidChosen>
-                        {t('McPostSuccess.option_chosen')}
-                      </SWinningOptionDetailsBidChosen>
-                      <SWinningOptionDetailsSeeAll
-                        onClick={() => setOpenedMainSection('options')}
-                      >
-                        {t('McPostSuccess.see_all')}
-                      </SWinningOptionDetailsSeeAll>
-                      <SWinningOptionDetailsTitle variant={4}>
-                        {winningOption.text}
-                      </SWinningOptionDetailsTitle>
-                    </SWinningOptionDetails>
-                  </>
-                )}
-              </SMainSectionWrapper>
-              {!isMobile ? (
-                <>
-                  {!responseViewed && videoTab === 'announcement' ? (
-                    <SWatchResponseWrapper>
-                      <SWatchResponseBtn
-                        shouldView={!responseViewed}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
-                      </SWatchResponseBtn>
-                    </SWatchResponseWrapper>
-                  ) : null}
-                  {responseViewed ? (
-                    <SToggleVideoWidget>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'announcement'}
-                        onClick={() => setVideoTab('announcement')}
-                      >
-                        {t('PostVideoSuccess.tabs.watch_original')}
-                      </SChangeTabBtn>
-                      <SChangeTabBtn
-                        shouldView={videoTab === 'response'}
-                        onClick={() => setVideoTab('response')}
-                      >
-                        {t('PostVideoSuccess.tabs.watch_response')}
-                      </SChangeTabBtn>
-                    </SToggleVideoWidget>
-                  ) : null}
-                </>
-              ) : null}
-            </>
-          ) : (
-            <McSuccessOptionsTab
-              post={post}
-              handleGoBack={() => setOpenedMainSection('main')}
-            />
-          )}
-        </SActivitesContainer>
-      </SWrapper>
-      {post.isCommentsAllowed && (
-        <SCommentsSection id='comments' ref={commentsSectionRef}>
-          <SCommentsHeadline variant={4}>
-            {t('SuccessCommon.Comments.heading')}
-          </SCommentsHeadline>
-          <CommentsSuccess
-            commentsRoomId={post.commentsRoomId as number}
-            handleGoBack={() => {}}
+    // Comments
+    const { ref: commentsSectionRef, inView } = useInView({
+      threshold: 0.8,
+    });
+
+    // Check if the response has been viewed
+    useEffect(() => {
+      fetchPostLatestData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Scroll to comments if hash is present
+    useEffect(() => {
+      const handleCommentsInitialHash = () => {
+        const { hash } = window.location;
+        if (!hash) {
+          return;
+        }
+        const parsedHash = hash.substring(1);
+
+        if (parsedHash === 'comments') {
+          document.getElementById('comments')?.scrollIntoView();
+        }
+      };
+
+      handleCommentsInitialHash();
+    }, []);
+
+    // Replace hash once scrolled to comments
+    useEffect(() => {
+      if (inView) {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}#comments`
+        );
+      } else {
+        window.history.replaceState(
+          {
+            postId: post.postUuid,
+          },
+          'Post',
+          `/post/${post.postUuid}`
+        );
+      }
+    }, [inView, post.postUuid]);
+
+    // Load winning option
+    useEffect(() => {
+      async function fetchAndSetWinningOption(id: number) {
+        try {
+          const payload = new newnewapi.GetMcOptionRequest({
+            optionId: id,
+          });
+
+          const res = await getMcOption(payload);
+
+          console.log(res);
+
+          if (res.data?.option) {
+            setWinningOption(
+              res.data.option as newnewapi.MultipleChoice.Option
+            );
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      console.log(post.winningOptionId);
+
+      if (post.winningOptionId) {
+        fetchAndSetWinningOption(post.winningOptionId as number);
+      }
+    }, [post.winningOptionId]);
+
+    return (
+      <>
+        <SWrapper>
+          <PostVideoSuccess
+            postId={post.postUuid}
+            announcement={post.announcement!!}
+            response={post.response ?? undefined}
+            responseViewed={responseViewed}
+            openedTab={videoTab}
+            setOpenedTab={(tab) => setVideoTab(tab)}
+            isMuted={mutedMode}
+            handleToggleMuted={() => handleToggleMutedMode()}
+            handleSetResponseViewed={(newValue) => setResponseViewed(newValue)}
           />
-        </SCommentsSection>
-      )}
-    </>
-  );
-};
+          <SActivitesContainer>
+            {openedMainSection === 'main' ? (
+              <>
+                <DecisionEndedBox type='mc' imgSrc={assets.creation.McAnimated}>
+                  {t('McPostSuccess.hero_text')}
+                </DecisionEndedBox>
+                <SMainSectionWrapper>
+                  <SCreatorInfoDiv>
+                    <SCreator>
+                      <SCreatorImage src={post.creator?.avatarUrl!!} />
+                      <SWantsToKnow>
+                        {t('McPostSuccess.wants_to_know', {
+                          creator: post.creator?.nickname,
+                        })}
+                      </SWantsToKnow>
+                    </SCreator>
+                    <STotal>
+                      {`${formatNumber(post.totalVotes ?? 0, true)}`}{' '}
+                      <span>{t('McPostSuccess.in_total_votes')}</span>
+                    </STotal>
+                  </SCreatorInfoDiv>
+                  <SPostTitle variant={4}>{post.title}</SPostTitle>
+                  <SSeparator />
+                  {winningOption && (
+                    <>
+                      <SWinningBidCreator>
+                        <SCreator>
+                          <SCreatorImage
+                            src={
+                              winningOption.creator?.avatarUrl ??
+                              winningOption.firstVoter?.avatarUrl!!
+                            }
+                          />
+                          <SWinningBidCreatorText>
+                            {winningOption.creator?.uuid ===
+                              user.userData?.userUuid ||
+                            winningOption.isSupportedByMe
+                              ? winningOption.supporterCount > 1
+                                ? t('me')
+                                : t('I')
+                              : getDisplayname(
+                                  winningOption.creator ??
+                                    winningOption.firstVoter!!
+                                )}
+                            {winningOption.supporterCount > 1 ? (
+                              <>
+                                {' & '}
+                                {formatNumber(
+                                  winningOption.supporterCount,
+                                  true
+                                )}{' '}
+                                {t('McPostSuccess.others')}
+                              </>
+                            ) : null}{' '}
+                            {t('McPostSuccess.voted')}
+                          </SWinningBidCreatorText>
+                        </SCreator>
+                      </SWinningBidCreator>
+                      <SWinningOptionAmount variant={4}>
+                        {`${formatNumber(winningOption.voteCount ?? 0, true)}`}{' '}
+                        {winningOption.voteCount > 1
+                          ? t('McPostSuccess.votes')
+                          : t('McPostSuccess.vote')}
+                      </SWinningOptionAmount>
+                      <SSeparator />
+                      <SWinningOptionDetails>
+                        <SWinningOptionDetailsBidChosen>
+                          {t('McPostSuccess.option_chosen')}
+                        </SWinningOptionDetailsBidChosen>
+                        <SWinningOptionDetailsSeeAll
+                          onClick={() => setOpenedMainSection('options')}
+                        >
+                          {t('McPostSuccess.see_all')}
+                        </SWinningOptionDetailsSeeAll>
+                        <SWinningOptionDetailsTitle variant={4}>
+                          {winningOption.text}
+                        </SWinningOptionDetailsTitle>
+                      </SWinningOptionDetails>
+                    </>
+                  )}
+                </SMainSectionWrapper>
+                {!isMobile ? (
+                  <>
+                    {!responseViewed && videoTab === 'announcement' ? (
+                      <SWatchResponseWrapper>
+                        <SWatchResponseBtn
+                          shouldView={!responseViewed}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
+                        </SWatchResponseBtn>
+                      </SWatchResponseWrapper>
+                    ) : null}
+                    {responseViewed ? (
+                      <SToggleVideoWidget>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'announcement'}
+                          onClick={() => setVideoTab('announcement')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_original')}
+                        </SChangeTabBtn>
+                        <SChangeTabBtn
+                          shouldView={videoTab === 'response'}
+                          onClick={() => setVideoTab('response')}
+                        >
+                          {t('PostVideoSuccess.tabs.watch_response')}
+                        </SChangeTabBtn>
+                      </SToggleVideoWidget>
+                    ) : null}
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <McSuccessOptionsTab
+                post={post}
+                handleGoBack={() => setOpenedMainSection('main')}
+              />
+            )}
+          </SActivitesContainer>
+        </SWrapper>
+        {post.isCommentsAllowed && (
+          <SCommentsSection id='comments' ref={commentsSectionRef}>
+            <SCommentsHeadline variant={4}>
+              {t('SuccessCommon.Comments.heading')}
+            </SCommentsHeadline>
+            <CommentsSuccess
+              commentsRoomId={post.commentsRoomId as number}
+              handleGoBack={() => {}}
+            />
+          </SCommentsSection>
+        )}
+      </>
+    );
+  }
+);
 
 export default PostSuccessMC;
 

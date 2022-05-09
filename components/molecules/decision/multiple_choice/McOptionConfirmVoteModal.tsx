@@ -233,6 +233,11 @@ const SContentContainer = styled.div`
     height: fit-content;
     max-height: initial;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 32px;
+    padding-top: 16px;
+  }
 `;
 
 const SImageContainer = styled.div`

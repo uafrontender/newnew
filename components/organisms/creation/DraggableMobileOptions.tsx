@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import InlineSVG from '../../atoms/InlineSVG';
-import OptionItem from '../../molecules/creation/DraggableOptionItem';
+import DraggableOptionItem from '../../molecules/creation/DraggableOptionItem';
 
 import plusIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 
@@ -45,7 +45,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
   };
 
   const renderItem = (item: any, index: number) => (
-    <OptionItem
+    <DraggableOptionItem
       key={`draggable-option-${item.id}`}
       item={item}
       index={index}
