@@ -5,7 +5,6 @@ import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 
 import { NextPageWithLayout } from '../_app';
@@ -17,13 +16,8 @@ import PostModal from '../../components/organisms/decision/PostModal';
 import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
-import HowItWorksDarkHoldFrameIcon from '../../public/images/profile/Hourglass-Dark-Holdframe.png';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
-import {
-  NoContentDescription,
-  NoContentTitle,
-} from '../../components/atoms/profile/NoContentCommonElements';
-import Button from '../../components/atoms/Button';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 interface IMyProfilePurchases {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -61,7 +55,6 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('profile');
-  const router = useRouter();
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -155,23 +148,10 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
-            <NoContentCard
-              graphics={<SImage src={HowItWorksDarkHoldFrameIcon.src} />}
-            >
-              <NoContentTitle>{t('Purchases.no-content.title')}</NoContentTitle>
+            <NoContentCard>
               <NoContentDescription>
                 {t('Purchases.no-content.description')}
               </NoContentDescription>
-              <Button
-                withShadow
-                view='primaryGrad'
-                onClick={() => {
-                  router.push('/');
-                }}
-                style={{ width: 'fit-content' }}
-              >
-                {t('Purchases.no-content.button')}
-              </Button>
             </NoContentCard>
           )}
         </SCardsSection>
@@ -284,16 +264,5 @@ const SCardsSection = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
-  }
-`;
-
-const SImage = styled.img`
-  object-fit: contain;
-  width: 140px;
-  height: 160px;
-
-  ${({ theme }) => theme.media.laptop} {
-    width: 140px;
-    height: 160px;
   }
 `;

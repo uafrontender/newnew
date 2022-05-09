@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
@@ -15,6 +16,8 @@ import PostModal from '../../components/organisms/decision/PostModal';
 import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 interface IMyProfileFavorites {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -51,6 +54,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
+  const { t } = useTranslation('profile');
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -144,6 +148,13 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
               }}
               handlePostClicked={handleOpenPostModal}
             />
+          )}
+          {posts && posts.length === 0 && !isLoading && (
+            <NoContentCard>
+              <NoContentDescription>
+                {t('Favorites.no-content.description')}
+              </NoContentDescription>
+            </NoContentCard>
           )}
         </SCardsSection>
         <div ref={loadingRef} />
