@@ -38,11 +38,15 @@
     "copied": "Link copied!"
   },
   "PaymentSuccessModal": {
-    "title": "Alright! Payment success.",
-    "doneBtn": "Done",
-    "ac": "Stay tuned, {{postCreator}} will choose the winning option on {{postDeadline}}",
-    "mc": "Stay tuned, {{postCreator}} will upload response on {{postDeadline}}",
-    "cf": "Stay tuned, {{postCreator}} will upload response on {{postDeadline}}"
+    "title": {
+      "ac": "Your bid is in!",
+      "mc": "Your vote is in!",
+      "cf": "You’re backing this goal!"
+    },
+    "doneBtn": "Sounds good!",
+    "ac": "{{postCreator}} will pick their favorite bid once the event is over.",
+    "mc": "{{postCreator}} will do the option with the most amount of votes when the superpoll is over.",
+    "cf": "{{postCreator}} will do the goal once it gets enough backers."
   },
   "PostFailedBoxModeration": {
     "title": "{{ postType }} is cancelled",
@@ -265,9 +269,13 @@
     }
   },
   "AcPost": {
-    "paymenModalHeader": {
+    "paymentModalHeader": {
       "subtitle": "You bid on"
     },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid."
+    },
+    "paymentModalPayButton": "Bid",
     "PostTopInfo": {
       "SelectWinner": {
         "title": "Time's up!",
@@ -329,9 +337,13 @@
       "vote": "vote",
       "votes": "votes"
     },
-    "paymenModalHeader": {
+    "paymentModalHeader": {
       "subtitle": "You vote for"
     },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if your vote wins."
+    },
+    "paymentModalPayButton": "Vote for",
     "OptionsTab": {
       "me": "me",
       "tags": {
@@ -428,9 +440,13 @@
         "backer_founded": "backer successfully funded"
       }
     },
-    "paymenModalHeader": {
+    "paymentModalHeader": {
       "subtitle": "You pledge for"
     },
+    "paymentModalFooter": {
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal."
+    },
+    "paymentModalPayButton": "Back it for",
     "FloatingActionButton": {
       "choosePledgeBtn": "Make pledge"
     }

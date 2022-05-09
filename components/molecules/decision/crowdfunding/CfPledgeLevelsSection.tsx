@@ -36,6 +36,7 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import getDisplayname from '../../../../utils/getDisplayname';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsSection {
@@ -398,10 +399,18 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
+            bottomCaption={
+              <SPaymentFooter variant={3}>
+                {t('CfPost.paymentModalFooter.body', {
+                  creator: getDisplayname(post.creator!!),
+                })}
+              </SPaymentFooter>
+            }
+            payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
           >
             <SPaymentModalHeader>
               <SPaymentModalTitle variant={3}>
-                {t('CfPost.paymenModalHeader.subtitle')}
+                {t('CfPost.paymentModalHeader.subtitle')}
               </SPaymentModalTitle>
               <SPaymentModalOptionText>{post.title}</SPaymentModalOptionText>
             </SPaymentModalHeader>
@@ -539,4 +548,12 @@ const STutorialTooltipHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;

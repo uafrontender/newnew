@@ -23,8 +23,11 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'DELETED': {
-        return 'deleted';
+      case 'DELETED_BY_CREATOR': {
+        return 'deleted_by_creator';
+      }
+      case 'DELETED_BY_ADMIN': {
+        return 'deleted_by_admin';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -61,8 +64,11 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'DELETED': {
-        return 'deleted';
+      case 'DELETED_BY_CREATOR': {
+        return 'deleted_by_creator';
+      }
+      case 'DELETED_BY_ADMIN': {
+        return 'deleted_by_admin';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -99,8 +105,11 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'DELETED': {
-        return 'deleted';
+      case 'DELETED_BY_CREATOR': {
+        return 'deleted_by_creator';
+      }
+      case 'DELETED_BY_ADMIN': {
+        return 'deleted_by_admin';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';

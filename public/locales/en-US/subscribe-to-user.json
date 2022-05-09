@@ -51,8 +51,9 @@
       }
     }
   },
-  "paymenModalHeader": {
+  "paymentModalHeader": {
     "subtitle": "Subscribe to",
     "numSubscribers": "subscribers"
-  }
+  },
+  "paymentModalPayButton": "Subscribe for"
 }

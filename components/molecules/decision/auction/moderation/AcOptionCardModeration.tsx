@@ -297,7 +297,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         {/* Confirm block user modal */}
         <BlockUserModalPost
           confirmBlockUser={isBlockModalOpen}
-          onUserBlock={() => {}}
           user={option.creator!!}
           closeModal={() => setIsBlockModalOpen(false)}
         />
