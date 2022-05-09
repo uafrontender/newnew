@@ -31,7 +31,7 @@ export const TutorialCard: React.FC<ITutorialCard> = ({
       <SImageBG id='backgroundPart' height={height}>
         <SImageHolder>
           <img
-            src={image.src}
+            src={image}
             alt={title}
             style={imageStyle ?? {}}
             draggable={false}
