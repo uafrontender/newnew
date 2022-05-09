@@ -1,19 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from './_app';
 import HomeLayout from '../components/templates/HomeLayout';
-import TopSection from '../components/organisms/home/TopSection';
-import HeroSection from '../components/organisms/home/HeroSection';
-import CardsSection from '../components/organisms/home/CardsSection';
-import PostModal from '../components/organisms/decision/PostModal';
-
 import { useAppSelector } from '../redux-store/store';
 import {
   fetchPostByUUID,
@@ -28,14 +24,30 @@ import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
-import TutorialCard from '../components/molecules/TutorialCard';
 import assets from '../constants/assets';
+
+const TopSection = dynamic(
+  () => import('../components/organisms/home/TopSection')
+);
+const HeroSection = dynamic(
+  () => import('../components/organisms/home/HeroSection')
+);
+const CardsSection = dynamic(
+  () => import('../components/organisms/home/CardsSection')
+);
+const PostModal = dynamic(
+  () => import('../components/organisms/decision/PostModal')
+);
+const TutorialCard = dynamic(
+  () => import('../components/molecules/TutorialCard')
+);
 
 interface IHome {
   top10posts: newnewapi.NonPagedPostsResponse;
   postFromQuery?: newnewapi.Post;
 }
 
+// No sense to memorize
 const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
   const { t } = useTranslation('home');
   const user = useAppSelector((state) => state.user);
@@ -87,19 +99,22 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     newnewapi.IPost | undefined
   >(postFromQuery ?? undefined);
 
-  const handleOpenPostModal = (post: newnewapi.IPost) => {
-    setDisplayedPost(post);
-    setPostModalOpen(true);
-  };
+  const handleOpenPostModal = useCallback(
+    (post: newnewapi.IPost) => {
+      setDisplayedPost(post);
+      setPostModalOpen(true);
+    },
+    [setDisplayedPost, setPostModalOpen]
+  );
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
-  const handleClosePostModal = () => {
+  const handleClosePostModal = useCallback(() => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
-  };
+  }, []);
 
   // Fetch top posts of various types
   // FY posts
@@ -356,7 +371,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           }
         />
       )}
-      {!collectionBiggestError && (
+      {!collectionBiggestError &&
+      collectionBiggestInitialLoading &&
+      collectionBiggest.length > 0 ? (
         <CardsSection
           title={t('biggest-block-title')}
           category='biggest'
@@ -364,7 +381,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionBiggestInitialLoading}
           handlePostClicked={handleOpenPostModal}
         />
-      )}
+      ) : null}
       {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
         <CardsSection
           user={{
@@ -386,7 +403,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           isOpen={postModalOpen}
           post={displayedPost}
           manualCurrLocation={isBrowser() ? window.location.pathname : ''}
-          handleClose={() => handleClosePostModal()}
+          handleClose={handleClosePostModal}
           handleOpenAnotherPost={handleSetDisplayedPost}
         />
       )}

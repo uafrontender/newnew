@@ -2,7 +2,9 @@ import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAppSelector } from '../../redux-store/store';
 
-import Item, { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
+import BottomNavigationItem, {
+  TBottomNavigationItem,
+} from '../molecules/BottomNavigationItem';
 import MoreMenuMobile from './MoreMenuMobile';
 
 interface IBottomNavigation {
@@ -19,7 +21,7 @@ export const BottomNavigation: React.FC<IBottomNavigation> = (props) => {
   const user = useAppSelector((state) => state.user);
 
   const renderItem = useCallback(
-    (item) => <Item key={item.key} item={item} />,
+    (item) => <BottomNavigationItem key={item.key} item={item} />,
     []
   );
 

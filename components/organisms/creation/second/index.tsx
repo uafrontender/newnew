@@ -20,15 +20,9 @@ import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
-import InlineSVG from '../../../atoms/InlineSVG';
-import UserAvatar from '../../../molecules/UserAvatar';
 import FileUpload from '../../../molecules/creation/FileUpload';
-import MobileField from '../../../molecules/creation/MobileField';
 import Tabs, { Tab } from '../../../molecules/Tabs';
 import TabletStartDate from '../../../molecules/creation/TabletStartDate';
-import MobileFieldBlock from '../../../molecules/creation/MobileFieldBlock';
-import TabletFieldBlock from '../../../molecules/creation/TabletFieldBlock';
-import DraggableMobileOptions from '../DraggableMobileOptions';
 
 import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -72,13 +66,29 @@ import {
 } from '../../../../constants/general';
 
 import closeIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
-import HeroPopup from '../../../molecules/creation/HeroPopup';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
+const HeroPopup = dynamic(
+  () => import('../../../molecules/creation/HeroPopup')
+);
+const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
+const DraggableMobileOptions = dynamic(
+  () => import('../DraggableMobileOptions')
+);
+const TabletFieldBlock = dynamic(
+  () => import('../../../molecules/creation/TabletFieldBlock')
+);
+const MobileFieldBlock = dynamic(
+  () => import('../../../molecules/creation/MobileFieldBlock')
+);
+const MobileField = dynamic(
+  () => import('../../../molecules/creation/MobileField')
+);
+const UserAvatar = dynamic(() => import('../../../molecules/UserAvatar'));
 
 interface ICreationSecondStepContent {}
 
@@ -760,6 +770,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       };
       func();
     }, [validateT, validateTextAPI, validateTitleDebounced]);
+
     useEffect(() => {
       if (socketConnection) {
         socketConnection.on('VideoProcessingProgress', handlerSocketUpdated);
@@ -772,6 +783,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socketConnection, handlerSocketUpdated]);
+
     useEffect(() => {
       if (playerRef.current && isDesktop) {
         if (overlay) {
@@ -1038,11 +1050,13 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
             )}
           </SContent>
         </div>
-        <HeroPopup
-          isPopupVisible={isTutorialVisible}
-          postType={tutorialType}
-          closeModal={goToNextStep}
-        />
+        {isTutorialVisible && (
+          <HeroPopup
+            isPopupVisible={isTutorialVisible}
+            postType={tutorialType}
+            closeModal={goToNextStep}
+          />
+        )}
       </>
     );
   };

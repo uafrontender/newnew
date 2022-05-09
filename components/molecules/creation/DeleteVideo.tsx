@@ -13,7 +13,7 @@ interface IDeleteVideo {
   handleSubmit: () => void;
 }
 
-export const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
+const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
   const { open, handleClose, handleSubmit } = props;
   const { t } = useTranslation('creation');
 

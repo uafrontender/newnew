@@ -397,7 +397,6 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;
       if (size) {
-        console.log(size);
         setHeightDelta(size);
       }
     });
@@ -560,11 +559,11 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               actionSectionContainer.current = el!!;
             }}
           >
-            <Text variant={3}>
+            <SText variant={3}>
               {t('McPost.OptionsTab.ActionSection.subscribeToCreatorCaption', {
                 creator: post.creator?.nickname,
               })}
-            </Text>
+            </SText>
             <SSubscribeButton
               onClick={() => {
                 handleRedirectToPostCreator();
@@ -659,10 +658,16 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
+          bottomCaption={
+            <SPaymentFooter variant={3}>
+              {t('McPost.paymentModalFooter.body')}
+            </SPaymentFooter>
+          }
+          payButtonCaptionKey={t('McPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
-              {t('McPost.paymenModalHeader.subtitle')}
+              {t('McPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText>{newOptionText}</SPaymentModalOptionText>
           </SPaymentModalHeader>
@@ -672,6 +677,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
+        postType='mc'
         isVisible={paymentSuccessModalOpen}
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
@@ -684,7 +690,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       {isMobile &&
       !suggestNewMobileOpen &&
       !hasVotedOptionId &&
-      postStatus === 'voting' ? (
+      postStatus === 'voting' &&
+      canVoteForFree ? (
         <>
           <SActionButton
             view='primaryGrad'
@@ -900,6 +907,14 @@ const SActionSectionSubscribe = styled.div`
   }
 `;
 
+const SText = styled(Text)`
+  height: 100%;
+  align-self: center;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
 const SSubscribeButton = styled(Button)`
   background: ${({ theme }) => theme.colorsThemed.accent.yellow};
 
@@ -976,4 +991,12 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;

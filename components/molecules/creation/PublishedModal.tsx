@@ -37,7 +37,7 @@ interface IPublishedModal {
   handleClose: () => void;
 }
 
-export const PublishedModal: React.FC<IPublishedModal> = (props) => {
+const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const { t } = useTranslation('creation');
   const user = useAppSelector((state) => state.user);

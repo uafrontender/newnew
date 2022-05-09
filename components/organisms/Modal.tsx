@@ -17,7 +17,7 @@ interface IModal {
   children: ReactNode;
 }
 
-const Modal: React.FC<IModal> = (props) => {
+const Modal: React.FC<IModal> = React.memo((props) => {
   const {
     show,
     transitionSpeed,
@@ -75,7 +75,7 @@ const Modal: React.FC<IModal> = (props) => {
   }
 
   return null;
-};
+});
 
 interface IStyledModalOverlay {
   show: boolean;

@@ -519,8 +519,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             <STutorialTooltipTextAreaHolder>
               <TutorialTooltip
                 isTooltipVisible={
+                  options.length > 0 &&
                   user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                    newnewapi.AcTutorialStep.AC_TEXT_FIELD
                 }
                 closeTooltip={goToNextStep}
                 title={t('tutorials.ac.createYourBid.title')}
@@ -533,8 +534,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
         <STutorialTooltipHolder>
           <TutorialTooltip
             isTooltipVisible={
+              options.length > 0 &&
               user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-              newnewapi.AcTutorialStep.AC_ALL_BIDS
+                newnewapi.AcTutorialStep.AC_ALL_BIDS
             }
             closeTooltip={goToNextStep}
             title={t('tutorials.ac.peopleBids.title')}
@@ -608,10 +610,16 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handleSubmitNewOptionWallet}
+          bottomCaption={
+            <SPaymentFooter variant={3}>
+              {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
+            </SPaymentFooter>
+          }
+          payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
             <SPaymentModalTitle variant={3}>
-              {t('AcPost.paymenModalHeader.subtitle')}
+              {t('AcPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
             <SPaymentModalOptionText>{newBidText}</SPaymentModalOptionText>
           </SPaymentModalHeader>
@@ -621,6 +629,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
+        postType='ac'
         isVisible={paymentSuccesModalOpen}
         closeModal={() => setPaymentSuccesModalOpen(false)}
       >
@@ -641,8 +650,9 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           <STutorialTooltipHolderMobile>
             <TutorialTooltip
               isTooltipVisible={
+                options.length > 0 &&
                 user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
               }
               closeTooltip={goToNextStep}
               title={t('tutorials.ac.createYourBid.title')}
@@ -883,4 +893,12 @@ const STutorialTooltipTextAreaHolder = styled.div`
   div {
     width: 190px;
   }
+`;
+
+const SPaymentFooter = styled(Text)`
+  margin-top: 24px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
 `;

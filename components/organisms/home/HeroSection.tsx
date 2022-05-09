@@ -15,7 +15,6 @@ import Text from '../../atoms/Text';
 import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import AnimatedPresence from '../../atoms/AnimatedPresence';
-// import NotificationItem from '../../molecules/NotificationsItem';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -33,61 +32,6 @@ export const HeroSection = React.memo(() => {
   const [animateSubTitle, setAnimateSubTitle] = useState(false);
   const [animateButton, setAnimateButton] = useState(false);
 
-  // const notifications = useMemo(() => [
-  //   {
-  //     id: 'uniqueid-1',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  //   {
-  //     id: 'uniqueid-2',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  //   {
-  //     id: 'uniqueid-3',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  //   {
-  //     id: 'uniqueid-4',
-  //     bid: 50,
-  //     bidCurrency: '$',
-  //     bidUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/men/19.jpg',
-  //       nickname: '@sugardaddy',
-  //     },
-  //     bidForUser: {
-  //       avatar: 'https://randomuser.me/api/portraits/women/34.jpg',
-  //       nickname: '@unicornbaby',
-  //     },
-  //   },
-  // ], []);
-
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -102,11 +46,6 @@ export const HeroSection = React.memo(() => {
       containerId: 'generalScrollContainer',
     });
   };
-  // const renderItem = (item: any) => (
-  //   <SNotificationItemHolder key={item.id}>
-  //     <NotificationItem item={item} />
-  //   </SNotificationItemHolder>
-  // );
 
   const handleTitleAnimationEnd = useCallback(() => {
     setAnimateSubTitle(true);

@@ -2,8 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-nested-ternary */
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -14,13 +21,21 @@ import { fetchCuratedPosts, fetchPostByUUID } from '../../api/endpoints/post';
 
 import { NextPageWithLayout } from '../_app';
 import HomeLayout from '../../components/templates/HomeLayout';
-import PostModal from '../../components/organisms/decision/PostModal';
-import TopSection from '../../components/organisms/home/TopSection';
-import HeroSection from '../../components/organisms/home/HeroSection';
 import switchPostType from '../../utils/switchPostType';
-import isSafari from '../../utils/isSafari';
 import { toggleMutedMode } from '../../redux-store/slices/uiStateSlice';
 import isBrowser from '../../utils/isBrowser';
+
+const PostModal = dynamic(
+  () => import('../../components/organisms/decision/PostModal')
+);
+
+const TopSection = dynamic(
+  () => import('../../components/organisms/home/TopSection')
+);
+
+const HeroSection = dynamic(
+  () => import('../../components/organisms/home/HeroSection')
+);
 
 interface IPostPage {
   top10posts: newnewapi.NonPagedPostsResponse;
@@ -56,9 +71,9 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (postToOpen: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((postToOpen: newnewapi.IPost) => {
     setDisplayedPost(postToOpen);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);

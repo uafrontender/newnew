@@ -61,7 +61,7 @@ interface IFileUpload {
   handleCancelVideoUpload: () => void;
 }
 
-export const FileUpload: React.FC<IFileUpload> = ({
+const FileUpload: React.FC<IFileUpload> = ({
   id,
   value,
   etaUpload,

@@ -15,7 +15,7 @@ interface IMobileField {
   onChange: (key: string, value: string | boolean) => void;
 }
 
-export const MobileField: React.FC<IMobileField> = (props) => {
+const MobileField: React.FC<IMobileField> = (props) => {
   const { id, type, value, onChange } = props;
   const { t } = useTranslation('creation');
   const theme = useTheme();

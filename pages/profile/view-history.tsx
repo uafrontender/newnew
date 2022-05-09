@@ -6,18 +6,24 @@ import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import PostModal from '../../components/organisms/decision/PostModal';
-import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+
+const PostModal = dynamic(
+  () => import('../../components/organisms/decision/PostModal')
+);
+const PostList = dynamic(
+  () => import('../../components/organisms/see-more/PostList')
+);
 
 interface IMyProfileViewHistory {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -62,9 +68,9 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
     setPostModalOpen(true);
   };
 
-  const handleSetDisplayedPost = (post: newnewapi.IPost) => {
+  const handleSetDisplayedPost = useCallback((post: newnewapi.IPost) => {
     setDisplayedPost(post);
-  };
+  }, []);
 
   const handleClosePostModal = () => {
     setPostModalOpen(false);
@@ -160,7 +166,7 @@ const MyProfileViewHistory: NextPage<IMyProfileViewHistory> = ({
         </SCardsSection>
         <div ref={loadingRef} />
       </SMain>
-      {displayedPost && (
+      {displayedPost && postModalOpen && (
         <PostModal
           isOpen={postModalOpen}
           post={displayedPost}

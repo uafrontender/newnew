@@ -6,18 +6,26 @@ import { useTranslation } from 'next-i18next';
 import type { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
-import OnboardingSectionDetails from '../components/molecules/creator-onboarding/OnboardingSectionDetails';
 import useLeavePageConfirm from '../utils/hooks/useLeavePageConfirm';
 import { getSupportedCreatorCountries } from '../api/endpoints/payments';
 import { getMyOnboardingState } from '../api/endpoints/user';
-import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
+
+const OnboardingSectionDetails = dynamic(
+  () =>
+    import(
+      '../components/molecules/creator-onboarding/OnboardingSectionDetails'
+    )
+);
+
+const Lottie = dynamic(() => import('../components/atoms/Lottie'));
 
 const countriesMock: Omit<newnewapi.Country, 'toJSON'>[] = [
   {

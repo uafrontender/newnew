@@ -43,9 +43,7 @@ const HeroPopup: React.FC<IHeroPopup> = ({
             />
           </SImageWrapper>
           <STitle variant={4}>{t(`heroPopup${postType}.title`)}</STitle>
-          <SText variant={2}>{t(`heroPopup${postType}.line1`)}</SText>
-          <SText variant={2}>{t(`heroPopup${postType}.line2`)}</SText>
-          <SText variant={2}>{t(`heroPopup${postType}.line3`)}</SText>
+          <SText variant={2}>{t(`heroPopup${postType}.text`)}</SText>
           <SButton view='primary' onClick={closeModal}>
             {t('heroPopupCommon.heroBtnText')}
           </SButton>
@@ -104,6 +102,8 @@ const STitle = styled(Headline)`
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   margin-bottom: 24px;
+  white-space: pre-line;
+  font-weight: 600;
 `;
 
 const SButton = styled(Button)`

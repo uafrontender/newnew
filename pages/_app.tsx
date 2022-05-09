@@ -8,7 +8,7 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { ToastContainer } from 'react-toastify';
 import { CookiesProvider } from 'react-cookie';
-import { parse, UserAgent } from 'next-useragent';
+import { parse } from 'next-useragent';
 import { appWithTranslation } from 'next-i18next';
 import { hotjar } from 'react-hotjar';
 
@@ -48,6 +48,7 @@ import assets from '../constants/assets';
 // Landing
 import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
+import { NotificationsProvider } from '../contexts/notificationsContext';
 
 // interface for shared layouts
 export type NextPageWithLayout = NextPage & {
@@ -61,30 +62,7 @@ interface IMyApp extends AppProps {
 
 const MyApp = (props: IMyApp): ReactElement => {
   const { Component, pageProps, uaString } = props;
-  const ua: UserAgent = parse(
-    uaString || (isBrowser() ? window?.navigator?.userAgent : '')
-  );
   const store = useStore();
-  const currentResizeMode = store.getState()?.ui?.resizeMode;
-  const getInitialResizeMode = () => {
-    let resizeMode = 'mobile';
-
-    if (ua.isTablet) {
-      resizeMode = 'tablet';
-    } else if (ua.isDesktop) {
-      resizeMode = 'laptop';
-
-      if (['laptopL', 'desktop'].includes(currentResizeMode)) {
-        // keep old mode in case laptop
-        resizeMode = currentResizeMode;
-      }
-    } else if (['mobileL', 'mobileM', 'mobileS'].includes(currentResizeMode)) {
-      // keep old mode in case mobile
-      resizeMode = currentResizeMode;
-    }
-
-    return resizeMode;
-  };
 
   // Pre-fetch images after all loading for initial page is done
   const [preFetchImages, setPreFetchImages] = useState<string>('');
@@ -107,7 +85,32 @@ const MyApp = (props: IMyApp): ReactElement => {
     }
   }, []);
 
-  store.dispatch(setResizeMode(getInitialResizeMode()));
+  useEffect(() => {
+    const currentResizeMode = store.getState()?.ui?.resizeMode;
+
+    let resizeMode = 'mobile';
+    const ua = parse(
+      uaString || (isBrowser() ? window?.navigator?.userAgent : '')
+    );
+
+    if (ua.isTablet) {
+      resizeMode = 'tablet';
+    } else if (ua.isDesktop) {
+      resizeMode = 'laptop';
+
+      if (['laptopL', 'desktop'].includes(currentResizeMode)) {
+        // keep old mode in case laptop
+        resizeMode = currentResizeMode;
+      }
+    } else if (['mobileL', 'mobileM', 'mobileS'].includes(currentResizeMode)) {
+      // keep old mode in case mobile
+      resizeMode = currentResizeMode;
+    }
+
+    if (resizeMode !== currentResizeMode) {
+      store.dispatch(setResizeMode(resizeMode));
+    }
+  }, [store, uaString]);
 
   // Shared layouts
   const getLayout = Component.getLayout ?? ((page) => page);
@@ -134,37 +137,39 @@ const MyApp = (props: IMyApp): ReactElement => {
                 persistor={(store as EnhancedStoreWithPersistor).__persistor}
               >
                 <SyncUserWrapper>
-                  <BlockedUsersProvider>
-                    <FollowingsContextProvider>
-                      {/* <WalletContextProvider> */}
-                      <SubscriptionsProvider>
-                        <ChatsProvider>
-                          <ResizeMode>
-                            <PostModalContextProvider>
-                              <GlobalTheme>
-                                <div>
-                                  <ToastContainer />
-                                  <VideoProcessingWrapper>
-                                    {!pageProps.error ? (
-                                      getLayout(<Component {...pageProps} />)
-                                    ) : (
-                                      <Error
-                                        errorMsg={pageProps.error?.message}
-                                        statusCode={
-                                          pageProps.error?.statusCode ?? 500
-                                        }
-                                      />
-                                    )}
-                                  </VideoProcessingWrapper>
-                                </div>
-                              </GlobalTheme>
-                            </PostModalContextProvider>
-                          </ResizeMode>
-                        </ChatsProvider>
-                      </SubscriptionsProvider>
-                      {/* </WalletContextProvider> */}
-                    </FollowingsContextProvider>
-                  </BlockedUsersProvider>
+                  <NotificationsProvider>
+                    <BlockedUsersProvider>
+                      <FollowingsContextProvider>
+                        {/* <WalletContextProvider> */}
+                        <SubscriptionsProvider>
+                          <ChatsProvider>
+                            <ResizeMode>
+                              <PostModalContextProvider>
+                                <GlobalTheme>
+                                  <div>
+                                    <ToastContainer />
+                                    <VideoProcessingWrapper>
+                                      {!pageProps.error ? (
+                                        getLayout(<Component {...pageProps} />)
+                                      ) : (
+                                        <Error
+                                          errorMsg={pageProps.error?.message}
+                                          statusCode={
+                                            pageProps.error?.statusCode ?? 500
+                                          }
+                                        />
+                                      )}
+                                    </VideoProcessingWrapper>
+                                  </div>
+                                </GlobalTheme>
+                              </PostModalContextProvider>
+                            </ResizeMode>
+                          </ChatsProvider>
+                        </SubscriptionsProvider>
+                        {/* </WalletContextProvider> */}
+                      </FollowingsContextProvider>
+                    </BlockedUsersProvider>
+                  </NotificationsProvider>
                 </SyncUserWrapper>
               </PersistGate>
             </ChannelsContextProvider>

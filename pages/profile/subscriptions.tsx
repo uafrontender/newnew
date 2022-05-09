@@ -5,7 +5,7 @@ import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-
+import dynamic from 'next/dynamic';
 import { NextPageWithLayout } from '../_app';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
@@ -13,9 +13,14 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
-import CreatorsList from '../../components/organisms/search/CreatorsList';
-import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+
+const NoContentCard = dynamic(
+  () => import('../../components/atoms/profile/NoContentCard')
+);
+const CreatorsList = dynamic(
+  () => import('../../components/organisms/search/CreatorsList')
+);
 
 interface IMyProfileSubscriptions {
   user: Omit<newnewapi.User, 'toJSON'>;

@@ -10,7 +10,6 @@ import { useAppSelector } from '../../../redux-store/store';
 import mockToS from './mockToS';
 import Headline from '../../atoms/Headline';
 import Caption from '../../atoms/Caption';
-import Text from '../../atoms/Text';
 import OnboardingTosSubmitForm from './OnboardingTosSubmitForm';
 
 interface IOnboardingSectionTos {

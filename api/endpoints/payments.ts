@@ -6,7 +6,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-export const BASE_URL_PAYMENTS = `${BASE_URL}/payments`;
+const BASE_URL_PAYMENTS = `${BASE_URL}/payments`;
 
 export const getSupportedCreatorCountries = (payload: newnewapi.EmptyRequest) =>
   fetchProtobuf<

@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -16,21 +15,9 @@ interface IHeader {
   visible: boolean;
 }
 
-export const Header: React.FC<IHeader> = (props) => {
+export const Header: React.FC<IHeader> = React.memo((props) => {
   const { visible } = props;
   const { banner, resizeMode } = useAppSelector((state) => state.ui);
-
-  const router = useRouter();
-
-  // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch('/');
-    router.prefetch('/sign-up');
-    router.prefetch('/profile');
-    router.prefetch('/creation');
-    router.prefetch('/creator/dashboard');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <SWrapper
@@ -57,7 +44,7 @@ export const Header: React.FC<IHeader> = (props) => {
       </SContentWrapper>
     </SWrapper>
   );
-};
+});
 
 export default Header;
 

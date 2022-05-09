@@ -16,48 +16,50 @@ interface IPostEllipseMenuModeration {
 }
 
 const PostEllipseMenuModeration: React.FunctionComponent<IPostEllipseMenuModeration> =
-  ({
-    postType,
-    isVisible,
-    canDeletePost,
-    handleClose,
-    handleOpenDeletePostModal,
-  }) => {
-    const { t } = useTranslation('decision');
-    const containerRef = useRef<HTMLDivElement>();
+  React.memo(
+    ({
+      postType,
+      isVisible,
+      canDeletePost,
+      handleClose,
+      handleOpenDeletePostModal,
+    }) => {
+      const { t } = useTranslation('decision');
+      const containerRef = useRef<HTMLDivElement>();
 
-    useOnClickEsc(containerRef, handleClose);
-    useOnClickOutside(containerRef, handleClose);
+      useOnClickEsc(containerRef, handleClose);
+      useOnClickOutside(containerRef, handleClose);
 
-    return (
-      <AnimatePresence>
-        {isVisible && (
-          <SContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SButton
-              disabled={!canDeletePost}
-              onClick={() => {
-                handleOpenDeletePostModal();
-                handleClose();
+      return (
+        <AnimatePresence>
+          {isVisible && (
+            <SContainer
+              ref={(el) => {
+                containerRef.current = el!!;
               }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <Text variant={3}>
-                {t('ellipse.deleteDecision', {
-                  postType: t(`postType.${postType}`),
-                })}
-              </Text>
-            </SButton>
-          </SContainer>
-        )}
-      </AnimatePresence>
-    );
-  };
+              <SButton
+                disabled={!canDeletePost}
+                onClick={() => {
+                  handleOpenDeletePostModal();
+                  handleClose();
+                }}
+              >
+                <Text variant={3}>
+                  {t('ellipse.deleteDecision', {
+                    postType: t(`postType.${postType}`),
+                  })}
+                </Text>
+              </SButton>
+            </SContainer>
+          )}
+        </AnimatePresence>
+      );
+    }
+  );
 
 export default PostEllipseMenuModeration;
 

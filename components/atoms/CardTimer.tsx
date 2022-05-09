@@ -13,21 +13,21 @@ interface ICardTimer {
   timestampSeconds: number;
 }
 
-const CardTimer: React.FunctionComponent<ICardTimer> = ({
-  timestampSeconds,
-}) => {
-  const { t } = useTranslation('home');
-  const parsed = (timestampSeconds - Date.now()) / 1000;
-  const hasEnded = Date.now() > timestampSeconds;
-  const expirationDate = new Date(timestampSeconds);
+// Its strange how much resources this component consumes om initial render (5.3% before memo)
+const CardTimer: React.FunctionComponent<ICardTimer> = React.memo(
+  ({ timestampSeconds }) => {
+    const { t } = useTranslation('home');
+    const parsed = (timestampSeconds - Date.now()) / 1000;
+    const hasEnded = Date.now() > timestampSeconds;
+    const expirationDate = new Date(timestampSeconds);
 
-  const [parsedSeconds, setParsedSeconds] = useState<DHM>(
-    secondsToDHM(parsed, 'noTrim')
-  );
-  const [seconds, setSeconds] = useState(parsed);
-  const interval = useRef<number>();
+    const [parsedSeconds, setParsedSeconds] = useState<DHM>(
+      secondsToDHM(parsed, 'noTrim')
+    );
+    const [seconds, setSeconds] = useState(parsed);
+    const interval = useRef<number>();
 
-  const parsedString = `
+    const parsedString = `
     ${
       parsedSeconds.days !== '0'
         ? `${parsedSeconds.days}${t('card-time-left-days')}`
@@ -45,30 +45,33 @@ const CardTimer: React.FunctionComponent<ICardTimer> = ({
     }
   `;
 
-  useEffect(() => {
-    if (isBrowser()) {
-      interval.current = window.setInterval(() => {
-        setSeconds((s) => s - 60);
-      }, 1000 * 60);
-    }
-    return () => clearInterval(interval.current);
-  }, []);
+    useEffect(() => {
+      // TODO: we can set the interval recursively and first one can
+      // be equal to seconds + milliseconds portion of the time left
+      if (isBrowser()) {
+        interval.current = window.setInterval(() => {
+          setSeconds((s) => s - 60);
+        }, 1000 * 60);
+      }
+      return () => clearInterval(interval.current);
+    }, []);
 
-  useEffect(() => {
-    setParsedSeconds(secondsToDHM(seconds, 'noTrim'));
-  }, [seconds]);
+    useEffect(() => {
+      setParsedSeconds(secondsToDHM(seconds, 'noTrim'));
+    }, [seconds]);
 
-  return !hasEnded ? (
-    <SCaption variant={2} weight={700}>
-      {t('card-time-left', { time: parsedString })}
-    </SCaption>
-  ) : (
-    <SCaptionEnded variant={2} weight={700}>
-      {t('card-time-expired-ended-on')}{' '}
-      {expirationDate.toLocaleDateString('en-US')}
-    </SCaptionEnded>
-  );
-};
+    return !hasEnded ? (
+      <SCaption variant={2} weight={700}>
+        {t('card-time-left', { time: parsedString })}
+      </SCaption>
+    ) : (
+      <SCaptionEnded variant={2} weight={700}>
+        {t('card-time-expired-ended-on')}{' '}
+        {expirationDate.toLocaleDateString('en-US')}
+      </SCaptionEnded>
+    );
+  }
+);
 
 export default CardTimer;
 

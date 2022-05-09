@@ -8,6 +8,7 @@ import { useInView } from 'react-intersection-observer';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
@@ -18,26 +19,27 @@ import { toggleMutedMode } from '../../../redux-store/slices/uiStateSlice';
 // Utils
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
-
-import CommentsSuccess from '../../molecules/decision/success/CommentsSuccess';
 import { formatNumber } from '../../../utils/format';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
-import WaitingForResponseBox from '../../molecules/decision/waiting/WaitingForResponseBox';
+
+const WaitingForResponseBox = dynamic(
+  () => import('../../molecules/decision/waiting/WaitingForResponseBox')
+);
+const CommentsSuccess = dynamic(
+  () => import('../../molecules/decision/success/CommentsSuccess')
+);
 
 interface IPostAwaitingResponseCF {
   post: newnewapi.Crowdfunding;
 }
 
 const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
-  ({ post }) => {
+  React.memo(({ post }) => {
     const { t } = useTranslation('decision');
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
-    const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
-    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-      resizeMode
-    );
+    const { mutedMode } = useAppSelector((state) => state.ui);
 
     const waitingTime = useMemo(() => {
       const end = (post.responseUploadDeadline?.seconds as number) * 1000;
@@ -299,7 +301,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
         )}
       </>
     );
-  };
+  });
 
 export default PostAwaitingResponseCF;
 

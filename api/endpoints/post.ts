@@ -6,7 +6,7 @@ import {
   fetchProtobufProtectedIntercepted,
 } from '../apiConfigs';
 
-export const BASE_URL_POST = `${BASE_URL}/post`;
+const BASE_URL_POST = `${BASE_URL}/post`;
 
 export const createPost = (payload: newnewapi.CreatePostRequest) =>
   fetchProtobufProtectedIntercepted<

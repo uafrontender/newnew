@@ -10,7 +10,7 @@ import {
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
 
-const AccountDeleted: React.FC = () => {
+const AccountDeleted: React.FC = React.memo(() => {
   const { t } = useTranslation('chat');
 
   return (
@@ -36,6 +36,6 @@ const AccountDeleted: React.FC = () => {
       </SBottomActionButton>
     </SBottomAction>
   );
-};
+});
 
 export default AccountDeleted;
