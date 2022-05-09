@@ -16,17 +16,7 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-// Email verification
-import BottomGlassSphereImage from '../../public/images/signup/floating-assets/Bottom-Glass-Sphere.png';
-import BottomSphereImage from '../../public/images/signup/floating-assets/Bottom-Sphere.png';
-import CrowdfundingImage from '../../public/images/signup/floating-assets/Crowdfunding.png';
-import LeftGlassSphereImage from '../../public/images/signup/floating-assets/Left-Glass-Sphere.png';
-import BulbImage from '../../public/images/signup/floating-assets/Sub-MC.webp';
-import ChoiceImage from '../../public/images/signup/floating-assets/Multiple-Choice.png';
-import RightGlassSphereImage from '../../public/images/signup/floating-assets/Right-Glass-Sphere.png';
-import TopGlassSphereImage from '../../public/images/signup/floating-assets/Top-Glass-Sphere.png';
-import TopMiddleSphereImage from '../../public/images/signup/floating-assets/Top-Middle-Sphere.png';
-import VotesImage from '../../public/images/signup/floating-assets/Votes.png';
+import assets from '../../constants/assets';
 
 export const AuthLayoutContext = createContext({
   shouldHeroUnmount: false,
@@ -161,57 +151,57 @@ const VerifyEmailVisual: React.FunctionComponent = () => {
   return (
     <SVerifyEmailBgWrapper>
       <img
-        src={BottomGlassSphereImage.src}
+        src={assets.floatingAssets.bottomGlassSphere}
         alt='background'
         className='email-bg-BottomGlassSphereImage'
       />
       <img
-        src={BottomSphereImage.src}
+        src={assets.floatingAssets.bottomSphere}
         alt='background'
         className='email-bg-BottomSphereImage'
       />
       <img
-        src={CrowdfundingImage.src}
+        src={assets.floatingAssets.crowdfunding}
         alt='background'
         className='email-bg-CrowdfundingImage'
       />
       <img
-        src={LeftGlassSphereImage.src}
+        src={assets.floatingAssets.leftGlassSphere}
         alt='background'
         className='email-bg-LeftGlassSphereImage'
       />
       <img
-        src={BulbImage.src}
+        src={assets.floatingAssets.subMC}
         alt='background'
         className='email-bg-BulbImage'
       />
       <img
-        src={ChoiceImage.src}
+        src={assets.floatingAssets.multipleChoice}
         alt='background'
         className='email-bg-ChoiceImage'
       />
       <img
-        src={RightGlassSphereImage.src}
+        src={assets.floatingAssets.rightGlassSphere}
         alt='background'
         className='email-bg-RightGlassSphereImage'
       />
       <img
-        src={TopGlassSphereImage.src}
+        src={assets.floatingAssets.topGlassSphere}
         alt='background'
         className='email-bg-TopGlassSphereImage'
       />
       <img
-        src={TopMiddleSphereImage.src}
+        src={assets.floatingAssets.topMiddleSphere}
         alt='background'
         className='email-bg-TopMiddleSphereImage'
       />
       <img
-        src={TopMiddleSphereImage.src}
+        src={assets.floatingAssets.bottomSphere}
         alt='background'
         className='email-bg-BottomMiddleSphereImage'
       />
       <img
-        src={VotesImage.src}
+        src={assets.floatingAssets.votes}
         alt='background'
         className='email-bg-VotesImage'
       />

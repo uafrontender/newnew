@@ -27,6 +27,19 @@ const assets = {
     lightMobileLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light.mp4`,
     lightMobileLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Mobile-Light-Hold-Frame.webp`,
   },
+  floatingAssets: {
+    bottomGlassSphere: `${APP_ASSETS_ORIGIN}/floating-assets/bottom-glass-sphere.png`,
+    bottomSphere: `${APP_ASSETS_ORIGIN}/floating-assets/bottom-sphere.png`,
+    crowdfunding: `${APP_ASSETS_ORIGIN}/floating-assets/crowdfunding.png`,
+    leftGlassSphere: `${APP_ASSETS_ORIGIN}/floating-assets/left-glass-sphere.png`,
+    multipleChoice: `${APP_ASSETS_ORIGIN}/floating-assets/multiple-choice.png`,
+    rightGlassSphere: `${APP_ASSETS_ORIGIN}/floating-assets/right-glass-sphere.png`,
+    subMC: `${APP_ASSETS_ORIGIN}/floating-assets/sub-MC.webp`,
+    topGlassSphere: `${APP_ASSETS_ORIGIN}/floating-assets/top-glass-sphere.png`,
+    topMiddleSphere: `${APP_ASSETS_ORIGIN}/floating-assets/top-middle-sphere.png`,
+    votes: `${APP_ASSETS_ORIGIN}/floating-assets/votes.png`,
+  },
+  signup: {},
 };
 
 export default assets;

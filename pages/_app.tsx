@@ -43,6 +43,8 @@ import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 
 // Images to be prefetched
+import assets from '../constants/assets';
+
 // Sign in
 import SignInIntroDark from '../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
 import SignInHoldDark from '../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
@@ -50,19 +52,7 @@ import SignInOutroDark from '../public/images/signup/hero-visual/Dark/sign-in-ou
 import SignInIntroLight from '../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
 import SignInHoldLight from '../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
 import SignInOutroLight from '../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
-// Email verification
-import BottomGlassSphereImage from '../public/images/signup/floating-assets/Bottom-Glass-Sphere.png';
-import BottomSphereImage from '../public/images/signup/floating-assets/Bottom-Sphere.png';
-import CrowdfundingImage from '../public/images/signup/floating-assets/Crowdfunding.png';
-import LeftGlassSphereImage from '../public/images/signup/floating-assets/Left-Glass-Sphere.png';
-import BulbImage from '../public/images/signup/floating-assets/Sub-MC.webp';
-import ChoiceImage from '../public/images/signup/floating-assets/Multiple-Choice.png';
-import RightGlassSphereImage from '../public/images/signup/floating-assets/Right-Glass-Sphere.png';
-import TopGlassSphereImage from '../public/images/signup/floating-assets/Top-Glass-Sphere.png';
-import TopMiddleSphereImage from '../public/images/signup/floating-assets/Top-Middle-Sphere.png';
-import VotesImage from '../public/images/signup/floating-assets/Votes.png';
-// Posts
-import assets from '../constants/assets';
+
 // Landing
 import PostModalContextProvider from '../contexts/postModalContext';
 import getColorMode from '../utils/getColorMode';
@@ -218,72 +208,62 @@ const PRE_FETCH_LINKS_COMMON = (
     {/* Sign up screen hero */}
     <link
       rel='prefetch'
-      href={BottomGlassSphereImage.src}
+      href={assets.floatingAssets.bottomGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={BottomSphereImage.src}
+      href={assets.floatingAssets.bottomSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={CrowdfundingImage.src}
+      href={assets.floatingAssets.crowdfunding}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={LeftGlassSphereImage.src}
+      href={assets.floatingAssets.leftGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={BulbImage.src}
+      href={assets.floatingAssets.subMC}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={ChoiceImage.src}
+      href={assets.floatingAssets.multipleChoice}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={RightGlassSphereImage.src}
+      href={assets.floatingAssets.rightGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={TopGlassSphereImage.src}
+      href={assets.floatingAssets.topGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={TopMiddleSphereImage.src}
+      href={assets.floatingAssets.topMiddleSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={VotesImage.src}
+      href={assets.floatingAssets.votes}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     {/* Creation screen */}
