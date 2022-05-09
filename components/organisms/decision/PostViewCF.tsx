@@ -742,6 +742,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
         )}
         {/* Payment success Modal */}
         <PaymentSuccessModal
+          postType='cf'
           isVisible={paymentSuccesModalOpen}
           closeModal={() => setPaymentSuccesModalOpen(false)}
         >

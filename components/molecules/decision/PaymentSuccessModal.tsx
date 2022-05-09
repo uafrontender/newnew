@@ -1,45 +1,33 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
-import Image from 'next/image';
+import styled from 'styled-components';
 
 import Button from '../../atoms/Button';
 import Modal from '../../organisms/Modal';
 import Headline from '../../atoms/Headline';
 
-import PaymentSuccesIcon from '../../../public/images/decision/payment-success.png';
-import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
-import InlineSvg from '../../atoms/InlineSVG';
+import { TPostType } from '../../../utils/switchPostType';
 
 interface IPaymentSuccessModal {
+  postType: TPostType;
   isVisible: boolean;
   closeModal: () => void;
 }
 
 const PaymentSuccessModal: React.FC<IPaymentSuccessModal> = ({
+  postType,
   isVisible,
   closeModal,
   children,
 }) => {
-  const theme = useTheme();
   const { t } = useTranslation('decision');
 
   return (
     <Modal show={isVisible} additionalZ={14} onClose={closeModal}>
       <SContainer onClick={(e) => e.stopPropagation()}>
         <SModal>
-          <SInlineSVG
-            clickable
-            scaleOnClick
-            svg={CloseIcon}
-            fill={theme.colorsThemed.text.primary}
-            width='24px'
-            height='24px'
-            onClick={closeModal}
-          />
-          <Image src={PaymentSuccesIcon} height={140} objectFit='contain' />
           <SModalTitle variant={6}>
-            {t('PaymentSuccessModal.title')}
+            {t(`PaymentSuccessModal.title.${postType}`)}
           </SModalTitle>
           <SModalMessage>{children}</SModalMessage>
           <SDoneButton onClick={closeModal}>
@@ -88,19 +76,13 @@ const SModalTitle = styled(Headline)`
 
 const SModalMessage = styled.p`
   text-align: center;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 500;
   font-size: 16px;
+  line-height: 24px;
   margin-bottom: 24px;
 `;
 
 const SDoneButton = styled(Button)`
   width: 100%;
-`;
-
-const SInlineSVG = styled(InlineSvg)`
-  position: absolute;
-  right: 24px;
-  top: 24px;
-
-  z-index: 1;
-  cursor: pointer;
 `;
