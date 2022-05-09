@@ -71,9 +71,9 @@ export const TitleBlock: React.FunctionComponent<ITitleBlock> = ({
       {
         key: 'cf',
       },
-      {
-        key: 'biggest',
-      },
+      // {
+      //   key: 'biggest',
+      // },
       ...(authenticated
         ? [
             {

@@ -374,7 +374,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           }
         />
       )}
-      {!collectionBiggestError && (
+      {!collectionBiggestError &&
+      collectionBiggestInitialLoading &&
+      collectionBiggest.length > 0 ? (
         <CardsSection
           title={t('biggest-block-title')}
           category='biggest'
@@ -382,7 +384,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           loading={collectionBiggestInitialLoading}
           handlePostClicked={handleOpenPostModal}
         />
-      )}
+      ) : null}
       {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
         <CardsSection
           user={{
