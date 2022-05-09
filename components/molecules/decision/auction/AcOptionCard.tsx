@@ -580,6 +580,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       )}
       {/* Payment success Modal */}
       <PaymentSuccessModal
+        postType='ac'
         isVisible={paymentSuccesModalOpen}
         closeModal={() => setPaymentSuccesModalOpen(false)}
       >

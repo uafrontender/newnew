@@ -629,6 +629,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
+        postType='ac'
         isVisible={paymentSuccesModalOpen}
         closeModal={() => setPaymentSuccesModalOpen(false)}
       >

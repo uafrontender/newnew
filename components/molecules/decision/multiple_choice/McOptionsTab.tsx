@@ -677,6 +677,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
       {/* Payment success Modal */}
       <PaymentSuccessModal
+        postType='mc'
         isVisible={paymentSuccessModalOpen}
         closeModal={() => setPaymentSuccessModalOpen(false)}
       >
