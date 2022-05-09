@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 import {
   SBottomAction,
   SBottomActionButton,
@@ -10,7 +11,8 @@ import {
   SBottomActionText,
   SBottomActionTitle,
 } from '../../atoms/chat/styles';
-import BlockUserModal from './BlockUserModal';
+
+const BlockUserModal = dynamic(() => import('./BlockUserModal'));
 
 interface IBlockedUser {
   onUserBlock: () => void;
@@ -62,13 +64,15 @@ const BlockedUser: React.FC<IBlockedUser> = ({
           </SBottomActionButton>
         </SBottomAction>
       )}
-      <BlockUserModal
-        confirmBlockUser={confirmBlockUser}
-        onUserBlock={onUserBlock}
-        user={user}
-        closeModal={closeModal}
-        isAnnouncement={isAnnouncement}
-      />
+      {confirmBlockUser && (
+        <BlockUserModal
+          confirmBlockUser={confirmBlockUser}
+          onUserBlock={onUserBlock}
+          user={user}
+          closeModal={closeModal}
+          isAnnouncement={isAnnouncement}
+        />
+      )}
     </>
   );
 };

@@ -5,16 +5,22 @@ import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import PostModal from '../../components/organisms/decision/PostModal';
-import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
+
+const PostModal = dynamic(
+  () => import('../../components/organisms/decision/PostModal')
+);
+const PostList = dynamic(
+  () => import('../../components/organisms/see-more/PostList')
+);
 
 interface IMyProfileFavorites {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -148,7 +154,7 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
         </SCardsSection>
         <div ref={loadingRef} />
       </SMain>
-      {displayedPost && (
+      {displayedPost && postModalOpen && (
         <PostModal
           isOpen={postModalOpen}
           post={displayedPost}

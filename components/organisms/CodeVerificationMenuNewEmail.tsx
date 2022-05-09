@@ -3,6 +3,7 @@ import { useRouter } from 'next/dist/client/router';
 import { newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
@@ -25,7 +26,8 @@ import AnimatedLogoEmailVerification from '../molecules/signup/AnimatedLogoEmail
 // Utils
 import secondsToString from '../../utils/secondsToHMS';
 import isBrowser from '../../utils/isBrowser';
-import AnimatedPresence from '../atoms/AnimatedPresence';
+
+const AnimatedPresence = dynamic(() => import('../atoms/AnimatedPresence'));
 
 export interface ICodeVerificationMenuNewEmail {
   expirationTime: number;

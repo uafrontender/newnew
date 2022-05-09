@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -13,7 +14,8 @@ import SearchInput from '../atoms/chat/SearchInput';
 import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
-import GoBackButton from '../molecules/GoBackButton';
+
+const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
 
 interface IChat {
   username?: string;
