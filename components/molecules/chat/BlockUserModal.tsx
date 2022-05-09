@@ -10,7 +10,7 @@ import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
 interface IBlockUserModal {
   user: newnewapi.IUser;
   confirmBlockUser: boolean;
-  onUserBlock: () => void;
+  onUserBlock?: () => void;
   closeModal: () => void;
   isAnnouncement?: boolean;
 }
@@ -36,7 +36,8 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       blockUser(user.uuid!!);
-      onUserBlock();
+      onUserBlock?.();
+      closeModal();
     } catch (err) {
       console.error(err);
     }
@@ -71,6 +72,10 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
       </SContainer>
     </Modal>
   );
+};
+
+BlockUserModal.defaultProps = {
+  onUserBlock: () => {},
 };
 
 export default BlockUserModal;

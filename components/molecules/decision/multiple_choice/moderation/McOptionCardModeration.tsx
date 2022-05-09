@@ -236,7 +236,6 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
         {!isCreatorsBid && (
           <BlockUserModalPost
             confirmBlockUser={isBlockModalOpen}
-            onUserBlock={() => {}}
             user={option.creator!!}
             closeModal={() => setIsBlockModalOpen(false)}
           />
