@@ -14,6 +14,7 @@ interface ITutorialCard {
   imageStyle?: React.CSSProperties;
 }
 
+// TODO: optimize, memorize imageStyle object
 export const TutorialCard: React.FC<ITutorialCard> = ({
   image,
   title,
