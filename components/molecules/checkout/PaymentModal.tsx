@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
@@ -25,6 +25,7 @@ interface IPaymentModal {
   showTocApply?: boolean;
   // predefinedOption?: 'wallet' | 'card';
   predefinedOption?: 'card';
+  bottomCaption?: React.ReactNode;
   onClose: () => void;
   // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
@@ -36,6 +37,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   amount,
   showTocApply,
   predefinedOption,
+  bottomCaption,
   onClose,
   // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
@@ -138,6 +140,7 @@ const PaymentModal: React.FC<IPaymentModal> = ({
               {t('payButton')}
               {amount && ` ${amount}`}
             </SPayButton>
+            {bottomCaption || null}
             {showTocApply && (
               <STocApply>
                 *{' '}
@@ -160,6 +163,7 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   predefinedOption: undefined,
+  bottomCaption: null,
   // handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
