@@ -11,13 +11,11 @@ import getDisplayname from '../../../utils/getDisplayname';
 interface IBlockUserModalPost {
   user: newnewapi.IUser;
   confirmBlockUser: boolean;
-  onUserBlock: () => void;
   closeModal: () => void;
 }
 
 const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
   confirmBlockUser,
-  onUserBlock,
   user,
   closeModal,
 }) => {
@@ -35,7 +33,7 @@ const BlockUserModalPost: React.FC<IBlockUserModalPost> = ({
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       blockUser(user.uuid!!);
-      onUserBlock();
+      closeModal();
     } catch (err) {
       console.error(err);
     }
