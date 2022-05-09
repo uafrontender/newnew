@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable arrow-body-style */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, createContext } from 'react';
 import { useRouter } from 'next/router';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
@@ -17,7 +17,11 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import assets from '../../constants/assets';
-import AuthLayoutContext from '../../contexts/authLayoutContext';
+
+export const AuthLayoutContext = createContext({
+  shouldHeroUnmount: false,
+  setShouldHeroUnmount: (newValue: boolean) => {},
+});
 
 const AuthLayoutContextProvider: React.FC = ({ children }) => {
   const [shouldHeroUnmount, setShouldHeroUnmount] = useState(false);

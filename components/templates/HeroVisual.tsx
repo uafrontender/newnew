@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 
 import useImageLoaded from '../../utils/hooks/useImageLoaded';
 import assets from '../../constants/assets';
-import AuthLayoutContext from '../../contexts/authLayoutContext';
+// Cyclic dependency
+import { AuthLayoutContext } from './AuthLayout';
 
 interface IHeroVisual {
   style?: React.CSSProperties;
