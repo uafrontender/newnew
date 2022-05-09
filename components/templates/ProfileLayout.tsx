@@ -331,7 +331,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     try {
       if (!currentUser.loggedIn) {
         router.push(
-          `/sign-up?reason=follow-creator&redirect=${window.location.href}`
+          `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
+            window.location.href
+          )}`
         );
       }
 

@@ -77,6 +77,8 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
   // need some case for banned users, etc.
   const [submitError, setSubmitError] = useState<string>('');
 
+  console.log(redirectURL);
+
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
     setSubmitError('');
@@ -87,7 +89,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
         ...(redirectURL
           ? {
-              redirectURL,
+              redirectURL: encodeURIComponent(redirectURL),
             }
           : {}),
       });
@@ -125,7 +127,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
     }
   }, [emailInput, setEmailInputValid]);
 
-  const redirectUrlParam = redirectURL ? `?redirect_url=${encodeURIComponent(redirectURL)}` : '';
+  const redirectUrlParam = redirectURL
+    ? `?redirect_url=${encodeURIComponent(redirectURL)}`
+    : '';
 
   return (
     <SSignupMenu
@@ -161,7 +165,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={GoogleIcon}
               hoverBgColor={theme.colorsThemed.social.google.hover}
               pressedBgColor={theme.colorsThemed.social.google.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google${redirectUrlParam}`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/google${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.google')}
             </SignInButton>
@@ -173,7 +181,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple${redirectUrlParam}`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/apple${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.apple')}
             </SignInButton>
@@ -185,7 +197,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)}
+              onClick={() =>
+                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
+              }
             >
               {t('signupOptions.facebook')}
             </SignInButton>
@@ -196,7 +210,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter${redirectUrlParam}`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.twitter')}
             </SignInButton>

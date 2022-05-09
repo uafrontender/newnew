@@ -114,7 +114,9 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
 
         if (!user.loggedIn) {
           router.push(
-            `/sign-up?reason=comment&redirect=${window.location.href}`
+            `/sign-up?reason=comment&redirect=${encodeURIComponent(
+              window.location.href
+            )}`
           );
         }
 

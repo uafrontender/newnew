@@ -376,7 +376,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       )}
       {!collectionBiggestError &&
       collectionBiggestInitialLoading &&
-      collectionBiggest.length > 0 ? (
+      collectionBiggest?.length > 0 ? (
         <CardsSection
           title={t('biggest-block-title')}
           category='biggest'

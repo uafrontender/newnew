@@ -100,6 +100,8 @@ const TwitterAuthRedirectPage: NextPage<ITwitterAuthRedirectPage> = ({
         setIsLoading(false);
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
+        } else if (data.me?.options?.isCreator) {
+          router.push('/dashboard');
         } else {
           router.push('/');
         }
