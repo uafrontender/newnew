@@ -770,6 +770,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
         {/* Payment success Modal */}
         {paymentSuccesModalOpen && (
           <PaymentSuccessModal
+            postType='ac'
             isVisible={paymentSuccesModalOpen}
             closeModal={() => setPaymentSuccesModalOpen(false)}
           >
