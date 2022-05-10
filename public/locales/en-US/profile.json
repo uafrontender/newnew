@@ -204,7 +204,6 @@
       "logout": "Log out"
     }
   },
-
   "MyPosts": {
     "no-content": {
       "description": "Posts you created will be shown here"
@@ -233,6 +232,16 @@
   "Favorites": {
     "no-content": {
       "description": "Any creators you favorite\nwill be shown here"
+    }
+  },
+  "CreatorsDecisions": {
+    "no-content": {
+      "description": "Posts from the creator will be shown here"
+    }
+  },
+  "Activity": {
+    "no-content": {
+      "description": "Any creators activity will be shown here"
     }
   }
 }

@@ -18,6 +18,8 @@ import PostList from '../../components/organisms/see-more/PostList';
 import Text from '../../components/atoms/Text';
 import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 interface IUserPageActivity {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -171,6 +173,13 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
                 }}
                 handlePostClicked={handleOpenPostModal}
               />
+            )}
+            {posts && posts.length === 0 && !isLoading && (
+              <NoContentCard>
+                <NoContentDescription>
+                  {t('Activity.no-content.description')}
+                </NoContentDescription>
+              </NoContentCard>
             )}
           </SCardsSection>
           <div ref={loadingRef} />

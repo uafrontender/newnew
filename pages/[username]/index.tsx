@@ -19,6 +19,8 @@ import InlineSvg from '../../components/atoms/InlineSVG';
 
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
 import Text from '../../components/atoms/Text';
+import NoContentCard from '../../components/atoms/profile/NoContentCard';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 interface IUserPageIndex {
   user: Omit<newnewapi.User, 'toJSON'>;
@@ -170,6 +172,13 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
                 }}
                 handlePostClicked={handleOpenPostModal}
               />
+            )}
+            {posts && posts.length === 0 && !isLoading && (
+              <NoContentCard>
+                <NoContentDescription>
+                  {t('CreatorsDecisions.no-content.description')}
+                </NoContentDescription>
+              </NoContentCard>
             )}
           </SCardsSection>
           <div ref={loadingRef} />
