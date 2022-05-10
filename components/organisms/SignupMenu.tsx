@@ -91,7 +91,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
         ...(redirectURL
           ? {
-              redirectURL: encodeURIComponent(redirectURL),
+              redirectUrl: redirectURL,
             }
           : {}),
       });
