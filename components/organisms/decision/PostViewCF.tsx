@@ -729,6 +729,7 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             renderBackersSection()
           ) : post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('backers')}
             />

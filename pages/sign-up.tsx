@@ -22,15 +22,17 @@ export const signupReasons = [
   'follow-decision',
   'follow-creator',
   'session_expired',
+  'report',
 ] as const;
 export type SignupReason = typeof signupReasons[number];
 
 interface ISignup {
   reason?: SignupReason;
   redirectURL?: string;
+  goal?: string;
 }
 
-const Signup: NextPage<ISignup> = ({ reason, redirectURL }) => {
+const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
   const { t } = useTranslation('sign-up');
 
   const router = useRouter();
@@ -64,6 +66,7 @@ const Signup: NextPage<ISignup> = ({ reason, redirectURL }) => {
         <meta name='description' content={t('meta.description')} />
       </Head>
       <SignupMenu
+        goal={goal ?? undefined}
         reason={reason ?? undefined}
         redirectURL={redirectURL ?? undefined}
       />
@@ -96,13 +99,14 @@ const Signup: NextPage<ISignup> = ({ reason, redirectURL }) => {
 export default Signup;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { reason, redirect } = context.query;
+  const { to, reason, redirect } = context.query;
   const translationContext = await serverSideTranslations(context.locale!!, [
     'sign-up',
     'verify-email',
   ]);
 
   const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';
+  const goal = to && !Array.isArray(to) ? to : '';
 
   if (
     reason &&
@@ -117,6 +121,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               redirectURL,
             }
           : {}),
+        ...(goal
+          ? {
+              goal,
+            }
+          : {}),
         ...translationContext,
       },
     };
@@ -127,6 +136,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       ...(redirectURL
         ? {
             redirectURL,
+          }
+        : {}),
+      ...(goal
+        ? {
+            goal,
           }
         : {}),
       ...translationContext,

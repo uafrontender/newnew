@@ -206,8 +206,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const handleReportOpen = useCallback(() => {
+    if (!user.loggedIn) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
     setReportPostOpen(true);
-  }, []);
+  }, [user, router]);
 
   const handleReportClose = useCallback(() => {
     setReportPostOpen(false);
@@ -238,7 +246,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       : undefined
   );
 
-  const { handleSetCommentIdFromUrl } = useContext(CommentFromUrlContext);
+  const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
+    useContext(CommentFromUrlContext);
 
   useEffect(() => {
     const commentId = isBrowser()
@@ -246,7 +255,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         new URL(window.location.href).searchParams.get('comment_id')
       : undefined;
 
+    const commentContent = isBrowser()
+      ? new URL(window.location.href).searchParams.get('?comment_content') ||
+        new URL(window.location.href).searchParams.get('comment_content')
+      : undefined;
+
     handleSetCommentIdFromUrl?.(commentId ?? '');
+    handleSetNewCommentContentFromUrl?.(commentContent ?? '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

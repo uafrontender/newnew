@@ -22,7 +22,7 @@ const Error: NextPage<IErrorPage> = ({ statusCode, errorMsg }) => {
     // Redirect to sign up page
     if (errorMsg === 'Refresh token invalid') {
       dispatch(
-        logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+        logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
       );
     }
   }, [errorMsg, dispatch]);

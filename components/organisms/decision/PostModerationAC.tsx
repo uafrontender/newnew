@@ -663,6 +663,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               canDeleteComments={post.creator?.uuid === user.userData?.userUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('bids')}
