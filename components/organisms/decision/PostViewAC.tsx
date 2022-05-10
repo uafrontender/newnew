@@ -704,6 +704,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             <AcOptionsTab
               postId={post.postUuid}
               postStatus={postStatus}
+              postText={post.title}
               postCreator={
                 (post.creator?.nickname as string) ?? post.creator?.username
               }

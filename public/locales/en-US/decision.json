@@ -270,7 +270,8 @@
   },
   "AcPost": {
     "paymentModalHeader": {
-      "subtitle": "You bid on"
+      "title": "{{ creator }}'s Event",
+      "subtitle": "Your bid"
     },
     "paymentModalFooter": {
       "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} chooses your bid."
@@ -338,10 +339,11 @@
       "votes": "votes"
     },
     "paymentModalHeader": {
-      "subtitle": "You vote for"
+      "title": "{{ creator }}'s Superpoll",
+      "subtitle": "Option you chose"
     },
     "paymentModalFooter": {
-      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if your vote wins."
+      "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if the option you chose gets the most votes."
     },
     "paymentModalPayButton": "Vote for",
     "OptionsTab": {
@@ -441,7 +443,7 @@
       }
     },
     "paymentModalHeader": {
-      "subtitle": "You pledge for"
+      "title": "{{ creator }}'s Goal"
     },
     "paymentModalFooter": {
       "body": "A temporary hold will be placed on your card. \nYou’ll only get charged if {{ creator }} reaches their goal."
