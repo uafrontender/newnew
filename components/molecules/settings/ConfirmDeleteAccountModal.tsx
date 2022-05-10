@@ -91,15 +91,32 @@ const SModal = styled.div`
 `;
 
 const SModalTitle = styled.strong`
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 700;
   margin-bottom: 16px;
   text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  ${({ theme }) => theme.media.desktop} {
+    font-size: 32px;
+    line-height: 40px;
+  }
 `;
 
 const SModalMessage = styled.p`
-  font-size: 16px;
-  margin-bottom: 24px;
+  font-size: 14px;
+  margin-bottom: 20px;
   text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
 `;
 
 const SModalButtons = styled.div`
@@ -117,15 +134,15 @@ const SCancelButton = styled(Button)`
   color: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colorsThemed.text.primary
-      : props.theme.colors.white};
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
+      : props.theme.colorsThemed.text.secondary};
+  background: ${(props) => props.theme.colorsThemed.background.secondary};
+
   &:hover {
     background: ${(props) =>
       props.theme.name === 'light'
-        ? props.theme.colors.dark
-        : props.theme.colorsThemed.background.quaternary};
+        ? `${props.theme.colors.dark} !important`
+        : `${props.theme.colorsThemed.background.quaternary} !important`};
     color: ${(props) => props.theme.colors.white};
-    background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }
 `;
 
@@ -134,7 +151,9 @@ const SConfirmButton = styled(Button)`
   line-height: 24px;
   font-size: 14px;
   background-color: ${(props) => props.theme.colorsThemed.accent.error};
+
   &:hover {
-    background-color: ${(props) => props.theme.colorsThemed.accent.error};
+    background-color: ${(props) =>
+      `${props.theme.colorsThemed.accent.error} !important`};
   }
 `;

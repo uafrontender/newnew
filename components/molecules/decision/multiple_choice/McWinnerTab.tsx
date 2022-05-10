@@ -17,7 +17,6 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import isBrowser from '../../../../utils/isBrowser';
 
-import WinnerIcon from '../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import { formatNumber } from '../../../../utils/format';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
@@ -26,6 +25,7 @@ import PostWaitingForResponseBox from '../PostWaitingForResponseBox';
 import { markPost } from '../../../../api/endpoints/post';
 import PostSuccessBox from '../PostSuccessBox';
 import getDisplayname from '../../../../utils/getDisplayname';
+import assets from '../../../../constants/assets';
 
 interface IMcWinnerTab {
   postId: string;
@@ -53,10 +53,10 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
     [user.loggedIn, option.creator?.uuid, user.userData?.userUuid]
   );
 
-  const isCreatorsBid = useMemo(() => {
-    if (!option.creator) return true;
-    return false;
-  }, [option.creator]);
+  const isCreatorsBid = useMemo(
+    () => option.creator?.uuid === postCreator.uuid,
+    [option.creator?.uuid, postCreator.uuid]
+  );
 
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);
@@ -186,7 +186,7 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
               </Link>
             </SOptionCreator>
           </SOptionDetails>
-          <STrophyImg src={WinnerIcon.src} />
+          <STrophyImg src={assets.decision.trophy} />
           {!isMobile && (
             <>
               <STrophyGlow />

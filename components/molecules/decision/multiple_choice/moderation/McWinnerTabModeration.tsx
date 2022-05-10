@@ -19,10 +19,10 @@ import Text from '../../../../atoms/Text';
 import isBrowser from '../../../../../utils/isBrowser';
 import { formatNumber } from '../../../../../utils/format';
 
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import getDisplayname from '../../../../../utils/getDisplayname';
+import assets from '../../../../../constants/assets';
 
 interface MAcWinnerTabModeration {
   postId: string;
@@ -39,10 +39,10 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
       resizeMode
     );
 
-    const isCreatorsBid = useMemo(() => {
-      if (!option.creator) return true;
-      return false;
-    }, [option.creator]);
+    const isCreatorsBid = useMemo(
+      () => option.creator?.uuid === postCreator.uuid,
+      [option.creator?.uuid, postCreator.uuid]
+    );
 
     const containerRef = useRef<HTMLDivElement>();
     const [isScrolledDown, setIsScrolledDown] = useState(false);
@@ -187,7 +187,7 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
                 </Link>
               </SOptionCreator>
             </SOptionDetails>
-            <STrophyImg src={WinnerIcon.src} />
+            <STrophyImg src={assets.decision.trophy} />
             {!isMobile && (
               <>
                 <STrophyGlow />

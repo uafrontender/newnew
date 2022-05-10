@@ -31,12 +31,10 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 // Icons
+import assets from '../../../constants/assets';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
-import MCIcon from '../../../public/images/creation/MC.webp';
-import ACIcon from '../../../public/images/creation/AC.webp';
-import CFIcon from '../../../public/images/creation/CF.webp';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
@@ -48,13 +46,11 @@ import switchPostStatusString from '../../../utils/switchPostStatusString';
 import CommentFromUrlContextProvider, {
   CommentFromUrlContext,
 } from '../../../contexts/commentFromUrlContext';
-import { FollowingsContext } from '../../../contexts/followingContext';
-import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
-import { ReportData } from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import { usePostModalState } from '../../../contexts/postModalContext';
+import { ReportData } from '../../molecules/chat/ReportModal';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -100,10 +96,10 @@ const PostSuccessAnimationBackground = dynamic(
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
-const images = {
-  ac: ACIcon.src,
-  mc: MCIcon.src,
-  cf: CFIcon.src,
+const IMAGES = {
+  ac: assets.creation.AcAnimated,
+  cf: assets.creation.CfAnimated,
+  mc: assets.creation.McAnimated,
 };
 
 interface IPostModal {
@@ -165,8 +161,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     [postStatus]
   );
 
-  // Local controls for wairting and success views
-  const { followingsIds, addId, removeId } = useContext(FollowingsContext);
+  // Local controls for waiting and success views
   const [isFollowingDecision, setIsFollowingDecision] = useState(
     !!postParsed?.isFavoritedByMe
   );
@@ -197,35 +192,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     }
   }, [postParsed, router, user.loggedIn]);
 
-  const handleToggleFollowingCreator = useCallback(async () => {
-    try {
-      if (!user.loggedIn) {
-        router.push(
-          `/sign-up?reason=follow-creator&redirect=${window.location.href}`
-        );
-      }
-
-      const payload = new newnewapi.MarkUserRequest({
-        userUuid: postParsed?.creator?.uuid,
-        markAs: followingsIds.includes(postParsed?.creator?.uuid as string)
-          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
-          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-      });
-
-      const res = await markUser(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (followingsIds.includes(postParsed?.creator?.uuid as string)) {
-        removeId(postParsed?.creator?.uuid as string);
-      } else {
-        addId(postParsed?.creator?.uuid as string);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [addId, followingsIds, postParsed, removeId, router, user.loggedIn]);
-
   const handleUpdatePostStatus = useCallback(
     (newStatus: number | string) => {
       let status;
@@ -240,8 +206,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const handleReportOpen = useCallback(() => {
+    if (!user.loggedIn) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
     setReportPostOpen(true);
-  }, []);
+  }, [user, router]);
 
   const handleReportClose = useCallback(() => {
     setReportPostOpen(false);
@@ -272,7 +246,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
       : undefined
   );
 
-  const { handleSetCommentIdFromUrl } = useContext(CommentFromUrlContext);
+  const { handleSetCommentIdFromUrl, handleSetNewCommentContentFromUrl } =
+    useContext(CommentFromUrlContext);
 
   useEffect(() => {
     const commentId = isBrowser()
@@ -280,7 +255,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
         new URL(window.location.href).searchParams.get('comment_id')
       : undefined;
 
+    const commentContent = isBrowser()
+      ? new URL(window.location.href).searchParams.get('?comment_content') ||
+        new URL(window.location.href).searchParams.get('comment_content')
+      : undefined;
+
     handleSetCommentIdFromUrl?.(commentId ?? '');
+    handleSetNewCommentContentFromUrl?.(commentContent ?? '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -841,13 +822,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             {!isMobile && (
               <PostEllipseMenu
                 postType={typeOfPost as string}
-                isFollowing={followingsIds.includes(
-                  postParsed?.creator?.uuid as string
-                )}
                 isFollowingDecision={isFollowingDecision}
                 isVisible={ellipseMenuOpen}
                 handleFollowDecision={handleFollowDecision}
-                handleToggleFollowingCreator={handleToggleFollowingCreator}
                 handleReportOpen={handleReportOpen}
                 onClose={handleEllipseMenuClose}
               />
@@ -855,14 +832,10 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
             {isMobile && ellipseMenuOpen ? (
               <PostEllipseModal
                 postType={typeOfPost as string}
-                isFollowing={followingsIds.includes(
-                  postParsed?.creator?.uuid as string
-                )}
                 isFollowingDecision={isFollowingDecision}
                 zIndex={11}
                 isOpen={ellipseMenuOpen}
                 handleFollowDecision={handleFollowDecision}
-                handleToggleFollowingCreator={handleToggleFollowingCreator}
                 handleReportOpen={handleReportOpen}
                 onClose={handleEllipseMenuClose}
               />
@@ -956,7 +929,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                imageSrc={images[typeOfPost]}
+                imageSrc={IMAGES[typeOfPost]}
                 buttonCaption={t('PostDeletedByMe.ctaButton')}
                 handleButtonClick={() => {
                   router.push('/creation');
@@ -981,7 +954,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 buttonCaption={t('PostDeleted.ctaButton', {
                   postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
                 })}
-                imageSrc={images[typeOfPost]}
+                imageSrc={IMAGES[typeOfPost]}
                 style={{
                   marginBottom: '24px',
                 }}

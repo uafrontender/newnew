@@ -110,9 +110,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
           postStatus={postStatus}
           creator={post.creator!!}
           hasWinner={false}
-          hasResponse={false}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-          startsAtSeconds={post.startsAt?.seconds as number}
           handleReportOpen={handleReportOpen}
         />
         <SActivitesContainer />

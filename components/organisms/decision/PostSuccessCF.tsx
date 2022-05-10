@@ -18,9 +18,9 @@ import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import BoxIcon from '../../../public/images/creation/CF.webp';
 import { formatNumber } from '../../../utils/format';
 import { fetchPledges } from '../../../api/endpoints/crowdfunding';
+import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 
 const CommentsSuccess = dynamic(
@@ -227,7 +227,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
           />
           <SActivitesContainer>
             <>
-              <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
+              <DecisionEndedBox type='mc' imgSrc={assets.creation.CfAnimated}>
                 {t('CfPostSuccess.hero_text')}
               </DecisionEndedBox>
               <SMainSectionWrapper>
@@ -317,6 +317,7 @@ const PostSuccessCF: React.FunctionComponent<IPostSuccessCF> = React.memo(
               {t('SuccessCommon.Comments.heading')}
             </SCommentsHeadline>
             <CommentsSuccess
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => {}}
             />

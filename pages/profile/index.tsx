@@ -5,7 +5,6 @@ import { useInView } from 'react-intersection-observer';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 
@@ -13,14 +12,8 @@ import { NextPageWithLayout } from '../_app';
 import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import Button from '../../components/atoms/Button';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
-import HowItWorksDarkHoldFrameIcon from '../../public/images/profile/How-it-Works-Dark-Hold-Frame.png';
-import {
-  NoContentDescription,
-  NoContentTitle,
-} from '../../components/atoms/profile/NoContentCommonElements';
+import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -68,7 +61,6 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   const [isLoading, setIsLoading] = useState(false);
   const { ref: loadingRef, inView } = useInView();
   const { t } = useTranslation('profile');
-  const router = useRouter();
   const [triedLoading, setTriedLoading] = useState(false);
 
   const handleOpenPostModal = (post: newnewapi.IPost) => {
@@ -150,7 +142,6 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   return (
     <div>
       <SMain>
-        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
           {posts && posts.length > 0 && (
             <PostList
@@ -164,23 +155,10 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
             />
           )}
           {posts && posts.length === 0 && !isLoading && (
-            <NoContentCard
-              graphics={<SImage src={HowItWorksDarkHoldFrameIcon.src} />}
-            >
-              <NoContentTitle>{t('Active.no-content.title')}</NoContentTitle>
+            <NoContentCard>
               <NoContentDescription>
                 {t('Active.no-content.description')}
               </NoContentDescription>
-              <Button
-                withShadow
-                view='primaryGrad'
-                onClick={() => {
-                  router.push('/');
-                }}
-                style={{ width: 'fit-content' }}
-              >
-                {t('Active.no-content.button')}
-              </Button>
             </NoContentCard>
           )}
         </SCardsSection>
@@ -294,16 +272,5 @@ const SCardsSection = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     margin-right: -32px !important;
-  }
-`;
-
-const SImage = styled.img`
-  object-fit: contain;
-  width: 282px;
-  height: 193px;
-
-  ${({ theme }) => theme.media.laptop} {
-    width: 330px;
-    height: 226px;
   }
 `;

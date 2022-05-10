@@ -200,7 +200,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
         ) : (
           <>
             <SItemWithMargin>
-              <Link href='/sign-up'>
+              <Link href='/sign-up?to=log-in'>
                 <a>
                   <Button view='quaternary'>{t('button-login-in')}</Button>
                 </a>

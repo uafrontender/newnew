@@ -10,8 +10,7 @@ import Text from '../../../atoms/Text';
 import Headline from '../../../atoms/Headline';
 
 import { formatNumber } from '../../../../utils/format';
-
-import WinnerIcon from '../../../../public/images/decision/ac-select-winner-trophy-mock.png';
+import assets from '../../../../constants/assets';
 
 interface ICfCrowdfundingSuccess {
   post: newnewapi.Crowdfunding;
@@ -31,7 +30,7 @@ const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> =
         {!isMobile ? (
           <>
             <SProgressRingContainer>
-              <STrophyImg src={WinnerIcon.src} />
+              <STrophyImg src={assets.decision.trophy} />
               <STrophyGlow />
             </SProgressRingContainer>
           </>
@@ -58,7 +57,7 @@ const CfCrowdfundingSuccess: React.FunctionComponent<ICfCrowdfundingSuccess> =
             </SNumBidders>
             <SHeadline variant={4}>{post.title}</SHeadline>
           </SOptionDetails>
-          {isMobile && <STrophyImgCard src={WinnerIcon.src} />}
+          {isMobile && <STrophyImgCard src={assets.decision.trophy} />}
         </SWinnerCard>
       </SSectionContainer>
     );

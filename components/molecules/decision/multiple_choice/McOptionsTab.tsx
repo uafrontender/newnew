@@ -36,7 +36,7 @@ import Button from '../../../atoms/Button';
 import McOptionCard from './McOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 // import VotesAmountTextInput from '../../../atoms/decision/VotesAmountTextInput';
-import PaymentModal from '../../checkout/PaymentModal';
+import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import LoadingModal from '../../LoadingModal';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
@@ -50,6 +50,8 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import Headline from '../../../atoms/Headline';
+import McSymbolIcon from '../../../../public/images/decision/mc-option.png';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -472,6 +474,8 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               key={option.id.toString()}
               option={option as TMcOptionWithHighestField}
               creator={option.creator ?? post.creator!!}
+              postCreator={postCreator}
+              postText={post.title}
               postId={post.postUuid}
               index={i}
               minAmount={minAmount}
@@ -479,6 +483,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               optionBeingSupported={optionBeingSupported}
               votingAllowed={postStatus === 'voting'}
               canVoteForFree={canVoteForFree}
+              isCreatorsBid={
+                !option.creator || option.creator?.uuid === post.creator?.uuid
+              }
               handleResetFreeVote={handleResetFreeVote}
               noAction={
                 (hasVotedOptionId !== undefined &&
@@ -654,7 +661,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           //       }
           //     : {}),
           // }}
-          predefinedOption='card'
+          // predefinedOption='card'
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
           // handlePayWithWallet={handlePayWithWallet}
@@ -663,13 +670,28 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               {t('McPost.paymentModalFooter.body')}
             </SPaymentFooter>
           }
-          payButtonCaptionKey={t('McPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
+            <SPaymentModalHeading>
+              <SPaymentModalHeadingPostSymbol>
+                <SPaymentModalHeadingPostSymbolImg src={McSymbolIcon.src} />
+              </SPaymentModalHeadingPostSymbol>
+              <SPaymentModalHeadingPostCreator variant={3}>
+                {t('McPost.paymentModalHeader.title', {
+                  creator: postCreator,
+                })}
+              </SPaymentModalHeadingPostCreator>
+            </SPaymentModalHeading>
+            <SPaymentModalPostText variant={2}>
+              {post.title}
+            </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('McPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>{newOptionText}</SPaymentModalOptionText>
+            <SPaymentModalOptionText variant={5}>
+              {newOptionText}
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}
@@ -947,20 +969,58 @@ const SSubscribeButton = styled(Button)`
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
 
+const SPaymentModalHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 16px;
+
+  padding-right: 64px;
+  margin-bottom: 24px;
+`;
+
+const SPaymentModalHeadingPostSymbol = styled.div`
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+`;
+
+const SPaymentModalHeadingPostSymbolImg = styled.img`
+  width: 24px;
+`;
+
+const SPaymentModalHeadingPostCreator = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const SPaymentModalPostText = styled(Text)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 24px;
+`;
+
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   margin-bottom: 6px;
 `;
 
-const SPaymentModalOptionText = styled.div`
+const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
 `;
-
-// const SPlaceABidButton = styled(Button)`
-//   min-width: 123px;
-// `;
 
 const STutorialTooltipHolder = styled.div`
   position: absolute;

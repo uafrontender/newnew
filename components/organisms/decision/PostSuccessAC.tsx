@@ -19,9 +19,9 @@ import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 import DecisionEndedBox from '../../molecules/decision/success/DecisionEndedBox';
 
-import BoxIcon from '../../../public/images/creation/AC.webp';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
+import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 
 const AcSuccessOptionsTab = dynamic(
@@ -176,7 +176,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
           <SActivitesContainer>
             {openedMainSection === 'main' ? (
               <>
-                <DecisionEndedBox imgSrc={BoxIcon.src}>
+                <DecisionEndedBox imgSrc={assets.creation.AcAnimated}>
                   {t('AcPostSuccess.hero_text')}
                 </DecisionEndedBox>
                 <SMainSectionWrapper>
@@ -296,6 +296,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
               {t('SuccessCommon.Comments.heading')}
             </SCommentsHeadline>
             <CommentsSuccess
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => {}}
             />
