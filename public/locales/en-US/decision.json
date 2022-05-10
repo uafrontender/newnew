@@ -108,8 +108,6 @@
     "ctaButton": "See more"
   },
   "ellipse": {
-    "follow-creator": "Follow creator",
-    "unfollow-creator": "Unfollow creator",
     "follow-decision": "Follow {{ postType }}",
     "unfollow-decision": "Unfollow {{ postType }}",
     "report": "Report",

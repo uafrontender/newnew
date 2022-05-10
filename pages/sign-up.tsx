@@ -8,7 +8,6 @@ import { useRouter } from 'next/dist/client/router';
 import { motion } from 'framer-motion';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
@@ -34,7 +33,6 @@ interface ISignup {
 const Signup: NextPage<ISignup> = ({ reason, redirectURL }) => {
   const { t } = useTranslation('sign-up');
 
-  const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
   // Redirect if the user is logged in

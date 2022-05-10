@@ -10,10 +10,8 @@ import Text from '../../atoms/Text';
 interface IPostEllipseMenu {
   postType: string;
   isVisible: boolean;
-  isFollowing: boolean;
   isFollowingDecision: boolean;
   handleFollowDecision: () => void;
-  handleToggleFollowingCreator: () => void;
   handleReportOpen: () => void;
   onClose: () => void;
 }
@@ -22,10 +20,8 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
   ({
     postType,
     isVisible,
-    isFollowing,
     isFollowingDecision,
     handleFollowDecision,
-    handleToggleFollowingCreator,
     handleReportOpen,
     onClose,
   }) => {
@@ -46,18 +42,6 @@ const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <SButton
-              onClick={() => handleToggleFollowingCreator()}
-              style={{
-                marginBottom: '16px',
-              }}
-            >
-              <Text variant={3}>
-                {!isFollowing
-                  ? t('ellipse.follow-creator')
-                  : t('ellipse.unfollow-creator')}
-              </Text>
-            </SButton>
             <SButton onClick={() => handleFollowDecision()}>
               <Text variant={3}>
                 {!isFollowingDecision
