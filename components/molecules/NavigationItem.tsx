@@ -1,12 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
-import styled from 'styled-components';
-import { useRouter } from 'next/router';
+import styled, { useTheme } from 'styled-components';
 // import { useCookies } from 'react-cookie';
-import { useTranslation } from 'next-i18next';
 
-import Text from '../atoms/Text';
 import Indicator from '../atoms/Indicator';
+import InlineSVG from '../atoms/InlineSVG';
+import Button from '../atoms/Button';
+import iconNotifications from '../../public/images/svg/icons/outlined/Notifications.svg';
+import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
+
+const icons: any = {
+  notifications: iconNotifications,
+  directMessages: iconDirectMessages,
+};
 
 export type TNavigationItem = {
   key: string;
@@ -22,11 +28,9 @@ export interface INavigationItem {
 
 export const NavigationItem: React.FC<INavigationItem> = (props) => {
   const { item } = props;
-  const { t } = useTranslation();
-  const router = useRouter();
+  const theme = useTheme();
   // const [cookies, setCookie] = useCookies();
 
-  const active = item.url === router.route;
   // const cookieKey = `${item.key}-${item.counter}`;
 
   // const handleAnimationEnd = () => {
@@ -44,14 +48,15 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
   return (
     <Link href={item.url}>
       <a>
-        <SNavItem variant={3} weight={600}>
-          <div className='navText' style={{ opacity: active ? 1 : 0.5 }}>
-            {t(`mobile-top-navigation-${item.key}`, {
-              value: item.value,
-            })}
-          </div>
+        <SNavItem iconOnly view='tertiary'>
+          <InlineSVG
+            fill={theme.colorsThemed.text.primary}
+            svg={icons[item.key]}
+            width='24px'
+            height='24px'
+          />
           {!!item.counter && (
-            <SIndicatorContainer bigCounter={item.counter > 9}>
+            <SIndicatorContainer>
               <Indicator counter={item.counter} animate={false} />
             </SIndicatorContainer>
           )}
@@ -63,36 +68,14 @@ export const NavigationItem: React.FC<INavigationItem> = (props) => {
 
 export default NavigationItem;
 
-const SNavItem = styled(Text)`
-  display: flex;
-  padding: 12px;
-  align-items: center;
-  flex-direction: row;
-
-  &:hover {
-    .navText {
-      opacity: 1;
-    }
-  }
-
-  .navText {
-    color: ${(props) => props.theme.colorsThemed.text.primary};
-    opacity: 0.5;
-    transition: opacity ease 0.5s;
-  }
-  ${(props) => props.theme.media.tablet} {
-    padding: 12px 6px;
-  }
-
-  ${(props) => props.theme.media.laptop} {
-    padding: 12px;
-  }
+const SNavItem = styled(Button)`
+  position: relative;
+  overflow: visible;
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 `;
 
-interface ISIndicatorContainer {
-  bigCounter: boolean;
-}
-
-const SIndicatorContainer = styled.div<ISIndicatorContainer>`
-  margin-left: ${(props) => (props.bigCounter ? '6px' : '10px')};
+const SIndicatorContainer = styled.div`
+  position: absolute;
+  right: -5px;
+  top: -3px;
 `;

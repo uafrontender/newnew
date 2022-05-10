@@ -15,6 +15,8 @@ import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 import ChatIconFilled from '../../public/images/svg/icons/filled/Chat.svg';
 import ShareIcon from '../../public/images/svg/icons/filled/Share.svg';
 import ShareMenu from './ShareMenu';
+import { useAppSelector } from '../../redux-store/store';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 
 interface IMoreMenuMobile {
   isVisible: boolean;
@@ -29,11 +31,11 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
   const router = useRouter();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
-
+  const user = useAppSelector((state) => state.user);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
-
+  const { creatorsImSubscribedTo } = useGetSubscriptions();
   const { unreadCount } = useGetChats();
 
   useOnClickEsc(containerRef, handleClose);
@@ -56,33 +58,36 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         >
           {!shareMenuOpen ? (
             <>
-              <SButton
-                onClick={() =>
-                  router.route.includes('direct-messages')
-                    ? handleClose()
-                    : handleClick('/direct-messages')
-                }
-              >
-                {unreadCount && unreadCount > 0 ? (
-                  <Indicator counter={unreadCount} animate={false} />
-                ) : null}
-                <SText
-                  variant={2}
-                  active={router.route.includes('direct-messages')}
-                >
-                  {t('mobile-bottom-navigation-dms')}
-                </SText>
-                <InlineSvg
-                  svg={ChatIconFilled}
-                  fill={
+              {(user.userData?.options?.isCreator ||
+                creatorsImSubscribedTo.length > 0) && (
+                <SButton
+                  onClick={() =>
                     router.route.includes('direct-messages')
-                      ? theme.colorsThemed.accent.blue
-                      : theme.colorsThemed.text.tertiary
+                      ? handleClose()
+                      : handleClick('/direct-messages')
                   }
-                  width='24px'
-                  height='24px'
-                />
-              </SButton>
+                >
+                  {unreadCount && unreadCount > 0 ? (
+                    <Indicator counter={unreadCount} animate={false} />
+                  ) : null}
+                  <SText
+                    variant={2}
+                    active={router.route.includes('direct-messages')}
+                  >
+                    {t('mobile-bottom-navigation-dms')}
+                  </SText>
+                  <InlineSvg
+                    svg={ChatIconFilled}
+                    fill={
+                      router.route.includes('direct-messages')
+                        ? theme.colorsThemed.accent.blue
+                        : theme.colorsThemed.text.tertiary
+                    }
+                    width='24px'
+                    height='24px'
+                  />
+                </SButton>
+              )}
               <SButton onClick={handleShareMenuClick}>
                 <SText variant={2} active={router.route.includes('share')}>
                   {t('mobile-bottom-navigation-share')}
