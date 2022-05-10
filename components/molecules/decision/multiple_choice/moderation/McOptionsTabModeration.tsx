@@ -81,6 +81,8 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 />
               </>
             ) : null}
+            {/* Seems like every option has a creator now. */}
+            {/* TODO: confirm, update types, remove unnecessary parameter 'creator'. */}
             {options.map((option, i) => (
               <McOptionCardModeration
                 index={i}
@@ -88,7 +90,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 canBeDeleted={options.length > 2}
-                postId={post.postUuid}
+                isCreatorsBid={option.creator?.uuid === post.creator?.uuid}
               />
             ))}
             {!isMobile ? (
