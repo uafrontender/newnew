@@ -11,9 +11,9 @@ import Headline from '../../../../atoms/Headline';
 
 import { formatNumber } from '../../../../../utils/format';
 
-import WinnerIcon from '../../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
+import assets from '../../../../../constants/assets';
 
 interface ICfCrowdfundingSuccessModeration {
   post: newnewapi.Crowdfunding;
@@ -88,7 +88,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
                     />
                   </SProgressRingSvg>
                 ) : null}
-                <STrophyImg src={WinnerIcon.src} />
+                <STrophyImg src={assets.decision.trophy} />
                 <STrophyGlow />
               </SProgressRingContainer>
             </>
@@ -132,7 +132,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
               )}
             </SDetailsHeadline>
           </SOptionDetails>
-          {isMobile && <STrophyImgCard src={WinnerIcon.src} />}
+          {isMobile && <STrophyImgCard src={assets.decision.trophy} />}
         </SWinnerCard>
         {postStatus === 'succeeded' ? (
           <PostSuccessBoxModeration

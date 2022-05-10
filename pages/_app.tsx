@@ -43,37 +43,11 @@ import AppConstantsContextProvider from '../contexts/appConstantsContext';
 import VideoProcessingWrapper from '../contexts/videoProcessingWrapper';
 
 // Images to be prefetched
-// Sign in
-import SignInIntro from '../public/images/signup/hero-visual/Dark/sign-in-intro-fade.webp';
-import SignInHold from '../public/images/signup/hero-visual/Dark/Sign-In-Hold-Frame.png';
-import SignInOutro from '../public/images/signup/hero-visual/Dark/sign-in-outro.webp';
-import SignInIntroLight from '../public/images/signup/hero-visual/Light/sign-in-intro-fade-light.webp';
-import SignInHoldLight from '../public/images/signup/hero-visual/Light/Sign-In-Hold-Frame-Light.png';
-import SignInOutroLight from '../public/images/signup/hero-visual/Light/sign-in-outro-light.webp';
-// Email verification
-import BottomGlassSphereImage from '../public/images/signup/floating-assets/Bottom-Glass-Sphere.png';
-import BottomSphereImage from '../public/images/signup/floating-assets/Bottom-Sphere.png';
-import CrowdfundingImage from '../public/images/signup/floating-assets/Crowdfunding.png';
-import LeftGlassSphereImage from '../public/images/signup/floating-assets/Left-Glass-Sphere.png';
-import BulbImage from '../public/images/signup/floating-assets/Sub-MC.webp';
-import ChoiceImage from '../public/images/signup/floating-assets/Multiple-Choice.png';
-import RightGlassSphereImage from '../public/images/signup/floating-assets/Right-Glass-Sphere.png';
-import TopGlassSphereImage from '../public/images/signup/floating-assets/Top-Glass-Sphere.png';
-import TopMiddleSphereImage from '../public/images/signup/floating-assets/Top-Middle-Sphere.png';
-import VotesImage from '../public/images/signup/floating-assets/Votes.png';
-// Posts
-import acImage from '../public/images/creation/AC.webp';
-import mcImage from '../public/images/creation/MC.webp';
-import cfImage from '../public/images/creation/CF.webp';
-import acImageStatic from '../public/images/creation/AC-static.png';
-import mcImageStatic from '../public/images/creation/MC-static.png';
-import cfImageStatic from '../public/images/creation/CF-static.png';
+import assets from '../constants/assets';
+
 // Landing
-import HeroDarkPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Dark.webp';
-import HeroLightPlaceholder from '../public/images/home/Landing-Page-Hold-Frame-Light.webp';
-import HeroDarkMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Dark-Hold-Frame.webp';
-import HeroLightMobilePlaceholder from '../public/images/home/Landing-Page-Mobile-Light-Hold-Frame.webp';
 import PostModalContextProvider from '../contexts/postModalContext';
+import getColorMode from '../utils/getColorMode';
 import { NotificationsProvider } from '../contexts/notificationsContext';
 
 // interface for shared layouts
@@ -91,13 +65,14 @@ const MyApp = (props: IMyApp): ReactElement => {
   const store = useStore();
 
   // Pre-fetch images after all loading for initial page is done
-  const [preFetchImages, setPreFetchImages] = useState(false);
+  const [preFetchImages, setPreFetchImages] = useState<string>('');
   const PRE_FETCHING_DELAY = 2500;
   useEffect(() => {
     setTimeout(() => {
-      setPreFetchImages(true);
+      const currentTheme = getColorMode(store.getState()?.ui?.colorMode);
+      setPreFetchImages(currentTheme);
     }, PRE_FETCHING_DELAY);
-  }, []);
+  }, [store]);
 
   useEffect(() => {
     const hotjarIdVariable = process.env.NEXT_PUBLIC_HOTJAR_ID;
@@ -149,7 +124,9 @@ const MyApp = (props: IMyApp): ReactElement => {
           name='viewport'
           content='width=device-width, initial-scale=1, user-scalable=no'
         />
-        {preFetchImages && PRE_FETCH_LINKS}
+        {preFetchImages !== '' && PRE_FETCH_LINKS_COMMON}
+        {preFetchImages === 'dark' && PRE_FETCH_LINKS_DARK}
+        {preFetchImages === 'light' && PRE_FETCH_LINKS_LIGHT}
       </Head>
       <CookiesProvider cookies={cookiesInstance}>
         <AppConstantsContextProvider>
@@ -221,190 +198,145 @@ MyAppWithTranslationAndRedux.getInitialProps = async (appContext: any) => {
 
 export default MyAppWithTranslationAndRedux;
 
-const PRE_FETCH_LINKS = (
+// Preload assets
+const PRE_FETCH_LINKS_COMMON = (
   <>
-    {/* Preload assets */}
-    {/* Sign up screen hero */}
-    {/* Dark */}
-    <link
-      rel='prefetch'
-      href={SignInHold.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInIntro.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInOutro.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    {/* Light */}
-    <link
-      rel='prefetch'
-      href={SignInHoldLight.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInIntroLight.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
-    <link
-      rel='prefetch'
-      href={SignInOutroLight.src}
-      as='image'
-      crossOrigin='anonymous'
-      media='(min-width: 760px)'
-    />
     {/* Email verification screen */}
+    {/* Sign up screen hero */}
     <link
       rel='prefetch'
-      href={BottomGlassSphereImage.src}
+      href={assets.floatingAssets.bottomGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={BottomSphereImage.src}
+      href={assets.floatingAssets.bottomSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={CrowdfundingImage.src}
+      href={assets.floatingAssets.crowdfunding}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={LeftGlassSphereImage.src}
+      href={assets.floatingAssets.leftGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={BulbImage.src}
+      href={assets.floatingAssets.subMC}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={ChoiceImage.src}
+      href={assets.floatingAssets.multipleChoice}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={RightGlassSphereImage.src}
+      href={assets.floatingAssets.rightGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={TopGlassSphereImage.src}
+      href={assets.floatingAssets.topGlassSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={TopMiddleSphereImage.src}
+      href={assets.floatingAssets.topMiddleSphere}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={VotesImage.src}
+      href={assets.floatingAssets.votes}
       as='image'
-      crossOrigin='anonymous'
       media='(min-width: 760px)'
-    />
-    {/* Landing page */}
-    {/* NB! Video is not supported, so preload placeholders */}
-    {/* Dark */}
-    {/* <link rel="preload" href="/images/home/Landing-Page-Dark.mp4" as="video" crossOrigin="anonymous" /> */}
-    <link
-      rel='prefetch'
-      href={HeroDarkPlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={HeroLightPlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    {/* Light */}
-    <link
-      rel='prefetch'
-      href={HeroDarkMobilePlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
-    />
-    <link
-      rel='prefetch'
-      href={HeroLightMobilePlaceholder.src}
-      as='image'
-      crossOrigin='anonymous'
     />
     {/* Creation screen */}
+    <link rel='prefetch' href={assets.creation.AcAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.McAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.CfAnimated} as='image' />
+    <link rel='prefetch' href={assets.creation.AcStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.McStatic} as='image' />
+    <link rel='prefetch' href={assets.creation.CfStatic} as='image' />
+  </>
+);
+
+const PRE_FETCH_LINKS_DARK = (
+  <>
     <link
       rel='prefetch'
-      href={acImage.src}
+      href={assets.signup.darkStatic}
       as='image'
-      crossOrigin='anonymous'
+      media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={mcImage.src}
+      href={assets.signup.darkInto}
       as='image'
-      crossOrigin='anonymous'
+      media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={cfImage.src}
+      href={assets.signup.darkOutro}
       as='image'
-      crossOrigin='anonymous'
+      media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={acImageStatic.src}
+      href={assets.home.darkLandingStatic}
       as='image'
-      crossOrigin='anonymous'
+      media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={mcImageStatic.src}
+      href={assets.home.darkMobileLandingStatic}
       as='image'
-      crossOrigin='anonymous'
+    />
+  </>
+);
+
+const PRE_FETCH_LINKS_LIGHT = (
+  <>
+    <link
+      rel='prefetch'
+      href={assets.signup.lightStatic}
+      as='image'
+      media='(min-width: 760px)'
     />
     <link
       rel='prefetch'
-      href={cfImageStatic.src}
+      href={assets.signup.lightInto}
       as='image'
-      crossOrigin='anonymous'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={assets.signup.lightOutro}
+      as='image'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={assets.home.lightLandingStatic}
+      as='image'
+      media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={assets.home.lightMobileLandingStatic}
+      as='image'
     />
   </>
 );

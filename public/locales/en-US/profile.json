@@ -205,35 +205,34 @@
     }
   },
 
-  "Active": {
-    "no-content": {
-      "title": "Still noone decisions?",
-      "description": "Still didn’t make any decision? Let’s discover some decision you want to support!",
-      "button": "Make some decisions"
-    }
-  },
   "MyPosts": {
     "no-content": {
-      "title": "Still noone decisions?",
-      "description": "Still didn’t create any decision? Let’s discover what you can create!",
-      "button": "Create some decisions"
+      "description": "Posts you created will be shown here"
     }
   },
-  "Subscriptions": {
+  "Active": {
     "no-content": {
-      "title": "You’re not subscribed to any creators",
-      "description": "By subscribing to creators you will be able to",
-      "instruction1": "Direct message you",
-      "instruction2": "Get a free vote on your Superpolls",
-      "instruction3": "Add custom suggestions to your Superpolls",
-      "button": "Find creators"
+      "description": "Posts you’re actively bidding on, voting\non, or backing will be shown here"
     }
   },
   "Purchases": {
     "no-content": {
-      "title": "Title of placeholder",
-      "description": "Still didn’t make any decision? Let’s discover some decision you want to support!",
-      "button": "Button title"
+      "description": "Any purchases you make\nwill be shown here"
+    }
+  },
+  "Viewing-history": {
+    "no-content": {
+      "description": "All posts you previewed\nwill be kept here in your history"
+    }
+  },
+  "Subscriptions": {
+    "no-content": {
+      "description": "You’re not subscribed\nto any creators yet"
+    }
+  },
+  "Favorites": {
+    "no-content": {
+      "description": "Any creators you favorite\nwill be shown here"
     }
   }
 }

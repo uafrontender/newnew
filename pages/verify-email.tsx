@@ -9,9 +9,10 @@ import { motion } from 'framer-motion';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { NextPageWithLayout } from './_app';
-import AuthLayout from '../components/templates/AuthLayout';
+import AuthLayout, {
+  AuthLayoutContext,
+} from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
-import AuthLayoutContext from '../contexts/authLayoutContext';
 
 interface IVerifyEmail {}
 

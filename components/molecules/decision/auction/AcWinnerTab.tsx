@@ -16,7 +16,6 @@ import { useAppSelector } from '../../../../redux-store/store';
 
 import isBrowser from '../../../../utils/isBrowser';
 
-import WinnerIcon from '../../../../public/images/decision/ac-select-winner-trophy-mock.png';
 import { formatNumber } from '../../../../utils/format';
 import Headline from '../../../atoms/Headline';
 import Text from '../../../atoms/Text';
@@ -24,6 +23,7 @@ import { TPostStatusStringified } from '../../../../utils/switchPostStatus';
 import PostWaitingForResponseBox from '../PostWaitingForResponseBox';
 import { markPost } from '../../../../api/endpoints/post';
 import PostSuccessBox from '../PostSuccessBox';
+import assets from '../../../../constants/assets';
 
 interface IAcWinnerTab {
   postId: string;
@@ -169,7 +169,7 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
             </SOptionCreator>
             <SHeadline variant={4}>{option.title}</SHeadline>
           </SOptionDetails>
-          <STrophyImg src={WinnerIcon.src} />
+          <STrophyImg src={assets.decision.trophy} />
           {!isMobile && (
             <>
               <STrophyGlow />
