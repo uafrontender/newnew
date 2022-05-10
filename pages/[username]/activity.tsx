@@ -15,7 +15,6 @@ import { fetchUsersPosts } from '../../api/endpoints/post';
 import PostModal from '../../components/organisms/decision/PostModal';
 import PostList from '../../components/organisms/see-more/PostList';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import Text from '../../components/atoms/Text';
 import InlineSvg from '../../components/atoms/InlineSVG';
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
@@ -161,7 +160,6 @@ const UserPageActivity: NextPage<IUserPageActivity> = ({
         </SMain>
       ) : (
         <SMain>
-          <PostsFilterSection numDecisions={totalCount} />
           <SCardsSection>
             {posts && (
               <PostList

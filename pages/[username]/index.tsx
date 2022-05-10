@@ -15,7 +15,6 @@ import { fetchUsersPosts } from '../../api/endpoints/post';
 
 import PostModal from '../../components/organisms/decision/PostModal';
 import PostList from '../../components/organisms/see-more/PostList';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import InlineSvg from '../../components/atoms/InlineSVG';
 
 import LockIcon from '../../public/images/svg/icons/filled/Lock.svg';
@@ -160,7 +159,6 @@ const UserPageIndex: NextPage<IUserPageIndex> = ({
         </SMain>
       ) : (
         <SMain>
-          <PostsFilterSection numDecisions={totalCount} />
           <SCardsSection>
             {posts && (
               <PostList
