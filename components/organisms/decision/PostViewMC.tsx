@@ -713,6 +713,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('options')}
             />

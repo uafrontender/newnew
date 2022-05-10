@@ -37,12 +37,14 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 
 interface ICommentsSuccess {
+  postUuid: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
   handleGoBack: () => void;
 }
 
 const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
+  postUuid,
   canDeleteComments,
   commentsRoomId,
   handleGoBack,
@@ -479,6 +481,8 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
           }}
         >
           <CommentForm
+            isRoot
+            postUuid={postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
