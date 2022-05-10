@@ -16,7 +16,9 @@ import Text from '../../atoms/Text';
 import { useAppSelector } from '../../../redux-store/store';
 import { subscribeToCreator } from '../../../api/endpoints/subscription';
 
-const PaymentModal = dynamic(() => import('../checkout/PaymentModal'));
+const PaymentModal = dynamic(
+  () => import('../checkout/PaymentModalRedirectOnly')
+);
 
 interface ISubscriptionExpired {
   user: newnewapi.IUser;
@@ -76,7 +78,7 @@ const SubscriptionExpired: React.FC<ISubscriptionExpired> = React.memo(
         </SBottomActionButton>
 
         <PaymentModal
-          predefinedOption='card'
+          // predefinedOption='card'
           isOpen={paymentModalOpen}
           zIndex={10}
           showTocApply
