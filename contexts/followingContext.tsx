@@ -71,7 +71,7 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
           dispatch(
-            logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }
