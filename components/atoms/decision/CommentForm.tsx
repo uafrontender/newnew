@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -13,6 +19,7 @@ import CommentTextArea from './CommentTextArea';
 
 import sendIcon from '../../../public/images/svg/icons/filled/Send.svg';
 import { validateText } from '../../../api/endpoints/infrastructure';
+import { CommentFromUrlContext } from '../../../contexts/commentFromUrlContext';
 
 const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
   let errorMsg = 'generic';
@@ -43,14 +50,16 @@ const errorSwitch = (status: newnewapi.ValidateTextResponse.Status) => {
 };
 
 interface ICommentForm {
+  postUuid?: string;
   position?: string;
   zIndex?: number;
+  isRoot?: boolean;
   onBlur?: () => void;
   onSubmit: (text: string) => void;
 }
 
 const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
-  ({ position, zIndex, onBlur, onSubmit }, ref) => {
+  ({ postUuid, position, zIndex, isRoot, onBlur, onSubmit }, ref) => {
     const theme = useTheme();
     const router = useRouter();
     const { t } = useTranslation('decision');
@@ -59,6 +68,10 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    // Comment content from URL
+    const { newCommentContentFromUrl, handleResetNewCommentContentFromUrl } =
+      useContext(CommentFromUrlContext);
 
     const [focusedInput, setFocusedInput] = useState<boolean>(false);
 
@@ -113,22 +126,46 @@ const CommentForm = React.forwardRef<HTMLFormElement, ICommentForm>(
         if (isAPIValidateLoading) return;
 
         if (!user.loggedIn) {
-          router.push(
-            `/sign-up?reason=comment&redirect=${window.location.href}`
-          );
+          if (!isRoot) {
+            router.push(
+              `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                window.location.href
+              )}`
+            );
+          } else {
+            router.push(
+              `/sign-up?reason=comment&redirect=${encodeURIComponent(
+                `${process.env.NEXT_PUBLIC_APP_URL}/${
+                  router.locale !== 'en-US' ? `${router.locale}/` : ''
+                }post/${postUuid}?comment_content=${commentText}#comments`
+              )}`
+            );
+          }
+
+          return;
         }
 
         await onSubmit(commentText);
         setCommentText('');
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [commentText, user.loggedIn, isAPIValidateLoading, onSubmit]
+      [commentText, user.loggedIn, isAPIValidateLoading, onSubmit, isRoot]
     );
 
     const handleBlur = useCallback(() => {
       setFocusedInput(false);
       if (onBlur !== undefined) onBlur();
     }, [onBlur]);
+
+    useEffect(() => {
+      if (!isRoot || !newCommentContentFromUrl) return;
+
+      if (newCommentContentFromUrl) {
+        setCommentText(newCommentContentFromUrl);
+        handleResetNewCommentContentFromUrl?.();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [newCommentContentFromUrl]);
 
     return (
       <SCommentsForm
@@ -197,6 +234,8 @@ CommentForm.defaultProps = {
   onBlur: () => {},
   zIndex: undefined,
   position: undefined,
+  isRoot: false,
+  postUuid: '',
 };
 
 const SInlineSVG = styled(InlineSVG)``;

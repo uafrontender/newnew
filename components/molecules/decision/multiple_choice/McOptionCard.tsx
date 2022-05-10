@@ -93,15 +93,17 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   const { appConstants } = useGetAppConstants();
   // const { walletBalance } = useContext(WalletContext);
 
+  console.log(option.creator);
+
   const isBlue = useMemo(
     () => !!option.isSupportedByMe,
     [option.isSupportedByMe]
   );
 
   const isCreatorsBid = useMemo(() => {
-    if (!option.creator) return true;
+    if (!option.creator || option.creator.uuid === creator.uuid) return true;
     return false;
-  }, [option.creator]);
+  }, [option.creator, creator]);
 
   const isSuggestedByMe = useMemo(
     () => !isCreatorsBid && option.creator?.uuid === user.userData?.userUuid,
