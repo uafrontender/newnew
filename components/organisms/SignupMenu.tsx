@@ -42,6 +42,7 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 // Utils
 import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
+import isSafari from '../../utils/isSafari';
 
 export interface ISignupMenu {
   goal?: string;
@@ -104,11 +105,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
       authLayoutContext.setShouldHeroUnmount(true);
 
-      setTimeout(() => {
+      if (!isSafari()) {
+        setTimeout(() => {
+          router.push('/verify-email');
+        }, 1000);
+      } else {
         router.push('/verify-email');
-      }, 1000);
-
-      // router.push('/verify-email');
+      }
     } catch (err: any) {
       setIsSubmitLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -492,7 +495,7 @@ const SHeadline = styled(Headline)`
   }
 
   ${({ theme }) => theme.media.laptopL} {
-    margin-top: 140px;
+    margin-top: 80px;
 
     font-size: 32px;
     line-height: 40px;
