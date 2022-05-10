@@ -124,7 +124,7 @@ const SListWrapper = styled.div`
   ${(props) => props.theme.media.tablet} {
     left: 16px;
     width: calc(100% + 26px);
-    padding: 24px 0 0 0;
+    padding: 0;
 
     margin: 0 auto !important;
     max-width: 768px;
@@ -133,7 +133,6 @@ const SListWrapper = styled.div`
   ${(props) => props.theme.media.laptop} {
     left: -16px;
     width: calc(100% + 32px);
-    padding: 32px 0 0 0;
 
     max-width: 1248px;
   }

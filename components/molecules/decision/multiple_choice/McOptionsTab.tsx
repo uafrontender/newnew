@@ -483,6 +483,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
               optionBeingSupported={optionBeingSupported}
               votingAllowed={postStatus === 'voting'}
               canVoteForFree={canVoteForFree}
+              isCreatorsBid={
+                !option.creator || option.creator?.uuid === post.creator?.uuid
+              }
               handleResetFreeVote={handleResetFreeVote}
               noAction={
                 (hasVotedOptionId !== undefined &&

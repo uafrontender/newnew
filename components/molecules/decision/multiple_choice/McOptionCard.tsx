@@ -59,6 +59,7 @@ interface IMcOptionCard {
   noAction: boolean;
   votingAllowed: boolean;
   canVoteForFree: boolean;
+  isCreatorsBid: boolean;
   optionBeingSupported?: string;
   handleResetFreeVote: () => void;
   handleSetSupportedBid: (id: string) => void;
@@ -80,6 +81,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   noAction,
   votingAllowed,
   canVoteForFree,
+  isCreatorsBid,
   optionBeingSupported,
   handleResetFreeVote,
   handleSetSupportedBid,
@@ -104,11 +106,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     () => !!option.isSupportedByMe,
     [option.isSupportedByMe]
   );
-
-  const isCreatorsBid = useMemo(() => {
-    if (!option.creator || option.creator.uuid === creator.uuid) return true;
-    return false;
-  }, [option.creator, creator]);
 
   const isSuggestedByMe = useMemo(
     () => !isCreatorsBid && option.creator?.uuid === user.userData?.userUuid,
@@ -799,9 +796,9 @@ const RenderSupportersInfo: React.FunctionComponent<{
             <SSpanBiddersHighlighted className='spanHighlighted'>
               {formatNumber(supporterCountSubstracted, true)}{' '}
               {t('McPost.OptionsTab.OptionCard.others')}
-            </SSpanBiddersHighlighted>{' '}
+            </SSpanBiddersHighlighted>
           </>
-        ) : null}
+        ) : null}{' '}
         <SSpanBiddersRegular className='spanRegular'>
           {t('McPost.OptionsTab.OptionCard.voted')}
         </SSpanBiddersRegular>

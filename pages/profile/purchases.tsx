@@ -13,7 +13,6 @@ import { getMyPosts } from '../../api/endpoints/user';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 const PostModal = dynamic(
@@ -141,7 +140,6 @@ const MyProfilePurchases: NextPage<IMyProfilePurchases> = ({
   return (
     <div>
       <SMain>
-        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
           {posts && posts.length > 0 && (
             <PostList

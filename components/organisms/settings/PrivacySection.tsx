@@ -220,6 +220,8 @@ const SCloseAccountSubsection = styled.div`
     'titleAr delete'
     'captionAr delete';
   grid-template-columns: 5fr 1fr;
+  grid-template-rows: 100%;
+  align-items: center;
 
   padding-top: 16px;
   padding-bottom: 16px;

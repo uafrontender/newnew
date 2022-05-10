@@ -685,9 +685,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           title={post.title}
           amountInBids={totalAmount}
           hasWinner={!!post.winningOptionId}
-          hasResponse={!!post.response}
           creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
           handleReportOpen={handleReportOpen}
         />
