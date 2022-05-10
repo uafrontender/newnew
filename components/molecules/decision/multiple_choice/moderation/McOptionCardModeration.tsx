@@ -52,9 +52,9 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     );
 
     const isCreatorsBid = useMemo(() => {
-      if (!option.creator) return true;
+      if (!option.creator || option.creator.uuid === creator.uuid) return true;
       return false;
-    }, [option.creator]);
+    }, [option.creator, creator]);
     const supporterCountSubstracted = useMemo(() => {
       if (isCreatorsBid) return option.supporterCount;
       return option.supporterCount - 1;

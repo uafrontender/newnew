@@ -728,6 +728,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('bids')}
             />
@@ -739,6 +740,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('bids')}
             />

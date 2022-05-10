@@ -41,12 +41,14 @@ import Text from '../../atoms/Text';
 const CommentsMobileModal = dynamic(() => import('./CommentsModalMobile'));
 
 interface ICommentsTab {
+  postUuid: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
   handleGoBack: () => void;
 }
 
 const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
+  postUuid,
   canDeleteComments,
   commentsRoomId,
   handleGoBack,
@@ -480,6 +482,8 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
           }}
         >
           <CommentForm
+            isRoot
+            postUuid={postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
@@ -540,6 +544,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
                 <CommentsMobileModal
                   isVisible={isMobile}
                   comments={comments}
+                  postUuid={postUuid}
                   commentsLoading={commentsLoading}
                   commentsNextPageToken={commentsNextPageToken}
                   commentIdFromUrl={commentIdFromUrl ?? undefined}

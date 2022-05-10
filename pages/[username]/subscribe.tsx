@@ -85,7 +85,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   const handleOpenPaymentModal = () => {
     if (!loggedIn) {
-      router.push(`/sign-up?reason=subscribe&redirect=${window.location.href}`);
+      router.push(
+        `/sign-up?reason=subscribe&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
       return;
     }
     setIsPaymentModalOpen(true);
