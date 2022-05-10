@@ -24,6 +24,7 @@ import useScrollDirection from '../../utils/hooks/useScrollDirection';
 import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
+import { useGetChats } from '../../contexts/chatContext';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -39,6 +40,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const theme = useTheme();
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
+  const { unreadCount } = useGetChats();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -101,6 +103,12 @@ export const General: React.FC<IGeneral> = (props) => {
             width: '33%',
             counter: unreadNotificationCount,
           },
+          {
+            key: 'dms',
+            url: '/direct-messages',
+            width: '33%',
+            counter: unreadCount,
+          },
         ];
       }
     }
@@ -110,6 +118,7 @@ export const General: React.FC<IGeneral> = (props) => {
     user.loggedIn,
     unreadNotificationCount,
     user.userData?.options?.isCreator,
+    unreadCount,
   ]);
 
   useOverlay(wrapperRef);

@@ -8,6 +8,7 @@ import Lottie from '../components/atoms/Lottie';
 import logoAnimation from '../public/animations/logo-loading-blue.json';
 import { SocketContext } from '../contexts/socketContext';
 import { getSubscriptionStatus } from '../api/endpoints/subscription';
+import { useGetSubscriptions } from '../contexts/subscriptionsContext';
 
 interface ISubscriptionSuccessPage {
   userId: string;
@@ -19,6 +20,8 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
   username,
 }) => {
   const router = useRouter();
+
+  const { fetchCreatorsImSubscribedTo } = useGetSubscriptions();
 
   // Socket
   const socketConnection = useContext(SocketContext);
@@ -36,6 +39,7 @@ const SubscriptionSuccessPage: NextPage<ISubscriptionSuccessPage> = ({
 
         if (res.data?.status?.activeRenewsAt) {
           console.log('Subscribed! Redirecting to chat');
+          fetchCreatorsImSubscribedTo();
           // I think we should not check is room created or not at this point
           // we can do this on chat page and if not try to create again
           // if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
