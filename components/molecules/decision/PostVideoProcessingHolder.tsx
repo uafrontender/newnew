@@ -3,15 +3,9 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 
-// Images
-import HourglassDarkHoldFrame from '../../../public/images/decision/Hourglass-Dark-Hold-Frame.webp';
-import HourglassLightHoldFrame from '../../../public/images/decision/Hourglass-Light-Hold-Frame.webp';
 import Text from '../../atoms/Text';
 import Headline from '../../atoms/Headline';
-
-// Videos
-const HourglassDarkUrl = '/images/decision/Hourglass-Dark.webm';
-const HourglassLightUrl = '/images/decision/Hourglass-Light.webm';
+import assets from '../../../constants/assets';
 
 interface IPostVideoProcessingHolder {
   holderText: 'decision' | 'moderation';
@@ -33,13 +27,15 @@ const PostVideoProcessingHolder: React.FunctionComponent<IPostVideoProcessingHol
               playsInline
               poster={
                 theme.name === 'light'
-                  ? HourglassLightHoldFrame.src
-                  : HourglassDarkHoldFrame.src
+                  ? assets.decision.lightHourglassStatic
+                  : assets.decision.darkHourglassStatic
               }
             >
               <source
                 src={
-                  theme.name === 'light' ? HourglassLightUrl : HourglassDarkUrl
+                  theme.name === 'light'
+                    ? assets.decision.lightHourglassAnimated
+                    : assets.decision.darkHourglassAnimated
                 }
                 type='video/mp4'
               />

@@ -18,9 +18,9 @@ import { getMcOption } from '../../../api/endpoints/multiple_choice';
 import Headline from '../../atoms/Headline';
 import PostVideoSuccess from '../../molecules/decision/success/PostVideoSuccess';
 
-import BoxIcon from '../../../public/images/creation/MC.webp';
 import { formatNumber } from '../../../utils/format';
 import getDisplayname from '../../../utils/getDisplayname';
+import assets from '../../../constants/assets';
 import { fetchPostByUUID } from '../../../api/endpoints/post';
 
 const McSuccessOptionsTab = dynamic(
@@ -186,7 +186,7 @@ const PostSuccessMC: React.FunctionComponent<IPostSuccessMC> = React.memo(
           <SActivitesContainer>
             {openedMainSection === 'main' ? (
               <>
-                <DecisionEndedBox type='mc' imgSrc={BoxIcon.src}>
+                <DecisionEndedBox type='mc' imgSrc={assets.creation.McAnimated}>
                   {t('McPostSuccess.hero_text')}
                 </DecisionEndedBox>
                 <SMainSectionWrapper>

@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -9,24 +8,18 @@ import { useTranslation } from 'next-i18next';
 import Caption from '../../atoms/Caption';
 
 import { useAppSelector } from '../../../redux-store/store';
-
-import acImage from '../../../public/images/creation/AC.webp';
-import mcImage from '../../../public/images/creation/MC.webp';
-import cfImage from '../../../public/images/creation/CF.webp';
-import acImageStatic from '../../../public/images/creation/AC-static.png';
-import mcImageStatic from '../../../public/images/creation/MC-static.png';
-import cfImageStatic from '../../../public/images/creation/CF-static.png';
+import assets from '../../../constants/assets';
 
 const IMAGES: any = {
-  auction: acImage,
-  crowdfunding: cfImage,
-  'multiple-choice': mcImage,
+  auction: assets.creation.AcAnimated,
+  crowdfunding: assets.creation.CfAnimated,
+  'multiple-choice': assets.creation.McAnimated,
 };
 
 const IMAGES_STATIC: any = {
-  auction: acImageStatic,
-  crowdfunding: cfImageStatic,
-  'multiple-choice': mcImageStatic,
+  auction: assets.creation.AcStatic,
+  crowdfunding: assets.creation.CfStatic,
+  'multiple-choice': assets.creation.McStatic,
 };
 
 interface IListItem {
@@ -70,7 +63,7 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
             </SDescription>
           </SContent>
           <SImageWrapper>
-            <Image
+            <img
               src={
                 isMobile || isTablet
                   ? IMAGES[itemKey]
@@ -78,11 +71,10 @@ const ListItem: React.FC<IListItem> = React.memo(({ itemKey }) => {
                   ? IMAGES[itemKey]
                   : IMAGES_STATIC[itemKey]
               }
-              alt='Post type image'
+              alt='Post type'
               width={isMobile ? 80 : 120}
               height={isMobile ? 80 : 120}
-              objectFit='contain'
-              priority
+              style={{ objectFit: 'contain' }}
             />
           </SImageWrapper>
         </SWrapper>

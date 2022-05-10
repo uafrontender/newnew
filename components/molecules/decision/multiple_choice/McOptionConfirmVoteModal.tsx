@@ -14,9 +14,9 @@ import Headline from '../../../atoms/Headline';
 import VotesAmountInputModal from '../../../atoms/decision/VotesAmountInputModal';
 
 // Icons
-import VotesIcon from '../../../../public/images/decision/mc-votes-modal.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import assets from '../../../../constants/assets';
 
 interface IMcConfirmVoteModal {
   isOpen: boolean;
@@ -70,7 +70,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               />
             </SCloseButton>
             <SImageContainer>
-              <img src={VotesIcon.src} alt='votes' />
+              <img src={assets.decision.votes} alt='votes' />
             </SImageContainer>
             <SHeadline variant={4}>
               {supportVotesAmount}{' '}
@@ -124,7 +124,7 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             />
           </SCloseButton>
           <SImageContainer>
-            <img src={VotesIcon.src} alt='votes' />
+            <img src={assets.decision.votes} alt='votes' />
           </SImageContainer>
           <SHeadline variant={4}>
             {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.custom')}

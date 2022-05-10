@@ -1,14 +1,13 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
-import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useAppSelector } from '../../../redux-store/store';
 import Headline from '../Headline';
 
-import acImage from '../../../public/images/creation/AC.png';
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../InlineSVG';
+import assets from '../../../constants/assets';
 
 const SubsFeatures = () => {
   const { t } = useTranslation('creator');
@@ -19,12 +18,12 @@ const SubsFeatures = () => {
 
   return (
     <SContainer>
-      <Image
-        src={acImage}
+      <img
+        src={assets.creation.AcStatic}
         alt='Enable subscription'
         width={isMobile ? 232 : 162}
         height={isMobile ? 240 : 152}
-        objectFit='cover'
+        style={{ objectFit: 'cover' }}
       />
       <SContent>
         <STitle variant={6}>{t('subscribersFeatures.title')}</STitle>

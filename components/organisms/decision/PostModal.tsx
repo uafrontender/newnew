@@ -31,12 +31,10 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import InlineSvg from '../../atoms/InlineSVG';
 // Icons
+import assets from '../../../constants/assets';
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 import ShareIcon from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIcon from '../../../public/images/svg/icons/filled/More.svg';
-import MCIcon from '../../../public/images/creation/MC.webp';
-import ACIcon from '../../../public/images/creation/AC.webp';
-import CFIcon from '../../../public/images/creation/CF.webp';
 
 // Utils
 import isBrowser from '../../../utils/isBrowser';
@@ -51,10 +49,10 @@ import CommentFromUrlContextProvider, {
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { markUser } from '../../../api/endpoints/user';
 import getDisplayname from '../../../utils/getDisplayname';
-import { ReportData } from '../../molecules/chat/ReportModal';
 import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import { usePostModalState } from '../../../contexts/postModalContext';
+import { ReportData } from '../../molecules/chat/ReportModal';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -100,10 +98,10 @@ const PostSuccessAnimationBackground = dynamic(
 );
 const ReportModal = dynamic(() => import('../../molecules/chat/ReportModal'));
 
-const images = {
-  ac: ACIcon.src,
-  mc: MCIcon.src,
-  cf: CFIcon.src,
+const IMAGES = {
+  ac: assets.creation.AcAnimated,
+  cf: assets.creation.CfAnimated,
+  mc: assets.creation.McAnimated,
 };
 
 interface IPostModal {
@@ -956,7 +954,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                         postType: t(`postType.${typeOfPost}`),
                       })
                 }
-                imageSrc={images[typeOfPost]}
+                imageSrc={IMAGES[typeOfPost]}
                 buttonCaption={t('PostDeletedByMe.ctaButton')}
                 handleButtonClick={() => {
                   router.push('/creation');
@@ -981,7 +979,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
                 buttonCaption={t('PostDeleted.ctaButton', {
                   postTypeMultiple: t(`postType.multiple.${typeOfPost}`),
                 })}
-                imageSrc={images[typeOfPost]}
+                imageSrc={IMAGES[typeOfPost]}
                 style={{
                   marginBottom: '24px',
                 }}
