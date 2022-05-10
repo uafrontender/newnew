@@ -142,6 +142,8 @@ const CodeVerificationMenu: React.FunctionComponent<ICodeVerificationMenu> = ({
 
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
+        } else if (data.me?.options?.isCreator) {
+          router.push('/creator/dashboard');
         } else {
           router.push('/');
         }

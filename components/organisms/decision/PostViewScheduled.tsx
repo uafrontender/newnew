@@ -157,9 +157,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               postType={postType as TPostType}
               creator={post.creator!!}
               hasWinner={false}
-              hasResponse={false}
               isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-              startsAtSeconds={post.startsAt?.seconds as number}
               handleReportOpen={handleReportOpen}
             />
           ) : (

@@ -685,9 +685,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           title={post.title}
           amountInBids={totalAmount}
           hasWinner={!!post.winningOptionId}
-          hasResponse={!!post.response}
           creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
           handleReportOpen={handleReportOpen}
         />
@@ -704,6 +702,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             <AcOptionsTab
               postId={post.postUuid}
               postStatus={postStatus}
+              postText={post.title}
               postCreator={
                 (post.creator?.nickname as string) ?? post.creator?.username
               }
@@ -728,6 +727,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('bids')}
             />
@@ -739,6 +739,7 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('bids')}
             />
