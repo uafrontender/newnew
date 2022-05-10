@@ -667,9 +667,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           title={post.title}
           totalVotes={totalVotes}
           hasWinner={false}
-          hasResponse={!!post.response}
           creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
           handleReportOpen={handleReportOpen}
         />
