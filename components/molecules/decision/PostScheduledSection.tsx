@@ -13,15 +13,8 @@ import Headline from '../../atoms/Headline';
 import isBrowser from '../../../utils/isBrowser';
 import secondsToDHMS, { DHMS } from '../../../utils/secondsToDHMS';
 import Button from '../../atoms/Button';
+import assets from '../../../constants/assets';
 // import assets from '../../../constants/assets';
-
-// Images
-import HourglassDarkHoldFrame from '../../../public/images/decision/Hourglass-Dark-Hold-Frame.webp';
-import HourglassLightHoldFrame from '../../../public/images/decision/Hourglass-Light-Hold-Frame.webp';
-
-// Videos
-const HourglassDarkUrl = '/images/decision/Hourglass-Dark.webm';
-const HourglassLightUrl = '/images/decision/Hourglass-Light.webm';
 
 interface IPostScheduledSection {
   postType: string;
@@ -73,7 +66,6 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     <SContainer>
       <SHeadingContainer>
         <SImgContainer>
-          {/* CHANGE GRAPHICS */}
           <video
             className='hourglass-video'
             loop
@@ -82,13 +74,15 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
             playsInline
             poster={
               theme.name === 'light'
-                ? HourglassLightHoldFrame.src
-                : HourglassDarkHoldFrame.src
+                ? assets.decision.lightHourglassStatic
+                : assets.decision.darkHourglassStatic
             }
           >
             <source
               src={
-                theme.name === 'light' ? HourglassLightUrl : HourglassDarkUrl
+                theme.name === 'light'
+                  ? assets.decision.lightHourglassAnimated
+                  : assets.decision.darkHourglassAnimated
               }
               type='video/mp4'
             />

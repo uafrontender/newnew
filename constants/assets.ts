@@ -16,6 +16,10 @@ const assets = {
     paymentSuccess: `${APP_ASSETS_ORIGIN}/decision/payment-success.png`,
     trophy: `${APP_ASSETS_ORIGIN}/decision/trophy.png`,
     votes: `${APP_ASSETS_ORIGIN}/decision/votes.png`,
+    darkHourglassAnimated: `${APP_ASSETS_ORIGIN}/decision/hourglass-dark.webm`,
+    darkHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-dark-hold-frame.webp`,
+    lightHourglassAnimated: `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webm`,
+    lightHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-light-hold-frame.webp`,
   },
   home: {
     darkLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Dark.mp4`,
