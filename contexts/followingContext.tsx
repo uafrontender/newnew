@@ -40,8 +40,8 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
       isLoading,
       addId,
       removeId,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [followingsIds, removeId, addId, removeId]
   );
 
