@@ -37,7 +37,7 @@
     "block": {
       "title": {
         "file": "Upload file",
-        "decision": "Decision information",
+        "decision": "Details",
         "advanced": "Advanced settings",
         "floating": "Preview"
       },
