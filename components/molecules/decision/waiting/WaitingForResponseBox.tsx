@@ -1,10 +1,9 @@
 /* eslint-disable react/require-default-props */
 import React from 'react';
 import styled from 'styled-components';
+import assets from '../../../../constants/assets';
 
 import Headline from '../../../atoms/Headline';
-
-import HourGlassImage from '../../../../public/images/decision/hourglass-mock.png';
 
 interface IWaitingForResponseBox {
   title: string;
@@ -19,7 +18,7 @@ const WaitingForResponseBox: React.FunctionComponent<IWaitingForResponseBox> =
         <SText variant={6}>{body}</SText>
       </STextWrapper>
       <SImageContainer>
-        <img src={HourGlassImage.src} alt='decision' />
+        <img src={assets.decision.hourglass} alt='decision' />
       </SImageContainer>
     </SBox>
   );

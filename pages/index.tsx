@@ -22,12 +22,9 @@ import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 
-import acImage from '../public/images/creation/AC.webp';
-import mcImage from '../public/images/creation/MC.webp';
-import cfImage from '../public/images/creation/CF.webp';
-
 import switchPostType from '../utils/switchPostType';
 import isBrowser from '../utils/isBrowser';
+import assets from '../constants/assets';
 
 const TopSection = dynamic(
   () => import('../components/organisms/home/TopSection')
@@ -322,7 +319,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={acImage}
+                image={assets.creation.AcAnimated}
                 title={t('ac-block-tutorial-card.title')}
                 caption={t('ac-block-tutorial-card.caption')}
                 imageStyle={{
@@ -344,7 +341,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={mcImage}
+                image={assets.creation.McAnimated}
                 title={t('mc-block-tutorial-card.title')}
                 caption={t('mc-block-tutorial-card.caption')}
               />
@@ -362,7 +359,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           tutorialCard={
             !user.loggedIn ? (
               <TutorialCard
-                image={cfImage}
+                image={assets.creation.CfAnimated}
                 title={t('cf-block-tutorial-card.title')}
                 caption={t('cf-block-tutorial-card.caption')}
                 imageStyle={{
