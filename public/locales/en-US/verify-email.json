@@ -6,7 +6,7 @@
   "goBackBtn": "Go back",
   "heading": {
     "heading": "Verify your email",
-    "subheading": "Please, enter a code we sent you to"
+    "subheading": "Please enter the code we sent to"
   },
   "timeExpired": {
     "not_receieved": "I didn't get a code.",
