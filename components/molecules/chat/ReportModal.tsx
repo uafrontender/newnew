@@ -6,8 +6,8 @@ import dynamic from 'next/dynamic';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
-import CheckBox from '../CheckBox';
 import { useAppSelector } from '../../../redux-store/store';
+import CheckMark from '../CheckMark';
 
 const GoBackButton = dynamic(() => import('../GoBackButton'));
 
@@ -31,11 +31,10 @@ const ReportModal: React.FC<IReportModal> = React.memo(
       resizeMode
     );
 
-    const [reason, setReason] =
-      useState<newnewapi.ReportingReason | null>(null);
+    const [reasons, setReasons] = useState<newnewapi.ReportingReason[]>([]);
     const [message, setMessage] = useState('');
 
-    const disabled = reason === null || message.length < 15;
+    const disabled = reasons.length === 0 || message.length < 15;
 
     const reportTypes = useMemo(
       () => [
@@ -70,12 +69,13 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const reportMaxLength = 150;
 
     const submitReport = () => {
-      if (reason && message.length >= 15) {
+      if (reasons.length > 0 && message.length >= 15) {
         onSubmit({
-          reason,
+          // TODO: Update newnew-api, send all reasons
+          reason: reasons[0],
           message,
         });
-        setReason(null);
+        setReasons([]);
         setMessage('');
       }
     };
@@ -89,8 +89,19 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const handleTypeChange = useCallback(
       (id: newnewapi.ReportingReason | undefined) => {
-        /* eslint-disable no-unused-expressions */
-        id && setReason(id);
+        if (id) {
+          setReasons((current) => {
+            const alreadySelectedIndex = current.indexOf(id);
+
+            if (alreadySelectedIndex > -1) {
+              const newReasons = current.slice();
+              newReasons.splice(alreadySelectedIndex, 1);
+              return newReasons;
+            }
+
+            return [...current, id];
+          });
+        }
       },
       []
     );
@@ -109,10 +120,10 @@ const ReportModal: React.FC<IReportModal> = React.memo(
             <SCheckBoxList>
               {reportTypes.map((item) => (
                 <SCheckBoxWrapper key={item.id}>
-                  <CheckBox
+                  <CheckMark
                     id={item.id.toString()}
                     label={item.title}
-                    selected={reason === item.id}
+                    selected={reasons.includes(item.id)}
                     handleChange={() => handleTypeChange(item.id)}
                   />
                 </SCheckBoxWrapper>
