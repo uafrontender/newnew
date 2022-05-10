@@ -15,11 +15,9 @@ export const Mobile: React.FC = React.memo(() => {
     <SContainer>
       <Logo />
       <SRightBlock>
-        {user.loggedIn && user.userData?.options?.isCreator && (
-          <SItemWithMargin>
-            <SearchInput />
-          </SItemWithMargin>
-        )}
+        <SItemWithMargin>
+          <SearchInput />
+        </SItemWithMargin>
         <SItemWithMargin>
           <Link
             href={

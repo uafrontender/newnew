@@ -20,6 +20,7 @@ import dashboardIconFilled from '../../public/images/svg/icons/filled/Earnings.s
 import dashboardIconOutlined from '../../public/images/svg/icons/outlined/Earnings.svg';
 import notificationsIconFilled from '../../public/images/svg/icons/filled/Notifications.svg';
 import notificationsIconOutlined from '../../public/images/svg/icons/outlined/Notifications.svg';
+import iconDirectMessages from '../../public/images/svg/icons/outlined/Comments.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
@@ -31,6 +32,7 @@ const icons: any = {
     share: shareIconOutlined,
     dashboard: dashboardIconOutlined,
     notifications: notificationsIconOutlined,
+    dms: iconDirectMessages,
   },
   filled: {
     add: addIconFilled,
@@ -39,6 +41,7 @@ const icons: any = {
     share: shareIconFilled,
     dashboard: dashboardIconFilled,
     notifications: notificationsIconFilled,
+    dms: iconDirectMessages,
   },
 };
 

@@ -44,7 +44,6 @@ const SearchInput: React.FC = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet'].includes(resizeMode);
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -167,8 +166,8 @@ const SearchInput: React.FC = React.memo(() => {
           <InlineSVG
             fill={theme.colorsThemed.text.primary}
             svg={closeIcon}
-            width={isTablet ? '24px' : '20px'}
-            height={isTablet ? '24px' : '20px'}
+            width='24px'
+            height='24px'
           />
         </SCloseButtonMobile>
       ) : null}
@@ -194,7 +193,7 @@ const SearchInput: React.FC = React.memo(() => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder='Titles, genres, people'
+            placeholder='Search'
           />
           <SRightInlineSVG
             clickable
@@ -437,7 +436,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
 
   ${({ theme }) => theme.media.tablet} {
     width: ${(props) => (props.active ? 'calc(100vw - 60px - 50px)' : '48px')};
-    padding: 10.5px;
+    padding: 11px;
     border-radius: 16px;
   }
 

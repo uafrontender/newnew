@@ -25,6 +25,7 @@ const SubscriptionsContext = createContext({
   isCreatorsImSubscribedToLoading: false,
   newSubscriber: {} as newnewapi.ICreatorSubscriptionChanged,
   mySubscribersTotal: 0,
+  fetchCreatorsImSubscribedTo: () => {},
 });
 
 export const SubscriptionsProvider: React.FC = ({ children }) => {
@@ -77,6 +78,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       isCreatorsImSubscribedToLoading,
       newSubscriber,
       mySubscribersTotal,
+      fetchCreatorsImSubscribedTo,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -88,8 +90,26 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       removeCreatorsImSubscribedTo,
       newSubscriber,
       mySubscribersTotal,
+      fetchCreatorsImSubscribedTo,
     ]
   );
+
+  async function fetchCreatorsImSubscribedTo() {
+    if (!user.loggedIn) return;
+    try {
+      setCreatorsImSubscribedToLoading(true);
+      const payload = new newnewapi.EmptyRequest({});
+      const res = await getCreatorsImSubscribedTo(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setCreatorsImSubscribedTo(res.data.creators as []);
+      console.log(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreatorsImSubscribedToLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchMySubscribers() {
@@ -108,22 +128,6 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       } catch (err) {
         console.error(err);
         setMySubscribersIsLoading(false);
-      }
-    }
-
-    async function fetchCreatorsImSubscribedTo() {
-      if (!user.loggedIn) return;
-      try {
-        setCreatorsImSubscribedToLoading(true);
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getCreatorsImSubscribedTo(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        setCreatorsImSubscribedTo(res.data.creators as []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setCreatorsImSubscribedToLoading(false);
       }
     }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
@@ -17,8 +17,8 @@ import { useAppSelector } from '../../../redux-store/store';
 
 import menuIcon from '../../../public/images/svg/icons/outlined/Menu.svg';
 import MoreMenuTablet from '../../organisms/MoreMenuTablet';
-import ShareMenu from '../../organisms/ShareMenu';
 import { useNotifications } from '../../../contexts/notificationsContext';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 
 interface ITablet {}
 
@@ -29,14 +29,41 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
   const user = useAppSelector((state) => state.user);
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   const { unreadNotificationCount } = useNotifications();
+  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   const handleMenuClick = () => setMoreMenuOpen(!moreMenuOpen);
-  const handleShareMenuClick = () => setShareMenuOpen(!shareMenuOpen);
+
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  const handlerCopy = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/${user.userData?.username}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SContainer>
@@ -44,6 +71,25 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
       <SRightBlock>
         {user.loggedIn && (
           <>
+            {user.userData?.options?.isCreator && (
+              <SItemWithMargin>
+                <SNavText variant={3} weight={600} onClick={handlerCopy}>
+                  {isCopiedUrl ? t('my-link-copied') : t('my-link')}
+                </SNavText>
+              </SItemWithMargin>
+            )}
+            {(user.userData?.options?.isCreator ||
+              creatorsImSubscribedTo.length > 0) && (
+              <SItemWithMargin>
+                <NavigationItem
+                  item={{
+                    url: '/direct-messages',
+                    key: 'directMessages',
+                    counter: unreadCount,
+                  }}
+                />
+              </SItemWithMargin>
+            )}
             <SItemWithMargin>
               <NavigationItem
                 item={{
@@ -51,27 +97,6 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                   key: 'notifications',
                   counter: unreadNotificationCount,
                 }}
-              />
-            </SItemWithMargin>
-            {user.loggedIn && (
-              <SItemWithMargin>
-                <NavigationItem
-                  item={{
-                    url: '/direct-messages',
-                    key: 'direct-messages',
-                    counter: unreadCount,
-                  }}
-                />
-              </SItemWithMargin>
-            )}
-            <SItemWithMargin>
-              <SNavText variant={3} weight={600} onClick={handleShareMenuClick}>
-                Share
-              </SNavText>
-              <ShareMenu
-                absolute
-                isVisible={shareMenuOpen}
-                handleClose={() => setShareMenuOpen(false)}
               />
             </SItemWithMargin>
             {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
@@ -89,15 +114,13 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
             )} */}
           </>
         )}
-        {user.loggedIn && user.userData?.options?.isCreator && (
-          <SItemWithMargin
-            style={{
-              position: 'static',
-            }}
-          >
-            <SearchInput />
-          </SItemWithMargin>
-        )}
+        <SItemWithMargin
+          style={{
+            position: 'static',
+          }}
+        >
+          <SearchInput />
+        </SItemWithMargin>
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (
@@ -150,7 +173,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
                         view='primaryGrad'
                         withShadow={!globalSearchActive}
                       >
-                        {t('button-create')}
+                        {t('button-create-on-newnew')}
                       </Button>
                     </a>
                   </Link>
