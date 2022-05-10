@@ -25,10 +25,6 @@ import PostEllipseModal from './PostEllipseModal';
 
 import ShareIconFilled from '../../../public/images/svg/icons/filled/Share.svg';
 import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
-import AcSelectWinnerIcon from '../../../public/images/decision/ac-select-winner-trophy-mock.png';
-import MCIcon from '../../../public/images/creation/MC.webp';
-import ACIcon from '../../../public/images/creation/AC.webp';
-import CFIcon from '../../../public/images/creation/CF.webp';
 
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
@@ -36,11 +32,12 @@ import { markUser } from '../../../api/endpoints/user';
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
+import assets from '../../../constants/assets';
 
-const images = {
-  ac: ACIcon.src,
-  mc: MCIcon.src,
-  cf: CFIcon.src,
+const IMAGES = {
+  ac: assets.creation.AcAnimated,
+  cf: assets.creation.CfAnimated,
+  mc: assets.creation.McAnimated,
 };
 
 interface IPostTopInfo {
@@ -314,7 +311,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
             <SText variant={3}>
               {t('AcPost.PostTopInfo.SelectWinner.body')}
             </SText>
-            <STrophyImg src={AcSelectWinnerIcon.src} />
+            <STrophyImg src={assets.decision.trophy} />
           </SSelectingWinnerOption>
         ) : null}
       </SWrapper>
@@ -329,7 +326,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           buttonCaption={t('PostFailedBox.ctaButton', {
             postTypeMultiple: t(`postType.multiple.${postType}`),
           })}
-          imageSrc={images[postType!!]}
+          imageSrc={IMAGES[postType!!]}
           handleButtonClick={() => {
             document.getElementById('post-modal-container')?.scrollTo({
               top: document.getElementById('recommendations-section-heading')
