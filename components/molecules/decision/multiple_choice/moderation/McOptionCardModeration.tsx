@@ -36,27 +36,24 @@ import { reportSuperpollOption } from '../../../../../api/endpoints/report';
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
-  postId: string;
   index: number;
   canBeDeleted: boolean;
+  isCreatorsBid: boolean;
 }
 
 const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
-  ({ option, creator, postId, index, canBeDeleted }) => {
+  ({ option, creator, index, canBeDeleted, isCreatorsBid }) => {
     const theme = useTheme();
     const { t } = useTranslation('decision');
     const { resizeMode } = useAppSelector((state) => state.ui);
-    const user = useAppSelector((state) => state.user);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
 
-    const isCreatorsBid = useMemo(() => {
-      if (!option.creator || option.creator.uuid === creator.uuid) return true;
-      return false;
-    }, [option.creator, creator]);
-    const supporterCountSubstracted = useMemo(() => {
-      if (isCreatorsBid) return option.supporterCount;
+    const supporterCountSubtracted = useMemo(() => {
+      if (isCreatorsBid) {
+        return option.supporterCount;
+      }
       return option.supporterCount - 1;
     }, [option.supporterCount, isCreatorsBid]);
 
@@ -134,10 +131,10 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
               <SBiddersInfo variant={3}>
                 {isCreatorsBid ? (
                   <>
-                    {supporterCountSubstracted > 0 ? (
+                    {supporterCountSubtracted > 0 ? (
                       <>
                         <SSpanBiddersHighlighted>
-                          {formatNumber(supporterCountSubstracted, true)}{' '}
+                          {formatNumber(supporterCountSubtracted, true)}{' '}
                           {t('McPost.OptionsTab.OptionCard.voters')}
                         </SSpanBiddersHighlighted>{' '}
                         <SSpanBiddersRegular>
@@ -169,11 +166,11 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                         )}
                       </SSpanBiddersHighlighted>
                     </Link>
-                    {supporterCountSubstracted > 0 ? (
+                    {supporterCountSubtracted > 0 ? (
                       <>
                         {', '}
                         <SSpanBiddersHighlighted>
-                          {formatNumber(supporterCountSubstracted, true)}{' '}
+                          {formatNumber(supporterCountSubtracted, true)}{' '}
                           {t('McPost.OptionsTab.OptionCard.voters')}
                         </SSpanBiddersHighlighted>{' '}
                         <SSpanBiddersRegular>

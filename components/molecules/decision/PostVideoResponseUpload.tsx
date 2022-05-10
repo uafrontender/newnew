@@ -74,7 +74,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
 }) => {
   const { t } = useTranslation('decision');
   const [showVideoDelete, setShowVideoDelete] = useState(false);
-  const inputRef: any = useRef();
+  const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState(null);
 
@@ -160,7 +160,12 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           style={{ display: 'none' }}
           accept='video/*'
           multiple={false}
-          onChange={handleFileChange}
+          onChange={(e) => {
+            handleFileChange(e);
+            if (inputRef.current) {
+              inputRef.current.value = '';
+            }
+          }}
         />
         <SHeadline variant={6}>
           {t('PostVideo.UploadResponseForm.fileUpload.title_1')}
@@ -317,7 +322,12 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
             style={{ display: 'none' }}
             accept='video/*'
             multiple={false}
-            onChange={handleFileChange}
+            onChange={(e) => {
+              handleFileChange(e);
+              if (inputRef.current) {
+                inputRef.current.value = '';
+              }
+            }}
           />
           <SPlayerWrapper>
             <BitmovinPlayer

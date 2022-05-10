@@ -39,10 +39,10 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
       resizeMode
     );
 
-    const isCreatorsBid = useMemo(() => {
-      if (!option.creator) return true;
-      return false;
-    }, [option.creator]);
+    const isCreatorsBid = useMemo(
+      () => option.creator?.uuid === postCreator.uuid,
+      [option.creator?.uuid, postCreator.uuid]
+    );
 
     const containerRef = useRef<HTMLDivElement>();
     const [isScrolledDown, setIsScrolledDown] = useState(false);

@@ -13,7 +13,6 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import { useAppSelector } from '../../redux-store/store';
-import Headline from '../atoms/Headline';
 import Text from '../atoms/Text';
 
 export interface ICreatorStripeLayout {
@@ -71,7 +70,6 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
           {!isMobileOrTablet &&
             !router.pathname.includes('creator-onboarding') && (
               <SSideMessage>
-                <SHeadline variant={3}>{t(`stripe.side.heading`)}</SHeadline>
                 <Text variant={2}>{t(`stripe.side.subheading`)}</Text>
               </SSideMessage>
             )}
@@ -148,9 +146,4 @@ const SSideMessage = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-`;
-
-const SHeadline = styled(Headline)`
-  margin-bottom: 12px;
-  font-weight: 600;
 `;

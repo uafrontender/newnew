@@ -11,7 +11,7 @@ import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
 
 interface IOnboardingProfileImageInput {
   imageInEditUrl: string;
-  handleChangeImageInEdit: (newValue: any) => void;
+  handleChangeImageInEdit: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileImageInput> =
@@ -63,7 +63,12 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
             ref={(el) => {
               imageInputRef.current = el!!;
             }}
-            onChange={handleChangeImageInEdit}
+            onChange={(e) => {
+              handleChangeImageInEdit(e);
+              if (imageInputRef.current) {
+                imageInputRef.current.value = '';
+              }
+            }}
           />
         </SInputContainer>
         {true && (
