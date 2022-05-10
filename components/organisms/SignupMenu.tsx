@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // Temp disabled until backend is in place
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -43,11 +44,13 @@ import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
 
 export interface ISignupMenu {
+  goal?: string;
   reason?: SignupReason;
   redirectURL?: string;
 }
 
 const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
+  goal,
   reason,
   redirectURL,
 }) => {
@@ -148,8 +151,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
-            ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}`
-            : t('heading.sign_in')}
+            ? `${t('heading.sign-in-to')} ${t(`heading.reasons.${reason}`)}`
+            : goal
+            ? t(`heading.${goal}`)
+            : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
           {reason !== 'session_expired'
@@ -271,7 +276,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 }
                 onClick={() => {}}
               >
-                <span>{t('signupOptions.signInBtn')}</span>
+                <span>
+                  {goal !== 'log-in'
+                    ? t('signupOptions.signInBtn')
+                    : t('signupOptions.logInBtn')}
+                </span>
               </EmailSignInButton>
             </motion.div>
           </SEmailSignInForm>
