@@ -296,6 +296,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
               {t('SuccessCommon.Comments.heading')}
             </SCommentsHeadline>
             <CommentsSuccess
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => {}}
             />
