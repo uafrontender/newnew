@@ -52,6 +52,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
 
     const [mobileCropWidth, setMobileCropWidth] = useState(0);
     const containerRef = useRef<HTMLDivElement>();
+    const inputRef = useRef<HTMLInputElement>(null);
 
     // Drag & Drop support
     const [dropZoneHighlighted, setDropZoneHighlighted] = useState(false);
@@ -153,6 +154,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
             onDrop={(e) => handleOnDrop(e)}
           >
             <SImageInput
+              ref={inputRef}
               type='file'
               accept='image/*'
               multiple={false}
@@ -160,6 +162,10 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const { files } = e.target;
                 handleSetPictureInEdit(files);
+
+                if (inputRef.current) {
+                  inputRef.current.value = '';
+                }
               }}
             />
             <SChangeImageCaption
