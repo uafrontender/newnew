@@ -15,9 +15,9 @@
       "button-confirm": "Block user"
     },
     "delete-my-account": {
-      "title": "Delete account",
-      "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      "button-confirm": "Confirm and delete",
+      "title": "Delete my account",
+      "body": "Are you sure you want to delete your account?\nYou won’t be able to access your account in the future\nand all of your history will be erased.",
+      "button-confirm": "Delete my account",
       "button-cancel": "Cancel"
     }
   },
@@ -108,8 +108,8 @@
     }
   },
   "Settings": {
-    "heading": "General settings",
-    "goBackBtn": "Go back",
+    "heading": "Settings",
+    "goBackBtn": "Back",
     "colorModeSwitch": {
       "options": {
         "light": "Light",
@@ -120,18 +120,18 @@
     "sections": {
       "Wallet": {
         "empty": {
-          "balance": "Balance",
-          "caption": "Use your NewNew wallet and make your bets with no fees.",
-          "topUpBtn": "Top up my wallet"
+          "balance": "My balance",
+          "caption": "Add funds to vote and bid without any fees",
+          "topUpBtn": "Add funds"
         },
         "non-empty": {
           "balance": "Balance",
-          "topUpBtn": "Top up"
+          "topUpBtn": "Add funds"
         },
         "TopUpWalletModal": {
-          "heading": "Top up amount",
-          "checkoutButtonMobile": "Check out",
-          "checkoutButtonDesktop": "Check out",
+          "heading": "Add funds",
+          "checkoutButtonMobile": "Checkout",
+          "checkoutButtonDesktop": "Checkout",
           "cancelButtonDesktop": "Cancel"
         }
       },
@@ -178,12 +178,12 @@
         "title": "Privacy",
         "privacySubsections": {
           "spendings": {
-            "title": "Hide spending from other users.",
-            "caption": "People will not be able to see how much you spent on votes and bids."
+            "title": "Hide my spending from others",
+            "caption": "People will not be able to see how much you spent on events, superpolls and goals"
           },
           "private": {
-            "title": "Make private account.",
-            "caption": "People will not be able to see your bids."
+            "title": "Make my activity private",
+            "caption": "People will not be able to see any of your activity on events, superpolls and goals"
           }
         },
         "blockedusers": {
