@@ -13,7 +13,6 @@ import { getMyPosts } from '../../api/endpoints/user';
 // import { TTokenCookie } from '../../api/apiConfigs';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
 const PostModal = dynamic(
@@ -143,7 +142,6 @@ const MyProfileIndex: NextPage<IMyProfileIndex> = ({
   return (
     <div>
       <SMain>
-        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
           {posts && posts.length > 0 && (
             <PostList

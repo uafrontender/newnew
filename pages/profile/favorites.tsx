@@ -14,7 +14,6 @@ import { getMyPosts } from '../../api/endpoints/user';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
@@ -142,7 +141,6 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   return (
     <div>
       <SMain>
-        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
           {posts && (
             <PostList

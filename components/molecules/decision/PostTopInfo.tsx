@@ -28,7 +28,6 @@ import MoreIconFilled from '../../../public/images/svg/icons/filled/More.svg';
 
 import { formatNumber } from '../../../utils/format';
 import { markPost } from '../../../api/endpoints/post';
-import { markUser } from '../../../api/endpoints/user';
 import { FollowingsContext } from '../../../contexts/followingContext';
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import getDisplayname from '../../../utils/getDisplayname';
@@ -47,12 +46,10 @@ interface IPostTopInfo {
   creator: newnewapi.IUser;
   isFollowingDecisionInitial: boolean;
   postType?: TPostType;
-  startsAtSeconds: number;
   totalVotes?: number;
   totalPledges?: number;
   targetPledges?: number;
   amountInBids?: number;
-  hasResponse: boolean;
   hasWinner: boolean;
   handleReportOpen: () => void;
 }
@@ -62,21 +59,18 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   postStatus,
   title,
   creator,
-  postType,
-  startsAtSeconds,
   isFollowingDecisionInitial,
-  amountInBids,
+  postType,
+  totalVotes,
   totalPledges,
   targetPledges,
-  hasResponse,
+  amountInBids,
   hasWinner,
-  totalVotes,
   handleReportOpen,
 }) => {
   const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
-  const startingDateParsed = new Date(startsAtSeconds * 1000);
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -166,37 +160,6 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     }
   }, [isFollowingDecision, postId, router, user.loggedIn]);
 
-  const handleToggleFollowingCreator = useCallback(async () => {
-    try {
-      if (!user.loggedIn) {
-        router.push(
-          `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
-            window.location.href
-          )}`
-        );
-      }
-
-      const payload = new newnewapi.MarkUserRequest({
-        userUuid: creator.uuid,
-        markAs: followingsIds.includes(creator.uuid as string)
-          ? newnewapi.MarkUserRequest.MarkAs.NOT_FOLLOWED
-          : newnewapi.MarkUserRequest.MarkAs.FOLLOWED,
-      });
-
-      const res = await markUser(payload);
-
-      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
-      if (followingsIds.includes(creator.uuid as string)) {
-        removeId(creator.uuid as string);
-      } else {
-        addId(creator.uuid as string);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [addId, removeId, creator.uuid, followingsIds, router, user.loggedIn]);
-
   return (
     <SContainer>
       <SWrapper showSelectingWinnerOption={showSelectingWinnerOption}>
@@ -277,11 +240,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {!isMobile && (
             <PostEllipseMenu
               postType={postType as string}
-              isFollowing={followingsIds.includes(creator.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               isVisible={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
               handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
             />
@@ -289,12 +250,10 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           {isMobile && ellipseMenuOpen ? (
             <PostEllipseModal
               postType={postType as string}
-              isFollowing={followingsIds.includes(creator.uuid as string)}
               isFollowingDecision={isFollowingDecision}
               zIndex={11}
               isOpen={ellipseMenuOpen}
               handleFollowDecision={handleFollowDecision}
-              handleToggleFollowingCreator={handleToggleFollowingCreator}
               handleReportOpen={handleReportOpen}
               onClose={handleCloseEllipseMenu}
             />

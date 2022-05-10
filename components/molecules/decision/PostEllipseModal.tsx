@@ -8,24 +8,20 @@ import Text from '../../atoms/Text';
 
 interface IPostEllipseModal {
   postType: string;
-  isFollowing: boolean;
   isFollowingDecision: boolean;
   isOpen: boolean;
   zIndex: number;
   handleFollowDecision: () => void;
-  handleToggleFollowingCreator: () => void;
   handleReportOpen: () => void;
   onClose: () => void;
 }
 
 const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
   postType,
-  isFollowing,
   isFollowingDecision,
   isOpen,
   zIndex,
   handleFollowDecision,
-  handleToggleFollowingCreator,
   handleReportOpen,
   onClose,
 }) => {
@@ -39,18 +35,6 @@ const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
             e.stopPropagation();
           }}
         >
-          <SButton
-            onClick={() => handleToggleFollowingCreator()}
-            style={{
-              marginBottom: '28px',
-            }}
-          >
-            <Text variant={3}>
-              {!isFollowing
-                ? t('ellipse.follow-creator')
-                : t('ellipse.unfollow-creator')}
-            </Text>
-          </SButton>
           <SButton onClick={() => handleFollowDecision()}>
             <Text variant={3}>
               {!isFollowingDecision
