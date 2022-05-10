@@ -77,8 +77,6 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
   // need some case for banned users, etc.
   const [submitError, setSubmitError] = useState<string>('');
 
-  console.log(redirectURL);
-
   const handleSubmitEmail = async () => {
     setIsSubmitLoading(true);
     setSubmitError('');
