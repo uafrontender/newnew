@@ -12,8 +12,9 @@
       "bid": "bid",
       "subscribe": "subscribe",
       "pledge": "make pledge",
-      "follow-decision": "follow decision",
-      "follow-creator": "follow creator"
+      "follow-decision": "favorite decision",
+      "follow-creator": "favorite creator",
+      "report": "make a report"
     },
     "subheading": "We'll sign you in or create an account.",
     "subheadingSessionExpired": "Session expired, please sign in again"
