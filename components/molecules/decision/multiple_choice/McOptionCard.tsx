@@ -27,7 +27,7 @@ import { TMcOptionWithHighestField } from '../../../organisms/decision/PostViewM
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModal';
+import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 
 import { formatNumber } from '../../../../utils/format';
@@ -44,12 +44,15 @@ import TutorialTooltip, {
 } from '../../../atoms/decision/TutorialTooltip';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
+import Headline from '../../../atoms/Headline';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
   option: TMcOptionWithHighestField;
   creator: newnewapi.IUser;
   postId: string;
+  postCreator: string;
+  postText: string;
   index: number;
   minAmount: number;
   votePrice: number;
@@ -70,6 +73,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   option,
   creator,
   postId,
+  postCreator,
+  postText,
   index,
   minAmount,
   votePrice,
@@ -94,6 +99,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const { appConstants } = useGetAppConstants();
   // const { walletBalance } = useContext(WalletContext);
+
+  console.log(option.creator);
 
   const isBlue = useMemo(
     () => !!option.isSupportedByMe,
@@ -559,7 +566,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             //   : {
             //       predefinedOption: 'card',
             //     })}
-            predefinedOption='card'
+            // predefinedOption='card'
             onClose={() => setPaymentModalOpen(false)}
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
@@ -568,13 +575,28 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 {t('McPost.paymentModalFooter.body')}
               </SPaymentFooter>
             }
-            payButtonCaptionKey={t('McPost.paymentModalPayButton')}
+            // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
           >
             <SPaymentModalHeader>
+              <SPaymentModalHeading>
+                <SPaymentModalHeadingPostSymbol>
+                  <SPaymentModalHeadingPostSymbolImg src={McSymbolIcon.src} />
+                </SPaymentModalHeadingPostSymbol>
+                <SPaymentModalHeadingPostCreator variant={3}>
+                  {t('McPost.paymentModalHeader.title', {
+                    creator: postCreator,
+                  })}
+                </SPaymentModalHeadingPostCreator>
+              </SPaymentModalHeading>
+              <SPaymentModalPostText variant={2}>
+                {postText}
+              </SPaymentModalPostText>
               <SPaymentModalTitle variant={3}>
                 {t('McPost.paymentModalHeader.subtitle')}
               </SPaymentModalTitle>
-              <SPaymentModalOptionText>{option.text}</SPaymentModalOptionText>
+              <SPaymentModalOptionText variant={5}>
+                {option.text}
+              </SPaymentModalOptionText>
             </SPaymentModalHeader>
           </PaymentModal>
         ) : null}
@@ -1141,12 +1163,54 @@ const SSelectVotesModalCard = styled.div<{
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
 
+const SPaymentModalHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 16px;
+
+  padding-right: 64px;
+  margin-bottom: 24px;
+`;
+
+const SPaymentModalHeadingPostSymbol = styled.div`
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+`;
+
+const SPaymentModalHeadingPostSymbolImg = styled.img`
+  width: 24px;
+`;
+
+const SPaymentModalHeadingPostCreator = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const SPaymentModalPostText = styled(Text)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 24px;
+`;
+
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   margin-bottom: 6px;
 `;
 
-const SPaymentModalOptionText = styled.div`
+const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;

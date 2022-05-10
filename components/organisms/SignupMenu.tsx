@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // Temp disabled until backend is in place
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -41,13 +42,16 @@ import FacebookIconLight from '../../public/images/svg/auth/icon-facebook-light.
 // Utils
 import isBrowser from '../../utils/isBrowser';
 import { AuthLayoutContext } from '../templates/AuthLayout';
+import isSafari from '../../utils/isSafari';
 
 export interface ISignupMenu {
+  goal?: string;
   reason?: SignupReason;
   redirectURL?: string;
 }
 
 const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
+  goal,
   reason,
   redirectURL,
 }) => {
@@ -87,7 +91,7 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
           newnewapi.SendVerificationEmailRequest.UseCase.SIGN_UP_WITH_EMAIL,
         ...(redirectURL
           ? {
-              redirectURL,
+              redirectUrl: redirectURL,
             }
           : {}),
       });
@@ -101,11 +105,13 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
 
       authLayoutContext.setShouldHeroUnmount(true);
 
-      setTimeout(() => {
+      if (!isSafari()) {
+        setTimeout(() => {
+          router.push('/verify-email');
+        }, 1000);
+      } else {
         router.push('/verify-email');
-      }, 1000);
-
-      // router.push('/verify-email');
+      }
     } catch (err: any) {
       setIsSubmitLoading(false);
       setSubmitError(err?.message ?? 'generic_error');
@@ -124,6 +130,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
       setEmailInputValid(isEmail(emailInput));
     }
   }, [emailInput, setEmailInputValid]);
+
+  const redirectUrlParam = redirectURL
+    ? `?redirect_url=${encodeURIComponent(redirectURL)}`
+    : '';
 
   return (
     <SSignupMenu
@@ -144,8 +154,10 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
         </SSignInBackButton>
         <SHeadline variant={3}>
           {reason && reason !== 'session_expired'
-            ? `${t('heading.sign_in_to')} ${t(`heading.reasons.${reason}`)}`
-            : t('heading.sign_in')}
+            ? `${t('heading.sign-in-to')} ${t(`heading.reasons.${reason}`)}`
+            : goal
+            ? t(`heading.${goal}`)
+            : t('heading.sign-in')}
         </SHeadline>
         <SSubheading variant={2} weight={600}>
           {reason !== 'session_expired'
@@ -159,7 +171,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={GoogleIcon}
               hoverBgColor={theme.colorsThemed.social.google.hover}
               pressedBgColor={theme.colorsThemed.social.google.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/google`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/google${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.google')}
             </SignInButton>
@@ -171,7 +187,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverBgColor='#000'
               hoverContentColor='#FFF'
               pressedBgColor={theme.colorsThemed.social.apple.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/apple`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/apple${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.apple')}
             </SignInButton>
@@ -183,7 +203,9 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               hoverSvg={FacebookIconLight}
               hoverBgColor={theme.colorsThemed.social.facebook.hover}
               pressedBgColor={theme.colorsThemed.social.facebook.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/fb`)}
+              onClick={() =>
+                handleSignupRedirect(`${BASE_URL_AUTH}/fb${redirectUrlParam}`)
+              }
             >
               {t('signupOptions.facebook')}
             </SignInButton>
@@ -194,7 +216,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
               svg={TwitterIcon}
               hoverBgColor={theme.colorsThemed.social.twitter.hover}
               pressedBgColor={theme.colorsThemed.social.twitter.pressed}
-              onClick={() => handleSignupRedirect(`${BASE_URL_AUTH}/twitter`)}
+              onClick={() =>
+                handleSignupRedirect(
+                  `${BASE_URL_AUTH}/twitter${redirectUrlParam}`
+                )
+              }
             >
               {t('signupOptions.twitter')}
             </SignInButton>
@@ -253,7 +279,11 @@ const SignupMenu: React.FunctionComponent<ISignupMenu> = ({
                 }
                 onClick={() => {}}
               >
-                <span>{t('signupOptions.signInBtn')}</span>
+                <span>
+                  {goal !== 'log-in'
+                    ? t('signupOptions.signInBtn')
+                    : t('signupOptions.logInBtn')}
+                </span>
               </EmailSignInButton>
             </motion.div>
           </SEmailSignInForm>
@@ -465,7 +495,7 @@ const SHeadline = styled(Headline)`
   }
 
   ${({ theme }) => theme.media.laptopL} {
-    margin-top: 140px;
+    margin-top: 80px;
 
     font-size: 32px;
     line-height: 40px;

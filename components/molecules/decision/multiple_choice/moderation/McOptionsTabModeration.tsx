@@ -90,7 +90,9 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
                 option={option as TMcOptionWithHighestField}
                 creator={option.creator ?? post.creator!!}
                 canBeDeleted={options.length > 2}
-                isCreatorsBid={option.creator?.uuid === post.creator?.uuid}
+                isCreatorsBid={
+                  !option.creator || option.creator?.uuid === post.creator?.uuid
+                }
               />
             ))}
             {!isMobile ? (

@@ -66,11 +66,13 @@ const VerficationCodeInput: React.FunctionComponent<IVerficationInput> = ({
   const handlePasteToFirstSlot = (
     e: React.ClipboardEvent<HTMLInputElement>
   ) => {
-    const data = e.clipboardData.getData('Text');
+    let data = e.clipboardData.getData('Text');
 
     if (!data) return;
 
     const regex = /[0-9]/;
+
+    data = data.split(' ').join('');
 
     if (data && !Array.isArray(data) && data.length === 6 && regex.test(data)) {
       const pastedCode = data.split('');

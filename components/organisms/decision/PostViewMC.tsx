@@ -667,9 +667,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
           title={post.title}
           totalVotes={totalVotes}
           hasWinner={false}
-          hasResponse={!!post.response}
           creator={post.creator!!}
-          startsAtSeconds={post.startsAt?.seconds as number}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
           handleReportOpen={handleReportOpen}
         />
@@ -713,6 +711,7 @@ const PostViewMC: React.FunctionComponent<IPostViewMC> = React.memo(
             />
           ) : currentTab === 'comments' && post.isCommentsAllowed ? (
             <CommentsTab
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => handleChangeTab('options')}
             />

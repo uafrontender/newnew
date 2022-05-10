@@ -294,6 +294,7 @@ const PostAwaitingResponseCF: React.FunctionComponent<IPostAwaitingResponseCF> =
               {t('SuccessCommon.Comments.heading')}
             </SCommentsHeadline>
             <CommentsSuccess
+              postUuid={post.postUuid}
               commentsRoomId={post.commentsRoomId as number}
               handleGoBack={() => {}}
             />

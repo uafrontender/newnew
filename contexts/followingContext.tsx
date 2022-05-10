@@ -40,8 +40,8 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
       isLoading,
       addId,
       removeId,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [followingsIds, removeId, addId, removeId]
   );
 
@@ -71,7 +71,7 @@ const FollowingsContextProvider: React.FC = ({ children }) => {
         // Redirect to sign up page
         if ((err as Error).message === 'Refresh token invalid') {
           dispatch(
-            logoutUserClearCookiesAndRedirect('sign-up?reason=session_expired')
+            logoutUserClearCookiesAndRedirect('/sign-up?reason=session_expired')
           );
         }
       }

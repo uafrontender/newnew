@@ -140,7 +140,9 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
     try {
       if (!user.loggedIn) {
         router.push(
-          `/sign-up?reason=follow-decision&redirect=${window.location.href}`
+          `/sign-up?reason=follow-decision&redirect=${encodeURIComponent(
+            window.location.href
+          )}`
         );
       }
       const markAsViewedPayload = new newnewapi.MarkPostRequest({
