@@ -36,7 +36,7 @@ import AcOptionCard from './AcOptionCard';
 import SuggestionTextArea from '../../../atoms/decision/SuggestionTextArea';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 import LoadingModal from '../../LoadingModal';
-import PaymentModal from '../../checkout/PaymentModal';
+import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import GradientMask from '../../../atoms/GradientMask';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 
@@ -48,10 +48,13 @@ import TutorialTooltip, {
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
+import Headline from '../../../atoms/Headline';
+import assets from '../../../../constants/assets';
 
 interface IAcOptionsTab {
   postId: string;
   postCreator: string;
+  postText: string;
   postDeadline: string;
   postStatus: TPostStatusStringified;
   options: newnewapi.Auction.Option[];
@@ -68,6 +71,7 @@ interface IAcOptionsTab {
 const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   postId,
   postCreator,
+  postText,
   postDeadline,
   postStatus,
   options,
@@ -447,6 +451,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               postId={postId}
               postCreator={postCreator}
               postDeadline={postDeadline}
+              postText={postText}
               index={i}
               minAmount={parseInt((appConstants.minAcBid / 100).toFixed(0))}
               votingAllowed={postStatus === 'voting'}
@@ -605,7 +610,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           //   : {
           //       predefinedOption: 'card',
           //     })}
-          predefinedOption='card'
+          // predefinedOption='card'
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -615,13 +620,28 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
               {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
             </SPaymentFooter>
           }
-          payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('AcPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
+            <SPaymentModalHeading>
+              <SPaymentModalHeadingPostSymbol>
+                <SPaymentModalHeadingPostSymbolImg
+                  src={assets.creation.AcStatic}
+                />
+              </SPaymentModalHeadingPostSymbol>
+              <SPaymentModalHeadingPostCreator variant={3}>
+                {t('AcPost.paymentModalHeader.title', { creator: postCreator })}
+              </SPaymentModalHeadingPostCreator>
+            </SPaymentModalHeading>
+            <SPaymentModalPostText variant={2}>
+              {postText}
+            </SPaymentModalPostText>
             <SPaymentModalTitle variant={3}>
               {t('AcPost.paymentModalHeader.subtitle')}
             </SPaymentModalTitle>
-            <SPaymentModalOptionText>{newBidText}</SPaymentModalOptionText>
+            <SPaymentModalOptionText variant={5}>
+              {newBidText}
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}
@@ -813,12 +833,58 @@ const SActionSection = styled.div`
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
 
+const SPaymentModalHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 16px;
+
+  padding-right: 64px;
+  margin-bottom: 24px;
+`;
+
+const SPaymentModalHeadingPostSymbol = styled.div`
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+`;
+
+const SPaymentModalHeadingPostSymbolImg = styled.img`
+  width: 24px;
+
+  position: relative;
+  top: -3px;
+  left: 2px;
+`;
+
+const SPaymentModalHeadingPostCreator = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const SPaymentModalPostText = styled(Text)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 24px;
+`;
+
 const SPaymentModalTitle = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   margin-bottom: 6px;
 `;
 
-const SPaymentModalOptionText = styled.div`
+const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;

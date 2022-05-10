@@ -18,12 +18,14 @@ import Button from '../../../atoms/Button';
 import Modal from '../../../organisms/Modal';
 import LoadingModal from '../../LoadingModal';
 import InlineSvg from '../../../atoms/InlineSVG';
-import PaymentModal from '../../checkout/PaymentModal';
+import PaymentModal from '../../checkout/PaymentModalRedirectOnly';
 import OptionActionMobileModal from '../OptionActionMobileModal';
 import BidAmountTextInput from '../../../atoms/decision/BidAmountTextInput';
 
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import getDisplayname from '../../../../utils/getDisplayname';
+import Headline from '../../../atoms/Headline';
+import assets from '../../../../constants/assets';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface ICfPledgeLevelsModal {
@@ -348,7 +350,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
           //   : {
           //       predefinedOption: 'card',
           //     })}
-          predefinedOption='card'
+          // predefinedOption='card'
           showTocApply={!user?.loggedIn}
           onClose={() => setPaymentModalOpen(false)}
           handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
@@ -360,13 +362,24 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
               })}
             </SPaymentFooter>
           }
-          payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
+          // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
         >
           <SPaymentModalHeader>
-            <SPaymentModalTitle variant={3}>
-              {t('CfPost.paymentModalHeader.subtitle')}
-            </SPaymentModalTitle>
-            <SPaymentModalOptionText>{post.title}</SPaymentModalOptionText>
+            <SPaymentModalHeading>
+              <SPaymentModalHeadingPostSymbol>
+                <SPaymentModalHeadingPostSymbolImg
+                  src={assets.creation.CfStatic}
+                />
+              </SPaymentModalHeadingPostSymbol>
+              <SPaymentModalHeadingPostCreator variant={3}>
+                {t('McPost.paymentModalHeader.title', {
+                  creator: getDisplayname(post.creator!!),
+                })}
+              </SPaymentModalHeadingPostCreator>
+            </SPaymentModalHeading>
+            <SPaymentModalOptionText variant={5}>
+              {post.title}
+            </SPaymentModalOptionText>
           </SPaymentModalHeader>
         </PaymentModal>
       ) : null}
@@ -473,12 +486,41 @@ const SSeparator = styled.div`
 // Payment modal header
 const SPaymentModalHeader = styled.div``;
 
-const SPaymentModalTitle = styled(Text)`
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-  margin-bottom: 6px;
+const SPaymentModalHeading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 16px;
+
+  padding-right: 64px;
+  margin-bottom: 24px;
 `;
 
-const SPaymentModalOptionText = styled.div`
+const SPaymentModalHeadingPostSymbol = styled.div`
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+`;
+
+const SPaymentModalHeadingPostSymbolImg = styled.img`
+  width: 24px;
+`;
+
+const SPaymentModalHeadingPostCreator = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+`;
+
+const SPaymentModalOptionText = styled(Headline)`
   display: flex;
   align-items: center;
   gap: 8px;
