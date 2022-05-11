@@ -351,7 +351,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 handleOpenMakePledgeForm={handleOpenCustomPledgeForm}
               />
               <GradientMaskHorizontal
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 height={`${
                   buttonsContainerRef.current?.getBoundingClientRect().height
                 }px`}
@@ -360,7 +360,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 active={showLeftGradient}
               />
               <GradientMaskHorizontal
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 height={`${
                   buttonsContainerRef.current?.getBoundingClientRect().height
                 }px`}
@@ -470,7 +470,7 @@ const SButtonsContainer = styled.div<{
   display: flex;
   flex-shrink: 0;
   flex-direction: row;
-  gap: 15px;
+  gap: 8px;
 
   width: 400px;
 

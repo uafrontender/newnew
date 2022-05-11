@@ -560,11 +560,14 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask
-          gradientType='secondary'
+          gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
           positionTop={heightDelta}
           active={showTopGradient}
         />
-        <GradientMask gradientType='secondary' active={showBottomGradient} />
+        <GradientMask
+          gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+          active={showBottomGradient}
+        />
       </STabContainer>
     </>
   );

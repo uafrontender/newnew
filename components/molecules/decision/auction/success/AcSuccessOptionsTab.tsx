@@ -5,7 +5,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useTranslation } from 'next-i18next';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 
 import { useAppSelector } from '../../../../../redux-store/store';
@@ -26,6 +26,7 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
   post,
   handleGoBack,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { user } = useAppSelector((state) => state);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -203,12 +204,12 @@ const AcSuccessOptionsTab: React.FunctionComponent<IAcSuccessOptionsTab> = ({
         {!isMobile ? (
           <>
             <GradientMask
-              gradientType='secondary'
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
               positionTop
               active={showTopGradient}
             />
             <GradientMask
-              gradientType='secondary'
+              gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
               positionBottom={0}
               active={showBottomGradient}
             />

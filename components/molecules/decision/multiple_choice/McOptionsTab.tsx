@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -90,6 +90,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   handleResetFreeVote,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -458,12 +459,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionTop
                 active={showTopGradient}
               />
               <GradientMask
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionBottom={heightDelta}
                 active={showBottomGradient}
               />
