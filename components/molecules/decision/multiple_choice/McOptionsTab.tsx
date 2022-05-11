@@ -51,7 +51,7 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
-import McSymbolIcon from '../../../../public/images/decision/mc-option.png';
+import assets from '../../../../constants/assets';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -675,7 +675,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SPaymentModalHeader>
             <SPaymentModalHeading>
               <SPaymentModalHeadingPostSymbol>
-                <SPaymentModalHeadingPostSymbolImg src={McSymbolIcon.src} />
+                <SPaymentModalHeadingPostSymbolImg
+                  src={assets.decision.votes}
+                />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
                 {t('McPost.paymentModalHeader.title', {

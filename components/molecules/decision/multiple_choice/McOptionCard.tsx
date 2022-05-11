@@ -33,7 +33,6 @@ import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 import { formatNumber } from '../../../../utils/format';
 
 // Icons
-import McSymbolIcon from '../../../../public/images/decision/mc-option.png';
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
@@ -45,6 +44,7 @@ import TutorialTooltip, {
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
+import assets from '../../../../constants/assets';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -99,8 +99,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 
   const { appConstants } = useGetAppConstants();
   // const { walletBalance } = useContext(WalletContext);
-
-  console.log(option.creator);
 
   const isBlue = useMemo(
     () => !!option.isSupportedByMe,
@@ -409,7 +407,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         >
           <SBidDetails isBlue={isBlue} noAction={noAction}>
             <SBidAmount>
-              <SOptionSymbolImg src={McSymbolIcon.src} />
+              <SOptionSymbolImg src={assets.decision.votes} />
               <div>
                 {option.voteCount && option.voteCount > 0
                   ? `${formatNumber(option?.voteCount, true)} ${t(
@@ -580,7 +578,9 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             <SPaymentModalHeader>
               <SPaymentModalHeading>
                 <SPaymentModalHeadingPostSymbol>
-                  <SPaymentModalHeadingPostSymbolImg src={McSymbolIcon.src} />
+                  <SPaymentModalHeadingPostSymbolImg
+                    src={assets.decision.votes}
+                  />
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
                   {t('McPost.paymentModalHeader.title', {
@@ -619,7 +619,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
               <SBidAmount>
-                <SOptionSymbolImg src={McSymbolIcon.src} />
+                <SOptionSymbolImg src={assets.decision.votes} />
                 <div>
                   {option.voteCount && option.voteCount > 0
                     ? `${formatNumber(option?.voteCount, true)}`
