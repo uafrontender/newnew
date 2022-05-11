@@ -168,18 +168,13 @@ const MyProfileSettginsIndex: NextPage = () => {
       parameter: 'email',
       configs: [
         {
-          title: 'New bids',
-          parameter: 'new_bids',
+          title: 'Updates to decisions you participated in',
+          parameter: 'decisions',
           value: true,
         },
         {
-          title: 'New decisions',
-          parameter: 'new_decisions',
-          value: true,
-        },
-        {
-          title: 'Flags',
-          parameter: 'flags',
+          title: 'Subscription updates',
+          parameter: 'subscriptions',
           value: true,
         },
       ],
@@ -189,18 +184,13 @@ const MyProfileSettginsIndex: NextPage = () => {
       parameter: 'push',
       configs: [
         {
-          title: 'New bids',
-          parameter: 'new_bids',
+          title: 'Updates to decisions you participated in',
+          parameter: 'decisions',
           value: true,
         },
         {
-          title: 'New decisions',
-          parameter: 'new_decisions',
-          value: true,
-        },
-        {
-          title: 'Flags',
-          parameter: 'flags',
+          title: 'Subscription updates',
+          parameter: 'subscriptions',
           value: true,
         },
       ],
