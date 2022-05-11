@@ -25,7 +25,6 @@ const Notification = dynamic(
   () => import('../components/molecules/notifications/Notification')
 );
 
-// UNUSED
 export const Notifications = () => {
   const { t } = useTranslation('notifications');
   const { ref: scrollRef, inView } = useInView();
