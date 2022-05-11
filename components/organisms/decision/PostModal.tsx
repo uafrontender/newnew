@@ -1059,7 +1059,10 @@ const SPostModalContainer = styled.div<{
 
   ${({ theme }) => theme.media.tablet} {
     top: 64px;
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : theme.colorsThemed.background.primary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
     width: 100%;
     height: calc(100% - 64px);
