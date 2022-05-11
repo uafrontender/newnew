@@ -864,7 +864,7 @@ const SButton = styled(Button)<ISButtonSpan>`
       props.cardType === 'cf'
         ? css`
             width: 100%;
-            text-align: left;
+            text-align: center;
           `
         : ''}
   }
