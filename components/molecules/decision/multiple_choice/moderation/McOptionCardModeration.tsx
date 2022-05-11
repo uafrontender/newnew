@@ -82,8 +82,8 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
     };
 
     const handleReportSubmit = useCallback(
-      async ({ reason, message }: ReportData) => {
-        await reportSuperpollOption(option.id, reason, message);
+      async ({ reasons, message }: ReportData) => {
+        await reportSuperpollOption(option.id, reasons, message);
         setIsReportModalOpen(false);
       },
       [option.id]
