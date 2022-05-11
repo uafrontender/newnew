@@ -370,9 +370,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   );
 
   const handleReportSubmit = useCallback(
-    async ({ reason, message }: ReportData) => {
+    async ({ reasons, message }: ReportData) => {
       if (postParsed) {
-        await reportPost(postParsed.postUuid, reason, message).catch((e) =>
+        await reportPost(postParsed.postUuid, reasons, message).catch((e) =>
           console.error(e)
         );
       }
