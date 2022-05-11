@@ -325,6 +325,7 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
                 imageStyle={{
                   position: 'relative',
                   left: '10%',
+                  bottom: '6px',
                 }}
               />
             ) : undefined
