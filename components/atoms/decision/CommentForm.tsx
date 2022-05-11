@@ -275,7 +275,10 @@ const SCommentsForm = styled.form<{
   background: ${({ theme }) => theme.colorsThemed.background.primary};
 
   ${(props) => props.theme.media.tablet} {
-    background: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : theme.colorsThemed.background.primary};
   }
 `;
 

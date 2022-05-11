@@ -18,9 +18,14 @@ const Cookie = React.memo(() => {
   const [animateCookie, setAnimateCookie] = useState(false);
 
   const handleClose = () => {
+    const d = new Date();
+
     setAnimation('trans-06-reverse');
     setAnimateCookie(true);
-    setCookie('accepted', true);
+    setCookie('accepted', true, {
+      expires: new Date(d.setFullYear(d.getFullYear() + 1)),
+      path: '/',
+    });
   };
   const handleAnimationEnd = () => {
     setAnimateCookie(false);
@@ -55,7 +60,7 @@ const Cookie = React.memo(() => {
         <SText>{t('cookie-text')}</SText>
         <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
         <Link href='/cookies'>
-          <a>
+          <a target='_blank'>
             <STextLink>{t('cookie-link')}</STextLink>
           </a>
         </Link>

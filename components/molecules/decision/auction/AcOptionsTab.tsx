@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 import { useInView } from 'react-intersection-observer';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
@@ -82,6 +82,7 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   handleLoadBids,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
@@ -432,12 +433,12 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionTop
                 active={showTopGradient}
               />
               <GradientMask
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionBottom={gradientMaskBottomPosition}
                 active={showBottomGradient}
               />
@@ -798,7 +799,10 @@ const SActionSection = styled.div`
 
     padding-top: 16px;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : theme.colorsThemed.background.primary};
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};

@@ -213,10 +213,12 @@ const SContainer = styled.div`
     margin-left: auto;
     margin-right: auto;
     max-width: 696px;
+
+    margin-bottom: 32px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    max-width: 1200px;
+    max-width: 1160px;
   }
 `;
 

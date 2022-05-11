@@ -557,6 +557,8 @@ const SImageHolder = styled.div<ISWrapper>`
     border-color: ${({ theme }) => theme.colorsThemed.background.outlines1};
     padding: 18px;
 
+    background-color: ${({ theme }) => theme.colorsThemed.background.primary};
+
     video {
       position: absolute;
       top: 10px;
@@ -862,7 +864,7 @@ const SButton = styled(Button)<ISButtonSpan>`
       props.cardType === 'cf'
         ? css`
             width: 100%;
-            text-align: left;
+            text-align: center;
           `
         : ''}
   }
