@@ -576,9 +576,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             show={confirmReportUser}
             reportedDisplayname={getDisplayname(chatRoom.visavis)}
             onClose={() => setConfirmReportUser(false)}
-            onSubmit={async ({ reason, message }) => {
+            onSubmit={async ({ reasons, message }) => {
               if (chatRoom?.visavis?.uuid) {
-                await reportUser(chatRoom.visavis.uuid, reason, message).catch(
+                await reportUser(chatRoom.visavis.uuid, reasons, message).catch(
                   (e) => console.error(e)
                 );
               }
