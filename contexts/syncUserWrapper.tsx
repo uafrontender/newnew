@@ -52,7 +52,6 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
                 isVerified: data.me?.options?.isVerified,
                 creatorStatus: data.me?.options?.creatorStatus,
                 birthDateUpdatesLeft: data.me?.options?.birthDateUpdatesLeft,
-                canChangeUsername: data.me?.options?.canChangeUsername,
                 isOfferingSubscription: data.me.options?.isOfferingSubscription,
               },
             } as TUserData)

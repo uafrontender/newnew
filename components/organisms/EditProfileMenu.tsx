@@ -445,7 +445,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           coverUrl: res.data.me?.coverUrl,
           options: {
             ...user.userData?.options,
-            canChangeUsername: res.data.me?.options?.canChangeUsername,
           },
         })
       );
@@ -786,9 +785,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <UsernameInput
                 type='text'
                 value={dataInEdit.username}
-                disabled={
-                  isLoading || !user.userData?.options?.canChangeUsername
-                }
+                disabled={isLoading}
                 popupCaption={
                   <UsernamePopupList
                     points={[
@@ -813,22 +810,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                       },
                     ]}
                   />
-                }
-                frequencyCaption={
-                  user.userData?.options?.canChangeUsername
-                    ? t('EditProfileMenu.inputs.username.frequencyCaption', {
-                        domain:
-                          process.env.NEXT_PUBLIC_APP_URL &&
-                          process.env.NEXT_PUBLIC_APP_URL[
-                            (process.env.NEXT_PUBLIC_APP_URL?.length ?? 1) - 1
-                          ] === '/'
-                            ? process.env.NEXT_PUBLIC_APP_URL
-                            : `${process.env.NEXT_PUBLIC_APP_URL}/`,
-                        username: dataInEdit.username,
-                      })
-                    : t(
-                        'EditProfileMenu.inputs.username.cannotBeChangedCaption'
-                      )
                 }
                 errorCaption={t(
                   `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`

@@ -9,14 +9,12 @@ import AnimatedPresence from '../AnimatedPresence';
 type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   popupCaption: ReactElement;
-  frequencyCaption: string;
   errorCaption: string;
 };
 
 const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   value,
   popupCaption,
-  frequencyCaption,
   errorCaption,
   isValid,
   disabled,
@@ -107,7 +105,6 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
           </SPopup>
         ) : null}
       </AnimatePresence>
-      <SCaptionDiv disabled={disabled ?? false}>{frequencyCaption}</SCaptionDiv>
       <SStyledButton
         disabled={disabled}
         onClick={() => setIsPopupVisible((curr) => !curr)}
@@ -248,30 +245,6 @@ const SPopup = styled(motion.div)`
       'M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z'
     );
   }
-`;
-
-const SCaptionDiv = styled.div<{
-  disabled: boolean;
-}>`
-  text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  padding-left: 20px;
-  margin-bottom: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-
-  margin-top: 6px;
-
-  ${({ disabled }) => {
-    if (disabled)
-      return css`
-        opacity: 0.5;
-      `;
-    return null;
-  }}
 `;
 
 const SErrorDiv = styled.div`
