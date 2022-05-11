@@ -98,18 +98,18 @@ const SImageBG = styled.div<ISImageBG>`
   height: 60%;
   position: relative;
 
-  padding: 16px;
-  padding-bottom: 0px;
+  padding: 48px;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  border-radius: 10px;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   ${({ theme }) => theme.media.tablet} {
-    justify-content: flex-end;
+    padding: 16px;
   }
 `;
 
@@ -130,7 +130,7 @@ const SImageHolder = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     img {
-      height: 182px;
+      height: 172px;
     }
   }
 `;
@@ -138,13 +138,20 @@ const SImageHolder = styled.div`
 const SHeadline = styled(Headline)`
   margin-top: 36px;
   text-align: center;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 10px;
+  }
 `;
 
 const SBottomContent = styled(Text)`
   text-align: center;
-  padding: 8px 10px;
+  padding-top: 8px;
 
   font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
 
   ${(props) => props.theme.media.tablet} {
     width: 180px;

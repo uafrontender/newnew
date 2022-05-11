@@ -117,7 +117,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
 
     return (
       <Link key={item.key} href={item.url} passHref>
-        <SBlockOption>{t(`footer-${item.key}`)}</SBlockOption>
+        <SBlockOption target='_blank'>{t(`footer-${item.key}`)}</SBlockOption>
       </Link>
     );
   };

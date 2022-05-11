@@ -211,6 +211,10 @@ const SLabelButton = styled.button`
   font-weight: 500;
   line-height: 20px;
 
+  span {
+    line-break: strict;
+  }
+
   ${({ theme }) => theme.media.tablet} {
     font-size: 16px;
     line-height: 24px;
@@ -225,6 +229,7 @@ const SLabelButton = styled.button`
 
   span {
     margin-right: 8px;
+    line-break: strict;
   }
 
   transition: 0.2s linear;

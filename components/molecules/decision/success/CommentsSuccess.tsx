@@ -1,5 +1,6 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
@@ -538,12 +539,24 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask
-          gradientType={isMobile ? 'primary' : 'secondary'}
+          gradientType={
+            isMobile
+              ? 'primary'
+              : theme.name === 'dark'
+              ? 'secondary'
+              : 'primary'
+          }
           positionTop={heightDelta}
           active={showTopGradient}
         />
         <GradientMask
-          gradientType={isMobile ? 'primary' : 'secondary'}
+          gradientType={
+            isMobile
+              ? 'primary'
+              : theme.name === 'dark'
+              ? 'secondary'
+              : 'primary'
+          }
           active={showBottomGradient}
         />
       </STabContainer>

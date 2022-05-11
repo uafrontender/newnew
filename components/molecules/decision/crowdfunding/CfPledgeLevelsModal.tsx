@@ -372,7 +372,7 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                 />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
-                {t('McPost.paymentModalHeader.title', {
+                {t('CfPost.paymentModalHeader.title', {
                   creator: getDisplayname(post.creator!!),
                 })}
               </SPaymentModalHeadingPostCreator>

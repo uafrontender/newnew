@@ -10,6 +10,7 @@ import StatisticsIconFilled from '../../../public/images/svg/icons/filled/Statis
 import CommentsIcon from '../../../public/images/svg/icons/outlined/Comments.svg';
 import CommentsIconFilled from '../../../public/images/svg/icons/filled/Comments.svg';
 import { useAppSelector } from '../../../redux-store/store';
+import isSafari from '../../../utils/isSafari';
 
 type TDecisonTab = {
   label: string;
@@ -80,6 +81,13 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
       ref={(el) => {
         tabsRef.current = el!!;
       }}
+      style={{
+        ...(tabs.length === 1 && isSafari()
+          ? {
+              paddingBottom: '0px',
+            }
+          : {}),
+      }}
     >
       <STabsContainer
         ref={(el) => {
@@ -91,6 +99,7 @@ const DecisionTabs: React.FunctionComponent<IDecisionTabs> = ({
                 justifyContent: 'center',
                 visibility: 'hidden',
                 display: isMobile ? 'none' : 'flex',
+                paddingBottom: '0px',
               }
             : {}),
         }}
