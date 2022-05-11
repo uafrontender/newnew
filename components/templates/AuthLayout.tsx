@@ -121,7 +121,11 @@ const BackgroundVisual: React.FunctionComponent<IBackgroundVisual> = ({
   return (
     <SBackgroundVisual>
       <AnimatePresence>
-        {view === 'sign-up' && <HeroVisual key='hero-visual' />}
+        {view === 'sign-up' && (
+          <HeroVisualContainer>
+            <HeroVisual key='hero-visual' />
+          </HeroVisualContainer>
+        )}
         {view === 'verify-email' && <VerifyEmailVisual />}
       </AnimatePresence>
     </SBackgroundVisual>
@@ -144,6 +148,23 @@ const SBackgroundVisual = styled.div`
 
     color: #000;
     text-align: center;
+  }
+`;
+
+const HeroVisualContainer = styled('div')`
+  position: absolute;
+  display: none;
+
+  ${({ theme }) => theme.media.tablet} {
+    display: block;
+
+    right: 55%;
+    top: 25%;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    right: 50%;
+    top: 100px;
   }
 `;
 

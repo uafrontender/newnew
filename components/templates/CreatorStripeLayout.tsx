@@ -11,6 +11,7 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import { useAppSelector } from '../../redux-store/store';
+import HeroVisual from './HeroVisual';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
@@ -30,6 +31,9 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
 }) => {
   const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
 
   return (
@@ -54,6 +58,11 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
             </SHomeLogoButton>
           ) : null}
           <SContentContainer>{children}</SContentContainer>
+          {!isMobile && !isTablet && (
+            <HeroVisualContainer>
+              <HeroVisual />
+            </HeroVisualContainer>
+          )}
         </SCreatorStripeLayout>
       </SkeletonTheme>
     </ErrorBoundary>
@@ -111,4 +120,12 @@ const SContentContainer = styled.div`
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+`;
+
+const HeroVisualContainer = styled('div')`
+  position: absolute;
+  display: block;
+  top: 100px;
+  margin-right: 100px;
+  right: 50%;
 `;
