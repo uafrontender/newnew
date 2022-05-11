@@ -515,6 +515,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       () => (
         <>
           <SItemWrapper>
+            <SInputLabel htmlFor='title'>Title</SInputLabel>
             <TextArea
               id='title'
               value={post?.title}
@@ -666,7 +667,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
             </>
           ) : (
             <>
-              <SItemWrapper>
+              <SItemWrapper style={{ marginBottom: 16 }}>
                 <TabletFieldBlock
                   id='expiresAt'
                   type='select'
@@ -682,10 +683,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   )}
                 />
               </SItemWrapper>
-              <SSeparator margin='16px 0' />
-              <STabletBlockTitle variant={1} weight={700}>
-                {t('secondStep.field.startsAt.tablet.title')}
-              </STabletBlockTitle>
               <TabletStartDate
                 id='startsAt'
                 value={post.startsAt}
@@ -1309,5 +1306,12 @@ const SButtonUser = styled(Button)`
 `;
 
 const SCaption = styled(Caption)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SInputLabel = styled.label`
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
