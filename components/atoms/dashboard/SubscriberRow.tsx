@@ -38,9 +38,9 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
   const handleOpenEllipseMenu = () => setEllipseMenuOpen(true);
   const handleCloseEllipseMenu = () => setEllipseMenuOpen(false);
 
-  const handleReportSubmit = async ({ reason, message }: ReportData) => {
+  const handleReportSubmit = async ({ reasons, message }: ReportData) => {
     if (subscriber.user?.uuid) {
-      await reportUser(subscriber.user.uuid, reason, message);
+      await reportUser(subscriber.user.uuid, reasons, message);
     }
     setConfirmReportUser(false);
   };

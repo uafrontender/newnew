@@ -12,7 +12,7 @@ import CheckMark from '../CheckMark';
 const GoBackButton = dynamic(() => import('../GoBackButton'));
 
 export interface ReportData {
-  reason: newnewapi.ReportingReason;
+  reasons: newnewapi.ReportingReason[];
   message: string;
 }
 
@@ -71,8 +71,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     const submitReport = () => {
       if (reasons.length > 0 && message.length >= 15) {
         onSubmit({
-          // TODO: Update newnew-api, send all reasons
-          reason: reasons[0],
+          reasons,
           message,
         });
         setReasons([]);

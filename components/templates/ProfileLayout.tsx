@@ -266,9 +266,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
   );
 
   const handleReportSubmit = useCallback(
-    async ({ reason, message }: ReportData) => {
+    async ({ reasons, message }: ReportData) => {
       if (currentUser.userData?.userUuid) {
-        await reportUser(currentUser.userData.userUuid, reason, message).catch(
+        await reportUser(currentUser.userData.userUuid, reasons, message).catch(
           (e) => console.error(e)
         );
       }
