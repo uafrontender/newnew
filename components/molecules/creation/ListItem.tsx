@@ -103,19 +103,15 @@ const SWrapper = styled.div`
   }
 
   ${(props) => props.theme.media.tablet} {
-    padding: 44px 24px 24px 24px;
+    padding: 20px 24px 24px 24px;
   }
 
   ${(props) => props.theme.media.laptop} {
     img {
       transition: all ease 0.5s;
-      filter: grayscale(1);
     }
     :hover {
       transform: translateY(-12px);
-      img {
-        filter: grayscale(0);
-      }
     }
   }
 `;
@@ -135,6 +131,7 @@ const SContent = styled.div`
 
 const STitle = styled(Caption)`
   margin-bottom: 4px;
+  margin-top: 18px;
 
   ${(props) => props.theme.media.tablet} {
     text-align: center;
@@ -155,7 +152,7 @@ const SImageWrapper = styled.div`
   min-height: 80px;
 
   ${(props) => props.theme.media.tablet} {
-    top: -77px;
+    top: -100px;
     left: 50%;
     position: absolute;
     transform: translateX(-50%);
