@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../InlineSVG';
 
