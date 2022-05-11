@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useMemo, useState } from 'react';
-import moment from 'moment';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
@@ -51,16 +50,6 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     e.preventDefault();
     e.stopPropagation();
   };
-  const formatStartsAt = useCallback(() => {
-    const time = moment(
-      `${post.startsAt.time} ${post.startsAt['hours-format']}`,
-      ['hh:mm a']
-    );
-
-    return moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
-  }, [post.startsAt]);
   const socialButtons = useMemo(
     () => [
       // {
@@ -176,20 +165,31 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
               {post?.title}
             </SUserTitle>
           </SUserBlock>
-          <SSubTitle variant={2} weight={500}>
+          <STitle variant={6}>
             {t(
-              `published.texts.desktop.subTitle-${
+              `published.texts.title-${
                 post.startsAt.type === 'right-away' ? 'published' : 'scheduled'
-              }`,
-              {
-                value: formatStartsAt().format('DD MMM [at] hh:mm A'),
-              }
+              }`
             )}
-          </SSubTitle>
-          <STitle variant={6}>{t('published.texts.title')}</STitle>
+          </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
           <SButtonWrapper onClick={handleClose}>
-            <SButtonTitle>{t('published.button.submit')}</SButtonTitle>
+            <SButtonTitle>
+              {t(
+                `published.button.submit-${
+                  post.startsAt.type === 'right-away'
+                    ? 'published'
+                    : 'scheduled'
+                }`,
+                {
+                  value: postData!!.auction
+                    ? 'Event'
+                    : postData!!.crowdfunding
+                    ? 'Goal'
+                    : 'Superpoll',
+                }
+              )}
+            </SButtonTitle>
           </SButtonWrapper>
         </SContent>
       </SMobileContainer>
@@ -229,11 +229,6 @@ const SPlayerWrapper = styled.div`
 
 const STitle = styled(Headline)`
   margin-top: 24px;
-  text-align: center;
-`;
-
-const SSubTitle = styled(Text)`
-  margin-top: 16px;
   text-align: center;
 `;
 
