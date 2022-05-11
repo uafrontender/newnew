@@ -116,7 +116,9 @@ const STitleContainer = styled.div`
   margin-bottom: 24px;
 `;
 
-const SCancelButton = styled(Button)``;
+const SCancelButton = styled(Button)`
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
+`;
 
 const STitleText = styled(Headline)`
   text-align: left;

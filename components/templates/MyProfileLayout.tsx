@@ -666,7 +666,7 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
           <Modal
             show={isEditProfileMenuOpen}
             overlayDim
-            transitionSpeed={isMobileOrTablet ? 0.5 : 0}
+            transitionSpeed={isMobileOrTablet ? 0.15 : 0}
             onClose={handleClosePreventDiscarding}
           >
             {isEditProfileMenuOpen ? (

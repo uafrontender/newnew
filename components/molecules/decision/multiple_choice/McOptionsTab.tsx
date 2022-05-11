@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -51,7 +51,7 @@ import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McConfirmUseFreeVoteModal from './McConfirmUseFreeVoteModal';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
-import McSymbolIcon from '../../../../public/images/decision/mc-option.png';
+import assets from '../../../../constants/assets';
 
 interface IMcOptionsTab {
   post: newnewapi.MultipleChoice;
@@ -90,6 +90,7 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
   handleResetFreeVote,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
@@ -458,12 +459,12 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           {!isMobile ? (
             <>
               <GradientMask
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionTop
                 active={showTopGradient}
               />
               <GradientMask
-                gradientType='secondary'
+                gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                 positionBottom={heightDelta}
                 active={showBottomGradient}
               />
@@ -675,7 +676,9 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
           <SPaymentModalHeader>
             <SPaymentModalHeading>
               <SPaymentModalHeadingPostSymbol>
-                <SPaymentModalHeadingPostSymbolImg src={McSymbolIcon.src} />
+                <SPaymentModalHeadingPostSymbolImg
+                  src={assets.decision.votes}
+                />
               </SPaymentModalHeadingPostSymbol>
               <SPaymentModalHeadingPostCreator variant={3}>
                 {t('McPost.paymentModalHeader.title', {
@@ -868,7 +871,10 @@ const SActionSection = styled.div`
 
     padding-top: 8px;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : theme.colorsThemed.background.primary};
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
@@ -895,7 +901,10 @@ const SActionSectionSubscribe = styled.div`
 
   padding-top: 24px;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : theme.colorsThemed.background.primary};
 
   div {
     width: 100%;
