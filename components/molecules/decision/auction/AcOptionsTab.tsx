@@ -798,7 +798,10 @@ const SActionSection = styled.div`
 
     padding-top: 16px;
 
-    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : theme.colorsThemed.background.primary};
 
     border-top: 1.5px solid
       ${({ theme }) => theme.colorsThemed.background.outlines1};
