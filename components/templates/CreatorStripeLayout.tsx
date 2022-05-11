@@ -1,8 +1,6 @@
 import React from 'react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -13,7 +11,6 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import { useAppSelector } from '../../redux-store/store';
-import Text from '../atoms/Text';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
@@ -32,17 +29,7 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
   children,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
-  const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = [
-    'mobile',
-    'mobileS',
-    'mobileM',
-    'mobileL',
-    'tablet',
-    'laptop',
-  ].includes(resizeMode);
   const isTablet = ['tablet'].includes(resizeMode);
 
   return (
@@ -67,12 +54,6 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
             </SHomeLogoButton>
           ) : null}
           <SContentContainer>{children}</SContentContainer>
-          {!isMobileOrTablet &&
-            !router.pathname.includes('creator-onboarding') && (
-              <SSideMessage>
-                <Text variant={2}>{t(`stripe.side.subheading`)}</Text>
-              </SSideMessage>
-            )}
         </SCreatorStripeLayout>
       </SkeletonTheme>
     </ErrorBoundary>
@@ -122,22 +103,6 @@ const SContentContainer = styled.div`
     left: unset;
     right: 0;
   }
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-`;
-
-const SSideMessage = styled.div`
-  position: fixed;
-  bottom: 48px;
-  left: 104px;
-
-  max-width: 400px;
 
   /* No select */
   -webkit-touch-callout: none;
