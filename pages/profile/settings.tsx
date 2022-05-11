@@ -366,7 +366,7 @@ const MyProfileSettginsIndex: NextPage = () => {
   }, [socketConnection]);
 
   useEffect(() => {
-    async function fetchUsersIblocked() {
+    async function fetchUsersIBlocked() {
       try {
         const users: newnewapi.User[] = [];
 
@@ -388,7 +388,7 @@ const MyProfileSettginsIndex: NextPage = () => {
       }
     }
 
-    fetchUsersIblocked();
+    fetchUsersIBlocked();
   }, [usersIBlockedIds]);
 
   return (
@@ -491,6 +491,7 @@ const SGoBackButton = styled(GoBackButton)`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 32px;
+  font-weight: 600;
 
   ${({ theme }) => theme.media.laptop} {
     margin-bottom: 40px;

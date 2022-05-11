@@ -223,7 +223,7 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
               'Settings.sections.PersonalInformation.birthDateInput.label'
             )}
             bottomCaption={t(
-              'Settings.sections.PersonalInformation.birthDateInput.captions.cannotChange'
+              'Settings.sections.PersonalInformation.birthDateInput.captions.twoTimesOnly'
             )}
             onChange={handleDateInput}
             handleSetActive={() => handleSetActive()}
