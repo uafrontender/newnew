@@ -66,7 +66,7 @@ const SettingsAccordion: React.FunctionComponent<ISettingsAccordion> = ({
               isOpen={sectionsState[i]}
               onClick={() => handleToggleSection(i)}
             >
-              <Headline variant={6}>{section.title}</Headline>
+              <SHeadline variant={6}>{section.title}</SHeadline>
               <SInlineSvg
                 svg={ChevronDown}
                 isOpen={sectionsState[i]}
@@ -125,6 +125,10 @@ const SSettingsAccordionItemHeading = styled.button<{
 
   cursor: pointer;
 `;
+
+const SHeadline = styled(Headline)({
+  fontWeight: 600,
+});
 
 const SInlineSvg = styled(InlineSvg)<{
   isOpen: boolean;

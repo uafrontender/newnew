@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 
 import { TUserData } from '../../../redux-store/slices/userStateSlice';
 
@@ -24,7 +23,6 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   currentUser,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('profile');
 
   return (
@@ -65,14 +63,22 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
         {cardInfo.direction === 'from' ? <span>- </span> : null}$
         {cardInfo.amount.toFixed(2)}
       </SAmount>
-      <SDate variant={2}>
-        {cardInfo.date.toLocaleDateString(router.locale).replaceAll('/', '.')}
-      </SDate>
+      <SDate variant={2}>{getFormattedDate(cardInfo.date)}</SDate>
     </STransactionCard>
   );
 };
 
 export default TransactionCard;
+
+function getFormattedDate(date: Date): string {
+  return date
+    .toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+    .replaceAll(',', '');
+}
 
 const STransactionCard = styled.div`
   display: grid;

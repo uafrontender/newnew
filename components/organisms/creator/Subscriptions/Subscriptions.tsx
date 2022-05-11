@@ -47,8 +47,8 @@ export const Subscriptions: React.FC = React.memo(() => {
       } else {
         /* eslint-disable no-unused-expressions */
         !onboardingState?.isCreatorConnectedToStripe
-          ? router.push('/creator/get-paid')
-          : router.push('/creator/subscribers/edit-subscription-rate');
+          ? router.replace('/creator/get-paid')
+          : router.replace('/creator/subscribers/edit-subscription-rate');
       }
     } catch (err) {
       console.error(err);
