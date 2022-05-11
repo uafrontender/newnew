@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
@@ -20,46 +20,69 @@ const Notification: React.FC<newnewapi.INotification> = ({
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+
+  const [url, setUrl] = useState('');
+
+  useEffect(() => {
+    if (url.length < 1 && target) {
+      if (target.creatorDashboard && target?.creatorDashboard.section === 2)
+        setUrl('/direct-messages');
+
+      if (target.creatorDashboard && target?.creatorDashboard.section === 1)
+        setUrl('/creator/subscribers');
+
+      if (target.userProfile && target?.userProfile.userUsername)
+        setUrl(`/direct-messages/${target.userProfile.userUsername}`);
+
+      if (target.postResponse && target?.postResponse.postUuid)
+        setUrl(`/post/${target.postResponse.postUuid}`);
+    }
+  }, [url, target]);
+
   return (
-    <SWrapper>
-      <SAvatarHolder>
-        <SUserAvatar
-          avatarUrl={
-            content?.relatedUser?.thumbnailAvatarUrl
-              ? content?.relatedUser?.thumbnailAvatarUrl
-              : ''
-          }
-        />
-        {target && (
-          <SIcon>
-            <SInlineSVG
-              svg={
-                target === newnewapi.RoutingTarget.ChatRoomTarget
-                  ? MessageIcon
-                  : MessageCircle
-              }
-              fill={theme.colors.white}
-              width='14px'
-              height='14px'
-            />
-          </SIcon>
-        )}
-      </SAvatarHolder>
-      <SText>
-        <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
-        <p>{content!!.message}</p>
-        <SDate>{moment((createdAt?.seconds as number) * 1000).fromNow()}</SDate>
-      </SText>
-      {content!!.relatedPost &&
-        content!!.relatedPost.thumbnailImageUrl &&
-        !isMobile && (
-          <Link href={`/post/${content?.relatedPost.uuid}`}>
+    <Link href={url}>
+      <SWrapper>
+        <SAvatarHolder>
+          <SUserAvatar
+            avatarUrl={
+              content?.relatedUser?.thumbnailAvatarUrl
+                ? content?.relatedUser?.thumbnailAvatarUrl
+                : ''
+            }
+          />
+          {target && (
+            <SIcon>
+              <SInlineSVG
+                svg={
+                  target === newnewapi.RoutingTarget.ChatRoomTarget
+                    ? MessageIcon
+                    : MessageCircle
+                }
+                fill={theme.colors.white}
+                width='14px'
+                height='14px'
+              />
+            </SIcon>
+          )}
+        </SAvatarHolder>
+        <SText>
+          <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
+          <p>{content!!.message}</p>
+          <SDate>
+            {moment((createdAt?.seconds as number) * 1000).fromNow()}
+          </SDate>
+        </SText>
+        {content!!.relatedPost &&
+          content!!.relatedPost.thumbnailImageUrl &&
+          !isMobile && (
+            // <Link href={`/post/${content?.relatedPost.uuid}`}>
             <SPostThumbnail
               avatarUrl={content!!.relatedPost.thumbnailImageUrl}
             />
-          </Link>
-        )}
-    </SWrapper>
+            // </Link>
+          )}
+      </SWrapper>
+    </Link>
   );
 };
 
@@ -69,6 +92,7 @@ const SWrapper = styled.div`
   display: flex;
   padding: 12px 0 0;
   border-bottom: 0;
+  cursor: pointer;
   ${({ theme }) => theme.media.tablet} {
     border-bottom: 1px solid
       ${(props) => props.theme.colorsThemed.background.outlines1};
