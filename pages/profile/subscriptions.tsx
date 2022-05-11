@@ -11,7 +11,6 @@ import { NextPageWithLayout } from '../_app';
 
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
-import PostsFilterSection from '../../components/molecules/profile/PostsFilterSection';
 import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
 
@@ -56,7 +55,6 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
   return (
     <div>
       <SMain>
-        <PostsFilterSection numDecisions={totalCount} />
         <SCardsSection>
           {creatorsImSubscribedTo.length > 0 ? (
             <CreatorsList

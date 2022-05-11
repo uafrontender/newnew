@@ -24,7 +24,7 @@ import Button from '../../components/atoms/Button';
 import Headline from '../../components/atoms/Headline';
 import GoBackButton from '../../components/molecules/GoBackButton';
 import FaqSection from '../../components/molecules/subscribe/FaqSection';
-import PaymentModal from '../../components/molecules/checkout/PaymentModal';
+import PaymentModal from '../../components/molecules/checkout/PaymentModalRedirectOnly';
 
 import isBrowser from '../../utils/isBrowser';
 import { formatNumber } from '../../utils/format';
@@ -85,7 +85,11 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   const handleOpenPaymentModal = () => {
     if (!loggedIn) {
-      router.push(`/sign-up?reason=subscribe&redirect=${window.location.href}`);
+      router.push(
+        `/sign-up?reason=subscribe&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
       return;
     }
     setIsPaymentModalOpen(true);
@@ -330,13 +334,13 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
       )}
       <PaymentModal
         zIndex={10}
-        predefinedOption={predefinedOption}
+        // predefinedOption={predefinedOption}
         isOpen={isPaymentModalOpen}
         amount={`$${subPriceFormatted}`}
         onClose={() => setIsPaymentModalOpen(false)}
         handlePayWithCardStripeRedirect={handlePayRegistered}
         // handlePayWithWallet={handlePayRegistered}
-        payButtonCaptionKey={t('paymentModalPayButton')}
+        // payButtonCaptionKey={t('paymentModalPayButton')}
       >
         <SPaymentModalHeader>
           <SPaymentModalTitle variant={3}>

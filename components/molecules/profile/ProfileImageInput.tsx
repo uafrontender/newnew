@@ -39,7 +39,12 @@ const ProfileImageInput: React.FunctionComponent<IProfileImageInput> = ({
         ref={(el) => {
           imageInputRef.current = el!!;
         }}
-        onChange={handleImageInputChange}
+        onChange={(e) => {
+          handleImageInputChange(e);
+          if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+          }
+        }}
       />
       <SEditButton
         iconOnly

@@ -8,6 +8,7 @@ import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
 import copyIcon from '../../public/images/svg/icons/outlined/Link.svg';
+import { useAppSelector } from '../../redux-store/store';
 
 interface IShareMenu {
   isVisible: boolean;
@@ -21,6 +22,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
   absolute,
 }) => {
   const { t } = useTranslation('common');
+  const user = useAppSelector((state) => state.user);
   const containerRef = useRef<HTMLDivElement>();
 
   useOnClickEsc(containerRef, handleClose);
@@ -38,7 +40,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
 
   const handlerCopy = useCallback(() => {
     if (window) {
-      const url = `${window.location}`;
+      const url = `${window.location.origin}/${user.userData?.username}`;
 
       copyPostUrlToClipboard(url)
         .then(() => {
@@ -52,6 +54,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
           console.log(err);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleClose]);
 
   return (
@@ -68,7 +71,7 @@ const ShareMenu: React.FC<IShareMenu> = ({
         >
           <SItemButtonWide onClick={handlerCopy}>
             <InlineSvg svg={copyIcon} width='24px' height='24px' />
-            {isCopiedUrl ? t(`socials.copied`) : t(`socials.copy`)}
+            {isCopiedUrl ? t('my-link-copied') : t('my-link')}
           </SItemButtonWide>
         </SContainer>
       )}

@@ -29,6 +29,18 @@ export const markAsRead = (payload: newnewapi.MarkAsReadRequest) =>
     payload
   );
 
+export const markAllAsRead = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_NOTIFICATION}/mark_all_as_read`,
+    'post',
+    payload
+  );
+
 export const getUnreadNotificationCount = (payload: newnewapi.EmptyRequest) =>
   fetchProtobufProtectedIntercepted<
     newnewapi.EmptyRequest,

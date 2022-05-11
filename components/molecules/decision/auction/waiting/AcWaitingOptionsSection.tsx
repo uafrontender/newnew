@@ -217,6 +217,7 @@ const AcWaitingOptionsSection: React.FunctionComponent<IAcWaitingOptionsSection>
               postId={post.postUuid}
               postCreator={post.creator?.nickname!!}
               postDeadline=''
+              postText=''
               index={i}
               minAmount={0}
               votingAllowed={false}

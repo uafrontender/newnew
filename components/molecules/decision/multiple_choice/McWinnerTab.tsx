@@ -53,10 +53,10 @@ const McWinnerTab: React.FunctionComponent<IMcWinnerTab> = ({
     [user.loggedIn, option.creator?.uuid, user.userData?.userUuid]
   );
 
-  const isCreatorsBid = useMemo(() => {
-    if (!option.creator) return true;
-    return false;
-  }, [option.creator]);
+  const isCreatorsBid = useMemo(
+    () => option.creator?.uuid === postCreator.uuid,
+    [option.creator?.uuid, postCreator.uuid]
+  );
 
   const containerRef = useRef<HTMLDivElement>();
   const [isScrolledDown, setIsScrolledDown] = useState(false);

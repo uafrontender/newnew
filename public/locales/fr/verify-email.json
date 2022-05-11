@@ -6,7 +6,7 @@
   "goBackBtn": "FR Go back",
   "heading": {
     "heading": "FR Email verification",
-    "subheading": "FR Please, enter a code we’ve sent you to"
+    "subheading": "FR Please enter the code we sent to"
   },
   "timeExpired": {
     "not_receieved": "FR Didn’t receive a code?",

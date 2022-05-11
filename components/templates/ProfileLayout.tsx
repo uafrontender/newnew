@@ -265,6 +265,19 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     [renderedPage]
   );
 
+  const handleClickReport = useCallback(() => {
+    if (!currentUser.loggedIn) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
+
+    setConfirmReportUser(true);
+  }, [currentUser, router]);
+
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
       if (currentUser.userData?.userUuid) {
@@ -331,7 +344,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
     try {
       if (!currentUser.loggedIn) {
         router.push(
-          `/sign-up?reason=follow-creator&redirect=${window.location.href}`
+          `/sign-up?reason=follow-creator&redirect=${encodeURIComponent(
+            window.location.href
+          )}`
         );
       }
 
@@ -467,9 +482,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                   setBlockUserModalOpen(true);
                 }
               }}
-              handleClickReport={() => {
-                setConfirmReportUser(true);
-              }}
+              handleClickReport={handleClickReport}
               handleClickUnsubscribe={() => {}}
             />
           )}

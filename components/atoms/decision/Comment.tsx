@@ -5,6 +5,7 @@ import styled, { keyframes, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import moment from 'moment';
 
 import Button from '../Button';
@@ -44,6 +45,7 @@ const Comment: React.FC<IComment> = ({
   handleDeleteComment,
 }) => {
   const theme = useTheme();
+  const router = useRouter();
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -70,8 +72,17 @@ const Comment: React.FC<IComment> = ({
   const replies = useMemo(() => comment.replies ?? [], [comment.replies]);
 
   const onUserReport = useCallback(() => {
+    if (!user.loggedIn) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
+
     setConfirmReportUser(true);
-  }, []);
+  }, [user, router]);
 
   const onDeleteComment = () => {
     setConfirmDeleteComment(true);

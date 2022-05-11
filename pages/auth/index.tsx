@@ -61,29 +61,31 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         let res: APIResponse<newnewapi.SignInResponse>;
 
         if (provider === 'google') {
-          const { code } = router.query;
+          const { code, state } = router.query;
 
           if (!code || Array.isArray(code)) throw new Error('No code');
 
           const requestPayload = new newnewapi.GoogleSignInRequest({
             code,
+            state: state as string,
           });
 
           res = await signInWithGoogle(requestPayload);
         } else if (provider === 'fb') {
-          const { code } = router.query;
+          const { code, state } = router.query;
 
           if (!code || Array.isArray(code)) throw new Error('No code');
 
           const requestPayload = new newnewapi.FacebookSignInRequest({
             code,
+            state: state as string,
           });
 
           res = await signInWithFacebook(requestPayload);
         } else if (provider === 'apple') {
           if (!body) throw new Error('No body receieved');
 
-          const { id_token, sub } = body;
+          const { id_token, sub, state } = body;
 
           if (!id_token || Array.isArray(id_token)) throw new Error('No code');
           if (!sub || Array.isArray(sub)) throw new Error('No user id');
@@ -91,6 +93,7 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
           const requestPayload = new newnewapi.AppleSignInRequest({
             identityToken: id_token,
             userId: sub,
+            state: state as string,
           });
 
           res = await signInWithApple(requestPayload);
@@ -147,6 +150,8 @@ const AuthRedirectPage: NextPage<IAuthRedirectPage> = ({ provider, body }) => {
         setIsLoading(false);
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
+        } else if (data.me?.options?.isCreator) {
+          router.push('/creator/dashboard');
         } else {
           router.push('/');
         }

@@ -255,7 +255,6 @@
       "description": "Connect a Stripe account to get paid on time."
     },
     "side": {
-      "heading": "Payments made easy with Stripe",
       "subheading": "Connect a Stripe account to get paid on time."
     },
     "title-set-up-stripe": "Set payment system",

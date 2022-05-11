@@ -80,7 +80,7 @@ const FileUpload: React.FC<IFileUpload> = ({
   const [showThumbnailEdit, setShowThumbnailEdit] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const { t } = useTranslation('creation');
-  const inputRef: any = useRef();
+  const inputRef = useRef<HTMLInputElement>(null);
   const playerRef: any = useRef();
   const [localFile, setLocalFile] = useState(null);
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -96,35 +96,43 @@ const FileUpload: React.FC<IFileUpload> = ({
   const handleButtonClick = useCallback(() => {
     inputRef.current?.click();
   }, []);
+
   const handleFullPreview = useCallback(() => {
     setShowFullPreview(true);
     playerRef.current.pause();
   }, []);
+
   const handleCloseFullPreviewClick = useCallback(() => {
     setShowFullPreview(false);
     playerRef.current.play();
   }, []);
+
   const handleEditThumb = useCallback(() => {
     setShowThumbnailEdit(true);
     playerRef.current.pause();
   }, []);
+
   const handleCloseThumbnailEditClick = useCallback(() => {
     setShowThumbnailEdit(false);
     playerRef.current.play();
   }, []);
+
   const handleDeleteVideoShow = useCallback(() => {
     setShowVideoDelete(true);
     playerRef.current.pause();
   }, []);
+
   const handleCloseDeleteVideoClick = useCallback(() => {
     setShowVideoDelete(false);
     playerRef.current.play();
   }, []);
+
   const handleDeleteVideo = useCallback(() => {
     handleCloseDeleteVideoClick();
     setLocalFile(null);
     onChange(id, null);
   }, [handleCloseDeleteVideoClick, id, onChange]);
+
   const handlePreviewEditSubmit = useCallback(
     (params) => {
       handleCloseThumbnailEditClick();
@@ -132,6 +140,7 @@ const FileUpload: React.FC<IFileUpload> = ({
     },
     [handleCloseThumbnailEditClick, onChange]
   );
+
   const handleFileChange = useCallback(
     async (e) => {
       const file = e.target?.files[0];
@@ -153,9 +162,11 @@ const FileUpload: React.FC<IFileUpload> = ({
     },
     [id, onChange, t]
   );
+
   const handleRetryVideoUpload = useCallback(() => {
     onChange(id, localFile);
   }, [id, localFile, onChange]);
+
   const handleCancelVideoProcessing = useCallback(async () => {
     try {
       const payload = new newnewapi.RemoveUploadedFileRequest({
@@ -209,7 +220,12 @@ const FileUpload: React.FC<IFileUpload> = ({
           style={{ display: 'none' }}
           accept='video/*'
           multiple={false}
-          onChange={handleFileChange}
+          onChange={(e) => {
+            handleFileChange(e);
+            if (inputRef.current) {
+              inputRef.current.value = '';
+            }
+          }}
         />
         <SPlaceholder weight={600} variant={2}>
           {t('secondStep.fileUpload.description')}
@@ -320,7 +336,12 @@ const FileUpload: React.FC<IFileUpload> = ({
             style={{ display: 'none' }}
             accept='video/*'
             multiple={false}
-            onChange={handleFileChange}
+            onChange={(e) => {
+              handleFileChange(e);
+              if (inputRef.current) {
+                inputRef.current.value = '';
+              }
+            }}
           />
           <SPlayerWrapper>
             <BitmovinPlayer

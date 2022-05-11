@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import moment from 'moment';
 import { useInView } from 'react-intersection-observer';
+import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import UserAvatar from '../../UserAvatar';
@@ -13,7 +14,7 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from '../../notifications/NoResults';
-import { useAppSelector } from '../../../../redux-store/store';
+// import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
   markAsRead,
@@ -30,7 +31,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 }) => {
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
-  const user = useAppSelector((state) => state.user);
+  // const user = useAppSelector((state) => state.user);
   const [notifications, setNotifications] =
     useState<newnewapi.INotification[] | null>(null);
   const [unreadNotifications, setUnreadNotifications] =
@@ -115,7 +116,6 @@ export const NotificationsList: React.FC<IFunction> = ({
           notificationIds: unreadNotifications,
         });
         const res = await markAsRead(payload);
-        console.log(res);
 
         if (res.error) throw new Error(res.error?.message ?? 'Request failed');
         setUnreadNotifications(null);
@@ -139,8 +139,6 @@ export const NotificationsList: React.FC<IFunction> = ({
       unreadNotifications &&
       unreadNotifications.length > 0
     ) {
-      console.log(unreadNotifications);
-
       readNotification();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,28 +171,47 @@ export const NotificationsList: React.FC<IFunction> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialLoad, unreadNotificationCount]);
 
+  const getUrl = (target: newnewapi.IRoutingTarget | null | undefined) => {
+    if (target) {
+      if (target.creatorDashboard && target?.creatorDashboard.section === 2)
+        return '/direct-messages';
+
+      if (target.creatorDashboard && target?.creatorDashboard.section === 1)
+        return '/creator/subscribers';
+
+      if (target.userProfile && target?.userProfile.userUsername)
+        return `/direct-messages/${target.userProfile.userUsername}`;
+
+      if (target.postResponse && target?.postResponse.postUuid)
+        return `/post/${target.postResponse.postUuid}`;
+    }
+    return '';
+  };
+
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification) => (
-      <SNotificationItem key={`notification-item-${item.id}`}>
-        <SNotificationItemAvatar
-          withClick
-          // onClick={handleUserClick}
-          avatarUrl={
-            item.content?.relatedUser?.thumbnailAvatarUrl
-              ? item.content?.relatedUser?.thumbnailAvatarUrl
-              : ''
-          }
-        />
-        <SNotificationItemCenter>
-          <SNotificationItemText variant={3} weight={600}>
-            {item.content!!.message}
-          </SNotificationItemText>
-          <SNotificationItemTime variant={2} weight={600}>
-            {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
-          </SNotificationItemTime>
-        </SNotificationItemCenter>
-        {!item.isRead && <SNotificationItemIndicator minified />}
-      </SNotificationItem>
+      <Link href={getUrl(item.target)}>
+        <SNotificationItem key={`notification-item-${item.id}`}>
+          <SNotificationItemAvatar
+            withClick
+            // onClick={handleUserClick}
+            avatarUrl={
+              item.content?.relatedUser?.thumbnailAvatarUrl
+                ? item.content?.relatedUser?.thumbnailAvatarUrl
+                : ''
+            }
+          />
+          <SNotificationItemCenter>
+            <SNotificationItemText variant={3} weight={600}>
+              {item.content!!.message}
+            </SNotificationItemText>
+            <SNotificationItemTime variant={2} weight={600}>
+              {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
+            </SNotificationItemTime>
+          </SNotificationItemCenter>
+          {!item.isRead && <SNotificationItemIndicator minified />}
+        </SNotificationItem>
+      </Link>
     ),
 
     []
