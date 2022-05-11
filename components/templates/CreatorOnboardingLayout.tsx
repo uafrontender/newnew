@@ -36,14 +36,9 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
     const router = useRouter();
     const { t } = useTranslation('creator-onboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
-    const isMobileOrTablet = [
-      'mobile',
-      'mobileS',
-      'mobileM',
-      'mobileL',
-      'tablet',
-      'laptop',
-    ].includes(resizeMode);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
     const isTablet = ['tablet'].includes(resizeMode);
 
     const SideTextSwitch = () => {
@@ -81,7 +76,8 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
               {!hideOnboardingHeader && <OnboardingMobileHeader />}
               {children}
             </SContentContainer>
-            {!isMobileOrTablet &&
+            {!isMobile &&
+              !isTablet &&
               !router.pathname.includes('creator-onboarding') && (
                 <SSideMessage>
                   {!hideOnboardingHeader && <OnboardingMobileHeader />}
@@ -93,17 +89,12 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
                   </Text>
                 </SSideMessage>
               )}
-            {!isMobileOrTablet &&
+            {!isMobile &&
+              !isTablet &&
               router.pathname.includes('creator-onboarding') && (
-                <HeroVisual
-                  style={{
-                    top: '140px',
-                    left: '0px',
-                    width: 'calc(100vw - 800px)',
-                    maxWidth: '100%',
-                    height: '700px',
-                  }}
-                />
+                <HeroVisualContainer>
+                  <HeroVisual />
+                </HeroVisualContainer>
               )}
           </SCreatorOnboardingLayout>
         </SkeletonTheme>
@@ -152,7 +143,8 @@ const SContentContainer = styled.div`
   height: 100%;
 
   ${({ theme }) => theme.media.laptop} {
-    width: 706px;
+    min-width: 706px;
+    width: 50%;
     left: unset;
     right: 0;
   }
@@ -184,4 +176,12 @@ const SSideMessage = styled.div`
 
 const SHeadline = styled(Headline)`
   margin-bottom: 12px;
+`;
+
+const HeroVisualContainer = styled('div')`
+  position: absolute;
+  display: block;
+  top: 100px;
+  margin-right: 100px;
+  right: max(706px, 50%);
 `;
