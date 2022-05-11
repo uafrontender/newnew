@@ -448,7 +448,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           {noAction ? null : isMobile ? (
             <>
               <SSupportButton
-                view='quaternary'
+                view='primary'
                 disabled={disabled}
                 isBlue={isBlue}
                 canVoteForFree={canVoteForFree}
@@ -1045,7 +1045,6 @@ const SSupportButton = styled(Button)<{
     gap: 8px;
   }
 
-  background: ${({ theme }) => theme.colorsThemed.background.quinary};
   color: #ffffff;
 
   &:hover:enabled,
