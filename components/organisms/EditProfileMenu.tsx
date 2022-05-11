@@ -323,6 +323,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     ]
   );
 
+  // Avatar
+  const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
+
   // Cover image
   const [coverUrlInEdit, setCoverUrlInEdit] = useState(user.userData?.coverUrl);
   const [coverUrlInEditAnimated, setCoverUrlInEditAinmated] = useState(false);
@@ -377,8 +380,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     setCroppedAreaCoverImage(croppedAreaPixels);
   }, []);
 
-  // Update textual data and cover URL
-  const handleUpdateTextualDataAndCover = useCallback(async () => {
+  const handleUpdateUserData = useCallback(async () => {
     if (isAPIValidateLoading) return;
     try {
       setIsLoading(true);
@@ -415,7 +417,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
           },
         });
 
-        if (!uploadResponse.ok) throw new Error('Upload failed');
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
 
         newCoverImgURL = res.data.publicUrl;
       }
@@ -423,6 +427,10 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const payload = new newnewapi.UpdateMeRequest({
         nickname: dataInEdit.nickname,
         bio: dataInEdit.bio,
+        // Update avatar
+        ...(avatarUrlInEdit && avatarUrlInEdit !== user.userData?.avatarUrl
+          ? { avatarUrl: avatarUrlInEdit }
+          : {}),
         // Send username only if it was updated
         ...(dataInEdit.username !== user.userData?.username
           ? { username: dataInEdit.username }
@@ -441,11 +449,11 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         setUserData({
           username: res.data.me?.username,
           nickname: res.data.me?.nickname,
+          avatarUrl: res.data.me?.avatarUrl,
           bio: res.data.me?.bio,
           coverUrl: res.data.me?.coverUrl,
           options: {
             ...user.userData?.options,
-            canChangeUsername: res.data.me?.options?.canChangeUsername,
           },
         })
       );
@@ -471,17 +479,18 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     handleClose,
     dispatch,
     dataInEdit,
+    avatarUrlInEdit,
     coverUrlInEdit,
     coverUrlInEditAnimated,
     croppedAreaCoverImage,
     user.userData?.username,
+    user.userData?.avatarUrl,
     user.userData?.coverUrl,
     user.userData?.options,
     isAPIValidateLoading,
   ]);
 
-  // Profile image
-  const [avatarUrlInEdit, setAvatarUrlInEdit] = useState('');
+  // Profile image editing
   const [originalProfileImageWidth, setOriginalProfileImageWidth] = useState(0);
   const [cropProfileImage, setCropProfileImage] = useState<Point>({
     x: 0,
@@ -587,22 +596,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
 
       if (!uploadResponse.ok) throw new Error('Upload failed');
 
-      const updateMePayload = new newnewapi.UpdateMeRequest({
-        avatarUrl: res.data.publicUrl,
-      });
-
-      const updateMeRes = await updateMe(updateMePayload);
-
-      if (!updateMeRes.data || updateMeRes.error)
-        throw new Error('Request failed');
-
-      // Update Redux state
-      dispatch(
-        setUserData({
-          ...user.userData,
-          avatarUrl: updateMeRes.data.me?.avatarUrl,
-        })
-      );
+      setAvatarUrlInEdit(res.data.publicUrl);
 
       setUpdateProfileImageLoading(false);
       handleSetStageToEditingGeneral();
@@ -625,7 +619,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     avatarUrlInEdit,
     handleSetStageToEditingGeneral,
     dispatch,
-    user.userData,
   ]);
 
   // Effects
@@ -658,6 +651,8 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     };
 
     if (
+      (!avatarUrlInEdit ||
+        isEqual(avatarUrlInEdit, user.userData?.avatarUrl)) &&
       isEqual(dataInEdit, initialData) &&
       isEqual(coverUrlInEdit, user.userData?.coverUrl)
     ) {
@@ -665,7 +660,13 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
     } else {
       handleSetWasModified(true);
     }
-  }, [dataInEdit, user.userData, handleSetWasModified, coverUrlInEdit]);
+  }, [
+    avatarUrlInEdit,
+    dataInEdit,
+    user.userData,
+    handleSetWasModified,
+    coverUrlInEdit,
+  ]);
 
   // Check fields validity
   useEffect(() => {
@@ -764,7 +765,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                 onZoomChange={setZoomCoverImage}
               />
               <ProfileImageInput
-                publicUrl={user.userData?.avatarUrl!!}
+                publicUrl={avatarUrlInEdit || user.userData?.avatarUrl!!}
                 disabled={isLoading}
                 handleImageInputChange={handleSetProfilePictureInEdit}
               />
@@ -786,9 +787,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               <UsernameInput
                 type='text'
                 value={dataInEdit.username}
-                disabled={
-                  isLoading || !user.userData?.options?.canChangeUsername
-                }
+                disabled={isLoading}
                 popupCaption={
                   <UsernamePopupList
                     points={[
@@ -813,22 +812,6 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                       },
                     ]}
                   />
-                }
-                frequencyCaption={
-                  user.userData?.options?.canChangeUsername
-                    ? t('EditProfileMenu.inputs.username.frequencyCaption', {
-                        domain:
-                          process.env.NEXT_PUBLIC_APP_URL &&
-                          process.env.NEXT_PUBLIC_APP_URL[
-                            (process.env.NEXT_PUBLIC_APP_URL?.length ?? 1) - 1
-                          ] === '/'
-                            ? process.env.NEXT_PUBLIC_APP_URL
-                            : `${process.env.NEXT_PUBLIC_APP_URL}/`,
-                        username: dataInEdit.username,
-                      })
-                    : t(
-                        'EditProfileMenu.inputs.username.cannotBeChangedCaption'
-                      )
                 }
                 errorCaption={t(
                   `EditProfileMenu.inputs.username.errors.${formErrors.usernameError}`
@@ -864,7 +847,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
                   width: isMobile ? '100%' : 'initial',
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
                 }}
-                onClick={() => handleUpdateTextualDataAndCover()}
+                onClick={() => handleUpdateUserData()}
               >
                 {t('EditProfileMenu.saveButton')}
               </Button>
