@@ -8,11 +8,9 @@ import assets from '../../constants/assets';
 import { AuthLayoutContext } from './AuthLayout';
 import isSafari from '../../utils/isSafari';
 
-interface IHeroVisual {
-  style?: React.CSSProperties;
-}
+interface IHeroVisual {}
 
-const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
+const HeroVisual: React.FunctionComponent<IHeroVisual> = React.memo(() => {
   const theme = useTheme();
   const authLayoutContext = useContext(AuthLayoutContext);
 
@@ -44,7 +42,6 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
   if (shouldUseCssFade) {
     return (
       <SHeroVisual
-        style={style ?? {}}
         exit={{
           x: -1000,
           y: 0,
@@ -89,7 +86,6 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
 
   return (
     <SHeroVisual
-      style={style ?? {}}
       exit={{
         x: -1000,
         y: 0,
@@ -147,7 +143,7 @@ const HeroVisual: React.FunctionComponent<IHeroVisual> = ({ style }) => {
       </SImageWrapper>
     </SHeroVisual>
   );
-};
+});
 
 HeroVisual.defaultProps = {
   style: {},
@@ -156,20 +152,7 @@ HeroVisual.defaultProps = {
 export default HeroVisual;
 
 const SHeroVisual = styled(motion.div)`
-  position: absolute;
-  display: none;
-
-  ${({ theme }) => theme.media.tablet} {
-    display: block;
-
-    right: 55%;
-    top: 25%;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    right: 50%;
-    top: 100px;
-  }
+  position: relative;
 `;
 
 const SImageWrapper = styled.div`
