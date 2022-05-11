@@ -17,11 +17,11 @@ const reportContent = (payload: newnewapi.ReportContentRequest) =>
 
 export const reportUser = (
   userId: string,
-  reason: newnewapi.ReportingReason,
+  reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
   const payload = new newnewapi.ReportContentRequest({
-    reason,
+    reasons,
     message,
     content: {
       userProfile: {
@@ -35,11 +35,11 @@ export const reportUser = (
 
 export const reportPost = (
   postId: string,
-  reason: newnewapi.ReportingReason,
+  reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
   const payload = new newnewapi.ReportContentRequest({
-    reason,
+    reasons,
     message,
     content: {
       postAnnounce: {
@@ -53,11 +53,11 @@ export const reportPost = (
 
 export const reportEventOption = (
   optionId: number | Long,
-  reason: newnewapi.ReportingReason,
+  reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
   const payload = new newnewapi.ReportContentRequest({
-    reason,
+    reasons,
     message,
     content: {
       auOption: {
@@ -71,11 +71,11 @@ export const reportEventOption = (
 
 export const reportSuperpollOption = (
   optionId: number | Long,
-  reason: newnewapi.ReportingReason,
+  reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
   const payload = new newnewapi.ReportContentRequest({
-    reason,
+    reasons,
     message,
     content: {
       mcOption: {
@@ -89,11 +89,11 @@ export const reportSuperpollOption = (
 
 export const reportMessage = (
   messageId: number | Long,
-  reason: newnewapi.ReportingReason,
+  reasons: newnewapi.ReportingReason[],
   message: string
 ) => {
   const payload = new newnewapi.ReportContentRequest({
-    reason,
+    reasons,
     message,
     content: {
       chatMessage: {
