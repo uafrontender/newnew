@@ -109,6 +109,6 @@ const SItem = styled.div<{
   padding-bottom: ${({ isLast }) => (isLast ? '32px' : '0px')};
 
   ${({ theme }) => theme.media.tablet} {
-    width: 404px;
+    width: 480px;
   }
 `;
