@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
@@ -46,6 +46,7 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
     handleUpdatePostStatus,
     handleUpdateWinningOption,
   }) => {
+    const theme = useTheme();
     const { t } = useTranslation('decision');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -118,12 +119,12 @@ const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
             {!isMobile ? (
               <>
                 <GradientMask
-                  gradientType='secondary'
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                   positionTop
                   active={showTopGradient}
                 />
                 <GradientMask
-                  gradientType='secondary'
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                   positionBottom={0}
                   active={showBottomGradient}
                 />

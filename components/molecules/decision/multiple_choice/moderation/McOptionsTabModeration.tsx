@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
@@ -35,6 +35,7 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
     handleLoadOptions,
     handleRemoveOption,
   }) => {
+    const theme = useTheme();
     const { t } = useTranslation('decision');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -70,12 +71,12 @@ const McOptionsTabModeration: React.FunctionComponent<IMcOptionsTabModeration> =
             {!isMobile ? (
               <>
                 <GradientMask
-                  gradientType='secondary'
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                   positionTop
                   active={showTopGradient}
                 />
                 <GradientMask
-                  gradientType='secondary'
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
                   positionBottom={0}
                   active={showBottomGradient}
                 />
