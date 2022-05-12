@@ -6,7 +6,9 @@ import type { NextPage, NextPageContext } from 'next';
 
 const ForcedRedirectPage: NextPage = () => <div />;
 
-export async function getStaticProps(context: NextPageContext): Promise<any> {
+export async function getServerSideProps(
+  context: NextPageContext
+): Promise<any> {
   return {
     redirect: {
       permanent: true,
