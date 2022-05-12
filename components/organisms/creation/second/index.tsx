@@ -92,8 +92,6 @@ const UserAvatar = dynamic(() => import('../../../molecules/UserAvatar'));
 
 interface ICreationSecondStepContent {}
 
-type CardType = 'ac' | 'mc' | 'cf';
-
 export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
   () => {
     const { t: tCommon } = useTranslation();
@@ -135,15 +133,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       ],
       []
     );
-    const typesOfPost: any = useMemo(
-      () => ({
-        auction: 'ac',
-        'multiple-choice': 'mc',
-        crowdfunding: 'cf',
-      }),
-      []
-    );
-    const typeOfPost: CardType = typesOfPost[tab as string];
     const [titleError, setTitleError] = useState('');
 
     const [isTutorialVisible, setIsTutorialVisible] = useState(false);
@@ -1011,18 +1000,21 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                         <SFloatingSubSectionUser>
                           <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
                           <SUserTitle variant={3} weight={600}>
-                            {post?.title}
+                            {user.userData?.nickname &&
+                            user.userData?.nickname?.length > 8
+                              ? `${user.userData?.nickname?.substring(0, 8)}...`
+                              : user.userData?.nickname}
                           </SUserTitle>
-                        </SFloatingSubSectionUser>
-                        <SBottomEnd>
-                          <SButtonUser view='primary'>
-                            {t(`secondStep.button.card.${typeOfPost}`)}
-                          </SButtonUser>
                           <SCaption variant={2} weight={700}>
                             {t('secondStep.card.left', {
                               time: formatExpiresAt().fromNow(true),
                             })}
                           </SCaption>
+                        </SFloatingSubSectionUser>
+                        <SBottomEnd>
+                          <SBottomEndPostTitle variant={3} weight={600}>
+                            {post.title}
+                          </SBottomEndPostTitle>
                         </SBottomEnd>
                       </SFloatingSubSectionWithPlayer>
                     ) : (
@@ -1109,10 +1101,14 @@ const SFloatingSubSectionWithPlayer = styled.div`
 `;
 
 const SFloatingSubSectionUser = styled.div`
-  display: flex;
+  width: 224px;
+
+  display: grid;
   margin-top: 12px;
   align-items: center;
   flex-direction: row;
+
+  grid-template-columns: 48px 1fr 1fr;
 `;
 
 const SFloatingSubSectionPlayer = styled.div`
@@ -1273,7 +1269,7 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SUserTitle = styled(Text)`
-  width: 188px;
+  max-width: 188px;
   display: -webkit-box;
   overflow: hidden;
   position: relative;
@@ -1283,6 +1279,7 @@ const SUserTitle = styled(Text)`
 `;
 
 const SBottomEnd = styled.div`
+  width: 224px;
   display: flex;
   margin-top: 12px;
   align-items: center;
@@ -1290,22 +1287,15 @@ const SBottomEnd = styled.div`
   justify-content: space-between;
 `;
 
-const SButtonUser = styled(Button)`
-  padding: 12px;
-  border-radius: 12px;
-
-  span {
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 16px;
-  }
-
-  ${(props) => props.theme.media.tablet} {
-    padding: 8px 12px;
-  }
+const SBottomEndPostTitle = styled(Text)`
+  max-width: 100%;
+  line-break: loose;
 `;
 
 const SCaption = styled(Caption)`
+  margin-left: 4px;
+  justify-self: flex-end;
+  line-break: strict;
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
 
