@@ -78,7 +78,6 @@ const SContentWrapper = styled.div`
     position: absolute;
     background-color: ${(props) =>
       props.theme.colorsThemed.background.backgroundHeader};
-    opacity: 0.8;
-    filter: blur(10px);
+    opacity: 0.7;
   }
 `;
