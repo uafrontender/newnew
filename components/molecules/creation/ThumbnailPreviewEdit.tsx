@@ -75,9 +75,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     const position = (percentage * 70) / 100;
 
     if (progressIndicatorRef.current) {
-      progressIndicatorRef.current.style.transition = 'all ease 0.5s';
-      progressIndicatorRef.current.style.left = `calc(50% - 38px + ${position}px)`;
-      progressIndicatorRef.current.style.transform = 'translateX(-50%)';
+      progressIndicatorRef.current.style.transform = `translateX(${position}px)`;
     }
   }, []);
 
@@ -88,23 +86,61 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
       seconds = videoThumbs.current.startTime;
     }
 
-    let minutes = (seconds / 60).toFixed(0);
+    const minutes = Math.floor(seconds / 60);
 
     if (+minutes) {
       seconds -= +minutes * 60;
     }
 
-    if (minutes.length === 1) {
-      minutes = `0${minutes}`;
+    let minutesStringified = minutes.toString();
+
+    if (minutes.toString().length === 1) {
+      minutesStringified = `0${minutes}`;
     }
 
     if (seconds?.toString()?.length === 1) {
       seconds = `0${seconds}`;
     }
 
-    return `${minutes}:${seconds}`;
+    return `${minutesStringified}:${seconds}`;
   }, []);
   const handleVideoSelectDrag = useCallback(() => {
+    const { left, width } = progressRef.current.getBoundingClientRect();
+    const initialPoint = window.innerWidth / 2 - 36;
+    const percentage = ((initialPoint - left) * 100) / width;
+    const startTime = +((videoDuration * percentage) / 100).toFixed(0);
+    const endTime = startTime + 3;
+
+    videoThumbs.current = {
+      startTime,
+      endTime,
+    };
+    endTimeRef.current.innerHTML = getTime('end');
+    startTimeRef.current.innerHTML = getTime('start');
+  }, [getTime, videoDuration]);
+
+  const handleVideoSelectDragStart = useCallback(() => {
+    const { left, width } = progressRef.current.getBoundingClientRect();
+    const initialPoint = window.innerWidth / 2 - 36;
+    const percentage = ((initialPoint - left) * 100) / width;
+    const startTime = +((videoDuration * percentage) / 100).toFixed(0);
+    const endTime = startTime + 3;
+
+    videoThumbs.current = {
+      startTime,
+      endTime,
+    };
+    endTimeRef.current.innerHTML = getTime('end');
+    startTimeRef.current.innerHTML = getTime('start');
+
+    playerRef.current.off(
+      PlayerEvent.TimeChanged,
+      playerRef.current.handleTimeChange
+    );
+    playerRef.current.pause();
+  }, [getTime, videoDuration]);
+
+  const handleVideoSelectDragEnd = useCallback(() => {
     const { left, width } = progressRef.current.getBoundingClientRect();
     const initialPoint = window.innerWidth / 2 - 36;
     const percentage = ((initialPoint - left) * 100) / width;
@@ -140,6 +176,7 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
     playerRef.current.seek(videoThumbs.current.startTime);
     playerRef.current.play();
   }, [getTime, videoDuration, setCurrentTime]);
+
   const getInitialXPosition = useCallback(() => {
     const generalWidth = chunks.length * 7 - 5;
     const startPointPercentage =
@@ -228,8 +265,8 @@ export const ThumbnailPreviewEdit: React.FC<IThumbnailPreviewEdit> = (
                 drag='x'
                 style={{ x: initialX }}
                 onDrag={handleVideoSelectDrag}
-                onDragEnd={handleVideoSelectDrag}
-                onDragStart={handleVideoSelectDrag}
+                onDragEnd={handleVideoSelectDragEnd}
+                onDragStart={handleVideoSelectDragStart}
                 dragElastic={0}
                 dragMomentum={false}
                 dragConstraints={{
@@ -470,4 +507,6 @@ const SProgressIndicator = styled.div`
   background: ${(props) => props.theme.colorsThemed.accent.yellow};
   border-radius: 2px;
   pointer-events: none;
+
+  transition: all linear 0.3s;
 `;
