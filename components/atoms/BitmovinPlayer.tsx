@@ -69,17 +69,20 @@ export const BitmovinPlayer: React.FC<IBitmovinPlayer> = (props) => {
   const playerRef: any = useRef();
   const player: any = useRef(null);
 
-  const handleTimeChange = useCallback(() => {
-    if (setCurrentTime) {
-      setCurrentTime(player.current.getCurrentTime());
-    }
+  const handleTimeChange = useCallback(
+    (e: any) => {
+      if (setCurrentTime) {
+        setCurrentTime(e.time);
+      }
 
-    if (player.current.getCurrentTime() >= thumbnails.endTime) {
-      player.current.pause();
-      player.current.seek(thumbnails.startTime);
-      player.current.play();
-    }
-  }, [setCurrentTime, thumbnails]);
+      if (player.current.getCurrentTime() >= thumbnails.endTime) {
+        player.current.pause();
+        player.current.seek(thumbnails.startTime);
+        player.current.play();
+      }
+    },
+    [setCurrentTime, thumbnails]
+  );
   const handlePlaybackFinished = useCallback(() => {
     player.current.play();
   }, []);

@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback } from 'react';
-import moment from 'moment';
+/* eslint-disable no-nested-ternary */
+import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -41,58 +41,126 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const { post, videoProcessing, fileProcessing } = useAppSelector(
+  const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
     (state) => state.creation
   );
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
 
-  const handleSubmit = useCallback(async () => {
-    router.push('/');
-    dispatch(clearCreation({}));
-  }, [dispatch, router]);
-  const formatStartsAt = useCallback(() => {
-    const time = moment(
-      `${post.startsAt.time} ${post.startsAt['hours-format']}`,
-      ['hh:mm a']
-    );
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
-    return moment(post.startsAt.date)
-      .hours(time.hours())
-      .minutes(time.minutes());
-  }, [post.startsAt]);
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      document.execCommand('copy', true, url);
+    }
+  }
+
+  interface IItemButtonAttrs extends NamedNodeMap {
+    type?: {
+      value: string;
+    };
+  }
+
+  const socialBtnClickHandler = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const attr: IItemButtonAttrs = (e.target as HTMLDivElement).attributes;
+      const val = attr.type?.value;
+      if (val === 'copy' && postData) {
+        let url;
+        if (window) {
+          url = `${window.location.origin}/post/`;
+          if (url) {
+            if (postData.auction) {
+              url += postData.auction.postUuid;
+            }
+            if (postData.crowdfunding) {
+              url += postData.crowdfunding.postUuid;
+            }
+            if (postData.multipleChoice) {
+              url += postData.multipleChoice.postUuid;
+            }
+
+            copyPostUrlToClipboard(url)
+              .then(() => {
+                setIsCopiedUrl(true);
+                setTimeout(() => {
+                  setIsCopiedUrl(false);
+                }, 1500);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+        }
+      }
+    },
+    [postData]
+  );
+
+  const handleViewMyPost = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (postData) {
+        let url;
+        if (window) {
+          url = `${window.location.origin}/post/`;
+          if (url) {
+            if (postData.auction) {
+              url += postData.auction.postUuid;
+            }
+            if (postData.crowdfunding) {
+              url += postData.crowdfunding.postUuid;
+            }
+            if (postData.multipleChoice) {
+              url += postData.multipleChoice.postUuid;
+            }
+
+            router.push(url);
+
+            dispatch(clearCreation({}));
+          }
+        }
+      }
+    },
+    [postData, router, dispatch]
+  );
+
   const socialButtons = useMemo(
     () => [
-      {
-        key: 'twitter',
-      },
-      {
-        key: 'facebook',
-      },
-      {
-        key: 'instagram',
-      },
-      {
-        key: 'tiktok',
-      },
+      // {
+      //   key: 'twitter',
+      // },
+      // {
+      //   key: 'facebook',
+      // },
+      // {
+      //   key: 'instagram',
+      // },
+      // {
+      //   key: 'tiktok',
+      // },
       {
         key: 'copy',
       },
     ],
     []
   );
+
   const renderItem = (item: any) => (
     <SItem key={item.key}>
-      <SItemButton type={item.key}>
+      <SItemButton type={item.key} onClick={socialBtnClickHandler}>
         <InlineSVG
           svg={SOCIAL_ICONS[item.key] as string}
-          width='50%'
-          height='50%'
+          width='25px'
+          height='25px'
         />
       </SItemButton>
       <SItemTitle variant={3} weight={600}>
-        {t(`published.socials.${item.key}`)}
+        {item.key === 'copy' && isCopiedUrl
+          ? t(`published.socials.copied`)
+          : t(`published.socials.${item.key}`)}
       </SItemTitle>
     </SItem>
   );
@@ -109,35 +177,46 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
               thumbnails={post.thumbnailParameters}
             />
           ) : (
-            <SText variant={2}>
-              Your video will be available once processed
-            </SText>
+            <SText variant={2}>{t('video-being-processed-caption')}</SText>
           )}
         </SPlayerWrapper>
         <SUserBlock>
           <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
           <SUserTitle variant={3} weight={600}>
-            {post?.title}
+            {user.userData?.nickname}
           </SUserTitle>
+          <SPostTitleText variant={3} weight={600}>
+            {post?.title}
+          </SPostTitleText>
         </SUserBlock>
-        <STitle variant={6}>{t('published.texts.title')}</STitle>
-        <SSubTitle variant={2} weight={500}>
+        <STitle variant={6}>
           {t(
-            `published.texts.subTitle-${
+            `published.texts.title-${
               post.startsAt.type === 'right-away' ? 'published' : 'scheduled'
-            }`,
-            {
-              value: formatStartsAt().format('DD MMM [at] hh:mm A'),
-            }
+            }`
           )}
-        </SSubTitle>
+        </STitle>
         <SSocials>{socialButtons.map(renderItem)}</SSocials>
       </SContent>
       {isMobile && (
         <SButtonWrapper>
           <SButtonContent>
-            <SButton view='secondary' onClick={handleSubmit}>
-              {t('published.button.submit')}
+            {/* @ts-ignore */}
+            <SButton view='primary' onClick={handleViewMyPost}>
+              {t(
+                `published.button.submit-${
+                  post.startsAt.type === 'right-away'
+                    ? 'published'
+                    : 'scheduled'
+                }`,
+                {
+                  value: postData!!.auction
+                    ? 'Event'
+                    : postData!!.crowdfunding
+                    ? 'Goal'
+                    : 'Superpoll',
+                }
+              )}
             </SButton>
           </SButtonContent>
         </SButtonWrapper>
@@ -210,7 +289,9 @@ const SUserBlock = styled.div`
   width: 224px;
   margin: 16px auto 0 auto;
   display: flex;
+  align-items: center;
   flex-direction: row;
+  flex-wrap: wrap;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -230,19 +311,14 @@ const SUserTitle = styled(Text)`
   -webkit-box-orient: vertical;
 `;
 
-const SSubTitle = styled(Text)`
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
-  margin-top: 4px;
-  text-align: center;
-`;
-
 const SSocials = styled.div`
-  gap: 24px;
+  /* gap: 24px; */
+  width: 100%;
   display: flex;
   margin-top: 16px;
-  align-items: center;
+  /* align-items: center; */
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
 `;
 
 const SItem = styled.div`
@@ -257,8 +333,9 @@ interface ISItemButton {
 }
 
 const SItemButton = styled.div<ISItemButton>`
-  width: 100%;
-  padding: 25% 0;
+  cursor: pointer;
+  width: 224px;
+  height: 48px;
   display: flex;
   overflow: hidden;
   align-items: center;
@@ -273,6 +350,12 @@ const SItemTitle = styled(Caption)`
 `;
 
 const SText = styled(Text)`
+  margin-top: 45%;
+
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
+`;
+
+const SPostTitleText = styled(Text)`
+  width: 100%;
 `;

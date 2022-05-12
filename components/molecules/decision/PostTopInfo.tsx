@@ -279,7 +279,7 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           title={t('PostFailedBox.title', {
             postType: t(`postType.${postType}`),
           })}
-          body={t(`PostFailedBoxModeration.reason.${failureReason}`, {
+          body={t(`PostFailedBox.reason.${failureReason}`, {
             creator: getDisplayname(creator),
           })}
           buttonCaption={t('PostFailedBox.ctaButton', {

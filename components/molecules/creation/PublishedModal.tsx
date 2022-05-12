@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
@@ -38,6 +39,7 @@ interface IPublishedModal {
 
 const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
+  const router = useRouter();
   const { t } = useTranslation('creation');
   const user = useAppSelector((state) => state.user);
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
@@ -121,6 +123,31 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     [postData]
   );
 
+  const handleViewMyPost = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (postData) {
+        let url;
+        if (window) {
+          url = `${window.location.origin}/post/`;
+          if (url) {
+            if (postData.auction) {
+              url += postData.auction.postUuid;
+            }
+            if (postData.crowdfunding) {
+              url += postData.crowdfunding.postUuid;
+            }
+            if (postData.multipleChoice) {
+              url += postData.multipleChoice.postUuid;
+            }
+
+            router.push(url);
+          }
+        }
+      }
+    },
+    [postData, router]
+  );
+
   const renderItem = (item: any) => (
     <SItem key={item.key}>
       <SItemButton type={item.key} onClick={socialBtnClickHandler}>
@@ -153,17 +180,18 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                   borderRadius='16px'
                 />
               ) : (
-                <SText variant={2}>
-                  Your video will be available once processed
-                </SText>
+                <SText variant={2}>{t('video-being-processed-caption')}</SText>
               )
             ) : null}
           </SPlayerWrapper>
           <SUserBlock>
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
             <SUserTitle variant={3} weight={600}>
-              {post?.title}
+              {user.userData?.nickname}
             </SUserTitle>
+            <SPostTitleText variant={3} weight={600}>
+              {post?.title}
+            </SPostTitleText>
           </SUserBlock>
           <STitle variant={6}>
             {t(
@@ -173,7 +201,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             )}
           </STitle>
           <SSocials>{socialButtons.map(renderItem)}</SSocials>
-          <SButtonWrapper onClick={handleClose}>
+          <SButtonWrapper onClick={handleViewMyPost}>
             <SButtonTitle>
               {t(
                 `published.button.submit-${
@@ -290,6 +318,7 @@ const SUserBlock = styled.div`
   display: flex;
   align-items: center;
   flex-direction: row;
+  flex-wrap: wrap;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -313,4 +342,8 @@ const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   padding-top: 120px;
+`;
+
+const SPostTitleText = styled(Text)`
+  width: 100%;
 `;
