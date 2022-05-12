@@ -9,9 +9,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import CreationLayout from '../../../components/templates/CreationLayout';
 import PreviewContent from '../../../components/organisms/creation/preview';
 
-import { useAppSelector } from '../../../redux-store/store';
-import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
-
 import { NextPageWithLayout } from '../../_app';
 
 interface ICreationPreview {}
@@ -19,31 +16,6 @@ interface ICreationPreview {}
 export const CreationPreview: React.FC<ICreationPreview> = (props) => {
   const { t } = useTranslation('creation');
   const router = useRouter();
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-  const isTablet = ['tablet'].includes(resizeMode);
-  const isDesktop = !isMobile && !isTablet;
-
-  const allowedRoutes = [
-    '/creation',
-    '/creation/auction',
-    '/creation/multiple-choice',
-    '/creation/crowdfunding',
-    '/creation/auction/preview',
-    '/creation/multiple-choice/preview',
-    '/creation/crowdfunding/preview',
-    '/creation/auction/published',
-    '/creation/multiple-choice/published',
-    '/creation/crowdfunding/published',
-  ];
-
-  if (isDesktop) {
-    allowedRoutes.push('/');
-  }
-
-  useLeavePageConfirm(true, t('secondStep.modal.leave.message'), allowedRoutes);
 
   return (
     <SWrapper>

@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -30,6 +31,7 @@ import {
 } from '../../../../constants/general';
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
@@ -76,6 +78,32 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet;
+
+  const allowedRoutes = [
+    '/creation',
+    '/creation/auction',
+    '/creation/multiple-choice',
+    '/creation/crowdfunding',
+    '/creation/auction/preview',
+    '/creation/multiple-choice/preview',
+    '/creation/crowdfunding/preview',
+    '/creation/auction/published',
+    '/creation/multiple-choice/published',
+    '/creation/crowdfunding/published',
+  ];
+
+  if (isDesktop) {
+    allowedRoutes.push('/');
+  }
+
+  useLeavePageConfirm(
+    showModal ? false : true,
+    t('secondStep.modal.leave.message'),
+    allowedRoutes
+  );
+
   const titleIsValid = !validateText(
     post.title,
     CREATION_TITLE_MIN,
@@ -331,9 +359,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 resources={videoProcessing?.targetUrls}
               />
             ) : (
-              <SText variant={2}>
-                Your video will be available once processed
-              </SText>
+              <SText variant={2}>{t('video-being-processed-caption')}</SText>
             )}
           </SPlayerWrapper>
         </SContent>
@@ -359,7 +385,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         <PublishedModal open={showModal} handleClose={handleCloseModal} />
       )}
       <SHeadLine variant={3} weight={600}>
-        {t('preview.title')}
+        {t(`preview.title-${router?.query?.tab}`)}
       </SHeadLine>
       <STabletContent>
         <SLeftPart>
@@ -374,9 +400,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
                 borderRadius='16px'
               />
             ) : (
-              <SText variant={2}>
-                Your video will be available once processed
-              </SText>
+              <SText variant={2}>{t('video-being-processed-caption')}</SText>
             )}
           </STabletPlayer>
         </SLeftPart>
@@ -576,5 +600,9 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
-  text-align: center;
+  text-align: left;
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: center;
+  }
 `;

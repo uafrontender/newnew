@@ -10,6 +10,7 @@
   "second-step-auction-title": "Event",
   "second-step-multiple-choice-title": "Superpoll",
   "second-step-crowdfunding-title": "Goal",
+  "video-being-processed-caption": "Your video will be available once processed",
   "tabs": {
     "auction": "Event",
     "multiple-choice": "Superpoll",
@@ -182,7 +183,9 @@
       "title-multiple-choice": "Creation | Superpoll | Preview",
       "title-crowdfunding": "Creation | Goal | Preview"
     },
-    "title": "Post preview",
+    "title-auction": "Review my Event",
+    "title-multiple-choice": "Review my Superpoll",
+    "title-crowdfunding": "Review my Goal",
     "button": {
       "submit": "Publish",
       "edit": "Edit"
@@ -190,7 +193,7 @@
     "settings": {
       "minimalBid": "Minimum bid",
       "targetBackerCount": "Backers",
-      "expiresAt": "Expire after",
+      "expiresAt": "Ends on",
       "startsAt": "Start date",
       "comments": "Comments",
       "allowSuggestions": "Suggestions"
