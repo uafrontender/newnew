@@ -1,8 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import moment from 'moment';
 import { useAppSelector } from '../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
 import Lottie from '../../atoms/Lottie';
@@ -11,6 +13,9 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import { getMyPosts } from '../../../api/endpoints/user';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
+import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
+import { getMyEarnings } from '../../../api/endpoints/payments';
+import dateToTimestamp from '../../../utils/dateToTimestamp';
 
 const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
 const DynamicSection = dynamic(
@@ -49,9 +54,15 @@ export const Dashboard: React.FC = React.memo(() => {
   const [isTodosCompletedLoading, setIsTodosCompletedLoading] =
     useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEarningnsLoading, setIsEarningnsLoading] = useState(true);
+  const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
+    useState(true);
   const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>(
     []
   );
+  const filter = '7_days';
+  const [myEarnings, setMyEarnings] =
+    useState<newnewapi.GetMyEarningsResponse | undefined>();
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
@@ -62,8 +73,10 @@ export const Dashboard: React.FC = React.memo(() => {
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+      setIsMySubscriptionProductLoading(false);
     } catch (err) {
       console.error(err);
+      setIsMySubscriptionProductLoading(false);
     }
   };
 
@@ -126,6 +139,39 @@ export const Dashboard: React.FC = React.memo(() => {
     }
   }, [isTodosCompleted, isLoading, hasMyPosts, loadMyPosts]);
 
+  const fetchMyEarnings = useCallback(async () => {
+    try {
+      const payload = new newnewapi.GetMyEarningsRequest({
+        beginDate: dateToTimestamp(
+          moment()
+            .subtract(
+              filter.split('_')[0],
+              filter.split('_')[1] as moment.unitOfTime.DurationConstructor
+            )
+            .startOf('day')
+        ),
+        endDate: dateToTimestamp(new Date()),
+      });
+      const res = await getMyEarnings(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setMyEarnings(res.data);
+      setIsEarningnsLoading(false);
+    } catch (err) {
+      setIsEarningnsLoading(false);
+      console.error(err);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEarningnsLoading]);
+
+  useEffect(() => {
+    if (isTodosCompleted && !myEarnings && isEarningnsLoading) {
+      fetchMyEarnings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTodosCompleted]);
+
   return (
     <SContainer>
       {!isMobile && <Navigation />}
@@ -140,7 +186,73 @@ export const Dashboard: React.FC = React.memo(() => {
             todosCompletedLoading={todosCompletedLoading}
           />
         </SBlock>
-        {isLoadingExpirationPosts ? (
+        {!isTodosCompletedLoading ? (
+          <>
+            {isLoadingExpirationPosts ? (
+              <SBlock>
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
+              </SBlock>
+            ) : (
+              expirationPosts.length > 0 && (
+                <SBlock>
+                  <ExpirationPosts expirationPosts={expirationPosts} />
+                </SBlock>
+              )
+            )}
+            <SBlock>
+              {!isEarningnsLoading ? (
+                isTodosCompleted ? (
+                  <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+                ) : (
+                  <FinishProfileSetup />
+                )
+              ) : (
+                <Lottie
+                  width={64}
+                  height={64}
+                  options={{
+                    loop: true,
+                    autoplay: true,
+                    animationData: loadingAnimation,
+                  }}
+                />
+              )}
+            </SBlock>
+            {!isMySubscriptionProductLoading ? (
+              !mySubscriptionProduct ? (
+                <SBlock noMargin>
+                  <EnableSubscription />
+                </SBlock>
+              ) : (
+                <SBlock noMargin>
+                  {mySubscribers.length > 0 ? (
+                    <SubscriptionStats />
+                  ) : (
+                    <EmptySubscriptionStats />
+                  )}
+                </SBlock>
+              )
+            ) : (
+              <Lottie
+                width={64}
+                height={64}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: loadingAnimation,
+                }}
+              />
+            )}
+          </>
+        ) : (
           <SBlock>
             <Lottie
               width={64}
@@ -151,30 +263,6 @@ export const Dashboard: React.FC = React.memo(() => {
                 animationData: loadingAnimation,
               }}
             />
-          </SBlock>
-        ) : (
-          <SBlock>
-            <ExpirationPosts expirationPosts={expirationPosts} />
-          </SBlock>
-        )}
-        <SBlock>
-          <Earnings
-            isTodosCompleted={isTodosCompleted}
-            isTodosCompletedLoading={isTodosCompletedLoading}
-            hasMyPosts={hasMyPosts}
-          />
-        </SBlock>
-        {!mySubscriptionProduct ? (
-          <SBlock noMargin>
-            <EnableSubscription />
-          </SBlock>
-        ) : (
-          <SBlock noMargin>
-            {mySubscribers.length > 0 ? (
-              <SubscriptionStats />
-            ) : (
-              <EmptySubscriptionStats />
-            )}
           </SBlock>
         )}
       </SContent>
@@ -214,7 +302,9 @@ const SContent = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 interface ISBlock {
   name?: string;

@@ -3,7 +3,7 @@
     "meta": {
       "title": "Creator Dashboard"
     },
-    "title": "Dashboard",
+    "title": "My Dashboard",
     "button": {
       "notifications": "Notifications",
       "dms": "DMs",
@@ -13,35 +13,35 @@
       "earlier": "Earlier"
     },
     "enableSubscription": {
-      "title": "Grow your passive income with timely subscriptions",
-      "description": "Add a subscription and start earning a fixed income.",
+      "title": "Earn more with subscriptions",
+      "description": "Enable subscriptions to earn steady income and connect with the people who ❤️ you most",
       "learnMore": "Learn more",
-      "submit": "Enable subscription"
+      "submit": "Turn on Subscriptions"
     },
     "earnings": {
-      "title": "Earnings",
+      "title": "My Earnings",
       "earned": "earned in last",
       "earnedToday": "earned today",
       "earnedYesterday": "earned yesterday",
       "insights": "Insights",
       "insights_tablet": "Go to insights",
       "cashOut": {
-        "amount": "You have",
-        "date": ", will be available to cash out on {{date}}.",
-        "submit": "Cash out"
+        "amount": "Your next payout of",
+        "date": "will automatically be sent on {{date}}.",
+        "submit": "Learn More"
       },
       "todosIssue": {
-        "text": "Finish setting up your profile and complete cashout method to get paid",
-        "btnText": "See To-Dos"
+        "text": "Add a bio and your bank info to withdraw your earnings",
+        "btnText": "Add"
       },
       "makeDecision": {
-        "text": "Start making decisions and start earning money!",
+        "text": "Make a decision. Start earning.",
         "btnText": "Make a decision"
       },
       "list": {
-        "ac": "Auctions",
-        "cf": "Crowdfunding",
-        "mc": "Multiple Choices",
+        "ac": "Events",
+        "cf": "Superpolls",
+        "mc": "Goals",
         "subscriptions": "Subscriptions"
       },
       "filter": {
@@ -54,7 +54,7 @@
       }
     },
     "expirationPosts": {
-      "title": "Expiration Posts",
+      "title": "Awaiting your Response ",
       "submit": "Show 10 more posts",
       "decide": "Decide",
       "table": {
@@ -102,21 +102,20 @@
       "copied": "Copied"
     },
     "todos": {
-      "title": "Your to-do’s",
-      "subtitle": "Let’s get you ready to cash out your earnings, next steps are",
-      "sign-up": "Sign up",
-      "basic-info": "Basic info",
-      "complete-profile": "Complete your profile",
-      "complete-profile-btn": "Complete profile",
-      "add-cashout-method": "Add a cashout method",
-      "add-cashout-method-btn": "Connect Stripe"
+      "title": "Complete these steps to get paid",
+      "subtitle": "Made💰? Finish these steps to withdraw your earnings...",
+      "sign-up": "Sign up as a Creator",
+      "complete-profile": "Add a bio",
+      "complete-profile-btn": "Add",
+      "add-cashout-method": "Add bank info",
+      "add-cashout-method-btn": "Add"
     }
   },
   "subscriptions": {
     "meta": {
       "title": "Creator Subscriptions"
     },
-    "title": "Subscribers",
+    "title": "My Subscribers",
     "table": {
       "subscribers": "Subscribers",
       "date": "Date subscribed",
@@ -163,7 +162,8 @@
     "myPosts": "My Posts",
     "insights": "Insights",
     "earnings": "Earnings",
-    "getPaid": "Get Paid",
+    "getPaid": "Add Bank",
+    "getPaidEdit": "Edit Bank",
     "transactions": "Transactions"
   },
   "tabs": {
@@ -200,7 +200,7 @@
     }
   },
   "SubrateSection": {
-    "heading": "Your subscription rate",
+    "heading": "Your subscription price",
     "selectInput": {
       "perMonth": "/month",
       "select": "Select",
@@ -208,7 +208,8 @@
     },
     "submitDesktop": "Enable",
     "backButton": "Cancel",
-    "updateRate": "Save changes"
+    "updateRate": "Save changes",
+    "removeSubscription": "Remove subscription"
   },
   "subscribersFeatures": {
     "title": "Subscribers have access to exclusive features",
@@ -217,17 +218,19 @@
     "thirdFeature": "Suggest on your multiple choices."
   },
   "enableSubModal": {
-    "title": "Unlock subscriptions",
-    "text": "You’re almost done – We just need you to confirm enabling the subscription service to your fans.",
-    "note": "Subscription price is locked for 30 days from the day you enable the service.",
-    "bntText": "Yes, enable subscription",
-    "confirmationTextFirstPart": "Enable",
-    "confirmationTextSecondPart": "monthly subscription price for my fans"
+    "title": "Turn on subscription",
+    "note": "This subscription price is locked for 30 days from the day you enable it",
+    "bntText": "Yes, turn on subscription",
+    "confirmationTextFirstPart": "Confirm",
+    "confirmationTextSecondPart": "monthly subscription"
+  },
+  "removeSubModal": {
+    "title": "Remove my subscription",
+    "note": "If you remove your subscription, you won’t be able to gain new subscribers and your subscription will end for your current subscribers. You will also lose the abilitiy to chat with your subscribers.\n You can turn your subscription back on at any time. ",
+    "bntText": "Remove my subscription"
   },
   "noResults": {
-    "title": "No results",
-    "text": "Bring more exposure, share with your network.",
-    "btnShare": "Share with friends",
+    "text": "Share your profile to let others\n know about your subscription",
     "updateSub": "Update subscription"
   },
   "modal": {

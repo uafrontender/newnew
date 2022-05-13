@@ -1,17 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import Button from '../Button';
 import Text from '../Text';
 
-import moneyIcon from '../../../public/images/dashboard/money.png';
+import money from '../../../public/images/svg/icons/filled/Money.svg';
 
 import { SCROLL_TO_TOP } from '../../../constants/timings';
+import InlineSVG from '../InlineSVG';
 
 export const FinishProfileSetup = () => {
   const { t } = useTranslation('creator');
+  const theme = useTheme();
 
   const handleClick = () => {
     scroller.scrollTo('top-reload', {
@@ -25,11 +26,11 @@ export const FinishProfileSetup = () => {
     <SCashOutContainer>
       <SCashOutTopBlock>
         <SImageWrapper>
-          <Image
-            src={moneyIcon}
-            alt={t('dashboard.earnings.todosIssue.text')}
-            width={48}
-            height={48}
+          <InlineSVG
+            svg={money}
+            fill={theme.colors.white}
+            width='48px'
+            height='48px'
           />
         </SImageWrapper>
         <SDescriptionWrapper>

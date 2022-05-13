@@ -3,6 +3,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -92,31 +93,36 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
                 : t('stripe.requestSetupLinkBtn')}
             </span>
           </SButton>
-          <SButtonUpdate
-            view='transparent'
-            onClick={() => {
-              handleRedirectToStripesetup();
-            }}
-          >
-            {t('stripe.updateButton')}
-          </SButtonUpdate>
+          {isConnectedToStripe && (
+            <SButtonUpdate
+              view='transparent'
+              onClick={() => {
+                handleRedirectToStripesetup();
+              }}
+            >
+              {t('stripe.updateButton')}
+            </SButtonUpdate>
+          )}
         </SButtons>
         <SControlsDiv>
           {!isMobile && (
-            <GoBackButton noArrow onClick={() => router.back()}>
-              {t('stripe.backButton')}
-            </GoBackButton>
+            <Link href='/creator/dashboard'>
+              <GoBackButton noArrow onClick={() => {}}>
+                {t('stripe.backButton')}
+              </GoBackButton>
+            </Link>
           )}
-          <Button
-            view='primaryGrad'
-            disabled={!isConnectedToStripe}
-            style={{
-              width: isMobile ? '100%' : 'initial',
-            }}
-            onClick={() => router.back()}
-          >
-            {isMobile ? t('stripe.submitMobile') : t('stripe.submitDesktop')}
-          </Button>
+          <Link href={!isConnectedToStripe ? '' : '/creator/dashboard'}>
+            <Button
+              view='primaryGrad'
+              disabled={!isConnectedToStripe}
+              style={{
+                width: isMobile ? '100%' : 'initial',
+              }}
+            >
+              {isMobile ? t('stripe.submitMobile') : t('stripe.submitDesktop')}
+            </Button>
+          </Link>
         </SControlsDiv>
       </SContainer>
     );
