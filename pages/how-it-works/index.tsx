@@ -12,10 +12,18 @@ import Headline from '../../components/atoms/Headline';
 import Text from '../../components/atoms/Text';
 import assets from '../../constants/assets';
 import Button from '../../components/atoms/Button';
+import { useAppSelector } from '../../redux-store/store';
+import QuestionMarkVisual from './QuestionMarkVisual';
 
 export const HowItWorks = () => {
   const { t } = useTranslation('how-it-works');
   const router = useRouter();
+  const { resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+
+  const isTablet = ['tablet'].includes(resizeMode);
 
   return (
     <Container>
@@ -27,11 +35,23 @@ export const HowItWorks = () => {
               {t('intro.text')}
             </IntroText>
           </IntroContent>
-          <IntroImage src={assets.info.howItWorks} alt='How it works' />
+          <QuestionMarkVisual alt='How it works' />
         </IntroSection>
 
         <Section>
-          <SectionImage src={assets.creation.AcStatic} alt='events' />
+          <SectionImage
+            src={assets.creation.AcAnimated}
+            alt='events'
+            // Quick fix for animated image alignment
+            style={
+              // eslint-disable-next-line no-nested-ternary
+              isMobile
+                ? { top: -10, right: -5, position: 'relative' }
+                : isTablet
+                ? { top: -35, right: -25, position: 'relative' }
+                : { top: -45, right: -35, position: 'relative' }
+            }
+          />
           <SectionContent>
             <Headline variant={3}>{t('events.title')}</Headline>
             <SectionText variant={3}>{t('events.text')}</SectionText>
@@ -39,7 +59,19 @@ export const HowItWorks = () => {
         </Section>
 
         <Section reversed>
-          <SectionImage src={assets.creation.McStatic} alt='superpolls' />
+          <SectionImage
+            src={assets.creation.McAnimated}
+            alt='superpolls'
+            // Quick fix for animated image alignment
+            style={
+              // eslint-disable-next-line no-nested-ternary
+              isMobile
+                ? { top: -10, position: 'relative' }
+                : isTablet
+                ? { top: -15, position: 'relative' }
+                : { top: -30, position: 'relative' }
+            }
+          />
           <SectionContent>
             <Headline variant={3}>{t('superpolls.title')}</Headline>
             <SectionText variant={3}>{t('superpolls.text')}</SectionText>
@@ -47,7 +79,19 @@ export const HowItWorks = () => {
         </Section>
 
         <Section>
-          <SectionImage src={assets.creation.CfStatic} alt='goals' />
+          <SectionImage
+            src={assets.creation.CfAnimated}
+            alt='goals'
+            // Quick fix for animated image alignment
+            style={
+              // eslint-disable-next-line no-nested-ternary
+              isMobile
+                ? { top: -10, position: 'relative' }
+                : isTablet
+                ? { top: -15, position: 'relative' }
+                : { top: -30, position: 'relative' }
+            }
+          />
           <SectionContent>
             <Headline variant={3}>{t('goals.title')}</Headline>
             <SectionText variant={3}>{t('goals.text')}</SectionText>
@@ -158,11 +202,6 @@ const IntroText = styled(Text)`
   ${({ theme }) => theme.media.laptop} {
     margin-top: 24px;
   }
-`;
-
-const IntroImage = styled('img')`
-  width: 100%;
-  object-fit: contain;
 `;
 
 const Section = styled('div')<{ reversed?: boolean }>`

@@ -22,7 +22,10 @@ const assets = {
     lightHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-light-hold-frame.webp`,
   },
   info: {
-    howItWorks: `${APP_ASSETS_ORIGIN}/info/how-it-works-static.png`,
+    lightQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-light.png`,
+    lightQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-light.webp`,
+    darkQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-dark.png`,
+    darkQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-dark.webp`,
   },
   home: {
     darkLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Dark.mp4`,
