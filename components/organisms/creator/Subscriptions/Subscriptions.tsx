@@ -1,13 +1,19 @@
+/* eslint-disable no-nested-ternary */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import Headline from '../../../atoms/Headline';
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import { getMyOnboardingState } from '../../../../api/endpoints/user';
+import { getMyRooms } from '../../../../api/endpoints/chat';
+import Button from '../../../atoms/Button';
+import Lottie from '../../../atoms/Lottie';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
 const SubscribersTable = dynamic(
   () => import('../../../molecules/creator/dashboard/SubscribersTable')
@@ -26,7 +32,8 @@ export const Subscriptions: React.FC = React.memo(() => {
     resizeMode
   );
 
-  const { mySubscribersTotal } = useGetSubscriptions();
+  const { mySubscribersTotal, isMySubscribersIsLoading } =
+    useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
 
@@ -34,6 +41,40 @@ export const Subscriptions: React.FC = React.memo(() => {
     useState<newnewapi.GetMyOnboardingStateResponse>();
   const [isLoadingOnboardingState, setIsLoadingOnboardingState] =
     useState(true);
+
+  const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
+    useState<number | undefined>();
+  const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
+
+  const fetchMyRoom = async () => {
+    if (loadingRoom) return;
+    try {
+      setLoadingRoom(true);
+      const payload = new newnewapi.GetMyRoomsRequest({
+        myRole: 2,
+        roomKind: 4,
+        paging: {
+          limit: 1,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.rooms[0].id) {
+        setMyAnnouncementRoomId(res.data.rooms[0].id as number);
+      }
+      setLoadingRoom(false);
+    } catch (err) {
+      console.error(err);
+      setLoadingRoom(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!myAnnouncementRoomId && mySubscribersTotal > 0) fetchMyRoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myAnnouncementRoomId, mySubscribersTotal]);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -82,15 +123,38 @@ export const Subscriptions: React.FC = React.memo(() => {
             {t('subscriptions.title')}{' '}
             {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
           </STitle>
+          {myAnnouncementRoomId && (
+            <Link
+              href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
+            >
+              <a>
+                <Button view='primaryGrad'>
+                  {t('subscriptions.message-all')}
+                </Button>
+              </a>
+            </Link>
+          )}
         </STitleBlock>
-        {!mySubscribersTotal || mySubscribersTotal < 1 ? (
-          <NoResults
-            isCreatorConnectedToStripe={
-              onboardingState?.isCreatorConnectedToStripe
-            }
-          />
+        {!isMySubscribersIsLoading ? (
+          !mySubscribersTotal || mySubscribersTotal < 1 ? (
+            <NoResults
+              isCreatorConnectedToStripe={
+                onboardingState?.isCreatorConnectedToStripe
+              }
+            />
+          ) : (
+            <SubscribersTable />
+          )
         ) : (
-          <SubscribersTable />
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
         )}
       </SContent>
     </SContainer>

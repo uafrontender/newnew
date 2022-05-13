@@ -107,21 +107,27 @@ const DashboardSectionStripe: React.FC<IDashboardSectionStripe> = React.memo(
         <SControlsDiv>
           {!isMobile && (
             <Link href='/creator/dashboard'>
-              <GoBackButton noArrow onClick={() => {}}>
-                {t('stripe.backButton')}
-              </GoBackButton>
+              <a>
+                <GoBackButton noArrow onClick={() => {}}>
+                  {t('stripe.backButton')}
+                </GoBackButton>
+              </a>
             </Link>
           )}
           <Link href={!isConnectedToStripe ? '' : '/creator/dashboard'}>
-            <Button
-              view='primaryGrad'
-              disabled={!isConnectedToStripe}
-              style={{
-                width: isMobile ? '100%' : 'initial',
-              }}
-            >
-              {isMobile ? t('stripe.submitMobile') : t('stripe.submitDesktop')}
-            </Button>
+            <a>
+              <Button
+                view='primaryGrad'
+                disabled={!isConnectedToStripe}
+                style={{
+                  width: isMobile ? '100%' : 'initial',
+                }}
+              >
+                {isMobile
+                  ? t('stripe.submitMobile')
+                  : t('stripe.submitDesktop')}
+              </Button>
+            </a>
           </Link>
         </SControlsDiv>
       </SContainer>
@@ -252,6 +258,9 @@ const SButtonUpdate = styled(SButton)`
     ${(props) =>
       props.theme.name === 'light' ? '#2C2C33' : props.theme.colors.white};
   cursor: pointer;
+  background: ${(props) =>
+    props.theme.name === 'light' && props.theme.colors.white} !important;
+  color: ${(props) => props.theme.name === 'light' && '#434956'} !important;
   &:hover {
     background: ${(props) =>
       props.theme.name === 'light'

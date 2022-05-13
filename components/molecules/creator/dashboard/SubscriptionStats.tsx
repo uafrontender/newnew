@@ -2,9 +2,9 @@ import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import moment from 'moment';
-import { useRouter } from 'next/router';
 import { google, newnewapi } from 'newnew-api';
 import { toNumber } from 'lodash';
+import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -17,12 +17,14 @@ import handIcon from '../../../../public/images/svg/icons/filled/Hand.svg';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
 import { getMyRooms } from '../../../../api/endpoints/chat';
+import Lottie from '../../../atoms/Lottie';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
 export const SubscriptionStats = () => {
   const { t } = useTranslation('creator');
-  const router = useRouter();
   const [filter, setFilter] = useState('7_days');
-  const [mySubscribersIsLoading, setMySubscribersIsLoading] = useState(true);
+  const [mySubscribersIsLoading, setMySubscribersIsLoading] =
+    useState<boolean | null>(null);
   const [newSubs, setNewSubs] = useState<newnewapi.ISubscriber[]>([]);
   const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
     useState<number | undefined>();
@@ -32,25 +34,26 @@ export const SubscriptionStats = () => {
     startDate: google.protobuf.ITimestamp,
     endDate: google.protobuf.ITimestamp
   ) {
+    if (mySubscribersIsLoading) return;
     try {
-      if (mySubscribersIsLoading) {
-        setMySubscribersIsLoading(false);
-        const payload = new newnewapi.GetMySubscribersRequest({
-          paging: null,
-          order: 2,
-          dateFilter: {
-            startDate,
-            endDate,
-          },
-        });
-        const res = await getMySubscribers(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
-      }
+      setMySubscribersIsLoading(true);
+      const payload = new newnewapi.GetMySubscribersRequest({
+        paging: null,
+        order: 2,
+        dateFilter: {
+          startDate,
+          endDate,
+        },
+      });
+      const res = await getMySubscribers(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
+      console.log(res.data.subscribers);
+      setMySubscribersIsLoading(false);
     } catch (err) {
       console.error(err);
-      setMySubscribersIsLoading(true);
+      setMySubscribersIsLoading(false);
     }
   }
 
@@ -163,38 +166,35 @@ export const SubscriptionStats = () => {
   //   [t, isMobile, theme.colorsThemed.accent.error, theme.colorsThemed.accent.success]
   // );
   const renderSubscriber = useCallback((item: newnewapi.ISubscriber, index) => {
-    const handleUserClick = () => {};
     if (index < 6) {
       return (
         <SSubscribersItem
           key={`list-item-subscriptionStats-subscriber-${item.user?.uuid}`}
         >
-          {item.user?.avatarUrl && (
-            <SSubscribersItemAvatar
-              withClick
-              onClick={handleUserClick}
-              avatarUrl={item.user?.avatarUrl}
-            />
-          )}
-          <SSubscribersItemInfo>
-            <SSubscribersItemName variant={3} weight={600}>
-              {item.user?.nickname ? item.user?.nickname : item.user?.username}
-            </SSubscribersItemName>
-            <SSubscribersItemNick variant={2} weight={600}>
-              {item.user?.username ? item.user?.username : item.user?.nickname}
-            </SSubscribersItemNick>
-          </SSubscribersItemInfo>
+          <Link href={`/${item.user!!.username}`}>
+            <a>
+              {item.user?.avatarUrl && (
+                <SSubscribersItemAvatar avatarUrl={item.user?.avatarUrl} />
+              )}
+              <SSubscribersItemInfo>
+                <SSubscribersItemName variant={3} weight={600}>
+                  {item.user?.nickname
+                    ? item.user?.nickname
+                    : item.user?.username}
+                </SSubscribersItemName>
+                <SSubscribersItemNick variant={2} weight={600}>
+                  {item.user?.username
+                    ? item.user?.username
+                    : item.user?.nickname}
+                </SSubscribersItemNick>
+              </SSubscribersItemInfo>
+            </a>
+          </Link>
         </SSubscribersItem>
       );
     }
     return null;
   }, []);
-  const handleSubmit = useCallback(() => {
-    if (myAnnouncementRoomId)
-      router.push(
-        `/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`
-      );
-  }, [router, myAnnouncementRoomId]);
 
   return (
     <SContainer>
@@ -215,12 +215,26 @@ export const SubscriptionStats = () => {
           </STotalText>
         </STotalTextWrapper>
       </STotalLine>
-      {!mySubscribersIsLoading && (
+      {mySubscribersIsLoading === false ? (
         <SSubscribersList>{newSubs.map(renderSubscriber)}</SSubscribersList>
+      ) : (
+        <Lottie
+          width={64}
+          height={64}
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: loadingAnimation,
+          }}
+        />
       )}
-      <SButtonSubmit view='secondary' onClick={handleSubmit}>
-        {t('dashboard.subscriptionStats.seeAll')}
-      </SButtonSubmit>
+      <Link href='/creator/subscribers'>
+        <a>
+          <SButtonSubmit view='secondary'>
+            {t('dashboard.subscriptionStats.seeAll')}
+          </SButtonSubmit>
+        </a>
+      </Link>
       {myAnnouncementRoomId && (
         <SBannerContainer>
           <SBannerTopBlock>
@@ -229,9 +243,15 @@ export const SubscriptionStats = () => {
               {t('dashboard.subscriptionStats.banner.description')}
             </SDescription>
           </SBannerTopBlock>
-          <SButton view='primaryGrad' onClick={handleSubmit}>
-            {t('dashboard.subscriptionStats.banner.submit')}
-          </SButton>
+          <Link
+            href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
+          >
+            <a>
+              <SButton view='primaryGrad'>
+                {t('dashboard.subscriptionStats.banner.submit')}
+              </SButton>
+            </a>
+          </Link>
         </SBannerContainer>
       )}
     </SContainer>

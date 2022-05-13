@@ -208,7 +208,10 @@ const SThead = styled.div`
   display: flex;
   border-top: 1px solid
     ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   line-height: 48px;
+  margin-bottom: -1px;
 `;
 
 const SSub = styled.div`
