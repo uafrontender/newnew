@@ -15,6 +15,7 @@ import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
 import { getMyOnboardingState } from '../../../api/endpoints/user';
+import Button from '../../atoms/Button';
 // import transactionsFilledIcon from '../../../public/images/svg/icons/filled/Transactions.svg';
 // import transactionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Transactions.svg';
 
@@ -87,19 +88,21 @@ export const Navigation = () => {
 
       return (
         <Link href={item.url} key={item.url}>
-          <SItem active={active}>
-            <SInlineSVG
-              svg={active ? item.iconFilled : item.iconOutlined}
-              fill={
-                active
-                  ? theme.colorsThemed.accent.blue
-                  : theme.colorsThemed.text.tertiary
-              }
-              width='24px'
-              height='24px'
-            />
-            <SLabel>{item.label}</SLabel>
-          </SItem>
+          <a>
+            <SItem active={active}>
+              <SInlineSVG
+                svg={active ? item.iconFilled : item.iconOutlined}
+                fill={
+                  active
+                    ? theme.colorsThemed.accent.blue
+                    : theme.colorsThemed.text.tertiary
+                }
+                width='24px'
+                height='24px'
+              />
+              <SLabel>{item.label}</SLabel>
+            </SItem>
+          </a>
         </Link>
       );
     },
@@ -110,7 +113,16 @@ export const Navigation = () => {
     ]
   );
 
-  return <SContainer>{collection.map(renderItem)}</SContainer>;
+  return (
+    <SContainer>
+      {collection.map(renderItem)}
+      <Link href='/creation'>
+        <a>
+          <Button>{t('navigation.new-post')}</Button>
+        </a>
+      </Link>
+    </SContainer>
+  );
 };
 
 export default Navigation;

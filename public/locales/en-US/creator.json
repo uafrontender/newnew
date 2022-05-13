@@ -82,7 +82,7 @@
       "seeAll": "See all new subs",
       "prevWeek": "vs prev week",
       "banner": {
-        "description": "Send welcome message to greet your new subscribers.",
+        "description": "Send a welcome message to your new subscribers",
         "submit": "Send message"
       },
       "list": {
@@ -120,13 +120,14 @@
       "subscribers": "Subscribers",
       "date": "Date subscribed",
       "menu": {
-        "report": "Report user",
-        "block": "Block user",
-        "unblock": "Unblock user",
+        "report": "Report",
+        "block": "Block",
+        "unblock": "Unblock",
         "view": "View profile"
       },
       "updateSub": "Update subscription"
-    }
+    },
+    "message-all": "DM all"
   },
   "earnings": {
     "meta": {
@@ -164,7 +165,8 @@
     "earnings": "Earnings",
     "getPaid": "Add Bank",
     "getPaidEdit": "Edit Bank",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "new-post": "New post"
   },
   "tabs": {
     "chat": "DMs",
@@ -257,12 +259,12 @@
       "title": "Payments made easy with Stripe",
       "description": "Connect a Stripe account to get paid on time."
     },
-    "title-set-up-stripe": "Set payment system",
+    "title-set-up-stripe": "Get paid through",
     "title-stripe-active": "account is active",
     "bullets": {
-      "1": "$2.00 USD NewNew withdrawal fee.",
-      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
-      "3": "Set up will take you to Stripe."
+      "1": "Setting up a Stripe account is quick and easy",
+      "2": "Withdraw your NewNew earnings directly to your bank account",
+      "3": "Stripe keeps your information private and secure"
     },
     "requestSetupLinkBtn": "Connect with Stripe",
     "stripeConnectedLinkBtn": "Stripe connected!",

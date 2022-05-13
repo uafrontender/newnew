@@ -334,6 +334,7 @@ const SAnimatedContainer = styled.div`
     left: unset;
     width: 500px;
     height: 800px;
+    max-height: 86vh;
     bottom: unset;
   }
 
