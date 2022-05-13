@@ -3,10 +3,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-
-import { useAppSelector } from '../redux-store/store';
 import General from '../components/templates/General';
 import SearchResults from '../components/organisms/search/SearchResults';
 
@@ -14,13 +11,7 @@ import { NextPageWithLayout } from './_app';
 
 export const Search = () => {
   const { t } = useTranslation('search');
-  const router = useRouter();
-  const user = useAppSelector((state) => state.user);
 
-  if (!user.loggedIn && !user.userData?.options?.isCreator) {
-    router.push('/');
-    return null;
-  }
   return (
     <>
       <Head>
