@@ -980,9 +980,9 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               <SRightPart>
                 <SFloatingPart>
                   <SItemWrapper noMargin={isDesktop}>
-                    <STabletBlockTitle variant={1} weight={700}>
+                    <STabletBlockPreviewTitle variant={1} weight={700}>
                       {t('secondStep.block.title.floating')}
-                    </STabletBlockTitle>
+                    </STabletBlockPreviewTitle>
                   </SItemWrapper>
                   {fileUpload?.progress === 100 ? (
                     fileProcessing?.progress === 100 ? (
@@ -1259,13 +1259,21 @@ const STabletBlockTitle = styled(Caption)`
   }
 `;
 
+const STabletBlockPreviewTitle = styled(Caption)`
+  margin-bottom: 8px;
+  text-align: center;
+  ${({ theme }) => theme.media.tablet} {
+    margin-bottom: 16px;
+  }
+`;
+
 const STabletBlockSubTitle = styled(Text)``;
 
 const SUserAvatar = styled(UserAvatar)`
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
 `;
 
 const SUserTitle = styled(Text)`
