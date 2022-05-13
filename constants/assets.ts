@@ -21,6 +21,9 @@ const assets = {
     lightHourglassAnimated: `${APP_ASSETS_ORIGIN}/decision/hourglass-light.webm`,
     lightHourglassStatic: `${APP_ASSETS_ORIGIN}/decision/hourglass-light-hold-frame.webp`,
   },
+  info: {
+    howItWorks: `${APP_ASSETS_ORIGIN}/info/how-it-works-static.png`,
+  },
   home: {
     darkLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Dark.mp4`,
     darkLandingStatic: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Hold-Frame-Dark.webp`,
