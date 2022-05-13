@@ -124,6 +124,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
         setMySubscribers(res.data.subscribers as newnewapi.ISubscriber[]);
         if (res.data.paging?.total)
           setMySubscribersTotal(res.data.paging?.total);
+        setMySubscribersIsLoading(false);
       } catch (err) {
         console.error(err);
         setMySubscribersIsLoading(false);

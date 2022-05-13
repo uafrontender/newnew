@@ -1,24 +1,20 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
-import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import preventParentClick from '../../../utils/preventParentClick';
 import Modal from '../../organisms/Modal';
 import Button from '../Button';
 import CloseModalButton from './CloseModalButton';
-import { formatNumber } from '../../../utils/format';
 
-interface IEnableSubModal {
+interface IRemoveSubModal {
   confirmEnableSub: boolean;
-  selectedProduct: newnewapi.ISubscriptionProduct;
   closeModal: () => void;
   subEnabled: () => void;
 }
 
-const EnableSubModal: React.FC<IEnableSubModal> = ({
+const RemoveSubModal: React.FC<IRemoveSubModal> = ({
   confirmEnableSub,
-  selectedProduct,
   closeModal,
   subEnabled,
 }) => {
@@ -32,20 +28,16 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SModalHeader>
-            <SModalTitle>{t('enableSubModal.title')}</SModalTitle>
-            <CloseModalButton handleClick={closeModal} />
+            <SModalTitle>{t('removeSubModal.title')}</SModalTitle>
+            <SCloseModalButton>
+              <CloseModalButton handleClick={closeModal} />
+            </SCloseModalButton>
           </SModalHeader>
           <SModalContent>
-            <SProductInfo>{`${t('enableSubModal.confirmationTextFirstPart')}
-            $${formatNumber(
-              selectedProduct?.monthlyRate?.usdCents!! / 100 ?? 0,
-              true
-            )}
-            ${t('enableSubModal.confirmationTextSecondPart')}`}</SProductInfo>
-            <SNote>{t('enableSubModal.note')}</SNote>
+            <SText>{t('removeSubModal.note')}</SText>
           </SModalContent>
-          <SConfirmButton view='primaryGrad' onClick={handleSubmit}>
-            {t('enableSubModal.bntText')}
+          <SConfirmButton view='danger' onClick={handleSubmit}>
+            {t('removeSubModal.bntText')}
           </SConfirmButton>
         </SModal>
       </SContainer>
@@ -53,7 +45,7 @@ const EnableSubModal: React.FC<IEnableSubModal> = ({
   );
 };
 
-export default EnableSubModal;
+export default RemoveSubModal;
 
 const SContainer = styled.div`
   display: flex;
@@ -63,6 +55,7 @@ const SContainer = styled.div`
 `;
 
 const SModal = styled.div`
+  text-align: center;
   width: 100%;
   background: ${(props) =>
     props.theme.name === 'light'
@@ -82,48 +75,45 @@ const SModal = styled.div`
 
   ${(props) => props.theme.media.tablet} {
     height: auto;
-    padding: 24px;
+    padding: 24px 24px 40px;
     max-width: 480px;
     border-radius: ${(props) => props.theme.borderRadius.medium};
   }
 `;
 
 const SModalHeader = styled.div`
-  display: flex;
+  position: relative;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 22px;
   justify-content: space-between;
 `;
 
 const SModalTitle = styled.strong`
-  font-size: 20px;
-  margin: 0;
-  font-weight: 600;
-`;
-
-const SModalContent = styled.div`
-  padding: 0 22px;
-`;
-
-const SProductInfo = styled.div`
-  border-radius: 16px;
-  padding: 16px;
-  margin: 0 0 6px;
-  background: ${(props) => props.theme.colorsThemed.background.quaternary};
+  font-size: 32px;
+  margin: 36px 0 0;
+  font-weight: bold;
   text-align: center;
+  display: block;
 `;
 
-const SNote = styled.p`
-  font-size: 12px;
-  margin-bottom: 20px;
-  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+const SCloseModalButton = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
+
+const SModalContent = styled.div``;
+
+const SText = styled.p`
+  margin-bottom: 24px;
+  white-space: pre-wrap;
 `;
 
 const SConfirmButton = styled(Button)`
   padding: 16px 10px;
   line-height: 24px;
   font-size: 16px;
-  width: 100%;
+  margin: 0 auto;
 
   &:disabled {
     cursor: default;

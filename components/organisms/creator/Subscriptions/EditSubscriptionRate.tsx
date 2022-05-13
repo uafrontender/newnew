@@ -24,7 +24,12 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
       const payload = new newnewapi.EmptyRequest();
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+      if (res.data?.myProduct) {
+        setMySubscriptionProduct(res.data?.myProduct);
+      }
+      else {
+        setMySubscriptionProduct(null);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -43,7 +48,10 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
         <STitleBlock>
           <STitle variant={4}>{t('SubrateSection.heading')}</STitle>
         </STitleBlock>
-        <SubproductsSelect mySubscriptionProduct={mySubscriptionProduct} />
+        <SubproductsSelect
+          mySubscriptionProduct={mySubscriptionProduct}
+          removedMyProduct={fetchMySubscriptionProduct}
+        />
       </SContent>
     </SContainer>
   );
@@ -83,7 +91,9 @@ const SContent = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 const STitleBlock = styled.section`
   display: flex;

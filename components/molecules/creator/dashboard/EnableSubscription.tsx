@@ -1,31 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { newnewapi } from 'newnew-api';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
-import { useAppSelector } from '../../../../redux-store/store';
-import assets from '../../../../constants/assets';
+import emptyFolder from '../../../../public/images/notifications/no-results.png';
+import { getMyOnboardingState } from '../../../../api/endpoints/user';
 
 export const EnableSubscription = () => {
   const { t } = useTranslation('creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
-    resizeMode
-  );
-  const router = useRouter();
+
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchOnboardingState() {
+      if (isLoading) return;
+      try {
+        setIsLoading(false);
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getMyOnboardingState(payload);
+
+        if (res.data) {
+          setOnboardingState(res.data);
+        }
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsLoading(false);
+      }
+    }
+
+    fetchOnboardingState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SContainer>
-      <img
-        src={assets.creation.AcStatic}
-        alt='Enable subscription'
-        width={isMobile ? 232 : 206}
-        height={isMobile ? 240 : 202}
-        style={{ objectFit: 'cover' }}
+      <Image
+        src={emptyFolder}
+        alt={t('dashboard.enableSubscription.title')}
+        width={176}
+        height={176}
       />
       <SContent>
         <STitle variant={6}>{t('dashboard.enableSubscription.title')}</STitle>
@@ -33,14 +56,18 @@ export const EnableSubscription = () => {
           <SDescription variant={3} weight={600}>
             {t('dashboard.enableSubscription.description')}
           </SDescription>
-          {/* <SLearnMore onClick={handleLearnMore}>{t('dashboard.enableSubscription.learnMore')}</SLearnMore> */}
         </SDescriptionWrapper>
-        <SButton
-          view='primaryGrad'
-          onClick={() => router.push('/creator/subscribers')}
+        <Link
+          href={
+            onboardingState?.isCreatorConnectedToStripe
+              ? '/creator/subscribers/edit-subscription-rate'
+              : '/creator/get-paid'
+          }
         >
-          {t('dashboard.enableSubscription.submit')}
-        </SButton>
+          <a>
+            <SButton>{t('dashboard.enableSubscription.submit')}</SButton>
+          </a>
+        </Link>
       </SContent>
     </SContainer>
   );
@@ -61,7 +88,7 @@ const SContainer = styled.div`
   justify-content: center;
 
   ${(props) => props.theme.media.tablet} {
-    padding: 24px;
+    padding: 18px 24px 18px 32px;
     flex-direction: row-reverse;
     justify-content: space-between;
   }
@@ -93,10 +120,16 @@ const SButton = styled(Button)`
   padding: 16px 20px;
   margin-top: 16px;
 
+  background: ${(props) => props.theme.colorsThemed.accent.yellow};
+  color: #2c2c33;
+
   ${(props) => props.theme.media.tablet} {
     width: unset;
     padding: 12px 24px;
     margin-top: 24px;
+  }
+  &:hover {
+    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
   }
 `;
 

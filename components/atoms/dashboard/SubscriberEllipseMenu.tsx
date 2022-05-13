@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import useOnClickEsc from '../../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
@@ -28,7 +28,6 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
 }) => {
   const { t } = useTranslation('creator');
   const containerRef = useRef<HTMLDivElement>();
-  const router = useRouter();
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
@@ -43,10 +42,6 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
     handleClose();
   };
 
-  const viewUserProfile = () => {
-    router.push(`/${user.username}`);
-  };
-
   return (
     <AnimatePresence>
       {isVisible && (
@@ -58,13 +53,15 @@ const SubscriberEllipseMenu: React.FC<ISubscriberEllipseMenu> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SButton onClick={viewUserProfile}>
-            <Text variant={2}>{t('subscriptions.table.menu.view')}</Text>
-          </SButton>
+          <Link href={`/${user.username}`}>
+            <a>
+              <SButton>
+                <Text variant={2}>{t('subscriptions.table.menu.view')}</Text>
+              </SButton>
+            </a>
+          </Link>
           <SButton onClick={reportUserHandler}>
-            <Text variant={2} tone='error'>
-              {t('subscriptions.table.menu.report')}
-            </Text>
+            <Text variant={2}>{t('subscriptions.table.menu.report')}</Text>
           </SButton>
           <SButton onClick={blockUserHandler}>
             <Text variant={2}>
@@ -106,6 +103,10 @@ const SContainer = styled(motion.div)`
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;
+  }
+  a {
+    display: block;
+    width: 100%;
   }
 `;
 
