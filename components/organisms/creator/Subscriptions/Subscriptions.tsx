@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import Headline from '../../../atoms/Headline';
 import { useAppSelector } from '../../../../redux-store/store';
@@ -26,7 +25,6 @@ export const Subscriptions: React.FC = React.memo(() => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const router = useRouter();
 
   const { mySubscribersTotal } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
@@ -44,11 +42,6 @@ export const Subscriptions: React.FC = React.memo(() => {
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) {
         setMySubscriptionProduct(res.data?.myProduct);
-      } else {
-        /* eslint-disable no-unused-expressions */
-        !onboardingState?.isCreatorConnectedToStripe
-          ? router.replace('/creator/get-paid')
-          : router.replace('/creator/subscribers/edit-subscription-rate');
       }
     } catch (err) {
       console.error(err);
@@ -139,7 +132,9 @@ const SContent = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 const STitleBlock = styled.section`
   display: flex;

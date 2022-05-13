@@ -11,7 +11,6 @@ import Headline from '../../../atoms/Headline';
 import DropDown from '../../../atoms/creator/DropDown';
 import CashOut from '../../../atoms/creator/CashOut';
 
-import FinishProfileSetup from '../../../atoms/creator/FinishProfileSetup';
 import MakeDecision from '../../../atoms/creator/MakeDecision';
 import { getMyEarnings } from '../../../../api/endpoints/payments';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
@@ -20,15 +19,13 @@ import loadingAnimation from '../../../../public/animations/logo-loading-blue.js
 import Lottie from '../../../atoms/Lottie';
 
 interface IFunctionProps {
-  isTodosCompleted: boolean;
   hasMyPosts: boolean;
-  isTodosCompletedLoading: boolean;
+  earnings: newnewapi.GetMyEarningsResponse | undefined;
 }
 
 export const Earnings: React.FC<IFunctionProps> = ({
-  isTodosCompleted,
   hasMyPosts,
-  isTodosCompletedLoading,
+  earnings,
 }) => {
   const { t } = useTranslation('creator');
   const [filter, setFilter] = useState('7_days');
@@ -36,6 +33,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
   const [myEarnings, setMyEarnings] =
     useState<newnewapi.GetMyEarningsResponse | undefined>();
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     async function fetchMyEarnings() {
@@ -66,6 +64,10 @@ export const Earnings: React.FC<IFunctionProps> = ({
     }
     if (isLoading === null) {
       fetchMyEarnings();
+    }
+    if (initialLoad) {
+      setMyEarnings(earnings);
+      setInitialLoad(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
@@ -234,20 +236,7 @@ export const Earnings: React.FC<IFunctionProps> = ({
         </STotalInsights> */}
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {!isTodosCompletedLoading ? (
-        isTodosCompleted ? (
-          hasMyPosts && myEarnings?.nextCashoutAmount ? (
-            <CashOut
-              nextCashoutAmount={myEarnings?.nextCashoutAmount}
-              nextCashoutDate={myEarnings?.nextCashoutDate}
-            />
-          ) : (
-            <MakeDecision />
-          )
-        ) : (
-          <FinishProfileSetup />
-        )
-      ) : (
+      {isLoading || initialLoad ? (
         <Lottie
           width={64}
           height={64}
@@ -257,6 +246,13 @@ export const Earnings: React.FC<IFunctionProps> = ({
             animationData: loadingAnimation,
           }}
         />
+      ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
+        <CashOut
+          nextCashoutAmount={myEarnings?.nextCashoutAmount}
+          nextCashoutDate={myEarnings?.nextCashoutDate}
+        />
+      ) : (
+        <MakeDecision />
       )}
     </SContainer>
   );

@@ -56,11 +56,6 @@ export const YourTodos: React.FC<IFunctionProps> = ({
         completed: true,
       },
       {
-        id: 'basic-info',
-        title: t('dashboard.todos.basic-info'),
-        completed: true,
-      },
-      {
         id: 'complete-profile',
         title: t('dashboard.todos.complete-profile'),
         completed: isProfileComplete(),
@@ -125,7 +120,8 @@ export const YourTodos: React.FC<IFunctionProps> = ({
 
     checkAndLoad();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, dispatch, currentTags, allCompleted]);
+  }, []);
+  // }, [user, dispatch, currentTags, allCompleted]);
 
   useEffect(() => {
     if (!allCompleted && isLoading === false) {
@@ -205,23 +201,24 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => props.theme.colors.white};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? '#14151F'
+      : props.theme.colorsThemed.background.quinary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
     width: 100%;
-    padding: 20px 24px 24px;
+    padding: 20px 32px 8px 25px;
     border-radius: 16px;
-    background: ${(props) =>
-      props.theme.name === 'light' ? '#14151F' : props.theme.colors.white};
   }
 `;
 
 const STitle = styled(Headline)`
-  color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33'};
+  color: ${(props) => props.theme.colors.white};
   font-weight: 600;
+  margin-bottom: 8px;
 `;
 
 const SHeaderLine = styled.div`
@@ -233,10 +230,15 @@ const SHeaderLine = styled.div`
 
 const SDescription = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.tertiary
+      : props.theme.colorsThemed.text.secondary};
 `;
 
 const SList = styled.div`
   font-size: 14px;
+  padding-top: 16px;
   ${(props) => props.theme.media.tablet} {
     font-size: 16px;
   }
@@ -247,31 +249,24 @@ interface ISListItem {
   isFirst: boolean;
 }
 const SListItem = styled.div<ISListItem>`
-  padding: 16px;
+  padding: 0 0 16px;
   display: flex;
-  ${(props) => {
-    if (!props.isFirst) {
-      return css`
-          border-top: 1px solid ${() =>
-            props.theme.name === 'light' ? '#272835' : '#E5E9F1'};
-        }
-      `;
-    }
-    return css``;
-  }}
-
+  align-items: center;
   ${(props) => {
     if (props.completed) {
       return css`
-          color: ${() =>
-            props.theme.name === 'light' ? '#586070' : '#B3BBCA'};
           text-decoration:line-through;
+          div{
+            color: ${() =>
+              props.theme.name === 'light' ? '#586070' : '#B3BBCA'};
+          }
         }
       `;
     }
     return css`
-      color: ${() =>
-        props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33'};
+      div {
+        color: ${() => props.theme.colors.white};
+      }
     `;
   }}
 `;
