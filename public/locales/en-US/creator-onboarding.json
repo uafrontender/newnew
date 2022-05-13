@@ -140,7 +140,7 @@
   },
   "StripeSection": {
     "meta": {
-      "title": "Payments made easy with Stripe",
+      "title": "Get paid through",
       "description": "Connect a Stripe account to get paid on time."
     },
     "side": {
@@ -150,9 +150,9 @@
     "title-set-up-stripe": "Set payment system",
     "title-stripe-active": "account is active",
     "bullets": {
-      "1": "$2.00 USD NewNew withdrawal fee.",
-      "2": "Stripe may charge additional fees for sending and withdrawing funds.",
-      "3": "Set up will take you to Stripe."
+      "1": "Setting up a Stripe account is quick and easy",
+      "2": "Withdraw your NewNew earnings directly to your bank account",
+      "3": "Stripe keeps your information private and secure"
     },
     "requestSetupLinkBtn": "Connect with Stripe",
     "stripeConnectedLinkBtn": "Stripe connected!",

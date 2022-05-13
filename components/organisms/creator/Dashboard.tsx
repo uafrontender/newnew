@@ -54,7 +54,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const [isTodosCompletedLoading, setIsTodosCompletedLoading] =
     useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [isEarningnsLoading, setIsEarningnsLoading] = useState(true);
+  const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
     useState(true);
   const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>(
@@ -157,20 +157,20 @@ export const Dashboard: React.FC = React.memo(() => {
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       setMyEarnings(res.data);
-      setIsEarningnsLoading(false);
+      setIsEarningsLoading(false);
     } catch (err) {
-      setIsEarningnsLoading(false);
+      setIsEarningsLoading(false);
       console.error(err);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEarningnsLoading]);
+  }, [isEarningsLoading]);
 
   useEffect(() => {
-    if (isTodosCompleted && !myEarnings && isEarningnsLoading) {
+    if (!isTodosCompletedLoading && !myEarnings && isEarningsLoading) {
       fetchMyEarnings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTodosCompleted]);
+  }, [isTodosCompletedLoading]);
 
   return (
     <SContainer>
@@ -208,7 +208,7 @@ export const Dashboard: React.FC = React.memo(() => {
               )
             )}
             <SBlock>
-              {!isEarningnsLoading ? (
+              {!isEarningsLoading ? (
                 isTodosCompleted ? (
                   <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
                 ) : (
