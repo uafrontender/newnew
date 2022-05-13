@@ -129,7 +129,7 @@ export const General: React.FC<IGeneral> = (props) => {
     resizeMode
   );
 
-  const [isOpenedChat, setIsOpenedChat] = useState(true);
+  const [isOpenedChat, setIsOpenedChat] = useState(false);
 
   const openChat = () => {
     setIsOpenedChat(true);

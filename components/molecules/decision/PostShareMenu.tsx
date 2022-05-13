@@ -39,37 +39,37 @@ const PostShareMenu: React.FunctionComponent<IPostShareMenu> = React.memo(
     useOnClickEsc(containerRef, onClose);
     useOnClickOutside(containerRef, onClose);
 
-    const socialButtons = useMemo(
-      () => [
-        {
-          key: 'twitter',
-        },
-        {
-          key: 'facebook',
-        },
-        {
-          key: 'instagram',
-        },
-        {
-          key: 'tiktok',
-        },
-      ],
-      []
-    );
-    const renderItem = (item: any) => (
-      <SItem key={item.key}>
-        <SItemButton type={item.key}>
-          <InlineSvg
-            svg={SOCIAL_ICONS[item.key] as string}
-            width='50%'
-            height='50%'
-          />
-        </SItemButton>
-        <SItemTitle variant={3} weight={600}>
-          {t(`socials.${item.key}`)}
-        </SItemTitle>
-      </SItem>
-    );
+    // const socialButtons = useMemo(
+    //   () => [
+    //     {
+    //       key: 'twitter',
+    //     },
+    //     {
+    //       key: 'facebook',
+    //     },
+    //     {
+    //       key: 'instagram',
+    //     },
+    //     {
+    //       key: 'tiktok',
+    //     },
+    //   ],
+    //   []
+    // );
+    // const renderItem = (item: any) => (
+    //   <SItem key={item.key}>
+    //     <SItemButton type={item.key}>
+    //       <InlineSvg
+    //         svg={SOCIAL_ICONS[item.key] as string}
+    //         width='50%'
+    //         height='50%'
+    //       />
+    //     </SItemButton>
+    //     <SItemTitle variant={3} weight={600}>
+    //       {t(`socials.${item.key}`)}
+    //     </SItemTitle>
+    //   </SItem>
+    // );
 
     const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 

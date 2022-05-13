@@ -6,11 +6,11 @@ import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
+import Link from 'next/link';
 import {
   getStandardSubscriptionProducts,
   setMySubscriptionProduct,
 } from '../../../../api/endpoints/subscription';
-
 import Text from '../../../atoms/Text';
 import Lottie from '../../../atoms/Lottie';
 import Button from '../../../atoms/Button';
@@ -19,19 +19,21 @@ import SubsFeatures from '../../../atoms/dashboard/SubsFeatures';
 import checkBoxAnim from '../../../../public/animations/checkbox.json';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import EnableSubModal from '../../../atoms/dashboard/EnableSubModal';
+import RemoveSubModal from '../../../atoms/dashboard/RemoveSubModal';
 
 interface ISubproductsSelect {
   mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
+  removedMyProduct: () => void;
 }
 
 const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   mySubscriptionProduct,
+  removedMyProduct,
 }) => {
   const { t } = useTranslation('creator');
   const [standardProducts, setStandardProducts] = useState<
     newnewapi.ISubscriptionProduct[]
   >([]);
-  const [featuredProductsIds, setFeaturedProductsIds] = useState<string[]>([]);
   const [selectedProduct, setSelectedProduct] =
     useState<newnewapi.ISubscriptionProduct>();
   const [isLoading, setIsLoading] = useState(true);
@@ -47,9 +49,6 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
         );
         if (getStandardProductsRes.data) {
           setStandardProducts(getStandardProductsRes.data.products);
-          setFeaturedProductsIds(
-            getStandardProductsRes.data.featuredProductIds
-          );
         }
         setIsLoading(false);
       } catch (err) {
@@ -64,17 +63,11 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
     if (mySubscriptionProduct) {
       setSelectedProduct(mySubscriptionProduct);
     } else {
-      if (featuredProductsIds.length > 0 && standardProducts.length > 0) {
-        setSelectedProduct(
-          standardProducts[
-            standardProducts.findIndex((p) =>
-              featuredProductsIds.includes(p.id as string)
-            )
-          ]
-        );
+      if (standardProducts.length > 0) {
+        setSelectedProduct(standardProducts[0]);
       }
     }
-  }, [mySubscriptionProduct, featuredProductsIds, standardProducts]);
+  }, [mySubscriptionProduct, standardProducts]);
 
   const handleSetSelectedProduct = (
     product: newnewapi.ISubscriptionProduct
@@ -116,24 +109,30 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
               <ProductOption
                 key={p.id}
                 product={p}
+                isMyProduct={
+                  mySubscriptionProduct
+                    ? mySubscriptionProduct.id === p.id
+                    : false
+                }
                 selected={selectedProduct ? selectedProduct.id === p.id : false}
-                featured={featuredProductsIds.includes(p.id as string)}
                 handleClick={() => handleSetSelectedProduct(p)}
+                removedMyProduct={removedMyProduct}
               />
             ))}
           </SProductOptions>
           <SubsFeatures />
           <SActions>
-            <Button
-              view='quaternary'
-              onClick={() =>
+            <Link
+              href={
                 !mySubscriptionProduct
-                  ? router.push('/creator/dashboard')
-                  : router.push('/creator/subscribers')
+                  ? '/creator/dashboard'
+                  : '/creator/subscribers'
               }
             >
-              {t('SubrateSection.backButton')}
-            </Button>
+              <Button view='quaternary'>
+                {t('SubrateSection.backButton')}
+              </Button>
+            </Link>
             {!mySubscriptionProduct ? (
               <Button view='primaryGrad' onClick={() => handlerConfirmEnable()}>
                 {t('SubrateSection.submitDesktop')}
@@ -199,19 +198,38 @@ const SActions = styled.div`
 
 interface IProductOption {
   selected: boolean;
-  featured: boolean;
+  isMyProduct: boolean;
   product: newnewapi.ISubscriptionProduct;
   handleClick: () => void;
+  removedMyProduct: () => void;
 }
 
 const ProductOption: React.FunctionComponent<IProductOption> = ({
   selected,
-  featured,
   product,
   handleClick,
+  isMyProduct,
+  removedMyProduct,
 }) => {
   const { t } = useTranslation('creator');
   const ref: any = useRef();
+  const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
+
+  const removeMyProduct = async () => {
+    try {
+      const payload = new newnewapi.SetMySubscriptionProductRequest({
+        productId: null,
+      });
+      const res = await setMySubscriptionProduct(payload);
+
+      if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+      setConfirmSubEnable(false);
+      removedMyProduct();
+    } catch (err) {
+      console.error(err);
+      setConfirmSubEnable(false);
+    }
+  };
 
   useEffect(() => {
     ref.current.anim.stop();
@@ -247,16 +265,28 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
             <SPerMonth variant={2}>
               {t('SubrateSection.selectInput.perMonth')}
             </SPerMonth>
-            {featured && (
-              <SFeaturedLabel>
-                {t('SubrateSection.selectInput.featured')}
-              </SFeaturedLabel>
-            )}
           </>
         ) : (
           <Text variant={2}>{t('SubrateSection.selectInput.noProduct')}</Text>
         )}
       </SLabelContent>
+      {isMyProduct && (
+        <>
+          <SButton
+            view='danger'
+            onClick={() => {
+              setConfirmSubEnable(true);
+            }}
+          >
+            {t('SubrateSection.removeSubscription')}
+          </SButton>
+          <RemoveSubModal
+            confirmEnableSub={confirmSubEnable}
+            closeModal={() => setConfirmSubEnable(false)}
+            subEnabled={removeMyProduct}
+          />
+        </>
+      )}
     </SProductOption>
   );
 };
@@ -266,6 +296,7 @@ const SProductOption = styled.button<{
 }>`
   display: flex;
   align-items: center;
+  position: relative;
 
   border-style: solid;
   border-width: 2px;
@@ -291,7 +322,7 @@ const SProductOption = styled.button<{
   transition: 0.2s linear;
 
   ${({ theme }) => theme.media.tablet} {
-    width: 48%;
+    width: 49%;
   }
 `;
 
@@ -316,18 +347,11 @@ const SPerMonth = styled(Text)`
     theme.name === 'light' ? '#586070' : theme.colorsThemed.text.tertiary};
 `;
 
-const SFeaturedLabel = styled.div`
+const SButton = styled(Button)`
   position: absolute;
-  top: calc(50% - 16px);
-  right: 0px;
-
-  border-radius: 24px;
-  padding: 8px 16px;
-
-  background: ${({ theme }) => theme.colorsThemed.accent.blue};
-
-  color: #fff;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
+  right: 0;
+  top: -25px;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 14px 16px;
 `;

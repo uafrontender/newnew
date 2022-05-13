@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
@@ -30,7 +30,6 @@ export const YourTodos: React.FC<IFunctionProps> = ({
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const [allCompleted, setAllcompleted] = useState<boolean | null>(null);
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
@@ -53,11 +52,6 @@ export const YourTodos: React.FC<IFunctionProps> = ({
       {
         id: 'sign-up',
         title: t('dashboard.todos.sign-up'),
-        completed: true,
-      },
-      {
-        id: 'basic-info',
-        title: t('dashboard.todos.basic-info'),
         completed: true,
       },
       {
@@ -125,7 +119,8 @@ export const YourTodos: React.FC<IFunctionProps> = ({
 
     checkAndLoad();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, dispatch, currentTags, allCompleted]);
+  }, []);
+  // }, [user, dispatch, currentTags, allCompleted]);
 
   useEffect(() => {
     if (!allCompleted && isLoading === false) {
@@ -161,28 +156,26 @@ export const YourTodos: React.FC<IFunctionProps> = ({
           </SItemTitle>
         </SItemText>
         {!item.completed && item.id === 'complete-profile' && (
-          <SBottomActionButton
-            withDim
-            withShrink
-            view='primaryGrad'
-            onClick={() => router.push('/creator-onboarding-about')}
-          >
-            {t('dashboard.todos.complete-profile-btn')}
-          </SBottomActionButton>
+          <Link href='/creator-onboarding-about'>
+            <a>
+              <SBottomActionButton withDim withShrink view='primaryGrad'>
+                {t('dashboard.todos.complete-profile-btn')}
+              </SBottomActionButton>
+            </a>
+          </Link>
         )}
         {!item.completed && item.id === 'add-cashout-method' && (
-          <SBottomActionButton
-            withDim
-            withShrink
-            view='primaryGrad'
-            onClick={() => router.push('/creator/get-paid')}
-          >
-            {t('dashboard.todos.add-cashout-method-btn')}
-          </SBottomActionButton>
+          <Link href='/creator/get-paid'>
+            <a>
+              <SBottomActionButton withDim withShrink view='primaryGrad'>
+                {t('dashboard.todos.add-cashout-method-btn')}
+              </SBottomActionButton>
+            </a>
+          </Link>
         )}
       </SListItem>
     ),
-    [t, router, theme.name]
+    [t, theme.name]
   );
   return allCompleted === false && !isLoading ? (
     <SContainer>
@@ -205,23 +198,24 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => props.theme.colors.white};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? '#14151F'
+      : props.theme.colorsThemed.background.quinary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
     width: 100%;
-    padding: 20px 24px 24px;
+    padding: 20px 32px 8px 25px;
     border-radius: 16px;
-    background: ${(props) =>
-      props.theme.name === 'light' ? '#14151F' : props.theme.colors.white};
   }
 `;
 
 const STitle = styled(Headline)`
-  color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33'};
+  color: ${(props) => props.theme.colors.white};
   font-weight: 600;
+  margin-bottom: 8px;
 `;
 
 const SHeaderLine = styled.div`
@@ -233,10 +227,15 @@ const SHeaderLine = styled.div`
 
 const SDescription = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.tertiary
+      : props.theme.colorsThemed.text.secondary};
 `;
 
 const SList = styled.div`
   font-size: 14px;
+  padding-top: 16px;
   ${(props) => props.theme.media.tablet} {
     font-size: 16px;
   }
@@ -247,33 +246,31 @@ interface ISListItem {
   isFirst: boolean;
 }
 const SListItem = styled.div<ISListItem>`
-  padding: 16px;
+  padding: 0 0 16px;
   display: flex;
-  ${(props) => {
-    if (!props.isFirst) {
-      return css`
-          border-top: 1px solid ${() =>
-            props.theme.name === 'light' ? '#272835' : '#E5E9F1'};
-        }
-      `;
-    }
-    return css``;
-  }}
-
+  align-items: center;
   ${(props) => {
     if (props.completed) {
       return css`
-          color: ${() =>
-            props.theme.name === 'light' ? '#586070' : '#B3BBCA'};
           text-decoration:line-through;
+          div{
+            color: ${() =>
+              props.theme.name === 'light' ? '#586070' : '#B3BBCA'};
+          }
         }
       `;
     }
     return css`
-      color: ${() =>
-        props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33'};
+      div {
+        color: ${() => props.theme.colors.white};
+      }
     `;
   }}
+  a {
+    margin-left: auto;
+    flex-shrink: 0;
+    display: block;
+  }
 `;
 
 const SItemText = styled.div`

@@ -1,11 +1,11 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
+import { newnewapi } from 'newnew-api';
 
 import InlineSVG from '../../atoms/InlineSVG';
-
 import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboard.svg';
 import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
 import subscriptionsFilledIcon from '../../../public/images/svg/icons/filled/Subscriptions.svg';
@@ -14,6 +14,8 @@ import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined
 // import earningsOutlinedIcon from '../../../public/images/svg/icons/outlined/Earnings.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
+import { getMyOnboardingState } from '../../../api/endpoints/user';
+import Button from '../../atoms/Button';
 // import transactionsFilledIcon from '../../../public/images/svg/icons/filled/Transactions.svg';
 // import transactionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Transactions.svg';
 
@@ -21,6 +23,26 @@ export const Navigation = () => {
   const theme = useTheme();
   const { t } = useTranslation('creator');
   const router = useRouter();
+
+  const [onboardingState, setOnboardingState] =
+    useState<newnewapi.GetMyOnboardingStateResponse>();
+
+  useEffect(() => {
+    async function fetchOnboardingState() {
+      try {
+        const payload = new newnewapi.EmptyRequest({});
+        const res = await getMyOnboardingState(payload);
+
+        if (res.data) {
+          setOnboardingState(res.data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchOnboardingState();
+  }, []);
 
   const collection = useMemo(
     () => [
@@ -44,7 +66,9 @@ export const Navigation = () => {
       // },
       {
         url: '/creator/get-paid',
-        label: t('navigation.getPaid'),
+        label: onboardingState?.isCreatorConnectedToStripe
+          ? t('navigation.getPaidEdit')
+          : t('navigation.getPaid'),
         iconFilled: walletFilledIcon,
         iconOutlined: walletOutlinedIcon,
       },
@@ -55,7 +79,7 @@ export const Navigation = () => {
       //   iconOutlined: transactionsOutlinedIcon,
       // },
     ],
-    [t]
+    [t, onboardingState]
   );
 
   const renderItem = useCallback(
@@ -64,19 +88,21 @@ export const Navigation = () => {
 
       return (
         <Link href={item.url} key={item.url}>
-          <SItem active={active}>
-            <SInlineSVG
-              svg={active ? item.iconFilled : item.iconOutlined}
-              fill={
-                active
-                  ? theme.colorsThemed.accent.blue
-                  : theme.colorsThemed.text.tertiary
-              }
-              width='24px'
-              height='24px'
-            />
-            <SLabel>{item.label}</SLabel>
-          </SItem>
+          <a>
+            <SItem active={active}>
+              <SInlineSVG
+                svg={active ? item.iconFilled : item.iconOutlined}
+                fill={
+                  active
+                    ? theme.colorsThemed.accent.blue
+                    : theme.colorsThemed.text.tertiary
+                }
+                width='24px'
+                height='24px'
+              />
+              <SLabel>{item.label}</SLabel>
+            </SItem>
+          </a>
         </Link>
       );
     },
@@ -87,7 +113,16 @@ export const Navigation = () => {
     ]
   );
 
-  return <SContainer>{collection.map(renderItem)}</SContainer>;
+  return (
+    <SContainer>
+      {collection.map(renderItem)}
+      <Link href='/creation'>
+        <a>
+          <Button>{t('navigation.new-post')}</Button>
+        </a>
+      </Link>
+    </SContainer>
+  );
 };
 
 export default Navigation;
