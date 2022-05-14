@@ -108,6 +108,7 @@ interface IPostModal {
   manualCurrLocation?: string;
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
+  handleRemovePostFromState?: () => void;
 }
 
 // Memorization does not work
@@ -117,6 +118,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   manualCurrLocation,
   handleClose,
   handleOpenAnotherPost,
+  handleRemovePostFromState,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -393,6 +395,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           variant='decision'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -536,6 +539,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           variant='moderation'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -548,6 +552,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           post={postParsed as newnewapi.MultipleChoice}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -559,6 +564,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           post={postParsed as newnewapi.Auction}
           postStatus={postStatus}
           handleGoBack={handleGoBackInsidePost}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleUpdatePostStatus={handleUpdatePostStatus}
         />
       );
@@ -570,6 +576,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           postStatus={postStatus}
           post={postParsed as newnewapi.Crowdfunding}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleGoBack={handleGoBackInsidePost}
         />
       );
@@ -1017,8 +1024,9 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
 PostModal.defaultProps = {
   post: undefined,
-  handleOpenAnotherPost: () => {},
   manualCurrLocation: undefined,
+  handleOpenAnotherPost: () => {},
+  handleRemovePostFromState: () => {},
 };
 
 export default (props: any) => (

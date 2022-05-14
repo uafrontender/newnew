@@ -21,7 +21,6 @@ import Button from '../../../../atoms/Button';
 import { formatNumber } from '../../../../../utils/format';
 
 // Icons
-import McSymbolIcon from '../../../../../public/images/decision/mc-option-mock.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMenu';
@@ -32,6 +31,7 @@ import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
+import assets from '../../../../../constants/assets';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -120,7 +120,7 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
           >
             <SBidDetails>
               <SBidAmount>
-                <SOptionSymbolImg src={McSymbolIcon.src} />
+                <SOptionSymbolImg src={assets.decision.votes} />
                 <div>
                   {option.voteCount && option.voteCount > 0
                     ? `${formatNumber(option?.voteCount, true)}`

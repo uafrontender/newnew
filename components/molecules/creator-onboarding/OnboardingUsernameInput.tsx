@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../../atoms/InlineSVG';
 
@@ -32,6 +32,20 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [focused, setFocused] = useState(false);
 
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue =
+        (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
+
+      const pseudoEvent = {
+        target: {
+          value: newValue,
+        },
+      };
+
+      // @ts-ignore
+      onChange(pseudoEvent || '');
+    };
+
     useEffect(() => {
       if (focused) return;
       if (isValid) setErrorBordersShown(false);
@@ -44,11 +58,11 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
         </SLabel>
         <SInputWrapper>
           <SOnboardingSectionUsernameInput
-            value={value}
+            value={(value as string).length > 0 ? `@${value}` : value}
             id='username_input'
             disabled={disabled}
             errorBordersShown={errorBordersShown}
-            onChange={onChange}
+            onChange={handleOnChange}
             onBlur={() => {
               setIsPopupVisible(false);
               setFocused(false);
@@ -107,6 +121,9 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
             ) : null}
           </AnimatePresence>
         </SInputWrapper>
+        {!errorBordersShown ? (
+          <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}${value}`}</SPreviewDiv>
+        ) : null}
         {errorBordersShown ? (
           <AnimatedPresence animation='t-09'>
             <SErrorDiv>
@@ -115,9 +132,6 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
             </SErrorDiv>
           </AnimatedPresence>
         ) : null}
-        <SCaptionDiv disabled={disabled ?? false}>
-          {frequencyCaption}
-        </SCaptionDiv>
       </SWrapper>
     );
   };
@@ -295,27 +309,6 @@ const SPopup = styled(motion.div)`
   }
 `;
 
-const SCaptionDiv = styled.div<{
-  disabled: boolean;
-}>`
-  text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-
-  margin-top: 6px;
-
-  ${({ disabled }) => {
-    if (disabled)
-      return css`
-        opacity: 0.5;
-      `;
-    return null;
-  }}
-`;
-
 const SErrorDiv = styled.div`
   display: flex;
   justify-content: flex-start;
@@ -329,6 +322,25 @@ const SErrorDiv = styled.div`
   line-height: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
+`;
+
+const SPreviewDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 16px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   & > div {
     margin-right: 4px;

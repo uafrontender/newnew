@@ -31,6 +31,7 @@ import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBrowser from '../../utils/isBrowser';
+import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
 
 type TPageType =
   | 'activelyBidding'
@@ -101,6 +102,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
+  const { syncedHistoryPushState, syncedHistoryReplaceState } =
+    useSynchronizedHistory();
 
   const tabs: Tab[] = useMemo(
     () => [
@@ -466,21 +469,24 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
     [setWasModified]
   );
 
-  const handleCloseEditProfileMenu = useCallback(() => {
-    if (isBrowser()) {
-      // window.history.back();
-    }
-    setIsEditProfileMenuOpen(false);
-  }, [setIsEditProfileMenuOpen]);
+  const handleCloseEditProfileMenu = useCallback(
+    (preventGoBack = false) => {
+      if (isBrowser() && !preventGoBack) {
+        window.history.back();
+      }
+      setIsEditProfileMenuOpen(false);
+    },
+    [setIsEditProfileMenuOpen]
+  );
 
   const handleOpenEditProfileMenu = () => {
     // Allow closing with browser back button
     if (isBrowser()) {
-      window.history.pushState(
+      syncedHistoryPushState(
         {
           stage: 'edit-general',
         },
-        ''
+        window.location.href
       );
     }
     setEditingStage('edit-general');
@@ -489,11 +495,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleSetStageToEditingProfilePicture = () => {
     if (isBrowser()) {
-      window.history.pushState(
+      syncedHistoryPushState(
         {
           stage: 'edit-profile-picture',
         },
-        ''
+        window.location.href
       );
     }
     setEditingStage('edit-profile-picture');
@@ -501,11 +507,11 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
 
   const handleSetStageToEditingGeneral = () => {
     if (isBrowser()) {
-      window.history.replaceState(
+      syncedHistoryReplaceState(
         {
           stage: 'edit-general',
         },
-        ''
+        window.location.href
       );
     }
     setEditingStage('edit-general');

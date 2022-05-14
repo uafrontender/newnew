@@ -171,8 +171,8 @@
         "process": "{{progress}}% • {{time}} left"
       },
       "processing": {
-        "title": "Processing the video...",
-        "description": "You can publish the post while the video is processed",
+        "title": "You can still fill out the details below and publish your post while the video is being processed!",
+        "description": "Your video is processing...",
         "process": "{{progress}}% • {{time}} left"
       }
     }
