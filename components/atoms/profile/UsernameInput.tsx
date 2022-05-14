@@ -63,6 +63,9 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         }}
         {...rest}
       />
+      {!errorBordersShown ? (
+        <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}${value}`}</SPreviewDiv>
+      ) : null}
       {errorBordersShown ? (
         <AnimatedPresence animation='t-09'>
           <SErrorDiv>
@@ -253,6 +256,7 @@ const SErrorDiv = styled.div`
   align-items: center;
 
   margin-top: 6px;
+  margin-bottom: 16px;
 
   text-align: center;
   font-weight: 600;
@@ -260,6 +264,26 @@ const SErrorDiv = styled.div`
   line-height: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
+`;
+
+const SPreviewDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+  margin-bottom: 16px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   & > div {
     margin-right: 4px;

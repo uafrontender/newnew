@@ -27,7 +27,6 @@ import TabletStartDate from '../../../molecules/creation/TabletStartDate';
 import useDebounce from '../../../../utils/hooks/useDebounce';
 import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
-import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import {
@@ -115,7 +114,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const {
       query: { tab },
     } = router;
-    const { mySubscribers } = useGetSubscriptions();
     const tabs: Tab[] = useMemo(
       () => [
         {
@@ -680,16 +678,17 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
               <SSeparator margin='16px 0' />
             </>
           )}
-          {tab === 'multiple-choice' && mySubscribers.length > 0 && (
-            <SMobileFieldWrapper>
-              <MobileField
-                id='allowSuggestions'
-                type='toggle'
-                value={multiplechoice.options.allowSuggestions}
-                onChange={handleItemChange}
-              />
-            </SMobileFieldWrapper>
-          )}
+          {tab === 'multiple-choice' &&
+            user?.userData?.options?.isOfferingSubscription && (
+              <SMobileFieldWrapper>
+                <MobileField
+                  id='allowSuggestions'
+                  type='toggle'
+                  value={multiplechoice.options.allowSuggestions}
+                  onChange={handleItemChange}
+                />
+              </SMobileFieldWrapper>
+            )}
           <MobileField
             id='comments'
             type='toggle'
@@ -706,7 +705,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         post.expiresAt,
         post.options.commentsEnabled,
         auction.minimalBid,
-        mySubscribers.length,
+        user?.userData?.options?.isOfferingSubscription,
         crowdfunding.targetBackerCount,
         multiplechoice.options.allowSuggestions,
         expireOptions,
@@ -861,6 +860,13 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       if (payload) markTutorialStepAsCompleted(payload);
       setIsTutorialVisible(false);
     };
+
+    useEffect(() => {
+      if (!user?.userData?.options?.isOfferingSubscription) {
+        dispatch(setCreationAllowSuggestions(false));
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.userData?.options?.isOfferingSubscription]);
 
     return (
       <>

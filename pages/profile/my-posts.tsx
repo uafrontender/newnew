@@ -15,6 +15,7 @@ import { getMyPosts } from '../../api/endpoints/user';
 import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import switchPostType from '../../utils/switchPostType';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -76,6 +77,15 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
   const handleClosePostModal = () => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
+  };
+
+  const handleRemovePostFromState = (postUuid: string) => {
+    handleSetPosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
   };
 
   // TODO: filters and other parameters
@@ -171,6 +181,9 @@ const MyProfileMyPosts: NextPage<IMyProfileMyPosts> = ({
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
+          }
         />
       )}
     </div>
