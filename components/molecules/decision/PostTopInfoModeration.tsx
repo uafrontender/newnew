@@ -142,7 +142,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
 
         if (!res.error) {
           console.log('Post deleted/cancelled');
-          handleUpdatePostStatus('DELETED');
+          handleUpdatePostStatus('DELETED_BY_CREATOR');
           handleCloseDeletePostModal();
         }
       } catch (err) {
