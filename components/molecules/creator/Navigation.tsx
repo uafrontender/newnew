@@ -84,7 +84,7 @@ export const Navigation = () => {
 
   const renderItem = useCallback(
     (item) => {
-      const active = item.url === router.route;
+      const active = router.route.includes(item.url);
 
       return (
         <Link href={item.url} key={item.url}>

@@ -26,8 +26,7 @@ export const EditSubscriptionRate: React.FC = React.memo(() => {
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) {
         setMySubscriptionProduct(res.data?.myProduct);
-      }
-      else {
+      } else {
         setMySubscriptionProduct(null);
       }
     } catch (err) {
@@ -76,11 +75,11 @@ const SContainer = styled.div`
 const SContent = styled.div`
   min-height: calc(100vh - 120px);
   margin-bottom: 30px;
-  width: calc(100vw - 180px);
+  /* width: calc(100vw - 180px); */
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
-    width: calc(100vw - 365px);
+    /* width: calc(100vw - 365px); */
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     border-radius: 24px;

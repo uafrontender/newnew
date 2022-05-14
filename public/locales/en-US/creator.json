@@ -76,7 +76,7 @@
     "subscriptionStats": {
       "title": "Subscriptions",
       "no-subs": "Bring more exposure to your business, share with your network",
-      "newTitle": "New subscribers",
+      "newTitle": "Recently subscribed",
       "newLink": "Subscriptions",
       "newLink_tablet": "Go to subscriptions",
       "seeAll": "See all new subs",
@@ -202,22 +202,23 @@
     }
   },
   "SubrateSection": {
-    "heading": "Your subscription price",
+    "heading": "Set your subscription price",
     "selectInput": {
       "perMonth": "/month",
       "select": "Select",
       "featured": "Popular"
     },
-    "submitDesktop": "Enable",
+    "submitDesktop": "Turn on Subscription",
     "backButton": "Cancel",
     "updateRate": "Save changes",
     "removeSubscription": "Remove subscription"
   },
   "subscribersFeatures": {
-    "title": "Subscribers have access to exclusive features",
-    "firstFeature": "Send you private messages.",
-    "secondFeature": "Vote for free on your multiple choices. ",
-    "thirdFeature": "Suggest on your multiple choices."
+    "title": "By subscribing to you, your subscribers will be able to:",
+    "firstFeature": "Direct message you",
+    "secondFeature": "Get a free vote on your Superpolls",
+    "thirdFeature": "Add custom suggestions to your Superpolls",
+    "note": "Don’t worry–turning on subscriptions won’t limit people from participating in your Events, Superpolls or Goals"
   },
   "enableSubModal": {
     "title": "Turn on subscription",
