@@ -68,10 +68,17 @@ interface IPostModerationAC {
   postStatus: TPostStatusStringified;
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleRemovePostFromState: () => void;
 }
 
 const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
-  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
+  ({
+    post,
+    postStatus,
+    handleUpdatePostStatus,
+    handleGoBack,
+    handleRemovePostFromState,
+  }) => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -639,6 +646,7 @@ const PostModerationAC: React.FunctionComponent<IPostModerationAC> = React.memo(
           hasWinner={!!winningOptionId}
           hasResponse={!!post.response}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState}
         />
         <SActivitesContainer
           decisionFailed={postStatus === 'failed'}

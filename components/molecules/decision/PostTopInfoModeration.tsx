@@ -47,6 +47,7 @@ interface IPostTopInfoModeration {
   hasResponse: boolean;
   hasWinner: boolean;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleRemovePostFromState: () => void;
 }
 
 const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
@@ -62,6 +63,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
     hasResponse,
     hasWinner,
     handleUpdatePostStatus,
+    handleRemovePostFromState,
   }) => {
     const theme = useTheme();
     const router = useRouter();
@@ -143,6 +145,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
         if (!res.error) {
           console.log('Post deleted/cancelled');
           handleUpdatePostStatus('DELETED_BY_CREATOR');
+          handleRemovePostFromState?.();
           handleCloseDeletePostModal();
         }
       } catch (err) {
