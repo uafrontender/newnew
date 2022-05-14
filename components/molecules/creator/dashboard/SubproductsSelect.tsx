@@ -121,6 +121,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
             ))}
           </SProductOptions>
           <SubsFeatures />
+          <SNote>{t('subscribersFeatures.note')}</SNote>
           <SActions>
             <Link
               href={
@@ -181,7 +182,7 @@ const SContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 16px;
+    /* gap: 16px; */
   }
 `;
 
@@ -194,6 +195,15 @@ const SActions = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+`;
+
+const SNote = styled.p`
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 16px;
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  margin: 0 0 16px;
 `;
 
 interface IProductOption {
