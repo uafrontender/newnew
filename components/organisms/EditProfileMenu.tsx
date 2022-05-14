@@ -50,7 +50,7 @@ export type TEditingStage = 'edit-general' | 'edit-profile-picture';
 interface IEditProfileMenu {
   stage: TEditingStage;
   wasModified: boolean;
-  handleClose: () => void;
+  handleClose: (preventGoBack?: boolean) => void;
   handleSetWasModified: (newState: boolean) => void;
   handleClosePreventDiscarding: () => void;
   handleSetStageToEditingProfilePicture: () => void;
@@ -629,7 +629,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       const { stage: currStage } = window.history.state;
 
       if (!currStage) {
-        handleClose();
+        handleClose(true);
       } else if (currStage === 'edit-general') {
         handleSetStageToEditingGeneral();
       }
@@ -836,7 +836,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
             </STextInputsWrapper>
             <SControlsWrapper>
               {!isMobile ? (
-                <Button view='secondary' onClick={handleClose}>
+                <Button view='secondary' onClick={() => handleClose()}>
                   {t('EditProfileMenu.cancelButton')}
                 </Button>
               ) : null}

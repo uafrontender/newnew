@@ -68,11 +68,18 @@ interface IPostModerationCF {
   post: newnewapi.Crowdfunding;
   postStatus: TPostStatusStringified;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleRemovePostFromState: () => void;
   handleGoBack: () => void;
 }
 
 const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
-  ({ post, postStatus, handleUpdatePostStatus, handleGoBack }) => {
+  ({
+    post,
+    postStatus,
+    handleUpdatePostStatus,
+    handleGoBack,
+    handleRemovePostFromState,
+  }) => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state);
     const { resizeMode, mutedMode } = useAppSelector((state) => state.ui);
@@ -476,6 +483,7 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
           totalPledges={currentBackers}
           targetPledges={post.targetBackerCount}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState}
         />
         <SActivitesContainer>
           <DecisionTabs

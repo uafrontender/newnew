@@ -231,12 +231,12 @@
   "PostViewProcessingAnnouncement": {
     "videoHolder": {
       "decision": {
-        "title": "Processing video...",
-        "body": "Hang tight as we process the video."
+        "title": "Just a minute...",
+        "body": "The video is processing. This will only take a few minutes..."
       },
       "moderation": {
-        "title": "Processing video...",
-        "body": "Hang tight as we process your video."
+        "title": "Just a minute...",
+        "body": "Your video is processing. This will only take a few minutes..."
       }
     }
   },
