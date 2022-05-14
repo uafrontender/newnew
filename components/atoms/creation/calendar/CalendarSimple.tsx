@@ -124,7 +124,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
     <SWrapper ref={wrapperRef}>
       <SContainer onClick={open ? handleClose : handleClick}>
         <SCalendarLabel variant={2} weight={500}>
-          {moment(date).format('DD MMMM')}
+          {moment(date).format('MMMM DD')}
         </SCalendarLabel>
         <InlineSVG
           svg={calendarIcon}
@@ -155,7 +155,7 @@ export const CalendarSimple: React.FC<ICalendarSimple> = (props) => {
               )}
             </SInlineSVGWrapper>
             <SMonth variant={2} weight={600}>
-              {moment().add(visibleMonth, 'month').format('MMMM, YYYY')}
+              {moment().add(visibleMonth, 'month').format('MMMM YYYY')}
             </SMonth>
             <SInlineSVGWrapper
               onClick={handleNextMonth}

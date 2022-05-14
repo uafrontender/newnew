@@ -22,7 +22,7 @@ import {
 } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+// import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
 import {
   removeUploadedFile,
   stopVideoProcessing,
@@ -304,7 +304,7 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SLoadingDescription variant={2} weight={600}>
             {t('secondStep.video.processing.description')}
           </SLoadingDescription>
-          <SLoadingBottomBlock>
+          {/* <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('secondStep.video.processing.process', {
                 time: `${etaProcessing} seconds`,
@@ -320,10 +320,10 @@ const FileUpload: React.FC<IFileUpload> = ({
             >
               {t('secondStep.button.cancel')}
             </SLoadingBottomBlockButton>
-          </SLoadingBottomBlock>
-          <SSpinnerWrapper>
+          </SLoadingBottomBlock> */}
+          {/* <SSpinnerWrapper>
             <InlineSVG svg={spinnerIcon} width='16px' />
-          </SSpinnerWrapper>
+          </SSpinnerWrapper> */}
         </SLoadingBox>
       );
     } else if (progressProcessing === 100) {
@@ -381,7 +381,6 @@ const FileUpload: React.FC<IFileUpload> = ({
     errorUpload,
     loadingUpload,
     progressUpload,
-    etaProcessing,
     errorProcessing,
     loadingProcessing,
     progressProcessing,
@@ -583,20 +582,20 @@ const SLoadingProgress = styled.div`
   border-radius: 16px;
 `;
 
-const SSpinnerWrapper = styled.div`
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
+// const SSpinnerWrapper = styled.div`
+//   @keyframes spin {
+//     from {
+//       transform: rotate(0deg);
+//     }
+//     to {
+//       transform: rotate(360deg);
+//     }
+//   }
 
-  div {
-    animation: spin 0.7s linear infinite;
-  }
-`;
+//   div {
+//     animation: spin 0.7s linear infinite;
+//   }
+// `;
 
 interface ISProgress {
   progress?: number;

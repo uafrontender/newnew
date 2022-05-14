@@ -30,6 +30,7 @@ interface IPostViewScheduled {
   variant: 'decision' | 'moderation';
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleRemovePostFromState: () => void;
   handleReportOpen: () => void;
 }
 
@@ -43,6 +44,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       handleGoBack,
       handleUpdatePostStatus,
       handleReportOpen,
+      handleRemovePostFromState,
     }) => {
       const dispatch = useAppDispatch();
       const { user } = useAppSelector((state) => state);
@@ -169,6 +171,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               hasWinner={false}
               hasResponse={false}
               handleUpdatePostStatus={handleUpdatePostStatus}
+              handleRemovePostFromState={handleRemovePostFromState}
             />
           )}
           <SActivitesContainer>
