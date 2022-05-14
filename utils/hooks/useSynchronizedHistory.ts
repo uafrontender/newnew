@@ -28,6 +28,7 @@ const useSynchronizedHistory = () => {
       '',
       url
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const syncedHistoryReplaceState = useCallback((data: any, url: string) => {
@@ -52,6 +53,7 @@ const useSynchronizedHistory = () => {
       '',
       url
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { syncedHistoryPushState, syncedHistoryReplaceState };
