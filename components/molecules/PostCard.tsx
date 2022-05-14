@@ -41,6 +41,7 @@ import switchPostType from '../../utils/switchPostType';
 import { SocketContext } from '../../contexts/socketContext';
 import { ChannelsContext } from '../../contexts/channelsContext';
 import CardTimer from '../atoms/CardTimer';
+import switchPostStatus from '../../utils/switchPostStatus';
 
 const NUMBER_ICONS: any = {
   light: {
@@ -385,7 +386,9 @@ export const PostCard: React.FC<ICard> = React.memo(
               </SButton>
             ) : (
               <SButtonFirst withShrink onClick={handleBidClick}>
-                {t(`button-card-first-${typeOfPost}`)}
+                {switchPostStatus(typeOfPost, postParsed.status) === 'voting'
+                  ? t(`button-card-first-${typeOfPost}`)
+                  : t(`button-card-see-${typeOfPost}`)}
               </SButtonFirst>
             )}
           </SBottomEnd>
