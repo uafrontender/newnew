@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
@@ -12,13 +13,14 @@ import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
+import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -41,6 +43,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const router = useRouter();
   const { t } = useTranslation('creation');
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
     (state) => state.creation
@@ -141,12 +144,36 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             }
 
             router.push(url);
+
+            dispatch(clearCreation({}));
           }
         }
       }
     },
-    [postData, router]
+    [postData, router, dispatch]
   );
+
+  const formatExpiresAtNoStartsAt = useCallback(() => {
+    const dateValue = moment();
+
+    if (post.expiresAt === '1-hour') {
+      dateValue.add(1, 'h');
+    } else if (post.expiresAt === '6-hours') {
+      dateValue.add(6, 'h');
+    } else if (post.expiresAt === '12-hours') {
+      dateValue.add(12, 'h');
+    } else if (post.expiresAt === '1-day') {
+      dateValue.add(1, 'd');
+    } else if (post.expiresAt === '3-days') {
+      dateValue.add(3, 'd');
+    } else if (post.expiresAt === '5-days') {
+      dateValue.add(5, 'd');
+    } else if (post.expiresAt === '7-days') {
+      dateValue.add(7, 'd');
+    }
+
+    return dateValue;
+  }, [post.expiresAt]);
 
   const renderItem = (item: any) => (
     <SItem key={item.key}>
@@ -187,12 +214,19 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
           <SUserBlock>
             <SUserAvatar avatarUrl={user.userData?.avatarUrl} />
             <SUserTitle variant={3} weight={600}>
-              {user.userData?.nickname}
+              {user.userData?.nickname && user.userData?.nickname?.length > 8
+                ? `${user.userData?.nickname?.substring(0, 8)}...`
+                : user.userData?.nickname}
             </SUserTitle>
-            <SPostTitleText variant={3} weight={600}>
-              {post?.title}
-            </SPostTitleText>
+            <SCaption variant={2} weight={700}>
+              {t('secondStep.card.left', {
+                time: formatExpiresAtNoStartsAt().fromNow(true),
+              })}
+            </SCaption>
           </SUserBlock>
+          <SPostTitleText variant={3} weight={600}>
+            {post?.title}
+          </SPostTitleText>
           <STitle variant={6}>
             {t(
               `published.texts.title-${
@@ -315,10 +349,11 @@ const SButtonTitle = styled.div`
 const SUserBlock = styled.div`
   width: 224px;
   margin: 16px auto 0 auto;
-  display: flex;
+  display: grid;
   align-items: center;
   flex-direction: row;
-  flex-wrap: wrap;
+
+  grid-template-columns: 36px 1fr 1fr;
 `;
 
 const SUserAvatar = styled(UserAvatar)`
@@ -329,7 +364,7 @@ const SUserAvatar = styled(UserAvatar)`
 `;
 
 const SUserTitle = styled(Text)`
-  width: 188px;
+  max-width: 188px;
   display: -webkit-box;
   overflow: hidden;
   position: relative;
@@ -345,5 +380,14 @@ const SText = styled(Text)`
 `;
 
 const SPostTitleText = styled(Text)`
-  width: 100%;
+  width: 224px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const SCaption = styled(Caption)`
+  margin-left: 4px;
+  justify-self: flex-end;
+  line-break: strict;
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
 `;
