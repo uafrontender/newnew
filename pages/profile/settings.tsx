@@ -65,7 +65,7 @@ const unicornbabe = {
   },
 };
 
-const MyProfileSettginsIndex: NextPage = () => {
+const MyProfileSettingsIndex: NextPage = () => {
   const theme = useTheme();
   const router = useRouter();
   // Translations
@@ -161,41 +161,6 @@ const MyProfileSettginsIndex: NextPage = () => {
     }
   }, [dispatch, setIsLogoutLoading, removeCookie]);
 
-  // temp
-  const [notifications, setNotifications] = useState([
-    {
-      title: 'Email Notifications',
-      parameter: 'email',
-      configs: [
-        {
-          title: 'Updates to decisions you participated in',
-          parameter: 'decisions',
-          value: true,
-        },
-        {
-          title: 'Subscription updates',
-          parameter: 'subscriptions',
-          value: true,
-        },
-      ],
-    },
-    {
-      title: 'Push Notifications',
-      parameter: 'push',
-      configs: [
-        {
-          title: 'Updates to decisions you participated in',
-          parameter: 'decisions',
-          value: true,
-        },
-        {
-          title: 'Subscription updates',
-          parameter: 'subscriptions',
-          value: true,
-        },
-      ],
-    },
-  ]);
   const [spendingHidden, setSpendingHidden] = useState(false);
 
   const handleToggleAccountPrivate = async () => {
@@ -257,24 +222,7 @@ const MyProfileSettginsIndex: NextPage = () => {
     },
     {
       title: t('Settings.sections.Notifications.title'),
-      content: (
-        <SettingsNotificationsSection
-          configs={notifications}
-          handleUpdateItem={(category, itemname) => {
-            const newNotifications = [...notifications];
-            const idx1 = newNotifications.findIndex(
-              (c) => c.parameter === category
-            );
-            const idx2 = newNotifications[idx1].configs.findIndex(
-              (i) => i.parameter === itemname
-            );
-            newNotifications[idx1].configs[idx2].value =
-              !newNotifications[idx1].configs[idx2].value;
-            setNotifications(() => newNotifications);
-          }}
-          handleSetActive={() => {}}
-        />
-      ),
+      content: <SettingsNotificationsSection />,
     },
     {
       title: t('Settings.sections.Transactions.title'),
@@ -317,12 +265,6 @@ const MyProfileSettginsIndex: NextPage = () => {
       ),
     },
   ];
-
-  // Try to pre-fetch the content
-  useEffect(() => {
-    router.prefetch(`/`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (!loggedIn) router.push('/');
@@ -447,13 +389,13 @@ const MyProfileSettginsIndex: NextPage = () => {
   );
 };
 
-(MyProfileSettginsIndex as NextPageWithLayout).getLayout = function getLayout(
+(MyProfileSettingsIndex as NextPageWithLayout).getLayout = function getLayout(
   page: ReactElement
 ) {
   return <MyProfileSettingsLayout>{page}</MyProfileSettingsLayout>;
 };
 
-export default MyProfileSettginsIndex;
+export default MyProfileSettingsIndex;
 
 const SMain = styled.main`
   position: relative;
