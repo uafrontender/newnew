@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from 'react';
+import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
@@ -11,14 +12,27 @@ import PostTopInfo from '../../molecules/decision/PostTopInfo';
 // Utils
 import { TPostStatusStringified } from '../../../utils/switchPostStatus';
 import PostVideoProcessingHolder from '../../molecules/decision/PostVideoProcessingHolder';
+import PostTopInfoModeration from '../../molecules/decision/PostTopInfoModeration';
+import { TPostType } from '../../../utils/switchPostType';
+import assets from '../../../constants/assets';
+import Text from '../../atoms/Text';
 
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
+
+const IMAGES = {
+  ac: assets.creation.AcStatic,
+  mc: assets.creation.McStatic,
+  cf: assets.decision.votes,
+};
 
 interface IPostViewProcessingAnnouncement {
   post: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice;
   postStatus: TPostStatusStringified;
+  postType: string;
+  variant: 'decision' | 'moderation';
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
+  handleRemovePostFromState: () => void;
   handleReportOpen: () => void;
 }
 
@@ -27,10 +41,14 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
   ({
     post,
     postStatus,
+    postType,
+    variant,
     handleGoBack,
     handleUpdatePostStatus,
+    handleRemovePostFromState,
     handleReportOpen,
   }) => {
+    const { t } = useTranslation('decision');
     const { user } = useAppSelector((state) => state);
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -104,16 +122,36 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
               : 'decision'
           }
         />
-        <PostTopInfo
-          title={post.title}
-          postId={post.postUuid}
-          postStatus={postStatus}
-          creator={post.creator!!}
-          hasWinner={false}
-          isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
-          handleReportOpen={handleReportOpen}
-        />
-        <SActivitesContainer />
+        {variant === 'decision' ? (
+          <PostTopInfo
+            title={post.title}
+            postId={post.postUuid}
+            postStatus={postStatus}
+            postType={postType as TPostType}
+            creator={post.creator!!}
+            hasWinner={false}
+            isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
+            handleReportOpen={handleReportOpen}
+          />
+        ) : (
+          <PostTopInfoModeration
+            title={post.title}
+            postId={post.postUuid}
+            postStatus={postStatus}
+            postType={postType as TPostType}
+            hasWinner={false}
+            hasResponse={false}
+            handleUpdatePostStatus={handleUpdatePostStatus}
+            handleRemovePostFromState={handleRemovePostFromState}
+          />
+        )}
+        <SActivitesContainer>
+          {/* @ts-ignore */}
+          <SDecisionImage src={IMAGES[postType]} />
+          <SText variant={2} weight={600}>
+            {t('PostViewProcessingAnnouncement.stayTuned')}
+          </SText>
+        </SActivitesContainer>
       </SWrapper>
     );
   };
@@ -126,7 +164,8 @@ const SWrapper = styled.div`
   grid-template-areas:
     'expires'
     'video'
-    'title';
+    'title'
+    'activities';
 
   margin-bottom: 32px;
 
@@ -172,10 +211,13 @@ const SActivitesContainer = styled.div`
 
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   align-self: bottom;
 
   height: 100%;
+  min-height: 300px;
 
   ${({ theme }) => theme.media.tablet} {
     min-height: initial;
@@ -189,4 +231,12 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.laptop} {
     max-height: calc(728px - 46px - 64px);
   }
+`;
+
+const SDecisionImage = styled.img`
+  width: 140px;
+`;
+
+const SText = styled(Text)`
+  text-align: center;
 `;

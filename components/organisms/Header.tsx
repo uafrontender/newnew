@@ -78,6 +78,6 @@ const SContentWrapper = styled.div`
     position: absolute;
     background-color: ${(props) =>
       props.theme.colorsThemed.background.backgroundHeader};
-    opacity: 0.7;
+    opacity: ${({ theme }) => (theme.name === 'dark' ? 0.7 : 1)};
   }
 `;
