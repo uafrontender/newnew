@@ -161,7 +161,9 @@
         "cancelBtn": "Cancel"
       },
       "Notifications": {
-        "title": "Notifications"
+        "title": "Notifications",
+        "email": "Email Notifications",
+        "push": "Push Notifications"
       },
       "Transactions": {
         "title": "Transactions",
