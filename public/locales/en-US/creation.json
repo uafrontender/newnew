@@ -166,13 +166,13 @@
         "title": "Video preview"
       },
       "loading": {
-        "title": "Uploading video...",
+        "title": "Uploading video",
         "description": "Your file is uploading. It won’t take long...",
         "process": "{{progress}}% • {{time}} left"
       },
       "processing": {
         "title": "You can still fill out the details below and publish your post while the video is being processed!",
-        "description": "Your video is processing...",
+        "description": "Your video is processing",
         "process": "{{progress}}% • {{time}} left"
       }
     }
