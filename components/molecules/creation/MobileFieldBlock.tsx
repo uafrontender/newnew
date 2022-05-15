@@ -201,9 +201,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               <SSeparator />
               <SModalToggleWrapper>
                 <STimePickerWrapper>
-                  <TimePicker value={value?.time} onChange={handleTimeChange} />
+                  <TimePicker
+                    disabled={value?.type === 'right-away'}
+                    value={value?.time}
+                    onChange={handleTimeChange}
+                  />
                 </STimePickerWrapper>
                 <CustomToggle
+                  disabled={value?.type === 'right-away'}
                   options={formatOptions}
                   selected={value?.['hours-format']}
                   onChange={handleFormatChange}
