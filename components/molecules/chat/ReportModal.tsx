@@ -56,7 +56,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
         },
         {
           id: newnewapi.ReportingReason.HARASSMENT,
-          title: t('modal.report-user.options.harrasment'),
+          title: t('modal.report-user.options.harassment'),
         },
         {
           id: newnewapi.ReportingReason.OTHER,
