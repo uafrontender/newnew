@@ -12,13 +12,14 @@ import Headline from '../../atoms/Headline';
 import InlineSVG from '../../atoms/InlineSVG';
 import UserAvatar from '../UserAvatar';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import copyIcon from '../../../public/images/svg/icons/outlined/Link.svg';
 import tiktokIcon from '../../../public/images/svg/icons/socials/TikTok.svg';
 import twitterIcon from '../../../public/images/svg/icons/socials/Twitter.svg';
 import facebookIcon from '../../../public/images/svg/icons/socials/Facebook.svg';
 import instagramIcon from '../../../public/images/svg/icons/socials/Instagram.svg';
+import { clearCreation } from '../../../redux-store/slices/creationStateSlice';
 
 const SOCIAL_ICONS: any = {
   copy: copyIcon,
@@ -41,6 +42,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
   const { open, handleClose } = props;
   const router = useRouter();
   const { t } = useTranslation('creation');
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
   const { post, videoProcessing, fileProcessing, postData } = useAppSelector(
     (state) => state.creation
@@ -141,11 +143,13 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
             }
 
             router.push(url);
+
+            dispatch(clearCreation({}));
           }
         }
       }
     },
-    [postData, router]
+    [postData, router, dispatch]
   );
 
   const renderItem = (item: any) => (
