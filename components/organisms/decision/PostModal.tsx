@@ -407,8 +407,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
+          postType={typeOfPost as string}
+          variant='decision'
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -522,8 +525,11 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           key={postParsed?.postUuid}
           post={postParsed!!}
           postStatus={postStatus}
+          variant='moderation'
+          postType={typeOfPost as string}
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
+          handleRemovePostFromState={handleRemovePostFromState!!}
           handleReportOpen={handleReportOpen}
         />
       );

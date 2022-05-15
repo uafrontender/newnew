@@ -47,7 +47,10 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const { mutedMode } = useAppSelector((state) => state.ui);
+  const { mutedMode, resizeMode } = useAppSelector((state) => state.ui);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const [postParsed, typeOfPost] = useMemo(
     () => (post ? switchPostType(post) : [undefined, undefined]),
@@ -99,6 +102,13 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (isMobile && !postModalOpen) {
+      router.push('/');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postModalOpen, isMobile]);
+
   return (
     <>
       <Head>
@@ -115,7 +125,7 @@ const PostPage: NextPage<IPostPage> = ({ top10posts, postUuid, post }) => {
         />
       </Head>
       {!user.loggedIn && <HeroSection />}
-      {topSectionCollection.length > 0 && (
+      {!isMobile && topSectionCollection.length > 0 && (
         <TopSection
           collection={topSectionCollection}
           handlePostClicked={handleOpenPostModal}

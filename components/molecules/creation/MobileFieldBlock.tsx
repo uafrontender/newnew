@@ -75,6 +75,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
     (item: any) => {
       const handleItemClick = () => {
         onChange(id, item.id);
+        handleBlur();
       };
       const selected = item.id === value;
 
@@ -91,7 +92,7 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
         </SButton>
       );
     },
-    [id, onChange, value]
+    [id, onChange, handleBlur, value]
   );
   const getModal = useCallback(() => {
     if (type === 'select') {
@@ -200,9 +201,14 @@ const MobileFieldBlock: React.FC<IMobileFieldBlock> = (props) => {
               <SSeparator />
               <SModalToggleWrapper>
                 <STimePickerWrapper>
-                  <TimePicker value={value?.time} onChange={handleTimeChange} />
+                  <TimePicker
+                    disabled={value?.type === 'right-away'}
+                    value={value?.time}
+                    onChange={handleTimeChange}
+                  />
                 </STimePickerWrapper>
                 <CustomToggle
+                  disabled={value?.type === 'right-away'}
                   options={formatOptions}
                   selected={value?.['hours-format']}
                   onChange={handleFormatChange}

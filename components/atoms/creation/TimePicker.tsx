@@ -1,5 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { scroller } from 'react-scroll';
+import React, { useRef, useState, useCallback } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import Text from '../Text';
@@ -28,6 +27,91 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
   const direction = useDropDownDirection(wrapperRef, 340);
+
+  // Dragging state hours
+  const [clientY, setClientY] = useState<number>(0);
+  const [scrollY, setScrollY] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [mouseIsDown, setMouseIsDown] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const mouseDownHandler = (e: any) => {
+    if (!scrollContainerRef.current) {
+      return;
+    }
+
+    setMouseIsDown(true);
+    setClientY(e.clientY);
+    setScrollY(scrollContainerRef.current.scrollTop);
+  };
+
+  const mouseMoveHandler = (e: any) => {
+    if (!mouseIsDown) {
+      return;
+    }
+
+    if (!scrollContainerRef.current) {
+      return;
+    }
+
+    scrollContainerRef.current.scrollTop = scrollY - e.clientY + clientY;
+    setClientY(e.clientY);
+    setScrollY(scrollY - e.clientY + clientY);
+    setIsDragging(true);
+  };
+
+  const mouseUpHandler = () => {
+    setMouseIsDown(false);
+
+    if (isDragging) {
+      setTimeout(() => {
+        setIsDragging(false);
+      }, 0);
+    }
+  };
+
+  // Dragging state minutes
+  const [clientYMinutes, setClientYMinutes] = useState<number>(0);
+  const [scrollYMinutes, setScrollYMinutes] = useState<number>(0);
+  const [isDraggingMinutes, setIsDraggingMinutes] = useState(false);
+  const [mouseIsDownMinutes, setMouseIsDownMinutes] = useState(false);
+  const scrollContainerRefMinutes = useRef<HTMLDivElement>(null);
+
+  const mouseDownHandlerMinutes = (e: any) => {
+    if (!scrollContainerRefMinutes.current) {
+      return;
+    }
+
+    setMouseIsDownMinutes(true);
+    setClientYMinutes(e.clientY);
+    setScrollYMinutes(scrollContainerRefMinutes.current.scrollTop);
+  };
+
+  const mouseMoveHandlerMinutes = (e: any) => {
+    if (!mouseIsDownMinutes) {
+      return;
+    }
+
+    if (!scrollContainerRefMinutes.current) {
+      return;
+    }
+
+    scrollContainerRefMinutes.current.scrollTop =
+      scrollYMinutes - e.clientY + clientYMinutes;
+    setClientYMinutes(e.clientY);
+    setScrollYMinutes(scrollYMinutes - e.clientY + clientYMinutes);
+    setIsDraggingMinutes(true);
+  };
+
+  const mouseUpHandlerMinutes = () => {
+    setMouseIsDownMinutes(false);
+
+    if (isDraggingMinutes) {
+      setTimeout(() => {
+        setIsDraggingMinutes(false);
+      }, 0);
+    }
+  };
 
   const hour = time.split(':')[0];
   const minute = time.split(':')[1];
@@ -62,7 +146,9 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
     (item: any) => {
       const selected = hour === item.value;
       const handleItemClick = () => {
-        handleTimeChange(`${item.value}:${minute}`);
+        if (!isDragging) {
+          handleTimeChange(`${item.value}:${minute}`);
+        }
       };
 
       return (
@@ -78,13 +164,15 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         </SItem>
       );
     },
-    [handleTimeChange, hour, minute]
+    [handleTimeChange, isDragging, hour, minute]
   );
   const renderMinuteItem = useCallback(
     (item: any) => {
       const selected = minute === item.value;
       const handleItemClick = () => {
-        handleTimeChange(`${hour}:${item.value}`);
+        if (!isDraggingMinutes) {
+          handleTimeChange(`${hour}:${item.value}`);
+        }
       };
 
       return (
@@ -100,7 +188,7 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
         </SItem>
       );
     },
-    [handleTimeChange, hour, minute]
+    [handleTimeChange, isDraggingMinutes, hour, minute]
   );
   const renderFormatItem = useCallback(
     (item: any) => {
@@ -128,23 +216,6 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
   useOnClickEsc(wrapperRef, handleClose);
   useOnClickOutside(wrapperRef, handleClose);
 
-  useEffect(() => {
-    scroller.scrollTo(`hour-${hour}`, {
-      offset: 0,
-      smooth: 'easeInOutQuart',
-      duration: 500,
-      containerId: 'hoursContainer',
-    });
-  }, [hour]);
-  useEffect(() => {
-    scroller.scrollTo(`minute-${minute}`, {
-      offset: 0,
-      smooth: 'easeInOutQuart',
-      duration: 500,
-      containerId: 'minutesContainer',
-    });
-  }, [minute]);
-
   return (
     <SWrapper ref={wrapperRef}>
       <SContainer onClick={open ? handleClose : handleClick}>
@@ -166,12 +237,26 @@ export const TimePicker: React.FC<ITimePicker> = (props) => {
       >
         <SListHolder direction={direction}>
           <SScrollListWrapper>
-            <SScrollList id='hoursContainer'>
+            <SScrollList
+              id='hoursContainer'
+              ref={scrollContainerRef}
+              onMouseUp={mouseUpHandler}
+              onMouseDown={mouseDownHandler}
+              onMouseMove={mouseMoveHandler}
+              onMouseLeave={mouseUpHandler}
+            >
               {HOURS.map(renderHourItem)}
             </SScrollList>
           </SScrollListWrapper>
           <SScrollListWrapper>
-            <SScrollList id='minutesContainer'>
+            <SScrollList
+              id='minutesContainer'
+              ref={scrollContainerRefMinutes}
+              onMouseUp={mouseUpHandlerMinutes}
+              onMouseDown={mouseDownHandlerMinutes}
+              onMouseMove={mouseMoveHandlerMinutes}
+              onMouseLeave={mouseUpHandlerMinutes}
+            >
               {MINUTES.map(renderMinuteItem)}
             </SScrollList>
           </SScrollListWrapper>
@@ -272,6 +357,8 @@ const SItem = styled.div<ISItem>`
   background: ${(props) =>
     props.selected ? props.theme.colorsThemed.accent.blue : 'transparent'};
   border-radius: 12px;
+
+  user-select: none;
 
   :hover {
     background: ${(props) =>
