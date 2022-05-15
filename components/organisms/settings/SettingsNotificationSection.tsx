@@ -1,6 +1,7 @@
 import { newnewapi } from 'newnew-api';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'next-i18next';
 import {
   getMyNotificationsState,
   updateMyNotificationsState,
@@ -11,6 +12,7 @@ import loadingAnimation from '../../../public/animations/logo-loading-blue.json'
 import Toggle from '../../atoms/Toggle';
 
 const SettingsNotificationsSection = () => {
+  const { t } = useTranslation('profile');
   const [isLoading, setLoading] = useState<boolean | null>(null);
   const [myNotificationState, setMyNotificationState] =
     useState<newnewapi.INotificationState[] | null>(null);
@@ -87,15 +89,15 @@ const SettingsNotificationsSection = () => {
             <Text variant={2} weight={600}>
               {subsection.notificationSource &&
               subsection.notificationSource === 1
-                ? 'Email Notifications'
-                : 'Push Notifications'}
+                ? t('Settings.sections.Notifications.email')
+                : t('Settings.sections.Notifications.push')}
             </Text>
             <Toggle
               title={
                 subsection.notificationSource &&
                 subsection.notificationSource === 1
-                  ? 'Email Notifications'
-                  : 'Push Notifications'
+                  ? t('Settings.sections.Notifications.email')
+                  : t('Settings.sections.Notifications.push')
               }
               checked={subsection.isEnabled ?? false}
               onChange={() => handleUpdateItem(idx)}
