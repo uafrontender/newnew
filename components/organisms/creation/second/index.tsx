@@ -421,7 +421,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, []);
     const handleItemBlur = useCallback(
       async (key: string, value: string) => {
-        if (key === 'title') {
+        if (key === 'title' && value.length > 0) {
           setTitleError(
             await validateT(
               value,
