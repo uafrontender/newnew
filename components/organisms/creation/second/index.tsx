@@ -233,6 +233,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         .hours(time.hours())
         .minutes(time.minutes());
     }, [post.startsAt]);
+
     const formatExpiresAt = useCallback(() => {
       const time = moment(
         `${post.startsAt.time} ${post.startsAt['hours-format']}`,
@@ -260,9 +261,33 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
       return dateValue;
     }, [post.expiresAt, post.startsAt]);
+
+    const formatExpiresAtNoStartsAt = useCallback(() => {
+      const dateValue = moment();
+
+      if (post.expiresAt === '1-hour') {
+        dateValue.add(1, 'h');
+      } else if (post.expiresAt === '6-hours') {
+        dateValue.add(6, 'h');
+      } else if (post.expiresAt === '12-hours') {
+        dateValue.add(12, 'h');
+      } else if (post.expiresAt === '1-day') {
+        dateValue.add(1, 'd');
+      } else if (post.expiresAt === '3-days') {
+        dateValue.add(3, 'd');
+      } else if (post.expiresAt === '5-days') {
+        dateValue.add(5, 'd');
+      } else if (post.expiresAt === '7-days') {
+        dateValue.add(7, 'd');
+      }
+
+      return dateValue;
+    }, [post.expiresAt]);
+
     const handleSubmit = useCallback(async () => {
       router.push(`/creation/${tab}/preview`);
     }, [tab, router]);
+
     const handleCloseClick = useCallback(() => {
       if (router.query?.referer) {
         router.push(router.query.referer as string);
@@ -270,6 +295,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         router.push('/');
       }
     }, [router]);
+
     const handleVideoDelete = useCallback(async () => {
       try {
         const payload = new newnewapi.RemoveUploadedFileRequest({
@@ -421,7 +447,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, []);
     const handleItemBlur = useCallback(
       async (key: string, value: string) => {
-        if (key === 'title') {
+        if (key === 'title' && value.length > 0) {
           setTitleError(
             await validateT(
               value,
@@ -1013,7 +1039,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                           </SUserTitle>
                           <SCaption variant={2} weight={700}>
                             {t('secondStep.card.left', {
-                              time: formatExpiresAt().fromNow(true),
+                              time: formatExpiresAtNoStartsAt().fromNow(true),
                             })}
                           </SCaption>
                         </SFloatingSubSectionUser>

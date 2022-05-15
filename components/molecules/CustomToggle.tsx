@@ -6,16 +6,19 @@ import Text from '../atoms/Text';
 interface ICustomToggle {
   options: {}[];
   selected: string | undefined;
+  disabled?: boolean;
   onChange: (id: string) => void;
 }
 
 const CustomToggle: React.FC<ICustomToggle> = (props) => {
-  const { options, selected, onChange } = props;
+  const { options, selected, disabled, onChange } = props;
   const renderOption = useCallback(
     (item) => {
       const isSelected = selected === item.id;
       const handleClick = () => {
-        onChange(item.id);
+        if (!disabled) {
+          onChange(item.id);
+        }
       };
 
       return (
@@ -26,12 +29,16 @@ const CustomToggle: React.FC<ICustomToggle> = (props) => {
         </SOption>
       );
     },
-    [onChange, selected]
+    [onChange, selected, disabled]
   );
 
   return (
     <SCustomToggleWrapper>{options.map(renderOption)}</SCustomToggleWrapper>
   );
+};
+
+CustomToggle.defaultProps = {
+  disabled: false,
 };
 
 export default CustomToggle;

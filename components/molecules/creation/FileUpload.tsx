@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -239,9 +239,9 @@ const FileUpload: React.FC<IFileUpload> = ({
     if (loadingUpload) {
       content = (
         <SLoadingBox>
-          <SLoadingTitle variant={3} weight={600}>
+          <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
             {t('secondStep.video.loading.title')}
-          </SLoadingTitle>
+          </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
             {t('secondStep.video.loading.description')}
           </SLoadingDescription>
@@ -301,9 +301,9 @@ const FileUpload: React.FC<IFileUpload> = ({
           <SLoadingTitle variant={3} weight={600}>
             {t('secondStep.video.processing.title')}
           </SLoadingTitle>
-          <SLoadingDescription variant={2} weight={600}>
+          <SLoadingDescriptionWithEllipseAnimated variant={2} weight={600}>
             {t('secondStep.video.processing.description')}
-          </SLoadingDescription>
+          </SLoadingDescriptionWithEllipseAnimated>
           {/* <SLoadingBottomBlock>
             <SLoadingDescription variant={2} weight={600}>
               {t('secondStep.video.processing.process', {
@@ -531,11 +531,36 @@ const SLoadingBox = styled.div`
   }
 `;
 
+const ellipseAnimation = keyframes`
+from {
+  width: 0px;
+}
+  to {
+    width: 1em;
+  }
+`;
+
 const SLoadingTitle = styled(Text)`
   display: flex;
   align-items: center;
   margin-bottom: 6px;
   flex-direction: row;
+`;
+
+const SLoadingTitleWithEllipseAnimated = styled(Text)`
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-direction: row;
+
+  &:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    animation: ${ellipseAnimation} steps(4, end) 1100ms infinite;
+    content: '...';
+    width: 0px;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -544,6 +569,19 @@ const SInlineSVG = styled(InlineSVG)`
 
 const SLoadingDescription = styled(Caption)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+`;
+
+const SLoadingDescriptionWithEllipseAnimated = styled(Caption)`
+  color: ${(props) => props.theme.colorsThemed.text.tertiary};
+
+  &:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    animation: ${ellipseAnimation} steps(4, end) 1100ms infinite;
+    content: '...';
+    width: 0px;
+  }
 `;
 
 const SLoadingBottomBlock = styled.div`

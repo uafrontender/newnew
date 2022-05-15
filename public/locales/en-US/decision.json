@@ -229,6 +229,7 @@
     "history": "History"
   },
   "PostViewProcessingAnnouncement": {
+    "stayTuned": "Stay tuned!",
     "videoHolder": {
       "decision": {
         "title": "Just a minute...",
