@@ -69,7 +69,7 @@
         "abuse": "Abusive or harmful",
         "suicide": "Expresses intentions of self-harm or suicide",
         "hate-speech": "Hate speech",
-        "harrasment": "Harrasment or bullying"
+        "harassment": "Harassment or bullying"
       },
       "additional-info": {
         "label": "Additional info (optional)",
