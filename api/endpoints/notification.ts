@@ -52,3 +52,29 @@ export const getUnreadNotificationCount = (payload: newnewapi.EmptyRequest) =>
     'post',
     payload
   );
+
+export const getMyNotificationsState = (payload: newnewapi.EmptyRequest) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.EmptyRequest,
+    newnewapi.GetMyNotificationsStateResponse
+  >(
+    newnewapi.EmptyRequest,
+    newnewapi.GetMyNotificationsStateResponse,
+    `${BASE_URL_NOTIFICATION}/get_my_notifications_state`,
+    'post',
+    payload
+  );
+
+export const updateMyNotificationsState = (
+  payload: newnewapi.UpdateMyNotificationsStateRequest
+) =>
+  fetchProtobufProtectedIntercepted<
+    newnewapi.UpdateMyNotificationsStateRequest,
+    newnewapi.EmptyResponse
+  >(
+    newnewapi.UpdateMyNotificationsStateRequest,
+    newnewapi.EmptyResponse,
+    `${BASE_URL_NOTIFICATION}/update_my_notifications_state`,
+    'post',
+    payload
+  );
