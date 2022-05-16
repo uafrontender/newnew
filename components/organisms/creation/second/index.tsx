@@ -187,7 +187,6 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
 
         if (!error) {
           error = maxLength(tCommon, text, max);
-          console.log(error);
         }
 
         if (!error) {
@@ -893,6 +892,25 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.userData?.options?.isOfferingSubscription]);
+
+    // This effect results in the form re-rendering every second
+    // However, it re renders after every letter typed anyway
+    // TODO: optimize this view
+    useEffect(() => {
+      const updateStartDate = setInterval(() => {
+        const newStartAt = {
+          type: post.startsAt.type,
+          date: moment().format(),
+          time: moment().format('hh:mm'),
+          'hours-format': post.startsAt['hours-format'],
+        };
+        dispatch(setCreationStartDate(newStartAt));
+      }, 1000);
+
+      return () => {
+        clearInterval(updateStartDate);
+      };
+    }, [post.startsAt, dispatch]);
 
     return (
       <>

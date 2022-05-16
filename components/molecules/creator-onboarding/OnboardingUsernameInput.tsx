@@ -121,8 +121,8 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
             ) : null}
           </AnimatePresence>
         </SInputWrapper>
-        {!errorBordersShown ? (
-          <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}${value}`}</SPreviewDiv>
+        {!errorBordersShown && window ? (
+          <SPreviewDiv>{`${window.location.origin}/${value}`}</SPreviewDiv>
         ) : null}
         {errorBordersShown ? (
           <AnimatedPresence animation='t-09'>
