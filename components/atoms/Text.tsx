@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 interface IText {
   weight?: 500 | 600;
-  variant?: 1 | 2 | 3;
+  variant?: 1 | 2 | 3 | 4 | 5;
   onClick?: (e: any) => void;
   tone?: 'neutral' | 'error';
   children: React.ReactNode;
@@ -16,6 +16,8 @@ const Text: React.FC<IText> = React.memo((props) => {
     1: SText1,
     2: SText2,
     3: SText3,
+    4: SText4,
+    5: SText5,
   };
   const Component = components[variant ?? 1];
 
@@ -81,5 +83,35 @@ const SText3 = styled(SText)`
   ${({ theme }) => theme.media.laptop} {
     font-size: 14px;
     line-height: 20px;
+  }
+`;
+
+const SText4 = styled(SText)`
+  font-size: 14px;
+  line-height: 20px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 24px;
+    line-height: 32px;
+  }
+`;
+
+const SText5 = styled(SText)`
+  font-size: 16px;
+  line-height: 24px;
+
+  ${({ theme }) => theme.media.tablet} {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    font-size: 20px;
+    line-height: 28px;
   }
 `;
