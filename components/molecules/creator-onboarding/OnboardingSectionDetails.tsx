@@ -755,7 +755,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             <SUsernameNicknameContainer>
               <OnboardingSectionUsernameInput
                 type='text'
-                value={`${usernameInEdit}`}
+                value={usernameInEdit}
                 disabled={loadingModalOpen}
                 popupCaption={
                   <UsernamePopupList
