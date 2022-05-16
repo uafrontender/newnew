@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Headline from '../../../atoms/Headline';
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
@@ -27,6 +28,7 @@ const Navigation = dynamic(
 
 export const Subscriptions: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
+  const router = useRouter();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -83,6 +85,11 @@ export const Subscriptions: React.FC = React.memo(() => {
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) {
         setMySubscriptionProduct(res.data?.myProduct);
+      } else {
+        /* eslint-disable no-unused-expressions */
+        !onboardingState?.isCreatorConnectedToStripe
+          ? router.replace('/creator/get-paid')
+          : router.replace('/creator/subscribers/edit-subscription-rate');
       }
     } catch (err) {
       console.error(err);
