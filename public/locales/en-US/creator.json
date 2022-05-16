@@ -210,7 +210,7 @@
     },
     "submitDesktop": "Turn on Subscription",
     "backButton": "Cancel",
-    "updateRate": "Save changes",
+    "updateRate": "Save",
     "removeSubscription": "Remove subscription"
   },
   "subscribersFeatures": {
