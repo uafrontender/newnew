@@ -272,6 +272,32 @@ const SSectionContent = styled.div`
   position: relative;
   overflow-y: auto;
   flex-direction: column;
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  scrollbar-width: none;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+
+  &:hover {
+    scrollbar-width: thin;
+    &::-webkit-scrollbar-track {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    }
+  }
 `;
 
 const SNotificationItem = styled.div`
