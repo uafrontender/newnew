@@ -18,8 +18,7 @@
     "hours": "h",
     "minutes": "m",
     "seconds": "s",
-    "ended_on": "ended on",
-    "at_time": "at"
+    "ended_on": "ended on"
   },
   "expiresResponse": {
     "days": "d",
