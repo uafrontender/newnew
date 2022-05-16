@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -78,8 +79,8 @@ const PaymentModalRedirectOnly: React.FC<IPaymentModalRedirectOnly> = ({
             {showTocApply && (
               <STocApply>
                 *{' '}
-                <Link href='/terms-and-conditions'>
-                  <a href='/terms-and-conditions' target='_blank'>
+                <Link href='https://terms.newnew.co'>
+                  <a href='https://terms.newnew.co' target='_blank'>
                     {t('tocApplyLink')}
                   </a>
                 </Link>{' '}
