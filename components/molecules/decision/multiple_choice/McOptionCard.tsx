@@ -45,6 +45,12 @@ import { setUserTutorialsProgress } from '../../../../redux-store/slices/userSta
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import Headline from '../../../atoms/Headline';
 import assets from '../../../../constants/assets';
+import OptionMenu from '../OptionMenu';
+import ReportModal, { ReportData } from '../../chat/ReportModal';
+import { reportEventOption } from '../../../../api/endpoints/report';
+import InlineSvg from '../../../atoms/InlineSVG';
+import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
+import OptionModal from '../OptionModal';
 // import { WalletContext } from '../../../../contexts/walletContext';
 
 interface IMcOptionCard {
@@ -88,6 +94,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleSetPaymentSuccesModalOpen,
   handleAddOrUpdateOptionFromResponse,
 }) => {
+  const theme = useTheme();
   const router = useRouter();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -117,6 +124,41 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
     }
     return option.supporterCount;
   }, [option.supporterCount]);
+
+  // Ellipse menu
+  const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+  const [optionMenuX, setOptionMenuXY] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  // Report modal
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  const handleReportSubmit = useCallback(
+    async ({ reasons, message }: ReportData) => {
+      await reportEventOption(option.id, reasons, message);
+      setIsReportModalOpen(false);
+    },
+    [option.id]
+  );
+
+  const handleOpenReportForm = useCallback(() => {
+    if (!user.loggedIn) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
+
+    setIsReportModalOpen(true);
+  }, [user, router]);
+
+  const handleReportClose = useCallback(() => {
+    setIsReportModalOpen(false);
+  }, []);
 
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
   const [selectVotesMenuTop, setSelectVotesMenuTop] =
@@ -404,7 +446,32 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           $isDisabled={disabled && votingAllowed}
           $isBlue={isBlue}
+          onClick={(e) => {
+            if (
+              !isMobile &&
+              !isSuggestedByMe &&
+              !disabled &&
+              !isEllipseMenuOpen
+            ) {
+              setIsEllipseMenuOpen(true);
+
+              setOptionMenuXY({
+                x: e.clientX,
+                y: e.clientY,
+              });
+            }
+          }}
         >
+          {isMobile && !isSuggestedByMe && (
+            <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+              <InlineSvg
+                svg={MoreIcon}
+                width='16px'
+                height='16px'
+                fill={theme.colorsThemed.text.primary}
+              />
+            </SEllipseButtonMobile>
+          )}
           <SBidDetails isBlue={isBlue} noAction={noAction}>
             <SBidAmount>
               <SOptionSymbolImg src={assets.decision.votes} />
@@ -452,7 +519,8 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 disabled={disabled}
                 isBlue={isBlue}
                 canVoteForFree={canVoteForFree}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (canVoteForFree) {
                     setUseFreeVoteModalOpen(true);
                   } else {
@@ -492,6 +560,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                 disabled={disabled}
                 isBlue={isBlue}
                 onClick={(e) => {
+                  e.stopPropagation();
                   if (!isSupportMenuOpen) {
                     if (canVoteForFree) {
                       setUseFreeVoteModalOpen(true);
@@ -671,6 +740,32 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           }}
           handleOpenCustomAmountModal={handleOpenCustomAmountModal}
           handleSetAmountAndOpenModal={handleSetAmountAndOpenModal}
+        />
+      )}
+      {/* Ellipse modal */}
+      {isMobile && (
+        <OptionModal
+          zIndex={12}
+          isOpen={isEllipseMenuOpen}
+          handleOpenReportOptionModal={() => handleOpenReportForm()}
+          onClose={() => setIsEllipseMenuOpen(false)}
+        />
+      )}
+      {!isMobile && !isSuggestedByMe && (
+        <OptionMenu
+          xy={optionMenuX}
+          isVisible={isEllipseMenuOpen}
+          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenReportOptionModal={() => handleOpenReportForm()}
+        />
+      )}
+      {/* Report modal */}
+      {option.creator && (
+        <ReportModal
+          show={isReportModalOpen}
+          reportedDisplayname={getDisplayname(option.creator)}
+          onSubmit={handleReportSubmit}
+          onClose={handleReportClose}
         />
       )}
     </>
@@ -1231,4 +1326,18 @@ const SPaymentFooter = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre;
+`;
+
+const SEllipseButtonMobile = styled(Button)`
+  position: absolute;
+  right: 16px;
+
+  background: transparent;
+  padding: 0;
+  z-index: 1;
+
+  &:hover:enabled,
+  &:focus:enabled {
+    background: transparent;
+  }
 `;

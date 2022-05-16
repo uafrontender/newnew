@@ -116,6 +116,9 @@
     "deleteDecision": "Delete {{ postType }}",
     "cancel": "Cancel"
   },
+  "ellipse-option": {
+    "report-option": "Report"
+  },
   "PostVideo": {
     "tabs": {
       "announcement": "Decision",
