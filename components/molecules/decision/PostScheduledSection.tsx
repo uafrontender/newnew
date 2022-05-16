@@ -66,27 +66,15 @@ const PostScheduledSection: React.FunctionComponent<IPostScheduledSection> = ({
     <SContainer>
       <SHeadingContainer>
         <SImgContainer>
-          <video
-            className='hourglass-video'
-            loop
-            muted
-            autoPlay
-            playsInline
-            poster={
+          <img
+            className='hourglass-img'
+            src={
               theme.name === 'light'
-                ? assets.decision.lightHourglassStatic
-                : assets.decision.darkHourglassStatic
+                ? assets.decision.lightHourglassAnimated
+                : assets.decision.darkHourglassAnimated
             }
-          >
-            <source
-              src={
-                theme.name === 'light'
-                  ? assets.decision.lightHourglassAnimated
-                  : assets.decision.darkHourglassAnimated
-              }
-              type='video/mp4'
-            />
-          </video>
+            alt='video is processed'
+          />
         </SImgContainer>
         {!isMobile && (
           <STitle variant={6}>
@@ -210,7 +198,7 @@ const SImgContainer = styled.div`
   width: 48px;
   height: 48px;
 
-  .hourglass-video {
+  .hourglass-img {
     width: 100%;
     object-fit: contain;
     position: relative;
