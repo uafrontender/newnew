@@ -314,6 +314,12 @@ const PRE_FETCH_LINKS_DARK = (
       href={assets.home.darkMobileLandingStatic}
       as='image'
     />
+    <link
+      rel='prefetch'
+      href={assets.info.darkQuestionMarkAnimated}
+      as='image'
+    />
+    <link rel='prefetch' href={assets.info.darkQuestionMarkStatic} as='image' />
   </>
 );
 
@@ -356,6 +362,16 @@ const PRE_FETCH_LINKS_LIGHT = (
     <link
       rel='prefetch'
       href={assets.home.lightMobileLandingStatic}
+      as='image'
+    />
+    <link
+      rel='prefetch'
+      href={assets.info.lightQuestionMarkAnimated}
+      as='image'
+    />
+    <link
+      rel='prefetch'
+      href={assets.info.lightQuestionMarkStatic}
       as='image'
     />
   </>

@@ -46,6 +46,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     {
       key: 'how-it-works',
       url: '/how-it-works',
+      external: true,
     },
     {
       key: 'faq',
