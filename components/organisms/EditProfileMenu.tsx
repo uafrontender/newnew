@@ -842,7 +842,9 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
               ) : null}
               <Button
                 withShadow
-                disabled={!wasModified || !isDataValid || isLoading}
+                disabled={
+                  !wasModified || !isDataValid || isLoading || !coverUrlInEdit
+                }
                 style={{
                   width: isMobile ? '100%' : 'initial',
                   ...(isAPIValidateLoading ? { cursor: 'wait' } : {}),
