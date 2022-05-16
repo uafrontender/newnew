@@ -67,6 +67,9 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
     return () => clearInterval(interval.current);
   }, []);
 
+  const [tutorialTitle, setTutorialTitle] = useState('Countdown');
+  const [tutorialText, setTutorialText] = useState('');
+
   useEffect(() => {
     if (isTutorialVisible === undefined || isTutorialVisible) {
       switch (postType) {
@@ -77,6 +80,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               newnewapi.AcTutorialStep.AC_TIMER
           )
             setIsTooltipVisible(true);
+          setTutorialTitle(t('tutorials.ac.timer.title'));
+          setTutorialText(t('tutorials.ac.timer.text'));
           break;
         case 'cf':
           if (
@@ -85,6 +90,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               newnewapi.CfTutorialStep.CF_TIMER
           )
             setIsTooltipVisible(true);
+          setTutorialTitle(t('tutorials.cf.timer.title'));
+          setTutorialText(t('tutorials.cf.timer.text'));
           break;
         case 'mc':
           if (
@@ -93,11 +100,14 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
               newnewapi.McTutorialStep.MC_TIMER
           )
             setIsTooltipVisible(true);
+          setTutorialTitle(t('tutorials.mc.timer.title'));
+          setTutorialText(t('tutorials.mc.timer.text'));
           break;
         default:
           setIsTooltipVisible(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postType, user.userTutorialsProgress, isTutorialVisible]);
 
   const goToNextStep = () => {
@@ -167,8 +177,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
                     <TutorialTooltip
                       isTooltipVisible={isTooltipVisible}
                       closeTooltip={goToNextStep}
-                      title={t('tutorials.timer.title')}
-                      text={t('tutorials.timer.text')}
+                      title={tutorialTitle}
+                      text={tutorialText}
                       dotPosition={
                         isMobileOrTablet
                           ? DotPositionEnum.TopLeft
@@ -189,8 +199,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
                 <TutorialTooltip
                   isTooltipVisible={isTooltipVisible}
                   closeTooltip={goToNextStep}
-                  title={t('tutorials.timer.title')}
-                  text={t('tutorials.timer.text')}
+                  title={tutorialTitle}
+                  text={tutorialText}
                   dotPosition={
                     isMobileOrTablet
                       ? DotPositionEnum.TopLeft
@@ -227,8 +237,8 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
             <TutorialTooltip
               isTooltipVisible={isTooltipVisible}
               closeTooltip={goToNextStep}
-              title={t('tutorials.timer.title')}
-              text={t('tutorials.timer.text')}
+              title={tutorialTitle}
+              text={tutorialText}
               dotPosition={
                 isMobileOrTablet
                   ? DotPositionEnum.TopLeft
