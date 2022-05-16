@@ -51,4 +51,5 @@ const SText = styled.p`
   font-weight: bold;
   line-height: 28px;
   text-align: center;
+  white-space: pre-line;
 `;

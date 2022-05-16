@@ -53,7 +53,7 @@
           "tooShort": "Username is too short",
           "invalidChar": "Username has invalid characters",
           "innappropriate": "Offensive words are forbidden",
-          "taken": "Username is taken",
+          "taken": "This username is already taken. Try another one",
           "linksForbidden": "Links not allowed"
         },
         "points": {
@@ -79,8 +79,8 @@
         "placeholder": "email@email.com",
         "cantChangeInfoCaption": "You can't change this info.",
         "errors": {
-          "invalidEmail": "Please, enter a valid email",
-          "emailTaken": "Email taken"
+          "invalidEmail": "Please enter a valid email address",
+          "emailTaken": "This email is already taken. Try another one"
         }
       },
       "CoR": {
@@ -89,11 +89,11 @@
       "DoB": {
         "label": "Date of birth",
         "captions": {
-          "twoTimesOnly": "Birthdate can be changed 2 times only.",
-          "cannotChange": "You can’t change birthdate."
+          "twoTimesOnly": "Birthday can be changed 2 times only.",
+          "cannotChange": "You can’t change birthday."
         },
         "errors": {
-          "tooYoung": "You must be 18 years or older."
+          "tooYoung": "You must be 18 or older to become a creator"
         }
       },
       "profilePicture": {
