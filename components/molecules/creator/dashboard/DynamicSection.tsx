@@ -316,30 +316,29 @@ const SIndicator = styled(Indicator)`
 `;
 
 const SAnimatedContainer = styled.div`
-  top: 144px;
-  left: 212px;
-  right: 12px;
-  bottom: 34px;
+  top: -20px;
+
   z-index: 5;
   padding: 24px 0;
-  position: fixed;
+  position: absolute;
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) =>
     props.theme.name === 'light'
       ? props.theme.colors.white
       : props.theme.colorsThemed.background.secondary};
   border-radius: 24px;
+  width: 500px;
+  right: -16px;
+  height: 800px;
 
   ${(props) => props.theme.media.laptop} {
     left: unset;
     width: 500px;
-    height: 800px;
-    max-height: 86vh;
     bottom: unset;
   }
 
   ${(props) => props.theme.media.laptopL} {
-    top: 120px;
+    top: -36px;
     width: 432px;
   }
 `;

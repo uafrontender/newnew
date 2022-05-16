@@ -41,47 +41,49 @@ const Notification: React.FC<newnewapi.INotification> = ({
 
   return (
     <Link href={url}>
-      <SWrapper>
-        <SAvatarHolder>
-          <SUserAvatar
-            avatarUrl={
-              content?.relatedUser?.thumbnailAvatarUrl
-                ? content?.relatedUser?.thumbnailAvatarUrl
-                : ''
-            }
-          />
-          {target && (
-            <SIcon>
-              <SInlineSVG
-                svg={
-                  target === newnewapi.RoutingTarget.ChatRoomTarget
-                    ? MessageIcon
-                    : MessageCircle
-                }
-                fill={theme.colors.white}
-                width='14px'
-                height='14px'
-              />
-            </SIcon>
-          )}
-        </SAvatarHolder>
-        <SText>
-          <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
-          <p>{content!!.message}</p>
-          <SDate>
-            {moment((createdAt?.seconds as number) * 1000).fromNow()}
-          </SDate>
-        </SText>
-        {content!!.relatedPost &&
-          content!!.relatedPost.thumbnailImageUrl &&
-          !isMobile && (
-            // <Link href={`/post/${content?.relatedPost.uuid}`}>
-            <SPostThumbnail
-              avatarUrl={content!!.relatedPost.thumbnailImageUrl}
+      <a>
+        <SWrapper>
+          <SAvatarHolder>
+            <SUserAvatar
+              avatarUrl={
+                content?.relatedUser?.thumbnailAvatarUrl
+                  ? content?.relatedUser?.thumbnailAvatarUrl
+                  : ''
+              }
             />
-            // </Link>
-          )}
-      </SWrapper>
+            {target && (
+              <SIcon>
+                <SInlineSVG
+                  svg={
+                    target === newnewapi.RoutingTarget.ChatRoomTarget
+                      ? MessageIcon
+                      : MessageCircle
+                  }
+                  fill={theme.colors.white}
+                  width='14px'
+                  height='14px'
+                />
+              </SIcon>
+            )}
+          </SAvatarHolder>
+          <SText>
+            <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
+            <p>{content!!.message}</p>
+            <SDate>
+              {moment((createdAt?.seconds as number) * 1000).fromNow()}
+            </SDate>
+          </SText>
+          {content!!.relatedPost &&
+            content!!.relatedPost.thumbnailImageUrl &&
+            !isMobile && (
+              // <Link href={`/post/${content?.relatedPost.uuid}`}>
+              <SPostThumbnail
+                avatarUrl={content!!.relatedPost.thumbnailImageUrl}
+              />
+              // </Link>
+            )}
+        </SWrapper>
+      </a>
     </Link>
   );
 };
