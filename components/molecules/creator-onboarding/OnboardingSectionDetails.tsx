@@ -168,9 +168,10 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
     );
     const [usernameError, setUsernameError] = useState('');
     const handleUpdateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setUsernameInEdit(e.target.value);
+      const newValue = e.target.value.replace('@', '');
+      setUsernameInEdit(newValue);
 
-      validateUsernameViaAPIDebounced(e.target.value);
+      validateUsernameViaAPIDebounced(newValue);
     };
 
     // Nickname
@@ -754,7 +755,7 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             <SUsernameNicknameContainer>
               <OnboardingSectionUsernameInput
                 type='text'
-                value={usernameInEdit}
+                value={`${usernameInEdit}`}
                 disabled={loadingModalOpen}
                 popupCaption={
                   <UsernamePopupList

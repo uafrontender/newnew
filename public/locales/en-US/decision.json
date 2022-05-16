@@ -124,7 +124,7 @@
       "back_to_response": "Watch response"
     },
     "floatingUploadResponseBtn": "Make a response video",
-    "setThumbnail": "Set a thubmnail",
+    "setThumbnail": "Set a thumbnail",
     "responseUploadedNonProcessed": "Success! Your response will be available once the video was processed",
     "UploadResponseForm": {
       "fileUpload": {
@@ -367,7 +367,7 @@
         "supportBtn": "Vote",
         "supportAgainBtn": "Vote \nagain",
         "raiseBidBtn": "Vote",
-        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of succes and double your bid!",
+        "doubleMyVoteCaption": "Want to see this option win, then increase the chances of success and double your bid!",
         "doubleMyVoteButton": "Double my vote",
         "placeABidBtn": "Place a vote",
         "cancelBtn": "Cancel",
@@ -461,7 +461,7 @@
     "cancel": "Cancel",
     "toast": {
       "success": "Success! Thumbnail will be changed once processed",
-      "error": "An error occured"
+      "error": "An error occurred"
     }
   },
   "AcPostModeration": {
@@ -688,7 +688,7 @@
       },
       "supportPeopleBids": {
         "title": "Boost a bid",
-        "text": "Boost exisiting bids that you want to see happen IRL."
+        "text": "Boost existing bids that you want to see happen IRL."
       },
       "createYourBid": {
         "title": "Make your own!",

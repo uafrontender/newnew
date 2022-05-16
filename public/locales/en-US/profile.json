@@ -125,7 +125,7 @@
           "topUpBtn": "Add funds"
         },
         "non-empty": {
-          "balance": "Balance",
+          "balance": "My balance",
           "topUpBtn": "Add funds"
         },
         "TopUpWalletModal": {
@@ -141,7 +141,7 @@
           "label": "Email Address",
           "placeholder": "email@email.com",
           "errors": {
-            "invalidEmail": "Please enter a valid email",
+            "invalidEmail": "Please enter a valid email address",
             "emailTaken": "Email taken"
           }
         },
@@ -151,7 +151,7 @@
             "tooYoung": "You must be 18 years or older."
           },
           "captions": {
-            "twoTimesOnly": "Birthdate can be changed 2 times only.",
+            "twoTimesOnly": "Birthday can be changed 2 times only",
             "cannotChange": "You can only change this once"
           },
           "saveBtn": "Save",
@@ -189,7 +189,7 @@
           }
         },
         "blockedusers": {
-          "title": "Blocked uses",
+          "title": "Blocked users",
           "unblockBtn": "Unblock",
           "no_blocked_users": "No blocked users"
         },
