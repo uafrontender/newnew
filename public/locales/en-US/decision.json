@@ -677,11 +677,11 @@
     "text": "Pool money with others to back goals made by your favorite creators. If enough people back the goal, you’ll watch the creator do it!"
   },
   "tutorials": {
-    "timer": {
-      "title": "Countdown",
-      "text": "When time’s up, the creator picks their favorite bid and posts a video doing the bid."
-    },
     "ac": {
+      "timer": {
+        "title": "Countdown",
+        "text": "When time’s up, the creator picks their favorite bid and posts a video doing the bid."
+      },
       "peopleBids": {
         "title": "All bids",
         "text": "These are all the bids submitted for the creator to choose from."
@@ -696,6 +696,10 @@
       }
     },
     "mc": {
+      "timer": {
+        "title": "Countdown",
+        "text": "When time’s up, the creator posts a video doing the option with the most votes."
+      },
       "peopleBids": {
         "title": "All options",
         "text": "These are all the options you can vote on."
@@ -710,9 +714,13 @@
       }
     },
     "cf": {
+      "timer": {
+        "title": "Countdown",
+        "text": "If the Goal is reached before the time is up, the creator will post a video doing the Goal."
+      },
       "peopleBids": {
         "title": "Goal progress",
-        "text": "See how close the Creator is to reaching their Goal. "
+        "text": "See how close the Creator is to reaching their Goal."
       },
       "createYourBid": {
         "title": "Back the Goal",
