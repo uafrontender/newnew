@@ -6,7 +6,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -25,7 +24,7 @@ import { useAppSelector } from '../../../redux-store/store';
 import { TCommentWithReplies } from '../../interfaces/tcomment';
 import { SocketContext } from '../../../contexts/socketContext';
 import { ChannelsContext } from '../../../contexts/channelsContext';
-import useScrollGradients from '../../../utils/hooks/useScrollGradients';
+// import useScrollGradients from '../../../utils/hooks/useScrollGradients';
 import {
   deleteMessage,
   getMessages,
@@ -72,7 +71,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
 
   // Scrolling gradients
   const scrollRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
+  // const { showTopGradient, showBottomGradient } = useScrollGradients(scrollRef);
 
   // Infinite load
   const { ref: loadingRef, inView } = useInView();
@@ -559,7 +558,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
             )}
           </SCommentsWrapper>
         </SActionSection>
-        <GradientMask
+        {/* <GradientMask
           gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
           positionTop={heightDelta}
           active={showTopGradient}
@@ -567,7 +566,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
         <GradientMask
           gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
           active={showBottomGradient}
-        />
+        /> */}
       </STabContainer>
     </>
   );
