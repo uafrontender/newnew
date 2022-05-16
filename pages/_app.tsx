@@ -295,6 +295,16 @@ const PRE_FETCH_LINKS_DARK = (
     />
     <link
       rel='prefetch'
+      href={assets.decision.darkHourglassAnimated}
+      as='image'
+    />
+    <link
+      rel='prefetch'
+      href={assets.decision.darkHourglassStatic}
+      as='image'
+    />
+    <link
+      rel='prefetch'
       href={assets.home.darkLandingStatic}
       as='image'
       media='(min-width: 760px)'
@@ -326,6 +336,16 @@ const PRE_FETCH_LINKS_LIGHT = (
       href={assets.signup.lightOutro}
       as='image'
       media='(min-width: 760px)'
+    />
+    <link
+      rel='prefetch'
+      href={assets.decision.lightHourglassAnimated}
+      as='image'
+    />
+    <link
+      rel='prefetch'
+      href={assets.decision.lightHourglassStatic}
+      as='image'
     />
     <link
       rel='prefetch'
