@@ -29,7 +29,7 @@
     "lottie-web": "5.8.1",
     "moment": "2.29.1",
     "next": "12.0.10",
-    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#2057cbc0a2e6485158f0342de8ef0920709f7ad8",
+    "newnew-api": "git+https://gitlab+deploy-token-616533:gQyRAxmTQQ-CsD_6rh9J@gitlab.com/newnewinc/newnew-api#98d8fde5b5401afb7ab88c85d2770d68041e6199",
     "next-i18next": "10.0.1",
     "next-redux-wrapper": "7.0.5",
     "next-useragent": "2.8.0",

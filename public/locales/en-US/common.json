@@ -75,6 +75,7 @@
         "suicide": "Expresses intentions of self-harm or suicide",
         "hate-speech": "Hate speech",
         "harassment": "Harassment or bullying",
+        "copyright": "Copyright",
         "other": "Other"
       },
       "additional-info": {
