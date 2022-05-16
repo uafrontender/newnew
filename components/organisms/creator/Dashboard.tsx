@@ -287,7 +287,7 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
-  min-height: calc(100vh - 120px);
+  min-height: 840px;
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
@@ -318,11 +318,10 @@ const SBlock = styled.section<ISBlock>`
       margin-bottom: 24px;
     `}
   ${(props) => props.theme.media.tablet} {
-    min-width: 608px;
     max-width: 100%;
   }
   ${(props) => props.theme.media.laptopL} {
-    max-width: calc(100% - 464px);
+    max-width: calc(100% - 435px);
   }
 `;
 
