@@ -64,7 +64,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const centerItems: TItem[] = [
     {
       key: 'twitter',
-      url: 'https://twitter.com',
+      url: 'https://twitter.com/newnewhq',
       external: true,
       iconSrc: twitterIcon,
     },
