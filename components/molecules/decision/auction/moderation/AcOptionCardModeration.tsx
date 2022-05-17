@@ -84,7 +84,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     const handleReportSubmit = useCallback(
       async ({ reasons, message }: ReportData) => {
         await reportEventOption(option.id, reasons, message);
-        setIsReportModalOpen(false);
       },
       [option.id]
     );

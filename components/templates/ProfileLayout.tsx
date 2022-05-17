@@ -286,7 +286,6 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
           (e) => console.error(e)
         );
       }
-      setConfirmReportUser(false);
     },
     [currentUser]
   );
