@@ -98,7 +98,6 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
 }) => {
   const theme = useTheme();
   const router = useRouter();
-  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
