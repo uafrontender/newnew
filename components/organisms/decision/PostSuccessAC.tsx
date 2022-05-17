@@ -347,6 +347,11 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 0px;
     min-height: 506px;
+
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : 'transparent'};
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -667,7 +672,12 @@ const SChangeTabBtn = styled.button<{
   height: 100%;
 
   text-align: center;
-  color: #ffffff;
+  color: ${({ shouldView, theme }) =>
+    shouldView
+      ? '#ffffff'
+      : theme.name === 'dark'
+      ? '#ffffff'
+      : theme.colorsThemed.text.tertiary};
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;

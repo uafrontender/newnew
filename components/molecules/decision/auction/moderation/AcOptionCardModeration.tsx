@@ -383,7 +383,11 @@ const SBidAmount = styled.div`
   justify-content: flex-start;
   gap: 8px;
 
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
 `;
 
 const OptionActionIcon = styled.img`

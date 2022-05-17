@@ -97,7 +97,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
             <SHeadlineNumBackers variant={3}>
               {currentNumBackers}
             </SHeadlineNumBackers>
-            <STarget>
+            <STarget weight={600}>
               {t('CfPost.BackersStatsSection.of_backers', {
                 targetBackers: formatNumber(post.targetBackerCount, true),
               })}
@@ -122,7 +122,7 @@ const CfCrowdfundingSuccessModeration: React.FunctionComponent<ICfCrowdfundingSu
             <SYouMade variant={3}>
               {t('CfPostModeration.WinnerTab.WinnerOptionCard.you_made')}
             </SYouMade>
-            <SDetailsHeadline variant={4}>
+            <SDetailsHeadline variant={5}>
               $
               {formatNumber(
                 post.totalAmount?.usdCents
@@ -165,14 +165,24 @@ const SSectionContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  padding-bottom: 64px;
+
+  ${({ theme }) => theme.media.tablet} {
+    padding-bottom: 0;
+  }
 `;
 
 const STopSectionWrapper = styled.div`
   ${({ theme }) => theme.media.tablet} {
+    margin-top: auto;
+    margin-bottom: auto;
+
     position: relative;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
+    gap: 30px;
   }
 `;
 
@@ -221,7 +231,7 @@ const STrophyGlow = styled.div`
 
   ${({ theme }) => theme.media.laptop} {
     top: 24px;
-    left: 66px;
+    left: 144px;
   }
 `;
 
@@ -252,6 +262,8 @@ const SHeadlineNumBackers = styled(Headline)`
   margin-top: 48px;
   color: ${({ theme }) => theme.colorsThemed.accent.green};
 
+  font-weight: 700;
+
   ${({ theme }) => theme.media.tablet} {
     margin-top: initial;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -264,6 +276,7 @@ const STarget = styled(Text)`
 
 // Winner card
 const SWinnerCard = styled.div`
+  position: relative;
   height: 218px;
 
   padding: 16px;
@@ -282,8 +295,6 @@ const SWinnerCard = styled.div`
   align-items: center;
 
   ${({ theme }) => theme.media.tablet} {
-    position: relative;
-
     height: fit-content;
 
     padding: 24px;
