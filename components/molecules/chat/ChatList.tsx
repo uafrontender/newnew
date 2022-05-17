@@ -108,6 +108,7 @@ const ChatList: React.FC<IFunctionProps> = ({
         if (!pageToken) setChatRooms([]);
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
+          myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
           paging: {
             limit: 20,
             pageToken,
@@ -117,7 +118,6 @@ const ChatList: React.FC<IFunctionProps> = ({
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        console.log(res.data.rooms);
 
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
