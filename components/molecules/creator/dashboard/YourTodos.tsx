@@ -1,51 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { setUserData } from '../../../../redux-store/slices/userStateSlice';
-import {
-  getMyCreatorTags,
-  getMyOnboardingState,
-} from '../../../../api/endpoints/user';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-interface IFunctionProps {
-  todosCompleted: (value: boolean) => void;
-  todosCompletedLoading: (value: boolean) => void;
-}
-
-export const YourTodos: React.FC<IFunctionProps> = ({
-  todosCompleted,
-  todosCompletedLoading,
-}) => {
+export const YourTodos = () => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
-  const [allCompleted, setAllcompleted] = useState<boolean | null>(null);
-  const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean | null>(null);
-
-  const isProfileComplete = useCallback(() => {
-    if (
-      user.userData?.bio &&
-      user.userData?.bio !== null &&
-      user.userData?.bio.length > 0 &&
-      currentTags.length > 0
-    ) {
-      return true;
-    }
-    return false;
-  }, [user.userData?.bio, currentTags]);
 
   const collection = useMemo(
     () => [
@@ -57,82 +27,19 @@ export const YourTodos: React.FC<IFunctionProps> = ({
       {
         id: 'complete-profile',
         title: t('dashboard.todos.complete-profile'),
-        completed: isProfileComplete(),
+        completed:
+          user.creatorData?.hasCreatorTags &&
+          user.userData?.bio &&
+          user.userData?.bio.length > 0,
       },
       {
         id: 'add-cashout-method',
         title: t('dashboard.todos.add-cashout-method'),
-        completed: user.userData?.options?.creatorStatus === 2,
+        completed: user.creatorData?.options?.isCreatorConnectedToStripe,
       },
     ],
-    [t, user.userData?.options?.creatorStatus, isProfileComplete]
+    [t, user.creatorData, user.userData]
   );
-
-  useEffect(() => {
-    async function fetchOnboardingState() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data?.isCreatorConnectedToStripe) {
-          dispatch(
-            setUserData({
-              options: {
-                ...user.userData?.options,
-                creatorStatus: 2,
-              },
-            })
-          );
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function fetchCreatorTags() {
-      try {
-        const myTagsPayload = new newnewapi.EmptyRequest({});
-        const tagsRes = await getMyCreatorTags(myTagsPayload);
-
-        if (tagsRes.data) {
-          setCurrentTags(tagsRes.data.tags);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function checkAndLoad() {
-      if (!allCompleted && !isLoading) {
-        todosCompletedLoading(true);
-        setIsLoading(true);
-        if (user.userData?.options?.creatorStatus !== 2) {
-          await fetchOnboardingState();
-        }
-        if (currentTags.length < 1) {
-          await fetchCreatorTags();
-        }
-        todosCompletedLoading(false);
-        setIsLoading(false);
-      }
-    }
-
-    checkAndLoad();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  // }, [user, dispatch, currentTags, allCompleted]);
-
-  useEffect(() => {
-    if (!allCompleted && isLoading === false) {
-      let done = true;
-      collection.forEach((item) => {
-        if (!item.completed) done = false;
-      });
-      setAllcompleted(done);
-      todosCompleted(done);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, allCompleted, todosCompleted, isLoading]);
 
   const renderItem = useCallback(
     (item, index) => (
@@ -177,7 +84,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({
     ),
     [t, theme.name]
   );
-  return allCompleted === false && !isLoading ? (
+  return (
     <SContainer>
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.todos.title')}</STitle>
@@ -187,7 +94,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({
         <SList>{collection.map(renderItem)}</SList>
       </SDescription>
     </SContainer>
-  ) : null;
+  );
 };
 
 export default YourTodos;

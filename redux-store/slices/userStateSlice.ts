@@ -12,12 +12,19 @@ export type TUserData = Omit<
   'toJSON' | '_nickname' | '_email' | '_dateOfBirth'
 >;
 
+interface ICreatorData {
+  isLoaded: boolean;
+  hasCreatorTags: boolean;
+  options: newnewapi.IGetMyOnboardingStateResponse;
+}
+
 export interface IUserStateInterface {
   loggedIn: boolean;
   signupEmailInput: string;
   userData?: TUserData;
   userTutorialsProgress: newnewapi.IGetTutorialsStatusResponse;
   userTutorialsProgressSynced: boolean;
+  creatorData?: ICreatorData;
 }
 
 const defaultUIState: IUserStateInterface = {
@@ -67,6 +74,9 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
     setUserData(state, { payload }: PayloadAction<TUserData>) {
       state.userData = { ...state.userData, ...payload };
     },
+    setCreatorData(state, { payload }: PayloadAction<ICreatorData>) {
+      state.creatorData = { ...state.creatorData, ...payload };
+    },
     setUserTutorialsProgressInner(
       state,
       { payload }: PayloadAction<newnewapi.IGetTutorialsStatusResponse>
@@ -92,6 +102,18 @@ export const userSlice: Slice<IUserStateInterface> = createSlice({
         bio: '',
         options: {},
       };
+      state.creatorData = {
+        isLoaded: false,
+        hasCreatorTags: false,
+        options: {
+          creatorStatus: null,
+          isCustomAvatar: null,
+          isCreatorConnectedToStripe: null,
+          isProfileComplete: null,
+          isSubscriptionEnabled: null,
+          stripeConnectStatus: null,
+        },
+      };
     },
   },
 });
@@ -101,6 +123,7 @@ export const {
   setSignupEmailInput,
   setUserTutorialsProgressInner,
   setUserData,
+  setCreatorData,
   logoutUser,
   setUserTutorialsProgressSynced,
 } = userSlice.actions;

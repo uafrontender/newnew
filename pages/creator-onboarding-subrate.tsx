@@ -18,6 +18,8 @@ import {
   getMySubscriptionProduct,
   getStandardSubscriptionProducts,
 } from '../api/endpoints/subscription';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { setCreatorData } from '../redux-store/slices/userStateSlice';
 
 const OnboardingSectionSubrate = dynamic(
   () =>
@@ -31,8 +33,6 @@ interface ICreatorOnboardingSubrate {}
 const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
   const { t } = useTranslation('creator-onboarding');
 
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
   const [standardProducts, setStandardProducts] = useState<
     newnewapi.ISubscriptionProduct[]
   >([]);
@@ -40,6 +40,8 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
   const [currentProduct, setCurrentProduct] =
     useState<newnewapi.ISubscriptionProduct | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -50,7 +52,12 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
         );
 
         if (onboardingStateRes.data) {
-          setOnboardingState(onboardingStateRes.data);
+          dispatch(
+            setCreatorData({
+              ...user.creatorData,
+              ...onboardingStateRes.data,
+            })
+          );
         }
 
         const getStandardProductsPayload = new newnewapi.EmptyRequest({});
@@ -79,6 +86,7 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
     }
 
     fetchOnboardingState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -89,7 +97,6 @@ const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
       </Head>
       {!isLoading ? (
         <OnboardingSectionSubrate
-          onboardingState={onboardingState!!}
           standardProducts={standardProducts}
           featuredProductsIds={featuredProductsIds}
           currentProduct={currentProduct}
