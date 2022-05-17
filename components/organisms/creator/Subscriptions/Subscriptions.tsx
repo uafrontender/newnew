@@ -9,7 +9,6 @@ import Headline from '../../../atoms/Headline';
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
-import { getMyOnboardingState } from '../../../../api/endpoints/user';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import Button from '../../../atoms/Button';
 import Lottie from '../../../atoms/Lottie';
@@ -37,14 +36,10 @@ export const Subscriptions: React.FC = React.memo(() => {
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
 
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoadingOnboardingState, setIsLoadingOnboardingState] =
-    useState(true);
-
   const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
     useState<number | undefined>();
   const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchMyRoom = async () => {
     if (loadingRoom) return;
@@ -77,42 +72,28 @@ export const Subscriptions: React.FC = React.memo(() => {
   }, [myAnnouncementRoomId, mySubscribersTotal]);
 
   const fetchMySubscriptionProduct = async () => {
+    if (isLoading) return;
     try {
+      setIsLoading(true);
       const payload = new newnewapi.EmptyRequest();
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) {
         setMySubscriptionProduct(res.data?.myProduct);
       }
+      setIsLoading(false);
     } catch (err) {
       console.error(err);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    async function fetchOnboardingState() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data) {
-          setOnboardingState(res.data);
-        }
-        setIsLoadingOnboardingState(false);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchOnboardingState();
-  }, []);
-
-  useEffect(() => {
-    if (!mySubscriptionProduct && !isLoadingOnboardingState) {
+    if (!mySubscriptionProduct && !isLoading) {
       fetchMySubscriptionProduct();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mySubscriptionProduct, isLoadingOnboardingState]);
+  }, [mySubscriptionProduct, isLoading]);
 
   return (
     <SContainer>
@@ -137,11 +118,7 @@ export const Subscriptions: React.FC = React.memo(() => {
         </STitleBlock>
         {!isMySubscribersIsLoading ? (
           !mySubscribersTotal || mySubscribersTotal < 1 ? (
-            <NoResults
-              isCreatorConnectedToStripe={
-                onboardingState?.isCreatorConnectedToStripe
-              }
-            />
+            <NoResults />
           ) : (
             <SubscribersTable />
           )

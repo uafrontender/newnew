@@ -4,7 +4,7 @@ import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 
-import { useAppSelector } from '../../../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../../../redux-store/store';
 
 import Button from '../../atoms/Button';
 import GoBackButton from '../GoBackButton';
@@ -12,27 +12,24 @@ import Headline from '../../atoms/Headline';
 import OnboardingSubproductSelect from './OnboardingSubproductsSelect';
 import LoadingModal from '../LoadingModal';
 import { setMySubscriptionProduct } from '../../../api/endpoints/subscription';
+import { setUserData } from '../../../redux-store/slices/userStateSlice';
 
 interface IOnboardingSectionSubrate {
-  onboardingState: newnewapi.GetMyOnboardingStateResponse;
   standardProducts: newnewapi.ISubscriptionProduct[];
   featuredProductsIds: string[];
   currentProduct?: newnewapi.ISubscriptionProduct;
 }
 
 const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrate> =
-  ({
-    onboardingState,
-    standardProducts,
-    featuredProductsIds,
-    currentProduct,
-  }) => {
+  ({ standardProducts, featuredProductsIds, currentProduct }) => {
     const router = useRouter();
     const { t } = useTranslation('creator-onboarding');
     const { resizeMode } = useAppSelector((state) => state.ui);
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+    const user = useAppSelector((state) => state.user);
+    const dispatch = useAppDispatch();
 
     // Selected products
     const [selectedProduct, setSelectedProduct] = useState(
@@ -54,7 +51,6 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
 
     const handleSubmit = async () => {
       try {
-        console.log(onboardingState);
         setLoadingModalOpen(true);
 
         const payload = new newnewapi.SetMySubscriptionProductRequest({
@@ -64,6 +60,17 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
         const res = await setMySubscriptionProduct(payload);
 
         if (res.error) throw new Error(res.error?.message ?? 'Request failed');
+
+        if (!user.userData?.options?.isOfferingSubscription) {
+          dispatch(
+            setUserData({
+              options: {
+                ...user.userData?.options,
+                isOfferingSubscription: true,
+              },
+            })
+          );
+        }
 
         router.push('/creator/dashboard');
       } catch (err) {

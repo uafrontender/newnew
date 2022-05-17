@@ -40,6 +40,7 @@ export const DynamicSection = () => {
   const { t } = useTranslation('creator');
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
@@ -190,17 +191,19 @@ export const DynamicSection = () => {
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  {mySubscribersTotal > 0 && (
-                    <Tabs
-                      t={t}
-                      tabs={tabs}
-                      draggable={false}
-                      activeTabIndex={activeTabIndex}
-                    />
-                  )}
+                  {mySubscribersTotal > 0 &&
+                    user.userData?.options?.isOfferingSubscription && (
+                      <Tabs
+                        t={t}
+                        tabs={tabs}
+                        draggable={false}
+                        activeTabIndex={activeTabIndex}
+                      />
+                    )}
                 </STabsWrapper>
                 <SSectionTopLineButtons>
-                  {tab === 'notifications' ? (
+                  {tab === 'notifications' ||
+                  !user.userData?.options?.isOfferingSubscription ? (
                     <>
                       {unreadNotificationCount > 0 && (
                         <STopLineButton

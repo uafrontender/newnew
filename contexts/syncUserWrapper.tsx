@@ -1,14 +1,17 @@
 import _ from 'lodash';
 import { newnewapi } from 'newnew-api';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   getMe,
+  getMyCreatorTags,
+  getMyOnboardingState,
   getTutorialsStatus,
   markTutorialStepAsCompleted,
 } from '../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
+  setCreatorData,
   setUserTutorialsProgress,
   setUserTutorialsProgressSynced,
   TUserData,
@@ -20,6 +23,26 @@ import { loadStateLS, saveStateLS } from '../utils/localStorage';
 const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
+
+  const [creatorDataSteps, setCreatorDataSteps] = useState(0);
+
+  const updateCreatorDataSteps = useCallback(
+    () =>
+      setCreatorDataSteps((curr) => {
+        return curr + 1;
+      }),
+    []
+  );
+
+  useEffect(() => {
+    if (creatorDataSteps === 2) {
+      dispatch(
+        setCreatorData({
+          isLoaded: true,
+        })
+      );
+    }
+  }, [creatorDataSteps]);
 
   useEffect(() => {
     async function syncUserData() {
@@ -56,6 +79,44 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
               },
             } as TUserData)
           );
+        }
+        if (data?.me?.options?.isCreator) {
+          try {
+            const payload = new newnewapi.EmptyRequest({});
+            const res = await getMyOnboardingState(payload);
+
+            if (res.data) {
+              dispatch(
+                setCreatorData({
+                  options: {
+                    ...user.creatorData?.options,
+                    ...res.data,
+                  },
+                })
+              );
+            }
+            updateCreatorDataSteps();
+          } catch (err) {
+            console.error(err);
+            updateCreatorDataSteps();
+          }
+
+          try {
+            const myTagsPayload = new newnewapi.EmptyRequest();
+            const tagsRes = await getMyCreatorTags(myTagsPayload);
+
+            if (tagsRes.data?.tags && tagsRes.data?.tags.length > 0) {
+              dispatch(
+                setCreatorData({
+                  hasCreatorTags: true,
+                })
+              );
+            }
+            updateCreatorDataSteps();
+          } catch (err) {
+            console.error(err);
+            updateCreatorDataSteps();
+          }
         }
       } catch (err) {
         console.error(err);
@@ -265,8 +326,8 @@ const SyncUserWrapper: React.FunctionComponent = ({ children }) => {
       'userTutorialsProgress'
     ) as newnewapi.IGetTutorialsStatusResponse;
     if (user.loggedIn) {
-      syncUserData();
       syncUserTutorialsProgress(localUserTutorialsProgress);
+      syncUserData();
     } else {
       if (!localUserTutorialsProgress) {
         saveStateLS('userTutorialsProgress', user.userTutorialsProgress);

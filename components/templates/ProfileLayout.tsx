@@ -544,7 +544,7 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                 )}
               </SShareButton>
             </SShareDiv>
-            {user.options?.isCreator ? (
+            {user.options?.isOfferingSubscription ? (
               <Link
                 href={
                   !isSubscribed

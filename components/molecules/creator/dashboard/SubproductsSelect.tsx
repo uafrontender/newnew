@@ -20,6 +20,8 @@ import checkBoxAnim from '../../../../public/animations/checkbox.json';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import EnableSubModal from '../../../atoms/dashboard/EnableSubModal';
 import RemoveSubModal from '../../../atoms/dashboard/RemoveSubModal';
+import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { setUserData } from '../../../../redux-store/slices/userStateSlice';
 
 interface ISubproductsSelect {
   mySubscriptionProduct: newnewapi.ISubscriptionProduct | null;
@@ -39,6 +41,8 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -87,8 +91,17 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
       const res = await setMySubscriptionProduct(payload);
 
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-
       setConfirmSubEnable(false);
+      if (!user.userData?.options?.isOfferingSubscription) {
+        dispatch(
+          setUserData({
+            options: {
+              ...user.userData?.options,
+              isOfferingSubscription: true,
+            },
+          })
+        );
+      }
       router.push('/creator/subscribers');
     } catch (err) {
       console.error(err);
@@ -223,6 +236,8 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
 }) => {
   const { t } = useTranslation('creator');
   const ref: any = useRef();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const [confirmSubEnable, setConfirmSubEnable] = useState<boolean>(false);
 
   const removeMyProduct = async () => {
@@ -234,6 +249,14 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
 
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       setConfirmSubEnable(false);
+      dispatch(
+        setUserData({
+          options: {
+            ...user.userData?.options,
+            isOfferingSubscription: false,
+          },
+        })
+      );
       removedMyProduct();
     } catch (err) {
       console.error(err);

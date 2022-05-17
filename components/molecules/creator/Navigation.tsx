@@ -1,9 +1,8 @@
-import React, { useMemo, useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
 
 import InlineSVG from '../../atoms/InlineSVG';
 import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboard.svg';
@@ -14,8 +13,8 @@ import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined
 // import earningsOutlinedIcon from '../../../public/images/svg/icons/outlined/Earnings.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
-import { getMyOnboardingState } from '../../../api/endpoints/user';
 import Button from '../../atoms/Button';
+import { useAppSelector } from '../../../redux-store/store';
 // import transactionsFilledIcon from '../../../public/images/svg/icons/filled/Transactions.svg';
 // import transactionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Transactions.svg';
 
@@ -23,26 +22,7 @@ export const Navigation = () => {
   const theme = useTheme();
   const { t } = useTranslation('creator');
   const router = useRouter();
-
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
-
-  useEffect(() => {
-    async function fetchOnboardingState() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data) {
-          setOnboardingState(res.data);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchOnboardingState();
-  }, []);
+  const user = useAppSelector((state) => state.user);
 
   const collection = useMemo(
     () => [
@@ -66,7 +46,7 @@ export const Navigation = () => {
       // },
       {
         url: '/creator/get-paid',
-        label: onboardingState?.isCreatorConnectedToStripe
+        label: user.creatorData?.options?.isCreatorConnectedToStripe
           ? t('navigation.getPaidEdit')
           : t('navigation.getPaid'),
         iconFilled: walletFilledIcon,
@@ -79,13 +59,18 @@ export const Navigation = () => {
       //   iconOutlined: transactionsOutlinedIcon,
       // },
     ],
-    [t, onboardingState]
+    [t, user.creatorData]
   );
 
   const renderItem = useCallback(
     (item) => {
       const active = router.route.includes(item.url);
-
+      if (
+        (!user.userData?.options?.isOfferingSubscription &&
+          item.url === '/creator/subscribers') ||
+        (!user.creatorData?.isLoaded && item.url === '/creator/get-paid')
+      )
+        return null;
       return (
         <Link href={item.url} key={item.url}>
           <a>
@@ -110,6 +95,7 @@ export const Navigation = () => {
       router.route,
       theme.colorsThemed.accent.blue,
       theme.colorsThemed.text.tertiary,
+      user,
     ]
   );
 

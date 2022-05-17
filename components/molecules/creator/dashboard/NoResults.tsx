@@ -10,13 +10,7 @@ import Button from '../../../atoms/Button';
 import { useAppSelector } from '../../../../redux-store/store';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-interface INoResults {
-  isCreatorConnectedToStripe: boolean | undefined;
-}
-
-export const NoResults: React.FC<INoResults> = ({
-  isCreatorConnectedToStripe,
-}) => {
+export const NoResults = () => {
   const { t } = useTranslation('creator');
   const user = useAppSelector((state) => state.user);
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -70,7 +64,7 @@ export const NoResults: React.FC<INoResults> = ({
         </SButton>
       </SWrapper>
       <SUpdateSubs>
-        {isCreatorConnectedToStripe ? (
+        {user.creatorData?.options?.isCreatorConnectedToStripe ? (
           <Link href='/creator/subscribers/edit-subscription-rate'>
             {t('noResults.updateSub')}
           </Link>

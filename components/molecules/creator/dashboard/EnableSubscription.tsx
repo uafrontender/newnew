@@ -1,46 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import { newnewapi } from 'newnew-api';
-
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
 import emptyFolder from '../../../../public/images/notifications/no-results.png';
-import { getMyOnboardingState } from '../../../../api/endpoints/user';
+import { useAppSelector } from '../../../../redux-store/store';
 
 export const EnableSubscription = () => {
   const { t } = useTranslation('creator');
-
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    async function fetchOnboardingState() {
-      if (isLoading) return;
-      try {
-        setIsLoading(false);
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data) {
-          setOnboardingState(res.data);
-        }
-
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err);
-        setIsLoading(false);
-      }
-    }
-
-    fetchOnboardingState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const user = useAppSelector((state) => state.user);
 
   return (
     <SContainer>
@@ -59,7 +31,7 @@ export const EnableSubscription = () => {
         </SDescriptionWrapper>
         <Link
           href={
-            onboardingState?.isCreatorConnectedToStripe
+            user.creatorData?.options?.isCreatorConnectedToStripe
               ? '/creator/subscribers/edit-subscription-rate'
               : '/creator/get-paid'
           }
