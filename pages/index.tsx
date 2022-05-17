@@ -116,6 +116,51 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
     setDisplayedPost(undefined);
   }, []);
 
+  const handleRemovePostFromState = (postUuid: string) => {
+    setTopSectionCollection((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionFY((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionAC((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionMC((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionCF((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionBiggest((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setCollectionCreator((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
   // Fetch top posts of various types
   // FY posts
   useEffect(() => {
@@ -406,6 +451,9 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           manualCurrLocation={isBrowser() ? window.location.pathname : ''}
           handleClose={handleClosePostModal}
           handleOpenAnotherPost={handleSetDisplayedPost}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
+          }
         />
       )}
     </>

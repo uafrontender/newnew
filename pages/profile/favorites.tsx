@@ -16,6 +16,7 @@ import MyProfileLayout from '../../components/templates/MyProfileLayout';
 // import useUpdateEffect from '../../utils/hooks/useUpdateEffect';
 import NoContentCard from '../../components/atoms/profile/NoContentCard';
 import NoContentDescription from '../../components/atoms/profile/NoContentDescription';
+import switchPostType from '../../utils/switchPostType';
 
 const PostModal = dynamic(
   () => import('../../components/organisms/decision/PostModal')
@@ -74,6 +75,34 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
   const handleClosePostModal = () => {
     setPostModalOpen(false);
     setDisplayedPost(undefined);
+  };
+
+  const handleRemovePostFromState = (postUuid: string) => {
+    handleSetPosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
+  const handleAddPostToState = (postToAdd: newnewapi.Post) => {
+    handleSetPosts((curr) => {
+      const newArr = [...curr];
+
+      const alreadyAdded = curr.findIndex(
+        (p) =>
+          switchPostType(p)[0].postUuid ===
+          switchPostType(postToAdd)[0].postUuid
+      );
+
+      if (alreadyAdded !== -1) {
+        return newArr;
+      }
+
+      const updated = [postToAdd, ...newArr];
+      return updated;
+    });
   };
 
   // TODO: filters and other parameters
@@ -169,6 +198,12 @@ const MyProfileFavorites: NextPage<IMyProfileFavorites> = ({
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
+          }
+          handleAddPostToState={() =>
+            handleAddPostToState(displayedPost as newnewapi.Post)
+          }
         />
       )}
     </div>
