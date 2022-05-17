@@ -148,9 +148,6 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
     const [currentBackers, setCurrentBackers] = useState(
       post.currentBackerCount ?? 0
     );
-    const crowdfundingSuccess = useMemo(() => {
-      return currentBackers >= post.targetBackerCount;
-    }, [post, currentBackers]);
 
     // Pledges
     const [pledges, setPledges] = useState<TCfPledgeWithHighestField[]>([]);
@@ -505,22 +502,21 @@ const PostModerationCF: React.FunctionComponent<IPostModerationCF> = React.memo(
             handleChangeTab={handleChangeTab}
           />
           {currentTab === 'backers' ? (
-            !crowdfundingSuccess ? (
-              postStatus === 'failed' ? (
-                <CfBackersStatsSectionModerationFailed
-                  targetBackerCount={post.targetBackerCount}
-                  currentNumBackers={currentBackers}
-                />
-              ) : (
-                <CfBackersStatsSectionModeration
-                  targetBackerCount={post.targetBackerCount}
-                  currentNumBackers={currentBackers}
-                />
-              )
-            ) : (
+            postStatus === 'waiting_for_response' ||
+            postStatus === 'succeeded' ? (
               <CfCrowdfundingSuccessModeration
                 post={post}
                 postStatus={postStatus}
+                currentNumBackers={currentBackers}
+              />
+            ) : postStatus === 'failed' ? (
+              <CfBackersStatsSectionModerationFailed
+                targetBackerCount={post.targetBackerCount}
+                currentNumBackers={currentBackers}
+              />
+            ) : (
+              <CfBackersStatsSectionModeration
+                targetBackerCount={post.targetBackerCount}
                 currentNumBackers={currentBackers}
               />
             )
