@@ -22,6 +22,7 @@ import isImage from '../../../utils/isImage';
 
 import { getImageUploadUrl } from '../../../api/endpoints/upload';
 import {
+  acceptCreatorTerms,
   becomeCreator,
   sendVerificationNewEmail,
   updateMe,
@@ -125,11 +126,10 @@ type TFieldsToBeUpdated = {
 interface IOnboardingSectionDetails {
   isAvatarCustom: boolean;
   availableCountries: newnewapi.Country[];
-  goToDashboard: () => void;
 }
 
 const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetails> =
-  ({ isAvatarCustom, availableCountries, goToDashboard }) => {
+  ({ isAvatarCustom, availableCountries }) => {
     const router = useRouter();
     const { t } = useTranslation('creator-onboarding');
     const dispatch = useAppDispatch();
@@ -533,7 +533,15 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
             })
           );
 
-          goToDashboard();
+          const acceptTermsPayload = new newnewapi.EmptyRequest({});
+
+          const res = await acceptCreatorTerms(acceptTermsPayload);
+
+          if (res.error) {
+            throw new Error('Request failed');
+          }
+
+          router.push('/creator/dashboard');
         }
       } catch (err) {
         console.error(err);
@@ -567,7 +575,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
       imageToSave,
       dispatch,
       isAPIValidateLoading,
-      goToDashboard,
       setLoadingModalOpen,
     ]);
 

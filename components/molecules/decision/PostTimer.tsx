@@ -1,6 +1,7 @@
 /* eslint-disable prefer-template */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-unused-expressions */
+import moment from 'moment';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dist/shared/lib/dynamic';
@@ -43,7 +44,6 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
 
   const parsed = (timestampSeconds - Date.now()) / 1000;
   const hasEnded = Date.now() > timestampSeconds;
-  const expirationDate = new Date(timestampSeconds);
 
   const [parsedSeconds, setParsedSeconds] = useState<DHMS>(
     secondsToDHMS(parsed)
@@ -228,11 +228,7 @@ const PostTimer: React.FunctionComponent<IPostTimer> = ({
       ) : (
         <STimerItemEnded>
           {t(`postType.${postType}`)} {t('expires.ended_on')}{' '}
-          {expirationDate.getDate()}{' '}
-          {expirationDate.toLocaleString('default', { month: 'short' })}{' '}
-          {expirationDate.getFullYear()} {t('expires.at_time')}{' '}
-          {('0' + expirationDate.getHours()).slice(-2)}:
-          {('0' + expirationDate.getMinutes()).slice(-2)}
+          {moment(timestampSeconds).format('DD MMM YYYY [at] hh:mm A')}
           <STutorialTooltipHolder>
             <TutorialTooltip
               isTooltipVisible={isTooltipVisible}

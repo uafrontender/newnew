@@ -42,6 +42,8 @@ import { formatNumber } from '../../../../utils/format';
 
 // Icons
 import assets from '../../../../constants/assets';
+import BidIconLight from '../../../../public/images/decision/bid-icon-light.png';
+import BidIconDark from '../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
@@ -421,7 +423,9 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             ) : null} */}
           </SLottieAnimationContainer>
           <SBidAmount isWhite={isSupportedByMe || isMyBid}>
-            <SCoinImg src={assets.creation.AcStatic} />
+            <OptionActionIcon
+              src={theme.name === 'light' ? BidIconLight.src : BidIconDark.src}
+            />
             <div>
               {option.totalAmount?.usdCents
                 ? `$${formatNumber(
@@ -806,7 +810,7 @@ const SBidAmount = styled.div<{
   justify-content: flex-start;
   gap: 8px;
 
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 
   font-weight: 700;
   font-size: 16px;
@@ -820,11 +824,9 @@ const SBidAmount = styled.div<{
       : null};
 `;
 
-const SCoinImg = styled.img`
-  height: 28px;
-
-  position: relative;
-  top: -2px;
+const OptionActionIcon = styled.img`
+  height: 24px;
+  width: 24px;
 `;
 
 const SOptionInfo = styled(Text)<{

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import CheckMark from '../CheckMark';
 
-interface IOnboardingSectionDetails {
+interface ICheckboxWithALink {
   label: string;
   linkText: string;
   value: boolean;
@@ -10,7 +10,7 @@ interface IOnboardingSectionDetails {
   onLinkClicked: () => void;
 }
 
-const CheckboxWithALink: React.FC<IOnboardingSectionDetails> = ({
+const CheckboxWithALink: React.FC<ICheckboxWithALink> = ({
   label,
   linkText,
   value,
