@@ -134,7 +134,14 @@ export const PostCard: React.FC<ICard> = React.memo(
     const handleUserClick = (username: string) => {
       router.push(`/${username}`);
     };
-    const handleMoreClick = () => {};
+
+    const handleMoreClick = (
+      e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
     const handleBidClick = () => {};
 
     useEffect(() => {
@@ -257,7 +264,12 @@ export const PostCard: React.FC<ICard> = React.memo(
               )}
               <SImageMask />
               <STopContent>
-                <SButtonIcon iconOnly id='showMore' view='transparent'>
+                <SButtonIcon
+                  iconOnly
+                  id='showMore'
+                  view='transparent'
+                  onClick={handleMoreClick}
+                >
                   <InlineSVG
                     svg={moreIcon}
                     fill={theme.colors.white}
