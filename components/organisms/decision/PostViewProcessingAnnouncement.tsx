@@ -20,9 +20,9 @@ import Text from '../../atoms/Text';
 const GoBackButton = dynamic(() => import('../../molecules/GoBackButton'));
 
 const IMAGES = {
-  ac: assets.creation.AcStatic,
-  mc: assets.creation.McStatic,
-  cf: assets.decision.votes,
+  ac: assets.creation.McAnimated,
+  mc: assets.decision.votes,
+  cf: assets.creation.CfAnimated,
 };
 
 interface IPostViewProcessingAnnouncement {
