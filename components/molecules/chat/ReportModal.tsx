@@ -8,6 +8,8 @@ import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useAppSelector } from '../../../redux-store/store';
 import CheckMark from '../CheckMark';
+import InlineSvg from '../../atoms/InlineSVG';
+import CloseIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
 const GoBackButton = dynamic(() => import('../GoBackButton'));
 
@@ -19,7 +21,7 @@ export interface ReportData {
 interface IReportModal {
   show: boolean;
   reportedDisplayname: string;
-  onSubmit: (reportData: ReportData) => void;
+  onSubmit: (reportData: ReportData) => Promise<void>;
   onClose: () => void;
 }
 
@@ -33,6 +35,7 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const [reasons, setReasons] = useState<newnewapi.ReportingReason[]>([]);
     const [message, setMessage] = useState('');
+    const [reportSent, setReportSent] = useState(false);
 
     const disabled = reasons.length === 0 || message.length < 15;
 
@@ -72,15 +75,21 @@ const ReportModal: React.FC<IReportModal> = React.memo(
 
     const reportMaxLength = 150;
 
-    const submitReport = () => {
+    const submitReport = async () => {
       if (reasons.length > 0 && message.length >= 15) {
-        onSubmit({
+        await onSubmit({
           reasons,
           message,
         });
-        setReasons([]);
-        setMessage('');
+        setReportSent(true);
       }
+    };
+
+    const handleClose = () => {
+      setReasons([]);
+      setMessage('');
+      setReportSent(false);
+      onClose();
     };
 
     const handleMessageChange = useCallback(
@@ -110,61 +119,81 @@ const ReportModal: React.FC<IReportModal> = React.memo(
     );
 
     return (
-      <Modal show={show} onClose={onClose}>
-        <SContainer>
-          <SModal onClick={preventParentClick()}>
-            <SModalHeader>
-              {isMobile && <GoBackButton onClick={onClose} />}
-              <SModalTitle>
-                {t('modal.report-user.title')} {reportedDisplayname}
-              </SModalTitle>
-            </SModalHeader>
-            <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
-            <SCheckBoxList>
-              {reportTypes.map((item) => (
-                <SCheckBoxWrapper key={item.id}>
-                  <CheckMark
-                    id={item.id.toString()}
-                    label={item.title}
-                    selected={reasons.includes(item.id)}
-                    handleChange={() => handleTypeChange(item.id)}
-                  />
-                </SCheckBoxWrapper>
-              ))}
-            </SCheckBoxList>
-            <STextAreaWrapper>
-              <STextAreaTitle>
-                <span>
-                  {message ? message.length : 0}/{reportMaxLength}
-                </span>
-              </STextAreaTitle>
-              <STextArea
-                id='report-additional-info'
-                maxLength={reportMaxLength}
-                value={message}
-                onChange={handleMessageChange}
-                placeholder={`${t(
-                  'modal.report-user.additional-info.placeholder'
-                )}`}
-              />
-            </STextAreaWrapper>
-            <SModalButtons>
-              {!isMobile && (
-                <SCancelButton onClick={onClose}>
-                  {t('modal.report-user.button-cancel')}
-                </SCancelButton>
-              )}
-              <SConfirmButton
-                view='primaryGrad'
-                disabled={disabled}
-                onClick={submitReport}
-              >
-                Report
-              </SConfirmButton>
-            </SModalButtons>
-          </SModal>
-        </SContainer>
-      </Modal>
+      <>
+        <Modal show={show} onClose={handleClose}>
+          <SContainer>
+            <SModal onClick={preventParentClick()}>
+              <SModalHeader>
+                {isMobile && <GoBackButton onClick={handleClose} />}
+                <SModalTitle>
+                  {t('modal.report-user.title')} {reportedDisplayname}
+                </SModalTitle>
+              </SModalHeader>
+              <SModalMessage>{t('modal.report-user.subtitle')}</SModalMessage>
+              <SCheckBoxList>
+                {reportTypes.map((item) => (
+                  <SCheckBoxWrapper key={item.id}>
+                    <CheckMark
+                      id={item.id.toString()}
+                      label={item.title}
+                      selected={reasons.includes(item.id)}
+                      handleChange={() => handleTypeChange(item.id)}
+                    />
+                  </SCheckBoxWrapper>
+                ))}
+              </SCheckBoxList>
+              <STextAreaWrapper>
+                <STextAreaTitle>
+                  <span>
+                    {message ? message.length : 0}/{reportMaxLength}
+                  </span>
+                </STextAreaTitle>
+                <STextArea
+                  id='report-additional-info'
+                  maxLength={reportMaxLength}
+                  value={message}
+                  onChange={handleMessageChange}
+                  placeholder={`${t(
+                    'modal.report-user.additional-info.placeholder'
+                  )}`}
+                />
+              </STextAreaWrapper>
+              <SModalButtons>
+                {!isMobile && (
+                  <SCancelButton onClick={handleClose}>
+                    {t('modal.report-user.button-cancel')}
+                  </SCancelButton>
+                )}
+                <SConfirmButton
+                  view='primaryGrad'
+                  disabled={disabled}
+                  onClick={submitReport}
+                >
+                  Report
+                </SConfirmButton>
+              </SModalButtons>
+            </SModal>
+          </SContainer>
+        </Modal>
+        <Modal show={reportSent} onClose={handleClose}>
+          <SContainer>
+            <ConformationContainer>
+              <CloseButton onClick={handleClose}>
+                <InlineSvg svg={CloseIcon} />
+              </CloseButton>
+              <SConformationTitle>
+                {t('modal.report-sent.title')}
+              </SConformationTitle>
+              <SConformationText>
+                {t('modal.report-sent.subtitle')}
+              </SConformationText>
+              <SAcknowledgementButton view='primaryGrad' onClick={handleClose}>
+                {t('modal.report-sent.button')}
+              </SAcknowledgementButton>
+            </ConformationContainer>
+          </SContainer>
+        </Modal>
+      </>
     );
   }
 );
@@ -347,5 +376,80 @@ const STextArea = styled.textarea`
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
+  }
+`;
+
+const ConformationContainer = styled(SModal)`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 40px 40px 40px;
+  margin: auto 16px;
+  height: auto;
+  max-width: 350px;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 16px;
+    max-width: 480px;
+  }
+`;
+
+const CloseButton = styled.div`
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  color: white;
+  cursor: pointer;
+`;
+
+const SConformationTitle = styled.strong`
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 28px;
+  margin-bottom: 16px;
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 24px;
+    line-height: 32px;
+  }
+`;
+
+const SConformationText = styled.p`
+  font-size: 14px;
+  line-height: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+  color: ${(props) => props.theme.colorsThemed.text.secondary};
+
+  ${(props) => props.theme.media.tablet} {
+    font-size: 16px;
+    line-height: 24px;
+  }
+`;
+
+const SAcknowledgementButton = styled(Button)`
+  width: auto;
+  flex-shrink: 0;
+  padding: 12px 24px;
+  line-height: 24px;
+  font-size: 14px;
+
+  &:disabled {
+    cursor: default;
+    opacity: 1;
+    outline: none;
+
+    :after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: '';
+      opacity: 1;
+      z-index: 6;
+      position: absolute;
+      background: ${(props) => props.theme.colorsThemed.button.disabled};
+    }
   }
 `;

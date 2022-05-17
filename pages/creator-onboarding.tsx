@@ -15,7 +15,10 @@ import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
 import useLeavePageConfirm from '../utils/hooks/useLeavePageConfirm';
 import { getSupportedCreatorCountries } from '../api/endpoints/payments';
-import { getMyOnboardingState } from '../api/endpoints/user';
+import {
+  acceptCreatorTerms,
+  getMyOnboardingState,
+} from '../api/endpoints/user';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
 
 const OnboardingSectionDetails = dynamic(
@@ -54,11 +57,6 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
 
-  // TODO: a call to the API to mark user as agreed to ToS with corresponding timestamp
-  const goToNext = () => {
-    router.push('/creator/dashboard');
-  };
-
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/creator/dashboard');
@@ -94,7 +92,6 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
           availableCountries={
             availableCountriesRes.countries as newnewapi.Country[]
           }
-          goToDashboard={goToNext}
         />
       ) : (
         <Lottie
