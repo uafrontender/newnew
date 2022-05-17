@@ -378,8 +378,6 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           console.error(e)
         );
       }
-
-      setReportPostOpen(false);
     },
     [postParsed]
   );

@@ -33,6 +33,8 @@ import McOptionConfirmVoteModal from './McOptionConfirmVoteModal';
 import { formatNumber } from '../../../../utils/format';
 
 // Icons
+import VoteIconLight from '../../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../../public/images/decision/vote-icon-dark.png';
 import McOptionCardSelectVotesMenu from './McOptionCardSelectVotesMenu';
 import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import McOptionCardSelectVotesModal from './McOptionCardSelectVotesModal';
@@ -89,6 +91,7 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
   handleAddOrUpdateOptionFromResponse,
 }) => {
   const router = useRouter();
+  const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const dispatch = useAppDispatch();
@@ -407,7 +410,11 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
         >
           <SBidDetails isBlue={isBlue} noAction={noAction}>
             <SBidAmount>
-              <SOptionSymbolImg src={assets.decision.votes} />
+              <OptionActionIcon
+                src={
+                  theme.name === 'light' ? VoteIconLight.src : VoteIconDark.src
+                }
+              />
               <div>
                 {option.voteCount && option.voteCount > 0
                   ? `${formatNumber(option?.voteCount, true)} ${t(
@@ -619,7 +626,13 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
           <SSelectVotesModalCard isBlue={isBlue}>
             <SBidDetails isBlue={isBlue} noAction={noAction}>
               <SBidAmount>
-                <SOptionSymbolImg src={assets.decision.votes} />
+                <OptionActionIcon
+                  src={
+                    theme.name === 'light'
+                      ? VoteIconLight.src
+                      : VoteIconDark.src
+                  }
+                />
                 <div>
                   {option.voteCount && option.voteCount > 0
                     ? `${formatNumber(option?.voteCount, true)}`
@@ -987,11 +1000,12 @@ const SBidAmount = styled.div`
   font-size: 16px;
   line-height: 24px;
 
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 `;
 
-const SOptionSymbolImg = styled.img`
+const OptionActionIcon = styled.img`
   height: 24px;
+  width: 24px;
 `;
 
 const SOptionInfo = styled(Text)`
