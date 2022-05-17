@@ -149,7 +149,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
           {/* @ts-ignore */}
           <SDecisionImage src={IMAGES[postType]} />
           <SText variant={2} weight={600}>
-            {t('PostViewProcessingAnnouncement.stayTuned')}
+            {t(`PostViewProcessingAnnouncement.stayTuned.${postType}`)}
           </SText>
         </SActivitesContainer>
       </SWrapper>
@@ -226,6 +226,8 @@ const SActivitesContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+
+    padding-bottom: 88px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -238,5 +240,8 @@ const SDecisionImage = styled.img`
 `;
 
 const SText = styled(Text)`
+  margin-top: 8px;
+
   text-align: center;
+  white-space: pre;
 `;
