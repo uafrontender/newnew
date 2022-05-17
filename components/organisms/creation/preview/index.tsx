@@ -384,9 +384,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
 
   return (
     <>
-      {showModal && (
-        <PublishedModal open={showModal} handleClose={handleCloseModal} />
-      )}
+      <PublishedModal open={showModal} handleClose={handleCloseModal} />
       <SHeadLine variant={3} weight={600}>
         {t(`preview.title-${router?.query?.tab}`)}
       </SHeadLine>
