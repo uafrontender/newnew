@@ -31,6 +31,7 @@ interface IPostViewScheduled {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleRemovePostFromState: () => void;
+  handleAddPostToState: () => void;
   handleReportOpen: () => void;
 }
 
@@ -45,6 +46,7 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
       handleUpdatePostStatus,
       handleReportOpen,
       handleRemovePostFromState,
+      handleAddPostToState,
     }) => {
       const dispatch = useAppDispatch();
       const { user } = useAppSelector((state) => state);
@@ -69,17 +71,21 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
         if (!user.loggedIn || user.userData?.userUuid === post.creator?.uuid)
           return;
         try {
-          const markAsViewedPayload = new newnewapi.MarkPostRequest({
+          const markAsFavoritePayload = new newnewapi.MarkPostRequest({
             markAs: !isFollowing
               ? newnewapi.MarkPostRequest.Kind.FAVORITE
               : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
             postUuid: post.postUuid,
           });
 
-          const res = await markPost(markAsViewedPayload);
+          const res = await markPost(markAsFavoritePayload);
 
           if (!res.error) {
             setIsFollowing(!isFollowing);
+
+            if (isFollowing) {
+              handleRemovePostFromState?.();
+            }
           }
         } catch (err) {
           console.error(err);
@@ -161,6 +167,8 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
               hasWinner={false}
               isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
               handleReportOpen={handleReportOpen}
+              handleRemovePostFromState={handleRemovePostFromState}
+              handleAddPostToState={handleAddPostToState}
             />
           ) : (
             <PostTopInfoModeration

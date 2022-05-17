@@ -73,6 +73,8 @@ interface IPostViewAC {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
+  handleRemovePostFromState: () => void;
+  handleAddPostToState: () => void;
 }
 
 const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
@@ -84,6 +86,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
+    handleRemovePostFromState,
+    handleAddPostToState,
   }) => {
     const { t } = useTranslation('decision');
     const dispatch = useAppDispatch();
@@ -688,6 +692,8 @@ const PostViewAC: React.FunctionComponent<IPostViewAC> = React.memo(
           creator={post.creator!!}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
           handleReportOpen={handleReportOpen}
+          handleRemovePostFromState={handleRemovePostFromState}
+          handleAddPostToState={handleAddPostToState}
         />
         <SActivitesContainer
           decisionFailed={postStatus === 'failed'}

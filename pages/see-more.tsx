@@ -27,6 +27,7 @@ import { APIResponse } from '../api/apiConfigs';
 import { fetchLiveAuctions } from '../api/endpoints/auction';
 import { fetchTopMultipleChoices } from '../api/endpoints/multiple_choice';
 import { fetchTopCrowdfundings } from '../api/endpoints/crowdfunding';
+import switchPostType from '../utils/switchPostType';
 
 const PostModal = dynamic(
   () => import('../components/organisms/decision/PostModal')
@@ -275,6 +276,21 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
     setDisplayedPost(undefined);
   };
 
+  const handleRemovePostFromState = (postUuid: string) => {
+    setCollectionLoaded((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+    setTopSectionCollection((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
+
   // Scroll to top once category changed
   useEffect(() => {
     const category = router.query.category?.toString() ?? '';
@@ -390,6 +406,9 @@ const Search: NextPage<ISearch> = ({ top10posts }) => {
           post={displayedPost}
           handleClose={() => handleClosePostModal()}
           handleOpenAnotherPost={handleSetDisplayedPost}
+          handleRemovePostFromState={() =>
+            handleRemovePostFromState(switchPostType(displayedPost)[0].postUuid)
+          }
         />
       )}
     </>

@@ -52,6 +52,8 @@ interface IPostTopInfo {
   amountInBids?: number;
   hasWinner: boolean;
   handleReportOpen: () => void;
+  handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
@@ -67,6 +69,8 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
   amountInBids,
   hasWinner,
   handleReportOpen,
+  handleRemovePostFromState,
+  handleAddPostToState,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -145,20 +149,35 @@ const PostTopInfo: React.FunctionComponent<IPostTopInfo> = ({
           )}`
         );
       }
-      const markAsViewedPayload = new newnewapi.MarkPostRequest({
-        markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
+      const markAsFavoritePayload = new newnewapi.MarkPostRequest({
+        markAs: !isFollowingDecision
+          ? newnewapi.MarkPostRequest.Kind.FAVORITE
+          : newnewapi.MarkPostRequest.Kind.NOT_FAVORITE,
         postUuid: postId,
       });
 
-      const res = await markPost(markAsViewedPayload);
+      const res = await markPost(markAsFavoritePayload);
 
       if (!res.error) {
         setIsFollowingDecision(!isFollowingDecision);
+
+        if (isFollowingDecision) {
+          handleRemovePostFromState?.();
+        } else {
+          handleAddPostToState?.();
+        }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [isFollowingDecision, postId, router, user.loggedIn]);
+  }, [
+    handleAddPostToState,
+    handleRemovePostFromState,
+    isFollowingDecision,
+    postId,
+    router,
+    user.loggedIn,
+  ]);
 
   return (
     <SContainer>
@@ -305,6 +324,8 @@ PostTopInfo.defaultProps = {
   totalVotes: undefined,
   totalPledges: undefined,
   targetPledges: undefined,
+  handleRemovePostFromState: undefined,
+  handleAddPostToState: undefined,
 };
 
 export default PostTopInfo;

@@ -24,6 +24,7 @@ import { searchPosts } from '../../../api/endpoints/search';
 import isBrowser from '../../../utils/isBrowser';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
+import switchPostType from '../../../utils/switchPostType';
 
 const PostList = dynamic(() => import('./PostList'));
 const PostModal = dynamic(() => import('../decision/PostModal'));
@@ -117,6 +118,15 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadingPosts, postSorting, query]
   );
+
+  const handleRemovePostFromState = (postUuid: string) => {
+    setResultsPosts((curr) => {
+      const updated = curr.filter(
+        (post) => switchPostType(post)[0].postUuid !== postUuid
+      );
+      return updated;
+    });
+  };
 
   useEffect(() => {
     if (!initialLoad) {
@@ -400,6 +410,11 @@ export const SearchDecisions: React.FC<IFunction> = ({ query }) => {
               manualCurrLocation={isBrowser() ? window.location.href : ''}
               handleClose={() => handleClosePostModal()}
               handleOpenAnotherPost={handleSetDisplayedPost}
+              handleRemovePostFromState={() =>
+                handleRemovePostFromState(
+                  switchPostType(displayedPost)[0].postUuid
+                )
+              }
             />
           )}
         </>

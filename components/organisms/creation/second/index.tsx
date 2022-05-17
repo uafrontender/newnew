@@ -29,6 +29,7 @@ import { validateText } from '../../../../api/endpoints/infrastructure';
 import { SocketContext } from '../../../../contexts/socketContext';
 import { minLength, maxLength } from '../../../../utils/validation';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
+import { useGetAppConstants } from '../../../../contexts/appConstantsContext';
 import {
   getVideoUploadUrl,
   removeUploadedFile,
@@ -111,6 +112,19 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     } = useAppSelector((state) => state.creation);
     const user = useAppSelector((state) => state.user);
     const { resizeMode, overlay } = useAppSelector((state) => state.ui);
+
+    const { appConstants } = useGetAppConstants();
+
+    const cfFormattedDescription = useMemo(() => {
+      if (appConstants?.standardPledgeAmounts?.length > 0) {
+        console.log(appConstants.standardPledgeAmounts);
+        return Math.round(
+          appConstants.standardPledgeAmounts[0].usdCents!! / 100
+        );
+      }
+      return Math.round(appConstants.minCfPledge / 100);
+    }, [appConstants.standardPledgeAmounts, appConstants.minCfPledge]);
+
     const {
       query: { tab },
     } = router;
@@ -579,7 +593,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                   type='input'
                   value={crowdfunding.targetBackerCount}
                   onChange={handleItemChange}
-                  formattedDescription={crowdfunding.targetBackerCount}
+                  formattedDescription={cfFormattedDescription}
                   inputProps={{
                     min: 1,
                     max: 999999,
@@ -593,18 +607,19 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         </>
       ),
       [
-        t,
-        tab,
-        isMobile,
-        titleError,
         post?.title,
-        auction?.minimalBid,
-        crowdfunding?.targetBackerCount,
-        validateT,
+        titleError,
         handleItemBlur,
         handleItemFocus,
         handleItemChange,
+        t,
+        tab,
         multiplechoice.choices,
+        validateT,
+        isMobile,
+        auction.minimalBid,
+        crowdfunding.targetBackerCount,
+        cfFormattedDescription,
       ]
     );
     const getAdvancedPart = useCallback(
@@ -636,7 +651,7 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
                       type='input'
                       value={crowdfunding.targetBackerCount}
                       onChange={handleItemChange}
-                      formattedDescription={crowdfunding.targetBackerCount}
+                      formattedDescription={cfFormattedDescription}
                       inputProps={{
                         min: 1,
                         type: 'number',
@@ -723,20 +738,21 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
         </>
       ),
       [
-        t,
-        tab,
         isMobile,
-        post.startsAt,
-        post.expiresAt,
-        post.options.commentsEnabled,
+        tab,
         auction.minimalBid,
-        user?.userData?.options?.isOfferingSubscription,
-        crowdfunding.targetBackerCount,
-        multiplechoice.options.allowSuggestions,
-        expireOptions,
-        formatStartsAt,
-        formatExpiresAt,
         handleItemChange,
+        crowdfunding.targetBackerCount,
+        cfFormattedDescription,
+        post.expiresAt,
+        post.startsAt,
+        post.options.commentsEnabled,
+        expireOptions,
+        t,
+        formatExpiresAt,
+        formatStartsAt,
+        user?.userData?.options?.isOfferingSubscription,
+        multiplechoice.options.allowSuggestions,
       ]
     );
     const handlerSocketUpdated = useCallback(
