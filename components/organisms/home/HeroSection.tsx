@@ -39,12 +39,22 @@ export const HeroSection = React.memo(() => {
     router.push('/sign-up');
   };
   const handleExploreClick = () => {
-    scroller.scrollTo('topSection', {
-      offset: isMobile ? -20 : -100,
-      smooth: 'ease',
-      duration: SCROLL_EXPLORE,
-      containerId: 'generalScrollContainer',
-    });
+    if (document.getElementsByName('topSection').length > 0) {
+      scroller.scrollTo('topSection', {
+        offset: isMobile ? -20 : -100,
+        smooth: 'ease',
+        duration: SCROLL_EXPLORE,
+        containerId: 'generalScrollContainer',
+      });
+    } else {
+      console.log('hey');
+      scroller.scrollTo('ac', {
+        offset: isMobile ? -20 : -100,
+        smooth: 'ease',
+        duration: SCROLL_EXPLORE,
+        containerId: 'generalScrollContainer',
+      });
+    }
   };
 
   const handleTitleAnimationEnd = useCallback(() => {
@@ -210,6 +220,9 @@ const STopWrapper = styled.div`
 
 const SHeadline = styled(Headline)`
   text-align: center;
+
+  /* Preserve line break */
+  white-space: pre;
 
   ${(props) => props.theme.media.tablet} {
     max-width: 320px;
