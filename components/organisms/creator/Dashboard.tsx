@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -42,6 +43,7 @@ const YourTodos = dynamic(
 
 export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -50,9 +52,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
-  const [isTodosCompletedLoading, setIsTodosCompletedLoading] =
-    useState<boolean>(true);
+  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
@@ -66,6 +66,16 @@ export const Dashboard: React.FC = React.memo(() => {
   const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
     useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
+
+  useEffect(() => {
+    user.creatorData?.isLoaded &&
+    user.creatorData?.hasCreatorTags &&
+    user.userData?.bio &&
+    user.userData?.bio.length > 0 &&
+    user.creatorData?.options?.isCreatorConnectedToStripe
+      ? setIsTodosCompleted(true)
+      : setIsTodosCompleted(false);
+  }, [user.creatorData, user.userData]);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -104,14 +114,6 @@ export const Dashboard: React.FC = React.memo(() => {
       fetchMySubscriptionProduct();
     }
   }, [mySubscriptionProduct]);
-
-  const todosCompleted = (value: boolean) => {
-    setIsTodosCompleted(value);
-  };
-
-  const todosCompletedLoading = (value: boolean) => {
-    setIsTodosCompletedLoading(value);
-  };
 
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
@@ -166,11 +168,11 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [isEarningsLoading]);
 
   useEffect(() => {
-    if (!isTodosCompletedLoading && !myEarnings && isEarningsLoading) {
+    if (isTodosCompleted && !myEarnings && isEarningsLoading) {
       fetchMyEarnings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTodosCompletedLoading]);
+  }, [isTodosCompleted]);
 
   return (
     <SContainer>
@@ -180,79 +182,24 @@ export const Dashboard: React.FC = React.memo(() => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        <SBlock name='your-todos'>
-          <YourTodos
-            todosCompleted={todosCompleted}
-            todosCompletedLoading={todosCompletedLoading}
+        {!user.creatorData?.isLoaded ? (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
           />
-        </SBlock>
-        {!isTodosCompletedLoading ? (
-          <>
-            {isLoadingExpirationPosts ? (
-              <SBlock>
-                <Lottie
-                  width={64}
-                  height={64}
-                  options={{
-                    loop: true,
-                    autoplay: true,
-                    animationData: loadingAnimation,
-                  }}
-                />
-              </SBlock>
-            ) : (
-              expirationPosts.length > 0 && (
-                <SBlock>
-                  <ExpirationPosts expirationPosts={expirationPosts} />
-                </SBlock>
-              )
-            )}
-            <SBlock>
-              {!isEarningsLoading ? (
-                isTodosCompleted ? (
-                  <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
-                ) : (
-                  <FinishProfileSetup />
-                )
-              ) : (
-                <Lottie
-                  width={64}
-                  height={64}
-                  options={{
-                    loop: true,
-                    autoplay: true,
-                    animationData: loadingAnimation,
-                  }}
-                />
-              )}
-            </SBlock>
-            {!isMySubscriptionProductLoading ? (
-              !mySubscriptionProduct ? (
-                <SBlock noMargin>
-                  <EnableSubscription />
-                </SBlock>
-              ) : (
-                <SBlock noMargin>
-                  {mySubscribers.length > 0 ? (
-                    <SubscriptionStats />
-                  ) : (
-                    <EmptySubscriptionStats />
-                  )}
-                </SBlock>
-              )
-            ) : (
-              <Lottie
-                width={64}
-                height={64}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: loadingAnimation,
-                }}
-              />
-            )}
-          </>
         ) : (
+          !isTodosCompleted && (
+            <SBlock name='your-todos'>
+              <YourTodos />
+            </SBlock>
+          )
+        )}
+        {isLoadingExpirationPosts ? (
           <SBlock>
             <Lottie
               width={64}
@@ -264,6 +211,56 @@ export const Dashboard: React.FC = React.memo(() => {
               }}
             />
           </SBlock>
+        ) : (
+          expirationPosts.length > 0 && (
+            <SBlock>
+              <ExpirationPosts expirationPosts={expirationPosts} />
+            </SBlock>
+          )
+        )}
+        <SBlock>
+          {!isEarningsLoading ? (
+            isTodosCompleted ? (
+              <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+            ) : (
+              <FinishProfileSetup />
+            )
+          ) : (
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          )}
+        </SBlock>
+        {!isMySubscriptionProductLoading ? (
+          !mySubscriptionProduct ? (
+            <SBlock noMargin>
+              <EnableSubscription />
+            </SBlock>
+          ) : (
+            <SBlock noMargin>
+              {mySubscribers.length > 0 ? (
+                <SubscriptionStats />
+              ) : (
+                <EmptySubscriptionStats />
+              )}
+            </SBlock>
+          )
+        ) : (
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
         )}
       </SContent>
     </SContainer>

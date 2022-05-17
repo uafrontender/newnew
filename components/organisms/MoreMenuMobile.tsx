@@ -58,7 +58,7 @@ const MoreMenuMobile: React.FC<IMoreMenuMobile> = ({
         >
           {!shareMenuOpen ? (
             <>
-              {(user.userData?.options?.isCreator ||
+              {(user.userData?.options?.isOfferingSubscription ||
                 creatorsImSubscribedTo.length > 0) && (
                 <SButton
                   onClick={() =>

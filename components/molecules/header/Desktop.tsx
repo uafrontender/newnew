@@ -67,7 +67,7 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {(user.userData?.options?.isCreator ||
+            {(user.userData?.options?.isOfferingSubscription ||
               creatorsImSubscribedTo.length > 0) && (
               <SItemWithMargin>
                 <NavigationItem
