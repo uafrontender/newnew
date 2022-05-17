@@ -790,7 +790,7 @@ McOptionCard.defaultProps = {
 
 export default McOptionCard;
 
-const RenderSupportersInfo: React.FunctionComponent<{
+export const RenderSupportersInfo: React.FunctionComponent<{
   isCreatorsBid: boolean;
   isSuggestedByMe: boolean;
   isSupportedByMe: boolean;

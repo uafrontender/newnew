@@ -38,7 +38,9 @@ const SWaitingForResponseBox = styled.div`
   z-index: 11;
   position: relative;
 
-  background: radial-gradient(
+  background: ${({ theme }) =>
+    theme.name === 'dark'
+      ? `radial-gradient(
         100% 1411.13% at 0% 0%,
         rgba(54, 55, 74, 0.4) 0%,
         rgba(54, 55, 74, 0) 81.65%
@@ -50,7 +52,8 @@ const SWaitingForResponseBox = styled.div`
         rgba(54, 55, 74, 0) 81.65%
       )
       /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
-    #1e1f29;
+    #1e1f29;`
+      : '#ffffff'};
   box-shadow: 0px 10px 30px rgba(54, 55, 74, 0.2);
 
   display: grid;
@@ -82,14 +85,14 @@ const SHeadline = styled(Text)`
   grid-area: headlineArea;
   align-self: center;
 
-  color: #ffffff;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 
 const SBody = styled(Text)`
   grid-area: bodyArea;
   align-self: center;
 
-  color: #ffffff;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
   opacity: 0.8;
 `;
 

@@ -330,6 +330,11 @@ const SActivitesContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     margin-top: 0px;
     min-height: 506px;
+
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : 'transparent'};
   }
 
   ${({ theme }) => theme.media.laptop} {

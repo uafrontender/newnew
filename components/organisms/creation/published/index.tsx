@@ -172,7 +172,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
   }, [post.expiresAt]);
 
   const renderItem = (item: any) => (
-    <SItem key={item.key}>
+    <SItem key={item.key} type={item.key}>
       <SItemButton type={item.key} onClick={socialBtnClickHandler}>
         <InlineSVG
           svg={SOCIAL_ICONS[item.key] as string}
@@ -180,7 +180,12 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
           height='25px'
         />
       </SItemButton>
-      <SItemTitle variant={3} weight={600}>
+      <SItemTitle
+        variant={3}
+        weight={600}
+        type={item.key}
+        onClick={socialBtnClickHandler as any}
+      >
         {item.key === 'copy' && isCopiedUrl
           ? t(`published.socials.copied`)
           : t(`published.socials.${item.key}`)}
@@ -352,7 +357,9 @@ const SSocials = styled.div`
   justify-content: center;
 `;
 
-const SItem = styled.div`
+const SItem = styled.div<{
+  type: string;
+}>`
   flex: 1;
   display: flex;
   align-items: center;
@@ -375,9 +382,12 @@ const SItemButton = styled.div<ISItemButton>`
   background: ${(props) => props.theme.colorsThemed.social[props.type].main};
 `;
 
-const SItemTitle = styled(Caption)`
+const SItemTitle = styled(Caption)<{
+  type: string;
+}>`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
   margin-top: 6px;
+  cursor: pointer;
 `;
 
 const SText = styled(Text)`
