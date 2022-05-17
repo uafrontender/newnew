@@ -32,6 +32,7 @@ import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
 import isBrowser from '../../utils/isBrowser';
 import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
+import BackButton from '../molecules/BackButton';
 
 type TPageType =
   | 'activelyBidding'
@@ -582,8 +583,8 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             >
               <InlineSvg
                 svg={EditIcon}
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
+                width={isMobileOrTablet ? '16px' : '24px'}
+                height={isMobileOrTablet ? '16px' : '24px'}
               />
               {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
             </Button>
@@ -596,14 +597,19 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             >
               <InlineSvg
                 svg={SettingsIcon}
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
+                width={isMobileOrTablet ? '16px' : '24px'}
+                height={isMobileOrTablet ? '16px' : '24px'}
               />
               {isMobileOrTablet
                 ? null
                 : t('ProfileLayout.headerButtons.settings')}
             </Button>
           </ProfileBackground>
+          <SBackButton
+            onClick={() => {
+              router.back();
+            }}
+          />
           {/* NB! Temp */}
           {user.userData?.avatarUrl && (
             <ProfileImage src={user.userData?.avatarUrl} />
@@ -753,6 +759,17 @@ const SGeneral = styled(General)`
         }
       }
     }
+  }
+`;
+
+const SBackButton = styled(BackButton)`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    top: 24px;
+    left: 24px;
   }
 `;
 
