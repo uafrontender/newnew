@@ -150,12 +150,6 @@ export const NotificationsList: React.FC<IFunction> = ({
   }, [inView, loading, notificationsNextPageToken]);
 
   useEffect(() => {
-    if (!notifications) {
-      fetchNotification();
-    }
-  }, [notifications, fetchNotification]);
-
-  useEffect(() => {
     if (initialLoad) {
       setLocalUnreadNotificationCount(unreadNotificationCount);
       setInitialLoad(false);
@@ -182,6 +176,9 @@ export const NotificationsList: React.FC<IFunction> = ({
 
       if (target.postResponse && target?.postResponse.postUuid)
         return `/post/${target.postResponse.postUuid}`;
+
+      if (target.postAnnounce && target?.postAnnounce.postUuid)
+        return `/post/${target.postAnnounce.postUuid}`;
     }
     return '';
   };
@@ -189,26 +186,28 @@ export const NotificationsList: React.FC<IFunction> = ({
   const renderNotificationItem = useCallback(
     (item: newnewapi.INotification) => (
       <Link href={getUrl(item.target)}>
-        <SNotificationItem key={`notification-item-${item.id}`}>
-          <SNotificationItemAvatar
-            withClick
-            // onClick={handleUserClick}
-            avatarUrl={
-              item.content?.relatedUser?.thumbnailAvatarUrl
-                ? item.content?.relatedUser?.thumbnailAvatarUrl
-                : ''
-            }
-          />
-          <SNotificationItemCenter>
-            <SNotificationItemText variant={3} weight={600}>
-              {item.content!!.message}
-            </SNotificationItemText>
-            <SNotificationItemTime variant={2} weight={600}>
-              {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
-            </SNotificationItemTime>
-          </SNotificationItemCenter>
-          {!item.isRead && <SNotificationItemIndicator minified />}
-        </SNotificationItem>
+        <a>
+          <SNotificationItem key={`notification-item-${item.id}`}>
+            <SNotificationItemAvatar
+              withClick
+              // onClick={handleUserClick}
+              avatarUrl={
+                item.content?.relatedUser?.thumbnailAvatarUrl
+                  ? item.content?.relatedUser?.thumbnailAvatarUrl
+                  : ''
+              }
+            />
+            <SNotificationItemCenter>
+              <SNotificationItemText variant={3} weight={600}>
+                {item.content!!.message}
+              </SNotificationItemText>
+              <SNotificationItemTime variant={2} weight={600}>
+                {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
+              </SNotificationItemTime>
+            </SNotificationItemCenter>
+            {!item.isRead && <SNotificationItemIndicator minified />}
+          </SNotificationItem>
+        </a>
       </Link>
     ),
 

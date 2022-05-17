@@ -25,7 +25,6 @@ import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessag
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
 const NotificationsList = dynamic(() => import('./NotificationsList'));
@@ -48,7 +47,6 @@ export const DynamicSection = () => {
   const { unreadCountForCreator } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
-  const { mySubscribersTotal } = useGetSubscriptions();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -80,6 +78,17 @@ export const DynamicSection = () => {
       },
     ],
     [unreadCountForCreator, unreadNotificationCount]
+  );
+
+  const tabNotification: Tab[] = useMemo(
+    () => [
+      {
+        url: '/creator/dashboard?tab=notifications',
+        counter: unreadNotificationCount,
+        nameToken: 'notifications',
+      },
+    ],
+    [unreadNotificationCount]
   );
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
@@ -148,7 +157,7 @@ export const DynamicSection = () => {
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          {mySubscribersTotal > 0 && (
+          {user.userData?.options?.isOfferingSubscription && (
             <SButton view='secondary' onClick={handleChatClick}>
               <SIconHolder>
                 <SInlineSVG
@@ -191,15 +200,21 @@ export const DynamicSection = () => {
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  {mySubscribersTotal > 0 &&
-                    user.userData?.options?.isOfferingSubscription && (
-                      <Tabs
-                        t={t}
-                        tabs={tabs}
-                        draggable={false}
-                        activeTabIndex={activeTabIndex}
-                      />
-                    )}
+                  {user.userData?.options?.isOfferingSubscription ? (
+                    <Tabs
+                      t={t}
+                      tabs={tabs}
+                      draggable={false}
+                      activeTabIndex={activeTabIndex}
+                    />
+                  ) : (
+                    <Tabs
+                      t={t}
+                      tabs={tabNotification}
+                      draggable={false}
+                      activeTabIndex={0}
+                    />
+                  )}
                 </STabsWrapper>
                 <SSectionTopLineButtons>
                   {tab === 'notifications' ||
