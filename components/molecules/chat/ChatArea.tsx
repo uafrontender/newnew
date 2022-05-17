@@ -1,4 +1,5 @@
 /* eslint-disable consistent-return */
+/* eslint-disable no-lonely-if */
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
@@ -62,8 +63,8 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   const [messageText, setMessageText] = useState<string>('');
   const [messages, setMessages] = useState<newnewapi.IChatMessage[]>([]);
   const [isVisavisBlocked, setIsVisavisBlocked] = useState<boolean>(false);
-  const [isMessagingDisabled, setIsMessagingDisabled] =
-    useState<boolean>(false);
+  // const [isMessagingDisabled, setIsMessagingDisabled] =
+  //   useState<boolean>(false);
   const [confirmBlockUser, setConfirmBlockUser] = useState<boolean>(false);
   const [confirmReportUser, setConfirmReportUser] = useState<boolean>(false);
   const [newMessage, setNewMessage] =
@@ -74,7 +75,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     blockedUser: false,
     isAnnouncement: false,
     subscriptionExpired: false,
-    messagingDisabled: false,
+    // messagingDisabled: false,
     accountDeleted: false,
   });
 
@@ -192,11 +193,16 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const isBlocked = usersIBlocked.find(
         (i) => i === chatRoom?.visavis?.uuid
       );
+      console.log(isBlocked);
+
       if (isBlocked) {
         setIsVisavisBlocked(true);
+      } else {
+        if (isVisavisBlocked) setIsVisavisBlocked(false);
       }
+    } else {
+      if (isVisavisBlocked) setIsVisavisBlocked(false);
     }
-    if (isVisavisBlocked) setIsVisavisBlocked(false);
   }, [usersIBlocked, chatRoom, isVisavisBlocked]);
 
   useEffect(() => {
@@ -205,11 +211,15 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         (i) => i === chatRoom?.visavis?.uuid
       );
       if (isBlocked) {
-        setIsMessagingDisabled(true);
+        // setIsMessagingDisabled(true);
       }
     }
-    if (isMessagingDisabled) setIsMessagingDisabled(false);
-  }, [usersBlockedMe, chatRoom, isMessagingDisabled]);
+    // if (isMessagingDisabled) setIsMessagingDisabled(false);
+  }, [
+    usersBlockedMe,
+    chatRoom,
+    // isMessagingDisabled
+  ]);
 
   useEffect(() => {
     if (newMessage && newMessage.roomId === chatRoom?.id) {
@@ -406,7 +416,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     if (
       isVisavisBlocked ||
       localUserData.subscriptionExpired ||
-      isMessagingDisabled ||
+      !chatRoom?.visavis?.options?.isOfferingSubscription ||
       localUserData.accountDeleted ||
       !chatRoom
     ) {
@@ -419,7 +429,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
   }, [
     isVisavisBlocked,
     localUserData.subscriptionExpired,
-    isMessagingDisabled,
+    // isMessagingDisabled,
     localUserData.accountDeleted,
     isAnnouncement,
     isMyAnnouncement,
@@ -538,9 +548,11 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
             <SubscriptionExpired user={chatRoom.visavis} />
           )}
         {localUserData.accountDeleted && <AccountDeleted />}
-        {isMessagingDisabled && chatRoom && chatRoom.visavis && (
-          <MessagingDisabled user={chatRoom.visavis} />
-        )}
+        {chatRoom &&
+          chatRoom.visavis &&
+          !chatRoom.visavis.options?.isOfferingSubscription && (
+            <MessagingDisabled user={chatRoom.visavis} />
+          )}
 
         {isTextareaHidden() && (
           <SBottomTextarea>

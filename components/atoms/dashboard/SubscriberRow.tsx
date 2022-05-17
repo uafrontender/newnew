@@ -143,15 +143,14 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
             onClose={handleReportClose}
           />
         )}
-        {isSubscriberBlocked === true ||
-          (confirmBlockUser && (
-            <BlockUserModal
-              confirmBlockUser={confirmBlockUser}
-              onUserBlock={() => setIsSubscriberBlocked(true)}
-              user={subscriber.user!!}
-              closeModal={() => setConfirmBlockUser(false)}
-            />
-          ))}
+        {isSubscriberBlocked === true || (
+          <BlockUserModal
+            confirmBlockUser={confirmBlockUser}
+            onUserBlock={() => setIsSubscriberBlocked(true)}
+            user={subscriber.user!!}
+            closeModal={() => setConfirmBlockUser(false)}
+          />
+        )}
       </SActions>
     </SContainer>
   );
