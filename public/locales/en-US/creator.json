@@ -28,7 +28,8 @@
       "cashOut": {
         "amount": "Your next payout of",
         "date": "will automatically be sent on {{date}}.",
-        "submit": "Learn More"
+        "submit": "Learn More",
+        "no-payouts": "You don’t have any upcoming payouts"
       },
       "todosIssue": {
         "text": "Add a bio and your bank info to withdraw your earnings",
