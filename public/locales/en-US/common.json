@@ -94,5 +94,9 @@
   "socials": {
     "copy": "Copy Link",
     "copied": "Link Copied!"
+  },
+  "search": {
+    "top-posts": "Top Posts",
+    "popular-creators": "Popular Creators"
   }
 }

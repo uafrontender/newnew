@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { newnewapi } from 'newnew-api';
+import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 import React from 'react';
-import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import UserAvatar from '../../molecules/UserAvatar';
 
@@ -11,27 +12,28 @@ interface IFunction {
 }
 
 const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
-  const router = useRouter();
+  const { t } = useTranslation('common');
   return (
     <SContainer>
-      <SBlockTitle>Popular Creators</SBlockTitle>
+      <SBlockTitle>{t('search.popular-creators')}</SBlockTitle>
       {creators.map((creator) => (
-        <SPost
-          key={creator.uuid}
-          onClick={() => router.push(`/${creator.username}`)}
-        >
-          <SLeftSide>
-            <SUserAvatar>
-              <UserAvatar
-                avatarUrl={creator.avatarUrl ? creator.avatarUrl : ''}
-              />
-            </SUserAvatar>
-            <SPostData>
-              <SCreatorUsername>{creator.nickname}</SCreatorUsername>
-              <SLink>See decisions</SLink>
-            </SPostData>
-          </SLeftSide>
-        </SPost>
+        <Link href={`/${creator.username}`} key={creator.uuid}>
+          <a>
+            <SPost>
+              <SLeftSide>
+                <SUserAvatar>
+                  <UserAvatar
+                    avatarUrl={creator.avatarUrl ? creator.avatarUrl : ''}
+                  />
+                </SUserAvatar>
+                <SPostData>
+                  <SCreatorUsername>{creator.nickname}</SCreatorUsername>
+                  <SLink>See decisions</SLink>
+                </SPostData>
+              </SLeftSide>
+            </SPost>
+          </a>
+        </Link>
       ))}
     </SContainer>
   );

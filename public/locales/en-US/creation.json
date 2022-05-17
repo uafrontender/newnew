@@ -42,7 +42,7 @@
         "floating": "Preview"
       },
       "subTitle": {
-        "votesInfo": "It will cost people $2 to vote on your Superpoll",
+        "votesInfo": "People will spend a minimum of $2 to vote",
         "floating": "Upload your video to preview it here",
         "floating-processing": "Preview will be available after processing"
       }
