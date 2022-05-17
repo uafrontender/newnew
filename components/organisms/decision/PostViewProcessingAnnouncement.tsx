@@ -33,6 +33,7 @@ interface IPostViewProcessingAnnouncement {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleRemovePostFromState: () => void;
+  handleAddPostToState: () => void;
   handleReportOpen: () => void;
 }
 
@@ -46,6 +47,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
     handleGoBack,
     handleUpdatePostStatus,
     handleRemovePostFromState,
+    handleAddPostToState,
     handleReportOpen,
   }) => {
     const { t } = useTranslation('decision');
@@ -132,6 +134,8 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
             hasWinner={false}
             isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
             handleReportOpen={handleReportOpen}
+            handleRemovePostFromState={handleRemovePostFromState}
+            handleAddPostToState={handleAddPostToState}
           />
         ) : (
           <PostTopInfoModeration
