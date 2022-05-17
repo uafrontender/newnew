@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import dynamic from 'next/dynamic';
 import { toast } from 'react-toastify';
 import { newnewapi } from 'newnew-api';
@@ -20,7 +20,7 @@ import {
 } from '../../../constants/general';
 
 import errorIcon from '../../../public/images/svg/icons/filled/Alert.svg';
-import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
+// import spinnerIcon from '../../../public/images/svg/icons/filled/Spinner.svg';
 import Headline from '../../atoms/Headline';
 import {
   removeUploadedFile,
@@ -188,9 +188,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     if (loadingUpload) {
       content = (
         <SLoadingBox>
-          <SLoadingTitle variant={3} weight={600}>
+          <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
             {t('PostVideo.UploadResponseForm.video.loading.title')}
-          </SLoadingTitle>
+          </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
             {t('PostVideo.UploadResponseForm.video.loading.description')}
           </SLoadingDescription>
@@ -245,15 +245,15 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     } else if (postStatus === 'processing_response') {
       content = (
         <SLoadingBox>
-          <SLoadingTitle variant={3} weight={600}>
+          <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
             {t('PostVideo.UploadResponseForm.video.processingPublished.title')}
-          </SLoadingTitle>
+          </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
             {t(
               'PostVideo.UploadResponseForm.video.processingPublished.description'
             )}
           </SLoadingDescription>
-          <SLoadingBottomBlock>
+          {/* <SLoadingBottomBlock>
             {etaProcessing > 0 && (
               <SLoadingDescription variant={2} weight={600}>
                 {t(
@@ -268,20 +268,20 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
           </SLoadingBottomBlock>
           <SSpinnerWrapper>
             <InlineSVG svg={spinnerIcon} width='16px' />
-          </SSpinnerWrapper>
+          </SSpinnerWrapper> */}
         </SLoadingBox>
       );
     } else if (loadingProcessing) {
       content = (
         <SLoadingBox>
-          <SLoadingTitle variant={3} weight={600}>
+          <SLoadingTitleWithEllipseAnimated variant={3} weight={600}>
             {t('PostVideo.UploadResponseForm.video.processing.title')}
-          </SLoadingTitle>
+          </SLoadingTitleWithEllipseAnimated>
           <SLoadingDescription variant={2} weight={600}>
             {t('PostVideo.UploadResponseForm.video.processing.description')}
           </SLoadingDescription>
           <SLoadingBottomBlock>
-            <SLoadingDescription variant={2} weight={600}>
+            {/* <SLoadingDescription variant={2} weight={600}>
               {t('PostVideo.UploadResponseForm.video.processing.process', {
                 time: `${etaProcessing} seconds`,
                 progress: progressProcessing,
@@ -295,7 +295,7 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               disabled={!value?.hlsStreamUrl}
             >
               {t('PostVideo.UploadResponseForm.button.cancel')}
-            </SLoadingBottomBlockButton>
+            </SLoadingBottomBlockButton> */}
             <SLoadingPublishButton
               view='primary'
               onClick={() => {
@@ -307,9 +307,9 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
               )}
             </SLoadingPublishButton>
           </SLoadingBottomBlock>
-          <SSpinnerWrapper>
+          {/* <SSpinnerWrapper>
             <InlineSVG svg={spinnerIcon} width='16px' />
-          </SSpinnerWrapper>
+          </SSpinnerWrapper> */}
         </SLoadingBox>
       );
     } else if (progressProcessing === 100) {
@@ -352,25 +352,24 @@ export const PostVideoResponseUpload: React.FC<IPostVideoResponseUpload> = ({
     return content;
   }, [
     t,
-    value,
-    etaUpload,
-    errorUpload,
+    handleButtonClick,
     loadingUpload,
-    progressUpload,
-    etaProcessing,
+    errorUpload,
     errorProcessing,
+    postStatus,
     loadingProcessing,
     progressProcessing,
-    postStatus,
-    thumbnails,
-    localFile,
     handleFileChange,
-    handleButtonClick,
-    handleDeleteVideoShow,
-    handleRetryVideoUpload,
+    etaUpload,
+    progressUpload,
     handleCancelVideoUpload,
     handleCancelVideoProcessing,
+    handleRetryVideoUpload,
+    localFile,
     handleUploadVideoNotProcessed,
+    value,
+    thumbnails,
+    handleDeleteVideoShow,
   ]);
 
   return (
@@ -518,11 +517,36 @@ const SLoadingBox = styled.div`
   }
 `;
 
-const SLoadingTitle = styled(Text)`
+const ellipseAnimation = keyframes`
+from {
+  width: 0px;
+}
+  to {
+    width: 1em;
+  }
+`;
+
+// const SLoadingTitle = styled(Text)`
+//   display: flex;
+//   align-items: center;
+//   margin-bottom: 6px;
+//   flex-direction: row;
+// `;
+
+const SLoadingTitleWithEllipseAnimated = styled(Text)`
   display: flex;
   align-items: center;
   margin-bottom: 6px;
   flex-direction: row;
+
+  &:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    animation: ${ellipseAnimation} steps(4, end) 1100ms infinite;
+    content: '...';
+    width: 0px;
+  }
 `;
 
 const SInlineSVG = styled(InlineSVG)`
@@ -551,14 +575,15 @@ const SLoadingBottomBlockButton = styled(Button)`
 
   &:focus:enabled,
   &:hover:enabled {
-    background: ${(props) =>
-      props.theme.name === 'light'
-        ? props.theme.colors.white
-        : props.theme.colorsThemed.background.secondary};
+    background: transparent;
   }
 `;
 
-const SLoadingPublishButton = styled(Button)``;
+const SLoadingPublishButton = styled(Button)`
+  margin-left: auto;
+
+  padding: 10px;
+`;
 
 const SLoadingProgress = styled.div`
   width: 100%;
@@ -570,20 +595,20 @@ const SLoadingProgress = styled.div`
   border-radius: 16px;
 `;
 
-const SSpinnerWrapper = styled.div`
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
+// const SSpinnerWrapper = styled.div`
+//   @keyframes spin {
+//     from {
+//       transform: rotate(0deg);
+//     }
+//     to {
+//       transform: rotate(360deg);
+//     }
+//   }
 
-  div {
-    animation: spin 0.7s linear infinite;
-  }
-`;
+//   div {
+//     animation: spin 0.7s linear infinite;
+//   }
+// `;
 
 interface ISProgress {
   progress?: number;
