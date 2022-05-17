@@ -33,6 +33,7 @@ interface IPostViewProcessingAnnouncement {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleRemovePostFromState: () => void;
+  handleAddPostToState: () => void;
   handleReportOpen: () => void;
 }
 
@@ -46,6 +47,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
     handleGoBack,
     handleUpdatePostStatus,
     handleRemovePostFromState,
+    handleAddPostToState,
     handleReportOpen,
   }) => {
     const { t } = useTranslation('decision');
@@ -132,6 +134,8 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
             hasWinner={false}
             isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
             handleReportOpen={handleReportOpen}
+            handleRemovePostFromState={handleRemovePostFromState}
+            handleAddPostToState={handleAddPostToState}
           />
         ) : (
           <PostTopInfoModeration
@@ -149,7 +153,7 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
           {/* @ts-ignore */}
           <SDecisionImage src={IMAGES[postType]} />
           <SText variant={2} weight={600}>
-            {t('PostViewProcessingAnnouncement.stayTuned')}
+            {t(`PostViewProcessingAnnouncement.stayTuned.${postType}`)}
           </SText>
         </SActivitesContainer>
       </SWrapper>
@@ -226,6 +230,8 @@ const SActivitesContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+
+    padding-bottom: 88px;
   }
 
   ${({ theme }) => theme.media.laptop} {
@@ -238,5 +244,8 @@ const SDecisionImage = styled.img`
 `;
 
 const SText = styled(Text)`
+  margin-top: 8px;
+
   text-align: center;
+  white-space: pre;
 `;

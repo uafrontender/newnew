@@ -109,6 +109,7 @@ interface IPostModal {
   handleClose: () => void;
   handleOpenAnotherPost?: (post: newnewapi.Post) => void;
   handleRemovePostFromState?: () => void;
+  handleAddPostToState?: () => void;
 }
 
 // Memorization does not work
@@ -119,6 +120,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   handleClose,
   handleOpenAnotherPost,
   handleRemovePostFromState,
+  handleAddPostToState,
 }) => {
   const theme = useTheme();
   const router = useRouter();
@@ -394,6 +396,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -410,6 +413,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -426,6 +430,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
+          handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
         />
       );
     }
@@ -440,6 +446,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
+          handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
         />
       );
     }
@@ -454,6 +462,8 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleReportOpen={handleReportOpen}
+          handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
         />
       );
     }
@@ -528,6 +538,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -544,6 +555,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
           handleGoBack={handleGoBackInsidePost}
           handleUpdatePostStatus={handleUpdatePostStatus}
           handleRemovePostFromState={handleRemovePostFromState!!}
+          handleAddPostToState={handleAddPostToState!!}
           handleReportOpen={handleReportOpen}
         />
       );
@@ -1031,6 +1043,7 @@ PostModal.defaultProps = {
   manualCurrLocation: undefined,
   handleOpenAnotherPost: () => {},
   handleRemovePostFromState: () => {},
+  handleAddPostToState: () => {},
 };
 
 export default (props: any) => (

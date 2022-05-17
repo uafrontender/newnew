@@ -45,10 +45,15 @@ import assets from '../../../../constants/assets';
 import BidIconLight from '../../../../public/images/decision/bid-icon-light.png';
 import BidIconDark from '../../../../public/images/decision/bid-icon-dark.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
+import MoreIcon from '../../../../public/images/svg/icons/filled/More.svg';
 import { setUserTutorialsProgress } from '../../../../redux-store/slices/userStateSlice';
 import { markTutorialStepAsCompleted } from '../../../../api/endpoints/user';
 import getDisplayname from '../../../../utils/getDisplayname';
 import Headline from '../../../atoms/Headline';
+import OptionModal from '../OptionModal';
+import OptionMenu from '../OptionMenu';
+import ReportModal, { ReportData } from '../../chat/ReportModal';
+import { reportEventOption } from '../../../../api/endpoints/report';
 
 interface IAcOptionCard {
   option: TAcOptionWithHighestField;
@@ -109,6 +114,41 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
 
   // Tutorials
   // const [isTooltipVisible, setIsTooltipVisible] = useState(true);
+
+  // Ellipse menu
+  const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+  const [optionMenuX, setOptionMenuXY] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  // Report modal
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  const handleReportSubmit = useCallback(
+    async ({ reasons, message }: ReportData) => {
+      await reportEventOption(option.id, reasons, message);
+      setIsReportModalOpen(false);
+    },
+    [option.id]
+  );
+
+  const handleOpenReportForm = useCallback(() => {
+    if (!user.loggedIn) {
+      router.push(
+        `/sign-up?reason=report&redirect=${encodeURIComponent(
+          window.location.href
+        )}`
+      );
+      return;
+    }
+
+    setIsReportModalOpen(true);
+  }, [user, router]);
+
+  const handleReportClose = useCallback(() => {
+    setIsReportModalOpen(false);
+  }, []);
 
   const [isSupportFormOpen, setIsSupportFormOpen] = useState(false);
   const [supportBidAmount, setSupportBidAmount] = useState('');
@@ -340,7 +380,30 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           : {}),
       }}
     >
-      <SContainer $isDisabled={disabled && votingAllowed} $isBlue={isBlue}>
+      <SContainer
+        $isDisabled={disabled && votingAllowed}
+        $isBlue={isBlue}
+        onClick={(e) => {
+          if (!isMobile && !isMyBid && !disabled && !isEllipseMenuOpen) {
+            setIsEllipseMenuOpen(true);
+
+            setOptionMenuXY({
+              x: e.clientX,
+              y: e.clientY,
+            });
+          }
+        }}
+      >
+        {isMobile && !isMyBid && (
+          <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+            <InlineSvg
+              svg={MoreIcon}
+              width='16px'
+              height='16px'
+              fill={theme.colorsThemed.text.primary}
+            />
+          </SEllipseButtonMobile>
+        )}
         <SBidDetails
           isBlue={isBlue}
           active={!!optionBeingSupported && !disabled}
@@ -375,7 +438,7 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
           <SOptionInfo isWhite={isSupportedByMe || isMyBid} variant={3}>
             {option.title}
           </SOptionInfo>
-          <SBiddersInfo variant={3}>
+          <SBiddersInfo onClick={(e) => e.preventDefault()} variant={3}>
             <Link href={`/${option.creator?.username}`}>
               <SSpanBiddersHighlighted
                 className='spanHighlighted'
@@ -430,7 +493,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             view='quaternary'
             disabled={disabled}
             isBlue={isBlue}
-            onClick={() => handleOpenSupportForm()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenSupportForm();
+            }}
           >
             <div>
               {!isSupportedByMe
@@ -443,7 +509,10 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
             view='secondary'
             disabled={disabled}
             isBlue={isBlue}
-            onClick={() => handleOpenSupportForm()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenSupportForm();
+            }}
           >
             {!isSupportedByMe
               ? t('AcPost.OptionsTab.OptionCard.supportBtn')
@@ -605,6 +674,32 @@ const AcOptionCard: React.FunctionComponent<IAcOptionCard> = ({
       </PaymentSuccessModal>
       {/* Loading Modal */}
       <LoadingModal isOpen={loadingModalOpen} zIndex={14} />
+      {/* Ellipse modal */}
+      {isMobile && (
+        <OptionModal
+          zIndex={12}
+          isOpen={isEllipseMenuOpen}
+          handleOpenReportOptionModal={() => handleOpenReportForm()}
+          onClose={() => setIsEllipseMenuOpen(false)}
+        />
+      )}
+      {!isMobile && !isMyBid && (
+        <OptionMenu
+          xy={optionMenuX}
+          isVisible={isEllipseMenuOpen}
+          handleClose={() => setIsEllipseMenuOpen(false)}
+          handleOpenReportOptionModal={() => handleOpenReportForm()}
+        />
+      )}
+      {/* Report modal */}
+      {option.creator && (
+        <ReportModal
+          show={isReportModalOpen}
+          reportedDisplayname={getDisplayname(option.creator)}
+          onSubmit={handleReportSubmit}
+          onClose={handleReportClose}
+        />
+      )}
     </div>
   );
 };
@@ -976,4 +1071,18 @@ const SPaymentFooter = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
   text-align: center;
   white-space: pre;
+`;
+
+const SEllipseButtonMobile = styled(Button)`
+  position: absolute;
+  right: 16px;
+
+  background: transparent;
+  padding: 0;
+  z-index: 1;
+
+  &:hover:enabled,
+  &:focus:enabled {
+    background: transparent;
+  }
 `;

@@ -64,7 +64,7 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         {...rest}
       />
       {!errorBordersShown ? (
-        <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}${value}`}</SPreviewDiv>
+        <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}/${value}`}</SPreviewDiv>
       ) : null}
       {errorBordersShown ? (
         <AnimatedPresence animation='t-09'>
