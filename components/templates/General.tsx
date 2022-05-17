@@ -194,17 +194,19 @@ export const General: React.FC<IGeneral> = (props) => {
           >
             <Cookie />
           </CookieContainer>
-          {withChat && isMobile && (
-            <ChatContainer
-              bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-            >
-              {!isOpenedChat ? (
-                <FloatingMessages withCounter openChat={openChat} />
-              ) : (
-                <MobileDashBoardChat closeChat={closeChat} />
-              )}
-            </ChatContainer>
-          )}
+          {withChat &&
+            isMobile &&
+            user.userData?.options?.isOfferingSubscription && (
+              <ChatContainer
+                bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+              >
+                {!isOpenedChat ? (
+                  <FloatingMessages withCounter openChat={openChat} />
+                ) : (
+                  <MobileDashBoardChat closeChat={closeChat} />
+                )}
+              </ChatContainer>
+            )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>

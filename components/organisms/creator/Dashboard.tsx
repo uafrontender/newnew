@@ -52,7 +52,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const { mySubscribers } = useGetSubscriptions();
   const [mySubscriptionProduct, setMySubscriptionProduct] =
     useState<newnewapi.ISubscriptionProduct | null>(null);
-  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(true);
+  const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
@@ -183,15 +183,17 @@ export const Dashboard: React.FC = React.memo(() => {
           {!isMobile && <DynamicSection />}
         </STitleBlock>
         {!user.creatorData?.isLoaded ? (
-          <Lottie
-            width={64}
-            height={64}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: loadingAnimation,
-            }}
-          />
+          <SBlock>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SBlock>
         ) : (
           !isTodosCompleted && (
             <SBlock name='your-todos'>
