@@ -25,7 +25,6 @@ import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessag
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
 import { useNotifications } from '../../../../contexts/notificationsContext';
-import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 
 const NewMessageModal = dynamic(() => import('./NewMessageModal'));
 const NotificationsList = dynamic(() => import('./NotificationsList'));
@@ -48,7 +47,6 @@ export const DynamicSection = () => {
   const { unreadCountForCreator } = useGetChats();
   const { unreadNotificationCount } = useNotifications();
   const [markReadNotifications, setMarkReadNotifications] = useState(false);
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
@@ -159,29 +157,28 @@ export const DynamicSection = () => {
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          {creatorsImSubscribedTo.length > 0 &&
-            user.userData?.options?.isOfferingSubscription && (
-              <SButton view='secondary' onClick={handleChatClick}>
-                <SIconHolder>
-                  <SInlineSVG
-                    svg={chatIcon}
-                    fill={
-                      theme.name === 'light'
-                        ? theme.colors.black
-                        : theme.colors.white
-                    }
-                    width='24px'
-                    height='24px'
-                  />
-                  {unreadCountForCreator > 0 && (
-                    <SIndicatorContainer>
-                      <SIndicator minified />
-                    </SIndicatorContainer>
-                  )}
-                </SIconHolder>
-                {t('dashboard.button.dms')}
-              </SButton>
-            )}
+          {user.userData?.options?.isOfferingSubscription && (
+            <SButton view='secondary' onClick={handleChatClick}>
+              <SIconHolder>
+                <SInlineSVG
+                  svg={chatIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.black
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+                {unreadCountForCreator > 0 && (
+                  <SIndicatorContainer>
+                    <SIndicator minified />
+                  </SIndicatorContainer>
+                )}
+              </SIconHolder>
+              {t('dashboard.button.dms')}
+            </SButton>
+          )}
         </>
       )}
       <AnimatedPresence
@@ -203,8 +200,7 @@ export const DynamicSection = () => {
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  {creatorsImSubscribedTo.length > 0 &&
-                  user.userData?.options?.isOfferingSubscription ? (
+                  {user.userData?.options?.isOfferingSubscription ? (
                     <Tabs
                       t={t}
                       tabs={tabs}
