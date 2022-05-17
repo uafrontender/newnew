@@ -115,6 +115,9 @@
     "deleteDecision": "Delete {{ postType }}",
     "cancel": "Cancel"
   },
+  "ellipse-option": {
+    "report-option": "Report"
+  },
   "PostVideo": {
     "tabs": {
       "announcement": "Decision",
@@ -228,7 +231,11 @@
     "history": "History"
   },
   "PostViewProcessingAnnouncement": {
-    "stayTuned": "Stay tuned!",
+    "stayTuned": {
+      "ac": "This Event will begin once the video \nhas been processed",
+      "mc": "This Superpoll will begin once the video \nhas been processed",
+      "cf": "This Goal will begin once the video \nhas been processed"
+    },
     "videoHolder": {
       "decision": {
         "title": "Just a minute...",

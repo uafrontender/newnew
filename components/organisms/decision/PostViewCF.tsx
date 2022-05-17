@@ -79,6 +79,8 @@ interface IPostViewCF {
   handleGoBack: () => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
   handleReportOpen: () => void;
+  handleRemovePostFromState: () => void;
+  handleAddPostToState: () => void;
 }
 
 const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
@@ -90,6 +92,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
     handleGoBack,
     handleUpdatePostStatus,
     handleReportOpen,
+    handleRemovePostFromState,
+    handleAddPostToState,
   }) => {
     const router = useRouter();
     const { t } = useTranslation('decision');
@@ -361,12 +365,12 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
             `/sign-up?reason=follow-decision&redirect=${window.location.href}`
           );
         }
-        const markAsViewedPayload = new newnewapi.MarkPostRequest({
+        const markAsFavoritePayload = new newnewapi.MarkPostRequest({
           markAs: newnewapi.MarkPostRequest.Kind.FAVORITE,
           postUuid: post.postUuid,
         });
 
-        const res = await markPost(markAsViewedPayload);
+        const res = await markPost(markAsFavoritePayload);
 
         console.log(res);
       } catch (err) {
@@ -705,6 +709,8 @@ const PostViewCF: React.FunctionComponent<IPostViewCF> = React.memo(
           targetPledges={post.targetBackerCount}
           isFollowingDecisionInitial={post.isFavoritedByMe ?? false}
           handleReportOpen={handleReportOpen}
+          handleRemovePostFromState={handleRemovePostFromState}
+          handleAddPostToState={handleAddPostToState}
         />
         <SActivitesContainer>
           <DecisionTabs

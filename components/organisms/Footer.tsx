@@ -41,7 +41,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const topItems: TItem[] = [
     {
       key: 'about',
-      url: '/about',
+      url: 'https://about.newnew.co',
     },
     {
       key: 'how-it-works',
@@ -50,11 +50,11 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     },
     {
       key: 'faq',
-      url: '/faq',
+      url: 'https://faqs.newnew.co',
     },
     {
       key: 'guidelines',
-      url: '/guidelines',
+      url: 'https://communityguidelines.newnew.co',
     },
     {
       key: 'jobs',
@@ -64,7 +64,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
   const centerItems: TItem[] = [
     {
       key: 'twitter',
-      url: 'https://twitter.com',
+      url: 'https://twitter.com/newnewhq',
       external: true,
       iconSrc: twitterIcon,
     },
@@ -201,14 +201,14 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                   <SBottomBlockOptionInc>
                     {t('footer-inc')}
                   </SBottomBlockOptionInc>
-                  <Link href='/terms' passHref>
+                  <a href='https://terms.newnew.co' target='_blank'>
                     <SBottomBlockOption>{t('footer-terms')}</SBottomBlockOption>
-                  </Link>
-                  <Link href='/privacy' passHref>
+                  </a>
+                  <a href='https://privacy.newnew.co' target='_blank'>
                     <SBottomBlockOption>
                       {t('footer-privacy')}
                     </SBottomBlockOption>
-                  </Link>
+                  </a>
                 </SLeftBlock>
                 <SRightBlock>
                   <SRightBlockItemHolder>

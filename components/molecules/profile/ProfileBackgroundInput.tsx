@@ -12,7 +12,7 @@ import ProfileBackgroundCropper, {
 import Button from '../../atoms/Button';
 import InlineSvg from '../../atoms/InlineSVG';
 
-import BinIcon from '../../../public/images/svg/icons/filled/Trash.svg';
+import PencilIcon from '../../../public/images/svg/icons/filled/Edit.svg';
 import ImageIcon from '../../../public/images/svg/icons/filled/Image.svg';
 
 interface IProfileBackgroundInput {
@@ -140,7 +140,7 @@ const ProfileBackgroundInput: React.FunctionComponent<IProfileBackgroundInput> =
               }}
             >
               <InlineSvg
-                svg={BinIcon}
+                svg={PencilIcon}
                 width='20px'
                 height='20px'
                 fill='#FFFFFF'
