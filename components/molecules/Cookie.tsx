@@ -56,24 +56,29 @@ const Cookie = React.memo(() => {
       onAnimationEnd={handleAnimationEnd}
       animateWhenInView={false}
     >
-      <SContainer onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
-        <SText>{t('cookie-text')}</SText>
-        <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
-        <Link href='/cookies'>
-          <a target='_blank'>
-            <STextLink>{t('cookie-link')}</STextLink>
-          </a>
-        </Link>
-        <InlineSVG
-          clickable
-          scaleOnClick
-          svg={closeIcon}
-          fill={theme.colorsThemed.text.secondary}
-          width='24px'
-          height='24px'
-          onClick={handleClose}
-        />
-      </SContainer>
+      {cookies.accepted !== 'true' && (
+        <SContainer
+          onMouseOver={handleMouseOver}
+          onMouseLeave={handleMouseLeave}
+        >
+          <SText>{t('cookie-text')}</SText>
+          <SInlineSVG svg={cookieIcon} width='20px' height='20px' />
+          <Link href='/cookies'>
+            <a target='_blank'>
+              <STextLink>{t('cookie-link')}</STextLink>
+            </a>
+          </Link>
+          <InlineSVG
+            clickable
+            scaleOnClick
+            svg={closeIcon}
+            fill={theme.colorsThemed.text.secondary}
+            width='24px'
+            height='24px'
+            onClick={handleClose}
+          />
+        </SContainer>
+      )}
     </AnimatedPresence>
   );
 });
