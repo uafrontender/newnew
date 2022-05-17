@@ -143,7 +143,7 @@ const AcWinnerTabModeration: React.FunctionComponent<IAcWinnerTabModeration> =
               <SYouMade variant={3}>
                 {t('AcPostModeration.WinnerTab.WinnerOptionCard.you_made')}
               </SYouMade>
-              <SHeadline variant={4}>
+              <SHeadline variant={5}>
                 ${formatNumber(option.totalAmount!!.usdCents!! / 100, true)}
               </SHeadline>
               <SOptionCreator variant={3}>
@@ -291,7 +291,10 @@ const SMainScoop = styled.div`
   height: 150px;
   border-radius: 50%;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 `;
 
 const STopScoop = styled.div`
@@ -301,7 +304,10 @@ const STopScoop = styled.div`
 
   width: 50px;
   height: 80px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;
@@ -317,7 +323,10 @@ const SBottomScoop = styled.div`
 
   width: 150px;
   height: 50px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;

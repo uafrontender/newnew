@@ -6,12 +6,14 @@ import { useTranslation } from 'next-i18next';
 interface IToggleVideoWidget {
   currentTab: 'announcement' | 'response';
   responseUploaded: boolean;
+  disabled?: boolean;
   handleChangeTab: (tab: 'announcement' | 'response') => void;
 }
 
 const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
   currentTab,
   responseUploaded,
+  disabled,
   handleChangeTab,
 }) => {
   const { t } = useTranslation('decision');
@@ -21,12 +23,14 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
       {!responseUploaded ? (
         <SWrapper>
           <STabBtn
+            disabled={disabled}
             active={currentTab === 'announcement'}
             onClick={() => handleChangeTab('announcement')}
           >
             {t('PostVideo.tabs.announcement')}
           </STabBtn>
           <STabBtn
+            disabled={disabled}
             active={currentTab === 'response'}
             onClick={() => handleChangeTab('response')}
           >
@@ -44,6 +48,10 @@ const ToggleVideoWidget: React.FunctionComponent<IToggleVideoWidget> = ({
       )}
     </SToggleVideoWidget>
   );
+};
+
+ToggleVideoWidget.defaultProps = {
+  disabled: false,
 };
 
 export default ToggleVideoWidget;
@@ -93,6 +101,10 @@ const STabBtn = styled.button<{
   &:focus,
   &:hover {
     outline: none;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
   }
 `;
 

@@ -43,6 +43,7 @@ import {
   uploadPostResponse,
 } from '../../../api/endpoints/post';
 import isSafari from '../../../utils/isSafari';
+import { usePostModalState } from '../../../contexts/postModalContext';
 
 const PostBitmovinPlayer = dynamic(() => import('./PostBitmovinPlayer'), {
   ssr: false,
@@ -163,6 +164,24 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     useState(false);
   const [responseFileProcessingError, setResponseFileProcessingError] =
     useState(false);
+
+  const { handleSetIsConfirmToClosePost } = usePostModalState();
+
+  const cannotLeavePage = useMemo(() => {
+    if (
+      openedTab === 'response' &&
+      postStatus === 'waiting_for_response' &&
+      (responseFileUploadLoading || responseFileProcessingLoading)
+    ) {
+      return true;
+    }
+    return false;
+  }, [
+    openedTab,
+    postStatus,
+    responseFileProcessingLoading,
+    responseFileUploadLoading,
+  ]);
 
   const handleVideoUpload = useCallback(async (value: File) => {
     try {
@@ -402,6 +421,11 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketConnection, handlerSocketUpdated]);
 
+  useEffect(() => {
+    handleSetIsConfirmToClosePost(cannotLeavePage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cannotLeavePage]);
+
   return (
     <>
       <SVideoWrapper>
@@ -525,6 +549,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           <ToggleVideoWidget
             currentTab={openedTab}
             responseUploaded={response !== undefined}
+            disabled={responseFileUploadLoading || responseFileUploadLoading}
             handleChangeTab={(newValue) => setOpenedTab(newValue)}
           />
         ) : null}
