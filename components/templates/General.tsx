@@ -25,6 +25,7 @@ import { TBottomNavigationItem } from '../molecules/BottomNavigationItem';
 import MobileDashBoardChat from '../organisms/MobileDashBoardChat';
 import { useNotifications } from '../../contexts/notificationsContext';
 import { useGetChats } from '../../contexts/chatContext';
+import { useGetSubscriptions } from '../../contexts/subscriptionsContext';
 
 interface IGeneral {
   children: React.ReactNode;
@@ -41,6 +42,7 @@ export const General: React.FC<IGeneral> = (props) => {
   const [cookies] = useCookies();
   const { unreadNotificationCount } = useNotifications();
   const { unreadCount } = useGetChats();
+  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
   const [moreMenuMobileOpen, setMoreMenuMobileOpen] = useState(false);
 
@@ -194,17 +196,20 @@ export const General: React.FC<IGeneral> = (props) => {
           >
             <Cookie />
           </CookieContainer>
-          {withChat && isMobile && (
-            <ChatContainer
-              bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
-            >
-              {!isOpenedChat ? (
-                <FloatingMessages withCounter openChat={openChat} />
-              ) : (
-                <MobileDashBoardChat closeChat={closeChat} />
-              )}
-            </ChatContainer>
-          )}
+          {withChat &&
+            isMobile &&
+            creatorsImSubscribedTo.length > 0 &&
+            user.userData?.options?.isOfferingSubscription && (
+              <ChatContainer
+                bottomNavigationVisible={isMobile && scrollDirection !== 'down'}
+              >
+                {!isOpenedChat ? (
+                  <FloatingMessages withCounter openChat={openChat} />
+                ) : (
+                  <MobileDashBoardChat closeChat={closeChat} />
+                )}
+              </ChatContainer>
+            )}
         </SWrapper>
       </SkeletonTheme>
     </ErrorBoundary>
