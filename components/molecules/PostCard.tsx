@@ -341,12 +341,18 @@ export const PostCard: React.FC<ICard> = React.memo(
             <SUsername variant={2}>
               {Date.now() > timestampSeconds
                 ? postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > 5
-                  ? `${postParsed.creator?.nickname?.substring(0, 3)}...`
+                  postParsed.creator?.nickname?.length > (isMobile ? 7 : 5)
+                  ? `${postParsed.creator?.nickname?.substring(
+                      0,
+                      isMobile ? 5 : 3
+                    )}...`
                   : postParsed.creator?.nickname
                 : postParsed.creator?.nickname &&
-                  postParsed.creator?.nickname?.length > 7
-                ? `${postParsed.creator?.nickname?.substring(0, 6)}...`
+                  postParsed.creator?.nickname?.length > (isMobile ? 18 : 11)
+                ? `${postParsed.creator?.nickname?.substring(
+                    0,
+                    isMobile ? 15 : 9
+                  )}...`
                 : postParsed.creator?.nickname}
             </SUsername>
             <CardTimer timestampSeconds={timestampSeconds} />
@@ -790,7 +796,7 @@ const SBottomStart = styled.div<{
   display: grid;
   grid-template-areas: 'avatar nickname timer';
   grid-template-columns: ${({ hasEnded }) =>
-    hasEnded ? '24px 3fr 8fr' : '24px 4fr 8fr'};
+    hasEnded ? '24px 3fr 9fr' : '24px 5fr 10fr'};
   align-items: center;
 
   height: 32px;
