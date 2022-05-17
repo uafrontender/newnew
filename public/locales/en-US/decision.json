@@ -540,8 +540,8 @@
   "CfPostModeration": {
     "WinnerTab": {
       "WinnerOptionCard": {
-        "backers_told_you": "backers told you to",
-        "backer_told_you": "backer told you to",
+        "backers_told_you": "backers successfully funded",
+        "backer_told_you": "backer successfully funded",
         "you_made": "You made"
       }
     }
