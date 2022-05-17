@@ -51,6 +51,7 @@ import { reportPost } from '../../../api/endpoints/report';
 import useSynchronizedHistory from '../../../utils/hooks/useSynchronizedHistory';
 import { usePostModalState } from '../../../contexts/postModalContext';
 import { ReportData } from '../../molecules/chat/ReportModal';
+import useLeavePageConfirm from '../../../utils/hooks/useLeavePageConfirm';
 
 const ListPostModal = dynamic(() => import('../see-more/ListPostModal'));
 // Posts views
@@ -132,9 +133,16 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
     resizeMode
   );
 
-  const { handleSetPostOverlayOpen } = usePostModalState();
+  const { handleSetPostOverlayOpen, isConfirmToClosePost } =
+    usePostModalState();
   const { syncedHistoryPushState, syncedHistoryReplaceState } =
     useSynchronizedHistory();
+
+  useLeavePageConfirm(
+    isConfirmToClosePost,
+    t('PostVideo.cannotLeavePageMsg'),
+    []
+  );
 
   const [postParsed, typeOfPost] = post
     ? switchPostType(post)
@@ -290,6 +298,12 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   const { ref: loadingRef, inView } = useInView();
 
   const handleCloseAndGoBack = () => {
+    if (
+      isConfirmToClosePost &&
+      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+    ) {
+      return;
+    }
     // Required to avoid wierd cases when navigating back to the post using browser back button
     if (currLocation === 'forced_redirect_to_home') {
       innerHistoryStack.current = [];
@@ -304,13 +318,27 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   };
 
   const handleGoBackInsidePost = useCallback(() => {
+    if (
+      isConfirmToClosePost &&
+      !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+    ) {
+      return;
+    }
+
     if (innerHistoryStack.current.length !== 0) {
       router.back();
     } else {
       handleClose();
       syncedHistoryPushState({}, currLocation);
     }
-  }, [currLocation, handleClose, router, syncedHistoryPushState]);
+  }, [
+    currLocation,
+    handleClose,
+    isConfirmToClosePost,
+    router,
+    syncedHistoryPushState,
+    t,
+  ]);
 
   const handleOpenRecommendedPost = useCallback(
     (newPost: newnewapi.Post) => {
@@ -677,6 +705,13 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
   // Close modal on back btn
   useEffect(() => {
     const verify = async () => {
+      if (
+        isConfirmToClosePost &&
+        !window.confirm(t('PostVideo.cannotLeavePageMsg'))
+      ) {
+        return;
+      }
+
       if (!isBrowser()) return;
 
       const postId =
@@ -736,7 +771,7 @@ const PostModal: React.FunctionComponent<IPostModal> = ({
 
     return () => window.removeEventListener('popstate', verify);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, isConfirmToClosePost]);
 
   useEffect(() => {
     if (inView && !recommendedPostsLoading) {

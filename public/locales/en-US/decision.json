@@ -125,6 +125,7 @@
       "back_to_original": "Back to original",
       "back_to_response": "Watch response"
     },
+    "cannotLeavePageMsg": "Are you sure you want to close this page? Upload progress will be lost",
     "floatingUploadResponseBtn": "Make a response video",
     "setThumbnail": "Set a thumbnail",
     "responseUploadedNonProcessed": "Success! Your response will be available once the video was processed",
@@ -177,17 +178,17 @@
         },
         "loading": {
           "title": "Uploading video",
-          "description": "We're uploading your video response...hang tight!",
+          "description": "We're uploading your video response... hang tight!",
           "process": "{{progress}}% • {{time}} left"
         },
         "processing": {
-          "title": "Processing the video...",
+          "title": "Processing the video",
           "description": "You can publish the response while the video is being processed",
           "process": "{{progress}}% • {{time}} left",
           "uploadNonProcessed": "Publish"
         },
         "processingPublished": {
-          "title": "Processing the video...",
+          "title": "Processing the video",
           "description": "Your video will be available once it's processed",
           "process": "{{progress}}% • {{time}} left"
         }
