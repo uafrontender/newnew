@@ -84,7 +84,7 @@
         "title": "Minimum backers",
         "value": "{{value}}",
         "label": "",
-        "placeholder": "10",
+        "placeholder": "ex. 50",
         "description": "${{value}} is the minimum a backer can contribute"
       },
       "expiresAt": {
