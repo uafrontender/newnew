@@ -64,8 +64,6 @@ export const NotificationsList: React.FC<IFunction> = ({
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
         if (res.data.notifications.length > 0) {
-          console.log(res.data.notifications);
-
           if (limit === defaultLimit) {
             setNotifications((curr) => {
               const arr = [...curr!!];
