@@ -38,14 +38,17 @@ const CashOut: React.FC<ICashOut> = ({
           </SDescription>
           <SAmount variant={3} weight={600}>
             {nextCashoutAmount && nextCashoutAmount.usdCents
-              ? `$${formatNumber(nextCashoutAmount?.usdCents / 100 ?? 0, true)}`
-              : '$0'}
+              ? ` $${formatNumber(
+                  nextCashoutAmount?.usdCents / 100 ?? 0,
+                  true
+                )}`
+              : ' $0'}
           </SAmount>
           {nextCashoutDate && (
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {
                 date: moment((nextCashoutDate.seconds as number) * 1000).format(
-                  'MMM DD,YYYY'
+                  'MMM DD YYYY'
                 ),
               })}
             </SDescription>

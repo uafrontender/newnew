@@ -41,6 +41,7 @@ import BlockUserModal from '../molecules/profile/BlockUserModalProfile';
 import { useGetBlockedUsers } from '../../contexts/blockedUsersContext';
 import ReportModal, { ReportData } from '../molecules/chat/ReportModal';
 import { reportUser } from '../../api/endpoints/report';
+import BackButton from '../molecules/profile/BackButton';
 
 type TPageType = 'creatorsDecisions' | 'activity' | 'activityHidden';
 
@@ -280,14 +281,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
 
   const handleReportSubmit = useCallback(
     async ({ reasons, message }: ReportData) => {
-      if (currentUser.userData?.userUuid) {
-        await reportUser(currentUser.userData.userUuid, reasons, message).catch(
-          (e) => console.error(e)
-        );
-      }
-      setConfirmReportUser(false);
+      await reportUser(user.uuid, reasons, message).catch((e) =>
+        console.error(e)
+      );
     },
-    [currentUser]
+    [user.uuid]
   );
   const handleReportClose = useCallback(() => setConfirmReportUser(false), []);
 
@@ -430,6 +428,11 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
             pictureURL={user.coverUrl ?? '../public/images/mock/profile-bg.png'}
           />
           {/* Favorites and more options buttons */}
+          <SBackButton
+            onClick={() => {
+              router.back();
+            }}
+          />
           <SFavoritesButton
             view='transparent'
             iconOnly
@@ -447,8 +450,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     ? theme.colorsThemed.accent.blue
                     : 'none'
                 }
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
+                width={isMobileOrTablet ? '16px' : '24px'}
+                height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
             {t('ProfileLayout.buttons.favorites')}
@@ -462,8 +465,8 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
               <InlineSvg
                 svg={MoreIconFilled}
                 fill={theme.colorsThemed.text.primary}
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
+                width={isMobileOrTablet ? '16px' : '24px'}
+                height={isMobileOrTablet ? '16px' : '24px'}
               />
             </SSVGContainer>
             {t('ProfileLayout.buttons.more')}
@@ -721,6 +724,17 @@ const SSVGContainer = styled.div<{
         ? 'linear-gradient(315deg, rgba(29, 180, 255, 0.85) 0%, rgba(29, 180, 255, 0) 50%), #1D6AFF;'
         : theme.colorsThemed.background.quinary};
     transition: 0.2s linear;
+  }
+`;
+
+const SBackButton = styled(BackButton)`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    top: 24px;
+    left: 24px;
   }
 `;
 

@@ -582,7 +582,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                   (e) => console.error(e)
                 );
               }
-              setConfirmReportUser(false);
             }}
           />
         )}

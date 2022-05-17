@@ -226,8 +226,7 @@ const Comment: React.FC<IComment> = ({
           reportedDisplayname={getDisplayname(comment.sender)}
           onClose={() => setConfirmReportUser(false)}
           onSubmit={async ({ reasons, message }) => {
-            reportMessage(comment.id, reasons, message);
-            setConfirmReportUser(false);
+            await reportMessage(comment.id, reasons, message);
           }}
         />
       )}

@@ -42,7 +42,6 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
     if (subscriber.user?.uuid) {
       await reportUser(subscriber.user.uuid, reasons, message);
     }
-    setConfirmReportUser(false);
   };
 
   const handleReportClose = () => setConfirmReportUser(false);
