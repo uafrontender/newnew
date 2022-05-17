@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import secondsToDHMS from '../../../utils/secondsToDHMS';
@@ -13,73 +14,68 @@ interface IFunction {
 }
 
 const TopDecisionsResults: React.FC<IFunction> = ({ posts }) => {
-  const router = useRouter();
-  const renderItem = useCallback(
-    (post: newnewapi.IPost) => {
-      const postType = Object.keys(post)[0];
-      const data = Object.values(post)[0] as
-        | newnewapi.Auction
-        | newnewapi.Crowdfunding
-        | newnewapi.MultipleChoice;
+  const { t } = useTranslation('common');
+  const renderItem = useCallback((post: newnewapi.IPost) => {
+    const postType = Object.keys(post)[0];
+    const data = Object.values(post)[0] as
+      | newnewapi.Auction
+      | newnewapi.Crowdfunding
+      | newnewapi.MultipleChoice;
 
-      let postTypeConverted = '';
+    let postTypeConverted = '';
 
-      const timestampSeconds = new Date(
-        (data.expiresAt?.seconds as number) * 1000
-      ).getTime();
+    const timestampSeconds = new Date(
+      (data.expiresAt?.seconds as number) * 1000
+    ).getTime();
 
-      const parsed = secondsToDHMS((timestampSeconds - Date.now()) / 1000);
+    const parsed = secondsToDHMS((timestampSeconds - Date.now()) / 1000);
 
-      switch (postType) {
-        case 'auction':
-          postTypeConverted = 'Event';
-          break;
-        case 'crowdfunding':
-          postTypeConverted = 'Goal';
-          break;
-        default:
-          postTypeConverted = 'Superpoll';
-      }
+    switch (postType) {
+      case 'auction':
+        postTypeConverted = 'Event';
+        break;
+      case 'crowdfunding':
+        postTypeConverted = 'Goal';
+        break;
+      default:
+        postTypeConverted = 'Superpoll';
+    }
 
-      const openPost = () => {
-        if (data.postUuid) {
-          router.push(`/post/${data.postUuid}`);
-        }
-      };
-
-      return (
-        <SPost key={data.postUuid} onClick={openPost}>
-          <SLeftSide>
-            <SUserAvatar>
-              <UserAvatar
-                avatarUrl={
-                  data.creator?.avatarUrl ? data.creator?.avatarUrl : ''
-                }
-              />
-            </SUserAvatar>
-            <SPostData>
-              {data.title && (
-                <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
-              )}
-              <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
-            </SPostData>
-          </SLeftSide>
-          <SPostDetails>
-            <SPostType>{postTypeConverted}</SPostType>
-            <SPostEnded>
-              {parsed.days !== '00' && `${parsed.days}d`}{' '}
-              {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
-            </SPostEnded>
-          </SPostDetails>
-        </SPost>
-      );
-    },
-    [router]
-  );
+    return (
+      <Link href={`/post/${data.postUuid}`} key={data.postUuid}>
+        <a>
+          <SPost>
+            <SLeftSide>
+              <SUserAvatar>
+                <UserAvatar
+                  avatarUrl={
+                    data.creator?.avatarUrl ? data.creator?.avatarUrl : ''
+                  }
+                />
+              </SUserAvatar>
+              <SPostData>
+                {data.title && (
+                  <SPostTitle>{textTrim(data.title, 28)}</SPostTitle>
+                )}
+                <SCreatorUsername>{data.creator?.nickname}</SCreatorUsername>
+              </SPostData>
+            </SLeftSide>
+            <SPostDetails>
+              <SPostType>{postTypeConverted}</SPostType>
+              <SPostEnded>
+                {parsed.days !== '00' && `${parsed.days}d`}{' '}
+                {`${parsed.hours}h ${parsed.minutes}m ${parsed.seconds}s `}
+              </SPostEnded>
+            </SPostDetails>
+          </SPost>
+        </a>
+      </Link>
+    );
+  }, []);
 
   return (
     <SContainer>
-      <SBlockTitle>Top Decisions</SBlockTitle>
+      <SBlockTitle>{t('search.top-posts')}</SBlockTitle>
       {posts.map(renderItem)}
     </SContainer>
   );
