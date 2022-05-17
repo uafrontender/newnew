@@ -3,7 +3,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
@@ -25,7 +24,8 @@ import { formatNumber } from '../../../../../utils/format';
 import { deleteAcOption } from '../../../../../api/endpoints/auction';
 
 // Icons
-import CoinIcon from '../../../../../public/images/decision/coin-mock.png';
+import BidIconLight from '../../../../../public/images/decision/bid-icon-light.png';
+import BidIconDark from '../../../../../public/images/decision/bid-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import ChevronDown from '../../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 
@@ -84,7 +84,6 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
     const handleReportSubmit = useCallback(
       async ({ reasons, message }: ReportData) => {
         await reportEventOption(option.id, reasons, message);
-        setIsReportModalOpen(false);
       },
       [option.id]
     );
@@ -106,7 +105,11 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
           <SContainer>
             <SBidDetails>
               <SBidAmount>
-                <SCoinImg src={CoinIcon.src} />
+                <OptionActionIcon
+                  src={
+                    theme.name === 'light' ? BidIconLight.src : BidIconDark.src
+                  }
+                />
                 <div>
                   {option.totalAmount?.usdCents
                     ? `$${formatNumber(
@@ -228,7 +231,11 @@ const AcOptionCardModeration: React.FunctionComponent<IAcOptionCardModeration> =
         >
           <SBidDetailsModal>
             <SBidAmount>
-              <SCoinImg src={CoinIcon.src} />
+              <OptionActionIcon
+                src={
+                  theme.name === 'light' ? BidIconLight.src : BidIconDark.src
+                }
+              />
               <div>
                 {option.totalAmount?.usdCents
                   ? `$${formatNumber(
@@ -379,8 +386,9 @@ const SBidAmount = styled.div`
   margin-bottom: 6px;
 `;
 
-const SCoinImg = styled.img`
+const OptionActionIcon = styled.img`
   height: 24px;
+  width: 24px;
 `;
 
 const SOptionInfo = styled(Text)`
