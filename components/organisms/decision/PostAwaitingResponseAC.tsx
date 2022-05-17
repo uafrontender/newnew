@@ -228,6 +228,11 @@ const SActivitesContainer = styled.div`
     min-height: 506px;
 
     height: 506px;
+
+    background-color: ${({ theme }) =>
+      theme.name === 'dark'
+        ? theme.colorsThemed.background.secondary
+        : 'transparent'};
   }
 
   ${({ theme }) => theme.media.laptop} {

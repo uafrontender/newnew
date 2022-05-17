@@ -23,6 +23,7 @@ import PostSuccessBoxModeration from '../../PostSuccessBoxModeration';
 import { TPostStatusStringified } from '../../../../../utils/switchPostStatus';
 import getDisplayname from '../../../../../utils/getDisplayname';
 import assets from '../../../../../constants/assets';
+import { useGetAppConstants } from '../../../../../contexts/appConstantsContext';
 
 interface MAcWinnerTabModeration {
   postId: string;
@@ -38,6 +39,8 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
     const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
       resizeMode
     );
+
+    const { appConstants } = useGetAppConstants();
 
     const isCreatorsBid = useMemo(
       () => option.creator?.uuid === postCreator.uuid,
@@ -157,8 +160,12 @@ const McWinnerTabModeration: React.FunctionComponent<MAcWinnerTabModeration> =
               <SYouMade variant={3}>
                 {t('McPostModeration.WinnerTab.WinnerOptionCard.you_made')}
               </SYouMade>
-              <SHeadline variant={4}>
-                ${formatNumber(option.voteCount * 5, true)}
+              <SHeadline variant={5}>
+                $
+                {formatNumber(
+                  option.voteCount * Math.round(appConstants.mcVotePrice / 100),
+                  true
+                )}
               </SHeadline>
               <SOptionCreator variant={3}>
                 <SSpanThin>
@@ -313,7 +320,10 @@ const SMainScoop = styled.div`
   height: 150px;
   border-radius: 50%;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 `;
 
 const STopScoop = styled.div`
@@ -323,7 +333,10 @@ const STopScoop = styled.div`
 
   width: 50px;
   height: 80px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;
@@ -339,7 +352,10 @@ const SBottomScoop = styled.div`
 
   width: 150px;
   height: 50px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;

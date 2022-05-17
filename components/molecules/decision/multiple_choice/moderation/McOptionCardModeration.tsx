@@ -33,6 +33,7 @@ import getDisplayname from '../../../../../utils/getDisplayname';
 import BlockUserModalPost from '../../BlockUserModalPost';
 import ReportModal, { ReportData } from '../../../chat/ReportModal';
 import { reportSuperpollOption } from '../../../../../api/endpoints/report';
+import { RenderSupportersInfo } from '../McOptionCard';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
@@ -51,12 +52,12 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
       resizeMode
     );
 
-    const supporterCountSubtracted = useMemo(() => {
-      if (isCreatorsBid) {
-        return option.supporterCount;
+    const supporterCountSubstracted = useMemo(() => {
+      if (option.supporterCount === 0) {
+        return 0;
       }
       return option.supporterCount - 1;
-    }, [option.supporterCount, isCreatorsBid]);
+    }, [option.supporterCount]);
 
     const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
 
@@ -129,63 +130,39 @@ const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
                 />
                 <div>
                   {option.voteCount && option.voteCount > 0
-                    ? `${formatNumber(option?.voteCount, true)}`
+                    ? `${formatNumber(option?.voteCount, true)} ${t(
+                        'McPost.OptionsTab.OptionCard.votes'
+                      )}`
                     : t('McPost.OptionsTab.OptionCard.noVotes')}
                 </div>
               </SBidAmount>
               <SOptionInfo variant={3}>{option.text}</SOptionInfo>
               <SBiddersInfo variant={3}>
-                {isCreatorsBid ? (
-                  <>
-                    {supporterCountSubtracted > 0 ? (
-                      <>
-                        <SSpanBiddersHighlighted>
-                          {formatNumber(supporterCountSubtracted, true)}{' '}
-                          {t('McPost.OptionsTab.OptionCard.voters')}
-                        </SSpanBiddersHighlighted>{' '}
-                        <SSpanBiddersRegular>
-                          {t('McPost.OptionsTab.OptionCard.voted')}
-                        </SSpanBiddersRegular>
-                      </>
-                    ) : null}
-                  </>
-                ) : (
-                  <>
-                    <Link href={`/${creator?.username}`}>
-                      <SSpanBiddersHighlighted
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                        style={{
-                          color:
-                            theme.name === 'dark'
-                              ? theme.colorsThemed.accent.yellow
-                              : theme.colors.dark,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {t(
-                          'McPost.OptionsTab.OptionCard.subscriber_suggestion',
-                          {
-                            nickname: getDisplayname(option?.creator!!),
-                          }
-                        )}
-                      </SSpanBiddersHighlighted>
-                    </Link>
-                    {supporterCountSubtracted > 0 ? (
-                      <>
-                        {', '}
-                        <SSpanBiddersHighlighted>
-                          {formatNumber(supporterCountSubtracted, true)}{' '}
-                          {t('McPost.OptionsTab.OptionCard.voters')}
-                        </SSpanBiddersHighlighted>{' '}
-                        <SSpanBiddersRegular>
-                          {t('McPost.OptionsTab.OptionCard.voted')}
-                        </SSpanBiddersRegular>
-                      </>
-                    ) : null}
-                  </>
-                )}
+                <RenderSupportersInfo
+                  isCreatorsBid
+                  isSuggestedByMe={false}
+                  isSupportedByMe={false}
+                  optionCreator={
+                    option.creator ? getDisplayname(option.creator) : undefined
+                  }
+                  optionCreatorUsername={
+                    option.creator
+                      ? (option.creator.username as string)
+                      : undefined
+                  }
+                  firstVoter={
+                    option.firstVoter
+                      ? getDisplayname(option.firstVoter)
+                      : undefined
+                  }
+                  firstVoterUsername={
+                    option.firstVoter
+                      ? (option.firstVoter.username as string)
+                      : undefined
+                  }
+                  supporterCount={option.supporterCount}
+                  supporterCountSubstracted={supporterCountSubstracted}
+                />
               </SBiddersInfo>
             </SBidDetails>
             {!isMobile ? (
@@ -319,7 +296,11 @@ const SBidAmount = styled.div`
   justify-content: flex-start;
   gap: 8px;
 
-  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+
+  margin-bottom: 8px;
 `;
 
 const OptionActionIcon = styled.img`
@@ -340,8 +321,13 @@ const SOptionInfo = styled(Text)`
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
 
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
+    padding-top: 4px;
   }
 `;
 
