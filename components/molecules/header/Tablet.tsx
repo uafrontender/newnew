@@ -71,7 +71,7 @@ export const Tablet: React.FC<ITablet> = React.memo(() => {
       <SRightBlock>
         {user.loggedIn && (
           <>
-            {user.userData?.options?.isCreator && (
+            {user.userData?.options?.isOfferingSubscription && (
               <SItemWithMargin>
                 <SNavText variant={3} weight={600} onClick={handlerCopy}>
                   {isCopiedUrl ? t('my-link-copied') : t('my-link')}

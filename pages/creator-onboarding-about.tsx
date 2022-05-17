@@ -14,7 +14,6 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import {
   getAvailableCreatorTags,
   getMyCreatorTags,
-  getMyOnboardingState,
 } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
@@ -32,22 +31,12 @@ const CreatorOnboardingAbout: NextPage<ICreatorOnboardingAbout> = ({
   availableTags,
 }) => {
   const { t } = useTranslation('creator-onboarding');
-
-  const [onboardingState, setOnboardingState] =
-    useState<newnewapi.GetMyOnboardingStateResponse>();
   const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchOnboardingState() {
       try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data) {
-          setOnboardingState(res.data);
-        }
-
         const myTagsPayload = new newnewapi.EmptyRequest({});
         const tagsRes = await getMyCreatorTags(myTagsPayload);
 
