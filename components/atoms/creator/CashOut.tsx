@@ -33,17 +33,23 @@ const CashOut: React.FC<ICashOut> = ({
       <SCashOutTopBlock>
         <SInlineSVG svg={cashOutIcon} width='48px' height='48px' />
         <SDescriptionWrapper>
-          <SDescription variant={3} weight={600}>
-            {t('dashboard.earnings.cashOut.amount')}
-          </SDescription>
-          <SAmount variant={3} weight={600}>
-            {nextCashoutAmount && nextCashoutAmount.usdCents
-              ? ` $${formatNumber(
+          {nextCashoutAmount && nextCashoutAmount.usdCents ? (
+            <>
+              <SDescription variant={3} weight={600}>
+                {t('dashboard.earnings.cashOut.amount')}
+              </SDescription>
+              <SAmount variant={3} weight={600}>
+                {`$${formatNumber(
                   nextCashoutAmount?.usdCents / 100 ?? 0,
                   true
-                )}`
-              : ' $0'}
-          </SAmount>
+                )}`}
+              </SAmount>
+            </>
+          ) : (
+            <SDescription variant={3} weight={600}>
+              {t('dashboard.earnings.cashOut.no-payouts')}
+            </SDescription>
+          )}
           {nextCashoutDate && (
             <SDescription variant={3} weight={600}>
               {t('dashboard.earnings.cashOut.date', {

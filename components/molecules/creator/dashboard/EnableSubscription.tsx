@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
-import emptyFolder from '../../../../public/images/notifications/no-results.png';
+import emptyFolder from '../../../../public/images/dashboard/turnon-sub.png';
 import { useAppSelector } from '../../../../redux-store/store';
 
 export const EnableSubscription = () => {
@@ -16,8 +15,8 @@ export const EnableSubscription = () => {
 
   return (
     <SContainer>
-      <Image
-        src={emptyFolder}
+      <img
+        src={emptyFolder.src}
         alt={t('dashboard.enableSubscription.title')}
         width={176}
         height={176}
