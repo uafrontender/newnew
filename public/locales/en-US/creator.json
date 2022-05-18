@@ -55,16 +55,23 @@
       }
     },
     "expirationPosts": {
-      "title": "Awaiting your Response ",
+      "title": "Awaiting your Response",
       "submit": "Show 10 more posts",
-      "decide": "Decide",
+      "decide": {
+        "desktop": "Respond Now",
+        "mobile": "Respond"
+      },
       "table": {
         "header": {
-          "post": "Post",
-          "total": "Total",
-          "contributions": "Contributions",
-          "actions": "Actions"
+          "post": "My posts",
+          "type": "Type",
+          "total": "Current total"
         }
+      },
+      "postTypes": {
+        "auction": "Event",
+        "multipleChoice": "Superpoll",
+        "crowdfunding": "Goal"
       },
       "expiresTime": {
         "days": "d",

@@ -16,7 +16,7 @@ import ChangeLanguage from '../atoms/ChangeLanguage';
 import { useAppSelector } from '../../redux-store/store';
 
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
-import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
+// import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
 // import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
 // import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
@@ -62,12 +62,13 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
     },
   ];
   const centerItems: TItem[] = [
-    {
+    // TODO: return twitter link later
+    /* {
       key: 'twitter',
       url: 'https://twitter.com/newnewhq',
       external: true,
       iconSrc: twitterIcon,
-    },
+    }, */
     {
       key: 'email',
       url: 'hi@newnew.co',

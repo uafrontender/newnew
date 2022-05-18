@@ -57,9 +57,7 @@ export const Dashboard: React.FC = React.memo(() => {
   const [isEarningsLoading, setIsEarningsLoading] = useState(true);
   const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
     useState(true);
-  const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>(
-    []
-  );
+  const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
   const filter = '7_days';
   const [myEarnings, setMyEarnings] =
     useState<newnewapi.GetMyEarningsResponse | undefined>();
@@ -95,7 +93,7 @@ export const Dashboard: React.FC = React.memo(() => {
       const payload = new newnewapi.PagedRequest();
       const res = await getMyUrgentPosts(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.posts) setExprirationPosts(res.data?.posts);
+      if (res.data?.posts) setExpirationPosts(res.data?.posts);
       setIsLoadingExpirationPosts(false);
     } catch (err) {
       setIsLoadingExpirationPosts(false);
