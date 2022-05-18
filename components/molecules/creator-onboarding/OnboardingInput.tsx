@@ -10,7 +10,6 @@ import LockIcon from '../../../public/images/svg/icons/filled/Lock.svg';
 type TOnboardingInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   isTaken?: boolean;
-  labelCaption: string;
   errorCaption?: string;
   cantChangeInfoCaption?: string;
 };
@@ -21,7 +20,6 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
   value,
   isValid,
   isTaken,
-  labelCaption,
   errorCaption,
   cantChangeInfoCaption,
   readOnly,
@@ -38,7 +36,6 @@ const OnboardingInput: React.FunctionComponent<TOnboardingInput> = ({
 
   return (
     <SContainer>
-      <SLabel>{labelCaption}</SLabel>
       {readOnly && (
         <SReadonlyLock>
           <InlineSvg
@@ -113,17 +110,6 @@ const SContainer = styled.div`
   }
 `;
 
-const SLabel = styled.div`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
-`;
-
 const SReadonlyCaption = styled.div`
   display: block;
 
@@ -143,12 +129,12 @@ interface ISOnboardingInput {
 const SOnboardingInput = styled.input<ISOnboardingInput>`
   display: block;
 
-  height: 44px;
+  height: 48px;
   width: 100%;
 
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
 
   padding: 12px 20px 12px 20px;
 
@@ -167,13 +153,13 @@ const SOnboardingInput = styled.input<ISOnboardingInput>`
   background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
 
   &::placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
   &::-ms-input-placeholder {
-    color: ${({ theme }) => theme.colorsThemed.text.tertiary};
+    color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
   &:hover:enabled,
@@ -194,13 +180,6 @@ const SOnboardingInput = styled.input<ISOnboardingInput>`
       }
       return theme.colorsThemed.accent.error;
     }};
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    height: 48px;
-
-    font-size: 16px;
-    line-height: 24px;
   }
 `;
 

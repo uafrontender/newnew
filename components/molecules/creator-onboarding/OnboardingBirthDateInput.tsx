@@ -257,6 +257,7 @@ export default OnboardingBirthDateInput;
 
 const SContainer = styled.div`
   position: relative;
+  flex-direction: column;
   width: 100%;
 `;
 
@@ -269,17 +270,6 @@ const SLabel = styled.div`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   margin-bottom: 6px;
-`;
-
-const SBottomCaption = styled.div`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-top: 6px;
 `;
 
 const SErrorDiv = styled.div`
@@ -310,11 +300,12 @@ const SDropdownsContainer = styled.div<{
   gap: 16px;
 
   button {
-    border-width: 1.5px;
+    border-width: 1px;
     border-style: solid;
     border-color: ${({ isValid, theme }) =>
       isValid ? 'transparent' : theme.colorsThemed.accent.error};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
+    padding: 11px 20px 11px 20px;
   }
 
   ${({ theme }) => theme.media.tablet} {
@@ -336,7 +327,7 @@ const SLabelButton = styled.button<{
 
   width: 100%;
 
-  border-width: 1.5px;
+  border-width: 1px;
   border-style: solid;
   border-color: ${({ isValid, theme }) =>
     isValid ? 'transparent' : theme.colorsThemed.accent.error};
@@ -349,7 +340,7 @@ const SLabelButton = styled.button<{
   font-weight: 500;
   line-height: 20px;
 
-  padding: 12px 20px 12px 20px;
+  padding: 11px 20px 11px 20px;
 
   span {
     margin-right: 8px;
