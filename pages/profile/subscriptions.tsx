@@ -61,6 +61,7 @@ const MyProfileSubscriptions: NextPage<IMyProfileSubscriptions> = ({
               loading={isCreatorsImSubscribedToLoading}
               collection={creatorsImSubscribedTo}
               subscribedTo
+              showSubscriptionPrice
             />
           ) : (
             <NoContentCard>

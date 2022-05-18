@@ -179,20 +179,14 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
               <STopScoop>
                 <mask id='mask-STopScoop'>
                   <svg>
-                    <circle
-                      id='circle-STopScoop'
-                      r='50'
-                      fill='#07e071'
-                      x='100%'
-                      y='100%'
-                    />
+                    <circle id='circle-STopScoop' r='50' fill='#0DEE59' />
                   </svg>
                 </mask>
               </STopScoop>
               <SBottomScoop>
                 <mask id='mask-SBottomScoop'>
                   <svg>
-                    <circle id='circle-SBottomScoop' r='30' fill='#0ae46a' />
+                    <circle id='circle-SBottomScoop' r='50' fill='#08e171' />
                   </svg>
                 </mask>
               </SBottomScoop>
@@ -241,6 +235,10 @@ export default AcWinnerTab;
 const STabContainer = styled(motion.div)`
   width: 100%;
   height: calc(100% - 112px);
+
+  min-height: 300px;
+
+  position: relative;
 `;
 
 const SWinnerOptionCard = styled.div`
@@ -251,13 +249,13 @@ const SWinnerOptionCard = styled.div`
   height: 218px;
 
   padding: 16px;
-  padding-right: 164px;
+  padding-right: 114px;
 
   background: linear-gradient(
-    211.77deg,
-    #0ff34f 0%,
-    #07df74 33.86%,
-    #00c291 76.49%
+    76.09deg,
+    #00c291 2.49%,
+    #07df74 50.67%,
+    #0ff34f 102.41%
   );
   border-radius: 24px;
 
@@ -265,18 +263,12 @@ const SWinnerOptionCard = styled.div`
   justify-content: flex-start;
   align-items: center;
 
-  div,
-  h4,
-  span {
-    color: #ffffff;
-  }
-
   ${({ theme }) => theme.media.tablet} {
     position: relative;
 
-    margin-top: 56px;
-
     height: fit-content;
+
+    width: 100%;
 
     padding: 24px;
   }
@@ -287,12 +279,9 @@ const STrophyImg = styled.img`
   right: 16px;
   bottom: 16px;
 
-  transform: rotate(-45deg);
-
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: -40px;
-    right: 32px;
+    bottom: -30px;
 
     width: 130px;
 
@@ -303,11 +292,11 @@ const STrophyImg = styled.img`
 const STrophyGlow = styled.div`
   ${({ theme }) => theme.media.tablet} {
     position: absolute;
-    top: 0px;
-    right: 64px;
+    bottom: -16px;
+    right: 16px;
 
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
 
     z-index: 1;
 
@@ -318,26 +307,30 @@ const STrophyGlow = styled.div`
 
 const SMainScoop = styled.div`
   position: absolute;
-  right: -30px;
-  top: -60px;
+  right: -20px;
+  bottom: -50px;
 
-  width: 220px;
-  height: 180px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
 
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 `;
 
 const STopScoop = styled.div`
   position: absolute;
-  right: 172.5px;
-  top: -15px;
-
-  transform: rotate(-90deg);
+  right: 0px;
+  bottom: 70px;
 
   width: 50px;
   height: 80px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;
@@ -348,16 +341,15 @@ const STopScoop = styled.div`
 
 const SBottomScoop = styled.div`
   position: absolute;
-  right: -2px;
-  top: 72px;
+  right: 26px;
+  bottom: 0px;
 
-  transform: rotate(214deg);
-
-  width: 50px;
+  width: 150px;
   height: 50px;
-  background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
-  border-radius: 48%;
+  background-color: ${({ theme }) =>
+    theme.name === 'dark'
+      ? theme.colorsThemed.background.secondary
+      : '#ffffff'};
 
   svg {
     position: absolute;
@@ -368,6 +360,8 @@ const SBottomScoop = styled.div`
 
 // Option details
 const SOptionDetails = styled.div`
+  color: #ffffff;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -378,14 +372,11 @@ const SNumBidders = styled(Text)`
 `;
 
 const SHeadline = styled(Headline)`
-  margin-bottom: 8px;
-
   color: #ffffff;
+  margin-bottom: 8px;
 
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 12px;
-
-    padding-right: 50px;
   }
 `;
 
