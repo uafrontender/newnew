@@ -249,11 +249,13 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                     : 'scheduled'
                 }`,
                 {
-                  value: postData!!.auction
-                    ? 'Event'
-                    : postData!!.crowdfunding
-                    ? 'Goal'
-                    : 'Superpoll',
+                  value: postData
+                    ? postData!!.auction
+                      ? 'Event'
+                      : postData!!.crowdfunding
+                      ? 'Goal'
+                      : 'Superpoll'
+                    : 'Post',
                 }
               )}
             </SButtonTitle>
