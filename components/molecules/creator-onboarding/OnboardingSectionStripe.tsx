@@ -125,32 +125,20 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
 export default OnboardingSectionStripe;
 
 const SContainer = styled.div`
-  padding-left: 16px;
-  padding-right: 16px;
-
-  padding-bottom: 88px;
-
+  padding: 0 20px 20px;
   z-index: 2;
-
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 0;
-
-    padding-left: 152px;
-    padding-right: 152px;
-
-    margin-bottom: 44px;
-
-    margin-top: 114px;
+    padding: 114px 152px 44px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: fit-content;
-
     padding-left: 0;
     padding-right: 104px;
-
-    margin-bottom: 190px;
-    margin-top: 44px;
+    padding-top: 44px;
   }
 `;
 
@@ -161,12 +149,10 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SControlsDiv = styled.div`
-  width: 100%;
-  margin-top: 80%;
-
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
-
+  a,
   button {
     width: 100%;
     height: 56px;
@@ -174,19 +160,13 @@ const SControlsDiv = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     position: static;
-    margin-top: 24px;
-
     margin-left: initial;
     width: 100%;
-
+    padding: 0;
     button {
       width: 170px;
       height: 48px;
     }
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 80%;
   }
 `;
 

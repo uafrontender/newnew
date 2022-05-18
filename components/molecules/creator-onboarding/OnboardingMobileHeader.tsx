@@ -38,14 +38,14 @@ const OnboardingMobileHeader: React.FunctionComponent = () => {
 export default OnboardingMobileHeader;
 
 const SOnboardingProgressBarContainer = styled.div`
-  padding-bottom: 30px;
+  padding-bottom: 32px;
 
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 38px;
+    padding-bottom: 58px;
   }
 
   ${({ theme }) => theme.media.laptop} {
-    padding-bottom: 46px;
+    padding-bottom: 80px;
   }
 `;
 

@@ -51,7 +51,7 @@ const OnboardingTagsSelection: React.FunctionComponent<IOnboardingTagsSelection>
                     svg={DeleteIcon}
                     width='16px'
                     height='16px'
-                    fill='#FFF'
+                    fill='#fff'
                   />
                 )}
               </STag>
@@ -98,7 +98,7 @@ const STag = styled.button<{
       : theme.colorsThemed.background.secondary};
 
   color: ${({ theme, selected }) =>
-    selected ? '#FFFFFF' : theme.colorsThemed.text.primary};
+    selected ? '#fff' : theme.colorsThemed.text.primary};
 
   cursor: pointer;
   transition: 0.2s linear;
