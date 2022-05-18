@@ -65,11 +65,7 @@ export const Navigation = () => {
   const renderItem = useCallback(
     (item) => {
       const active = router.route.includes(item.url);
-      if (
-        (!user.userData?.options?.isOfferingSubscription &&
-          item.url === '/creator/subscribers') ||
-        (!user.creatorData?.isLoaded && item.url === '/creator/get-paid')
-      )
+      if (!user.creatorData?.isLoaded && item.url === '/creator/get-paid')
         return null;
       return (
         <Link href={item.url} key={item.url}>
