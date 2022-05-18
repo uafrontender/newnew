@@ -24,7 +24,6 @@ export interface ICreatorOnboardingLayout {
 
 const SCreatorOnboardingLayout = styled.div`
   position: relative;
-
   max-width: 100%;
   height: 100vh;
   width: 100vw;
@@ -58,44 +57,46 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
           highlightColor={theme.colorsThemed.background.tertiary}
         >
           <SCreatorOnboardingLayout>
-            <HomeLogoButton />
-            {isTablet && hideOnboardingHeader ? (
-              <SHomeLogoButton
-                style={{
-                  display: 'block',
-                }}
-              >
-                <Row>
-                  <Col>
-                    <SLogo />
-                  </Col>
-                </Row>
-              </SHomeLogoButton>
-            ) : null}
-            <SContentContainer>
-              {!hideOnboardingHeader && <OnboardingMobileHeader />}
-              {children}
-            </SContentContainer>
-            {!isMobile &&
-              !isTablet &&
-              !router.pathname.includes('creator-onboarding') && (
-                <SSideMessage>
-                  {!hideOnboardingHeader && <OnboardingMobileHeader />}
-                  <SHeadline variant={3}>
-                    {t(`${SideTextSwitch()}.side.heading`)}
-                  </SHeadline>
-                  <Text variant={2}>
-                    {t(`${SideTextSwitch()}.side.subheading`)}
-                  </Text>
-                </SSideMessage>
-              )}
-            {!isMobile &&
-              !isTablet &&
-              router.pathname.includes('creator-onboarding') && (
-                <HeroVisualContainer>
-                  <HeroVisual />
-                </HeroVisualContainer>
-              )}
+            <Container>
+              <HomeLogoButton />
+              {isTablet && hideOnboardingHeader ? (
+                <SHomeLogoButton
+                  style={{
+                    display: 'block',
+                  }}
+                >
+                  <Row>
+                    <Col>
+                      <SLogo />
+                    </Col>
+                  </Row>
+                </SHomeLogoButton>
+              ) : null}
+              <SContentContainer>
+                {!hideOnboardingHeader && <OnboardingMobileHeader />}
+                {children}
+              </SContentContainer>
+              {!isMobile &&
+                !isTablet &&
+                !router.pathname.includes('creator-onboarding') && (
+                  <SSideMessage>
+                    {!hideOnboardingHeader && <OnboardingMobileHeader />}
+                    <SHeadline variant={3}>
+                      {t(`${SideTextSwitch()}.side.heading`)}
+                    </SHeadline>
+                    <Text variant={2}>
+                      {t(`${SideTextSwitch()}.side.subheading`)}
+                    </Text>
+                  </SSideMessage>
+                )}
+              {!isMobile &&
+                !isTablet &&
+                router.pathname.includes('creator-onboarding') && (
+                  <HeroVisualContainer>
+                    <HeroVisual />
+                  </HeroVisualContainer>
+                )}
+            </Container>
           </SCreatorOnboardingLayout>
         </SkeletonTheme>
       </ErrorBoundary>
@@ -104,7 +105,7 @@ const CreatorOnboardingLayout: React.FunctionComponent<ICreatorOnboardingLayout>
 
 export default CreatorOnboardingLayout;
 
-const HomeLogoButton: React.FunctionComponent = () => (
+const HomeLogoButton = () => (
   <SHomeLogoButton>
     <Row>
       <Col>
@@ -114,7 +115,7 @@ const HomeLogoButton: React.FunctionComponent = () => (
   </SHomeLogoButton>
 );
 
-const SHomeLogoButton = styled(Container)`
+const SHomeLogoButton = styled.div`
   display: none;
 
   ${({ theme }) => theme.media.tablet} {
@@ -132,6 +133,8 @@ const SHomeLogoButton = styled(Container)`
 
 const SLogo = styled(Logo)`
   z-index: 1;
+  width: 152px;
+  height: 148px;
 `;
 
 const SContentContainer = styled.div`

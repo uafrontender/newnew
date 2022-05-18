@@ -71,13 +71,11 @@ const OnboardingProfileImageInput: React.FunctionComponent<IOnboardingProfileIma
             }}
           />
         </SInputContainer>
-        {true && (
-          <SCaption>
-            {isMobileOrTablet
-              ? t('DetailsSection.form.profilePicture.captionMobile')
-              : t('DetailsSection.form.profilePicture.captionDesktop')}
-          </SCaption>
-        )}
+        <SCaption>
+          {isMobileOrTablet
+            ? t('DetailsSection.form.profilePicture.captionMobile')
+            : t('DetailsSection.form.profilePicture.captionDesktop')}
+        </SCaption>
       </SContainer>
     );
   };
@@ -99,23 +97,14 @@ const SLabel = styled.label`
   margin-bottom: 12px;
 `;
 
-const SCaption = styled.label`
-  position: absolute;
-  top: 0;
-  right: 0;
-
+const SCaption = styled.span`
   display: block;
-
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
-
-  ${({ theme }) => theme.media.laptop} {
-    position: static;
-  }
+  margin-top: 12px;
+  margin-bottom: 38px;
 `;
 
 const SInputContainer = styled.div`
@@ -124,7 +113,9 @@ const SInputContainer = styled.div`
   align-items: center;
   justify-content: flex-start;
 
-  margin-bottom: 12px;
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 12px;
+  }
 `;
 
 const SImageInput = styled.input`

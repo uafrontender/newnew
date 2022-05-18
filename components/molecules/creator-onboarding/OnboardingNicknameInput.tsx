@@ -8,20 +8,11 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 type TOnboardingSectionNicknameInput =
   React.ComponentPropsWithoutRef<'input'> & {
     isValid?: boolean;
-    labelCaption: string;
     errorCaption: string;
   };
 
 const OnboardingSectionNicknameInput: React.FunctionComponent<TOnboardingSectionNicknameInput> =
-  ({
-    value,
-    labelCaption,
-    isValid,
-    errorCaption,
-    onChange,
-    onFocus,
-    ...rest
-  }) => {
+  ({ value, isValid, errorCaption, onChange, onFocus, ...rest }) => {
     const [errorBordersShown, setErrorBordersShown] = useState(false);
     const [focused, setFocused] = useState(false);
 
@@ -32,9 +23,6 @@ const OnboardingSectionNicknameInput: React.FunctionComponent<TOnboardingSection
 
     return (
       <SWrapper>
-        <SLabel isVisible={(value as string)?.length > 0}>
-          {labelCaption}
-        </SLabel>
         <SOnboardingSectionNicknameInput
           value={value}
           id='nickname_input'
@@ -77,32 +65,9 @@ const SWrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
 
   ${({ theme }) => theme.media.laptop} {
     width: 50%;
-  }
-`;
-
-const SLabel = styled.div<{
-  isVisible: boolean;
-}>`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
-
-  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
-  height: ${({ isVisible }) => (isVisible ? 'fit-content' : 0)};
-  transition: linear 0.2s;
-
-  ${({ theme }) => theme.media.laptop} {
-    height: fit-content !important;
-    opacity: 1;
   }
 `;
 
@@ -113,9 +78,11 @@ interface ISOnboardingSectionNicknameInput {
 const SOnboardingSectionNicknameInput = styled.input<ISOnboardingSectionNicknameInput>`
   display: block;
 
+  height: 48px;
+
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
 
   padding: 12px 20px 12px 20px;
 
@@ -158,13 +125,6 @@ const SOnboardingSectionNicknameInput = styled.input<ISOnboardingSectionNickname
 
   &:disabled {
     opacity: 0.5;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    height: 48px;
-
-    font-size: 16px;
-    line-height: 24px;
   }
 `;
 

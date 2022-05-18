@@ -1,5 +1,4 @@
 import React, { useState, useRef, ReactElement, useEffect } from 'react';
-import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -40,7 +39,6 @@ const OnboardingCountrySelect = <T,>({
   onSelect,
 }: IOnboardingCountrySelect<T>): ReactElement => {
   const theme = useTheme();
-  const { t } = useTranslation('creator-onboarding');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>();
   const optionsContainerRef = useRef<HTMLDivElement>();
@@ -73,7 +71,6 @@ const OnboardingCountrySelect = <T,>({
 
   return (
     <SFormItemContainer pushedUp={isMobile && isOpen}>
-      <SLabel>{t('DetailsSection.form.CoR.label')}</SLabel>
       <SWrapper
         ref={(el) => {
           containerRef.current = el!!;
@@ -152,8 +149,6 @@ const SFormItemContainer = styled.div<{
 }>`
   width: 100%;
 
-  margin-bottom: 16px;
-
   transition: 0.3s transform linear;
 
   ${({ pushedUp }) =>
@@ -179,17 +174,6 @@ const SFormItemContainer = styled.div<{
   ${({ theme }) => theme.media.laptop} {
     /* width: 296px; */
   }
-`;
-
-const SLabel = styled.label`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
 `;
 
 const SWrapper = styled.div`
