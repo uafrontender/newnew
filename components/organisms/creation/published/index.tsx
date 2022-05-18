@@ -245,11 +245,13 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
                     : 'scheduled'
                 }`,
                 {
-                  value: postData!!.auction
-                    ? 'Event'
-                    : postData!!.crowdfunding
-                    ? 'Goal'
-                    : 'Superpoll',
+                  value: postData
+                    ? postData!!.auction
+                      ? 'Event'
+                      : postData!!.crowdfunding
+                      ? 'Goal'
+                      : 'Superpoll'
+                    : 'Post',
                 }
               )}
             </SButton>
