@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-template */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
-
+import Link from 'next/link';
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
@@ -15,11 +15,8 @@ import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
 
-import infoIcon from '../../../../public/images/svg/icons/filled/Info.svg';
 import shareIcon from '../../../../public/images/svg/icons/filled/Share.svg';
 import { formatNumber } from '../../../../utils/format';
-import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
-import InfoTooltipItem from '../../../atoms/dashboard/InfoTooltipItem';
 import secondsToDHMS from '../../../../utils/secondsToDHMS';
 
 interface IExpirationPosts {
@@ -31,7 +28,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 }) => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
-  const ref: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
 
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -42,7 +38,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   const router = useRouter();
 
   const [posts, setPosts] = useState<newnewapi.IPost[]>([]);
-  const [showInfoTooltip, setShowInfoTooltip] = useState<number | undefined>();
 
   useEffect(() => {
     if (expirationPosts) {
@@ -102,30 +97,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
     return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
   };
 
-  const getContributorsValue = (
-    postType: string,
-    data: newnewapi.Auction | newnewapi.Crowdfunding | newnewapi.MultipleChoice
-  ) => {
-    let amount = 0;
-
-    switch (postType) {
-      case 'multipleChoice':
-        amount = (data as newnewapi.MultipleChoice).totalVotes;
-        break;
-      case 'crowdfunding':
-        amount = (data as newnewapi.Crowdfunding).currentBackerCount;
-        break;
-      default:
-        amount = (data as newnewapi.Auction).bidCount as number;
-    }
-
-    return amount;
-  };
-
-  useOnClickOutside(ref, () => {
-    if (showInfoTooltip) setShowInfoTooltip(undefined);
-  });
-
   async function copyPostUrlToClipboard(url: string) {
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
@@ -142,10 +113,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
         | newnewapi.Crowdfunding
         | newnewapi.MultipleChoice;
 
-      const handleDecideClick = () => {
-        router.push(`/post/${data.postUuid}`);
-      };
-
       const handleShareClick = () => {
         let url;
         if (window) {
@@ -156,14 +123,13 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
 
       const countdownsrt = getCountdown(data);
       const money = getAmountValue(postType, data);
-      const contributors = getContributorsValue(postType, data);
 
       return (
         <SListItemWrapper key={data.postUuid}>
           <SListItem>
-            {isDesktop ? (
+            {isDesktop || isTablet ? (
               <>
-                <SListBodyItem width='calc(100% - 300px)' align='flex-start'>
+                <SListBodyItem width='calc(100% - 350px)' align='flex-start'>
                   {!data.announcement?.thumbnailImageUrl ? (
                     <SAvatar />
                   ) : (
@@ -185,20 +151,27 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                     </SListItemDate>
                   </SListItemTitleWrapper>
                 </SListBodyItem>
+
+                <SListBodyItem width='100px' align='flex-start'>
+                  <SListBodyItemText variant={3} weight={600}>
+                    {t(`dashboard.expirationPosts.postTypes.${postType}`)}
+                  </SListBodyItemText>
+                </SListBodyItem>
+
                 <SListBodyItem width='100px' align='flex-start'>
                   <SListBodyItemText variant={3} weight={600}>
                     {money}
                   </SListBodyItemText>
                 </SListBodyItem>
-                <SListBodyItem width='100px' align='flex-start'>
-                  <SListBodyItemText variant={3} weight={600}>
-                    {contributors}
-                  </SListBodyItemText>
-                </SListBodyItem>
-                <SListBodyItem width='100px' align='center'>
-                  <SListDecideButton view='primary' onClick={handleDecideClick}>
-                    {t('dashboard.expirationPosts.decide')}
-                  </SListDecideButton>
+
+                <SListBodyItem width='150px' align='center'>
+                  <Link href={`/post/${data.postUuid}`}>
+                    <a>
+                      <SListDecideButton view='primary'>
+                        {t('dashboard.expirationPosts.decide.desktop')}
+                      </SListDecideButton>
+                    </a>
+                  </Link>
                 </SListBodyItem>
               </>
             ) : (
@@ -231,29 +204,13 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                     height='20px'
                   />
                 </SListShareButton>
-                {!isMobile && (
-                  <SListShareButton
-                    view='secondary'
-                    onClick={() => setShowInfoTooltip(index)}
-                  >
-                    <InlineSVG
-                      svg={infoIcon}
-                      fill={theme.colorsThemed.text.primary}
-                      width='20px'
-                      height='20px'
-                    />
-                    {showInfoTooltip === index && (
-                      <InfoTooltipItem
-                        money={money}
-                        contributions={contributors.toString()}
-                        closeTooltip={() => setShowInfoTooltip(undefined)}
-                      />
-                    )}
-                  </SListShareButton>
-                )}
-                <SListDecideButton view='secondary' onClick={handleDecideClick}>
-                  {t('dashboard.expirationPosts.decide')}
-                </SListDecideButton>
+                <Link href={`/post/${data.postUuid}`}>
+                  <a>
+                    <SListDecideButton view='primary'>
+                      {t('dashboard.expirationPosts.decide.mobile')}
+                    </SListDecideButton>
+                  </a>
+                </Link>
               </>
             )}
           </SListItem>
@@ -269,7 +226,6 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
       posts.length,
       theme.colorsThemed.text.primary,
       router,
-      showInfoTooltip,
     ]
   );
 
@@ -283,7 +239,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
           <>
             <SListHeader>
               <SListHeaderItem
-                width='calc(100% - 300px)'
+                width='calc(100% - 350px)'
                 align='start'
                 weight={600}
                 variant={2}
@@ -296,7 +252,7 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 weight={600}
                 variant={2}
               >
-                {t('dashboard.expirationPosts.table.header.total')}
+                {t('dashboard.expirationPosts.table.header.type')}
               </SListHeaderItem>
               <SListHeaderItem
                 width='100px'
@@ -304,15 +260,15 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
                 weight={600}
                 variant={2}
               >
-                {t('dashboard.expirationPosts.table.header.contributions')}
+                {t('dashboard.expirationPosts.table.header.total')}
               </SListHeaderItem>
               <SListHeaderItem
-                width='100px'
+                width='150px'
                 align='center'
                 weight={600}
                 variant={2}
               >
-                {t('dashboard.expirationPosts.table.header.actions')}
+                {' '}
               </SListHeaderItem>
             </SListHeader>
             <SListItemSeparator />
@@ -337,10 +293,10 @@ const SContainer = styled.div`
       ? props.theme.colorsThemed.background.primary
       : props.theme.colorsThemed.background.secondary};
   flex-direction: column;
+  overflow: hidden;
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
-    width: 100%;
     padding: 24px;
     border-radius: 24px;
   }
@@ -353,7 +309,9 @@ const SContainer = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 const SHeaderLine = styled.div`
   display: flex;
@@ -451,6 +409,7 @@ const SListItemTitleWrapper = styled.div`
   display: flex;
   padding: 0 12px;
   flex-direction: column;
+  overflow: hidden;
 
   ${(props) => props.theme.media.laptop} {
     width: calc(100% - 48px);
@@ -466,6 +425,9 @@ const SListItemTitle = styled(Text)`
 `;
 
 const SListItemDate = styled(Caption)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: ${(props) => props.theme.colorsThemed.accent.pink};
 `;
 
