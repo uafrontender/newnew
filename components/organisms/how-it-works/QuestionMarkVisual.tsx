@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import assets from '../../../constants/assets';
 import useImageLoaded from '../../../utils/hooks/useImageLoaded';
-import isSafari from '../../../utils/isSafari';
 
 interface QuestionMarkVisualI {
   alt: string;
@@ -10,10 +9,7 @@ interface QuestionMarkVisualI {
 
 const QuestionMarkVisual: React.FC<QuestionMarkVisualI> = ({ alt }) => {
   const theme = useTheme();
-  const shouldUseCssFade = useMemo(() => isSafari(), []);
-  const [currentState, setCurrentState] = useState<'intro' | 'hold'>(
-    shouldUseCssFade ? 'hold' : 'intro'
-  );
+  const [currentState, setCurrentState] = useState<'intro' | 'hold'>('intro');
 
   const {
     ref: introRef,
