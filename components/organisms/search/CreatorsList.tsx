@@ -8,7 +8,7 @@ import router from 'next/router';
 import dynamic from 'next/dynamic';
 import Lottie from '../../atoms/Lottie';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import CreatorCard from '../../molecules/search/CreatorCard';
+import { CreatorCardWithSubscriptionPrice } from './CreatorCardWithSubscriptionPrice';
 
 const CardSkeleton = dynamic(() => import('../../molecules/CardSkeleton'));
 
@@ -18,6 +18,7 @@ interface IList {
   subscribedTo?: boolean;
   skeletonsBgColor?: string;
   skeletonsHighlightColor?: string;
+  showSubscriptionPrice?: boolean;
 }
 
 export const CreatorsList: React.FC<IList> = ({
@@ -26,17 +27,20 @@ export const CreatorsList: React.FC<IList> = ({
   subscribedTo = false,
   skeletonsBgColor,
   skeletonsHighlightColor,
+  showSubscriptionPrice = false,
 }) => {
   const renderItem = (item: newnewapi.IUser) => {
     const handleItemClick = () => {
       router.push(`/${item.username}`);
     };
 
-    const sign = subscribedTo ? 'subscribed' : undefined;
-
     return (
       <SItemWrapper key={item.uuid} onClick={handleItemClick}>
-        <CreatorCard creator={item} sign={sign} />
+        <CreatorCardWithSubscriptionPrice
+          subscribedTo={subscribedTo}
+          showSubscriptionPrice={showSubscriptionPrice}
+          item={item}
+        />
       </SItemWrapper>
     );
   };
@@ -83,6 +87,7 @@ CreatorsList.defaultProps = {
   subscribedTo: false,
   skeletonsBgColor: undefined,
   skeletonsHighlightColor: undefined,
+  showSubscriptionPrice: undefined,
 };
 
 export default CreatorsList;
