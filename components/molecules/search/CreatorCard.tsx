@@ -2,37 +2,56 @@ import { newnewapi } from 'newnew-api';
 import React from 'react';
 import styled from 'styled-components';
 import Image from 'next/image';
+import { useTranslation } from 'next-i18next';
 import UserAvatar from '../UserAvatar';
+import { formatNumber } from '../../../utils/format';
 
 interface ICreatorCard {
   creator: newnewapi.IUser;
   // TODO: make sign creator specific, get more data
   sign?: string;
+  subscriptionPrice?: number;
 }
 
-export const CreatorCard: React.FC<ICreatorCard> = ({ creator, sign }) => (
-  <SCard>
-    <SUserAvatarContainer>
-      <SUserAvatar>
-        <UserAvatar avatarUrl={creator.avatarUrl!!} />
-      </SUserAvatar>
-      {sign && <AvatarSign>{sign}</AvatarSign>}
-    </SUserAvatarContainer>
-    <SDisplayName>{creator.nickname}</SDisplayName>
-    <SUserName>@{creator.username}</SUserName>
-    <SBackground>
-      <Image src={creator.coverUrl!!} layout='fill' />
-    </SBackground>
-  </SCard>
-);
+export const CreatorCard: React.FC<ICreatorCard> = ({
+  creator,
+  sign,
+  subscriptionPrice,
+}) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <SCard showSubscriptionPrice={subscriptionPrice !== undefined}>
+      <SUserAvatarContainer>
+        <SUserAvatar>
+          <UserAvatar avatarUrl={creator.avatarUrl!!} />
+        </SUserAvatar>
+        {sign && <AvatarSign>{sign}</AvatarSign>}
+      </SUserAvatarContainer>
+      <SDisplayName>{creator.nickname}</SDisplayName>
+      <SUserName>@{creator.username}</SUserName>
+      {subscriptionPrice !== undefined && subscriptionPrice > 0 && (
+        <SSubscriptionPrice>
+          {t('creator-card.subscription-cost', {
+            amount: formatNumber(subscriptionPrice / 100, true),
+          })}
+        </SSubscriptionPrice>
+      )}
+      <SBackground>
+        <Image src={creator.coverUrl!!} layout='fill' />
+      </SBackground>
+    </SCard>
+  );
+};
 
 export default CreatorCard;
 
 CreatorCard.defaultProps = {
   sign: '',
+  subscriptionPrice: undefined,
 };
 
-const SCard = styled.div`
+const SCard = styled.div<{ showSubscriptionPrice: boolean }>`
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -40,7 +59,8 @@ const SCard = styled.div`
   border: 1.5px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   position: relative;
-  height: 160px;
+  height: ${({ showSubscriptionPrice }) =>
+    showSubscriptionPrice ? '185px' : '160px'};
   cursor: pointer;
   transition: 0.2s linear;
   &:hover {
@@ -61,6 +81,7 @@ const SBackground = styled.div`
 const SUserAvatarContainer = styled.div`
   position: relative;
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   width: 72px;
   height: 72px;
@@ -117,5 +138,14 @@ const SUserName = styled.p`
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SSubscriptionPrice = styled.p`
+  text-align: center;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  margin-top: 5px;
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
 `;

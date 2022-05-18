@@ -420,6 +420,13 @@
         "placeABidBtn": "Post my option"
       }
     },
+    "WinnerTab": {
+      "WinnerOptionCard": {
+        "voters_told_you": "voters told to",
+        "voter_told_you": "voter told to",
+        "created_by": "The option was created by"
+      }
+    },
     "FloatingActionButton": {
       "suggestNewBtn": "Suggest new"
     }
