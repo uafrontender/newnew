@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -18,9 +19,17 @@ export const Subscriptions = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user.userData?.options?.isOfferingSubscription)
-      router.push('/creator/subscribers/edit-subscription-rate');
-  }, [user.userData?.options?.isOfferingSubscription, router]);
+    if (!user.creatorData?.options.isCreatorConnectedToStripe) {
+      router.push('/creator/get-paid');
+    } else {
+      if (!user.userData?.options?.isOfferingSubscription)
+        router.push('/creator/subscribers/edit-subscription-rate');
+    }
+  }, [
+    user.userData?.options?.isOfferingSubscription,
+    router,
+    user.creatorData?.options.isCreatorConnectedToStripe,
+  ]);
 
   return (
     <>
