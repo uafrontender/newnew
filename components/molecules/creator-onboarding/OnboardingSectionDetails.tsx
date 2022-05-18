@@ -740,13 +740,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
         <SContainer isMobile={isMobile}>
           <SHeading variant={5}>{t('DetailsSection.heading')}</SHeading>
           <STopContainer>
-            <SNameContainer>
+            <SFieldPairContainer>
               <OnboardingInput
                 id='settings_first_name_input'
                 type='text'
                 value={firstNameInEdit}
                 isValid={firstNameInEdit.length > 1 ? true : false}
-                labelCaption={t('DetailsSection.form.firstName.labelCaption')}
                 placeholder={t('DetailsSection.form.firstName.placeholder')}
                 onChange={handleFirstnameInput}
                 errorCaption={t(
@@ -758,13 +757,12 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 type='text'
                 value={lastNameInEdit}
                 isValid={lastNameInEdit.length > 1 ? true : false}
-                labelCaption={t('DetailsSection.form.lastName.labelCaption')}
                 placeholder={t('DetailsSection.form.lastName.placeholder')}
                 onChange={handleLastnameInput}
                 errorCaption={t('DetailsSection.form.lastName.errors.tooShort')}
               />
-            </SNameContainer>
-            <SUsernameNicknameContainer>
+            </SFieldPairContainer>
+            <SFieldPairContainer>
               <OnboardingSectionUsernameInput
                 type='text'
                 value={usernameInEdit}
@@ -794,7 +792,6 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                     ]}
                   />
                 }
-                labelCaption={t('DetailsSection.form.username.labelCaption')}
                 frequencyCaption={t(
                   'DetailsSection.form.username.frequencyCaption'
                 )}
@@ -810,22 +807,20 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 value={nicknameInEdit}
                 disabled={loadingModalOpen}
                 placeholder={t('DetailsSection.form.nickname.placeholder')}
-                labelCaption={t('DetailsSection.form.nickname.labelCaption')}
                 errorCaption={t(
                   `DetailsSection.form.nickname.errors.${nicknameError}`
                 )}
                 isValid={nicknameError === ''}
                 onChange={handleUpdateNickname}
               />
-            </SUsernameNicknameContainer>
-            <SFormItemContainer>
+            </SFieldPairContainer>
+            <SFieldPairContainer marginBottom={34}>
               <OnboardingInput
                 id='settings_email_input'
                 type='email'
                 value={emailInEdit}
                 isValid={emailInEdit.length > 0 ? fieldsValid.email : true}
                 isTaken={emailError === 'emailTaken'}
-                labelCaption={t('DetailsSection.form.email.label')}
                 placeholder={t('DetailsSection.form.email.placeholder')}
                 cantChangeInfoCaption={t(
                   'DetailsSection.form.email.cantChangeInfoCaption'
@@ -837,43 +832,39 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
                 }
                 onChange={handleEmailInput}
               />
-            </SFormItemContainer>
-            <OnboardingCountrySelect<string>
-              label={
-                countries[
-                  countries.findIndex((o) => o.value === selectedCountry)
-                ].name
-              }
-              width='100%'
-              selected={selectedCountry}
-              options={countries}
-              onSelect={(val) => setSelectedCountry(val)}
-              closeOnSelect
-            />
-            <SFormItemContainer>
-              <OnboardingBirthDateInput
-                value={dateInEdit}
-                maxDate={maxDate}
-                locale={router.locale}
-                disabled={false}
-                isValid={dateError === ''}
-                labelCaption={t('DetailsSection.form.DoB.label')}
-                bottomCaption={t(
-                  'DetailsSection.form.DoB.captions.twoTimesOnly'
-                )}
-                errorCaption={t('DetailsSection.form.DoB.errors.tooYoung')}
-                onChange={handleDateInput}
-                handleResetIsValid={() => setDateError('')}
+              <OnboardingCountrySelect<string>
+                label={
+                  countries[
+                    countries.findIndex((o) => o.value === selectedCountry)
+                  ].name
+                }
+                width='100%'
+                selected={selectedCountry}
+                options={countries}
+                onSelect={(val) => setSelectedCountry(val)}
+                closeOnSelect
               />
-            </SFormItemContainer>
+            </SFieldPairContainer>
+            <OnboardingBirthDateInput
+              value={dateInEdit}
+              maxDate={maxDate}
+              locale={router.locale}
+              disabled={false}
+              isValid={dateError === ''}
+              labelCaption={t('DetailsSection.form.DoB.label')}
+              bottomCaption={t('DetailsSection.form.DoB.captions.twoTimesOnly')}
+              errorCaption={t('DetailsSection.form.DoB.errors.tooYoung')}
+              onChange={handleDateInput}
+              handleResetIsValid={() => setDateError('')}
+            />
           </STopContainer>
-          {!isTablet && <SSeparator />}
-          <STopContainer>
+          {!isMobile && !isTablet && <SSeparator />}
+          <SPhotoContainer>
             <OnboardingProfileImageInput
               imageInEditUrl={imageInEdit}
               handleChangeImageInEdit={handleSetProfilePictureInEdit}
             />
-          </STopContainer>
+          </SPhotoContainer>
           {(isMobile || isTablet) && (
             <CheckboxWithALink
               label={t('DetailsSection.agreedToTosCheckbox')}
@@ -982,17 +973,21 @@ const SContainer = styled.div<{
 const SHeading = styled(Headline)`
   padding-right: 32px;
 
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 
   ${({ theme }) => theme.media.tablet} {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    margin-bottom: 48px;
   }
 `;
 
 const STopContainer = styled.div`
   ${({ theme }) => theme.media.tablet} {
     background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-    padding: 24px;
+    padding: 32px 24px 45px 24px;
     border-radius: 16px;
     margin-bottom: 16px;
   }
@@ -1005,27 +1000,14 @@ const STopContainer = styled.div`
   }
 `;
 
-const SNameContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  gap: 16px;
-  margin-bottom: 16px;
-
-  ${({ theme }) => theme.media.laptop} {
-    flex-direction: row;
-  }
-`;
-
-const SUsernameNicknameContainer = styled.div`
+const SFieldPairContainer = styled.div<{ marginBottom?: number }>`
   display: flex;
   flex-direction: column;
   width: 100%;
 
-  ${({ theme }) => theme.media.tablet} {
-    width: 100%;
-  }
+  gap: 42px;
+  margin-bottom: ${({ marginBottom }) =>
+    marginBottom !== undefined ? `${marginBottom}px` : '42px;'};
 
   ${({ theme }) => theme.media.laptop} {
     flex-direction: row;
@@ -1033,25 +1015,30 @@ const SUsernameNicknameContainer = styled.div`
   }
 `;
 
-const SFormItemContainer = styled.div`
-  width: 100%;
-
-  margin-bottom: 16px;
-
-  ${({ theme }) => theme.media.tablet} {
-    /* width: 284px; */
-    width: 100%;
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    /* width: 296px; */
-  }
-`;
-
 const SSeparator = styled.div`
   border-bottom: 1px solid
     ${({ theme }) => theme.colorsThemed.background.outlines1};
-  margin-bottom: 16px;
+  margin-top: 20px;
+  margin-bottom: 32px;
+`;
+
+const SPhotoContainer = styled.div`
+  margin-top: 38px;
+
+  ${({ theme }) => theme.media.tablet} {
+    margin-top: 0px;
+    background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  ${({ theme }) => theme.media.laptop} {
+    background-color: initial;
+    padding: initial;
+    border-radius: initial;
+    margin-bottom: initial;
+  }
 `;
 
 const SControlsDiv = styled.div`
@@ -1142,7 +1129,7 @@ const SUsernamePopupListItem = styled.div<{
 
   &:before {
     content: '✓';
-    color: ${({ isValid }) => (isValid ? '#FFFFFF' : 'transparent')};
+    color: ${({ isValid }) => (isValid ? '#fff' : 'transparent')};
     font-size: 8px;
     text-align: center;
     line-height: 13px;
@@ -1177,5 +1164,5 @@ const SUsernamePopupList = styled.div`
   font-size: 12px;
   line-height: 16px;
 
-  color: #ffffff;
+  color: #fff;
 `;

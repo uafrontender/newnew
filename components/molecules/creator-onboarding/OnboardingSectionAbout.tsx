@@ -15,11 +15,7 @@ import Button from '../../atoms/Button';
 import Headline from '../../atoms/Headline';
 import OnboardingBioTextarea from './OnboardingBioTextarea';
 import OnboardingTagsSelection from './OnboardingTagsSelection';
-import {
-  setMyCreatorTags,
-  updateMe,
-  validateUsernameTextField,
-} from '../../../api/endpoints/user';
+import { setMyCreatorTags, updateMe } from '../../../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
   setUserData,
@@ -261,32 +257,20 @@ const OnboardingSectionAbout: React.FunctionComponent<IOnboardingSectionAbout> =
 export default OnboardingSectionAbout;
 
 const SContainer = styled.div`
-  padding-left: 16px;
-  padding-right: 16px;
-
-  padding-bottom: 88px;
-
+  padding: 0 20px 20px;
   z-index: 2;
-
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 0;
-
-    padding-left: 152px;
-    padding-right: 152px;
-
-    margin-bottom: 44px;
-
-    margin-top: 114px;
+    padding: 114px 152px 44px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: fit-content;
-
     padding-left: 0;
     padding-right: 104px;
-
-    margin-bottom: 190px;
-    margin-top: 44px;
+    padding-top: 44px;
   }
 `;
 
@@ -298,9 +282,7 @@ const SGoBackButton = styled(GoBackButton)`
 
 const SHeading = styled(Headline)`
   padding-right: 32px;
-
   margin-bottom: 24px;
-
   ${({ theme }) => theme.media.tablet} {
     margin-bottom: 40px;
   }
@@ -344,15 +326,9 @@ const SSeparator = styled.div`
 `;
 
 const SControlsDiv = styled.div`
-  /* position: fixed; */
-  margin-left: 16px;
-  width: calc(100% - 32px);
-
-  margin-top: 60%;
-
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
-
   button {
     width: 100%;
     height: 56px;
@@ -360,18 +336,12 @@ const SControlsDiv = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     position: static;
-    margin-top: 24px;
-
     margin-left: initial;
     width: 100%;
-
+    padding: 0;
     button {
       width: 170px;
       height: 48px;
     }
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 60%;
   }
 `;

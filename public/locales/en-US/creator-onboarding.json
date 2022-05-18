@@ -20,8 +20,7 @@
     "heading": "Ready to create? We'll just need a few details...",
     "form": {
       "firstName": {
-        "placeholder": "first name",
-        "labelCaption": "First name",
+        "placeholder": "First name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Firstname is too long",
@@ -32,8 +31,7 @@
         }
       },
       "lastName": {
-        "placeholder": "last name",
-        "labelCaption": "Last name",
+        "placeholder": "Last name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Lastname is too long",
@@ -44,8 +42,7 @@
         }
       },
       "username": {
-        "placeholder": "@username",
-        "labelCaption": "Username",
+        "placeholder": "Username",
         "frequencyCaption": "Username can be changed once a month.",
         "errors": {
           "generic": "Please check input",
@@ -63,8 +60,7 @@
         }
       },
       "nickname": {
-        "placeholder": "Create your display name",
-        "labelCaption": "Display name",
+        "placeholder": "Display name",
         "errors": {
           "generic": "Please check input",
           "tooLong": "Name is too long",
@@ -75,16 +71,12 @@
         }
       },
       "email": {
-        "label": "Email address",
-        "placeholder": "email@email.com",
+        "placeholder": "Email address",
         "cantChangeInfoCaption": "You can't change this info.",
         "errors": {
           "invalidEmail": "Please enter a valid email address",
           "emailTaken": "This email is already taken. Try another one"
         }
-      },
-      "CoR": {
-        "label": "Country of residence"
       },
       "DoB": {
         "label": "Date of birth",

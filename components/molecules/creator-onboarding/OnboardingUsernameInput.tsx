@@ -9,7 +9,6 @@ import AnimatedPresence from '../../atoms/AnimatedPresence';
 type TOnboardingSectionUsernameInput =
   React.ComponentPropsWithoutRef<'input'> & {
     isValid?: boolean;
-    labelCaption: string;
     popupCaption: ReactElement;
     frequencyCaption: string;
     errorCaption: string;
@@ -20,7 +19,6 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
     value,
     popupCaption,
     frequencyCaption,
-    labelCaption,
     errorCaption,
     isValid,
     disabled,
@@ -53,9 +51,6 @@ const OnboardingSectionUsernameInput: React.FunctionComponent<TOnboardingSection
 
     return (
       <SWrapper>
-        <SLabel isVisible={(value as string)?.length > 0}>
-          {labelCaption}
-        </SLabel>
         <SInputWrapper>
           <SOnboardingSectionUsernameInput
             value={(value as string).length > 0 ? `@${value}` : value}
@@ -154,28 +149,6 @@ const SWrapper = styled.div`
   }
 `;
 
-const SLabel = styled.div<{
-  isVisible: boolean;
-}>`
-  display: block;
-
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
-
-  margin-bottom: 6px;
-
-  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
-  height: ${({ isVisible }) => (isVisible ? 'fit-content' : 0)};
-  transition: linear 0.2s;
-
-  ${({ theme }) => theme.media.laptop} {
-    height: fit-content !important;
-    opacity: 1;
-  }
-`;
-
 const SInputWrapper = styled.div`
   position: relative;
   display: flex;
@@ -222,9 +195,11 @@ interface ISOnboardingSectionUsernameInput {
 const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsernameInput>`
   display: block;
 
+  height: 48px;
+
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
 
   padding: 12px 40px 12px 20px;
   padding-right: 32px;
@@ -268,13 +243,6 @@ const SOnboardingSectionUsernameInput = styled.input<ISOnboardingSectionUsername
 
   &:disabled {
     opacity: 0.5;
-  }
-
-  ${({ theme }) => theme.media.tablet} {
-    height: 48px;
-
-    font-size: 16px;
-    line-height: 24px;
   }
 `;
 
@@ -339,6 +307,8 @@ const SPreviewDiv = styled.div`
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
+  position: absolute;
+  bottom: -30px;
 
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
