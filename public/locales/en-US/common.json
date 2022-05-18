@@ -98,5 +98,8 @@
   "search": {
     "top-posts": "Top Posts",
     "popular-creators": "Popular Creators"
+  },
+  "creator-card": {
+    "subscription-cost": "${{amount}} Monthly"
   }
 }
