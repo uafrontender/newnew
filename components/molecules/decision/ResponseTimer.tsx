@@ -150,5 +150,7 @@ const SInlineSvg = styled(InlineSvg)`
 
 const STimeSpan = styled.span`
   display: inline-block;
-  min-width: 0.9rem;
+  text-align: end;
+  min-width: 16px;
+  margin-right: 1px;
 `;

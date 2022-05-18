@@ -552,15 +552,9 @@ const ProfileLayout: React.FunctionComponent<IProfileLayout> = ({
                     : `/direct-messages/${user.username}`
                 }
               >
-                <Button
-                  withShadow
-                  view='primaryGrad'
-                  style={{
-                    marginBottom: '16px',
-                  }}
-                >
+                <SSendButton withShadow view='primaryGrad'>
                   {t('ProfileLayout.buttons.sendMessage')}
-                </Button>
+                </SSendButton>
               </Link>
             ) : null}
             {user.bio ? <SBioText variant={3}>{user.bio}</SBioText> : null}
@@ -692,6 +686,21 @@ const SShareButton = styled(Button)`
     font-size: 14px;
     line-height: 20px;
     color: ${({ theme }) => theme.colorsThemed.text.primary};
+  }
+`;
+
+const SSendButton = styled(Button)`
+  margin-bottom: 16px;
+  background: ${(props) => props.theme.colorsThemed.accent.yellow};
+  color: #2c2c33;
+
+  :after {
+    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
+  }
+
+  &:hover {
+    background: ${(props) => props.theme.colorsThemed.accent.yellow} !important;
+    box-shadow: none !important;
   }
 `;
 

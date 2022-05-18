@@ -7,7 +7,7 @@ import Headline from '../Headline';
 
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../InlineSVG';
-import emptyFolder from '../../../public/images/notifications/no-results.png';
+import assets from '../../../constants/assets';
 
 const SubsFeatures = () => {
   const { t } = useTranslation('creator');
@@ -15,7 +15,7 @@ const SubsFeatures = () => {
   return (
     <SContainer>
       <Image
-        src={emptyFolder}
+        src={assets.subscription.subMC}
         alt={t('subscribersFeatures.title')}
         width={176}
         height={176}
