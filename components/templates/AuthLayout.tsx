@@ -64,17 +64,19 @@ const AuthLayout: React.FunctionComponent<IAuthLayout> = ({ children }) => {
       >
         <AuthLayoutContextProvider>
           <SAuthLayout>
-            <BackgroundVisual
-              view={
-                router.pathname.includes('verify-email')
-                  ? 'verify-email'
-                  : 'sign-up'
-              }
-            />
-            {!router.pathname.includes('verify-email') ? (
-              <HomeLogoButton />
-            ) : null}
-            <AnimatePresence>{children}</AnimatePresence>
+            <Container>
+              <BackgroundVisual
+                view={
+                  router.pathname.includes('verify-email')
+                    ? 'verify-email'
+                    : 'sign-up'
+                }
+              />
+              {!router.pathname.includes('verify-email') ? (
+                <HomeLogoButton />
+              ) : null}
+              <AnimatePresence>{children}</AnimatePresence>
+            </Container>
           </SAuthLayout>
         </AuthLayoutContextProvider>
       </SkeletonTheme>
@@ -94,18 +96,19 @@ const HomeLogoButton: React.FunctionComponent = () => (
   </SHomeLogoButton>
 );
 
-const SHomeLogoButton = styled(Container)`
+const SHomeLogoButton = styled.div`
   display: none;
 
   ${({ theme }) => theme.media.tablet} {
-    display: block;
-
     position: relative;
-    margin: 12px 0px;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 
   ${(props) => props.theme.media.laptop} {
-    margin: 16px 0;
+    display: block;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 `;
 

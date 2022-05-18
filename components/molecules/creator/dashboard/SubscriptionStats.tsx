@@ -49,7 +49,6 @@ export const SubscriptionStats = () => {
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
       setNewSubs(res.data.subscribers as newnewapi.ISubscriber[]);
-      console.log(res.data.subscribers);
       setMySubscribersIsLoading(false);
     } catch (err) {
       console.error(err);
