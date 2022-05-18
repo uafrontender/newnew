@@ -61,12 +61,25 @@ const OnboardingSectionSubrate: React.FunctionComponent<IOnboardingSectionSubrat
 
         if (res.error) throw new Error(res.error?.message ?? 'Request failed');
 
-        if (!user.userData?.options?.isOfferingSubscription) {
+        if (
+          !user.userData?.options?.isOfferingSubscription &&
+          selectedProduct.id &&
+          selectedProduct.id?.length > 0
+        ) {
           dispatch(
             setUserData({
               options: {
                 ...user.userData?.options,
                 isOfferingSubscription: true,
+              },
+            })
+          );
+        } else {
+          dispatch(
+            setUserData({
+              options: {
+                ...user.userData?.options,
+                isOfferingSubscription: false,
               },
             })
           );

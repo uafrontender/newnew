@@ -30,6 +30,7 @@ import {
 } from '../../../api/endpoints/user';
 import {
   logoutUserClearCookiesAndRedirect,
+  setCreatorData,
   setUserData,
 } from '../../../redux-store/slices/userStateSlice';
 import useUpdateEffect from '../../../utils/hooks/useUpdateEffect';
@@ -540,7 +541,11 @@ const OnboardingSectionDetails: React.FunctionComponent<IOnboardingSectionDetail
           if (res.error) {
             throw new Error('Request failed');
           }
-
+          dispatch(
+            setCreatorData({
+              isLoaded: true,
+            })
+          );
           router.push('/creator/dashboard');
         }
       } catch (err) {

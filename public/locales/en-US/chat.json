@@ -22,14 +22,14 @@
     "default-first-message": "👋 Hey, thank you for subscribing to my channel, I look forward to talking to you."
   },
   "user-blocked": {
-    "title": "User blocked",
-    "message": "Unblock the user, to continue conversation.",
-    "button-text": "Unblock user"
+    "title": "You blocked ",
+    "message": "Unblock them to chat. Don’t worry, they can’t see that you blocked them...",
+    "button-text": "Unblock"
   },
   "group-blocked": {
     "title": "Group blocked",
     "message": "Unblock the group, to continue conversation.",
-    "button-text": "Unblock group"
+    "button-text": "Unblock"
   },
   "subscription-expired": {
     "title": "Subscription expired",
@@ -37,9 +37,8 @@
     "button-text": "Renew subscription"
   },
   "messaging-disabled": {
-    "title": "Messaging temporarily disabled",
-    "message": "is not accepting messages at this moment. Stay tuned!",
-    "button-text": "Check user’s profile"
+    "title": "Messaging turned off",
+    "message": " temporarily turned off their subscription. Check back soon!"
   },
   "account-deleted": {
     "title": "Account deleted",
@@ -51,11 +50,11 @@
   },
   "modal": {
     "block-user": {
-      "title": "Block user",
-      "message-first-part": "Do you really want to block",
-      "message-second-part": "from messaging you on NewNew?",
+      "title": "Block",
+      "message-first-part": "Are you sure you want to block",
+      "message-second-part": "from messaging you?",
       "button-cancel": "Cancel",
-      "button-confirm": "Block user"
+      "button-confirm": "Block"
     },
     "block-group": {
       "title": "Block group",

@@ -3,6 +3,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -50,10 +51,6 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
       }
     };
 
-    const handleSubmit = () => {
-      router.push('/creator-onboarding-subrate');
-    };
-
     return (
       <SContainer>
         {isMobile && <SGoBackButton onClick={() => router.back()} />}
@@ -97,22 +94,29 @@ const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe>
         </SButton>
         <SControlsDiv>
           {!isMobile && (
-            <GoBackButton noArrow onClick={() => router.back()}>
-              {t('AboutSection.backButton')}
-            </GoBackButton>
+            <Link href='/creator/dashboard'>
+              <a>
+                <GoBackButton noArrow onClick={() => {}}>
+                  {t('AboutSection.backButton')}
+                </GoBackButton>
+              </a>
+            </Link>
           )}
-          <Button
-            view='primaryGrad'
-            disabled={!isConnectedToStripe}
-            style={{
-              width: isMobile ? '100%' : 'initial',
-            }}
-            onClick={() => handleSubmit()}
-          >
-            {isMobile
-              ? t('StripeSection.submitMobile')
-              : t('StripeSection.submitDesktop')}
-          </Button>
+          <Link href='/creator-onboarding-subrate'>
+            <a>
+              <Button
+                view='primaryGrad'
+                disabled={!isConnectedToStripe}
+                style={{
+                  width: isMobile ? '100%' : 'initial',
+                }}
+              >
+                {isMobile
+                  ? t('StripeSection.submitMobile')
+                  : t('StripeSection.submitDesktop')}
+              </Button>
+            </a>
+          </Link>
         </SControlsDiv>
       </SContainer>
     );

@@ -43,7 +43,7 @@ const BlockedUser: React.FC<IBlockedUser> = ({
               <SBottomActionTitle>
                 {isAnnouncement
                   ? t('group-blocked.title')
-                  : t('user-blocked.title')}
+                  : `${t('user-blocked.title')} ${user.username}`}
               </SBottomActionTitle>
               <SBottomActionMessage>
                 {isAnnouncement
@@ -64,15 +64,13 @@ const BlockedUser: React.FC<IBlockedUser> = ({
           </SBottomActionButton>
         </SBottomAction>
       )}
-      {confirmBlockUser && (
-        <BlockUserModal
-          confirmBlockUser={confirmBlockUser}
-          onUserBlock={onUserBlock}
-          user={user}
-          closeModal={closeModal}
-          isAnnouncement={isAnnouncement}
-        />
-      )}
+      <BlockUserModal
+        confirmBlockUser={confirmBlockUser}
+        onUserBlock={onUserBlock}
+        user={user}
+        closeModal={closeModal}
+        isAnnouncement={isAnnouncement}
+      />
     </>
   );
 };

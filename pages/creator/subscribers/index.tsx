@@ -1,24 +1,33 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import General from '../../../components/templates/General';
 import Content from '../../../components/organisms/creator/Subscriptions/Subscriptions';
 
 import { NextPageWithLayout } from '../../_app';
+import { useAppSelector } from '../../../redux-store/store';
 
 export const Subscriptions = () => {
   const { t } = useTranslation('creator');
+  const user = useAppSelector((state) => state.user);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user.userData?.options?.isOfferingSubscription)
+      router.push('/creator/subscribers/edit-subscription-rate');
+  }, [user.userData?.options?.isOfferingSubscription, router]);
 
   return (
     <>
       <Head>
         <title>{t('subscriptions.meta.title')}</title>
       </Head>
-      <Content />
+      {user.userData?.options?.isOfferingSubscription && <Content />}
     </>
   );
 };
