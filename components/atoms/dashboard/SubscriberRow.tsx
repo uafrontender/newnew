@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { newnewapi } from 'newnew-api';
@@ -51,10 +52,12 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
       const isBlocked = usersIBlocked.find((i) => i === subscriber.user?.uuid);
       if (isBlocked) {
         setIsSubscriberBlocked(true);
+      } else {
+        if (isSubscriberBlocked) setIsSubscriberBlocked(false);
       }
-      console.log(usersIBlocked);
+    } else {
+      if (isSubscriberBlocked) setIsSubscriberBlocked(false);
     }
-    if (isSubscriberBlocked) setIsSubscriberBlocked(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usersIBlocked, subscriber]);
@@ -143,14 +146,12 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
             onClose={handleReportClose}
           />
         )}
-        {isSubscriberBlocked === true || (
-          <BlockUserModal
-            confirmBlockUser={confirmBlockUser}
-            onUserBlock={() => setIsSubscriberBlocked(true)}
-            user={subscriber.user!!}
-            closeModal={() => setConfirmBlockUser(false)}
-          />
-        )}
+        <BlockUserModal
+          confirmBlockUser={confirmBlockUser}
+          onUserBlock={() => setIsSubscriberBlocked(true)}
+          user={subscriber.user!!}
+          closeModal={() => setConfirmBlockUser(false)}
+        />
       </SActions>
     </SContainer>
   );
