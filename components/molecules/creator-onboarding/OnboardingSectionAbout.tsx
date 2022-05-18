@@ -348,7 +348,7 @@ const SControlsDiv = styled.div`
   margin-left: 16px;
   width: calc(100% - 32px);
 
-  margin-top: 70%;
+  margin-top: 60%;
 
   display: flex;
   justify-content: space-between;
@@ -372,6 +372,6 @@ const SControlsDiv = styled.div`
   }
 
   ${({ theme }) => theme.media.laptop} {
-    margin-top: 70%;
+    margin-top: 60%;
   }
 `;

@@ -52,11 +52,12 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
           <SModalTitle>
             {isAnnouncement
               ? t('modal.block-group.title')
-              : t('modal.block-user.title')}
+              : `${t('modal.block-user.title')} ${user.username}`}
           </SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {user.nickname}{' '}
-            {t('modal.block-user.message-second-part')}
+            {`${t('modal.block-user.message-first-part')} ${user.username} ${t(
+              'modal.block-user.message-second-part'
+            )}`}
           </SModalMessage>
           <SModalButtons>
             <SCancelButton onClick={closeModal}>

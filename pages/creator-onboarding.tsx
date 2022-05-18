@@ -9,7 +9,7 @@ import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLayout';
@@ -20,6 +20,7 @@ import {
   getMyOnboardingState,
 } from '../api/endpoints/user';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
+import { setCreatorData } from '../redux-store/slices/userStateSlice';
 
 const OnboardingSectionDetails = dynamic(
   () =>
@@ -48,6 +49,8 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 
   const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   useLeavePageConfirm(true, t('DetailsSection.leaveMsg'), [
     '/creator/dashboard',
@@ -71,6 +74,14 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
 
         if (res.data) {
           setOnboardingState(res.data);
+          dispatch(
+            setCreatorData({
+              options: {
+                ...user.creatorData?.options,
+                ...res.data,
+              },
+            })
+          );
         }
       } catch (err) {
         console.error(err);
@@ -78,6 +89,7 @@ const CreatorOnboarding: NextPage<ICreatorOnboarding> = ({
     }
 
     fetchOnboardingState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
