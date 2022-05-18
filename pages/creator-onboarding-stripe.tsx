@@ -14,6 +14,8 @@ import CreatorOnboardingLayout from '../components/templates/CreatorOnboardingLa
 import { getMyOnboardingState } from '../api/endpoints/user';
 import Lottie from '../components/atoms/Lottie';
 import loadingAnimation from '../public/animations/logo-loading-blue.json';
+import { useAppDispatch, useAppSelector } from '../redux-store/store';
+import { setCreatorData } from '../redux-store/slices/userStateSlice';
 
 const OnboardingSectionStripe = dynamic(
   () =>
@@ -28,6 +30,8 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -37,6 +41,14 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
 
         if (res.data) {
           setOnboardingState(res.data);
+          dispatch(
+            setCreatorData({
+              options: {
+                ...user.creatorData?.options,
+                ...res.data,
+              },
+            })
+          );
         }
 
         setIsLoading(false);
@@ -44,8 +56,8 @@ const CreatorOnboardingStripe: NextPage<ICreatorOnboardingStripe> = () => {
         console.error(err);
       }
     }
-
     fetchOnboardingState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

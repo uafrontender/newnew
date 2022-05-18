@@ -134,12 +134,12 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (isTodosCompleted && !hasMyPosts && !isLoading) {
+    if (!hasMyPosts && !isLoading) {
       loadMyPosts();
     } else {
       setIsLoading(false);
     }
-  }, [isTodosCompleted, isLoading, hasMyPosts, loadMyPosts]);
+  }, [isLoading, hasMyPosts, loadMyPosts]);
 
   const fetchMyEarnings = useCallback(async () => {
     try {
@@ -168,11 +168,11 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [isEarningsLoading]);
 
   useEffect(() => {
-    if (isTodosCompleted && !myEarnings && isEarningsLoading) {
+    if (!myEarnings && isEarningsLoading) {
       fetchMyEarnings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTodosCompleted]);
+  }, []);
 
   return (
     <SContainer>

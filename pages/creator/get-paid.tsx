@@ -13,6 +13,8 @@ import { getMyOnboardingState } from '../../api/endpoints/user';
 import CreatorStripeLayout from '../../components/templates/CreatorStripeLayout';
 import { NextPageWithLayout } from '../_app';
 import Lottie from '../../components/atoms/Lottie';
+import { useAppDispatch, useAppSelector } from '../../redux-store/store';
+import { setCreatorData } from '../../redux-store/slices/userStateSlice';
 
 const DashboardSectionStripe = dynamic(
   () => import('../../components/organisms/creator/DashboardSectionStripe')
@@ -26,6 +28,8 @@ const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
   const [onboardingState, setOnboardingState] =
     useState<newnewapi.GetMyOnboardingStateResponse>();
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
     async function fetchOnboardingState() {
@@ -35,6 +39,14 @@ const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
 
         if (res.data) {
           setOnboardingState(res.data);
+          dispatch(
+            setCreatorData({
+              options: {
+                ...user.creatorData?.options,
+                ...res.data,
+              },
+            })
+          );
         }
 
         setIsLoading(false);
@@ -44,6 +56,7 @@ const GetPaid: NextPage<ICreatorOnboardingStripe> = () => {
     }
 
     fetchOnboardingState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
