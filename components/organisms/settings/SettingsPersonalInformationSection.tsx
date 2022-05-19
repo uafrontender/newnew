@@ -71,7 +71,13 @@ const SettingsPersonalInformationSection: React.FunctionComponent<TSettingsPerso
       try {
         setIsLoading(true);
 
-        if (wasDateModified && dateInEdit) {
+        if (
+          wasDateModified &&
+          dateInEdit &&
+          dateInEdit.getMonth() &&
+          dateInEdit.getFullYear() &&
+          dateInEdit.getDate()
+        ) {
           const updateDatePayload = new newnewapi.UpdateMeRequest({
             dateOfBirth: {
               year: dateInEdit.getFullYear(),
