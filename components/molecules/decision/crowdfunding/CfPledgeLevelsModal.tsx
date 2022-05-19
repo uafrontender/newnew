@@ -5,6 +5,7 @@ import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../redux-store/store';
 // import { doPledgeWithWallet } from '../../../../api/endpoints/crowdfunding';
@@ -369,13 +370,15 @@ const CfPledgeLevelsModal: React.FunctionComponent<ICfPledgeLevelsModal> = ({
                 </SPaymentSign>
               )}
               <SPaymentTerms variant={3}>
-                {'* '}
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('CfPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>{' '}
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('CfPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
                 {t('CfPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>

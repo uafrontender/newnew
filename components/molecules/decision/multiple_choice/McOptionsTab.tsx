@@ -15,6 +15,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { debounce } from 'lodash';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 import { validateText } from '../../../../api/endpoints/infrastructure';
@@ -678,13 +679,15 @@ const McOptionsTab: React.FunctionComponent<IMcOptionsTab> = ({
                 {t('McPost.paymentModalFooter.body', { creator: postCreator })}
               </SPaymentSign>
               <SPaymentTerms variant={3}>
-                {'* '}
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('McPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>{' '}
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('McPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
                 {t('McPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>

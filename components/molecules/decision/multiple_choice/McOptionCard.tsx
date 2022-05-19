@@ -655,13 +655,15 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
                   })}
                 </SPaymentSign>
                 <SPaymentTerms variant={3}>
-                  {'* '}
-                  <SPaymentTermsLink
-                    href='https://terms.newnew.co'
-                    target='_blank'
-                  >
-                    {t('McPost.paymentModalFooter.terms')}
-                  </SPaymentTermsLink>{' '}
+                  *{' '}
+                  <Link href='https://terms.newnew.co'>
+                    <SPaymentTermsLink
+                      href='https://terms.newnew.co'
+                      target='_blank'
+                    >
+                      {t('McPost.paymentModalFooter.terms')}
+                    </SPaymentTermsLink>
+                  </Link>{' '}
                   {t('McPost.paymentModalFooter.apply')}
                 </SPaymentTerms>
               </>

@@ -16,6 +16,7 @@ import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
+import Link from 'next/link';
 
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 // import { WalletContext } from '../../../../contexts/walletContext';
@@ -628,13 +629,15 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
                 {t('AcPost.paymentModalFooter.body', { creator: postCreator })}
               </SPaymentSign>
               <SPaymentTerms variant={3}>
-                {'* '}
-                <SPaymentTermsLink
-                  href='https://terms.newnew.co'
-                  target='_blank'
-                >
-                  {t('AcPost.paymentModalFooter.terms')}
-                </SPaymentTermsLink>{' '}
+                *{' '}
+                <Link href='https://terms.newnew.co'>
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('AcPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>
+                </Link>{' '}
                 {t('AcPost.paymentModalFooter.apply')}
               </SPaymentTerms>
             </>
