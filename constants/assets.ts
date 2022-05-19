@@ -23,9 +23,9 @@ const assets = {
   },
   info: {
     lightQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-light.png`,
-    lightQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-light.webp`,
+    lightQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-light.mp4`,
     darkQuestionMarkStatic: `${APP_ASSETS_ORIGIN}/info/question-mark-static-dark.png`,
-    darkQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-dark.webp`,
+    darkQuestionMarkAnimated: `${APP_ASSETS_ORIGIN}/info/question-mark-dark.mp4`,
   },
   home: {
     darkLandingAnimated: `${APP_ASSETS_ORIGIN}/home/Landing-Page-Dark.mp4`,

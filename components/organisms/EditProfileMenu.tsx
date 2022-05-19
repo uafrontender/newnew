@@ -675,7 +675,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
       dataInEdit.username.length <= 25 &&
       validator.isAlphanumeric(dataInEdit.username) &&
       validator.isLowercase(dataInEdit.username);
-    const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
+    const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
 
     if (!isNicknameValid || !isUsernameValid) {
       setFormErrors((errors) => {
@@ -704,7 +704,7 @@ const EditProfileMenu: React.FunctionComponent<IEditProfileMenu> = ({
         dataInEdit.username.length <= 25 &&
         validator.isAlphanumeric(dataInEdit.username) &&
         validator.isLowercase(dataInEdit.username);
-      const isNicknameValid = dataInEdit && dataInEdit!!.nickname!!.length > 0;
+      const isNicknameValid = dataInEdit && dataInEdit.nickname.length > 0;
 
       if (!isNicknameValid || !isUsernameValid) {
         setFormErrors((errors) => {

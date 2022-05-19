@@ -35,7 +35,7 @@ const BlockUserModal: React.FC<IBlockUserModal> = ({
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      blockUser(user.uuid!!);
+      if (user.uuid) blockUser(user.uuid);
       onUserBlock?.();
       closeModal();
     } catch (err) {

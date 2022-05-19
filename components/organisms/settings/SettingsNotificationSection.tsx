@@ -58,12 +58,14 @@ const SettingsNotificationsSection = () => {
 
   const handleUpdateItem = (index: number) => {
     setMyNotificationState((curr) => {
-      const arr = [...curr!!];
-      arr[index] = {
-        ...curr!![index],
-        isEnabled: !curr!![index].isEnabled,
-      };
-      updateMyNotificationState(arr[index]);
+      const arr = curr ? [...curr] : [];
+      if (curr) {
+        arr[index] = {
+          ...curr[index],
+          isEnabled: !curr[index].isEnabled,
+        };
+        updateMyNotificationState(arr[index]);
+      }
       return arr;
     });
   };

@@ -44,8 +44,8 @@ const AcBidCard: React.FunctionComponent<IAcBidCard> = ({ bid }) => {
           }}
         >
           <img
-            src={bid.bidder?.avatarUrl!! as string}
-            alt={bid.bidder?.username!!}
+            src={bid.bidder?.avatarUrl ?? ''}
+            alt={bid.bidder?.username ?? ''}
             draggable={false}
           />
         </SAvatar>

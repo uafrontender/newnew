@@ -310,7 +310,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
     const socketHandlerMessageCreated = (data: any) => {
       const arr = new Uint8Array(data);
       const decoded = newnewapi.ChatMessageCreated.decode(arr);
-      if (decoded.newMessage!!.sender?.uuid!! !== user.userData?.userUuid) {
+      if (decoded.newMessage!!.sender?.uuid !== user.userData?.userUuid) {
         setComments((curr) => {
           const workingArr = [...curr];
 
@@ -378,7 +378,7 @@ const CommentsTab: React.FunctionComponent<ICommentsTab> = ({
   );
 
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entry) => {
+    const resizeObserver = new ResizeObserver((entry: any) => {
       const size = entry[0]?.borderBoxSize
         ? entry[0]?.borderBoxSize[0]?.blockSize
         : entry[0]?.contentRect.height;

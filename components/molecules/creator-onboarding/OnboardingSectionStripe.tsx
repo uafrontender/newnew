@@ -163,6 +163,7 @@ const SControlsDiv = styled.div`
     margin-left: initial;
     width: 100%;
     padding: 0;
+    a,
     button {
       width: 170px;
       height: 48px;
