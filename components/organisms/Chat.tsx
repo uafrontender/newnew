@@ -37,7 +37,7 @@ export const Chat: React.FC<IChat> = ({ username }) => {
         ? (route = chatRoom?.visavis?.username)
         : (route = `${chatRoom?.visavis?.username}-announcement`);
     } else {
-      chatRoom!!.kind === 4 && chatRoom!!.myRole === 2
+      chatRoom && chatRoom.kind === 4 && chatRoom.myRole === 2
         ? (route = `${user.userData?.username}-announcement`)
         : '';
     }

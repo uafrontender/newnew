@@ -348,7 +348,7 @@ const PostVideoModeration: React.FunctionComponent<IPostVideoModeration> = ({
           responseObj = res.data.multipleChoice.response;
         if (res.data.crowdfunding) responseObj = res.data.crowdfunding.response;
         // @ts-ignore
-        handleUpdateResponseVideo(responseObj!!);
+        if (responseObj) handleUpdateResponseVideo(responseObj);
         handleUpdatePostStatus('SUCCEEDED');
         setUploadedResponseVideoUrl('');
       }

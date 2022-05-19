@@ -76,6 +76,15 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
     []
   );
 
+  const postTypeText = useCallback(() => {
+    if (postData) {
+      if (postData.auction) return 'Event';
+      if (postData.crowdfunding) return 'Goal';
+      return 'Superpoll';
+    }
+    return 'Event';
+  }, [postData]);
+
   async function copyPostUrlToClipboard(url: string) {
     if ('clipboard' in navigator) {
       await navigator.clipboard.writeText(url);
@@ -249,13 +258,7 @@ const PublishedModal: React.FC<IPublishedModal> = (props) => {
                     : 'scheduled'
                 }`,
                 {
-                  value: postData
-                    ? postData!!.auction
-                      ? 'Event'
-                      : postData!!.crowdfunding
-                      ? 'Goal'
-                      : 'Superpoll'
-                    : 'Post',
+                  value: postTypeText(),
                 }
               )}
             </SButtonTitle>

@@ -76,12 +76,14 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
 
   useEffect(() => {
     if (isBrowser()) {
-      const currScroll = document.getElementById('post-modal-container')!!
-        .scrollTop!!;
-      const targetScroll =
-        (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
+      const container = document.getElementById('post-modal-container');
+      if (container) {
+        const currScroll = container.scrollTop;
+        const targetScroll =
+          (containerRef.current?.getBoundingClientRect().top ?? 500) - 218;
 
-      setIsScrolledDown(currScroll >= targetScroll!!);
+        setIsScrolledDown(currScroll >= targetScroll!!);
+      }
     }
   }, []);
 
@@ -146,12 +148,18 @@ const AcWinnerTab: React.FunctionComponent<IAcWinnerTab> = ({
                   : t('AcPost.WinnerTab.WinnerOptionCard.bidder_bid_amount')}
               </SSpanThin>
             </SNumBidders>
-            <SHeadline variant={4}>
-              ${formatNumber(option.totalAmount!!.usdCents!! / 100, true)}
-            </SHeadline>
+            {option.totalAmount?.usdCents && (
+              <SHeadline variant={4}>
+                ${formatNumber(option.totalAmount.usdCents / 100, true)}
+              </SHeadline>
+            )}
             <SOptionCreator variant={3}>
               <SSpanThin>{t('AcPost.WinnerTab.WinnerOptionCard.on')}</SSpanThin>{' '}
-              <Link href={`/${option.creator?.username!!}`}>
+              <Link
+                href={`/${
+                  option.creator?.username ? option.creator?.username : '/'
+                }`}
+              >
                 <SSpanBold
                   style={{
                     cursor: !isMySuggestion ? 'pointer' : 'default',

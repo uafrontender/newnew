@@ -92,7 +92,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
       }
 
       if (postType === 'cf') {
-        if (!totalPledges || totalPledges!! < targetPledges!!) {
+        if (!totalPledges || (targetPledges && totalPledges < targetPledges)) {
           return 'cf';
         }
       }
@@ -258,7 +258,7 @@ const PostTopInfoModeration: React.FunctionComponent<IPostTopInfoModeration> =
               postType: t(`postType.${postType}`),
             })}
             body={t(`PostFailedBoxModeration.reason.${failureReason}`)}
-            imageSrc={IMAGES[postType!!]}
+            imageSrc={postType ? IMAGES[postType] : undefined}
             buttonCaption={t('PostFailedBoxModeration.ctaButton', {
               postType: t(`postType.${postType}`),
             })}
@@ -364,7 +364,7 @@ const SShareButton = styled(Button)`
   padding: 0px;
   &:focus:enabled {
     background: ${({ theme, view }) =>
-      theme.colorsThemed.button.background[view!!]};
+      view ? theme.colorsThemed.button.background[view] : ''};
   }
 `;
 

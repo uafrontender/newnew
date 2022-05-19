@@ -62,9 +62,10 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
         if (!res.data || res.error)
           throw new Error(res.error?.message ?? 'Request failed');
-        if (res.data && res.data.rooms.length > 0) {
+        if (res.data?.rooms.length > 0) {
           setChatRooms((curr) => {
-            const arr = [...curr!!, ...res.data?.rooms!!];
+            const arr =
+              curr && res.data?.rooms ? [...curr, ...res.data?.rooms] : [];
             return arr;
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
@@ -193,9 +194,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar
-            avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''}
-          />
+          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
         </SUserAvatar>
       );
       let chatName = chat.visavis?.nickname
@@ -206,7 +205,7 @@ const ChatList: React.FC<IFunctionProps> = ({ openChat, searchText }) => {
         avatar = (
           <SMyAvatar>
             <SUserAvatar>
-              <UserAvatar avatarUrl={user.userData?.avatarUrl!!} />
+              <UserAvatar avatarUrl={user.userData?.avatarUrl ?? ''} />
             </SUserAvatar>
             <SInlineSVG
               svg={megaphone}

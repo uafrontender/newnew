@@ -71,7 +71,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(subscriber.user?.uuid!!);
+      if (subscriber.user?.uuid) unblockUser(subscriber.user.uuid);
     } catch (err) {
       console.error(err);
     }
@@ -93,11 +93,7 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
     <SContainer>
       <SUser>
         <SUserAvatar>
-          <UserAvatar
-            avatarUrl={
-              subscriber.user?.avatarUrl ? subscriber.user.avatarUrl : ''
-            }
-          />
+          <UserAvatar avatarUrl={subscriber.user?.avatarUrl ?? ''} />
         </SUserAvatar>
         {subscriber.user?.nickname
           ? subscriber.user?.nickname
@@ -130,28 +126,30 @@ const SubscriberRow: React.FC<ISubscriberRow> = ({ subscriber }) => {
             height='20px'
           />
         </SMoreButton>
-        <SubscriberEllipseMenu
-          user={subscriber.user!!}
-          isVisible={ellipseMenuOpen}
-          handleClose={handleCloseEllipseMenu}
-          userBlocked={isSubscriberBlocked}
-          onUserBlock={onUserBlock}
-          onUserReport={onUserReport}
-        />
         {subscriber.user && (
-          <ReportModal
-            show={confirmReportUser}
-            reportedDisplayname={getDisplayname(subscriber.user)}
-            onSubmit={handleReportSubmit}
-            onClose={handleReportClose}
-          />
+          <>
+            <SubscriberEllipseMenu
+              user={subscriber.user}
+              isVisible={ellipseMenuOpen}
+              handleClose={handleCloseEllipseMenu}
+              userBlocked={isSubscriberBlocked}
+              onUserBlock={onUserBlock}
+              onUserReport={onUserReport}
+            />
+            <ReportModal
+              show={confirmReportUser}
+              reportedDisplayname={getDisplayname(subscriber.user)}
+              onSubmit={handleReportSubmit}
+              onClose={handleReportClose}
+            />
+            <BlockUserModal
+              confirmBlockUser={confirmBlockUser}
+              onUserBlock={() => setIsSubscriberBlocked(true)}
+              user={subscriber.user}
+              closeModal={() => setConfirmBlockUser(false)}
+            />
+          </>
         )}
-        <BlockUserModal
-          confirmBlockUser={confirmBlockUser}
-          onUserBlock={() => setIsSubscriberBlocked(true)}
-          user={subscriber.user!!}
-          closeModal={() => setConfirmBlockUser(false)}
-        />
       </SActions>
     </SContainer>
   );

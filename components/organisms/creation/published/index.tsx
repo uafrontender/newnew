@@ -59,6 +59,15 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
     }
   }
 
+  const postTypeText = useCallback(() => {
+    if (postData) {
+      if (postData.auction) return 'Event';
+      if (postData.crowdfunding) return 'Goal';
+      return 'Superpoll';
+    }
+    return 'Event';
+  }, [postData]);
+
   interface IItemButtonAttrs extends NamedNodeMap {
     type?: {
       value: string;
@@ -245,13 +254,7 @@ export const PublishedContent: React.FC<IPublishedContent> = () => {
                     : 'scheduled'
                 }`,
                 {
-                  value: postData
-                    ? postData!!.auction
-                      ? 'Event'
-                      : postData!!.crowdfunding
-                      ? 'Goal'
-                      : 'Superpoll'
-                    : 'Post',
+                  value: postTypeText(),
                 }
               )}
             </SButton>

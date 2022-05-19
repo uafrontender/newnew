@@ -116,11 +116,11 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     const { appConstants } = useGetAppConstants();
 
     const cfFormattedDescription = useMemo(() => {
-      if (appConstants?.standardPledgeAmounts?.length > 0) {
-        console.log(appConstants.standardPledgeAmounts);
-        return Math.round(
-          appConstants.standardPledgeAmounts[0].usdCents!! / 100
-        );
+      if (
+        appConstants?.standardPledgeAmounts?.length > 0 &&
+        appConstants.standardPledgeAmounts[0].usdCents
+      ) {
+        return Math.round(appConstants.standardPledgeAmounts[0].usdCents / 100);
       }
       return Math.round(appConstants.minCfPledge / 100);
     }, [appConstants.standardPledgeAmounts, appConstants.minCfPledge]);
@@ -835,68 +835,77 @@ export const CreationSecondStepContent: React.FC<ICreationSecondStepContent> =
     }, [activeTabIndex]);
 
     useEffect(() => {
-      if (user!!.userTutorialsProgressSynced) {
+      if (user.userTutorialsProgressSynced) {
         switch (tutorialType) {
           case 'MC':
-            user!!.userTutorialsProgress.remainingMcCrCurrentStep!![0] ===
-              newnewapi.McCreationTutorialStep.MC_CR_HERO &&
+            user.userTutorialsProgress.remainingMcCrCurrentStep &&
+              user.userTutorialsProgress.remainingMcCrCurrentStep[0] ===
+                newnewapi.McCreationTutorialStep.MC_CR_HERO &&
               setIsTutorialVisible(true);
             break;
           case 'CF':
-            user!!.userTutorialsProgress.remainingCfCrCurrentStep!![0] ===
-              newnewapi.CfCreationTutorialStep.CF_CR_HERO &&
+            user.userTutorialsProgress.remainingCfCrCurrentStep &&
+              user.userTutorialsProgress.remainingCfCrCurrentStep[0] ===
+                newnewapi.CfCreationTutorialStep.CF_CR_HERO &&
               setIsTutorialVisible(true);
             break;
           default:
-            user!!.userTutorialsProgress.remainingAcCrCurrentStep!![0] ===
-              newnewapi.AcCreationTutorialStep.AC_CR_HERO &&
+            user.userTutorialsProgress.remainingAcCrCurrentStep &&
+              user.userTutorialsProgress.remainingAcCrCurrentStep[0] ===
+                newnewapi.AcCreationTutorialStep.AC_CR_HERO &&
               setIsTutorialVisible(true);
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tutorialType, user!!.userTutorialsProgressSynced]);
+    }, [tutorialType, user.userTutorialsProgressSynced]);
 
     const goToNextStep = () => {
       let payload = null;
       switch (tutorialType) {
         case 'MC':
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            mcCrCurrentStep:
-              user.userTutorialsProgress.remainingMcCrCurrentStep!![0],
-          });
-          dispatch(
-            setUserTutorialsProgress({
-              remainingMcCrCurrentStep: [
-                ...user.userTutorialsProgress.remainingMcCrCurrentStep!!,
-              ].slice(1),
-            })
-          );
+          if (user.userTutorialsProgress.remainingMcCrCurrentStep) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              mcCrCurrentStep:
+                user.userTutorialsProgress.remainingMcCrCurrentStep[0],
+            });
+            dispatch(
+              setUserTutorialsProgress({
+                remainingMcCrCurrentStep: [
+                  ...user.userTutorialsProgress.remainingMcCrCurrentStep,
+                ].slice(1),
+              })
+            );
+          }
           break;
         case 'CF':
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            cfCrCurrentStep:
-              user.userTutorialsProgress.remainingCfCrCurrentStep!![0],
-          });
-          dispatch(
-            setUserTutorialsProgress({
-              remainingCfCrCurrentStep: [
-                ...user.userTutorialsProgress.remainingCfCrCurrentStep!!,
-              ].slice(1),
-            })
-          );
+          if (user.userTutorialsProgress.remainingCfCrCurrentStep) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              cfCrCurrentStep:
+                user.userTutorialsProgress.remainingCfCrCurrentStep[0],
+            });
+            dispatch(
+              setUserTutorialsProgress({
+                remainingCfCrCurrentStep: [
+                  ...user.userTutorialsProgress.remainingCfCrCurrentStep,
+                ].slice(1),
+              })
+            );
+          }
           break;
         default:
-          payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-            acCrCurrentStep:
-              user.userTutorialsProgress.remainingAcCrCurrentStep!![0],
-          });
-          dispatch(
-            setUserTutorialsProgress({
-              remainingAcCrCurrentStep: [
-                ...user.userTutorialsProgress.remainingAcCrCurrentStep!!,
-              ].slice(1),
-            })
-          );
+          if (user.userTutorialsProgress.remainingAcCrCurrentStep) {
+            payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+              acCrCurrentStep:
+                user.userTutorialsProgress.remainingAcCrCurrentStep[0],
+            });
+            dispatch(
+              setUserTutorialsProgress({
+                remainingAcCrCurrentStep: [
+                  ...user.userTutorialsProgress.remainingAcCrCurrentStep,
+                ].slice(1),
+              })
+            );
+          }
       }
       if (payload) markTutorialStepAsCompleted(payload);
       setIsTutorialVisible(false);

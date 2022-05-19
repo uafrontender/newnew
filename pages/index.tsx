@@ -431,8 +431,8 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
       {!collectionCreatorInitialLoading && collectionCreator?.length > 0 ? (
         <CardsSection
           user={{
-            avatarUrl: switchPostType(collectionCreator[0])[0].creator
-              ?.avatarUrl!!,
+            avatarUrl:
+              switchPostType(collectionCreator[0])[0].creator?.avatarUrl ?? '',
             username: switchPostType(collectionCreator[0])[0].creator
               ?.username!!,
           }}
