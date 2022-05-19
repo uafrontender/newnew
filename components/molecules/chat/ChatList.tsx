@@ -411,22 +411,23 @@ const ChatList: React.FC<IFunctionProps> = ({
         ? chat.visavis?.nickname
         : chat.visavis?.username;
 
-      if (chat.kind === 4 && chat.myRole === 2) {
+      if (chat.kind === 4) {
         avatar = (
-          <SMyAvatar>
-            <SUserAvatar>
-              <UserAvatar avatarUrl={user.userData?.avatarUrl ?? ''} />
-            </SUserAvatar>
+          <SMyAvatarMassupdate>
             <SInlineSVG
               svg={megaphone}
               fill={
-                theme.name === 'light' ? theme.colors.black : theme.colors.white
+                theme.name === 'light'
+                  ? theme.colorsThemed.text.secondary
+                  : theme.colors.white
               }
               width='26px'
               height='26px'
             />
-          </SMyAvatar>
+          </SMyAvatarMassupdate>
         );
+      }
+      if (chat.kind === 4 && chat.myRole === 2) {
         chatName = `${
           user.userData?.nickname
             ? user.userData?.nickname
@@ -434,21 +435,6 @@ const ChatList: React.FC<IFunctionProps> = ({
         } ${t('announcement.title')}`;
       }
       if (chat.kind === 4 && chat.myRole === 1) {
-        avatar = (
-          <SMyAvatar>
-            <SUserAvatar>
-              <UserAvatar avatarUrl={chat.visavis?.avatarUrl ?? ''} />
-            </SUserAvatar>
-            <SInlineSVG
-              svg={megaphone}
-              fill={
-                theme.name === 'light' ? theme.colors.black : theme.colors.white
-              }
-              width='26px'
-              height='26px'
-            />
-          </SMyAvatar>
-        );
         chatName = `${
           chat.visavis?.nickname
             ? chat.visavis?.nickname
@@ -663,22 +649,23 @@ const SInlineSVG = styled(InlineSVG)`
   margin-right: 14px;
 `;
 
-const SMyAvatar = styled.div`
-  position: relative;
-  height: 48px;
-  ${SInlineSVG} {
-    margin-right: 0;
-    position: absolute;
-    left: calc(50% - 13px);
-    top: calc(50% - 13px);
-  }
-  ${SUserAvatar} {
-    opacity: ${(props) => (props.theme.name === 'light' ? '1' : '0.5')};
-  }
-`;
-
 const SRef = styled.span`
   text-indent: -9999px;
   height: 0;
   overflow: hidden;
+`;
+
+const SMyAvatarMassupdate = styled.div`
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colorsThemed.background.quinary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${SInlineSVG} {
+    margin-right: 0;
+  }
 `;

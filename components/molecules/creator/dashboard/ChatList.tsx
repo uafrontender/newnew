@@ -167,19 +167,18 @@ export const ChatList = () => {
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
-          <SMyAvatar>
-            <SUserAvatar>
-              <UserAvatar avatarUrl={user.userData?.avatarUrl ?? ''} />
-            </SUserAvatar>
+          <SMyAvatarMassupdate>
             <SInlineSVG
               svg={megaphone}
               fill={
-                theme.name === 'light' ? theme.colors.black : theme.colors.white
+                theme.name === 'light'
+                  ? theme.colorsThemed.text.secondary
+                  : theme.colors.white
               }
               width='26px'
               height='26px'
             />
-          </SMyAvatar>
+          </SMyAvatarMassupdate>
         );
         chatName = `${
           user.userData?.nickname
@@ -360,16 +359,17 @@ const SInlineSVG = styled(InlineSVG)`
   margin-right: 14px;
 `;
 
-const SMyAvatar = styled.div`
-  position: relative;
+const SMyAvatarMassupdate = styled.div`
+  width: 48px;
   height: 48px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colorsThemed.background.quinary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   ${SInlineSVG} {
     margin-right: 0;
-    position: absolute;
-    left: calc(50% - 13px);
-    top: calc(50% - 13px);
-  }
-  ${SUserAvatar} {
-    opacity: ${(props) => (props.theme.name === 'light' ? '1' : '0.5')};
   }
 `;
