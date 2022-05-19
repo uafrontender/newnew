@@ -70,20 +70,18 @@ const Notification: React.FC<newnewapi.INotification> = ({
             )}
           </SAvatarHolder>
           <SText>
-            <STitle>{content!!.relatedUser?.nicknameOrUsername}</STitle>
-            <p>{content!!.message}</p>
+            <STitle>{content?.relatedUser?.nicknameOrUsername}</STitle>
+            <p>{content?.message}</p>
             <SDate>
               {moment((createdAt?.seconds as number) * 1000).fromNow()}
             </SDate>
           </SText>
-          {content!!.relatedPost &&
-            content!!.relatedPost.thumbnailImageUrl &&
+          {content?.relatedPost &&
+            content?.relatedPost.thumbnailImageUrl &&
             !isMobile && (
-              // <Link href={`/post/${content?.relatedPost.uuid}`}>
               <SPostThumbnail
-                avatarUrl={content!!.relatedPost.thumbnailImageUrl}
+                avatarUrl={content?.relatedPost.thumbnailImageUrl}
               />
-              // </Link>
             )}
         </SWrapper>
       </a>

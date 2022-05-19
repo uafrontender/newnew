@@ -86,7 +86,7 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
   const setRate = async () => {
     try {
       const payload = new newnewapi.SetMySubscriptionProductRequest({
-        productId: selectedProduct!!.id,
+        productId: selectedProduct ? selectedProduct.id : null,
       });
       const res = await setMySubscriptionProduct(payload);
 
@@ -154,7 +154,10 @@ const SubproductsSelect: React.FC<ISubproductsSelect> = ({
             ) : (
               <Button
                 view='primaryGrad'
-                disabled={mySubscriptionProduct.id === selectedProduct!!.id}
+                disabled={
+                  selectedProduct &&
+                  mySubscriptionProduct.id === selectedProduct.id
+                }
                 onClick={() => handlerUpdateRate()}
               >
                 {t('SubrateSection.updateRate')}
@@ -292,9 +295,11 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
       <SLabelContent>
         {product.id !== '' ? (
           <>
-            <Text variant={1} weight={600}>
-              ${formatNumber(product?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
-            </Text>
+            {product?.monthlyRate?.usdCents && (
+              <Text variant={1} weight={600}>
+                ${formatNumber(product.monthlyRate.usdCents / 100 ?? 0, true)}
+              </Text>
+            )}
             <SPerMonth variant={2}>
               {t('SubrateSection.selectInput.perMonth')}
             </SPerMonth>

@@ -354,17 +354,13 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={
-              user?.userData?.avatarUrl ? user?.userData?.avatarUrl : ''
-            }
+            avatarUrl={user?.userData?.avatarUrl ?? ''}
           />
         ) : (
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={
-              chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''
-            }
+            avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
           />
         )}
         {chatRoom?.kind === 4 ? (
@@ -381,7 +377,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                   ? chatRoom.memberCount
                   : 0
               } ${
-                chatRoom.memberCount!! > 1
+                chatRoom.memberCount && chatRoom.memberCount > 1
                   ? t('new-announcement.members')
                   : t('new-announcement.member')
               }`}

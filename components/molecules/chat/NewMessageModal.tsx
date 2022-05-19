@@ -116,9 +116,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   useEffect(() => {
     if (chatRooms) {
       const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-        if (c.visavis) {
+        if (c.visavis && c.visavis.username) {
           const letter = clearNameFromEmoji(
-            c.visavis?.username!!
+            c.visavis.username
           )[0].toLowerCase();
           acc[letter] = (acc[letter] || []).concat(c);
         }
@@ -152,9 +152,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis)
+          if (chat.visavis && chat.visavis.username)
             chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.username!!
+              chat.visavis.username
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
@@ -208,8 +208,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             </SChatItemCenter>
           </SChatItemM>
           {filteredChatrooms.length > 0
-            ? index !== filteredChatrooms!!.length - 1 && <SChatSeparator />
-            : index !== chatRooms!!.length - 1 && <SChatSeparator />}
+            ? index !== filteredChatrooms.length - 1 && <SChatSeparator />
+            : chatRooms && index !== chatRooms.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },

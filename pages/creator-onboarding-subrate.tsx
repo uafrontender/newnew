@@ -3,10 +3,8 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { NextPage } from 'next';
 import { newnewapi } from 'newnew-api';
 import dynamic from 'next/dynamic';
-
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { NextPageWithLayout } from './_app';
@@ -28,9 +26,7 @@ const OnboardingSectionSubrate = dynamic(
     )
 );
 
-interface ICreatorOnboardingSubrate {}
-
-const CreatorOnboardingSubrate: NextPage<ICreatorOnboardingSubrate> = () => {
+const CreatorOnboardingSubrate = () => {
   const { t } = useTranslation('creator-onboarding');
 
   const [standardProducts, setStandardProducts] = useState<

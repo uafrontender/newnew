@@ -237,7 +237,9 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
               : {}),
             cfPledgeRequest: {
               amount: new newnewapi.MoneyAmount({
-                usdCents: parseInt(pledgeAmount?.toString()!!),
+                usdCents: parseInt(
+                  pledgeAmount ? pledgeAmount?.toString() : '0'
+                ),
               }),
               postUuid: post.postUuid,
             },
@@ -261,19 +263,21 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
     }, [paymentModalOpen]);
 
     const goToNextStep = () => {
-      if (user.loggedIn) {
-        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-          cfCurrentStep: user.userTutorialsProgress.remainingCfSteps!![0],
-        });
-        markTutorialStepAsCompleted(payload);
+      if (user.userTutorialsProgress.remainingCfSteps) {
+        if (user.loggedIn) {
+          const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+            cfCurrentStep: user.userTutorialsProgress.remainingCfSteps[0],
+          });
+          markTutorialStepAsCompleted(payload);
+        }
+        dispatch(
+          setUserTutorialsProgress({
+            remainingCfSteps: [
+              ...user.userTutorialsProgress.remainingCfSteps,
+            ].slice(1),
+          })
+        );
       }
-      dispatch(
-        setUserTutorialsProgress({
-          remainingCfSteps: [
-            ...user.userTutorialsProgress.remainingCfSteps!!,
-          ].slice(1),
-        })
-      );
     };
 
     return (
@@ -342,7 +346,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                   grandsVipStatus={i === arr.length - 1}
                   handleOpenMakePledgeForm={() => {
                     handleSetPledgeAmountAndOpenPaymentModal(
-                      pledgeLevel.usdCents!!
+                      pledgeLevel?.usdCents ? pledgeLevel.usdCents : 0
                     );
                   }}
                 />
@@ -368,18 +372,20 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                 positionRight='0px'
                 active={showRightGradient}
               />
-              <STutorialTooltipHolder>
-                <TutorialTooltip
-                  isTooltipVisible={
-                    user!!.userTutorialsProgress.remainingCfSteps!![0] ===
-                    newnewapi.CfTutorialStep.CF_BACK_GOAL
-                  }
-                  closeTooltip={goToNextStep}
-                  title={t('tutorials.cf.createYourBid.title')}
-                  text={t('tutorials.cf.createYourBid.text')}
-                  dotPosition={DotPositionEnum.BottomRight}
-                />
-              </STutorialTooltipHolder>
+              {user?.userTutorialsProgress.remainingCfSteps && (
+                <STutorialTooltipHolder>
+                  <TutorialTooltip
+                    isTooltipVisible={
+                      user.userTutorialsProgress.remainingCfSteps[0] ===
+                      newnewapi.CfTutorialStep.CF_BACK_GOAL
+                    }
+                    closeTooltip={goToNextStep}
+                    title={t('tutorials.cf.createYourBid.title')}
+                    text={t('tutorials.cf.createYourBid.text')}
+                    dotPosition={DotPositionEnum.BottomRight}
+                  />
+                </STutorialTooltipHolder>
+              )}
             </SButtonsContainer>
           )}
         </SSectionContainer>
@@ -388,7 +394,7 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
           <PaymentModal
             isOpen={paymentModalOpen}
             zIndex={12}
-            amount={`$${(pledgeAmount!! / 100)?.toFixed(0)}`}
+            amount={pledgeAmount ? `$${(pledgeAmount / 100)?.toFixed(0)}` : '0'}
             // {...(walletBalance?.usdCents &&
             // pledgeAmount &&
             // walletBalance.usdCents >= pledgeAmount
@@ -403,9 +409,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
               <SPaymentFooter variant={3}>
-                {t('CfPost.paymentModalFooter.body', {
-                  creator: getDisplayname(post.creator!!),
-                })}
+                {post.creator
+                  ? t('CfPost.paymentModalFooter.body', {
+                      creator: getDisplayname(post.creator),
+                    })
+                  : ''}
               </SPaymentFooter>
             }
             // payButtonCaptionKey={t('CfPost.paymentModalPayButton')}
@@ -418,9 +426,11 @@ const CfPledgeLevelsSection: React.FunctionComponent<ICfPledgeLevelsSection> =
                   />
                 </SPaymentModalHeadingPostSymbol>
                 <SPaymentModalHeadingPostCreator variant={3}>
-                  {t('CfPost.paymentModalHeader.title', {
-                    creator: getDisplayname(post.creator!!),
-                  })}
+                  {post.creator
+                    ? t('CfPost.paymentModalHeader.title', {
+                        creator: getDisplayname(post.creator),
+                      })
+                    : ''}
                 </SPaymentModalHeadingPostCreator>
               </SPaymentModalHeading>
               <SPaymentModalOptionText variant={5}>

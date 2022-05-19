@@ -77,9 +77,7 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
   const subPriceFormatted = useMemo(
     () =>
-      subscriptionPrice
-        ? formatNumber(subscriptionPrice!! / 100 ?? 0, true)
-        : '',
+      subscriptionPrice ? formatNumber(subscriptionPrice / 100 ?? 0, true) : '',
     [subscriptionPrice]
   );
 
@@ -124,12 +122,8 @@ const SubscribeToUserPage: NextPage<ISubscribeToUserPage> = ({ user }) => {
 
         const res = await getSubscriptionStatus(getStatusPayload);
 
-        console.log(res.data?.status?.product);
-
-        if (res.data?.status?.product) {
-          setSubscriptionPrice(
-            res.data?.status?.product.monthlyRate?.usdCents!!
-          );
+        if (res.data?.status?.product?.monthlyRate?.usdCents) {
+          setSubscriptionPrice(res.data?.status?.product.monthlyRate?.usdCents);
         }
       } catch (err) {
         console.log(err);

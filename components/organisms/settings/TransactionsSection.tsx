@@ -30,14 +30,17 @@ const TransactionsSection: React.FunctionComponent<TTransactionsSection> = ({
 
   return (
     <SWrapper onMouseEnter={() => handleSetActive()}>
-      {transactions.map((t, i) => (
-        <TransactionCard
-          // eslint-disable-next-line react/no-array-index-key
-          key={i}
-          cardInfo={t}
-          currentUser={userData!!}
-        />
-      ))}
+      {transactions.map(
+        (t, i) =>
+          userData && (
+            <TransactionCard
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              cardInfo={t}
+              currentUser={userData}
+            />
+          )
+      )}
     </SWrapper>
   );
 };

@@ -166,7 +166,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
                 width='120px'
                 label={value?.day ? value?.day.toString() : 'Day'}
                 options={availableDays}
-                selected={value?.day!!}
+                selected={value?.day !== null ? value?.day : undefined}
                 maxItems={6}
                 onSelect={handleUpdateDay}
               />
@@ -179,7 +179,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
                     : 'Month'
                 }
                 options={months}
-                selected={value?.month!!}
+                selected={value?.month !== null ? value?.month : undefined}
                 maxItems={6}
                 onSelect={handleUpdateMonth}
               />
@@ -192,7 +192,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
                     : 'Year'
                 }
                 options={years}
-                selected={value?.year!!}
+                selected={value?.year !== null ? value?.year : undefined}
                 maxItems={6}
                 onSelect={handleUpdateYear}
               />
@@ -206,7 +206,7 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
               <span>
                 {value?.day && value.month && value.year
                   ? `${value?.day} ${months.find(
-                      (o) => o.value === value?.month!!
+                      (o) => o.value === value?.month
                     )?.name!!} ${value?.year}`
                   : 'Set your date of birth'}
               </span>
@@ -233,9 +233,9 @@ const OnboardingBirthDateInput: React.FunctionComponent<IOnboardingBirthDateInpu
           customBackdropFilterValue={1}
           onClose={() => setIsModalOpen(false)}
         >
-          {isModalOpen && (
+          {isModalOpen && value && (
             <BirthDateMobileInput
-              currentDate={value!!}
+              currentDate={value}
               months={months}
               years={years}
               handleChangeDate={onChange}

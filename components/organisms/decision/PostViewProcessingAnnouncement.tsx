@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import React, { useContext, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
@@ -84,11 +85,12 @@ const PostViewProcessingAnnouncement: React.FunctionComponent<IPostViewProcessin
         if (!decoded) return;
         if (decoded.postUuid === post.postUuid) {
           if (decoded.auction) {
-            handleUpdatePostStatus(decoded.auction!!);
+            handleUpdatePostStatus(decoded.auction);
           } else if (decoded.multipleChoice) {
-            handleUpdatePostStatus(decoded.multipleChoice!!);
+            handleUpdatePostStatus(decoded.multipleChoice);
           } else {
-            handleUpdatePostStatus(decoded.crowdfunding!!);
+            if (decoded.crowdfunding)
+              handleUpdatePostStatus(decoded.crowdfunding);
           }
         }
       };

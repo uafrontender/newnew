@@ -22,9 +22,7 @@ const PopularCreatorsResults: React.FC<IFunction> = ({ creators }) => {
             <SPost>
               <SLeftSide>
                 <SUserAvatar>
-                  <UserAvatar
-                    avatarUrl={creator.avatarUrl ? creator.avatarUrl : ''}
-                  />
+                  <UserAvatar avatarUrl={creator.avatarUrl ?? ''} />
                 </SUserAvatar>
                 <SPostData>
                   <SCreatorUsername>{creator.nickname}</SCreatorUsername>

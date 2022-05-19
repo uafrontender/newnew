@@ -3,7 +3,6 @@
 import React, { ReactElement, useContext, useEffect } from 'react';
 import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
-import type { NextPage } from 'next';
 import { motion } from 'framer-motion';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -14,9 +13,7 @@ import AuthLayout, {
 } from '../components/templates/AuthLayout';
 import CodeVerificationMenu from '../components/organisms/CodeVerificationMenu';
 
-interface IVerifyEmail {}
-
-const VerifyEmail: NextPage<IVerifyEmail> = () => {
+const VerifyEmail = () => {
   const { t } = useTranslation('verify-email');
   const authLayoutContext = useContext(AuthLayoutContext);
 

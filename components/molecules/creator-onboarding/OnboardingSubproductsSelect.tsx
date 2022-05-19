@@ -112,9 +112,11 @@ const ProductOption: React.FunctionComponent<IProductOption> = ({
       <SLabelContent>
         {product.id !== '' ? (
           <>
-            <Text variant={2}>
-              ${formatNumber(product?.monthlyRate?.usdCents!! / 100 ?? 0, true)}
-            </Text>
+            {product?.monthlyRate?.usdCents && (
+              <Text variant={2}>
+                ${formatNumber(product.monthlyRate.usdCents / 100 ?? 0, true)}
+              </Text>
+            )}
             <SPerMonth variant={2}>
               {t('SubrateSection.selectInput.perMonth')}
             </SPerMonth>
