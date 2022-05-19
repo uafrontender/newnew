@@ -345,81 +345,85 @@ const Home: NextPage<IHome> = ({ top10posts, postFromQuery }) => {
           handlePostClicked={handleOpenPostModal}
         />
       )}
-      {user.loggedIn && !collectionFYError && (
-        <CardsSection
-          title={t('for-you-block-title')}
-          category='for-you'
-          collection={collectionFY}
-          loading={collectionFYInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-        />
-      )}
-      {!collectionACError && (
-        <CardsSection
-          title={t('ac-block-title')}
-          category='ac'
-          collection={collectionAC}
-          loading={collectionACInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-          tutorialCard={
-            !user.loggedIn ? (
-              <TutorialCard
-                image={assets.creation.AcAnimated}
-                title={t('ac-block-tutorial-card.title')}
-                caption={t('ac-block-tutorial-card.caption')}
-                imageStyle={{
-                  position: 'relative',
-                  left: '10%',
-                  bottom: '6px',
-                }}
-              />
-            ) : undefined
-          }
-        />
-      )}
-      {!collectionMCError && (
-        <CardsSection
-          title={t('mc-block-title')}
-          category='mc'
-          collection={collectionMC}
-          loading={collectionMCInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-          tutorialCard={
-            !user.loggedIn ? (
-              <TutorialCard
-                image={assets.creation.McAnimated}
-                title={t('mc-block-tutorial-card.title')}
-                caption={t('mc-block-tutorial-card.caption')}
-              />
-            ) : undefined
-          }
-        />
-      )}
-      {!collectionCFError && (
-        <CardsSection
-          title={t('cf-block-title')}
-          category='cf'
-          collection={collectionCF}
-          loading={collectionCFInitialLoading}
-          handlePostClicked={handleOpenPostModal}
-          tutorialCard={
-            !user.loggedIn ? (
-              <TutorialCard
-                image={assets.creation.CfAnimated}
-                title={t('cf-block-tutorial-card.title')}
-                caption={t('cf-block-tutorial-card.caption')}
-                imageStyle={{
-                  position: 'relative',
-                  left: '5%',
-                }}
-              />
-            ) : undefined
-          }
-        />
-      )}
+      {user.loggedIn &&
+        !collectionFYError &&
+        (collectionFYInitialLoading || collectionFY.length > 0) && (
+          <CardsSection
+            title={t('for-you-block-title')}
+            category='for-you'
+            collection={collectionFY}
+            loading={collectionFYInitialLoading}
+            handlePostClicked={handleOpenPostModal}
+          />
+        )}
+      {!collectionACError &&
+        (collectionACInitialLoading || collectionAC.length > 0) && (
+          <CardsSection
+            title={t('ac-block-title')}
+            category='ac'
+            collection={collectionAC}
+            loading={collectionACInitialLoading}
+            handlePostClicked={handleOpenPostModal}
+            tutorialCard={
+              !user.loggedIn ? (
+                <TutorialCard
+                  image={assets.creation.AcAnimated}
+                  title={t('ac-block-tutorial-card.title')}
+                  caption={t('ac-block-tutorial-card.caption')}
+                  imageStyle={{
+                    position: 'relative',
+                    left: '10%',
+                    bottom: '6px',
+                  }}
+                />
+              ) : undefined
+            }
+          />
+        )}
+      {!collectionMCError &&
+        (collectionMCInitialLoading || collectionMC.length > 0) && (
+          <CardsSection
+            title={t('mc-block-title')}
+            category='mc'
+            collection={collectionMC}
+            loading={collectionMCInitialLoading}
+            handlePostClicked={handleOpenPostModal}
+            tutorialCard={
+              !user.loggedIn ? (
+                <TutorialCard
+                  image={assets.creation.McAnimated}
+                  title={t('mc-block-tutorial-card.title')}
+                  caption={t('mc-block-tutorial-card.caption')}
+                />
+              ) : undefined
+            }
+          />
+        )}
+      {!collectionCFError &&
+        (collectionCFInitialLoading || collectionCF.length > 0) && (
+          <CardsSection
+            title={t('cf-block-title')}
+            category='cf'
+            collection={collectionCF}
+            loading={collectionCFInitialLoading}
+            handlePostClicked={handleOpenPostModal}
+            tutorialCard={
+              !user.loggedIn ? (
+                <TutorialCard
+                  image={assets.creation.CfAnimated}
+                  title={t('cf-block-tutorial-card.title')}
+                  caption={t('cf-block-tutorial-card.caption')}
+                  imageStyle={{
+                    position: 'relative',
+                    left: '5%',
+                  }}
+                />
+              ) : undefined
+            }
+          />
+        )}
       {!collectionBiggestError &&
-      collectionBiggestInitialLoading &&
-      collectionBiggest?.length > 0 ? (
+      (collectionBiggestInitialLoading || collectionBiggest?.length > 0) ? (
         <CardsSection
           title={t('biggest-block-title')}
           category='biggest'
