@@ -1,7 +1,6 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React, { useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { google, newnewapi } from 'newnew-api';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -22,12 +21,11 @@ const CashOut: React.FC<ICashOut> = ({
   nextCashoutDate,
 }) => {
   const { t } = useTranslation('creator');
-  const router = useRouter();
 
   const handleSubmit = useCallback(() => {
-    router.push('/creator/get-paid');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    window.open('https://creatorpayouts.newnew.co', '_blank')!.focus();
   }, []);
+
   return (
     <SCashOutContainer>
       <SCashOutTopBlock>
