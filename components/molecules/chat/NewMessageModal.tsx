@@ -58,6 +58,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const theme = useTheme();
   const scrollRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -85,6 +86,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       try {
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
+          myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
           paging: { limit: 50 },
         });
         const res = await getMyRooms(payload);
@@ -259,7 +261,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                 )
               ) : (
                 <SSectionContent ref={scrollRef}>
-                  <NewAnnouncement handleClick={createNewAnnouncement} />
+                  {user.userData?.options?.isOfferingSubscription && (
+                    <NewAnnouncement handleClick={createNewAnnouncement} />
+                  )}
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
                       <SSection key={section.letter}>
