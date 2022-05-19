@@ -17,7 +17,7 @@ import { SocketContext } from './socketContext';
 const SubscriptionsContext = createContext({
   mySubscribers: [] as newnewapi.ISubscriber[],
   addSubscriber: (subscriber: newnewapi.ISubscriber) => {},
-  removeSubscriber: (subscriber: newnewapi.ISubscriber) => {},
+  removeSubscriber: (subscriberUuid: string) => {},
   creatorsImSubscribedTo: [] as newnewapi.IUser[],
   addCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
   removeCreatorsImSubscribedTo: (creator: newnewapi.IUser) => {},
@@ -48,12 +48,16 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
 
   const addSubscriber = (subscriber: newnewapi.ISubscriber) => {
     setMySubscribers((curr) => [...curr, subscriber]);
+    setMySubscribersTotal((curr) => curr + 1);
   };
 
-  const removeSubscriber = (subscriber: newnewapi.ISubscriber) => {
-    setMySubscribers((curr) =>
-      curr.filter((i) => i.user?.uuid !== subscriber.user?.uuid)
-    );
+  const removeSubscriber = (subscriberUuid: string) => {
+    setMySubscribers((curr) => {
+      let arr = [...curr];
+      arr.filter((i) => i.user?.uuid !== subscriberUuid);
+      return arr;
+    });
+    setMySubscribersTotal((curr) => curr - 1);
   };
 
   const addCreatorsImSubscribedTo = (creator: newnewapi.IUser) => {
@@ -65,6 +69,14 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       curr.filter((i) => i.uuid !== creator.uuid)
     );
   };
+
+  // useEffect(() => {
+  //   if (newSubscriber.subscriberUuid) {
+  //     console.log(newSubscriber);
+
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [newSubscriber]);
 
   const contextValue = useMemo(
     () => ({
@@ -110,27 +122,28 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
     }
   }
 
-  useEffect(() => {
-    async function fetchMySubscribers() {
-      if (!user.loggedIn) return;
-      try {
-        setMySubscribersIsLoading(true);
-        const payload = new newnewapi.GetMySubscribersRequest({
-          paging: null,
-        });
-        const res = await getMySubscribers(payload);
-        if (!res.data || res.error)
-          throw new Error(res.error?.message ?? 'Request failed');
-        setMySubscribers(res.data.subscribers as newnewapi.ISubscriber[]);
-        if (res.data.paging?.total)
-          setMySubscribersTotal(res.data.paging?.total);
-        setMySubscribersIsLoading(false);
-      } catch (err) {
-        console.error(err);
-        setMySubscribersIsLoading(false);
-      }
+  async function fetchMySubscribers() {
+    if (!user.loggedIn) return;
+    try {
+      setMySubscribersIsLoading(true);
+      const payload = new newnewapi.GetMySubscribersRequest({
+        paging: null,
+      });
+      const res = await getMySubscribers(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setMySubscribers(res.data.subscribers as newnewapi.ISubscriber[]);
+      res.data.paging?.total
+        ? setMySubscribersTotal(res.data.paging?.total)
+        : setMySubscribersTotal(0);
+      setMySubscribersIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      setMySubscribersIsLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchMySubscribers();
     fetchCreatorsImSubscribedTo();
   }, [user.loggedIn]);
@@ -143,6 +156,13 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       if (!decoded) return;
 
       setNewSubscriber(decoded);
+
+      // TODO: Request backend team functionality to send newnewapi.ISubscriber[] or newnewapi.IUser[] in decoded response
+      if (decoded.subscriberUuid !== user.userData?.userUuid) {
+        fetchMySubscribers();
+      } else {
+        fetchCreatorsImSubscribedTo();
+      }
     };
 
     if (socketConnection) {
