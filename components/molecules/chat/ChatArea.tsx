@@ -193,7 +193,6 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const isBlocked = usersIBlocked.find(
         (i) => i === chatRoom?.visavis?.uuid
       );
-      console.log(isBlocked);
 
       if (isBlocked) {
         setIsVisavisBlocked(true);

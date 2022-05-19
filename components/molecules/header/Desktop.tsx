@@ -24,7 +24,7 @@ export const Desktop: React.FC = React.memo(() => {
   const { unreadNotificationCount } = useNotifications();
   const { globalSearchActive } = useAppSelector((state) => state.ui);
   // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
-  const { creatorsImSubscribedTo } = useGetSubscriptions();
+  const { creatorsImSubscribedTo, mySubscribersTotal } = useGetSubscriptions();
 
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
 
@@ -67,7 +67,8 @@ export const Desktop: React.FC = React.memo(() => {
                 </SNavText>
               </SItemWithMargin>
             )}
-            {(user.userData?.options?.isOfferingSubscription ||
+            {((user.userData?.options?.isOfferingSubscription &&
+              mySubscribersTotal > 0) ||
               creatorsImSubscribedTo.length > 0) && (
               <SItemWithMargin>
                 <NavigationItem
