@@ -29,10 +29,14 @@ export const ChatList = () => {
   const { ref: scrollRef, inView } = useInView();
 
   const [loadingRooms, setLoadingRooms] = useState<boolean>(false);
-  const [chatRooms, setChatRooms] = useState<newnewapi.IChatRoom[] | null>(null);
-  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] = useState<string | undefined | null>('');
-  const [searchedRooms, setSearchedRooms] = useState<newnewapi.IChatRoom[] | null>(null);
-  const [updatedChat, setUpdatedChat] = useState<newnewapi.IChatRoom | null>(null);
+  const [chatRooms, setChatRooms] =
+    useState<newnewapi.IChatRoom[] | null>(null);
+  const [chatRoomsNextPageToken, setChatRoomsNextPageToken] =
+    useState<string | undefined | null>('');
+  const [searchedRooms, setSearchedRooms] =
+    useState<newnewapi.IChatRoom[] | null>(null);
+  const [updatedChat, setUpdatedChat] =
+    useState<newnewapi.IChatRoom | null>(null);
 
   const fetchMyRooms = useCallback(
     async (pageToken?: string) => {
@@ -49,7 +53,8 @@ export const ChatList = () => {
         });
         const res = await getMyRooms(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         if (res.data && res.data.rooms.length > 0) {
           setChatRooms((curr) => {
             const arr = [...curr!!, ...res.data?.rooms!!];
@@ -57,7 +62,8 @@ export const ChatList = () => {
           });
           setChatRoomsNextPageToken(res.data.paging?.nextPageToken);
         }
-        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken) setChatRoomsNextPageToken(null);
+        if (!res.data.paging?.nextPageToken && chatRoomsNextPageToken)
+          setChatRoomsNextPageToken(null);
         setLoadingRooms(false);
       } catch (err) {
         console.error(err);
@@ -78,7 +84,8 @@ export const ChatList = () => {
       });
       const res = await getMyRooms(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.rooms.length > 0) {
         setUpdatedChat(res.data.rooms[0]);
       }
@@ -103,7 +110,9 @@ export const ChatList = () => {
 
   useEffect(() => {
     if (updatedChat) {
-      const isAlreadyAdded = chatRooms?.findIndex((chat) => chat.id === updatedChat.id);
+      const isAlreadyAdded = chatRooms?.findIndex(
+        (chat) => chat.id === updatedChat.id
+      );
       if (isAlreadyAdded !== undefined) {
         const arr = chatRooms;
         arr?.splice(isAlreadyAdded, 1);
@@ -151,10 +160,14 @@ export const ChatList = () => {
 
       let avatar = (
         <SUserAvatar>
-          <UserAvatar avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''} />
+          <UserAvatar
+            avatarUrl={chat.visavis?.avatarUrl ? chat.visavis?.avatarUrl : ''}
+          />
         </SUserAvatar>
       );
-      let chatName = chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username;
+      let chatName = chat.visavis?.nickname
+        ? chat.visavis?.nickname
+        : chat.visavis?.username;
 
       if (chat.kind === 4 && chat.myRole === 2) {
         avatar = (
@@ -164,20 +177,26 @@ export const ChatList = () => {
             </SUserAvatar>
             <SInlineSVG
               svg={megaphone}
-              fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-              width="26px"
-              height="26px"
+              fill={
+                theme.name === 'light' ? theme.colors.black : theme.colors.white
+              }
+              width='26px'
+              height='26px'
             />
           </SMyAvatar>
         );
-        chatName = `${user.userData?.nickname ? user.userData?.nickname : user.userData?.username} ${t(
-          'announcement.title'
-        )}`;
+        chatName = `${
+          user.userData?.nickname
+            ? user.userData?.nickname
+            : user.userData?.username
+        } ${t('announcement.title')}`;
       }
       if (chat.kind === 4 && chat.myRole === 1) {
-        chatName = `${chat.visavis?.nickname ? chat.visavis?.nickname : chat.visavis?.username} ${t(
-          'announcement.title'
-        )}`;
+        chatName = `${
+          chat.visavis?.nickname
+            ? chat.visavis?.nickname
+            : chat.visavis?.username
+        } ${t('announcement.title')}`;
       }
 
       let lastMsg = chat.lastMessage?.content?.text;
@@ -190,7 +209,10 @@ export const ChatList = () => {
         }
       }
 
-      const unreadMessageCount = chat.unreadMessageCount && chat.unreadMessageCount > 0 ? chat.unreadMessageCount : 0;
+      const unreadMessageCount =
+        chat.unreadMessageCount && chat.unreadMessageCount > 0
+          ? chat.unreadMessageCount
+          : 0;
 
       return (
         <SChatItemContainer key={chat.id?.toString()}>
@@ -206,9 +228,12 @@ export const ChatList = () => {
             </SChatItemCenter>
             <SChatItemRight>
               <SChatItemTime variant={3} weight={600}>
-                {chat.updatedAt && moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
+                {chat.updatedAt &&
+                  moment((chat.updatedAt?.seconds as number) * 1000).fromNow()}
               </SChatItemTime>
-              {unreadMessageCount > 0 && <SUnreadCount>{unreadMessageCount}</SUnreadCount>}
+              {unreadMessageCount > 0 && (
+                <SUnreadCount>{unreadMessageCount}</SUnreadCount>
+              )}
             </SChatItemRight>
           </SChatItem>
           <SChatSeparator />
@@ -226,7 +251,9 @@ export const ChatList = () => {
       {chatRooms && (
         <>
           <SSectionContent>{chatRooms.map(renderChatItem)}</SSectionContent>
-          {chatRoomsNextPageToken && !searchedRooms && <SRef ref={scrollRef}>Loading...</SRef>}
+          {chatRoomsNextPageToken && !searchedRooms && (
+            <SRef ref={scrollRef}>Loading...</SRef>
+          )}
         </>
       )}
       {/* <GradientMask positionTop active={showTopGradient} />
@@ -244,6 +271,32 @@ const SSectionContent = styled.div`
   position: relative;
   overflow-y: auto;
   flex-direction: column;
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  scrollbar-width: none;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    transition: 0.2s linear;
+  }
+
+  &:hover {
+    scrollbar-width: thin;
+    &::-webkit-scrollbar-track {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines1};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({ theme }) => theme.colorsThemed.background.outlines2};
+    }
+  }
 `;
 
 const SChatItem = styled.div`

@@ -33,10 +33,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
   }, [ref, selected]);
 
   return (
-    <SOptionCard
-      selected={selected ?? false}
-      onClick={handleClick}
-    >
+    <SOptionCard selected={selected ?? false} onClick={handleClick}>
       <SAnimation>
         <Lottie
           ref={ref}
@@ -50,11 +47,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
         />
       </SAnimation>
       <SLabelContent>
-        <Text
-          variant={2}
-        >
-          { t('options.card.name') }
-        </Text>
+        <Text variant={2}>{t('options.card.name')}</Text>
         {/* <SFeesText
           variant={2}
         >
@@ -63,7 +56,7 @@ const OptionCard: React.FunctionComponent<IOptionCard> = ({
       </SLabelContent>
     </SOptionCard>
   );
-}
+};
 
 OptionCard.defaultProps = {
   selected: undefined,
@@ -81,19 +74,22 @@ const SOptionCard = styled.button<{
   border-width: 2px;
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  border-color: ${({ theme, selected }) => (selected ? theme.colorsThemed.accent.blue : 'transparent')};
+  border-color: ${({ theme, selected }) =>
+    selected ? theme.colorsThemed.accent.blue : 'transparent'};
 
   width: 100%;
 
-  background: ${({ selected, theme }) => (selected ?
-    'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))' : theme.colorsThemed.background.tertiary)};;
+  background: ${({ selected, theme }) =>
+    selected
+      ? 'linear-gradient(0deg, rgba(29, 106, 255, 0.2), rgba(29, 106, 255, 0.2))'
+      : theme.colorsThemed.background.tertiary};
 
   padding: 16px 16px;
   margin-top: 12px;
   margin-bottom: 12px;
 
   cursor: pointer;
-  transition: .2s linear;
+  transition: 0.2s linear;
 `;
 
 const SAnimation = styled.div`
@@ -111,4 +107,4 @@ const SLabelContent = styled.div`
 
 const SFeesText = styled(Text)`
   justify-self: flex-end;
-`
+`;

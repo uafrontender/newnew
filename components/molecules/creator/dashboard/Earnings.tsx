@@ -11,7 +11,6 @@ import Headline from '../../../atoms/Headline';
 import DropDown from '../../../atoms/creator/DropDown';
 import CashOut from '../../../atoms/creator/CashOut';
 
-import FinishProfileSetup from '../../../atoms/creator/FinishProfileSetup';
 import MakeDecision from '../../../atoms/creator/MakeDecision';
 import { getMyEarnings } from '../../../../api/endpoints/payments';
 import dateToTimestamp from '../../../../utils/dateToTimestamp';
@@ -20,17 +19,21 @@ import loadingAnimation from '../../../../public/animations/logo-loading-blue.js
 import Lottie from '../../../atoms/Lottie';
 
 interface IFunctionProps {
-  isTodosCompleted: boolean;
   hasMyPosts: boolean;
-  isTodosCompletedLoading: boolean;
+  earnings: newnewapi.GetMyEarningsResponse | undefined;
 }
 
-export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPosts, isTodosCompletedLoading }) => {
+export const Earnings: React.FC<IFunctionProps> = ({
+  hasMyPosts,
+  earnings,
+}) => {
   const { t } = useTranslation('creator');
   const [filter, setFilter] = useState('7_days');
   const [isLoading, setIsLoading] = useState<boolean | null>(null);
-  const [myEarnings, setMyEarnings] = useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [myEarnings, setMyEarnings] =
+    useState<newnewapi.GetMyEarningsResponse | undefined>();
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     async function fetchMyEarnings() {
@@ -39,14 +42,18 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
         const payload = new newnewapi.GetMyEarningsRequest({
           beginDate: dateToTimestamp(
             moment()
-              .subtract(filter.split('_')[0], filter.split('_')[1] as moment.unitOfTime.DurationConstructor)
+              .subtract(
+                filter.split('_')[0],
+                filter.split('_')[1] as moment.unitOfTime.DurationConstructor
+              )
               .startOf('day')
           ),
           endDate: dateToTimestamp(new Date()),
         });
         const res = await getMyEarnings(payload);
 
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         setMyEarnings(res.data);
 
         setIsLoading(false);
@@ -58,16 +65,24 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
     if (isLoading === null) {
       fetchMyEarnings();
     }
+    if (initialLoad) {
+      setMyEarnings(earnings);
+      setInitialLoad(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   useEffect(() => {
     if (myEarnings) {
       let sum = 0;
-      if (myEarnings.auEarnings?.usdCents) sum += myEarnings.auEarnings?.usdCents;
-      if (myEarnings.cfEarnings?.usdCents) sum += myEarnings.cfEarnings?.usdCents;
-      if (myEarnings.mcEarnings?.usdCents) sum += myEarnings.mcEarnings?.usdCents;
-      if (myEarnings.auEarnings?.usdCents) sum += myEarnings.auEarnings?.usdCents;
+      if (myEarnings.auEarnings?.usdCents)
+        sum += myEarnings.auEarnings?.usdCents;
+      if (myEarnings.cfEarnings?.usdCents)
+        sum += myEarnings.cfEarnings?.usdCents;
+      if (myEarnings.mcEarnings?.usdCents)
+        sum += myEarnings.mcEarnings?.usdCents;
+      if (myEarnings.auEarnings?.usdCents)
+        sum += myEarnings.auEarnings?.usdCents;
       setTotalEarnings(sum);
     }
   }, [myEarnings]);
@@ -124,22 +139,34 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
       switch (id) {
         case 'ac':
           return myEarnings?.auEarnings?.usdCents
-            ? `$${formatNumber(myEarnings.auEarnings.usdCents / 100 ?? 0, true)}`
+            ? `$${formatNumber(
+                myEarnings.auEarnings.usdCents / 100 ?? 0,
+                true
+              )}`
             : '$0.00';
 
         case 'cf':
           return myEarnings?.cfEarnings?.usdCents
-            ? `$${formatNumber(myEarnings.cfEarnings.usdCents / 100 ?? 0, true)}`
+            ? `$${formatNumber(
+                myEarnings.cfEarnings.usdCents / 100 ?? 0,
+                true
+              )}`
             : '$0.00';
 
         case 'mc':
           return myEarnings?.mcEarnings?.usdCents
-            ? `$${formatNumber(myEarnings.mcEarnings.usdCents / 100 ?? 0, true)}`
+            ? `$${formatNumber(
+                myEarnings.mcEarnings.usdCents / 100 ?? 0,
+                true
+              )}`
             : '$0.00';
 
         case 'subscriptions':
           return myEarnings?.subsEarnings?.usdCents
-            ? `$${formatNumber(myEarnings.subsEarnings.usdCents / 100 ?? 0, true)}`
+            ? `$${formatNumber(
+                myEarnings.subsEarnings.usdCents / 100 ?? 0,
+                true
+              )}`
             : '$0.00';
 
         default:
@@ -180,12 +207,20 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.earnings.title')}</STitle>
         <STotalInsights>
-          <DropDown value={filter} options={filterOptions} handleChange={handleChangeFilter} />
+          <DropDown
+            value={filter}
+            options={filterOptions}
+            handleChange={handleChangeFilter}
+          />
         </STotalInsights>
       </SHeaderLine>
       <STotalLine>
         <STotalTextWrapper>
-          <STotal variant={4}>{totalEarnings ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}` : '$0.00'}</STotal>
+          <STotal variant={4}>
+            {totalEarnings
+              ? `$${formatNumber(totalEarnings / 100 ?? 0, true)}`
+              : '$0.00'}
+          </STotal>
           <STotalText weight={600}>{splitPeriod()}</STotalText>
         </STotalTextWrapper>
         {/* <STotalInsights>
@@ -201,17 +236,7 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
         </STotalInsights> */}
       </STotalLine>
       <SListHolder>{collection.map(renderListItem)}</SListHolder>
-      {!isTodosCompletedLoading ? (
-        isTodosCompleted ? (
-          hasMyPosts && myEarnings?.nextCashoutAmount ? (
-            <CashOut nextCashoutAmount={myEarnings?.nextCashoutAmount} nextCashoutDate={myEarnings?.nextCashoutDate} />
-          ) : (
-            <MakeDecision />
-          )
-        ) : (
-          <FinishProfileSetup />
-        )
-      ) : (
+      {isLoading || initialLoad ? (
         <Lottie
           width={64}
           height={64}
@@ -221,6 +246,13 @@ export const Earnings: React.FC<IFunctionProps> = ({ isTodosCompleted, hasMyPost
             animationData: loadingAnimation,
           }}
         />
+      ) : hasMyPosts && myEarnings?.nextCashoutAmount ? (
+        <CashOut
+          nextCashoutAmount={myEarnings?.nextCashoutAmount}
+          nextCashoutDate={myEarnings?.nextCashoutDate}
+        />
+      ) : (
+        <MakeDecision />
       )}
     </SContainer>
   );

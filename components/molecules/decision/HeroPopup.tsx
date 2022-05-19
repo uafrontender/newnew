@@ -1,22 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import Image from 'next/image';
 
 import Text from '../../atoms/Text';
 import Modal from '../../organisms/Modal';
 import Headline from '../../atoms/Headline';
 import preventParentClick from '../../../utils/preventParentClick';
 
-import acImage from '../../../public/images/creation/AC.webp';
-import mcImage from '../../../public/images/creation/MC.webp';
-import cfImage from '../../../public/images/creation/CF.webp';
 import Button from '../../atoms/Button';
+import assets from '../../../constants/assets';
 
 const IMAGES: any = {
-  AC: acImage,
-  CF: mcImage,
-  MC: cfImage,
+  AC: assets.creation.AcAnimated,
+  CF: assets.creation.CfAnimated,
+  MC: assets.creation.McAnimated,
 };
 
 interface IHeroPopup {
@@ -37,20 +34,17 @@ const HeroPopup: React.FC<IHeroPopup> = ({
       <SContainer>
         <SModal onClick={preventParentClick()}>
           <SImageWrapper>
-            <Image
+            <img
               src={IMAGES[postType]}
-              alt="Post type image"
+              alt='Post type'
               width={150}
               height={130}
-              objectFit="contain"
-              priority
+              style={{ objectFit: 'contain' }}
             />
           </SImageWrapper>
           <STitle variant={4}>{t(`heroPopup${postType}.title`)}</STitle>
-          <SText variant={2}>{t(`heroPopup${postType}.line1`)}</SText>
-          <SText variant={2}>{t(`heroPopup${postType}.line2`)}</SText>
-          <SText variant={2}>{t(`heroPopup${postType}.line3`)}</SText>
-          <SButton view="primary" onClick={closeModal}>
+          <SText variant={2}>{t(`heroPopup${postType}.text`)}</SText>
+          <SButton view='primary' onClick={closeModal}>
             {t('heroPopupCommon.heroBtnText')}
           </SButton>
         </SModal>
@@ -108,6 +102,8 @@ const STitle = styled(Headline)`
 const SText = styled(Text)`
   color: ${({ theme }) => theme.colorsThemed.text.primary};
   margin-bottom: 24px;
+  white-space: pre-line;
+  font-weight: 600;
 `;
 
 const SButton = styled(Button)`

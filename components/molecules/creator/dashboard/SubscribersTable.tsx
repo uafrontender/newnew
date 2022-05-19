@@ -3,17 +3,22 @@ import styled, { css, useTheme } from 'styled-components';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
 
 import Button from '../../../atoms/Button';
 import Lottie from '../../../atoms/Lottie';
-import InlineSVG from '../../../atoms/InlineSVG';
-import SubscriberRow from '../../../atoms/dashboard/SubscriberRow';
 import { getMySubscribers } from '../../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
 import arrowDown from '../../../../public/images/svg/icons/filled/ArrowDown.svg';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import ChevronDown from '../../../../public/images/svg/icons/outlined/ChevronDown.svg';
 import ChevronFirstPage from '../../../../public/images/svg/icons/outlined/ChevronFirstPage.svg';
+
+const SubscriberRow = dynamic(
+  () => import('../../../atoms/dashboard/SubscriberRow')
+);
+
+const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
 
 export const SubscribersTable = () => {
   const { t } = useTranslation('creator');
@@ -22,7 +27,9 @@ export const SubscribersTable = () => {
 
   const [isSortDirectionDesc, setIsSortDirectionDesc] = useState<boolean>(true);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
-  const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>([]);
+  const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>(
+    []
+  );
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [lastPage, setLastPage] = useState<number>(0);
 
@@ -40,7 +47,8 @@ export const SubscribersTable = () => {
       });
       const res = await getMySubscribers(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       if (res.data && res.data.subscribers.length > 0) {
         setMySubscribers(res.data?.subscribers as newnewapi.ISubscriber[]);
       }
@@ -52,7 +60,8 @@ export const SubscribersTable = () => {
   }, [isMySubscribersIsLoading, currentPage, isSortDirectionDesc]);
 
   useEffect(() => {
-    if (mySubscribersTotal > 10) setLastPage(Math.floor(mySubscribersTotal / 10));
+    if (mySubscribersTotal > 10)
+      setLastPage(Math.floor(mySubscribersTotal / 10));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mySubscribersTotal]);
@@ -73,7 +82,9 @@ export const SubscribersTable = () => {
   }, [currentPage, changeSortDirection]);
 
   const renderItem = useCallback(
-    (subscriber: newnewapi.ISubscriber) => <SubscriberRow key={subscriber.user?.uuid} subscriber={subscriber} />,
+    (subscriber: newnewapi.ISubscriber) => (
+      <SubscriberRow key={subscriber.user?.uuid} subscriber={subscriber} />
+    ),
     []
   );
 
@@ -89,8 +100,8 @@ export const SubscribersTable = () => {
                 <SDateInlineSVG
                   svg={arrowDown}
                   fill={theme.colorsThemed.text.tertiary}
-                  width="20px"
-                  height="20px"
+                  width='20px'
+                  height='20px'
                   sortDirectionDesc={isSortDirectionDesc}
                 />
               </SDateWrapper>
@@ -98,7 +109,7 @@ export const SubscribersTable = () => {
           </SThead>
           <STBody>{mySubscribers.map(renderItem)}</STBody>
           <STfoot>
-            <SUpdateSub href="/creator/subscribers/edit-subscription-rate">
+            <SUpdateSub href='/creator/subscribers/edit-subscription-rate'>
               {t('subscriptions.table.updateSub')}
             </SUpdateSub>
             <STools>
@@ -113,39 +124,55 @@ export const SubscribersTable = () => {
               )}
 
               <STableNav>
-                <SButton onClick={goFirstPage} view="transparent" disabled={currentPage === 0}>
+                <SButton
+                  onClick={goFirstPage}
+                  view='transparent'
+                  disabled={currentPage === 0}
+                >
                   <SInlineSVG
                     svg={ChevronFirstPage}
                     fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 </SButton>
-                <SButton onClick={goPrevPage} view="transparent" disabled={currentPage === 0}>
+                <SButton
+                  onClick={goPrevPage}
+                  view='transparent'
+                  disabled={currentPage === 0}
+                >
                   <SInlineSVG
-                    type="prev"
+                    type='prev'
                     svg={ChevronDown}
                     fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 </SButton>
-                <SButton onClick={goNextPage} view="transparent" disabled={currentPage === lastPage}>
+                <SButton
+                  onClick={goNextPage}
+                  view='transparent'
+                  disabled={currentPage === lastPage}
+                >
                   <SInlineSVG
-                    type="next"
+                    type='next'
                     svg={ChevronDown}
                     fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 </SButton>
-                <SButton onClick={goLastPage} view="transparent" disabled={currentPage === lastPage}>
+                <SButton
+                  onClick={goLastPage}
+                  view='transparent'
+                  disabled={currentPage === lastPage}
+                >
                   <SInlineSVG
-                    type="last-page"
+                    type='last-page'
                     svg={ChevronFirstPage}
                     fill={theme.colorsThemed.text.secondary}
-                    width="20px"
-                    height="20px"
+                    width='20px'
+                    height='20px'
                   />
                 </SButton>
               </STableNav>
@@ -179,8 +206,12 @@ const STable = styled.div`
 `;
 const SThead = styled.div`
   display: flex;
-  border-top: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-top: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
   line-height: 48px;
+  margin-bottom: -1px;
 `;
 
 const SSub = styled.div`
@@ -214,7 +245,9 @@ interface ISDateInlineSVG {
 
 const SDateInlineSVG = styled(InlineSVG)<ISDateInlineSVG>`
   z-index: 1;
-  transform: rotate(${(props) => (!props.sortDirectionDesc ? '180deg' : '0deg')});
+  transform: rotate(
+    ${(props) => (!props.sortDirectionDesc ? '180deg' : '0deg')}
+  );
   transition: all ease 0.5s;
   margin-left: 4px;
 `;

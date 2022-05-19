@@ -9,7 +9,7 @@ interface ISuggestionTextArea {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
-const SuggestionTextArea:React.FunctionComponent<ISuggestionTextArea> = ({
+const SuggestionTextArea: React.FunctionComponent<ISuggestionTextArea> = ({
   value,
   placeholder,
   disabled,

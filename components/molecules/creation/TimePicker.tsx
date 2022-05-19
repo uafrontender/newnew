@@ -1,37 +1,108 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 
 import InlineSVG from '../../atoms/InlineSVG';
 
 import chevronDown from '../../../public/images/svg/icons/filled/ArrowDown.svg';
+import TimePickerMobileModal from './TimePickerMobileModal';
+import { TDropdownSelectItem } from '../../atoms/DropdownSelect';
+import Modal from '../../organisms/Modal';
+
+export interface ITimeComponents {
+  hours: string;
+  minutes: string;
+}
 
 interface ITimePicker {
   value: string;
+  disabled?: boolean;
   onChange: (e: any) => void;
 }
 
 export const TimePicker: React.FC<ITimePicker> = (props) => {
-  const {
-    value,
-    onChange,
-  } = props;
+  const { value, disabled, onChange } = props;
   const theme = useTheme();
 
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const currentTime: ITimeComponents = useMemo(() => {
+    const [h, m] = value.split(':');
+
+    return {
+      hours: h,
+      minutes: m,
+    };
+  }, [value]);
+
+  const hours: TDropdownSelectItem<string>[] = useMemo(
+    () =>
+      new Array(12).fill('').map((_, i) => ({
+        value:
+          (i + 1).toString().length > 1
+            ? (i + 1).toString()
+            : `0${(i + 1).toString()}`,
+        name: (i + 1).toString(),
+      })),
+    []
+  );
+
+  const minutes: TDropdownSelectItem<string>[] = useMemo(
+    () =>
+      new Array(60).fill('').map((_, i) => ({
+        value: i.toString().length > 1 ? i.toString() : `0${i.toString()}`,
+        name: i.toString(),
+      })),
+    []
+  );
+
+  const handleChangeTime = (newValue: ITimeComponents) => {
+    const val = `${newValue.hours}:${newValue.minutes}`;
+    const pseudoEvent = {
+      target: {
+        value: val,
+      },
+    };
+    onChange(pseudoEvent);
+  };
+
   return (
-    <SWrapper>
-      <SInput
-        type="time"
-        value={value}
-        onChange={onChange}
-      />
+    <SWrapper
+      onClick={(e) => {
+        e.preventDefault();
+
+        if (!disabled) {
+          setModalOpen(true);
+        }
+      }}
+    >
+      <SInput type='time' value={value} readOnly />
       <SInlineSVG
         svg={chevronDown}
         fill={theme.colorsThemed.text.secondary}
-        width="20px"
-        height="20px"
+        width='20px'
+        height='20px'
       />
+      <Modal
+        show={modalOpen}
+        customBackdropFilterValue={1}
+        onClose={() => setModalOpen(false)}
+      >
+        {modalOpen && (
+          <TimePickerMobileModal
+            hours={hours}
+            minutes={minutes}
+            currentTime={currentTime}
+            handleClose={() => setModalOpen(false)}
+            handleChangeTime={handleChangeTime}
+          />
+        )}
+      </Modal>
     </SWrapper>
   );
+};
+
+TimePicker.defaultProps = {
+  disabled: false,
 };
 
 export default TimePicker;
@@ -58,7 +129,7 @@ const SInput = styled.input`
   border: none;
   z-index: 1;
   outline: none;
-  padding: 0 8px;
+  /* padding: 0 8px; */
   position: absolute;
   font-size: 16px;
   transform: translateY(-50%);

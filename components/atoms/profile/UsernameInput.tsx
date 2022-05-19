@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { AnimatePresence, motion } from 'framer-motion';
 import InlineSvg from '../InlineSVG';
 
@@ -9,14 +9,12 @@ import AnimatedPresence from '../AnimatedPresence';
 type TUsernameInput = React.ComponentPropsWithoutRef<'input'> & {
   isValid?: boolean;
   popupCaption: ReactElement;
-  frequencyCaption: string;
   errorCaption: string;
-}
+};
 
 const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   value,
   popupCaption,
-  frequencyCaption,
   errorCaption,
   isValid,
   disabled,
@@ -29,10 +27,8 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
   const [focused, setFocused] = useState(false);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = (value as string).length > 0
-      ? e.target.value
-        .slice(1)
-      : e.target.value;
+    const newValue =
+      (value as string).length > 0 ? e.target.value.slice(1) : e.target.value;
 
     // @ts-ignore
     onChange(newValue || '');
@@ -67,22 +63,17 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
         }}
         {...rest}
       />
-      {
-        errorBordersShown ? (
-          <AnimatedPresence
-            animation="t-09"
-          >
-            <SErrorDiv>
-              <InlineSvg
-                svg={AlertIcon}
-                width="16px"
-                height="16px"
-              />
-              { errorCaption }
-            </SErrorDiv>
-          </AnimatedPresence>
-        ) : null
-      }
+      {!errorBordersShown ? (
+        <SPreviewDiv>{`${process.env.NEXT_PUBLIC_APP_URL}/${value}`}</SPreviewDiv>
+      ) : null}
+      {errorBordersShown ? (
+        <AnimatedPresence animation='t-09'>
+          <SErrorDiv>
+            <InlineSvg svg={AlertIcon} width='16px' height='16px' />
+            {errorCaption}
+          </SErrorDiv>
+        </AnimatedPresence>
+      ) : null}
       <AnimatePresence>
         {isPopupVisible ? (
           <SPopup
@@ -117,20 +108,11 @@ const UsernameInput: React.FunctionComponent<TUsernameInput> = ({
           </SPopup>
         ) : null}
       </AnimatePresence>
-      <SCaptionDiv
-        disabled={disabled ?? false}
-      >
-        { frequencyCaption }
-      </SCaptionDiv>
       <SStyledButton
         disabled={disabled}
         onClick={() => setIsPopupVisible((curr) => !curr)}
       >
-        <InlineSvg
-          svg={AlertIcon}
-          width="24px"
-          height="24px"
-        />
+        <InlineSvg svg={AlertIcon} width='24px' height='24px' />
       </SStyledButton>
     </SWrapper>
   );
@@ -162,7 +144,6 @@ const SStyledButton = styled.button`
   background: transparent;
   box-shadow: none;
 
-
   cursor: pointer;
 
   svg {
@@ -171,7 +152,8 @@ const SStyledButton = styled.button`
     }
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
   }
 
@@ -182,7 +164,7 @@ const SStyledButton = styled.button`
 `;
 
 interface ISUsernameInput {
-  errorBordersShown?: boolean
+  errorBordersShown?: boolean;
 }
 
 const SUsernameInput = styled.input<ISUsernameInput>`
@@ -201,7 +183,8 @@ const SUsernameInput = styled.input<ISUsernameInput>`
   border-color: ${({ theme, errorBordersShown }) => {
     if (!errorBordersShown) {
       return 'transparent';
-    } return (theme.colorsThemed.accent.error);
+    }
+    return theme.colorsThemed.accent.error;
   }};
 
   color: ${({ theme }) => theme.colorsThemed.text.primary};
@@ -217,15 +200,18 @@ const SUsernameInput = styled.input<ISUsernameInput>`
     color: ${({ theme }) => theme.colorsThemed.text.quaternary};
   }
 
-  &:hover:enabled, &:focus:enabled, &:active:enabled {
+  &:hover:enabled,
+  &:focus:enabled,
+  &:active:enabled {
     outline: none;
 
     border-color: ${({ theme, errorBordersShown }) => {
-    if (!errorBordersShown) {
-      // NB! Temp
-      return theme.colorsThemed.background.outlines2;
-    } return (theme.colorsThemed.accent.error);
-  }};
+      if (!errorBordersShown) {
+        // NB! Temp
+        return theme.colorsThemed.background.outlines2;
+      }
+      return theme.colorsThemed.accent.error;
+    }};
   }
 
   &:disabled {
@@ -243,7 +229,7 @@ const SPopup = styled(motion.div)`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
-  transition: .2s linear;
+  transition: 0.2s linear;
   z-index: 6;
 
   &:after {
@@ -258,29 +244,10 @@ const SPopup = styled(motion.div)`
     display: inline-block;
 
     background-color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-    clip-path: path('M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z');
+    clip-path: path(
+      'M0 0H20L12.8284 7.17157C11.2663 8.73367 8.73367 8.73367 7.17157 7.17157L0 0Z'
+    );
   }
-`;
-
-const SCaptionDiv = styled.div<{
-  disabled: boolean;
-}>`
-  text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-
-  padding-left: 20px;
-  margin-bottom: 16px;
-
-  color: ${({ theme }) => theme.colorsThemed.text.quaternary};
-
-  margin-top: 6px;
-
-  ${({ disabled }) => {
-    if (disabled) return css`opacity: 0.5;`;
-    return null;
-  }}
 `;
 
 const SErrorDiv = styled.div`
@@ -289,6 +256,7 @@ const SErrorDiv = styled.div`
   align-items: center;
 
   margin-top: 6px;
+  margin-bottom: 16px;
 
   text-align: center;
   font-weight: 600;
@@ -296,6 +264,26 @@ const SErrorDiv = styled.div`
   line-height: 16px;
 
   color: ${({ theme }) => theme.colorsThemed.accent.error};
+
+  & > div {
+    margin-right: 4px;
+  }
+`;
+
+const SPreviewDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 6px;
+  margin-bottom: 16px;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 
   & > div {
     margin-right: 4px;

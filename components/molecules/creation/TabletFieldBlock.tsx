@@ -25,8 +25,18 @@ interface ITabletFieldBlock {
   formattedDescription?: any;
 }
 
-export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
-  const { id, type, value, options, maxItems, inputProps, formattedValue, formattedDescription, onChange } = props;
+const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
+  const {
+    id,
+    type,
+    value,
+    options,
+    maxItems,
+    inputProps,
+    formattedValue,
+    formattedDescription,
+    onChange,
+  } = props;
   const { t } = useTranslation('creation');
   const inputRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
@@ -63,7 +73,9 @@ export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
         {type === 'input' ? (
           <SInputWrapper>
             <SInputContent>
-              {inputLabel && <SInputLabel htmlFor={id}>{inputLabel}</SInputLabel>}
+              {inputLabel && (
+                <SInputLabel htmlFor={id}>{inputLabel}</SInputLabel>
+              )}
               <SInput
                 id={id}
                 ref={inputRef}
@@ -80,7 +92,9 @@ export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
           <DropdownSelect<number>
             closeOnSelect
             width={isTablet ? '200px' : '208px'}
-            label={t(`secondStep.field.${id}.value`, { value: formattedValue || value })}
+            label={t(`secondStep.field.${id}.value`, {
+              value: formattedValue || value,
+            })}
             options={getSelectOptions()}
             selected={value}
             maxItems={maxItems}
@@ -88,7 +102,9 @@ export const TabletFieldBlock: React.FC<ITabletFieldBlock> = (props) => {
           />
         )}
         <SDescription variant={3} weight={600}>
-          {t(`secondStep.field.${id}.description`, { value: formattedDescription || value })}
+          {t(`secondStep.field.${id}.description`, {
+            value: formattedDescription || value,
+          })}
         </SDescription>
       </SContentPart>
     </SContainer>

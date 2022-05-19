@@ -1,73 +1,99 @@
+/* eslint-disable no-nested-ternary */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
-
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import Headline from '../../../atoms/Headline';
-import Navigation from '../../../molecules/creator/Navigation';
-
 import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import { useGetSubscriptions } from '../../../../contexts/subscriptionsContext';
-import NoResults from '../../../molecules/creator/dashboard/NoResults';
-import SubscribersTable from '../../../molecules/creator/dashboard/SubscribersTable';
-import { getMyOnboardingState } from '../../../../api/endpoints/user';
+import { getMyRooms } from '../../../../api/endpoints/chat';
+import Button from '../../../atoms/Button';
+import Lottie from '../../../atoms/Lottie';
+import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 
-export const Subscriptions = () => {
+const SubscribersTable = dynamic(
+  () => import('../../../molecules/creator/dashboard/SubscribersTable')
+);
+const NoResults = dynamic(
+  () => import('../../../molecules/creator/dashboard/NoResults')
+);
+const Navigation = dynamic(
+  () => import('../../../molecules/creator/Navigation')
+);
+
+export const Subscriptions: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const router = useRouter();
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const { mySubscribersTotal } = useGetSubscriptions();
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const { mySubscribersTotal, isMySubscribersIsLoading } =
+    useGetSubscriptions();
+  const [mySubscriptionProduct, setMySubscriptionProduct] =
+    useState<newnewapi.ISubscriptionProduct | null>(null);
 
-  const [onboardingState, setOnboardingState] = useState<newnewapi.GetMyOnboardingStateResponse>();
-  const [isLoadingOnboardingState, setIsLoadingOnboardingState] = useState(true);
+  const [myAnnouncementRoomId, setMyAnnouncementRoomId] =
+    useState<number | undefined>();
+  const [loadingRoom, setLoadingRoom] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchMyRoom = async () => {
+    if (loadingRoom) return;
+    try {
+      setLoadingRoom(true);
+      const payload = new newnewapi.GetMyRoomsRequest({
+        myRole: 2,
+        roomKind: 4,
+        paging: {
+          limit: 1,
+        },
+      });
+      const res = await getMyRooms(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      if (res.data && res.data.rooms[0].id) {
+        setMyAnnouncementRoomId(res.data.rooms[0].id as number);
+      }
+      setLoadingRoom(false);
+    } catch (err) {
+      console.error(err);
+      setLoadingRoom(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!myAnnouncementRoomId && mySubscribersTotal > 0) fetchMyRoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myAnnouncementRoomId, mySubscribersTotal]);
 
   const fetchMySubscriptionProduct = async () => {
+    if (isLoading) return;
     try {
+      setIsLoading(true);
       const payload = new newnewapi.EmptyRequest();
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) {
         setMySubscriptionProduct(res.data?.myProduct);
-      } else {
-        /* eslint-disable no-unused-expressions */
-        !onboardingState?.isCreatorConnectedToStripe
-          ? router.push('/creator/get-paid')
-          : router.push('/creator/subscribers/edit-subscription-rate');
       }
+      setIsLoading(false);
     } catch (err) {
       console.error(err);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    async function fetchOnboardingState() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data) {
-          setOnboardingState(res.data);
-        }
-        setIsLoadingOnboardingState(false);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchOnboardingState();
-  }, []);
-
-  useEffect(() => {
-    if (!mySubscriptionProduct && !isLoadingOnboardingState) {
+    if (!mySubscriptionProduct && !isLoading) {
       fetchMySubscriptionProduct();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mySubscriptionProduct, isLoadingOnboardingState]);
+  }, [mySubscriptionProduct, isLoading]);
 
   return (
     <SContainer>
@@ -75,18 +101,42 @@ export const Subscriptions = () => {
       <SContent>
         <STitleBlock>
           <STitle variant={4}>
-            {t('subscriptions.title')} {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
+            {t('subscriptions.title')}{' '}
+            {mySubscribersTotal > 0 && `(${mySubscribersTotal})`}
           </STitle>
+          {myAnnouncementRoomId && (
+            <Link
+              href={`/creator/dashboard?tab=direct-messages&roomID=${myAnnouncementRoomId}`}
+            >
+              <a>
+                <Button view='primaryGrad'>
+                  {t('subscriptions.message-all')}
+                </Button>
+              </a>
+            </Link>
+          )}
         </STitleBlock>
-        {!mySubscribersTotal || mySubscribersTotal < 1 ? (
-          <NoResults isCreatorConnectedToStripe={onboardingState?.isCreatorConnectedToStripe} />
+        {!isMySubscribersIsLoading ? (
+          !mySubscribersTotal || mySubscribersTotal < 1 ? (
+            <NoResults />
+          ) : (
+            <SubscribersTable />
+          )
         ) : (
-          <SubscribersTable />
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
         )}
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Subscriptions;
 
@@ -123,7 +173,9 @@ const SContent = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 const STitleBlock = styled.section`
   display: flex;

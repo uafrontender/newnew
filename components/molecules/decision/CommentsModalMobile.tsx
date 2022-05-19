@@ -16,6 +16,7 @@ import Text from '../../atoms/Text';
 import NoContentYetImg from '../../../public/images/decision/no-content-yet-mock.png';
 
 interface ICommentsModalMobile {
+  postUuid: string;
   isVisible: boolean;
   comments: any[];
   commentsLoading: boolean;
@@ -33,6 +34,7 @@ interface ICommentsModalMobile {
 }
 
 const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
+  postUuid,
   comments,
   isVisible,
   commentsLoading,
@@ -151,7 +153,7 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
                 {comments.length === 0 && !commentsLoading ? (
                   <SNoCommentsYet>
                     <SNoCommentsImgContainer>
-                      <img src={NoContentYetImg.src} alt="No content yet" />
+                      <img src={NoContentYetImg.src} alt='No content yet' />
                     </SNoCommentsImgContainer>
                     <SNoCommentsCaption variant={3}>
                       {t('comments.noCommentsCaption')}
@@ -184,6 +186,8 @@ const CommentsModalMobile: React.FC<ICommentsModalMobile> = ({
               </SCommentsWrapper>
               <SCommentFormWrapper>
                 <CommentForm
+                  isRoot
+                  postUuid={postUuid}
                   onSubmit={(newMsg: string) => handleAddComment(newMsg)}
                 />
               </SCommentFormWrapper>

@@ -7,20 +7,20 @@ interface IList {
   collection: object[];
 }
 
-export const List: React.FC<IList> = (props) => {
+export const List: React.FC<IList> = React.memo((props) => {
   const { collection } = props;
 
   const renderItem = useCallback(
     (item) => (
       <SItemWrapper key={`creation-item-${item.key}`}>
-        <ListItem item={item} />
+        <ListItem itemKey={item.key} />
       </SItemWrapper>
     ),
     []
   );
 
   return <SList>{collection?.map(renderItem)}</SList>;
-};
+});
 
 export default List;
 

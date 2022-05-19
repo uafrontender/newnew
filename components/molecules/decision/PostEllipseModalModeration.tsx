@@ -7,59 +7,61 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseModalModeration {
+  postType: string;
   isOpen: boolean;
+  canDeletePost: boolean;
   zIndex: number;
   onClose: () => void;
   handleOpenDeletePostModal: () => void;
 }
 
-const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModeration> = ({
-  isOpen,
-  zIndex,
-  onClose,
-  handleOpenDeletePostModal,
-}) => {
-  const { t } = useTranslation('decision');
+const PostEllipseModalModeration: React.FunctionComponent<IPostEllipseModalModeration> =
+  ({
+    postType,
+    isOpen,
+    zIndex,
+    canDeletePost,
+    onClose,
+    handleOpenDeletePostModal,
+  }) => {
+    const { t } = useTranslation('decision');
 
-  return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
-      <SWrapper>
-        <SContentContainer
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <SButton
-            onClick={() => {
-              handleOpenDeletePostModal();
-              onClose();
+    return (
+      <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
+        <SWrapper>
+          <SContentContainer
+            onClick={(e) => {
+              e.stopPropagation();
             }}
           >
-            <Text
-              variant={3}
+            <SButton
+              disabled={!canDeletePost}
+              onClick={() => {
+                handleOpenDeletePostModal();
+                onClose();
+              }}
             >
-              { t('ellipse.deleteDecision') }
-            </Text>
-          </SButton>
-        </SContentContainer>
-        <Button
-          view="secondary"
-          style={{
-            height: '56px',
-            width: 'calc(100% - 32px)',
-          }}
-        >
-          { t('ellipse.cancel') }
-        </Button>
-      </SWrapper>
-    </Modal>
-  );
-};
+              <Text variant={3}>
+                {t('ellipse.deleteDecision', {
+                  postType: t(`postType.${postType}`),
+                })}
+              </Text>
+            </SButton>
+          </SContentContainer>
+          <Button
+            view='secondary'
+            style={{
+              height: '56px',
+              width: 'calc(100% - 32px)',
+            }}
+            onClick={onClose}
+          >
+            {t('ellipse.cancel')}
+          </Button>
+        </SWrapper>
+      </Modal>
+    );
+  };
 
 export default PostEllipseModalModeration;
 
@@ -89,6 +91,8 @@ const SContentContainer = styled.div`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
+  z-index: 1;
+
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
     height: 480px;
@@ -106,5 +110,10 @@ const SButton = styled.button`
 
   &:focus {
     outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
 `;

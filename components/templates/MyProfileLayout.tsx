@@ -1,5 +1,9 @@
 import React, {
-  ReactElement, useCallback, useEffect, useMemo, useState,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
@@ -26,9 +30,12 @@ import EditIcon from '../../public/images/svg/icons/filled/Edit.svg';
 import SettingsIcon from '../../public/images/svg/icons/filled/Settings.svg';
 import ShareIconFilled from '../../public/images/svg/icons/filled/Share.svg';
 
-import isBroswer from '../../utils/isBrowser';
+import isBrowser from '../../utils/isBrowser';
+import useSynchronizedHistory from '../../utils/hooks/useSynchronizedHistory';
+import BackButton from '../molecules/profile/BackButton';
 
-type TPageType = 'activelyBidding'
+type TPageType =
+  | 'activelyBidding'
   | 'purchases'
   | 'viewHistory'
   | 'subscriptions'
@@ -96,15 +103,19 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
   const router = useRouter();
+  const { syncedHistoryPushState, syncedHistoryReplaceState } =
+    useSynchronizedHistory();
 
-  const tabs: Tab[] = useMemo(() => (
-    [
-      ...(user.userData?.options?.isCreator ? [
-        {
-          nameToken: 'myposts',
-          url: '/profile/my-posts',
-        },
-      ] : []),
+  const tabs: Tab[] = useMemo(
+    () => [
+      ...(user.userData?.options?.isCreator
+        ? [
+            {
+              nameToken: 'myposts',
+              url: '/profile/my-posts',
+            },
+          ]
+        : []),
       {
         nameToken: 'activelyBidding',
         url: '/profile',
@@ -125,13 +136,20 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
         nameToken: 'favorites',
         url: '/profile/favorites',
       },
-    ]), [user.userData?.options?.isCreator]);
+    ],
+    [user.userData?.options?.isCreator]
+  );
 
   // Show skeleton on route change
   // const [routeChangeLoading, setRouteChangeLoading] = useState(false);
 
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   // Share
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
@@ -162,227 +180,209 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   }, [user.userData?.username]);
 
   // Cached posts
-  const [
-    postsActivelyBiddingOn, setPostsActivelyBiddingOn,
-  ] = useState(postsCachedActivelyBiddingOn ?? []);
-  const [
-    postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter,
-  ] = useState(postsCachedActivelyBiddingOnFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    activelyBiddingPageToken,
-    setActivelyBiddingPageToken,
-  ] = useState(postsCachedActivelyBiddingPageToken);
-  const [
-    activelyBiddingCount,
-    setActivelyBiddingCount,
-  ] = useState(postsCachedActivelyBiddingCount);
+  const [postsActivelyBiddingOn, setPostsActivelyBiddingOn] = useState(
+    postsCachedActivelyBiddingOn ?? []
+  );
+  const [postsActivelyBiddingOnFilter, setPostsActivelyBiddingOnFilter] =
+    useState(postsCachedActivelyBiddingOnFilter ?? newnewapi.Post.Filter.ALL);
+  const [activelyBiddingPageToken, setActivelyBiddingPageToken] = useState(
+    postsCachedActivelyBiddingPageToken
+  );
+  const [activelyBiddingCount, setActivelyBiddingCount] = useState(
+    postsCachedActivelyBiddingCount
+  );
 
-  const [
-    postsMyPurchases, setPostsMyPurchases,
-  ] = useState(postsCachedMyPurchases ?? []);
-  const [
-    postsMyPurchasesFilter, setPostsMyPurchasesFilter,
-  ] = useState(postsCachedMyPurchasesFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    myPurchasesPageToken,
-    setMyPurchasesPageToken,
-  ] = useState(postsCachedMyPurchasesPageToken);
-  const [
-    myPurchasesCount,
-    setMyPurchasesCount,
-  ] = useState(postsCachedMyPurchasesCount);
+  const [postsMyPurchases, setPostsMyPurchases] = useState(
+    postsCachedMyPurchases ?? []
+  );
+  const [postsMyPurchasesFilter, setPostsMyPurchasesFilter] = useState(
+    postsCachedMyPurchasesFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [myPurchasesPageToken, setMyPurchasesPageToken] = useState(
+    postsCachedMyPurchasesPageToken
+  );
+  const [myPurchasesCount, setMyPurchasesCount] = useState(
+    postsCachedMyPurchasesCount
+  );
 
-  const [
-    postsViewHistory, setPostsViewHistory,
-  ] = useState(postsCachedViewHistory ?? []);
-  const [
-    postsViewHistoryFilter, setPostsViewHistoryFilter,
-  ] = useState(postsCachedViewHistoryFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    viewHistoryPageToken,
-    setViewHistoryPageToken,
-  ] = useState(postsCachedViewHistoryPageToken);
-  const [
-    viewHistoryCount,
-    setViewHistoryCount,
-  ] = useState(postsCachedViewHistoryCount);
+  const [postsViewHistory, setPostsViewHistory] = useState(
+    postsCachedViewHistory ?? []
+  );
+  const [postsViewHistoryFilter, setPostsViewHistoryFilter] = useState(
+    postsCachedViewHistoryFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [viewHistoryPageToken, setViewHistoryPageToken] = useState(
+    postsCachedViewHistoryPageToken
+  );
+  const [viewHistoryCount, setViewHistoryCount] = useState(
+    postsCachedViewHistoryCount
+  );
 
-  const [
-    postsSubscriptions, setPostsSubscriptions,
-  ] = useState(postsCachedSubscriptions ?? []);
-  const [
-    postsSubscriptionsFilter, setPostsSubscriptionsFilter,
-  ] = useState(postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    subscriptionsPageToken,
-    setSubscriptionsPageToken,
-  ] = useState(postsCachedSubscriptionsPageToken);
-  const [
-    subscriptionsCount,
-    setSubscriptionsCount,
-  ] = useState(postsCachedSubscriptionsCount);
+  const [postsSubscriptions, setPostsSubscriptions] = useState(
+    postsCachedSubscriptions ?? []
+  );
+  const [postsSubscriptionsFilter, setPostsSubscriptionsFilter] = useState(
+    postsCachedSubscriptionsFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [subscriptionsPageToken, setSubscriptionsPageToken] = useState(
+    postsCachedSubscriptionsPageToken
+  );
+  const [subscriptionsCount, setSubscriptionsCount] = useState(
+    postsCachedSubscriptionsCount
+  );
 
-  const [
-    postsFavorites, setPostsFavorites,
-  ] = useState(postsCachedFavorites ?? []);
-  const [
-    postsFavoritesFilter, setPostsFavoritesFilter,
-  ] = useState(postsCachedFavoritesFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    favoritesPageToken,
-    setFavoritesPageToken,
-  ] = useState(postsCachedFavoritesPageToken);
-  const [
-    postsFavoritesCount,
-    setFavoritesCount,
-  ] = useState(postsCachedFavoritesCount);
+  const [postsFavorites, setPostsFavorites] = useState(
+    postsCachedFavorites ?? []
+  );
+  const [postsFavoritesFilter, setPostsFavoritesFilter] = useState(
+    postsCachedFavoritesFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [favoritesPageToken, setFavoritesPageToken] = useState(
+    postsCachedFavoritesPageToken
+  );
+  const [postsFavoritesCount, setFavoritesCount] = useState(
+    postsCachedFavoritesCount
+  );
 
-  const [
-    postsMyPosts, setPostsMyPosts,
-  ] = useState(postsCachedMyPosts ?? []);
-  const [
-    postsMyPostsFilter, setPostsMyPostsFilter,
-  ] = useState(postsCachedMyPostsFilter ?? newnewapi.Post.Filter.ALL);
-  const [
-    myPostsPageToken,
-    setMyPostsPageToken,
-  ] = useState(postsCachedMyPostsPageToken);
-  const [
-    postsMyPostsCount,
-    setMyPostsCount,
-  ] = useState(postsCachedMyPostsCount);
+  const [postsMyPosts, setPostsMyPosts] = useState(postsCachedMyPosts ?? []);
+  const [postsMyPostsFilter, setPostsMyPostsFilter] = useState(
+    postsCachedMyPostsFilter ?? newnewapi.Post.Filter.ALL
+  );
+  const [myPostsPageToken, setMyPostsPageToken] = useState(
+    postsCachedMyPostsPageToken
+  );
+  const [postsMyPostsCount, setMyPostsCount] = useState(
+    postsCachedMyPostsCount
+  );
 
   // UpdateCachedPosts
-  const handleSetPostsActivelyBiddingOn: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setPostsActivelyBiddingOn, [setPostsActivelyBiddingOn],
-    );
+  const handleSetPostsActivelyBiddingOn: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setPostsActivelyBiddingOn, [setPostsActivelyBiddingOn]);
 
-  const handleSetPostsMyPurchases: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setPostsMyPurchases, [setPostsMyPurchases],
-    );
+  const handleSetPostsMyPurchases: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setPostsMyPurchases, [setPostsMyPurchases]);
 
-  const handleSetPostsViewHistory: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setPostsViewHistory, [setPostsViewHistory],
-    );
-  const handleSetPostsSubscriptions: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setPostsSubscriptions, [setPostsSubscriptions],
-    );
+  const handleSetPostsViewHistory: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setPostsViewHistory, [setPostsViewHistory]);
+  const handleSetPostsSubscriptions: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setPostsSubscriptions, [setPostsSubscriptions]);
 
-  const handleSetPostsFavorites: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setPostsFavorites, [setPostsFavorites],
-    );
+  const handleSetPostsFavorites: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setPostsFavorites, [setPostsFavorites]);
 
-  const handleSetPostsMyPosts: React
-    .Dispatch<React.SetStateAction<newnewapi.Post[]>> = useCallback(
-      setPostsMyPosts, [setPostsMyPosts],
-    );
+  const handleSetPostsMyPosts: React.Dispatch<
+    React.SetStateAction<newnewapi.Post[]>
+  > = useCallback(setPostsMyPosts, [setPostsMyPosts]);
 
-  const handleUpdateFilter = useCallback((
-    value: newnewapi.Post.Filter,
-  ) => {
-    switch (renderedPage) {
-      case 'activelyBidding': {
-        setPostsActivelyBiddingOnFilter(value);
-        break;
+  const handleUpdateFilter = useCallback(
+    (value: newnewapi.Post.Filter) => {
+      switch (renderedPage) {
+        case 'activelyBidding': {
+          setPostsActivelyBiddingOnFilter(value);
+          break;
+        }
+        case 'purchases': {
+          setPostsMyPurchasesFilter(value);
+          break;
+        }
+        case 'viewHistory': {
+          setPostsViewHistoryFilter(value);
+          break;
+        }
+        case 'subscriptions': {
+          setPostsSubscriptionsFilter(value);
+          break;
+        }
+        case 'favorites': {
+          setPostsFavoritesFilter(value);
+          break;
+        }
+        case 'myposts': {
+          setPostsMyPostsFilter(value);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      case 'purchases': {
-        setPostsMyPurchasesFilter(value);
-        break;
-      }
-      case 'viewHistory': {
-        setPostsViewHistoryFilter(value);
-        break;
-      }
-      case 'subscriptions': {
-        setPostsSubscriptionsFilter(value);
-        break;
-      }
-      case 'favorites': {
-        setPostsFavoritesFilter(value);
-        break;
-      }
-      case 'myposts': {
-        setPostsMyPostsFilter(value);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [renderedPage]);
+    },
+    [renderedPage]
+  );
 
-  const handleUpdatePageToken = useCallback((
-    value: string | null | undefined,
-  ) => {
-    switch (renderedPage) {
-      case 'activelyBidding': {
-        setActivelyBiddingPageToken(value);
-        break;
+  const handleUpdatePageToken = useCallback(
+    (value: string | null | undefined) => {
+      switch (renderedPage) {
+        case 'activelyBidding': {
+          setActivelyBiddingPageToken(value);
+          break;
+        }
+        case 'purchases': {
+          setMyPurchasesPageToken(value);
+          break;
+        }
+        case 'viewHistory': {
+          setViewHistoryPageToken(value);
+          break;
+        }
+        case 'subscriptions': {
+          setSubscriptionsPageToken(value);
+          break;
+        }
+        case 'favorites': {
+          setFavoritesPageToken(value);
+          break;
+        }
+        case 'myposts': {
+          setMyPostsPageToken(value);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      case 'purchases': {
-        setMyPurchasesPageToken(value);
-        break;
-      }
-      case 'viewHistory': {
-        setViewHistoryPageToken(value);
-        break;
-      }
-      case 'subscriptions': {
-        setSubscriptionsPageToken(value);
-        break;
-      }
-      case 'favorites': {
-        setFavoritesPageToken(value);
-        break;
-      }
-      case 'myposts': {
-        setMyPostsPageToken(value);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [renderedPage]);
+    },
+    [renderedPage]
+  );
 
-  const handleUpdateCount = useCallback((
-    value: number,
-  ) => {
-    switch (renderedPage) {
-      case 'activelyBidding': {
-        setActivelyBiddingCount(value);
-        break;
+  const handleUpdateCount = useCallback(
+    (value: number) => {
+      switch (renderedPage) {
+        case 'activelyBidding': {
+          setActivelyBiddingCount(value);
+          break;
+        }
+        case 'purchases': {
+          setMyPurchasesCount(value);
+          break;
+        }
+        case 'viewHistory': {
+          setViewHistoryCount(value);
+          break;
+        }
+        case 'subscriptions': {
+          setSubscriptionsCount(value);
+          break;
+        }
+        case 'favorites': {
+          setFavoritesCount(value);
+          break;
+        }
+        case 'myposts': {
+          setMyPostsCount(value);
+          break;
+        }
+        default: {
+          break;
+        }
       }
-      case 'purchases': {
-        setMyPurchasesCount(value);
-        break;
-      }
-      case 'viewHistory': {
-        setViewHistoryCount(value);
-        break;
-      }
-      case 'subscriptions': {
-        setSubscriptionsCount(value);
-        break;
-      }
-      case 'favorites': {
-        setFavoritesCount(value);
-        break;
-      }
-      case 'myposts': {
-        setMyPostsCount(value);
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [renderedPage]);
+    },
+    [renderedPage]
+  );
 
   const renderChildren = () => {
     let postsForPage = {};
@@ -445,45 +445,49 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
       }
     }
 
-    return React.cloneElement(
-      children as ReactElement,
-      {
-        ...(postsForPage ? { posts: postsForPage } : {}),
-        ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
-        pageToken,
-        totalCount,
-        handleSetPosts,
-        handleUpdatePageToken,
-        handleUpdateCount,
-        handleUpdateFilter,
-      },
-    );
+    return React.cloneElement(children as ReactElement, {
+      ...(postsForPage ? { posts: postsForPage } : {}),
+      ...(postsForPageFilter ? { postsFilter: postsForPageFilter } : {}),
+      pageToken,
+      totalCount,
+      handleSetPosts,
+      handleUpdatePageToken,
+      handleUpdateCount,
+      handleUpdateFilter,
+    });
   };
 
   // Edit Profile menu
   const [isEditProfileMenuOpen, setIsEditProfileMenuOpen] = useState(false);
-  const [editingStage, setEditingStage] = useState<TEditingStage>('edit-general');
+  const [editingStage, setEditingStage] =
+    useState<TEditingStage>('edit-general');
   const [wasModified, setWasModified] = useState(true);
 
-  const handleSetWasModified = useCallback((newState: boolean) => {
-    setWasModified(newState);
-  }, [setWasModified]);
+  const handleSetWasModified = useCallback(
+    (newState: boolean) => {
+      setWasModified(newState);
+    },
+    [setWasModified]
+  );
 
-  const handleCloseEditProfileMenu = useCallback(() => {
-    if (isBroswer()) {
-      // window.history.back();
-    }
-    setIsEditProfileMenuOpen(false);
-  }, [setIsEditProfileMenuOpen]);
+  const handleCloseEditProfileMenu = useCallback(
+    (preventGoBack = false) => {
+      if (isBrowser() && !preventGoBack) {
+        window.history.back();
+      }
+      setIsEditProfileMenuOpen(false);
+    },
+    [setIsEditProfileMenuOpen]
+  );
 
   const handleOpenEditProfileMenu = () => {
     // Allow closing with browser back button
-    if (isBroswer()) {
-      window.history.pushState(
+    if (isBrowser()) {
+      syncedHistoryPushState(
         {
           stage: 'edit-general',
         },
-        '',
+        window.location.href
       );
     }
     setEditingStage('edit-general');
@@ -491,24 +495,24 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   };
 
   const handleSetStageToEditingProfilePicture = () => {
-    if (isBroswer()) {
-      window.history.pushState(
+    if (isBrowser()) {
+      syncedHistoryPushState(
         {
           stage: 'edit-profile-picture',
         },
-        '',
+        window.location.href
       );
     }
     setEditingStage('edit-profile-picture');
   };
 
   const handleSetStageToEditingGeneral = () => {
-    if (isBroswer()) {
-      window.history.replaceState(
+    if (isBrowser()) {
+      syncedHistoryReplaceState(
         {
           stage: 'edit-general',
         },
-        '',
+        window.location.href
       );
     }
     setEditingStage('edit-general');
@@ -557,38 +561,21 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
   // Try to pre-fetch the content
   useEffect(() => {
     router.prefetch('/profile/settings');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const handlerHistory = () => {
-      console.log('Popstate');
-
-      const postId = window?.history?.state?.postId;
-      if (postId && window?.history?.state?.fromPost) {
-        router.push(`/post/${postId}`);
-      }
-    }
-
-    window?.addEventListener('popstate', handlerHistory);
-
-    return () => {
-      window?.removeEventListener('popstate', handlerHistory);
-    }
-  }, [router]);
 
   return (
     <ErrorBoundary>
-      <SGeneral
-        restrictMaxWidth
-      >
+      <SGeneral restrictMaxWidth>
         <SMyProfileLayout>
           <ProfileBackground
             // Temp
-            pictureURL={user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'}
+            pictureURL={
+              user?.userData?.coverUrl ?? '../public/images/mock/profile-bg.png'
+            }
           >
             <Button
-              view="transparent"
+              view='transparent'
               withShrink
               withDim
               iconOnly={isMobileOrTablet}
@@ -596,13 +583,13 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             >
               <InlineSvg
                 svg={EditIcon}
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
+                width={isMobileOrTablet ? '16px' : '24px'}
+                height={isMobileOrTablet ? '16px' : '24px'}
               />
               {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.edit')}
             </Button>
             <Button
-              view="transparent"
+              view='transparent'
               withDim
               withShrink
               iconOnly={isMobileOrTablet}
@@ -610,17 +597,22 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
             >
               <InlineSvg
                 svg={SettingsIcon}
-                width={isMobileOrTablet ? '20px' : '24px'}
-                height={isMobileOrTablet ? '20px' : '24px'}
+                width={isMobileOrTablet ? '16px' : '24px'}
+                height={isMobileOrTablet ? '16px' : '24px'}
               />
-              {isMobileOrTablet ? null : t('ProfileLayout.headerButtons.settings')}
+              {isMobileOrTablet
+                ? null
+                : t('ProfileLayout.headerButtons.settings')}
             </Button>
           </ProfileBackground>
+          <SBackButton
+            onClick={() => {
+              router.back();
+            }}
+          />
           {/* NB! Temp */}
           {user.userData?.avatarUrl && (
-            <ProfileImage
-              src={user.userData?.avatarUrl}
-            />
+            <ProfileImage src={user.userData?.avatarUrl} />
           )}
           <div
             style={{
@@ -629,14 +621,10 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               alignItems: 'center',
             }}
           >
-            <SUsername
-              variant={4}
-            >
-              {user.userData?.nickname}
-            </SUsername>
+            <SUsername variant={4}>{user.userData?.nickname}</SUsername>
             <SShareDiv>
               <SUsernameButton
-                view="tertiary"
+                view='tertiary'
                 iconOnly
                 style={{
                   paddingTop: '8px',
@@ -644,19 +632,23 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
                   paddingLeft: '16px',
                   paddingRight: '16px',
                 }}
-                onClick={() => {
-                }}
+                onClick={() => {}}
               >
                 <SUsernameButtonText>
-                  @
-                  {/* Temp! */}
-                  {user.userData?.username && user.userData?.username.length > 12
-                    ? `${user.userData?.username.substring(0, 6)}...${user.userData?.username.substring((user.userData?.username.length || 0) - 3)}`
+                  @{/* Temp! */}
+                  {user.userData?.username &&
+                  user.userData?.username.length > 12
+                    ? `${user.userData?.username.substring(
+                        0,
+                        6
+                      )}...${user.userData?.username.substring(
+                        (user.userData?.username.length || 0) - 3
+                      )}`
                     : user.userData?.username}
                 </SUsernameButtonText>
               </SUsernameButton>
               <SShareButton
-                view="tertiary"
+                view='tertiary'
                 iconOnly
                 withDim
                 withShrink
@@ -667,45 +659,44 @@ const MyProfileLayout: React.FunctionComponent<IMyProfileLayout> = ({
               >
                 {isCopiedUrl ? (
                   t('ProfileLayout.buttons.copied')
-                ): (
-                  <InlineSvg svg={ShareIconFilled} fill={theme.colorsThemed.text.primary} width="20px" height="20px" />
+                ) : (
+                  <InlineSvg
+                    svg={ShareIconFilled}
+                    fill={theme.colorsThemed.text.primary}
+                    width='20px'
+                    height='20px'
+                  />
                 )}
               </SShareButton>
             </SShareDiv>
             {user.userData?.bio ? (
-              <SBioText
-                variant={3}
-              >
-                {user.userData?.bio}
-              </SBioText>
+              <SBioText variant={3}>{user.userData?.bio}</SBioText>
             ) : null}
           </div>
-          <ProfileTabs
-            pageType="myProfile"
-            tabs={tabs}
-          />
+          <ProfileTabs pageType='myProfile' tabs={tabs} />
           {/* Edit Profile modal menu */}
           <Modal
             show={isEditProfileMenuOpen}
             overlayDim
-            transitionSpeed={isMobileOrTablet ? 0.5 : 0}
+            transitionSpeed={isMobileOrTablet ? 0.15 : 0}
             onClose={handleClosePreventDiscarding}
           >
-            {isEditProfileMenuOpen
-              ? (
-                <EditProfileMenu
-                  stage={editingStage}
-                  wasModified={wasModified}
-                  handleClose={handleCloseEditProfileMenu}
-                  handleSetWasModified={handleSetWasModified}
-                  handleClosePreventDiscarding={handleClosePreventDiscarding}
-                  handleSetStageToEditingProfilePicture={handleSetStageToEditingProfilePicture}
-                  handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
-                />
-              ) : null}
+            {isEditProfileMenuOpen ? (
+              <EditProfileMenu
+                stage={editingStage}
+                wasModified={wasModified}
+                handleClose={handleCloseEditProfileMenu}
+                handleSetWasModified={handleSetWasModified}
+                handleClosePreventDiscarding={handleClosePreventDiscarding}
+                handleSetStageToEditingProfilePicture={
+                  handleSetStageToEditingProfilePicture
+                }
+                handleSetStageToEditingGeneral={handleSetStageToEditingGeneral}
+              />
+            ) : null}
           </Modal>
         </SMyProfileLayout>
-        { renderChildren() }
+        {renderChildren()}
         {/* {!routeChangeLoading
           ? renderChildren() : (
             <CardSkeletonList
@@ -771,6 +762,17 @@ const SGeneral = styled(General)`
   }
 `;
 
+const SBackButton = styled(BackButton)`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  ${(props) => props.theme.media.laptop} {
+    top: 24px;
+    left: 24px;
+  }
+`;
+
 const SUsername = styled(Headline)`
   text-align: center;
 
@@ -791,7 +793,9 @@ const SShareDiv = styled.div`
 const SUsernameButton = styled(Button)`
   cursor: default;
 
-  &:active:enabled, &:hover:enabled, &:focus:enabled {
+  &:active:enabled,
+  &:hover:enabled,
+  &:focus:enabled {
     background: ${({ theme }) => theme.colorsThemed.background.primary};
   }
 `;

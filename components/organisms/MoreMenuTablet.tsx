@@ -1,20 +1,20 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useContext, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import styled, { useTheme } from 'styled-components';
-import { useRouter } from 'next/router';
+import styled from 'styled-components';
+import Link from 'next/link';
 
 import Text from '../atoms/Text';
-import InlineSvg from '../atoms/InlineSVG';
+// import InlineSvg from '../atoms/InlineSVG';
 
 import useOnClickEsc from '../../utils/hooks/useOnClickEsc';
 import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
 
-import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
-import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
+// import WalletIconFilled from '../../public/images/svg/icons/filled/Wallet.svg';
+// import WalletIconOutlined from '../../public/images/svg/icons/outlined/Wallet.svg';
 import { useAppSelector } from '../../redux-store/store';
-import { WalletContext } from '../../contexts/walletContext';
-import { formatNumber } from '../../utils/format';
+// import { WalletContext } from '../../contexts/walletContext';
+// import { formatNumber } from '../../utils/format';
 
 interface IMoreMenuTablet {
   isVisible: boolean;
@@ -25,21 +25,15 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
   isVisible,
   handleClose,
 }) => {
-  const theme = useTheme();
-  const router = useRouter();
+  // const theme = useTheme();
   const { t } = useTranslation('common');
   const containerRef = useRef<HTMLDivElement>();
 
   const user = useAppSelector((state) => state.user);
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
-
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
 
   useOnClickEsc(containerRef, handleClose);
   useOnClickOutside(containerRef, handleClose);
-
-  const handleClick = (url: string) => {
-    router.push(`/${url}`);
-  };
 
   return (
     <AnimatePresence>
@@ -52,37 +46,58 @@ const MoreMenuTablet: React.FC<IMoreMenuTablet> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <SButton
-            onClick={() => router.route === '/profile'
-              ? handleClose()
-              : handleClick(user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile')
+          <Link
+            href={
+              user.userData?.options?.isCreator
+                ? '/profile/my-posts'
+                : '/profile'
             }
           >
-            <SAvatar>
-              <img
-                src={user?.userData?.avatarUrl!! as string}
-                alt={user?.userData?.username!!}
-                draggable={false}
-              />
-            </SAvatar>
-            <Text variant={2}>
-              {t('mobile-top-navigation-profile')}
-            </Text>
-          </SButton>
-          <SButton onClick={() => router.route.includes('/profile/settings') ? handleClose() : handleClick('/profile/settings')}>
+            <SLink>
+              <SButton>
+                <SAvatar>
+                  <img
+                    src={user?.userData?.avatarUrl!! as string}
+                    alt={user?.userData?.username!!}
+                    draggable={false}
+                  />
+                </SAvatar>
+                <Text variant={2}>{t('mobile-top-navigation-profile')}</Text>
+              </SButton>
+            </SLink>
+          </Link>
+          {/* <SButton
+            onClick={() =>
+              router.route.includes('/profile/settings')
+                ? handleClose()
+                : handleClick('/profile/settings')
+            }
+          >
             <InlineSvg
-              svg={router.route.includes('profile/settings') ? WalletIconFilled : WalletIconOutlined}
-              fill={router.route.includes('profile/settings') ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
+              svg={
+                router.route.includes('profile/settings')
+                  ? WalletIconFilled
+                  : WalletIconOutlined
+              }
+              fill={
+                router.route.includes('profile/settings')
+                  ? theme.colorsThemed.accent.blue
+                  : theme.colorsThemed.text.tertiary
+              }
+              width='24px'
+              height='24px'
             />
             <Text variant={2}>
-            { !isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
-              ? t('mobile-top-navigation-my-balance', { value: formatNumber(Math.floor(walletBalance.usdCents / 100), true) })
-              : t('mobile-top-navigation-my-balance')
-            }
+              {!isBalanceLoading && walletBalance && walletBalance?.usdCents > 0
+                ? t('mobile-top-navigation-my-balance', {
+                    value: formatNumber(
+                      Math.floor(walletBalance.usdCents / 100),
+                      true
+                    ),
+                  })
+                : t('mobile-top-navigation-my-balance')}
             </Text>
-          </SButton>
+          </SButton> */}
         </SContainer>
       )}
     </AnimatePresence>
@@ -106,11 +121,18 @@ const SContainer = styled(motion.div)`
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
 
   ${({ theme }) => theme.media.laptop} {
     right: 16px;
   }
+`;
+
+const SLink = styled.a`
+  width: 100%;
+  display: block;
 `;
 
 const SButton = styled.button`
@@ -141,7 +163,6 @@ const SButton = styled.button`
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
   }
 `;
-
 
 const SAvatar = styled.div`
   overflow: hidden;

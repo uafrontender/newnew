@@ -5,7 +5,6 @@ import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
 import InlineSVG from '../../atoms/InlineSVG';
-
 import dashboardFilledIcon from '../../../public/images/svg/icons/filled/Dashboard.svg';
 import dashboardOutlinedIcon from '../../../public/images/svg/icons/outlined/Dashboard.svg';
 import subscriptionsFilledIcon from '../../../public/images/svg/icons/filled/Subscriptions.svg';
@@ -14,6 +13,8 @@ import subscriptionsOutlinedIcon from '../../../public/images/svg/icons/outlined
 // import earningsOutlinedIcon from '../../../public/images/svg/icons/outlined/Earnings.svg';
 import walletFilledIcon from '../../../public/images/svg/icons/filled/Wallet.svg';
 import walletOutlinedIcon from '../../../public/images/svg/icons/outlined/Wallet.svg';
+import Button from '../../atoms/Button';
+import { useAppSelector } from '../../../redux-store/store';
 // import transactionsFilledIcon from '../../../public/images/svg/icons/filled/Transactions.svg';
 // import transactionsOutlinedIcon from '../../../public/images/svg/icons/outlined/Transactions.svg';
 
@@ -21,6 +22,7 @@ export const Navigation = () => {
   const theme = useTheme();
   const { t } = useTranslation('creator');
   const router = useRouter();
+  const user = useAppSelector((state) => state.user);
 
   const collection = useMemo(
     () => [
@@ -44,7 +46,9 @@ export const Navigation = () => {
       // },
       {
         url: '/creator/get-paid',
-        label: t('navigation.getPaid'),
+        label: user.creatorData?.options?.isCreatorConnectedToStripe
+          ? t('navigation.getPaidEdit')
+          : t('navigation.getPaid'),
         iconFilled: walletFilledIcon,
         iconOutlined: walletOutlinedIcon,
       },
@@ -55,31 +59,52 @@ export const Navigation = () => {
       //   iconOutlined: transactionsOutlinedIcon,
       // },
     ],
-    [t]
+    [t, user.creatorData]
   );
 
   const renderItem = useCallback(
     (item) => {
-      const active = item.url === router.route;
-
+      const active = router.route.includes(item.url);
+      if (!user.creatorData?.isLoaded && item.url === '/creator/get-paid')
+        return null;
       return (
         <Link href={item.url} key={item.url}>
-          <SItem active={active}>
-            <SInlineSVG
-              svg={active ? item.iconFilled : item.iconOutlined}
-              fill={active ? theme.colorsThemed.accent.blue : theme.colorsThemed.text.tertiary}
-              width="24px"
-              height="24px"
-            />
-            <SLabel>{item.label}</SLabel>
-          </SItem>
+          <a>
+            <SItem active={active}>
+              <SInlineSVG
+                svg={active ? item.iconFilled : item.iconOutlined}
+                fill={
+                  active
+                    ? theme.colorsThemed.accent.blue
+                    : theme.colorsThemed.text.tertiary
+                }
+                width='24px'
+                height='24px'
+              />
+              <SLabel>{item.label}</SLabel>
+            </SItem>
+          </a>
         </Link>
       );
     },
-    [router.route, theme.colorsThemed.accent.blue, theme.colorsThemed.text.tertiary]
+    [
+      router.route,
+      theme.colorsThemed.accent.blue,
+      theme.colorsThemed.text.tertiary,
+      user,
+    ]
   );
 
-  return <SContainer>{collection.map(renderItem)}</SContainer>;
+  return (
+    <SContainer>
+      {collection.map(renderItem)}
+      <Link href='/creation'>
+        <a>
+          <Button>{t('navigation.new-post')}</Button>
+        </a>
+      </Link>
+    </SContainer>
+  );
 };
 
 export default Navigation;
@@ -112,13 +137,18 @@ const SItem = styled.a<ISItem>`
   flex-direction: row;
 
   svg {
-    fill: ${(props) => (props.active ? props.theme.colorsThemed.accent.blue : props.theme.colorsThemed.text.tertiary)};
+    fill: ${(props) =>
+      props.active
+        ? props.theme.colorsThemed.accent.blue
+        : props.theme.colorsThemed.text.tertiary};
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 
   label {
     color: ${(props) =>
-      props.active ? props.theme.colorsThemed.text.primary : props.theme.colorsThemed.text.secondary};
+      props.active
+        ? props.theme.colorsThemed.text.primary
+        : props.theme.colorsThemed.text.secondary};
     cursor: ${(props) => (props.active ? 'not-allowed' : 'pointer')};
   }
 

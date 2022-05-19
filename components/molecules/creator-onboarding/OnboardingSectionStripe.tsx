@@ -3,6 +3,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../redux-store/store';
 
@@ -21,149 +22,123 @@ interface IOnboardingSectionStripe {
   isConnectedToStripe: boolean;
 }
 
-const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe> = ({
-  isConnectedToStripe,
-}) => {
-  const router = useRouter();
-  const theme = useTheme();
-  const { t } = useTranslation('creator-onboarding');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const OnboardingSectionStripe: React.FunctionComponent<IOnboardingSectionStripe> =
+  ({ isConnectedToStripe }) => {
+    const router = useRouter();
+    const theme = useTheme();
+    const { t } = useTranslation('creator-onboarding');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const handleRedirectToStripesetup = async () => {
-    try {
-      const payload = new newnewapi.SetupStripeCreatorAccountRequest({
-        refreshUrl: window.location.href,
-        returnUrl: window.location.href,
-      });
+    const handleRedirectToStripesetup = async () => {
+      try {
+        const payload = new newnewapi.SetupStripeCreatorAccountRequest({
+          refreshUrl: window.location.href,
+          returnUrl: window.location.href,
+        });
 
-      const res = await fetchSetStripeLinkCreator(payload);
+        const res = await fetchSetStripeLinkCreator(payload);
 
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
 
-      const url = res.data.setupUrl;
-      window.location.href = url;
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        const url = res.data.setupUrl;
+        window.location.href = url;
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  const handleSubmit = () => {
-    router.push('/creator-onboarding-subrate');
-  };
-
-  return (
-    <SContainer>
-      {isMobile && (
-        <SGoBackButton
-          onClick={() => router.back()}
-        />
-      )}
-      <SHeadline
-          variant={5}
-        >
-          <span>
-            {t('StripeSection.title-set-up-stripe')}
-          </span>
-          <InlineSvg
-            svg={StripeLogo}
-            width="80px"
-          />
+    return (
+      <SContainer>
+        {isMobile && <SGoBackButton onClick={() => router.back()} />}
+        <SHeadline variant={5}>
+          <span>{t('StripeSection.title-set-up-stripe')}</span>
+          <InlineSvg svg={StripeLogo} width='80px' />
         </SHeadline>
         <SUl>
-          <li>
-            {t('StripeSection.bullets.1')}
-          </li>
-          <li>
-            {t('StripeSection.bullets.2')}
-          </li>
-          <li>
-            {t('StripeSection.bullets.3')}
-          </li>
+          <li>{t('StripeSection.bullets.1')}</li>
+          <li>{t('StripeSection.bullets.2')}</li>
+          <li>{t('StripeSection.bullets.3')}</li>
         </SUl>
         <SButton
-          view="primaryGrad"
+          view='primaryGrad'
           isConnectedToStripe={isConnectedToStripe}
           style={{
-            ...(isConnectedToStripe ? {
-              background: theme.colorsThemed.accent.success,
-            } : {})
+            ...(isConnectedToStripe
+              ? {
+                  background: theme.colorsThemed.accent.success,
+                }
+              : {}),
           }}
           onClick={() => {
             if (!isConnectedToStripe) {
-              handleRedirectToStripesetup()
+              handleRedirectToStripesetup();
             }
           }}
         >
           <InlineSvg
-            svg={!isConnectedToStripe ? StripeLogoS : VerificationPassedInverted}
-            width="24px"
-            height="24px"
+            svg={
+              !isConnectedToStripe ? StripeLogoS : VerificationPassedInverted
+            }
+            width='24px'
+            height='24px'
           />
           <span>
-            {
-              isConnectedToStripe ? (
-                t('StripeSection.stripeConnectedLinkBtn')
-              ) : t('StripeSection.requestSetupLinkBtn')
-            }
+            {isConnectedToStripe
+              ? t('StripeSection.stripeConnectedLinkBtn')
+              : t('StripeSection.requestSetupLinkBtn')}
           </span>
         </SButton>
-    <SControlsDiv>
-      {!isMobile && (
-        <GoBackButton
-          noArrow
-          onClick={() => router.back()}
-        >
-          { t('AboutSection.backButton') }
-        </GoBackButton>
-      )}
-      <Button
-        view="primaryGrad"
-        disabled={!isConnectedToStripe}
-        style={{
-          width: isMobile ? '100%' : 'initial',
-        }}
-        onClick={() => handleSubmit()}
-      >
-        {isMobile ? (
-          t('StripeSection.submitMobile')
-        ) : t('StripeSection.submitDesktop') }
-      </Button>
-    </SControlsDiv>
-    </SContainer>
-  );
-};
+        <SControlsDiv>
+          {!isMobile && (
+            <Link href='/creator/dashboard'>
+              <a>
+                <GoBackButton noArrow onClick={() => {}}>
+                  {t('AboutSection.backButton')}
+                </GoBackButton>
+              </a>
+            </Link>
+          )}
+          <Link href='/creator-onboarding-subrate'>
+            <a>
+              <Button
+                view='primaryGrad'
+                disabled={!isConnectedToStripe}
+                style={{
+                  width: isMobile ? '100%' : 'initial',
+                }}
+              >
+                {isMobile
+                  ? t('StripeSection.submitMobile')
+                  : t('StripeSection.submitDesktop')}
+              </Button>
+            </a>
+          </Link>
+        </SControlsDiv>
+      </SContainer>
+    );
+  };
 
 export default OnboardingSectionStripe;
 
-
 const SContainer = styled.div`
-  padding-left: 16px;
-  padding-right: 16px;
-
-  padding-bottom: 88px;
-
+  padding: 0 20px 20px;
   z-index: 2;
-
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   ${({ theme }) => theme.media.tablet} {
-    padding-bottom: 0;
-
-    padding-left: 152px;
-    padding-right: 152px;
-
-    margin-bottom: 44px;
-
-    margin-top: 114px;
+    padding: 114px 152px 44px;
   }
 
   ${({ theme }) => theme.media.laptop} {
     height: fit-content;
-
     padding-left: 0;
     padding-right: 104px;
-
-    margin-bottom: 190px;
-    margin-top: 44px;
+    padding-top: 44px;
   }
 `;
 
@@ -174,13 +149,10 @@ const SGoBackButton = styled(GoBackButton)`
 `;
 
 const SControlsDiv = styled.div`
-  width: 100%;
-  margin-top: 80%;
-
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
-
-
+  a,
   button {
     width: 100%;
     height: 56px;
@@ -188,19 +160,13 @@ const SControlsDiv = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     position: static;
-    margin-top: 24px;
-
     margin-left: initial;
     width: 100%;
-
+    padding: 0;
     button {
       width: 170px;
       height: 48px;
     }
-  }
-
-  ${({ theme }) => theme.media.laptop} {
-    margin-top: 80%;
   }
 `;
 
@@ -233,7 +199,6 @@ const SUl = styled.ul`
 const SButton = styled(Button)<{
   isConnectedToStripe: boolean;
 }>`
-
   margin-bottom: 24px;
 
   width: 100%;
@@ -251,12 +216,13 @@ const SButton = styled(Button)<{
     }
   }
 
-  ${({ isConnectedToStripe }) => (isConnectedToStripe ? (
-    css`
-      &:after {
-        display: none;
-      }
-      cursor: default;
-    `
-  ) : '')};
+  ${({ isConnectedToStripe }) =>
+    isConnectedToStripe
+      ? css`
+          &:after {
+            display: none;
+          }
+          cursor: default;
+        `
+      : ''};
 `;

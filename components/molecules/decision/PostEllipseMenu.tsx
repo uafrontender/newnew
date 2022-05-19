@@ -8,75 +8,68 @@ import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseMenu {
+  postType: string;
   isVisible: boolean;
-  isFollowing: boolean;
   isFollowingDecision: boolean;
-  handleFollowDecision: () => {};
-  handleToggleFollowingCreator: () => {};
-  handleClose: () => void;
+  handleFollowDecision: () => void;
+  handleReportOpen: () => void;
+  onClose: () => void;
 }
 
-const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = ({
-  isVisible,
-  isFollowing,
-  isFollowingDecision,
-  handleFollowDecision,
-  handleToggleFollowingCreator,
-  handleClose,
-}) => {
-  const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
+const PostEllipseMenu: React.FunctionComponent<IPostEllipseMenu> = React.memo(
+  ({
+    postType,
+    isVisible,
+    isFollowingDecision,
+    handleFollowDecision,
+    handleReportOpen,
+    onClose,
+  }) => {
+    const { t } = useTranslation('decision');
+    const containerRef = useRef<HTMLDivElement>();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+    useOnClickEsc(containerRef, onClose);
+    useOnClickOutside(containerRef, onClose);
 
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <SContainer
-          ref={(el) => {
-            containerRef.current = el!!;
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <SButton
-            onClick={() => handleToggleFollowingCreator()}
-            style={{
-              marginBottom: '16px',
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <SContainer
+            ref={(el) => {
+              containerRef.current = el!!;
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <Text
-              variant={3}
+            <SButton onClick={() => handleFollowDecision()}>
+              <Text variant={3}>
+                {!isFollowingDecision
+                  ? t('ellipse.follow-decision', {
+                      postType: t(`postType.${postType}`),
+                    })
+                  : t('ellipse.unfollow-decision', {
+                      postType: t(`postType.${postType}`),
+                    })}
+              </Text>
+            </SButton>
+            <SSeparator />
+            <SButton
+              onClick={() => {
+                handleReportOpen();
+                onClose();
+              }}
             >
-              { !isFollowing ? t('ellipse.follow-creator') : t('ellipse.unfollow-creator') }
-            </Text>
-          </SButton>
-          <SButton
-            onClick={() => handleFollowDecision()}
-          >
-            <Text
-              variant={3}
-            >
-              { !isFollowingDecision ? t('ellipse.follow-decision') : t('ellipse.unfollow-decision') }
-            </Text>
-          </SButton>
-          <SSeparator />
-          <SButton
-            onClick={() => {}}
-          >
-            <Text
-              variant={3}
-            >
-              { t('ellipse.report') }
-            </Text>
-          </SButton>
-        </SContainer>
-      )}
-    </AnimatePresence>
-  );
-};
+              <Text variant={3} tone='error'>
+                {t('ellipse.report')}
+              </Text>
+            </SButton>
+          </SContainer>
+        )}
+      </AnimatePresence>
+    );
+  }
+);
 
 export default PostEllipseMenu;
 
@@ -116,5 +109,6 @@ const SSeparator = styled.div`
   margin-top: 8px;
   margin-bottom: 8px;
   width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;

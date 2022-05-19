@@ -11,7 +11,7 @@ export default {
 } as ComponentMeta<typeof SettingsColorModeSwitch>;
 
 const Template: ComponentStory<typeof SettingsColorModeSwitch> = (args) => {
-  const [colorMode, setColorMode] = useState<TColorMode>('auto')
+  const [colorMode, setColorMode] = useState<TColorMode>('auto');
   const theme = useTheme();
 
   return (

@@ -9,17 +9,9 @@ const ProfileBackground: React.FunctionComponent<IProfileBackground> = ({
   pictureURL,
   children,
 }) => (
-  <SProfileBackground
-    pictureURL={pictureURL}
-  >
-    <img
-      src={pictureURL}
-      alt="Profile cover"
-      draggable={false}
-    />
-    <SButtonsContainer>
-      { children }
-    </SButtonsContainer>
+  <SProfileBackground pictureURL={pictureURL}>
+    <img src={pictureURL} alt='Profile cover' draggable={false} />
+    <SButtonsContainer>{children}</SButtonsContainer>
   </SProfileBackground>
 );
 
@@ -46,7 +38,8 @@ const SProfileBackground = styled.div<ISProfileBackground>`
     height: 30px;
     border-bottom-right-radius: 70%;
 
-    box-shadow: 12px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.secondary};
+    box-shadow: 12px 15px 0px 0px
+      ${({ theme }) => theme.colorsThemed.background.secondary};
 
     background: transparent;
   }
@@ -60,7 +53,8 @@ const SProfileBackground = styled.div<ISProfileBackground>`
     height: 30px;
     border-bottom-left-radius: 70%;
 
-    box-shadow: -12px 15px 0px 0px ${({ theme }) => theme.colorsThemed.background.secondary};
+    box-shadow: -12px 15px 0px 0px
+      ${({ theme }) => theme.colorsThemed.background.secondary};
 
     background: transparent;
   }
@@ -72,16 +66,19 @@ const SProfileBackground = styled.div<ISProfileBackground>`
     vertical-align: inherit;
   }
 
-    /* No select */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  /* No select */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   ${(props) => props.theme.media.tablet} {
     height: 200px;
+
+    border-top-left-radius: ${({ theme }) => theme.borderRadius.medium};
+    border-top-right-radius: ${({ theme }) => theme.borderRadius.medium};
   }
 
   ${(props) => props.theme.media.laptop} {

@@ -21,95 +21,100 @@ interface IMcOptionCardSelectVotesMenu {
   handleSetAmountAndOpenModal: (votesAmount: string) => void;
 }
 
-const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVotesMenu> = ({
-  top,
-  isVisible,
-  isSupportedByMe,
-  availableVotes,
-  handleClose,
-  handleOpenCustomAmountModal,
-  handleSetAmountAndOpenModal,
-}) => {
-  const { t } = useTranslation('decision');
-  const containerRef = useRef<HTMLDivElement>();
+const McOptionCardSelectVotesMenu: React.FunctionComponent<IMcOptionCardSelectVotesMenu> =
+  ({
+    top,
+    isVisible,
+    isSupportedByMe,
+    availableVotes,
+    handleClose,
+    handleOpenCustomAmountModal,
+    handleSetAmountAndOpenModal,
+  }) => {
+    const { t } = useTranslation('decision');
+    const containerRef = useRef<HTMLDivElement>();
 
-  const { appConstants } = useGetAppConstants();
+    const { appConstants } = useGetAppConstants();
 
-  useOnClickEsc(containerRef, handleClose);
-  useOnClickOutside(containerRef, handleClose);
+    useOnClickEsc(containerRef, handleClose);
+    useOnClickOutside(containerRef, handleClose);
 
-  useEffect(() => {
-    if (isBrowser() && !!document.getElementById('post-modal-container')) {
-      if (isVisible) {
-        document.getElementById('post-modal-container')!!.style.overflowY = 'hidden';
-      } else {
-        document.getElementById('post-modal-container')!!.style.overflowY = '';
+    useEffect(() => {
+      if (isBrowser() && !!document.getElementById('post-modal-container')) {
+        if (isVisible) {
+          document.getElementById('post-modal-container')!!.style.overflowY =
+            'hidden';
+        } else {
+          document.getElementById('post-modal-container')!!.style.overflowY =
+            '';
+        }
       }
-    }
-  }, [isVisible]);
+    }, [isVisible]);
 
-  if (!isVisible) return null;
+    if (!isVisible) return null;
 
-  if (isBrowser()) {
-    return ReactDOM.createPortal(
-      <StyledModalOverlay>
-        <AnimatePresence>
-          <SContainer
-            ref={(el) => {
-              containerRef.current = el!!;
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              ...(top ? {
-                top: `${top}px`,
-              } : {}),
-            }}
-          >
-            <STitleText
-              variant={3}
+    if (isBrowser()) {
+      return ReactDOM.createPortal(
+        <StyledModalOverlay>
+          <AnimatePresence>
+            <SContainer
+              ref={(el) => {
+                containerRef.current = el!!;
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                ...(top
+                  ? {
+                      top: `${top}px`,
+                    }
+                  : {}),
+              }}
             >
-              {!isSupportedByMe ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes')}
-            </STitleText>
-            {availableVotes.map((amount) => (
-              <SButton
-                key={amount}
-                onClick={() => handleSetAmountAndOpenModal(amount.toString())}
-              >
-                <Text
-                  variant={3}
+              <STitleText variant={3}>
+                {!isSupportedByMe
+                  ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title')
+                  : t(
+                      'McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes'
+                    )}
+              </STitleText>
+              {availableVotes.map((amount) => (
+                <SButton
+                  key={amount}
+                  onClick={() => handleSetAmountAndOpenModal(amount.toString())}
                 >
-                  <SBoldSpan>
-                    {amount}
-                    {' '}
-                    {amount === 1 ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.votes')}
-                  </SBoldSpan>
-                  {' '}
-                  <SOpaqueSpan>
-                    {`($${amount * Math.round(appConstants.mcVotePrice / 100)})`}
-                  </SOpaqueSpan>
+                  <Text variant={3}>
+                    <SBoldSpan>
+                      {amount}{' '}
+                      {amount === 1
+                        ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote')
+                        : t(
+                            'McPost.OptionsTab.OptionCard.selectVotesMenu.votes'
+                          )}
+                    </SBoldSpan>{' '}
+                    <SOpaqueSpan>
+                      {`($${
+                        amount * Math.round(appConstants.mcVotePrice / 100)
+                      })`}
+                    </SOpaqueSpan>
+                  </Text>
+                </SButton>
+              ))}
+              <SButton onClick={() => handleOpenCustomAmountModal()}>
+                <Text variant={3}>
+                  {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
                 </Text>
               </SButton>
-            ))}
-            <SButton
-              onClick={() => handleOpenCustomAmountModal()}
-            >
-              <Text
-                variant={3}
-              >
-                {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
-              </Text>
-            </SButton>
-          </SContainer>
-        </AnimatePresence>
-      </StyledModalOverlay>,
-      document.getElementById('modal-root') as HTMLElement
-    );
-  }
+            </SContainer>
+          </AnimatePresence>
+        </StyledModalOverlay>,
+        document.getElementById('modal-root') as HTMLElement
+      );
+    }
 
-  return null;
-};
+    return null;
+  };
 
 export default McOptionCardSelectVotesMenu;
 
@@ -157,19 +162,19 @@ const SButton = styled.button`
   font-size: 14px;
   line-height: 20px;
 
-  &:focus, &:hover, &:active {
+  &:focus,
+  &:hover,
+  &:active {
     outline: none;
 
-    background: #FFFFFF;
+    background: #ffffff;
     div {
       color: ${({ theme }) => theme.colors.dark};
     }
   }
 `;
 
-const SBoldSpan = styled.span`
-
-`;
+const SBoldSpan = styled.span``;
 
 const SOpaqueSpan = styled.span`
   opacity: 0.8;

@@ -1,21 +1,27 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 
-import emptyFolder from '../../../../public/images/dashboard/empty-folder.png';
+import copyIcon from '../../../../public/images/svg/icons/outlined/Link.svg';
+import emptyFolder from '../../../../public/images/dashboard/no-subs.png';
 import Button from '../../../atoms/Button';
 import { useAppSelector } from '../../../../redux-store/store';
+import InlineSvg from '../../../atoms/InlineSVG';
 
-interface INoResults {
-  isCreatorConnectedToStripe: boolean | undefined;
-}
-
-export const NoResults: React.FC<INoResults> = ({ isCreatorConnectedToStripe }) => {
+export const NoResults = () => {
   const { t } = useTranslation('creator');
   const user = useAppSelector((state) => state.user);
   const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+  const [linkText, setLinkText] = useState('');
+
+  useEffect(() => {
+    if (linkText.length < 1 && window && user.userData?.username) {
+      setLinkText(`${window.location.host}/${user.userData?.username}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function copyPostUrlToClipboard(url: string) {
     if ('clipboard' in navigator) {
@@ -45,18 +51,25 @@ export const NoResults: React.FC<INoResults> = ({ isCreatorConnectedToStripe }) 
   return (
     <SContainer>
       <SWrapper>
-        <Image src={emptyFolder} alt={t('noResults.title')} width={49} height={48} />
-        <STitle>{t('noResults.title')}</STitle>
+        <Image
+          src={emptyFolder}
+          alt={t('noResults.title')}
+          width={108}
+          height={96}
+        />
         <SText>{t('noResults.text')}</SText>
-        <Button view="primaryGrad" onClick={shareHandler}>
-          {isCopiedUrl ? t('dashboard.subscriptionStats.copied') : t('noResults.btnShare')}
-        </Button>
+        <SButton view='quaternary' onClick={shareHandler}>
+          <SInlineSvg svg={copyIcon} width='24px' height='24px' />
+          {isCopiedUrl ? t('dashboard.subscriptionStats.copied') : linkText}
+        </SButton>
       </SWrapper>
       <SUpdateSubs>
-        {isCreatorConnectedToStripe ? (
-          <Link href="/creator/subscribers/edit-subscription-rate">{t('noResults.updateSub')}</Link>
+        {user.creatorData?.options?.isCreatorConnectedToStripe ? (
+          <Link href='/creator/subscribers/edit-subscription-rate'>
+            {t('noResults.updateSub')}
+          </Link>
         ) : (
-          <Link href="/creator/get-paid">{t('noResults.updateSub')}</Link>
+          <Link href='/creator/get-paid'>{t('noResults.updateSub')}</Link>
         )}
       </SUpdateSubs>
     </SContainer>
@@ -71,16 +84,11 @@ const SContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 270px);
-  color: ${(props) => (props.theme.name !== 'light' ? props.theme.colorsThemed.text.tertiary : '#586070')};
+  color: ${(props) =>
+    props.theme.name !== 'light'
+      ? props.theme.colorsThemed.text.tertiary
+      : '#586070'};
   font-size: 14px;
-`;
-
-const STitle = styled.strong`
-  color: ${(props) => props.theme.colorsThemed.text.primary};
-  font-weight: 700;
-  font-size: 20px;
-  margin: 16px 0 6px;
-  line-height: 28px;
 `;
 
 const SWrapper = styled.div`
@@ -92,12 +100,30 @@ const SWrapper = styled.div`
 `;
 
 const SText = styled.p`
+  padding-top: 10px;
   margin-bottom: 24px;
+  white-space: pre-wrap;
 `;
 
 const SUpdateSubs = styled.p`
   margin-top: auto;
+  padding-top: 20px;
   a {
     color: ${(props) => props.theme.colorsThemed.text.secondary};
   }
+`;
+
+const SButton = styled(Button)`
+  border-radius: 24px;
+  min-width: 218px;
+  font-weight: 600;
+  color: ${(props) => props.theme.colorsThemed.accent.blue};
+  height: 56px;
+  span {
+    display: flex;
+  }
+`;
+
+const SInlineSvg = styled(InlineSvg)`
+  margin-right: 7px;
 `;

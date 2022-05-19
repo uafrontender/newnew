@@ -14,9 +14,9 @@ import Headline from '../../../atoms/Headline';
 import VotesAmountInputModal from '../../../atoms/decision/VotesAmountInputModal';
 
 // Icons
-import VotesIcon from '../../../../public/images/decision/mc-votes-modal.png';
 import CancelIcon from '../../../../public/images/svg/icons/outlined/Close.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
+import assets from '../../../../constants/assets';
 
 interface IMcConfirmVoteModal {
   isOpen: boolean;
@@ -48,7 +48,9 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
   const theme = useTheme();
   const { t } = useTranslation('decision');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   if (predefinedAmount) {
     return (
@@ -59,56 +61,42 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
               e.stopPropagation();
             }}
           >
-            <SCloseButton
-              iconOnly
-              view="transparent"
-              onClick={onClose}
-            >
+            <SCloseButton iconOnly view='transparent' onClick={onClose}>
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
             </SCloseButton>
             <SImageContainer>
-              <img
-                src={VotesIcon.src}
-                alt="votes"
-              />
+              <img src={assets.decision.votes} alt='votes' />
             </SImageContainer>
-            <SHeadline
-              variant={4}
-            >
-              {supportVotesAmount}
-              {' '}
-              {parseInt(supportVotesAmount) === 1 ? (
-                t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.vote')
-              ) : (
-                  t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.votes')
-              )}
+            <SHeadline variant={4}>
+              {supportVotesAmount}{' '}
+              {parseInt(supportVotesAmount) === 1
+                ? t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.vote')
+                : t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.votes')}
             </SHeadline>
-            <SCreatorsText
-              variant={2}
-            >
-              {parseInt(supportVotesAmount) === 1 ? (
-                t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_1_vote', { creator: postCreator })
-              ) : (
-                  t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_multiple_votes', { creator: postCreator, amount: supportVotesAmount })
-              )}
+            <SCreatorsText variant={2}>
+              {parseInt(supportVotesAmount) === 1
+                ? t(
+                    'McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_1_vote',
+                    { creator: postCreator }
+                  )
+                : t(
+                    'McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_multiple_votes',
+                    { creator: postCreator, amount: supportVotesAmount }
+                  )}
             </SCreatorsText>
-            <SCaption
-              variant={3}
-            >
-              {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.option_caption')}
+            <SCaption variant={3}>
+              {t(
+                'McPost.OptionsTab.OptionCard.ConfirmVoteModal.option_caption'
+              )}
             </SCaption>
-            <SOptionText
-              variant={2}
-            >
-              {optionText}
-            </SOptionText>
+            <SOptionText variant={2}>{optionText}</SOptionText>
             <SVoteButton
-              view="primary"
+              view='primary'
               onClick={() => handleOpenPaymentModal()}
             >
               {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.voteBtn')}
@@ -127,93 +115,81 @@ const McConfirmVoteModal: React.FC<IMcConfirmVoteModal> = ({
             e.stopPropagation();
           }}
         >
-          <SCloseButton
-            iconOnly
-            view="transparent"
-            onClick={onClose}
-          >
+          <SCloseButton iconOnly view='transparent' onClick={onClose}>
             <InlineSvg
               svg={CancelIcon}
               fill={theme.colorsThemed.text.primary}
-              width="24px"
-              height="24px"
+              width='24px'
+              height='24px'
             />
           </SCloseButton>
           <SImageContainer>
-            <img
-              src={VotesIcon.src}
-              alt="votes"
-            />
+            <img src={assets.decision.votes} alt='votes' />
           </SImageContainer>
-          <SHeadline
-            variant={4}
-          >
+          <SHeadline variant={4}>
             {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.custom')}
           </SHeadline>
-          <SCreatorsText
-              variant={2}
-            >
-              {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_custom_votes', { creator: postCreator })}
-            </SCreatorsText>
-            <SCaption
-              variant={3}
-            >
-              {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.option_caption')}
-            </SCaption>
-            <SOptionText
-              variant={2}
-            >
-              {optionText}
-            </SOptionText>
-            <VotesAmountInputModal
-              value={supportVotesAmount}
-              inputAlign="left"
-              placeholder={
-                minAmount > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              pseudoPlaceholder={
-                !supportVotesAmount || parseInt(supportVotesAmount) > 1
-                  ? t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )
-                  : t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )
-              }
-              onChange={(newValue: string) => handleSetSupportVotesAmount(newValue)}
-              bottomPlaceholder={
-                !supportVotesAmount || parseInt(supportVotesAmount) === 1
-                  ? `${1} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
-                    )} = $ ${1 * votePrice}`
-                  : `${supportVotesAmount} ${t(
-                      'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
-                    )} = $ ${parseInt(supportVotesAmount) * votePrice}`
-              }
-              minAmount={minAmount}
-            />
-            <SVoteButton
-              view="primary"
-              disabled={!supportVotesAmount || parseInt(supportVotesAmount) < minAmount}
-              onClick={() => handleOpenPaymentModal()}
-            >
-              {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.voteBtn')}
-            </SVoteButton>
+          <SCreatorsText variant={2}>
+            {t(
+              'McPost.OptionsTab.OptionCard.ConfirmVoteModal.body_custom_votes',
+              { creator: postCreator }
+            )}
+          </SCreatorsText>
+          <SCaption variant={3}>
+            {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.option_caption')}
+          </SCaption>
+          <SOptionText variant={2}>{optionText}</SOptionText>
+          <VotesAmountInputModal
+            value={supportVotesAmount}
+            inputAlign='left'
+            placeholder={
+              minAmount > 1
+                ? t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                  )
+                : t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                  )
+            }
+            pseudoPlaceholder={
+              !supportVotesAmount || parseInt(supportVotesAmount) > 1
+                ? t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                  )
+                : t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                  )
+            }
+            onChange={(newValue: string) =>
+              handleSetSupportVotesAmount(newValue)
+            }
+            bottomPlaceholder={
+              !supportVotesAmount || parseInt(supportVotesAmount) === 1
+                ? `${1} ${t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.vote'
+                  )} = $ ${1 * votePrice}`
+                : `${supportVotesAmount} ${t(
+                    'McPost.OptionsTab.ActionSection.votesAmount.placeholder.votes'
+                  )} = $ ${parseInt(supportVotesAmount) * votePrice}`
+            }
+            minAmount={minAmount}
+          />
+          <SVoteButton
+            view='primary'
+            disabled={
+              !supportVotesAmount || parseInt(supportVotesAmount) < minAmount
+            }
+            onClick={() => handleOpenPaymentModal()}
+          >
+            {t('McPost.OptionsTab.OptionCard.ConfirmVoteModal.voteBtn')}
+          </SVoteButton>
         </SContentContainer>
       </SWrapper>
     </Modal>
   );
 };
 
-McConfirmVoteModal.defaultProps = {
-
-};
+McConfirmVoteModal.defaultProps = {};
 
 export default McConfirmVoteModal;
 
@@ -257,6 +233,11 @@ const SContentContainer = styled.div`
     height: fit-content;
     max-height: initial;
   }
+
+  ${({ theme }) => theme.media.tablet} {
+    padding: 32px;
+    padding-top: 16px;
+  }
 `;
 
 const SImageContainer = styled.div`
@@ -276,16 +257,13 @@ const SHeadline = styled(Headline)`
 
 const SCreatorsText = styled(Text)`
   margin-bottom: 16px;
-
 `;
 
 const SCaption = styled(Text)`
   opacity: 0.6;
 `;
 
-const SOptionText = styled(Text)`
-
-`;
+const SOptionText = styled(Text)``;
 
 const SVoteButton = styled(Button)`
   margin-left: auto;

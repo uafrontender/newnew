@@ -3,7 +3,7 @@ import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence as FMAnimatedPresence } from 'framer-motion';
 
 export type TAnimation =
-  't-01'
+  | 't-01'
   | 't-01-reverse'
   | 't-02'
   | 't-08'
@@ -36,10 +36,7 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     onAnimationEnd,
   } = props;
   let { children } = props;
-  const {
-    ref,
-    inView,
-  } = useInView();
+  const { ref, inView } = useInView();
 
   let startAnimation = start;
 
@@ -291,12 +288,11 @@ export const AnimatedPresence: React.FC<IAnimatedWords> = (props) => {
     };
 
     // @ts-ignore
-    children = children.split(' ')
-      .map((word: string) => (
-        <motion.span key={`${children}-${word}`} variants={variantsChild}>
-          {`${word} `}
-        </motion.span>
-      ));
+    children = children.split(' ').map((word: string) => (
+      <motion.span key={`${children}-${word}`} variants={variantsChild}>
+        {`${word} `}
+      </motion.span>
+    ));
   }
 
   return (
@@ -322,6 +318,5 @@ AnimatedPresence.defaultProps = {
   delay: undefined,
   duration: undefined,
   animateWhenInView: true,
-  onAnimationEnd: () => {
-  },
+  onAnimationEnd: () => {},
 };

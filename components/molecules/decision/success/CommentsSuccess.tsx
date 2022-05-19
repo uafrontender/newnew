@@ -1,5 +1,6 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable arrow-body-style */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
@@ -37,12 +38,14 @@ import InlineSvg from '../../../atoms/InlineSVG';
 import Text from '../../../atoms/Text';
 
 interface ICommentsSuccess {
+  postUuid: string;
   commentsRoomId: number;
   canDeleteComments?: boolean;
   handleGoBack: () => void;
 }
 
 const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
+  postUuid,
   canDeleteComments,
   commentsRoomId,
   handleGoBack,
@@ -468,7 +471,7 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
   return (
     <>
       <STabContainer
-        key="comments"
+        key='comments'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -479,10 +482,12 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
           }}
         >
           <CommentForm
+            isRoot
+            postUuid={postUuid}
             ref={(el) => {
               commentFormRef.current = el!!;
             }}
-            position="sticky"
+            position='sticky'
             zIndex={1}
             onSubmit={(newMsg: string) => handleAddComment(newMsg)}
           />
@@ -490,7 +495,7 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
             {comments.length === 0 && !commentsLoading ? (
               <SNoCommentsYet>
                 <SNoCommentsImgContainer>
-                  <img src={NoContentYetImg.src} alt="No content yet" />
+                  <img src={NoContentYetImg.src} alt='No content yet' />
                 </SNoCommentsImgContainer>
                 <SNoCommentsCaption variant={3}>
                   {t('comments.noCommentsCaption')}
@@ -499,13 +504,13 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
                   <SMakeBidArrowSvg
                     svg={MakeFirstBidArrow}
                     fill={theme.colorsThemed.background.quinary}
-                    width="36px"
+                    width='36px'
                   />
                 )}
               </SNoCommentsYet>
             ) : null}
-            {
-              comments && comments.map((item, index) => {
+            {comments &&
+              comments.map((item, index) => {
                 return (
                   <Comment
                     key={item.id.toString()}
@@ -521,25 +526,37 @@ const CommentsSuccess: React.FunctionComponent<ICommentsSuccess> = ({
                   />
                 );
               })}
-              <SLoaderDiv
-                ref={loadingRef}
-                style={{
-                  ...(commentsLoading
-                    ? {
-                        display: 'none',
-                      }
-                    : {}),
-                }}
-              />
+            <SLoaderDiv
+              ref={loadingRef}
+              style={{
+                ...(commentsLoading
+                  ? {
+                      display: 'none',
+                    }
+                  : {}),
+              }}
+            />
           </SCommentsWrapper>
         </SActionSection>
         <GradientMask
-          gradientType={isMobile ? 'primary' : 'secondary'}
+          gradientType={
+            isMobile
+              ? 'primary'
+              : theme.name === 'dark'
+              ? 'secondary'
+              : 'primary'
+          }
           positionTop={heightDelta}
           active={showTopGradient}
         />
         <GradientMask
-          gradientType={isMobile ? 'primary' : 'secondary'}
+          gradientType={
+            isMobile
+              ? 'primary'
+              : theme.name === 'dark'
+              ? 'secondary'
+              : 'primary'
+          }
           active={showBottomGradient}
         />
       </STabContainer>
@@ -571,6 +588,7 @@ const SActionSection = styled.div`
   max-height: 500px;
 
   overflow-y: auto;
+  padding-left: 12px;
 
   // Scrollbar
   &::-webkit-scrollbar {

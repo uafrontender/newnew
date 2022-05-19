@@ -1,7 +1,8 @@
+/* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
@@ -14,7 +15,7 @@ import Modal from '../../organisms/Modal';
 import InlineSvg from '../../atoms/InlineSVG';
 import GoBackButton from '../GoBackButton';
 import OptionCard from './OptionCard';
-import OptionWallet from './OptionWallet';
+// import OptionWallet from './OptionWallet';
 
 import CancelIcon from '../../../public/images/svg/icons/outlined/Close.svg';
 
@@ -23,9 +24,12 @@ interface IPaymentModal {
   zIndex: number;
   amount?: string;
   showTocApply?: boolean;
-  predefinedOption?: 'wallet' | 'card';
+  // predefinedOption?: 'wallet' | 'card';
+  predefinedOption?: 'card';
+  bottomCaption?: React.ReactNode;
+  payButtonCaptionKey?: string;
   onClose: () => void;
-  handlePayWithWallet?: () => void;
+  // handlePayWithWallet?: () => void;
   handlePayWithCardStripeRedirect?: () => void;
 }
 
@@ -35,17 +39,25 @@ const PaymentModal: React.FC<IPaymentModal> = ({
   amount,
   showTocApply,
   predefinedOption,
+  bottomCaption,
+  payButtonCaptionKey,
   onClose,
-  handlePayWithWallet,
+  // handlePayWithWallet,
   handlePayWithCardStripeRedirect,
   children,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation('payment-modal');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
-  const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(predefinedOption ?? 'wallet');
+  // const [selectedOption, setSelectedOption] = useState<'wallet' | 'card'>(
+  //   predefinedOption ?? 'wallet'
+  // );
+
+  const [selectedOption, setSelectedOption] = useState('card');
 
   useEffect(() => {
     if (predefinedOption) {
@@ -65,42 +77,78 @@ const PaymentModal: React.FC<IPaymentModal> = ({
           {isMobile && <SGoBackButton onClick={() => onClose()} />}
           {!isMobile && (
             <SCloseButton onClick={() => onClose()}>
-              <InlineSvg svg={CancelIcon} fill={theme.colorsThemed.text.primary} width="24px" height="24px" />
+              <InlineSvg
+                svg={CancelIcon}
+                fill={theme.colorsThemed.text.primary}
+                width='24px'
+                height='24px'
+              />
             </SCloseButton>
           )}
           <SHeaderContainer>{children}</SHeaderContainer>
-          <SPaymentMethodTitle variant={3}>{t('paymentMethodTitle')}</SPaymentMethodTitle>
+          <SPaymentMethodTitle variant={3}>
+            {t('paymentMethodTitle')}
+          </SPaymentMethodTitle>
           <SOptionsContainer>
-            {!predefinedOption ? (
+            {/* {!predefinedOption ? (
               <>
-                <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
-                <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+                <OptionWallet
+                  selected={selectedOption === 'wallet'}
+                  handleClick={() => setSelectedOption('wallet')}
+                />
+                <OptionCard
+                  selected={selectedOption === 'card'}
+                  handleClick={() => setSelectedOption('card')}
+                />
               </>
             ) : selectedOption === 'card' ? (
-              <OptionCard selected={selectedOption === 'card'} handleClick={() => setSelectedOption('card')} />
+              <OptionCard
+                selected={selectedOption === 'card'}
+                handleClick={() => setSelectedOption('card')}
+              />
             ) : (
-              <OptionWallet selected={selectedOption === 'wallet'} handleClick={() => setSelectedOption('wallet')} />
+              <OptionWallet
+                selected={selectedOption === 'wallet'}
+                handleClick={() => setSelectedOption('wallet')}
+              />
+            )} */}
+            {!predefinedOption ? (
+              <>
+                <OptionCard
+                  selected={selectedOption === 'card'}
+                  handleClick={() => setSelectedOption('card')}
+                />
+              </>
+            ) : (
+              <OptionCard
+                selected={selectedOption === 'card'}
+                handleClick={() => setSelectedOption('card')}
+              />
             )}
           </SOptionsContainer>
           <SPayButtonDiv>
             <SPayButton
-              view="primaryGrad"
+              view='primaryGrad'
+              // onClick={() => {
+              //   if (selectedOption === 'card') {
+              //     handlePayWithCardStripeRedirect?.();
+              //   } else {
+              //     handlePayWithWallet?.();
+              //   }
+              // }}
               onClick={() => {
-                if (selectedOption === 'card') {
-                  handlePayWithCardStripeRedirect?.();
-                } else {
-                  handlePayWithWallet?.();
-                }
+                handlePayWithCardStripeRedirect?.();
               }}
             >
-              {t('payButton')}
+              {payButtonCaptionKey ?? t('payButton')}
               {amount && ` ${amount}`}
             </SPayButton>
+            {bottomCaption || null}
             {showTocApply && (
               <STocApply>
                 *{' '}
-                <Link href="/terms-and-conditions">
-                  <a href="/terms-and-conditions" target="_blank">
+                <Link href='https://terms.newnew.co'>
+                  <a href='https://terms.newnew.co' target='_blank'>
                     {t('tocApplyLink')}
                   </a>
                 </Link>{' '}
@@ -118,7 +166,9 @@ PaymentModal.defaultProps = {
   amount: undefined,
   showTocApply: undefined,
   predefinedOption: undefined,
-  handlePayWithWallet: () => {},
+  bottomCaption: null,
+  payButtonCaptionKey: undefined,
+  // handlePayWithWallet: () => {},
   handlePayWithCardStripeRedirect: () => {},
 };
 
@@ -155,14 +205,14 @@ const SContentContainer = styled.div<{
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
     height: fit-content;
-    min-height: 360px;
-    max-height: ${({ showTocApply }) => showTocApply ? '480px' : '412px'};
+    /* min-height: 360px; */
+    max-height: ${({ showTocApply }) => (showTocApply ? '480px' : '412px')};
     margin: auto;
 
     border-radius: ${({ theme }) => theme.borderRadius.medium};
 
     padding: 24px;
-    padding-bottom: 116px;
+    /* padding-bottom: 116px; */
   }
 `;
 
@@ -196,7 +246,8 @@ const SCloseButton = styled.button`
 const SHeaderContainer = styled.div`
   padding-bottom: 16px;
   margin-bottom: 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 
   ${({ theme }) => theme.media.tablet} {
     padding-bottom: 24px;
@@ -209,13 +260,15 @@ const SPaymentMethodTitle = styled(Text)`
 `;
 
 const SPayButtonDiv = styled.div`
-  position: absolute;
+  /* position: absolute;
   bottom: 16px;
   width: calc(100% - 32px);
 
   ${({ theme }) => theme.media.tablet} {
     width: calc(100% - 48px);
-  }
+  } */
+
+  width: 100%;
 `;
 
 const SPayButton = styled(Button)`
@@ -224,7 +277,7 @@ const SPayButton = styled(Button)`
 
 const STocApply = styled.div`
   margin-top: 16px;
-  padding-bottom: 16px;
+  /* padding-bottom: 16px; */
 
   text-align: center;
 

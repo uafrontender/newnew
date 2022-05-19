@@ -1,18 +1,19 @@
-import React, { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 import { isString } from 'lodash';
+import dynamic from 'next/dynamic';
 
-import Chat from './Chat';
 import Button from '../../../atoms/Button';
-import ChatList from './ChatList';
-import InlineSVG from '../../../atoms/InlineSVG';
-import Indicator from '../../../atoms/Indicator';
-import Tabs, { Tab } from '../../Tabs';
-import NotificationsList from './NotificationsList';
+import { Tab } from '../../Tabs';
 import AnimatedPresence, { TAnimation } from '../../../atoms/AnimatedPresence';
-
 import useOnClickEsc from '../../../../utils/hooks/useOnClickEsc';
 import { setOverlay } from '../../../../redux-store/slices/uiStateSlice';
 import useOnClickOutside from '../../../../utils/hooks/useOnClickOutside';
@@ -23,23 +24,37 @@ import searchIcon from '../../../../public/images/svg/icons/outlined/Search.svg'
 import NewMessageIcon from '../../../../public/images/svg/icons/filled/NewMessage.svg';
 import notificationsIcon from '../../../../public/images/svg/icons/filled/Notifications.svg';
 import { useGetChats } from '../../../../contexts/chatContext';
-import NewMessageModal from './NewMessageModal';
+import { useNotifications } from '../../../../contexts/notificationsContext';
+
+const NewMessageModal = dynamic(() => import('./NewMessageModal'));
+const NotificationsList = dynamic(() => import('./NotificationsList'));
+const ChatList = dynamic(() => import('./ChatList'));
+const Chat = dynamic(() => import('./Chat'));
+const InlineSVG = dynamic(() => import('../../../atoms/InlineSVG'));
+const Indicator = dynamic(() => import('../../../atoms/Indicator'));
+const Tabs = dynamic(() => import('../../Tabs'));
 
 export const DynamicSection = () => {
   const theme = useTheme();
   const { t } = useTranslation('creator');
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const containerRef: any = useRef(null);
   const [animate, setAnimate] = useState(false);
   const [animation, setAnimation] = useState('o-12');
   const { resizeMode } = useAppSelector((state) => state.ui);
   const { unreadCountForCreator } = useGetChats();
+  const { unreadNotificationCount } = useNotifications();
+  const [markReadNotifications, setMarkReadNotifications] = useState(false);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet', 'laptop', 'laptopM'].includes(resizeMode);
 
-  const [showNewMessageModal, setShowNewMessageModal] = useState<boolean>(false);
+  const [showNewMessageModal, setShowNewMessageModal] =
+    useState<boolean>(false);
 
   const closeNewMsgModal = () => {
     setShowNewMessageModal(false);
@@ -53,7 +68,7 @@ export const DynamicSection = () => {
     () => [
       {
         url: '/creator/dashboard?tab=notifications',
-        counter: 12,
+        counter: unreadNotificationCount,
         nameToken: 'notifications',
       },
       {
@@ -62,7 +77,18 @@ export const DynamicSection = () => {
         nameToken: 'chat',
       },
     ],
-    [unreadCountForCreator]
+    [unreadCountForCreator, unreadNotificationCount]
+  );
+
+  const tabNotification: Tab[] = useMemo(
+    () => [
+      {
+        url: '/creator/dashboard?tab=notifications',
+        counter: unreadNotificationCount,
+        nameToken: 'notifications',
+      },
+    ],
+    [unreadNotificationCount]
   );
   const activeTabIndex = tabs.findIndex((el) => el.nameToken === tab);
 
@@ -79,7 +105,10 @@ export const DynamicSection = () => {
     setAnimate(false);
   }, []);
   const handleMarkAllAsRead = useCallback(() => {
-    console.log('mark all as read');
+    setMarkReadNotifications(true);
+    setTimeout(() => {
+      setMarkReadNotifications(false);
+    }, 1500);
   }, []);
   const handleSearchClick = useCallback(() => {
     console.log('search');
@@ -108,34 +137,48 @@ export const DynamicSection = () => {
     <STopButtons>
       {!isDesktop && (
         <>
-          <SButton view="secondary" onClick={handleNotificationsClick}>
+          <SButton view='secondary' onClick={handleNotificationsClick}>
             <SIconHolder>
               <SInlineSVG
                 svg={notificationsIcon}
-                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-                width="24px"
-                height="24px"
+                fill={
+                  theme.name === 'light'
+                    ? theme.colors.black
+                    : theme.colors.white
+                }
+                width='24px'
+                height='24px'
               />
-              <SIndicatorContainer>
-                <SIndicator minified />
-              </SIndicatorContainer>
+              {unreadNotificationCount > 0 && (
+                <SIndicatorContainer>
+                  <SIndicator minified />
+                </SIndicatorContainer>
+              )}
             </SIconHolder>
             {t('dashboard.button.notifications')}
           </SButton>
-          <SButton view="secondary" onClick={handleChatClick}>
-            <SIconHolder>
-              <SInlineSVG
-                svg={chatIcon}
-                fill={theme.name === 'light' ? theme.colors.black : theme.colors.white}
-                width="24px"
-                height="24px"
-              />
-              <SIndicatorContainer>
-                <SIndicator minified />
-              </SIndicatorContainer>
-            </SIconHolder>
-            {t('dashboard.button.dms')}
-          </SButton>
+          {user.userData?.options?.isOfferingSubscription && (
+            <SButton view='secondary' onClick={handleChatClick}>
+              <SIconHolder>
+                <SInlineSVG
+                  svg={chatIcon}
+                  fill={
+                    theme.name === 'light'
+                      ? theme.colors.black
+                      : theme.colors.white
+                  }
+                  width='24px'
+                  height='24px'
+                />
+                {unreadCountForCreator > 0 && (
+                  <SIndicatorContainer>
+                    <SIndicator minified />
+                  </SIndicatorContainer>
+                )}
+              </SIconHolder>
+              {t('dashboard.button.dms')}
+            </SButton>
+          )}
         </>
       )}
       <AnimatedPresence
@@ -146,49 +189,90 @@ export const DynamicSection = () => {
       >
         <SAnimatedContainer ref={containerRef}>
           {tab === 'direct-messages' ? (
-            <Chat roomID={router.query.roomID && isString(router.query.roomID) ? router.query.roomID : ''} />
+            <Chat
+              roomID={
+                router.query.roomID && isString(router.query.roomID)
+                  ? router.query.roomID
+                  : ''
+              }
+            />
           ) : (
             <>
               <SSectionTopLine tab={tab as string}>
                 <STabsWrapper>
-                  <Tabs t={t} tabs={tabs} draggable={false} activeTabIndex={activeTabIndex} />
+                  {user.userData?.options?.isOfferingSubscription ? (
+                    <Tabs
+                      t={t}
+                      tabs={tabs}
+                      draggable={false}
+                      activeTabIndex={activeTabIndex}
+                    />
+                  ) : (
+                    <Tabs
+                      t={t}
+                      tabs={tabNotification}
+                      draggable={false}
+                      activeTabIndex={0}
+                    />
+                  )}
                 </STabsWrapper>
                 <SSectionTopLineButtons>
-                  {tab === 'notifications' ? (
+                  {tab === 'notifications' ||
+                  !user.userData?.options?.isOfferingSubscription ? (
                     <>
-                      <STopLineButton view="secondary" onClick={handleMarkAllAsRead}>
-                        {t('dashboard.button.markAllAsRead')}
-                      </STopLineButton>
+                      {unreadNotificationCount > 0 && (
+                        <STopLineButton
+                          view='secondary'
+                          onClick={handleMarkAllAsRead}
+                        >
+                          {t('dashboard.button.markAllAsRead')}
+                        </STopLineButton>
+                      )}
                       {!isDesktop && (
-                        <STopLineButton view="secondary" onClick={handleMinimizeClick}>
+                        <STopLineButton
+                          view='secondary'
+                          onClick={handleMinimizeClick}
+                        >
                           {t('dashboard.button.minimize')}
                         </STopLineButton>
                       )}
                     </>
                   ) : (
                     <>
-                      <SChatButton view="secondary" onClick={handleSearchClick}>
+                      <SChatButton view='secondary' onClick={handleSearchClick}>
                         <SChatInlineSVG
                           svg={searchIcon}
                           fill={theme.colorsThemed.text.primary}
-                          width="20px"
-                          height="20px"
+                          width='20px'
+                          height='20px'
                         />
                       </SChatButton>
-                      <SChatButton view="secondary" onClick={handleBulkMessageClick}>
+                      <SChatButton
+                        view='secondary'
+                        onClick={handleBulkMessageClick}
+                      >
                         <SChatInlineSVG
                           svg={NewMessageIcon}
                           fill={theme.colorsThemed.text.primary}
-                          width="20px"
-                          height="20px"
+                          width='20px'
+                          height='20px'
                         />
                       </SChatButton>
-                      <NewMessageModal showModal={showNewMessageModal} closeModal={closeNewMsgModal} />
+                      <NewMessageModal
+                        showModal={showNewMessageModal}
+                        closeModal={closeNewMsgModal}
+                      />
                     </>
                   )}
                 </SSectionTopLineButtons>
               </SSectionTopLine>
-              {tab === 'notifications' ? <NotificationsList /> : <ChatList />}
+              {tab === 'notifications' ? (
+                <NotificationsList
+                  markReadNotifications={markReadNotifications}
+                />
+              ) : (
+                <ChatList />
+              )}
             </>
           )}
         </SAnimatedContainer>
@@ -208,7 +292,9 @@ const STopButtons = styled.div`
 const SButton = styled(Button)`
   padding: 8px 12px;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.button.background.secondary};
   margin-left: 12px;
   border-radius: 12px;
 
@@ -242,31 +328,35 @@ const SIndicatorContainer = styled.div`
 const SIndicator = styled(Indicator)`
   border: 3px solid
     ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+      props.theme.name === 'light'
+        ? props.theme.colors.white
+        : props.theme.colorsThemed.button.background.secondary};
 `;
 
 const SAnimatedContainer = styled.div`
-  top: 144px;
-  left: 212px;
-  right: 12px;
-  bottom: 34px;
+  top: -20px;
+
   z-index: 5;
   padding: 24px 0;
-  position: fixed;
+  position: absolute;
   box-shadow: ${(props) => props.theme.shadows.dashboardNotifications};
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: 24px;
+  width: 500px;
+  right: -16px;
+  height: 800px;
 
   ${(props) => props.theme.media.laptop} {
     left: unset;
     width: 500px;
-    height: 800px;
     bottom: unset;
   }
 
   ${(props) => props.theme.media.laptopL} {
-    top: 120px;
+    top: -36px;
     width: 432px;
   }
 `;
@@ -298,7 +388,9 @@ const STopLineButton = styled(Button)`
   color: ${(props) => props.theme.colorsThemed.text.secondary};
   padding: 10px 12px;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.button.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.button.background.secondary};
   margin-left: 12px;
 `;
 

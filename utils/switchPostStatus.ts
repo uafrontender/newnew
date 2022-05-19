@@ -1,24 +1,28 @@
-import { newnewapi } from "newnew-api";
+import { newnewapi } from 'newnew-api';
 
-import { TPostType } from "./switchPostType";
+import { TPostType } from './switchPostType';
 
 export type TPostStatusStringified =
-  'scheduled'
+  | 'scheduled'
   | 'voting'
-  | 'wating_for_decision'
+  | 'waiting_for_decision'
   | 'waiting_for_response'
   | 'flagged'
   | 'succeeded'
   | 'failed'
-  | 'deleted'
-  | 'processing';
+  | 'deleted_by_creator'
+  | 'deleted_by_admin'
+  | 'processing_announcement'
+  | 'processing_response';
 
 // TODO: Resolve stringification issue
 export default function switchPostStatus(
   postType: TPostType,
-  status: newnewapi.Auction.Status | newnewapi.Crowdfunding.Status | newnewapi.MultipleChoice.Status,
+  status:
+    | newnewapi.Auction.Status
+    | newnewapi.Crowdfunding.Status
+    | newnewapi.MultipleChoice.Status
 ): TPostStatusStringified {
-
   if (postType === 'ac') {
     switch (status as newnewapi.Auction.Status) {
       case newnewapi.Auction.Status.SCHEDULED: {
@@ -28,7 +32,7 @@ export default function switchPostStatus(
         return 'voting';
       }
       case newnewapi.Auction.Status.WAITING_FOR_DECISION: {
-        return 'wating_for_decision';
+        return 'waiting_for_decision';
       }
       case newnewapi.Auction.Status.WAITING_FOR_RESPONSE: {
         return 'waiting_for_response';
@@ -36,8 +40,11 @@ export default function switchPostStatus(
       case newnewapi.Auction.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.Auction.Status.DELETED: {
-        return 'deleted';
+      case newnewapi.Auction.Status.DELETED_BY_CREATOR: {
+        return 'deleted_by_creator';
+      }
+      case newnewapi.Auction.Status.DELETED_BY_ADMIN: {
+        return 'deleted_by_admin';
       }
       case newnewapi.Auction.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -46,16 +53,16 @@ export default function switchPostStatus(
         return 'flagged';
       }
       case newnewapi.Auction.Status.PROCESSING_ANNOUNCE: {
-        return 'processing';
+        return 'processing_announcement';
       }
       case newnewapi.Auction.Status.PROCESSING_RESPONSE: {
-        return 'processing';
+        return 'processing_response';
       }
       case newnewapi.Auction.Status.FAILED: {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
@@ -74,8 +81,11 @@ export default function switchPostStatus(
       case newnewapi.Crowdfunding.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.Crowdfunding.Status.DELETED: {
-        return 'deleted';
+      case newnewapi.Crowdfunding.Status.DELETED_BY_CREATOR: {
+        return 'deleted_by_creator';
+      }
+      case newnewapi.Crowdfunding.Status.DELETED_BY_ADMIN: {
+        return 'deleted_by_admin';
       }
       case newnewapi.Crowdfunding.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -84,16 +94,16 @@ export default function switchPostStatus(
         return 'flagged';
       }
       case newnewapi.Crowdfunding.Status.PROCESSING_ANNOUNCE: {
-        return 'processing';
+        return 'processing_announcement';
       }
       case newnewapi.Crowdfunding.Status.PROCESSING_RESPONSE: {
-        return 'processing';
+        return 'processing_response';
       }
       case newnewapi.Crowdfunding.Status.FAILED: {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
@@ -112,8 +122,8 @@ export default function switchPostStatus(
       case newnewapi.MultipleChoice.Status.SUCCEEDED: {
         return 'succeeded';
       }
-      case newnewapi.MultipleChoice.Status.DELETED: {
-        return 'deleted';
+      case newnewapi.MultipleChoice.Status.DELETED_BY_CREATOR: {
+        return 'deleted_by_creator';
       }
       case newnewapi.MultipleChoice.Status.ANNOUNCE_FLAGGED: {
         return 'flagged';
@@ -122,19 +132,19 @@ export default function switchPostStatus(
         return 'flagged';
       }
       case newnewapi.MultipleChoice.Status.PROCESSING_ANNOUNCE: {
-        return 'processing';
+        return 'processing_announcement';
       }
       case newnewapi.MultipleChoice.Status.PROCESSING_RESPONSE: {
-        return 'processing';
+        return 'processing_response';
       }
       case newnewapi.MultipleChoice.Status.FAILED: {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
 
-  return 'processing';
+  return 'processing_announcement';
 }

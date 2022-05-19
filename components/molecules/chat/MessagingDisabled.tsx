@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { newnewapi } from 'newnew-api';
 import {
   SBottomAction,
-  SBottomActionButton,
   SBottomActionIcon,
   SBottomActionLeft,
   SBottomActionMessage,
@@ -16,34 +14,26 @@ interface IMessagingDisabled {
   user: newnewapi.IUser;
 }
 
-const MessagingDisabled: React.FC<IMessagingDisabled> = ({ user }) => {
-  const { t } = useTranslation('chat');
-  const router = useRouter();
-
-  return (
-    <SBottomAction>
-      <SBottomActionLeft>
-        <SBottomActionIcon>🙊</SBottomActionIcon>
-        <SBottomActionText>
-          <SBottomActionTitle>{t('messaging-disabled.title')}</SBottomActionTitle>
-          <SBottomActionMessage>
-            {user.nickname ? user.nickname : user.username} {t('messaging-disabled.message')}
-          </SBottomActionMessage>
-        </SBottomActionText>
-      </SBottomActionLeft>
-      <SBottomActionButton
-        withDim
-        withShadow
-        withShrink
-        view="primaryGrad"
-        onClick={() => {
-          router.push(`/${user.username}`);
-        }}
-      >
-        {t('messaging-disabled.button-text')}
-      </SBottomActionButton>
-    </SBottomAction>
-  );
-};
+const MessagingDisabled: React.FC<IMessagingDisabled> = React.memo(
+  ({ user }) => {
+    const { t } = useTranslation('chat');
+    return (
+      <SBottomAction>
+        <SBottomActionLeft>
+          <SBottomActionIcon>🙊</SBottomActionIcon>
+          <SBottomActionText>
+            <SBottomActionTitle>
+              {t('messaging-disabled.title')}
+            </SBottomActionTitle>
+            <SBottomActionMessage>
+              {user.username ? user.username : user.nickname}{' '}
+              {t('messaging-disabled.message')}
+            </SBottomActionMessage>
+          </SBottomActionText>
+        </SBottomActionLeft>
+      </SBottomAction>
+    );
+  }
+);
 
 export default MessagingDisabled;

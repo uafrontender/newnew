@@ -11,7 +11,9 @@ import { signInWithEmail } from '../../api/endpoints/auth';
 
 import { useAppDispatch, useAppSelector } from '../../redux-store/store';
 import {
-  setUserData, setUserLoggedIn, setSignupEmailInput,
+  setUserData,
+  setUserLoggedIn,
+  setSignupEmailInput,
 } from '../../redux-store/slices/userStateSlice';
 
 import logoAnimation from '../../public/animations/logo-loading-blue.json';
@@ -34,7 +36,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
   useEffect(() => {
     if (user.loggedIn) router.push('/');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -51,54 +53,49 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
 
         const res = await signInWithEmail(requestPayload);
 
-        if (!res!! || res!!.error || !res.data) throw new Error(res!!.error?.message ?? 'An error occured');
+        if (!res!! || res!!.error || !res.data)
+          throw new Error(res!!.error?.message ?? 'An error occured');
 
         const { data } = res!!;
 
-        if (
-          !data
-          || data.status !== newnewapi.SignInResponse.Status.SUCCESS
-        ) throw new Error('No data');
+        if (!data || data.status !== newnewapi.SignInResponse.Status.SUCCESS)
+          throw new Error('No data');
 
-        dispatch(setUserData({
-          username: data.me?.username,
-          nickname: data.me?.nickname,
-          email: data.me?.email,
-          avatarUrl: data.me?.avatarUrl,
-          coverUrl: data.me?.coverUrl,
-          userUuid: data.me?.userUuid,
-          bio: data.me?.bio,
-          dateOfBirth: {
-            day: data.me?.dateOfBirth?.day,
-            month: data.me?.dateOfBirth?.month,
-            year: data.me?.dateOfBirth?.year,
-          },
-          countryCode: data.me?.countryCode,
-          options: {
-            isActivityPrivate: data.me?.options?.isActivityPrivate,
-            isCreator: data.me?.options?.isCreator,
-            isVerified: data.me?.options?.isVerified,
-            creatorStatus: data.me?.options?.creatorStatus,
-          },
-        }));
+        dispatch(
+          setUserData({
+            username: data.me?.username,
+            nickname: data.me?.nickname,
+            email: data.me?.email,
+            avatarUrl: data.me?.avatarUrl,
+            coverUrl: data.me?.coverUrl,
+            userUuid: data.me?.userUuid,
+            bio: data.me?.bio,
+            dateOfBirth: {
+              day: data.me?.dateOfBirth?.day,
+              month: data.me?.dateOfBirth?.month,
+              year: data.me?.dateOfBirth?.year,
+            },
+            countryCode: data.me?.countryCode,
+            options: {
+              isActivityPrivate: data.me?.options?.isActivityPrivate,
+              isCreator: data.me?.options?.isCreator,
+              isVerified: data.me?.options?.isVerified,
+              creatorStatus: data.me?.options?.creatorStatus,
+            },
+          })
+        );
         // Set credential cookies
-        setCookie(
-          'accessToken',
-          data.credential?.accessToken,
-          {
-            expires: new Date((data.credential?.expiresAt?.seconds as number)!! * 1000),
-            path: '/',
-          },
-        );
-        setCookie(
-          'refreshToken',
-          data.credential?.refreshToken,
-          {
-            // Expire in 10 years
-            maxAge: (10 * 365 * 24 * 60 * 60),
-            path: '/',
-          },
-        );
+        setCookie('accessToken', data.credential?.accessToken, {
+          expires: new Date(
+            (data.credential?.expiresAt?.seconds as number)!! * 1000
+          ),
+          path: '/',
+        });
+        setCookie('refreshToken', data.credential?.refreshToken, {
+          // Expire in 10 years
+          maxAge: 10 * 365 * 24 * 60 * 60,
+          path: '/',
+        });
 
         dispatch(setSignupEmailInput(''));
         dispatch(setUserLoggedIn(true));
@@ -106,6 +103,8 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
         setIsLoading(false);
         if (data.redirectUrl) {
           router.push(data.redirectUrl);
+        } else if (data.me?.options?.isCreator) {
+          router.push('/creator/dashboard');
         } else {
           router.push('/');
         }
@@ -118,7 +117,7 @@ const EmailAuthRedirectPage: NextPage<IEmailAuthRedirectPage> = ({
     }
 
     handleAuth();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -166,10 +165,11 @@ export default EmailAuthRedirectPage;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { email_address, token } = context.query;
 
-  if (!email_address
-    || !token
-    || Array.isArray(email_address)
-    || Array.isArray(token)
+  if (
+    !email_address ||
+    !token ||
+    Array.isArray(email_address) ||
+    Array.isArray(token)
   ) {
     return {
       redirect: {

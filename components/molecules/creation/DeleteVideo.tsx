@@ -13,12 +13,8 @@ interface IDeleteVideo {
   handleSubmit: () => void;
 }
 
-export const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
-  const {
-    open,
-    handleClose,
-    handleSubmit,
-  } = props;
+const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
+  const { open, handleClose, handleSubmit } = props;
   const { t } = useTranslation('creation');
 
   const preventCLick = (e: any) => {
@@ -27,22 +23,17 @@ export const DeleteVideo: React.FC<IDeleteVideo> = (props) => {
   };
 
   return (
-    <Modal
-      show={open}
-      onClose={handleClose}
-    >
+    <Modal show={open} onClose={handleClose}>
       <SMobileContainer onClick={preventCLick}>
-        <STitle variant={6}>
-          {t('secondStep.modal.deleteFile.title')}
-        </STitle>
+        <STitle variant={6}>{t('secondStep.modal.deleteFile.title')}</STitle>
         <SDescription variant={2} weight={500}>
           {t('secondStep.modal.deleteFile.description')}
         </SDescription>
         <SButtonsHolder>
-          <Button view="secondary" onClick={handleClose}>
+          <Button view='secondary' onClick={handleClose}>
             {t('secondStep.button.cancel')}
           </Button>
-          <Button view="danger" onClick={handleSubmit}>
+          <Button view='danger' onClick={handleSubmit}>
             {t('secondStep.button.delete')}
           </Button>
         </SButtonsHolder>
@@ -60,14 +51,17 @@ const SMobileContainer = styled.div`
   position: relative;
   overflow: hidden;
   transform: translateY(-50%);
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.primary : props.theme.colorsThemed.background.secondary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.primary
+      : props.theme.colorsThemed.background.secondary};
   border-radius: 16px;
 
   ${({ theme }) => theme.media.mobileL} {
     margin: 0 auto;
     max-width: 464px;
   }
-  
+
   ${({ theme }) => theme.media.tablet} {
     padding: 24px;
   }

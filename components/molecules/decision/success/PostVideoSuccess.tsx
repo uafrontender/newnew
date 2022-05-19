@@ -45,7 +45,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
   const { t } = useTranslation('decision');
   const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
 
   useEffect(() => {
     async function markResponseAsViewed() {
@@ -67,18 +73,12 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
       }
     }
 
-    if (openedTab === 'response'
-      && user.loggedIn
-      && !responseViewed
-    ) {
+    if (openedTab === 'response' && user.loggedIn && !responseViewed) {
       markResponseAsViewed();
-    } else if (openedTab === 'response'
-      && !user.loggedIn
-      && !responseViewed
-    ) {
+    } else if (openedTab === 'response' && !user.loggedIn && !responseViewed) {
       handleSetResponseViewed(true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openedTab, postId, user.loggedIn, responseViewed]);
 
   return (
@@ -94,12 +94,16 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           />
           <SSoundButton
             iconOnly
-            view="transparent"
+            view='transparent'
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
-                (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                (
+                  document?.getElementById(
+                    `bitmovinplayer-video-${postId}`
+                  ) as HTMLVideoElement
+                )?.play();
               }
             }}
           >
@@ -107,7 +111,7 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               svg={isMuted ? VolumeOff : VolumeOn}
               width={isMobileOrTablet ? '20px' : '24px'}
               height={isMobileOrTablet ? '20px' : '24px'}
-              fill="#FFFFFF"
+              fill='#FFFFFF'
             />
           </SSoundButton>
         </>
@@ -120,12 +124,16 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
           />
           <SSoundButton
             iconOnly
-            view="transparent"
+            view='transparent'
             onClick={(e) => {
               e.stopPropagation();
               handleToggleMuted();
               if (isSafari()) {
-                (document?.getElementById(`bitmovinplayer-video-${postId}`) as HTMLVideoElement)?.play();
+                (
+                  document?.getElementById(
+                    `bitmovinplayer-video-${postId}`
+                  ) as HTMLVideoElement
+                )?.play();
               }
             }}
           >
@@ -133,18 +141,18 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
               svg={isMuted ? VolumeOff : VolumeOn}
               width={isMobileOrTablet ? '20px' : '24px'}
               height={isMobileOrTablet ? '20px' : '24px'}
-              fill="#FFFFFF"
+              fill='#FFFFFF'
             />
           </SSoundButton>
         </>
       )}
-      {!responseViewed && openedTab === 'announcement' ? (
+      {!responseViewed && openedTab === 'announcement' && response ? (
         <SWatchResponseWrapper>
           <SWatchResponseBtn
             shouldView={!responseViewed}
             onClick={() => setOpenedTab('response')}
           >
-            { t('PostVideoSuccess.tabs.watch_reponse_first_time') }
+            {t('PostVideoSuccess.tabs.watch_reponse_first_time')}
           </SWatchResponseBtn>
         </SWatchResponseWrapper>
       ) : null}
@@ -154,13 +162,13 @@ const PostVideoSuccess: React.FunctionComponent<IPostVideoSuccess> = ({
             shouldView={openedTab === 'announcement'}
             onClick={() => setOpenedTab('announcement')}
           >
-            { t('PostVideoSuccess.tabs.announcement') }
+            {t('PostVideoSuccess.tabs.announcement')}
           </SChangeTabBtn>
           <SChangeTabBtn
             shouldView={openedTab === 'response'}
             onClick={() => setOpenedTab('response')}
           >
-            { t('PostVideoSuccess.tabs.response')}
+            {t('PostVideoSuccess.tabs.response')}
           </SChangeTabBtn>
         </SToggleVideoWidget>
       ) : null}
@@ -257,7 +265,8 @@ const SWatchResponseWrapper = styled.div`
 const SWatchResponseBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
   border-radius: 16px;
 
@@ -265,14 +274,15 @@ const SWatchResponseBtn = styled.button<{
 
   width: 100%;
 
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;
@@ -297,7 +307,8 @@ const SToggleVideoWidget = styled.div`
 const SChangeTabBtn = styled.button<{
   shouldView?: boolean;
 }>`
-  background: ${({ shouldView, theme }) => (shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)')};
+  background: ${({ shouldView, theme }) =>
+    shouldView ? theme.colorsThemed.accent.blue : 'rgba(11, 10, 19, 0.2)'};
   border: transparent;
 
   padding: 17px 24px;
@@ -305,14 +316,15 @@ const SChangeTabBtn = styled.button<{
   width: 50%;
 
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 
   cursor: pointer;
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
   }
 `;

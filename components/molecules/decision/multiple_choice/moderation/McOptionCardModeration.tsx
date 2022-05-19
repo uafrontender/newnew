@@ -5,14 +5,12 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable arrow-body-style */
-import React, {
-  useMemo, useState,
-} from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { motion } from 'framer-motion';
 import { newnewapi } from 'newnew-api';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import { useAppSelector } from '../../../../../redux-store/store';
 import { TMcOptionWithHighestField } from '../../../../organisms/decision/PostViewMC';
@@ -23,228 +21,217 @@ import Button from '../../../../atoms/Button';
 import { formatNumber } from '../../../../../utils/format';
 
 // Icons
-import McSymbolIcon from '../../../../../public/images/decision/mc-option-mock.png';
+import VoteIconLight from '../../../../../public/images/decision/vote-icon-light.png';
+import VoteIconDark from '../../../../../public/images/decision/vote-icon-dark.png';
 import MoreIconFilled from '../../../../../public/images/svg/icons/filled/More.svg';
 import InlineSvg from '../../../../atoms/InlineSVG';
 import McOptionCardModerationEllipseMenu from './McOptionCardModerationEllipseMenu';
-import McConfirmDeleteOption from './McConfirmDeleteOption';
+import McConfirmDeleteOptionModal from './McConfirmDeleteOptionModal';
 import { deleteMcOption } from '../../../../../api/endpoints/multiple_choice';
 import McOptionCardModerationEllipseModal from './McOptionCardModerationEllipseModal';
+import getDisplayname from '../../../../../utils/getDisplayname';
+import BlockUserModalPost from '../../BlockUserModalPost';
+import ReportModal, { ReportData } from '../../../chat/ReportModal';
+import { reportSuperpollOption } from '../../../../../api/endpoints/report';
+import { RenderSupportersInfo } from '../McOptionCard';
 
 interface IMcOptionCardModeration {
   option: TMcOptionWithHighestField;
-  creator: newnewapi.IUser,
-  postId: string;
+  creator: newnewapi.IUser;
   index: number;
+  canBeDeleted: boolean;
+  isCreatorsBid: boolean;
 }
 
-const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> = ({
-  option,
-  creator,
-  postId,
-  index,
-}) => {
-  const router = useRouter();
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const user = useAppSelector((state) => state.user);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+const McOptionCardModeration: React.FunctionComponent<IMcOptionCardModeration> =
+  ({ option, creator, index, canBeDeleted, isCreatorsBid }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
 
-  const isCreatorsBid = useMemo(() => {
-    if (!option.creator) return true;
-    return false;
-  }, [option.creator]);
-  const supporterCountSubstracted = useMemo(() => {
-    if (isCreatorsBid) return option.supporterCount;
-    return  option.supporterCount - 1;
-  }, [option.supporterCount, isCreatorsBid]);
-
-  const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
-
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // Redirect to user's page
-  const handleRedirectToOptionCreator = () => {
-    window?.history.replaceState({
-      fromPost: true,
-    }, '', '');
-    router.push(`/${creator?.username}`);
-  }
-
-  const handleConfirmDelete = async () => {
-    try {
-      const payload = new newnewapi.DeleteMcOptionRequest({
-        optionId: option.id,
-      });
-
-      const res = await deleteMcOption(payload);
-
-      console.log(res);
-
-      if (!res.error) {
-        console.log('deleted');
+    const supporterCountSubstracted = useMemo(() => {
+      if (option.supporterCount === 0) {
+        return 0;
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      return option.supporterCount - 1;
+    }, [option.supporterCount]);
 
-  return (
-    <>
-      <motion.div
-        key={index}
-        layout="position"
-        transition={{
-          type: 'spring',
-          damping: 20,
-          stiffness: 300,
-        }}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          marginBottom: '16px',
-        }}
-      >
-        <SContainer
-          layout="position"
+    const [isEllipseMenuOpen, setIsEllipseMenuOpen] = useState(false);
+
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const handleConfirmDelete = async () => {
+      try {
+        const payload = new newnewapi.DeleteMcOptionRequest({
+          optionId: option.id,
+        });
+
+        const res = await deleteMcOption(payload);
+
+        console.log(res);
+
+        if (!res.error) {
+          console.log('deleted');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const handleReportSubmit = useCallback(
+      async ({ reasons, message }: ReportData) => {
+        await reportSuperpollOption(option.id, reasons, message);
+      },
+      [option.id]
+    );
+
+    const handleReportClose = useCallback(() => {
+      setIsReportModalOpen(false);
+    }, []);
+
+    return (
+      <>
+        <motion.div
+          key={index}
+          layout='position'
           transition={{
             type: 'spring',
             damping: 20,
             stiffness: 300,
           }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            marginBottom: '16px',
+          }}
         >
-          <SBidDetails>
-            <SBidAmount>
-              <SOptionSymbolImg
-                src={McSymbolIcon.src}
+          <SContainer
+            layout='position'
+            transition={{
+              type: 'spring',
+              damping: 20,
+              stiffness: 300,
+            }}
+          >
+            <SBidDetails>
+              <SBidAmount>
+                <OptionActionIcon
+                  src={
+                    theme.name === 'light'
+                      ? VoteIconLight.src
+                      : VoteIconDark.src
+                  }
+                />
+                <div>
+                  {option.voteCount && option.voteCount > 0
+                    ? `${formatNumber(option?.voteCount, true)} ${t(
+                        'McPost.OptionsTab.OptionCard.votes'
+                      )}`
+                    : t('McPost.OptionsTab.OptionCard.noVotes')}
+                </div>
+              </SBidAmount>
+              <SOptionInfo variant={3}>{option.text}</SOptionInfo>
+              <SBiddersInfo variant={3}>
+                <RenderSupportersInfo
+                  isCreatorsBid
+                  isSuggestedByMe={false}
+                  isSupportedByMe={false}
+                  optionCreator={
+                    option.creator ? getDisplayname(option.creator) : undefined
+                  }
+                  optionCreatorUsername={
+                    option.creator
+                      ? (option.creator.username as string)
+                      : undefined
+                  }
+                  firstVoter={
+                    option.firstVoter
+                      ? getDisplayname(option.firstVoter)
+                      : undefined
+                  }
+                  firstVoterUsername={
+                    option.firstVoter
+                      ? (option.firstVoter.username as string)
+                      : undefined
+                  }
+                  supporterCount={option.supporterCount}
+                  supporterCountSubstracted={supporterCountSubstracted}
+                />
+              </SBiddersInfo>
+            </SBidDetails>
+            {!isMobile ? (
+              <SEllipseButton onClick={() => setIsEllipseMenuOpen(true)}>
+                <InlineSvg
+                  svg={MoreIconFilled}
+                  fill={theme.colorsThemed.text.secondary}
+                  width='20px'
+                  height='20px'
+                />
+              </SEllipseButton>
+            ) : (
+              <SEllipseButtonMobile onClick={() => setIsEllipseMenuOpen(true)}>
+                {t('McPost.OptionsTab.OptionCard.moreBtn')}
+              </SEllipseButtonMobile>
+            )}
+            {!isMobile && (
+              <McOptionCardModerationEllipseMenu
+                isVisible={isEllipseMenuOpen}
+                isBySubscriber={!isCreatorsBid}
+                canBeDeleted={canBeDeleted}
+                handleClose={() => setIsEllipseMenuOpen(false)}
+                handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+                handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+                handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
               />
-              <div>
-                {
-                  option.voteCount && option.voteCount > 0
-                  ? `${formatNumber(option?.voteCount, true)}`
-                  : t('McPost.OptionsTab.OptionCard.noVotes')
-                }
-              </div>
-            </SBidAmount>
-            <SOptionInfo
-              variant={3}
-            >
-              {option.text}
-            </SOptionInfo>
-            <SBiddersInfo
-              variant={3}
-            >
-              {isCreatorsBid ? (
-                <>
-                  {supporterCountSubstracted > 0 ? (
-                    <>
-                      <SSpanBiddersHighlighted>
-                        {formatNumber(
-                          supporterCountSubstracted,
-                          true,
-                        )}
-                        { ' ' }
-                        { t('McPost.OptionsTab.OptionCard.voters') }
-                      </SSpanBiddersHighlighted>
-                      {' '}
-                      <SSpanBiddersRegular>
-                        {t('McPost.OptionsTab.OptionCard.voted')}
-                      </SSpanBiddersRegular>
-                    </>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <SSpanBiddersHighlighted
-                    onClick={() => {
-                      handleRedirectToOptionCreator()
-                    }}
-                    style={{
-                      color: theme.name === 'dark' ? theme.colorsThemed.accent.yellow : theme.colors.dark,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {t('McPost.OptionsTab.OptionCard.subscriber_suggestion',
-                      {
-                        nickname: option.creator?.nickname ?? option.creator?.username
-                      },
-                    )}
-                  </SSpanBiddersHighlighted>
-                  {supporterCountSubstracted > 0 ? (
-                    <>
-                      { ', ' }
-                      <SSpanBiddersHighlighted>
-                        {formatNumber(
-                          supporterCountSubstracted,
-                          true,
-                        )}
-                        { ' ' }
-                        {t('McPost.OptionsTab.OptionCard.voters')}
-                      </SSpanBiddersHighlighted>
-                      {' '}
-                      <SSpanBiddersRegular>
-                        {t('McPost.OptionsTab.OptionCard.voted')}
-                      </SSpanBiddersRegular>
-                    </>
-                  ) : null}
-                </>
-              )
-              }
-            </SBiddersInfo>
-          </SBidDetails>
-          {!isMobile ? (
-            <SEllipseButton
-              onClick={() => setIsEllipseMenuOpen(true)}
-            >
-              <InlineSvg
-                svg={MoreIconFilled}
-                fill={theme.colorsThemed.text.secondary}
-                width="20px"
-                height="20px"
-              />
-            </SEllipseButton>
-          ) : (
-            <SEllipseButtonMobile
-              onClick={() => setIsEllipseMenuOpen(true)}
-            >
-              { t('McPost.OptionsTab.OptionCard.moreBtn') }
-            </SEllipseButtonMobile>
-          )}
-          {!isMobile && (
-            <McOptionCardModerationEllipseMenu
-              isVisible={isEllipseMenuOpen}
-              isBySubscriber={!isCreatorsBid}
-              handleClose={() => setIsEllipseMenuOpen(false)}
-              handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
-              handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
-              handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
-            />
-          )}
-        </SContainer>
-      </motion.div>
-      {/* Modals */}
-      {/* Delete option */}
-      <McConfirmDeleteOption
-        isVisible={isDeleteModalOpen}
-        closeModal={() => setIsDeleteModalOpen(false)}
-        handleConfirmDelete={handleConfirmDelete}
-      />
-      {/* Ellipse modal */}
-      {isMobile && (
-        <McOptionCardModerationEllipseModal
-          isOpen={isEllipseMenuOpen}
-          zIndex={16}
-          onClose={() => setIsEllipseMenuOpen(false)}
-          handleOpenDeletePostModal={() => setIsDeleteModalOpen(true)}
+            )}
+          </SContainer>
+        </motion.div>
+        {/* Modals */}
+        {/* Delete option */}
+        <McConfirmDeleteOptionModal
+          isVisible={isDeleteModalOpen}
+          closeModal={() => setIsDeleteModalOpen(false)}
+          handleConfirmDelete={handleConfirmDelete}
         />
-      )}
-    </>
-  );
-};
+        {/* Ellipse modal */}
+        {isMobile && (
+          <McOptionCardModerationEllipseModal
+            isOpen={isEllipseMenuOpen}
+            zIndex={16}
+            onClose={() => setIsEllipseMenuOpen(false)}
+            isBySubscriber={!isCreatorsBid}
+            canBeDeleted={canBeDeleted}
+            handleOpenReportOptionModal={() => setIsReportModalOpen(true)}
+            handleOpenBlockUserModal={() => setIsBlockModalOpen(true)}
+            handleOpenRemoveOptionModal={() => setIsDeleteModalOpen(true)}
+          />
+        )}
+        {/* Confirm block user modal */}
+        {!isCreatorsBid && (
+          <BlockUserModalPost
+            confirmBlockUser={isBlockModalOpen}
+            user={option.creator!!}
+            closeModal={() => setIsBlockModalOpen(false)}
+          />
+        )}
+        {/* Report modal */}
+        {option.isCreatedBySubscriber && option.creator && (
+          <ReportModal
+            show={isReportModalOpen}
+            reportedDisplayname={getDisplayname(option.creator)}
+            onSubmit={handleReportSubmit}
+            onClose={handleReportClose}
+          />
+        )}
+      </>
+    );
+  };
 
 McOptionCardModeration.defaultProps = {};
 
@@ -290,11 +277,9 @@ const SBidDetails = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'amount bidders'
-    'optionInfo optionInfo';
+      'amount bidders'
+      'optionInfo optionInfo';
     grid-template-columns: 3fr 7fr;
-
-
 
     background-color: ${({ theme }) => theme.colorsThemed.background.tertiary};
     border-radius: ${({ theme }) => theme.borderRadius.medium};
@@ -311,11 +296,16 @@ const SBidAmount = styled.div`
   justify-content: flex-start;
   gap: 8px;
 
-  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+
+  margin-bottom: 8px;
 `;
 
-const SOptionSymbolImg = styled.img`
+const OptionActionIcon = styled.img`
   height: 24px;
+  width: 24px;
 `;
 
 const SOptionInfo = styled(Text)`
@@ -331,8 +321,13 @@ const SOptionInfo = styled(Text)`
 const SBiddersInfo = styled(Text)`
   grid-area: bidders;
 
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+
   ${({ theme }) => theme.media.tablet} {
     justify-self: flex-end;
+    padding-top: 4px;
   }
 `;
 
@@ -343,7 +338,6 @@ const SSpanBiddersHighlighted = styled.span`
 const SSpanBiddersRegular = styled.span`
   color: ${({ theme }) => theme.colorsThemed.text.tertiary};
 `;
-
 
 const SEllipseButton = styled(Button)`
   position: absolute;
@@ -395,7 +389,8 @@ const SEllipseButtonMobile = styled.button`
   cursor: pointer;
   transition: 0.2s linear;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
     background-color: ${({ theme }) => theme.colorsThemed.accent.blue};
   }

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import React from 'react';
 import Link from 'next/link';
 import { scroller } from 'react-scroll';
@@ -15,21 +16,23 @@ import ChangeLanguage from '../atoms/ChangeLanguage';
 import { useAppSelector } from '../../redux-store/store';
 
 import mobileLogo from '../../public/images/svg/mobile-logo.svg';
-import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
-import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
-import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
+// import twitterIcon from '../../public/images/svg/icons/filled/Twitter.svg';
+// import tiktokIcon from '../../public/images/svg/icons/filled/TikTok.svg';
+// import instagramIcon from '../../public/images/svg/icons/filled/Insragram.svg';
 
 import { SCROLL_TO_TOP } from '../../constants/timings';
 
-interface IFooter {
-}
+interface IFooter {}
 
 type TItem = {
-  key: string,
-  url: string
+  key: string;
+  url: string;
+  iconSrc?: string;
+  email?: boolean;
+  external?: boolean;
 };
 
-export const Footer: React.FC<IFooter> = () => {
+export const Footer: React.FC<IFooter> = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -38,40 +41,44 @@ export const Footer: React.FC<IFooter> = () => {
   const topItems: TItem[] = [
     {
       key: 'about',
-      url: '/about',
-    },
-    {
-      key: 'press',
-      url: '/press',
-    },
-    {
-      key: 'jobs',
-      url: '/jobs',
-    },
-    {
-      key: 'help',
-      url: '/help',
-    },
-  ];
-  const centerItems: TItem[] = [
-    {
-      key: 'faq',
-      url: '/faq',
+      url: 'https://about.newnew.co',
     },
     {
       key: 'how-it-works',
       url: '/how-it-works',
+      external: true,
+    },
+    {
+      key: 'faq',
+      url: 'https://faqs.newnew.co',
     },
     {
       key: 'guidelines',
-      url: '/guidelines',
+      url: 'https://communityguidelines.newnew.co',
     },
     {
-      key: 'accessibility',
-      url: '/accessibility',
+      key: 'jobs',
+      url: 'https://jobs.lever.co/NewNew',
     },
   ];
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const centerItems: TItem[] = [
+    // TODO: return twitter link later
+    /* {
+      key: 'twitter',
+      url: 'https://twitter.com/newnewhq',
+      external: true,
+      iconSrc: twitterIcon,
+    }, */
+    {
+      key: 'email',
+      url: 'hi@newnew.co',
+      external: true,
+      email: true,
+    },
+  ];
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleLogoClick = () => {
     if (router.pathname === '/') {
@@ -84,13 +91,38 @@ export const Footer: React.FC<IFooter> = () => {
       router.push('/', '/');
     }
   };
-  const renderItem = (item: TItem) => (
-    <Link key={item.key} href={item.url} passHref>
-      <SBlockOption>
-        {t(`footer-${item.key}`)}
-      </SBlockOption>
-    </Link>
-  );
+  const renderItem = (item: TItem) => {
+    if (item.external) {
+      return (
+        <SExternalLink
+          key={item.key}
+          href={item.email ? `mailto: ${item.url}` : item.url}
+          target='_blank'
+        >
+          {item.iconSrc ? (
+            <SSvgHolder target='_blank'>
+              <InlineSvg
+                svg={item.iconSrc}
+                fill={theme.colorsThemed.text.secondary}
+                width='20px'
+                height='20px'
+                hoverFill={theme.colorsThemed.text.primary}
+              />
+            </SSvgHolder>
+          ) : null}
+          <SBlockOption>
+            {!item.email ? t(`footer-${item.key}`) : item.url}
+          </SBlockOption>
+        </SExternalLink>
+      );
+    }
+
+    return (
+      <Link key={item.key} href={item.url} passHref>
+        <SBlockOption target='_blank'>{t(`footer-${item.key}`)}</SBlockOption>
+      </Link>
+    );
+  };
 
   return (
     <SWrapper>
@@ -103,8 +135,8 @@ export const Footer: React.FC<IFooter> = () => {
                   clickable
                   svg={mobileLogo}
                   fill={theme.colorsThemed.text.primary}
-                  width="48px"
-                  height="48px"
+                  width='48px'
+                  height='48px'
                   onClick={handleLogoClick}
                 />
               </SIconHolder>
@@ -122,8 +154,8 @@ export const Footer: React.FC<IFooter> = () => {
                   </SBlockTitle>
                   {centerItems.map(renderItem)}
                 </SBlock>
-                {isMobile && <SSeparator />}
-                <SBlock>
+                {/* {isMobile && <SSeparator />} */}
+                {/* <SBlock>
                   <SBlockTitle weight={700}>
                     {t('footer-bottom-title')}
                   </SBlockTitle>
@@ -162,7 +194,7 @@ export const Footer: React.FC<IFooter> = () => {
                       </SSvgHolder>
                     </Link>
                   </SBlockRow>
-                </SBlock>
+                </SBlock> */}
               </STopContent>
               <SSeparator />
               <SBlockBottomRow>
@@ -170,16 +202,14 @@ export const Footer: React.FC<IFooter> = () => {
                   <SBottomBlockOptionInc>
                     {t('footer-inc')}
                   </SBottomBlockOptionInc>
-                  <Link href="/terms" passHref>
-                    <SBottomBlockOption>
-                      {t('footer-terms')}
-                    </SBottomBlockOption>
-                  </Link>
-                  <Link href="/privacy" passHref>
+                  <a href='https://terms.newnew.co' target='_blank'>
+                    <SBottomBlockOption>{t('footer-terms')}</SBottomBlockOption>
+                  </a>
+                  <a href='https://privacy.newnew.co' target='_blank'>
                     <SBottomBlockOption>
                       {t('footer-privacy')}
                     </SBottomBlockOption>
-                  </Link>
+                  </a>
                 </SLeftBlock>
                 <SRightBlock>
                   <SRightBlockItemHolder>
@@ -193,12 +223,15 @@ export const Footer: React.FC<IFooter> = () => {
       </Container>
     </SWrapper>
   );
-};
+});
 
 export default Footer;
 
 const SWrapper = styled.footer`
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colorsThemed.background.secondary : props.theme.colorsThemed.background.primary)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.background.secondary
+      : props.theme.colorsThemed.background.primary};
 `;
 
 const SContent = styled.div`
@@ -233,7 +266,8 @@ const SBlock = styled.div`
 const SSeparator = styled.div`
   margin-top: 12px;
   margin-bottom: 24px;
-  border-bottom: 1px solid ${(props) => props.theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${(props) => props.theme.colorsThemed.background.outlines1};
 
   ${(props) => props.theme.media.tablet} {
     margin-top: 36px;
@@ -258,11 +292,11 @@ const SBlockOption = styled.a`
   }
 `;
 
-const SBlockRow = styled.div`
-  display: flex;
-  margin-bottom: 12px;
-  flex-direction: row;
-`;
+// const SBlockRow = styled.div`
+//   display: flex;
+//   margin-bottom: 12px;
+//   flex-direction: row;
+// `;
 
 const SBlockBottomRow = styled.div`
   display: flex;
@@ -296,9 +330,26 @@ const SBottomBlockOptionInc = styled.span`
   margin-right: 24px;
 `;
 
-const SSvgHolder = styled.a`
-  margin-right: 15px;
+const SExternalLink = styled.a`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 9px;
+
+  &:hover {
+    a {
+      color: ${(props) => props.theme.colorsThemed.text.primary};
+    }
+
+    div {
+      svg {
+        fill: ${(props) => props.theme.colorsThemed.text.primary};
+      }
+    }
+  }
 `;
+
+const SSvgHolder = styled.a``;
 
 const SIconHolder = styled.div`
   top: 32px;

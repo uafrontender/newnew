@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Text from '../../atoms/Text';
 
 import PostSuccessIcon from '../../../public/images/decision/post-success-moderation-img.png';
+import Button from '../../atoms/Button';
 
 interface IPostSuccessBoxModeration {
   title: string;
@@ -13,33 +14,14 @@ interface IPostSuccessBoxModeration {
   handleButtonClick: () => void;
 }
 
-const PostSuccessBoxModeration: React.FunctionComponent<IPostSuccessBoxModeration> = ({
-  title,
-  body,
-  buttonCaption,
-  style,
-  handleButtonClick,
-}) => (
-    <SWaitingForResponseBox
-      style={style ?? {}}
-    >
-      <SIconImg
-        src={PostSuccessIcon.src}
-      />
-      <SHeadline
-        variant={2}
-      >
-        {title}
-      </SHeadline>
-      <SBody
-        variant={3}
-      >
-        {body}
-      </SBody>
+const PostSuccessBoxModeration: React.FunctionComponent<IPostSuccessBoxModeration> =
+  ({ title, body, buttonCaption, style, handleButtonClick }) => (
+    <SWaitingForResponseBox style={style ?? {}}>
+      <SIconImg src={PostSuccessIcon.src} />
+      <SHeadline variant={2}>{title}</SHeadline>
+      <SBody variant={3}>{body}</SBody>
       <SCtaButtonContainer>
-        <SCTAButton
-          onClick={handleButtonClick}
-        >
+        <SCTAButton view='primaryGrad' onClick={handleButtonClick}>
           {buttonCaption}
         </SCTAButton>
       </SCtaButtonContainer>
@@ -48,20 +30,37 @@ const PostSuccessBoxModeration: React.FunctionComponent<IPostSuccessBoxModeratio
 
 PostSuccessBoxModeration.defaultProps = {
   style: undefined,
-}
+};
 
 export default PostSuccessBoxModeration;
 
 const SWaitingForResponseBox = styled.div`
-  background: radial-gradient(100% 1411.13% at 0% 0%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, radial-gradient(100% 1411.13% at 100% 100%, rgba(54, 55, 74, 0.4) 0%, rgba(54, 55, 74, 0) 81.65%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, #1E1F29;
+  z-index: 11;
+  position: relative;
+
+  background: ${({ theme }) =>
+    theme.name === 'dark'
+      ? `radial-gradient(
+        100% 1411.13% at 0% 0%,
+        rgba(54, 55, 74, 0.4) 0%,
+        rgba(54, 55, 74, 0) 81.65%
+      )
+      /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
+    radial-gradient(
+        100% 1411.13% at 100% 100%,
+        rgba(54, 55, 74, 0.4) 0%,
+        rgba(54, 55, 74, 0) 81.65%
+      )
+      /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
+    #1e1f29;`
+      : '#ffffff'};
   box-shadow: 0px 10px 30px rgba(54, 55, 74, 0.2);
 
   display: grid;
   grid-template-areas:
     'imageArea headlineArea'
     'imageArea bodyArea'
-    'ctaArea ctaArea'
-  ;
+    'ctaArea ctaArea';
   grid-template-columns: 64px 1fr;
 
   padding: 16px;
@@ -73,29 +72,27 @@ const SWaitingForResponseBox = styled.div`
 
     grid-template-areas:
       'imageArea headlineArea ctaArea'
-      'imageArea bodyArea ctaArea'
-    ;
+      'imageArea bodyArea ctaArea';
     grid-template-columns: 64px 5fr 3fr;
   }
 `;
 
 const SIconImg = styled.img`
   grid-area: imageArea;
-
 `;
 
 const SHeadline = styled(Text)`
   grid-area: headlineArea;
   align-self: center;
 
-  color: #FFFFFF;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
 `;
 
 const SBody = styled(Text)`
   grid-area: bodyArea;
   align-self: center;
 
-  color: #FFFFFF;
+  color: ${({ theme }) => theme.colorsThemed.text.primary};
   opacity: 0.8;
 `;
 
@@ -111,18 +108,10 @@ const SCtaButtonContainer = styled.div`
   }
 `;
 
-const SCTAButton = styled.button`
-  background: #FFFFFF;
-
-  border: transparent;
-  border-radius: 16px;
-
-  padding: 12px 24px;
-
+const SCTAButton = styled(Button)`
   font-weight: 600;
   font-size: 14px;
   line-height: 24px;
-  color: ${({ theme }) => theme.colors.dark};
 
   width: 100%;
   margin-top: 12px;

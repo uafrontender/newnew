@@ -1,12 +1,11 @@
-import { TPostType } from "./switchPostType";
-import { TPostStatusStringified } from "./switchPostStatus";
+import { TPostType } from './switchPostType';
+import { TPostStatusStringified } from './switchPostStatus';
 
 // TODO: Resolve stringification issue
 export default function switchPostStatusString(
   postType: TPostType,
-  status: string,
+  status: string
 ): TPostStatusStringified {
-
   if (postType === 'ac') {
     switch (status) {
       case 'SCHEDULED': {
@@ -16,7 +15,7 @@ export default function switchPostStatusString(
         return 'voting';
       }
       case 'WAITING_FOR_DECISION': {
-        return 'wating_for_decision';
+        return 'waiting_for_decision';
       }
       case 'WAITING_FOR_RESPONSE': {
         return 'waiting_for_response';
@@ -24,8 +23,11 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'DELETED': {
-        return 'deleted';
+      case 'DELETED_BY_CREATOR': {
+        return 'deleted_by_creator';
+      }
+      case 'DELETED_BY_ADMIN': {
+        return 'deleted_by_admin';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -34,16 +36,16 @@ export default function switchPostStatusString(
         return 'flagged';
       }
       case 'PROCESSING_ANNOUNCE': {
-        return 'processing';
+        return 'processing_announcement';
       }
       case 'PROCESSING_RESPONSE': {
-        return 'processing';
+        return 'processing_response';
       }
       case 'FAILED': {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
@@ -62,8 +64,11 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'DELETED': {
-        return 'deleted';
+      case 'DELETED_BY_CREATOR': {
+        return 'deleted_by_creator';
+      }
+      case 'DELETED_BY_ADMIN': {
+        return 'deleted_by_admin';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -72,16 +77,16 @@ export default function switchPostStatusString(
         return 'flagged';
       }
       case 'PROCESSING_ANNOUNCE': {
-        return 'processing';
+        return 'processing_announcement';
       }
       case 'PROCESSING_RESPONSE': {
-        return 'processing';
+        return 'processing_response';
       }
       case 'FAILED': {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
@@ -100,8 +105,11 @@ export default function switchPostStatusString(
       case 'SUCCEEDED': {
         return 'succeeded';
       }
-      case 'DELETED': {
-        return 'deleted';
+      case 'DELETED_BY_CREATOR': {
+        return 'deleted_by_creator';
+      }
+      case 'DELETED_BY_ADMIN': {
+        return 'deleted_by_admin';
       }
       case 'ANNOUNCE_FLAGGED': {
         return 'flagged';
@@ -110,19 +118,19 @@ export default function switchPostStatusString(
         return 'flagged';
       }
       case 'PROCESSING_ANNOUNCE': {
-        return 'processing';
+        return 'processing_announcement';
       }
       case 'PROCESSING_RESPONSE': {
-        return 'processing';
+        return 'processing_response';
       }
       case 'FAILED': {
         return 'failed';
       }
       default: {
-        return 'processing';
+        return 'processing_announcement';
       }
     }
   }
 
-  return 'processing';
+  return 'processing_announcement';
 }

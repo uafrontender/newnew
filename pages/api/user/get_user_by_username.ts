@@ -43,7 +43,7 @@ const users: User[] = [
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Uint8Array | any>,
+  res: NextApiResponse<Uint8Array | any>
 ): any {
   if (req.method === 'GET') {
     const { username } = req.query;
@@ -59,8 +59,7 @@ export default function handler(
       return;
     }
 
-    const resBytes = newnewapi.User
-      .encode(user).finish();
+    const resBytes = newnewapi.User.encode(user).finish();
 
     res.send(resBytes);
     return;

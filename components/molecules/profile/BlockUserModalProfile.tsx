@@ -6,21 +6,18 @@ import { markUser } from '../../../api/endpoints/user';
 import Modal from '../../organisms/Modal';
 import Button from '../../atoms/Button';
 import { useGetBlockedUsers } from '../../../contexts/blockedUsersContext';
+import getDisplayname from '../../../utils/getDisplayname';
 
 interface IBlockUserModalProfile {
   user: newnewapi.IUser;
   confirmBlockUser: boolean;
-  onUserBlock: () => void;
   closeModal: () => void;
-  isAnnouncement?: boolean;
 }
 
 const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
   confirmBlockUser,
-  onUserBlock,
   user,
   closeModal,
-  isAnnouncement,
 }) => {
   const { t } = useTranslation('profile');
 
@@ -33,9 +30,10 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
         userUuid: user.uuid,
       });
       const res = await markUser(payload);
-      if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
       blockUser(user.uuid!!);
-      onUserBlock();
+      closeModal();
     } catch (err) {
       console.error(err);
     }
@@ -47,14 +45,17 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
     <Modal show={confirmBlockUser} onClose={closeModal}>
       <SContainer>
         <SModal>
-          <SModalTitle>{isAnnouncement ? t('modal.block-group.title') : t('modal.block-user.title')}</SModalTitle>
+          <SModalTitle>{t('modal.block-user.title')}</SModalTitle>
           <SModalMessage>
-            {t('modal.block-user.message-first-part')} {user.nickname} {t('modal.block-user.message-second-part')}
+            {t('modal.block-user.message-first-part')} {getDisplayname(user)}{' '}
+            {t('modal.block-user.message-second-part')}
           </SModalMessage>
           <SModalButtons>
-            <SCancelButton>{t('modal.block-user.button-cancel')}</SCancelButton>
+            <SCancelButton onClick={closeModal}>
+              {t('modal.block-user.button-cancel')}
+            </SCancelButton>
             <SConfirmButton onClick={handleConfirmClick}>
-              {isAnnouncement ? t('modal.block-group.button-confirm') : t('modal.block-user.button-confirm')}
+              {t('modal.block-user.button-confirm')}
             </SConfirmButton>
           </SModalButtons>
         </SModal>
@@ -65,13 +66,13 @@ const BlockUserModalProfile: React.FC<IBlockUserModalProfile> = ({
 
 export default BlockUserModalProfile;
 
-BlockUserModalProfile.defaultProps = {
-  isAnnouncement: false,
-};
+BlockUserModalProfile.defaultProps = {};
 
 const SContainer = styled.div`
   display: flex;
   height: 100%;
+  width: 100%;
+  position: absolute;
   justify-content: center;
   align-items: center;
 `;
@@ -80,10 +81,14 @@ const SModal = styled.div`
   max-width: 480px;
   width: 100%;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.secondary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.secondary};
   border-radius: ${(props) => props.theme.borderRadius.medium};
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   padding: 24px;
   box-sizing: border-box;
   display: flex;
@@ -112,11 +117,15 @@ const SCancelButton = styled(Button)`
   margin-right: auto;
   flex-shrink: 0;
   color: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colorsThemed.text.primary : props.theme.colors.white};
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.primary
+      : props.theme.colors.white};
   background: ${(props) => props.theme.colorsThemed.background.quaternary};
   &:hover {
     background: ${(props) =>
-      props.theme.name === 'light' ? props.theme.colors.dark : props.theme.colorsThemed.background.quaternary};
+      props.theme.name === 'light'
+        ? props.theme.colors.dark
+        : props.theme.colorsThemed.background.quaternary};
     color: ${(props) => props.theme.colors.white};
     background: ${(props) => props.theme.colorsThemed.background.quaternary};
   }

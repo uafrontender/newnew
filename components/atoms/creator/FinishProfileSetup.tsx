@@ -1,17 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { scroller } from 'react-scroll';
 import Button from '../Button';
 import Text from '../Text';
 
-import moneyIcon from '../../../public/images/dashboard/money.png';
+import money from '../../../public/images/svg/icons/filled/Money.svg';
 
 import { SCROLL_TO_TOP } from '../../../constants/timings';
+import InlineSVG from '../InlineSVG';
 
 export const FinishProfileSetup = () => {
   const { t } = useTranslation('creator');
+  const theme = useTheme();
 
   const handleClick = () => {
     scroller.scrollTo('top-reload', {
@@ -25,7 +26,12 @@ export const FinishProfileSetup = () => {
     <SCashOutContainer>
       <SCashOutTopBlock>
         <SImageWrapper>
-          <Image src={moneyIcon} alt={t('dashboard.earnings.todosIssue.text')} width={48} height={48} />
+          <InlineSVG
+            svg={money}
+            fill={theme.colors.white}
+            width='48px'
+            height='48px'
+          />
         </SImageWrapper>
         <SDescriptionWrapper>
           <SDescription variant={2} weight={600}>
@@ -33,7 +39,7 @@ export const FinishProfileSetup = () => {
           </SDescription>
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <SButton view="primaryGrad" onClick={handleClick}>
+      <SButton view='primaryGrad' onClick={handleClick}>
         {t('dashboard.earnings.todosIssue.btnText')}
       </SButton>
     </SCashOutContainer>
@@ -81,7 +87,7 @@ const SButton = styled(Button)`
   width: auto;
   display: block;
   flex-shrink: 0;
-  color: #2C2C33;
+  color: #2c2c33;
   padding: 16px 20px;
   margin-top: 16px;
   background: ${(props) => props.theme.colors.white};

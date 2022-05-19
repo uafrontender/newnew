@@ -29,7 +29,9 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
   const { t } = useTranslation('decision');
   const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const createdAtParsed = new Date((pledge.createdAt?.seconds as number) * 1000);
+  const createdAtParsed = new Date(
+    (pledge.createdAt?.seconds as number) * 1000
+  );
 
   // Redirect to user's page
   const handleRedirectToUser = () => router.push(`/${creator?.username}`);
@@ -37,7 +39,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
   return (
     <motion.div
       key={index}
-      layout="position"
+      layout='position'
       transition={{
         type: 'spring',
         damping: 20,
@@ -51,7 +53,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
       }}
     >
       <SContainer
-        layout="position"
+        layout='position'
         transition={{
           type: 'spring',
           damping: 20,
@@ -75,23 +77,21 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
                 handleRedirectToUser();
               }}
             >
-              { creator?.uuid === user.userData?.userUuid
-                ? t('CfPost.OptionsTab.me') : creator?.username }
+              {creator?.uuid === user.userData?.userUuid
+                ? t('CfPost.OptionsTab.me')
+                : creator?.username}
             </SUsername>
             <SAmount>
               {pledge.amount?.usdCents
-                ? (
-                  `$${(pledge?.amount?.usdCents / 100).toFixed(2)}`
-                ) : '00.00'}
+                ? `$${(pledge?.amount?.usdCents / 100).toFixed(2)}`
+                : '00.00'}
             </SAmount>
-            {creator?.uuid === user.userData?.userUuid
-              ? (
-                <STag>{t('McPost.OptionsTab.tags.my_bid')}</STag>
-              ) : null}
-            {pledge.isHighest
-              ? (
-                <STag>{t('McPost.OptionsTab.tags.highest')}</STag>
-              ) : null}
+            {creator?.uuid === user.userData?.userUuid ? (
+              <STag>{t('McPost.OptionsTab.tags.my_bid')}</STag>
+            ) : null}
+            {pledge.isHighest ? (
+              <STag>{t('McPost.OptionsTab.tags.highest')}</STag>
+            ) : null}
             {/* Comment out for now */}
             {/* {creator.isVIP
               ? (
@@ -99,19 +99,12 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
               ) : null} */}
           </SPledgeInfo>
           <SPledgeDate>
-            { createdAtParsed.getDate() }
-            {' '}
-            { createdAtParsed.toLocaleString('default', { month: 'short' }) }
-            {' '}
-            { createdAtParsed.getFullYear() }
-            {' '}
+            {createdAtParsed.getDate()}{' '}
+            {createdAtParsed.toLocaleString('default', { month: 'short' })}{' '}
+            {createdAtParsed.getFullYear()}{' '}
           </SPledgeDate>
           {pledge.message ? (
-            <SPledgeMessage
-              variant={3}
-            >
-              { pledge.message }
-            </SPledgeMessage>
+            <SPledgeMessage variant={3}>{pledge.message}</SPledgeMessage>
           ) : null}
         </SPledgeDetails>
       </SContainer>
@@ -119,8 +112,7 @@ const CfPledgeCard: React.FunctionComponent<ICfPledgeCard> = ({
   );
 };
 
-CfPledgeCard.defaultProps = {
-};
+CfPledgeCard.defaultProps = {};
 
 export default CfPledgeCard;
 

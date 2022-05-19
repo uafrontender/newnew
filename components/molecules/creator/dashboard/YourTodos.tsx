@@ -1,41 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { css, useTheme } from 'styled-components';
-import { newnewapi } from 'newnew-api';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import Text from '../../../atoms/Text';
 import Button from '../../../atoms/Button';
 import Headline from '../../../atoms/Headline';
 
-import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
-import { setUserData } from '../../../../redux-store/slices/userStateSlice';
-import { getMyCreatorTags, getMyOnboardingState } from '../../../../api/endpoints/user';
+import { useAppSelector } from '../../../../redux-store/store';
 
 import RadioIcon from '../../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../../../atoms/InlineSVG';
 
-interface IFunctionProps {
-  todosCompleted: (value: boolean) => void;
-  todosCompletedLoading: (value: boolean) => void;
-}
-
-export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompletedLoading }) => {
+export const YourTodos = () => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
   const user = useAppSelector((state) => state.user);
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const [allCompleted, setAllcompleted] = useState<boolean | null>(null);
-  const [currentTags, setCurrentTags] = useState<newnewapi.ICreatorTag[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean | null>(null);
-
-  const isProfileComplete = useCallback(() => {
-    if (user.userData?.bio && user.userData?.bio !== null && user.userData?.bio.length > 0 && currentTags.length > 0) {
-      return true;
-    }
-    return false;
-  }, [user.userData?.bio, currentTags]);
 
   const collection = useMemo(
     () => [
@@ -45,88 +25,21 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
         completed: true,
       },
       {
-        id: 'basic-info',
-        title: t('dashboard.todos.basic-info'),
-        completed: true,
-      },
-      {
         id: 'complete-profile',
         title: t('dashboard.todos.complete-profile'),
-        completed: isProfileComplete(),
+        completed:
+          user.creatorData?.hasCreatorTags &&
+          user.userData?.bio &&
+          user.userData?.bio.length > 0,
       },
       {
         id: 'add-cashout-method',
         title: t('dashboard.todos.add-cashout-method'),
-        completed: user.userData?.options?.creatorStatus === 2,
+        completed: user.creatorData?.options?.isCreatorConnectedToStripe,
       },
     ],
-    [t, user.userData?.options?.creatorStatus, isProfileComplete]
+    [t, user.creatorData, user.userData]
   );
-
-  useEffect(() => {
-    async function fetchOnboardingState() {
-      try {
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getMyOnboardingState(payload);
-
-        if (res.data?.isCreatorConnectedToStripe) {
-          dispatch(
-            setUserData({
-              options: {
-                ...user.userData?.options,
-                creatorStatus: 2,
-              },
-            })
-          );
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function fetchCreatorTags() {
-      try {
-        const myTagsPayload = new newnewapi.EmptyRequest({});
-        const tagsRes = await getMyCreatorTags(myTagsPayload);
-
-        if (tagsRes.data) {
-          setCurrentTags(tagsRes.data.tags);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    async function checkAndLoad() {
-      if (!allCompleted && !isLoading) {
-        todosCompletedLoading(true);
-        setIsLoading(true);
-        if (user.userData?.options?.creatorStatus !== 2) {
-          await fetchOnboardingState();
-        }
-        if (currentTags.length < 1) {
-          await fetchCreatorTags();
-        }
-        todosCompletedLoading(false);
-        setIsLoading(false);
-      }
-    }
-
-    checkAndLoad();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, dispatch, currentTags, allCompleted]);
-
-  useEffect(() => {
-    if (!allCompleted && isLoading === false) {
-      let done = true;
-      collection.forEach((item) => {
-        if (!item.completed) done = false;
-      });
-      setAllcompleted(done);
-      todosCompleted(done);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, allCompleted, todosCompleted, isLoading]);
 
   const renderItem = useCallback(
     (item, index) => (
@@ -134,9 +47,14 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
         <SItemText>
           <SBullet completed={item.completed}>
             {item.completed ? (
-              <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+              <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
             ) : (
-              <InlineSvg svg={RadioIcon} width="8" height="8" fill={theme.name === 'light' ? '#1B1C27' : '#fff'} />
+              <InlineSvg
+                svg={RadioIcon}
+                width='8'
+                height='8'
+                fill={theme.name === 'light' ? '#1B1C27' : '#fff'}
+              />
             )}
           </SBullet>
           <SItemTitle>
@@ -145,25 +63,28 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
           </SItemTitle>
         </SItemText>
         {!item.completed && item.id === 'complete-profile' && (
-          <SBottomActionButton
-            withDim
-            withShrink
-            view="primaryGrad"
-            onClick={() => router.push('/creator-onboarding-about')}
-          >
-            {t('dashboard.todos.complete-profile-btn')}
-          </SBottomActionButton>
+          <Link href='/creator-onboarding-about'>
+            <a>
+              <SBottomActionButton withDim withShrink view='primaryGrad'>
+                {t('dashboard.todos.complete-profile-btn')}
+              </SBottomActionButton>
+            </a>
+          </Link>
         )}
         {!item.completed && item.id === 'add-cashout-method' && (
-          <SBottomActionButton withDim withShrink view="primaryGrad" onClick={() => router.push('/creator/get-paid')}>
-            {t('dashboard.todos.add-cashout-method-btn')}
-          </SBottomActionButton>
+          <Link href='/creator/get-paid'>
+            <a>
+              <SBottomActionButton withDim withShrink view='primaryGrad'>
+                {t('dashboard.todos.add-cashout-method-btn')}
+              </SBottomActionButton>
+            </a>
+          </Link>
         )}
       </SListItem>
     ),
-    [t, router, theme.name]
+    [t, theme.name]
   );
-  return allCompleted === false && !isLoading ? (
+  return (
     <SContainer>
       <SHeaderLine>
         <STitle variant={6}>{t('dashboard.todos.title')}</STitle>
@@ -173,7 +94,7 @@ export const YourTodos: React.FC<IFunctionProps> = ({ todosCompleted, todosCompl
         <SList>{collection.map(renderItem)}</SList>
       </SDescription>
     </SContainer>
-  ) : null;
+  );
 };
 
 export default YourTodos;
@@ -184,21 +105,24 @@ const SContainer = styled.div`
   padding: 16px;
   display: flex;
   position: relative;
-  background: ${(props) => props.theme.colors.white};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? '#14151F'
+      : props.theme.colorsThemed.background.quinary};
   flex-direction: column;
 
   ${(props) => props.theme.media.tablet} {
     left: unset;
     width: 100%;
-    padding: 20px 24px 24px;
+    padding: 20px 32px 8px 25px;
     border-radius: 16px;
-    background: ${(props) => (props.theme.name === 'light' ? '#14151F' : props.theme.colors.white)};
   }
 `;
 
 const STitle = styled(Headline)`
-  color: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33')};
+  color: ${(props) => props.theme.colors.white};
   font-weight: 600;
+  margin-bottom: 8px;
 `;
 
 const SHeaderLine = styled.div`
@@ -210,10 +134,15 @@ const SHeaderLine = styled.div`
 
 const SDescription = styled(Text)`
   color: ${(props) => props.theme.colorsThemed.text.tertiary};
+  color: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colorsThemed.text.tertiary
+      : props.theme.colorsThemed.text.secondary};
 `;
 
 const SList = styled.div`
   font-size: 14px;
+  padding-top: 16px;
   ${(props) => props.theme.media.tablet} {
     font-size: 16px;
   }
@@ -224,30 +153,31 @@ interface ISListItem {
   isFirst: boolean;
 }
 const SListItem = styled.div<ISListItem>`
-  padding: 16px;
+  padding: 0 0 16px;
   display: flex;
-  ${(props) => {
-    if (!props.isFirst) {
-      return css`
-          border-top: 1px solid ${() => (props.theme.name === 'light' ? '#272835' : '#E5E9F1')};
-        }
-      `;
-    }
-    return css``;
-  }}
-
+  align-items: center;
   ${(props) => {
     if (props.completed) {
       return css`
-          color: ${() => (props.theme.name === 'light' ? '#586070' : '#B3BBCA')};
           text-decoration:line-through;
+          div{
+            color: ${() =>
+              props.theme.name === 'light' ? '#586070' : '#B3BBCA'};
+          }
         }
       `;
     }
     return css`
-      color: ${() => (props.theme.name === 'light' ? props.theme.colors.white : '#2C2C33')};
+      div {
+        color: ${() => props.theme.colors.white};
+      }
     `;
   }}
+  a {
+    margin-left: auto;
+    flex-shrink: 0;
+    display: block;
+  }
 `;
 
 const SItemText = styled.div`
@@ -272,7 +202,8 @@ const SBullet = styled.div<ISBullet>`
       `;
     }
     return css`
-      background: ${() => (props.theme.name === 'light' ? '#2C2C33' : '#B3BBCA')};
+      background: ${() =>
+        props.theme.name === 'light' ? '#2C2C33' : '#B3BBCA'};
     `;
   }}
 `;

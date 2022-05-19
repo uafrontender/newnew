@@ -1,46 +1,42 @@
 /* eslint-disable no-unsafe-optional-chaining */
 import React from 'react';
-import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 import styled from 'styled-components';
-import { useAppSelector } from '../../../redux-store/store';
+import Image from 'next/image';
 import Headline from '../Headline';
 
-import acImage from '../../../public/images/creation/AC.png';
 import RadioIcon from '../../../public/images/svg/icons/filled/Radio.svg';
 import InlineSvg from '../InlineSVG';
+import assets from '../../../constants/assets';
 
 const SubsFeatures = () => {
   const { t } = useTranslation('creator');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
 
   return (
     <SContainer>
       <Image
-        src={acImage}
-        alt="Enable subscription"
-        width={isMobile ? 232 : 162}
-        height={isMobile ? 240 : 152}
-        objectFit="cover"
+        src={assets.subscription.subMC}
+        alt={t('subscribersFeatures.title')}
+        width={176}
+        height={176}
       />
       <SContent>
         <STitle variant={6}>{t('subscribersFeatures.title')}</STitle>
         <SListItem>
           <SBullet>
-            <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+            <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
           </SBullet>
           {t('subscribersFeatures.firstFeature')}
         </SListItem>
         <SListItem>
           <SBullet>
-            <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+            <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
           </SBullet>
           {t('subscribersFeatures.secondFeature')}
         </SListItem>
         <SListItem>
           <SBullet>
-            <InlineSvg svg={RadioIcon} width="8" height="8" fill="#fff" />
+            <InlineSvg svg={RadioIcon} width='8' height='8' fill='#fff' />
           </SBullet>
           {t('subscribersFeatures.thirdFeature')}
         </SListItem>
@@ -52,7 +48,7 @@ const SubsFeatures = () => {
 export default SubsFeatures;
 
 const SContainer = styled.div`
-  padding: 16px;
+  padding: 16px 16px 30px;
   display: flex;
   background: ${(props) =>
     props.theme.name === 'light'
@@ -62,7 +58,7 @@ const SContainer = styled.div`
   border-radius: 16px;
   flex-direction: column;
   justify-content: center;
-  margin-bottom: 12px;
+  margin: 16px 0;
 
   ${(props) => props.theme.media.tablet} {
     padding: 24px;
@@ -94,6 +90,7 @@ const STitle = styled(Headline)`
 const SListItem = styled.div`
   display: flex;
   margin-top: 15px;
+  align-items: center;
 `;
 
 const SBullet = styled.div`
@@ -104,4 +101,5 @@ const SBullet = styled.div`
   justify-content: center;
   background: #12a573;
   margin-right: 8px;
+  flex-shrink: 0;
 `;

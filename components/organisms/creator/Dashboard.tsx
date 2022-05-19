@@ -1,39 +1,79 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import dynamic from 'next/dynamic';
+import moment from 'moment';
 import { useAppSelector } from '../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../api/endpoints/subscription';
-
 import Lottie from '../../atoms/Lottie';
 import Headline from '../../atoms/Headline';
-import Navigation from '../../molecules/creator/Navigation';
-import Earnings from '../../molecules/creator/dashboard/Earnings';
-import YourTodos from '../../molecules/creator/dashboard/YourTodos';
-import DynamicSection from '../../molecules/creator/dashboard/DynamicSection';
-import ExpirationPosts from '../../molecules/creator/dashboard/ExpirationPosts';
 import loadingAnimation from '../../../public/animations/logo-loading-blue.json';
-import SubscriptionStats from '../../molecules/creator/dashboard/SubscriptionStats';
-import EnableSubscription from '../../molecules/creator/dashboard/EnableSubscription';
-import EmptySubscriptionStats from '../../molecules/creator/dashboard/EmptySubscriptionStats';
-
 import { getMyPosts } from '../../../api/endpoints/user';
 import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 import { getMyUrgentPosts } from '../../../api/endpoints/post';
+import FinishProfileSetup from '../../atoms/creator/FinishProfileSetup';
+import { getMyEarnings } from '../../../api/endpoints/payments';
+import dateToTimestamp from '../../../utils/dateToTimestamp';
 
-export const Dashboard = () => {
+const Navigation = dynamic(() => import('../../molecules/creator/Navigation'));
+const DynamicSection = dynamic(
+  () => import('../../molecules/creator/dashboard/DynamicSection')
+);
+const ExpirationPosts = dynamic(
+  () => import('../../molecules/creator/dashboard/ExpirationPosts')
+);
+const EnableSubscription = dynamic(
+  () => import('../../molecules/creator/dashboard/EnableSubscription')
+);
+const SubscriptionStats = dynamic(
+  () => import('../../molecules/creator/dashboard/SubscriptionStats')
+);
+const EmptySubscriptionStats = dynamic(
+  () => import('../../molecules/creator/dashboard/EmptySubscriptionStats')
+);
+const Earnings = dynamic(
+  () => import('../../molecules/creator/dashboard/Earnings')
+);
+const YourTodos = dynamic(
+  () => import('../../molecules/creator/dashboard/YourTodos')
+);
+
+export const Dashboard: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
+  const user = useAppSelector((state) => state.user);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const { mySubscribers } = useGetSubscriptions();
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const [mySubscriptionProduct, setMySubscriptionProduct] =
+    useState<newnewapi.ISubscriptionProduct | null>(null);
   const [isTodosCompleted, setIsTodosCompleted] = useState<boolean>(false);
-  const [isTodosCompletedLoading, setIsTodosCompletedLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [expirationPosts, setExprirationPosts] = useState<newnewapi.IPost[]>([]);
-  const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] = useState(true);
+  const [isEarningsLoading, setIsEarningsLoading] = useState(true);
+  const [isMySubscriptionProductLoading, setIsMySubscriptionProductLoading] =
+    useState(true);
+  const [expirationPosts, setExpirationPosts] = useState<newnewapi.IPost[]>([]);
+  const filter = '7_days';
+  const [myEarnings, setMyEarnings] =
+    useState<newnewapi.GetMyEarningsResponse | undefined>();
+  const [isLoadingExpirationPosts, setIsLoadingExpirationPosts] =
+    useState(true);
   const [hasMyPosts, setHasMyPosts] = useState(false);
+
+  useEffect(() => {
+    user.creatorData?.isLoaded &&
+    user.creatorData?.hasCreatorTags &&
+    user.userData?.bio &&
+    user.userData?.bio.length > 0 &&
+    user.creatorData?.options?.isCreatorConnectedToStripe
+      ? setIsTodosCompleted(true)
+      : setIsTodosCompleted(false);
+  }, [user.creatorData, user.userData]);
 
   const fetchMySubscriptionProduct = async () => {
     try {
@@ -41,8 +81,10 @@ export const Dashboard = () => {
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
       if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+      setIsMySubscriptionProductLoading(false);
     } catch (err) {
       console.error(err);
+      setIsMySubscriptionProductLoading(false);
     }
   };
 
@@ -51,7 +93,7 @@ export const Dashboard = () => {
       const payload = new newnewapi.PagedRequest();
       const res = await getMyUrgentPosts(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.posts) setExprirationPosts(res.data?.posts);
+      if (res.data?.posts) setExpirationPosts(res.data?.posts);
       setIsLoadingExpirationPosts(false);
     } catch (err) {
       setIsLoadingExpirationPosts(false);
@@ -70,14 +112,6 @@ export const Dashboard = () => {
       fetchMySubscriptionProduct();
     }
   }, [mySubscriptionProduct]);
-
-  const todosCompleted = (value: boolean) => {
-    setIsTodosCompleted(value);
-  };
-
-  const todosCompletedLoading = (value: boolean) => {
-    setIsTodosCompletedLoading(value);
-  };
 
   const loadMyPosts = useCallback(async () => {
     if (isLoading) return;
@@ -98,12 +132,45 @@ export const Dashboard = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (isTodosCompleted && !hasMyPosts && !isLoading) {
+    if (!hasMyPosts && !isLoading) {
       loadMyPosts();
     } else {
       setIsLoading(false);
     }
-  }, [isTodosCompleted, isLoading, hasMyPosts, loadMyPosts]);
+  }, [isLoading, hasMyPosts, loadMyPosts]);
+
+  const fetchMyEarnings = useCallback(async () => {
+    try {
+      const payload = new newnewapi.GetMyEarningsRequest({
+        beginDate: dateToTimestamp(
+          moment()
+            .subtract(
+              filter.split('_')[0],
+              filter.split('_')[1] as moment.unitOfTime.DurationConstructor
+            )
+            .startOf('day')
+        ),
+        endDate: dateToTimestamp(new Date()),
+      });
+      const res = await getMyEarnings(payload);
+
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setMyEarnings(res.data);
+      setIsEarningsLoading(false);
+    } catch (err) {
+      setIsEarningsLoading(false);
+      console.error(err);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEarningsLoading]);
+
+  useEffect(() => {
+    if (!myEarnings && isEarningsLoading) {
+      fetchMyEarnings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SContainer>
@@ -113,9 +180,25 @@ export const Dashboard = () => {
           <STitle variant={4}>{t('dashboard.title')}</STitle>
           {!isMobile && <DynamicSection />}
         </STitleBlock>
-        <SBlock name="your-todos">
-          <YourTodos todosCompleted={todosCompleted} todosCompletedLoading={todosCompletedLoading} />
-        </SBlock>
+        {!user.creatorData?.isLoaded ? (
+          <SBlock>
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          </SBlock>
+        ) : (
+          !isTodosCompleted && (
+            <SBlock name='your-todos'>
+              <YourTodos />
+            </SBlock>
+          )
+        )}
         {isLoadingExpirationPosts ? (
           <SBlock>
             <Lottie
@@ -129,28 +212,60 @@ export const Dashboard = () => {
             />
           </SBlock>
         ) : (
-          <SBlock>
-            <ExpirationPosts expirationPosts={expirationPosts} />
-          </SBlock>
+          expirationPosts.length > 0 && (
+            <SBlock>
+              <ExpirationPosts expirationPosts={expirationPosts} />
+            </SBlock>
+          )
         )}
         <SBlock>
-          <Earnings
-            isTodosCompleted={isTodosCompleted}
-            isTodosCompletedLoading={isTodosCompletedLoading}
-            hasMyPosts={hasMyPosts}
-          />
+          {!isEarningsLoading ? (
+            isTodosCompleted ? (
+              <Earnings hasMyPosts={hasMyPosts} earnings={myEarnings} />
+            ) : (
+              <FinishProfileSetup />
+            )
+          ) : (
+            <Lottie
+              width={64}
+              height={64}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: loadingAnimation,
+              }}
+            />
+          )}
         </SBlock>
-        {!mySubscriptionProduct ? (
-          <SBlock noMargin>
-            <EnableSubscription />
-          </SBlock>
+        {!isMySubscriptionProductLoading ? (
+          !mySubscriptionProduct ? (
+            <SBlock noMargin>
+              <EnableSubscription />
+            </SBlock>
+          ) : (
+            <SBlock noMargin>
+              {mySubscribers.length > 0 ? (
+                <SubscriptionStats />
+              ) : (
+                <EmptySubscriptionStats />
+              )}
+            </SBlock>
+          )
         ) : (
-          <SBlock noMargin>{mySubscribers.length > 0 ? <SubscriptionStats /> : <EmptySubscriptionStats />}</SBlock>
+          <Lottie
+            width={64}
+            height={64}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: loadingAnimation,
+            }}
+          />
         )}
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default Dashboard;
 
@@ -169,7 +284,7 @@ const SContainer = styled.div`
 `;
 
 const SContent = styled.div`
-  min-height: calc(100vh - 120px);
+  min-height: 840px;
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
@@ -184,7 +299,9 @@ const SContent = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 interface ISBlock {
   name?: string;
@@ -198,11 +315,10 @@ const SBlock = styled.section<ISBlock>`
       margin-bottom: 24px;
     `}
   ${(props) => props.theme.media.tablet} {
-    min-width: 608px;
     max-width: 100%;
   }
   ${(props) => props.theme.media.laptopL} {
-    max-width: calc(100% - 464px);
+    max-width: calc(100% - 435px);
   }
 `;
 

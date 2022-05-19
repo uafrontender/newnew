@@ -23,7 +23,7 @@ import Button from '../Button';
 import Lottie from '../Lottie';
 import NoResults from './NoResults';
 
-export const SearchInput: React.FC = () => {
+const SearchInput: React.FC = React.memo(() => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const inputRef: any = useRef();
@@ -32,10 +32,9 @@ export const SearchInput: React.FC = () => {
   const [inputRightPosition, setInputRightPosition] = useState(0);
   const [isResultsDropVisible, setIsResultsDropVisible] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [resultsPosts, setResultsPosts] = useState<newnewapi.IPost[]>([]);
   const [resultsCreators, setResultsCreators] = useState<newnewapi.IUser[]>([]);
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const { resizeMode, globalSearchActive } = useAppSelector(
     (state) => state.ui
@@ -45,7 +44,6 @@ export const SearchInput: React.FC = () => {
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
-  const isTablet = ['tablet'].includes(resizeMode);
   const isMobileOrTablet = [
     'mobile',
     'mobileS',
@@ -156,7 +154,7 @@ export const SearchInput: React.FC = () => {
     <>
       {isMobileOrTablet && globalSearchActive ? (
         <SCloseButtonMobile
-          view="tertiary"
+          view='tertiary'
           iconOnly
           onClick={() => {
             handleSearchClose();
@@ -168,8 +166,8 @@ export const SearchInput: React.FC = () => {
           <InlineSVG
             fill={theme.colorsThemed.text.primary}
             svg={closeIcon}
-            width={isTablet ? '24px' : '20px'}
-            height={isTablet ? '24px' : '20px'}
+            width='24px'
+            height='24px'
           />
         </SCloseButtonMobile>
       ) : null}
@@ -195,7 +193,7 @@ export const SearchInput: React.FC = () => {
             value={searchValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Titles, genres, people"
+            placeholder='Search'
           />
           <SRightInlineSVG
             clickable
@@ -236,9 +234,9 @@ export const SearchInput: React.FC = () => {
                 )}
                 <SButton
                   onClick={() => {
-                    router.push(`/search?query=${searchValue}`);
+                    router.push(`/search?query=${searchValue}&tab=decisions`);
                   }}
-                  view="quaternary"
+                  view='quaternary'
                 >
                   All results
                 </SButton>
@@ -277,9 +275,9 @@ export const SearchInput: React.FC = () => {
               )}
               <SButton
                 onClick={() => {
-                  router.push(`/search?query=${searchValue}`);
+                  router.push(`/search?query=${searchValue}&tab=decisions`);
                 }}
-                view="quaternary"
+                view='quaternary'
               >
                 All results
               </SButton>
@@ -289,7 +287,7 @@ export const SearchInput: React.FC = () => {
       )}
     </>
   );
-};
+});
 
 SearchInput.defaultProps = {
   fixed: false,
@@ -438,7 +436,7 @@ const SInputWrapper = styled.div<ISInputWrapper>`
 
   ${({ theme }) => theme.media.tablet} {
     width: ${(props) => (props.active ? 'calc(100vw - 60px - 50px)' : '48px')};
-    padding: 10.5px;
+    padding: 11px;
     border-radius: 16px;
   }
 

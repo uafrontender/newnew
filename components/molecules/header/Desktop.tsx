@@ -1,50 +1,58 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import Link from 'next/link';
 
 import Logo from '../Logo';
 import Button from '../../atoms/Button';
+import Text from '../../atoms/Text';
 import UserAvatar from '../UserAvatar';
 import SearchInput from '../../atoms/search/SearchInput';
 import NavigationItem from '../NavigationItem';
 
 import { useAppSelector } from '../../../redux-store/store';
-import { WalletContext } from '../../../contexts/walletContext';
+// import { WalletContext } from '../../../contexts/walletContext';
 import { useGetChats } from '../../../contexts/chatContext';
+import { useNotifications } from '../../../contexts/notificationsContext';
+import { useGetSubscriptions } from '../../../contexts/subscriptionsContext';
 
-interface IDesktop {}
-
-export const Desktop: React.FC<IDesktop> = () => {
+export const Desktop: React.FC = React.memo(() => {
   const { t } = useTranslation();
-  const router = useRouter();
   const user = useAppSelector((state) => state.user);
-  const { globalSearchActive } = useAppSelector((state) => state.ui);
 
   const { unreadCount } = useGetChats();
-  const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { unreadNotificationCount } = useNotifications();
+  const { globalSearchActive } = useAppSelector((state) => state.ui);
+  // const { walletBalance, isBalanceLoading } = useContext(WalletContext);
+  const { creatorsImSubscribedTo } = useGetSubscriptions();
 
-  const handleCreateClick = () => {
-    if (!user.userData?.options?.isCreator) {
-      router.push('/creator-onboarding-stage-1');
+  const [isCopiedUrl, setIsCopiedUrl] = useState(false);
+
+  async function copyPostUrlToClipboard(url: string) {
+    if ('clipboard' in navigator) {
+      await navigator.clipboard.writeText(url);
     } else {
-      router.push('/creation');
+      document.execCommand('copy', true, url);
     }
-  };
-  const handleDashboardClick = () => {
-    router.push('/creator/dashboard');
-  };
-  const handleUserClick = () => {
-    router.push(
-      user.userData?.options?.isCreator ? '/profile/my-posts' : '/profile'
-    );
-  };
-  const handleSignInClick = () => {
-    router.push('/sign-up');
-  };
-  const handleSignUpClick = () => {
-    router.push('/sign-up');
-  };
+  }
+
+  const handlerCopy = useCallback(() => {
+    if (window) {
+      const url = `${window.location.origin}/${user.userData?.username}`;
+
+      copyPostUrlToClipboard(url)
+        .then(() => {
+          setIsCopiedUrl(true);
+          setTimeout(() => {
+            setIsCopiedUrl(false);
+          }, 1500);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SContainer>
@@ -52,106 +60,129 @@ export const Desktop: React.FC<IDesktop> = () => {
       <SRightBlock>
         {user.loggedIn && !globalSearchActive && (
           <>
-            <SItemWithMargin>
-              <NavigationItem
-                item={{
-                  url: '/notifications',
-                  key: 'notifications',
-                  counter: user.notificationsCount,
-                }}
-              />
-            </SItemWithMargin>
-            {user.loggedIn && (
+            {user.userData?.options?.isCreator && (
+              <SItemWithMargin style={{ paddingRight: 16 }}>
+                <SNavText variant={3} weight={600} onClick={handlerCopy}>
+                  {isCopiedUrl ? t('my-link-copied') : t('my-link')}
+                </SNavText>
+              </SItemWithMargin>
+            )}
+            {(user.userData?.options?.isOfferingSubscription ||
+              creatorsImSubscribedTo.length > 0) && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
                     url: '/direct-messages',
-                    key: 'direct-messages',
+                    key: 'directMessages',
                     counter: unreadCount,
                   }}
                 />
               </SItemWithMargin>
             )}
-            {user.userData?.options?.isCreator ? (
-              <>
-                <SItemWithMargin>
-                  <NavigationItem
-                    item={{
-                      url: '/share',
-                      key: 'share',
-                    }}
-                  />
-                </SItemWithMargin>
-              </>
-            ) : (
+            <SItemWithMargin>
+              <NavigationItem
+                item={{
+                  url: '/notifications',
+                  key: 'notifications',
+                  counter: unreadNotificationCount,
+                }}
+              />
+            </SItemWithMargin>
+            {/* {user.userData?.options?.isCreator && !isBalanceLoading && (
               <SItemWithMargin>
                 <NavigationItem
                   item={{
-                    url: '/my-balance',
+                    url: '/profile/settings',
                     key: 'my-balance',
                     value:
-                      !isBalanceLoading &&
-                      walletBalance &&
-                      walletBalance?.usdCents !== undefined
+                      walletBalance && walletBalance?.usdCents !== undefined
                         ? parseInt((walletBalance.usdCents / 100).toFixed(0)) ??
-                          undefined
+                          0
                         : undefined,
                   }}
                 />
               </SItemWithMargin>
-            )}
+            )} */}
           </>
         )}
-        {user.loggedIn && user.userData?.options?.isCreator && (
-          <SItemWithMargin>
-            <SearchInput />
-          </SItemWithMargin>
-        )}
+        <SItemWithMargin>
+          <SearchInput />
+        </SItemWithMargin>
         {user.loggedIn ? (
           <>
             {user.userData?.options?.isCreator ? (
               <>
                 <SItemWithMargin>
-                  <Button view="quaternary" onClick={handleDashboardClick}>
-                    {t('button-dashboard')}
-                  </Button>
+                  <Link href='/creator/dashboard'>
+                    <a>
+                      <Button view='quaternary'>{t('button-dashboard')}</Button>
+                    </a>
+                  </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <Button
-                    withShadow
-                    view="primaryGrad"
-                    onClick={handleCreateClick}
+                  <Link
+                    href={
+                      !user.userData?.options?.isCreator
+                        ? '/creator-onboarding'
+                        : '/creation'
+                    }
                   >
-                    {t('button-create-decision')}
-                  </Button>
+                    <a>
+                      <Button withShadow view='primaryGrad'>
+                        {t('button-create-decision')}
+                      </Button>
+                    </a>
+                  </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar
-                    withClick
-                    avatarUrl={user.userData?.avatarUrl}
-                    onClick={handleUserClick}
-                  />
+                  <Link
+                    href={
+                      user.userData?.options?.isCreator
+                        ? '/profile/my-posts'
+                        : '/profile'
+                    }
+                  >
+                    <a>
+                      <UserAvatar
+                        withClick
+                        avatarUrl={user.userData?.avatarUrl}
+                      />
+                    </a>
+                  </Link>
                 </SItemWithMargin>
               </>
             ) : (
               <>
                 <SItemWithMargin>
-                  <Button
-                    withDim
-                    withShadow
-                    withShrink
-                    view="primaryGrad"
-                    onClick={handleCreateClick}
+                  <Link
+                    href={
+                      !user.userData?.options?.isCreator
+                        ? '/creator-onboarding'
+                        : '/creation'
+                    }
                   >
-                    {t('button-create-on-newnew')}
-                  </Button>
+                    <a>
+                      <Button withDim withShadow withShrink view='primaryGrad'>
+                        {t('button-create-on-newnew')}
+                      </Button>
+                    </a>
+                  </Link>
                 </SItemWithMargin>
                 <SItemWithMargin>
-                  <UserAvatar
-                    withClick
-                    avatarUrl={user.userData?.avatarUrl}
-                    onClick={handleUserClick}
-                  />
+                  <Link
+                    href={
+                      user.userData?.options?.isCreator
+                        ? '/profile/my-posts'
+                        : '/profile'
+                    }
+                  >
+                    <a>
+                      <UserAvatar
+                        withClick
+                        avatarUrl={user.userData?.avatarUrl}
+                      />
+                    </a>
+                  </Link>
                 </SItemWithMargin>
               </>
             )}
@@ -159,27 +190,27 @@ export const Desktop: React.FC<IDesktop> = () => {
         ) : (
           <>
             <SItemWithMargin>
-              <Button view="quaternary" onClick={handleSignInClick}>
-                {t('button-login-in')}
-              </Button>
+              <Link href='/sign-up?to=log-in'>
+                <a>
+                  <Button view='quaternary'>{t('button-login-in')}</Button>
+                </a>
+              </Link>
             </SItemWithMargin>
             <SItemWithMargin>
-              <Button
-                withDim
-                withShrink
-                withShadow
-                view="primaryGrad"
-                onClick={handleSignUpClick}
-              >
-                {t('button-sign-up')}
-              </Button>
+              <Link href='/sign-up'>
+                <a>
+                  <Button withDim withShrink withShadow view='primaryGrad'>
+                    {t('button-sign-up')}
+                  </Button>
+                </a>
+              </Link>
             </SItemWithMargin>
           </>
         )}
       </SRightBlock>
     </SContainer>
   );
-};
+});
 
 export default Desktop;
 
@@ -198,4 +229,12 @@ const SRightBlock = styled.nav`
 
 const SItemWithMargin = styled.div`
   margin-left: 16px;
+  position: relative;
+`;
+
+const SNavText = styled(Text)`
+  color: ${(props) => props.theme.colorsThemed.text.primary};
+  opacity: 0.5;
+  transition: opacity ease 0.5s;
+  cursor: pointer;
 `;

@@ -1,10 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
-import React, {
-  useEffect,
-  useRef,
-} from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useRef } from 'react';
+import styled, { useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
 import { motion } from 'framer-motion';
@@ -32,131 +29,134 @@ interface IAcOptionsTabModeration {
   optionsLoading: boolean;
   pagingToken: string | undefined | null;
   handleLoadBids: (token?: string) => void;
+  handleRemoveOption: (optionToDelete: newnewapi.Auction.Option) => void;
   handleUpdatePostStatus: (postStatus: number | string) => void;
-  handleUpdateWinningOptionId: (id: number) => void;
+  handleUpdateWinningOption: (winningOption: newnewapi.Auction.Option) => void;
 }
 
-const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> = ({
-  postId,
-  postStatus,
-  options,
-  optionsLoading,
-  pagingToken,
-  handleLoadBids,
-  handleUpdatePostStatus,
-  handleUpdateWinningOptionId,
-}) => {
-  const { t } = useTranslation('decision');
-  const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  // Infinite load
-  const {
-    ref: loadingRef,
-    inView,
-  } = useInView();
+const AcOptionsTabModeration: React.FunctionComponent<IAcOptionsTabModeration> =
+  ({
+    postId,
+    postStatus,
+    options,
+    optionsLoading,
+    pagingToken,
+    handleLoadBids,
+    handleRemoveOption,
+    handleUpdatePostStatus,
+    handleUpdateWinningOption,
+  }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
+    const { resizeMode } = useAppSelector((state) => state.ui);
+    const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+      resizeMode
+    );
+    // Infinite load
+    const { ref: loadingRef, inView } = useInView();
 
-  const containerRef = useRef<HTMLDivElement>();
-  const { showTopGradient, showBottomGradient } = useScrollGradients(containerRef);
+    const containerRef = useRef<HTMLDivElement>();
+    const { showTopGradient, showBottomGradient } =
+      useScrollGradients(containerRef);
 
-  const mainContainer = useRef<HTMLDivElement>();
+    const mainContainer = useRef<HTMLDivElement>();
 
-  const handleConfirmWinningOption = async (winningOption: newnewapi.Auction.Option) => {
-    try {
-      const payload = new newnewapi.SelectWinningOptionRequest({
-        postUuid: postId,
-        winningOptionId: winningOption.id,
-      });
+    const handleConfirmWinningOption = async (
+      winningOption: newnewapi.Auction.Option
+    ) => {
+      try {
+        const payload = new newnewapi.SelectWinningOptionRequest({
+          postUuid: postId,
+          winningOptionId: winningOption.id,
+        });
 
-      const res = await selectWinningOption(payload);
+        const res = await selectWinningOption(payload);
 
-      if (res.data) {
-        handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
-        handleUpdateWinningOptionId(winningOption.id as number);
+        if (res.data) {
+          handleUpdatePostStatus(newnewapi.Auction.Status.WAITING_FOR_RESPONSE);
+          handleUpdateWinningOption(winningOption);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    };
 
-  useEffect(() => {
-    if (inView && !optionsLoading && pagingToken) {
-      handleLoadBids(pagingToken);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, pagingToken, optionsLoading]);
+    useEffect(() => {
+      if (inView && !optionsLoading && pagingToken) {
+        handleLoadBids(pagingToken);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inView, pagingToken, optionsLoading]);
 
-  return (
-    <>
-      <STabContainer
-        key="bids"
-        ref={(el) => {
-          mainContainer.current = el!!;
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        {options.length === 0 && !optionsLoading && postStatus !== 'failed' ? (
-          <SNoOptionsYet>
-            <SNoOptionsImgContainer>
-              <img
-                src={NoContentYetImg.src}
-                alt='No content yet'
-              />
-            </SNoOptionsImgContainer>
-            <SNoOptionsCaption
-              variant={3}
-            >
-              { t('AcPostModeration.OptionsTab.NoOptions.caption_1') }
-            </SNoOptionsCaption>
-            <SNoOptionsCaption
-              variant={3}
-            >
-              { t('AcPostModeration.OptionsTab.NoOptions.caption_2') }
-            </SNoOptionsCaption>
-          </SNoOptionsYet>
-        ) : null}
-        <SBidsContainer
+    return (
+      <>
+        <STabContainer
+          key='bids'
           ref={(el) => {
-            containerRef.current = el!!;
+            mainContainer.current = el!!;
           }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         >
-          {!isMobile ? (
-            <>
-              <GradientMask gradientType="secondary" positionTop active={showTopGradient} />
-              <GradientMask gradientType="secondary" positionBottom={0} active={showBottomGradient} />
-            </>
+          {options.length === 0 &&
+          !optionsLoading &&
+          postStatus !== 'failed' ? (
+            <SNoOptionsYet>
+              <SNoOptionsImgContainer>
+                <img src={NoContentYetImg.src} alt='No content yet' />
+              </SNoOptionsImgContainer>
+              <SNoOptionsCaption variant={3}>
+                {t('AcPostModeration.OptionsTab.NoOptions.caption_1')}
+              </SNoOptionsCaption>
+            </SNoOptionsYet>
           ) : null}
-          {options.map((option, i) => (
-            <AcOptionCardModeration
-              index={i}
-              key={option.id.toString()}
-              postStatus={postStatus}
-              option={option as TAcOptionWithHighestField}
-              handleConfirmWinningOption={() => handleConfirmWinningOption(option)}
-            />
-          ))}
-          {!isMobile ? (
-            <SLoaderDiv
-              ref={loadingRef}
-            />
-          ) : (
-            pagingToken ? (
-              (
-                <SLoadMoreBtn
-                  view="secondary"
-                  onClick={() => handleLoadBids(pagingToken)}
-                >
-                  { t('loadMoreBtn') }
-                </SLoadMoreBtn>
-              )
-            ) : null
-          )}
-        </SBidsContainer>
-      </STabContainer>
-    </>
-  );
-};
+          <SBidsContainer
+            ref={(el) => {
+              containerRef.current = el!!;
+            }}
+          >
+            {!isMobile ? (
+              <>
+                <GradientMask
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                  positionTop
+                  active={showTopGradient}
+                />
+                <GradientMask
+                  gradientType={theme.name === 'dark' ? 'secondary' : 'primary'}
+                  positionBottom={0}
+                  active={showBottomGradient}
+                />
+              </>
+            ) : null}
+            {options.map((option, i) => (
+              <AcOptionCardModeration
+                index={i}
+                key={option.id.toString()}
+                postStatus={postStatus}
+                option={option as TAcOptionWithHighestField}
+                handleRemoveOption={handleRemoveOption}
+                handleConfirmWinningOption={() =>
+                  handleConfirmWinningOption(option)
+                }
+              />
+            ))}
+            {!isMobile ? (
+              <SLoaderDiv ref={loadingRef} />
+            ) : pagingToken ? (
+              <SLoadMoreBtn
+                view='secondary'
+                onClick={() => handleLoadBids(pagingToken)}
+              >
+                {t('loadMoreBtn')}
+              </SLoadMoreBtn>
+            ) : null}
+          </SBidsContainer>
+        </STabContainer>
+      </>
+    );
+  };
 
 AcOptionsTabModeration.defaultProps = {};
 
@@ -180,6 +180,10 @@ const SBidsContainer = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     height: 100%;
+    padding-top: 0px;
+    padding-right: 12px;
+    margin-right: -14px;
+    width: calc(100% + 14px);
 
     // Scrollbar
     &::-webkit-scrollbar {
@@ -189,12 +193,12 @@ const SBidsContainer = styled.div`
     &::-webkit-scrollbar-track {
       background: transparent;
       border-radius: 4px;
-      transition: .2s linear;
+      transition: 0.2s linear;
     }
     &::-webkit-scrollbar-thumb {
       background: transparent;
       border-radius: 4px;
-      transition: .2s linear;
+      transition: 0.2s linear;
     }
 
     &:hover {
@@ -231,7 +235,6 @@ const SNoOptionsYet = styled.div`
 `;
 
 const SNoOptionsImgContainer = styled.div`
-  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-export const useScrollGradientsHorizontal = (ref: React.MutableRefObject<HTMLDivElement | undefined>) => {
+export const useScrollGradientsHorizontal = (
+  ref: React.MutableRefObject<HTMLDivElement | undefined>
+) => {
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(() => {
     const scrollX = ref.current?.scrollLeft;
@@ -10,7 +12,9 @@ export const useScrollGradientsHorizontal = (ref: React.MutableRefObject<HTMLDiv
   });
 
   useEffect(() => {
-    setShowRightGradient(ref.current?.scrollWidth!! > ref.current?.clientWidth!!);
+    setShowRightGradient(
+      ref.current?.scrollWidth!! > ref.current?.clientWidth!!
+    );
 
     const handleScroll = () => {
       const scrollX = ref.current?.scrollLeft;

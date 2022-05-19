@@ -56,23 +56,36 @@ const ChatEllipseModal: React.FunctionComponent<IChatEllipseModal> = ({
             </>
           )}
           <SButton onClick={reportUserHandler}>
-            <Text variant={2}>{!isAnnouncement ? t('ellipse.report-user') : t('ellipse.report-group')}</Text>
+            <Text variant={2} tone='error'>
+              {!isAnnouncement
+                ? t('ellipse.report-user')
+                : t('ellipse.report-group')}
+            </Text>
           </SButton>
           <SSeparator />
           <SButton onClick={blockUserHandler}>
             {!isAnnouncement ? (
-              <Text variant={2}>{userBlocked ? t('ellipse.unblock-user') : t('ellipse.block-user')}</Text>
+              <Text variant={2}>
+                {userBlocked
+                  ? t('ellipse.unblock-user')
+                  : t('ellipse.block-user')}
+              </Text>
             ) : (
-              <Text variant={2}>{userBlocked ? t('ellipse.unblock-group') : t('ellipse.block-group')}</Text>
+              <Text variant={2}>
+                {userBlocked
+                  ? t('ellipse.unblock-group')
+                  : t('ellipse.block-group')}
+              </Text>
             )}
           </SButton>
         </SContentContainer>
         <Button
-          view="modalSecondary"
+          view='modalSecondary'
           style={{
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={onClose}
         >
           {t('Cancel')}
         </Button>
@@ -108,9 +121,13 @@ const SContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   background: ${(props) =>
-    props.theme.name === 'light' ? props.theme.colors.white : props.theme.colorsThemed.background.tertiary};
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colorsThemed.background.tertiary};
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
+
+  z-index: 1;
 
   ${({ theme }) => theme.media.tablet} {
     width: 480px;

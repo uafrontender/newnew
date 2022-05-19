@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 import React, { useRef, useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import dynamic from 'next/dynamic';
@@ -13,11 +14,13 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import Headline from '../../../atoms/Headline';
 import InlineSVG from '../../../atoms/InlineSVG';
-import PublishedModal from '../../../molecules/creation/PublishedModal';
 
 import { createPost } from '../../../../api/endpoints/post';
 import { maxLength, minLength } from '../../../../utils/validation';
-import { clearCreation, setPostData } from '../../../../redux-store/slices/creationStateSlice';
+import {
+  clearCreation,
+  setPostData,
+} from '../../../../redux-store/slices/creationStateSlice';
 import { useAppDispatch, useAppSelector } from '../../../../redux-store/store';
 
 import {
@@ -28,10 +31,14 @@ import {
 } from '../../../../constants/general';
 
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
+import useLeavePageConfirm from '../../../../utils/hooks/useLeavePageConfirm';
 
 const BitmovinPlayer = dynamic(() => import('../../../atoms/BitmovinPlayer'), {
   ssr: false,
 });
+const PublishedModal = dynamic(
+  () => import('../../../molecules/creation/PublishedModal')
+);
 
 interface IPreviewContent {}
 
@@ -44,7 +51,15 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const playerRef: any = useRef(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { post, auction, crowdfunding, multiplechoice, videoProcessing } = useAppSelector((state) => state.creation);
+  const {
+    post,
+    auction,
+    crowdfunding,
+    multiplechoice,
+    videoProcessing,
+    fileProcessing,
+  } = useAppSelector((state) => state.creation);
+  const { userData } = useAppSelector((state) => state.user);
   const validateText = useCallback(
     (text: string, min: number, max: number) => {
       let error = minLength(tCommon, text, min);
@@ -61,23 +76,71 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
   const {
     query: { tab },
   } = router;
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const titleIsValid = !validateText(post.title, CREATION_TITLE_MIN, CREATION_TITLE_MAX);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const isTablet = ['tablet'].includes(resizeMode);
+  const isDesktop = !isMobile && !isTablet;
+
+  const allowedRoutes = [
+    '/creation',
+    '/creation/auction',
+    '/creation/multiple-choice',
+    '/creation/crowdfunding',
+    '/creation/auction/preview',
+    '/creation/multiple-choice/preview',
+    '/creation/crowdfunding/preview',
+    '/creation/auction/published',
+    '/creation/multiple-choice/published',
+    '/creation/crowdfunding/published',
+  ];
+
+  if (isDesktop) {
+    allowedRoutes.push('/');
+  }
+
+  useLeavePageConfirm(
+    showModal ? false : true,
+    t('secondStep.modal.leave.message'),
+    allowedRoutes
+  );
+
+  const titleIsValid = !validateText(
+    post.title,
+    CREATION_TITLE_MIN,
+    CREATION_TITLE_MAX
+  );
   const optionsAreValid =
     tab !== 'multiple-choice' ||
-    multiplechoice.choices.findIndex((item) => validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)) ===
-      -1;
-  const disabled = loading || !titleIsValid || !post.title || !post.announcementVideoUrl || !optionsAreValid;
+    multiplechoice.choices.findIndex((item) =>
+      validateText(item.text, CREATION_OPTION_MIN, CREATION_OPTION_MAX)
+    ) === -1;
+  const disabled =
+    loading ||
+    !titleIsValid ||
+    !post.title ||
+    !post.announcementVideoUrl ||
+    !optionsAreValid;
 
   const formatStartsAt: () => any = useCallback(() => {
-    const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
+    const time = moment(
+      `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+      ['hh:mm a']
+    );
 
-    return moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+    return moment(post.startsAt.date)
+      .hours(time.hours())
+      .minutes(time.minutes());
   }, [post.startsAt]);
   const formatExpiresAt: (inSeconds?: boolean) => any = useCallback(
     (inSeconds = false) => {
-      const time = moment(`${post.startsAt.time} ${post.startsAt['hours-format']}`, ['hh:mm a']);
-      const dateValue = moment(post.startsAt.date).hours(time.hours()).minutes(time.minutes());
+      const time = moment(
+        `${post.startsAt.time} ${post.startsAt['hours-format']}`,
+        ['hh:mm a']
+      );
+      const dateValue = moment(post.startsAt.date)
+        .hours(time.hours())
+        .minutes(time.minutes());
       let seconds = 0;
 
       if (post.expiresAt === '1-hour') {
@@ -151,7 +214,9 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         };
       } else if (tab === 'multiple-choice') {
         body.multiplechoice = {
-          options: multiplechoice.choices.map((choice) => ({ text: choice.text })),
+          options: multiplechoice.choices.map((choice) => ({
+            text: choice.text,
+          })),
           isSuggestionsAllowed: multiplechoice.options.allowSuggestions,
         };
       } else if (tab === 'crowdfunding') {
@@ -174,14 +239,25 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       if (isMobile) {
         router.push(`/creation/${tab}/published`);
       } else {
-        playerRef.current.pause();
+        playerRef?.current?.pause();
         setShowModal(true);
       }
     } catch (err: any) {
       toast.error(err);
       setLoading(false);
     }
-  }, [tab, post, router, auction, isMobile, dispatch, crowdfunding, multiplechoice, formatStartsAt, formatExpiresAt]);
+  }, [
+    tab,
+    post,
+    router,
+    auction,
+    isMobile,
+    dispatch,
+    crowdfunding,
+    multiplechoice,
+    formatStartsAt,
+    formatExpiresAt,
+  ]);
   const settings: any = useMemo(
     () =>
       _compact([
@@ -203,16 +279,25 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
         },
         {
           key: 'comments',
-          value: t(`preview.values.${post.options.commentsEnabled ? 'comments-allowed' : 'comments-forbidden'}`),
-        },
-        tab === 'multiple-choice' && {
-          key: 'allowSuggestions',
           value: t(
             `preview.values.${
-              multiplechoice.options.allowSuggestions ? 'allowSuggestions-allowed' : 'allowSuggestions-forbidden'
+              post.options.commentsEnabled
+                ? 'comments-allowed'
+                : 'comments-forbidden'
             }`
           ),
         },
+        tab === 'multiple-choice' &&
+          userData?.options?.isOfferingSubscription && {
+            key: 'allowSuggestions',
+            value: t(
+              `preview.values.${
+                multiplechoice.options.allowSuggestions
+                  ? 'allowSuggestions-allowed'
+                  : 'allowSuggestions-forbidden'
+              }`
+            ),
+          },
       ]),
     [
       t,
@@ -222,6 +307,7 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
       auction.minimalBid,
       crowdfunding.targetBackerCount,
       multiplechoice?.options?.allowSuggestions,
+      userData?.options?.isOfferingSubscription,
       formatExpiresAt,
     ]
   );
@@ -256,23 +342,38 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
               clickable
               svg={chevronLeftIcon}
               fill={theme.colorsThemed.text.secondary}
-              width="20px"
-              height="20px"
+              width='20px'
+              height='20px'
               onClick={handleGoBack}
             />
             <SHeadlineMobile variant={2} weight={600}>
               {post.title}
             </SHeadlineMobile>
           </STopLine>
-          {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
+          {tab === 'multiple-choice' && (
+            <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
+          )}
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SPlayerWrapper>
-            <BitmovinPlayer id="preview-mobile" muted={false} resources={videoProcessing?.targetUrls} />
+            {fileProcessing.progress === 100 ? (
+              <BitmovinPlayer
+                id='preview-mobile'
+                muted={false}
+                resources={videoProcessing?.targetUrls}
+              />
+            ) : (
+              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+            )}
           </SPlayerWrapper>
         </SContent>
         <SButtonWrapper>
           <SButtonContent>
-            <SButton view="primaryGrad" loading={loading} onClick={handleSubmit} disabled={disabled}>
+            <SButton
+              view='primaryGrad'
+              loading={loading}
+              onClick={handleSubmit}
+              disabled={disabled}
+            >
               {t('preview.button.submit')}
             </SButton>
           </SButtonContent>
@@ -285,30 +386,41 @@ export const PreviewContent: React.FC<IPreviewContent> = () => {
     <>
       <PublishedModal open={showModal} handleClose={handleCloseModal} />
       <SHeadLine variant={3} weight={600}>
-        {t('preview.title')}
+        {t(`preview.title-${router?.query?.tab}`)}
       </SHeadLine>
       <STabletContent>
         <SLeftPart>
           <STabletPlayer>
-            <BitmovinPlayer
-              withMuteControl
-              id="preview"
-              innerRef={playerRef}
-              resources={videoProcessing?.targetUrls}
-              mutePosition="left"
-              borderRadius="16px"
-            />
+            {fileProcessing.progress === 100 ? (
+              <BitmovinPlayer
+                withMuteControl
+                id='preview'
+                innerRef={playerRef}
+                resources={videoProcessing?.targetUrls}
+                mutePosition='left'
+                borderRadius='16px'
+              />
+            ) : (
+              <SText variant={2}>{t('video-being-processed-caption')}</SText>
+            )}
           </STabletPlayer>
         </SLeftPart>
         <SRightPart>
           <SHeadline variant={5}>{post.title}</SHeadline>
-          {tab === 'multiple-choice' && <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>}
+          {tab === 'multiple-choice' && (
+            <SChoices>{multiplechoice.choices.map(renderChoice)}</SChoices>
+          )}
           <SSettings>{settings.map(renderSetting)}</SSettings>
           <SButtonsWrapper>
-            <Button view="secondary" onClick={handleClose} disabled={loading}>
+            <Button view='secondary' onClick={handleClose} disabled={loading}>
               {t('preview.button.edit')}
             </Button>
-            <Button view="primaryGrad" loading={loading} onClick={handleSubmit} disabled={disabled}>
+            <Button
+              view='primaryGrad'
+              loading={loading}
+              onClick={handleSubmit}
+              disabled={disabled}
+            >
               {t('preview.button.submit')}
             </Button>
           </SButtonsWrapper>
@@ -485,4 +597,13 @@ const STopLine = styled.div`
 const SInlineSVG = styled(InlineSVG)`
   min-width: 20px;
   min-height: 20px;
+`;
+
+const SText = styled(Text)`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: left;
+
+  ${({ theme }) => theme.media.tablet} {
+    text-align: center;
+  }
 `;

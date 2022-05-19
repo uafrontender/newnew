@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactEventHandler, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import InlineSVG from '../InlineSVG';
 import { useAppSelector } from '../../../redux-store/store';
@@ -14,14 +14,22 @@ interface ISearchInput {
   passInputValue?: (str: string) => void;
 }
 
-const SearchInput: React.FC<ISearchInput> = ({ placeholderText, bgColor, style, fontSize, passInputValue }) => {
+const SearchInput: React.FC<ISearchInput> = ({
+  placeholderText,
+  bgColor,
+  style,
+  fontSize,
+  passInputValue,
+}) => {
   const theme = useTheme();
   const inputRef: any = useRef();
   const [searchValue, setSearchValue] = useState('');
   const [focusedInput, setFocusedInput] = useState<boolean>(false);
   const { resizeMode } = useAppSelector((state) => state.ui);
 
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
@@ -136,9 +144,6 @@ const SInput = styled.input<ISInput>`
 
   ::placeholder {
     color: ${(props) => props.theme.colorsThemed.text.quaternary};
-  }
-  ::focus {
-    border-color: ;
   }
 `;
 

@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
 
 import InlineSVG from '../../atoms/InlineSVG';
-import OptionItem from '../../molecules/creation/DraggableOptionItem';
+import DraggableOptionItem from '../../molecules/creation/DraggableOptionItem';
 
 import plusIcon from '../../../public/images/svg/icons/outlined/Plus.svg';
 
@@ -18,18 +18,14 @@ interface IDraggableMobileOptions {
     text: string,
     min: number,
     max: number,
-    kind: newnewapi.ValidateTextRequest.Kind,
+    kind: newnewapi.ValidateTextRequest.Kind
   ) => Promise<string>;
 }
 
-export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props) => {
-  const {
-    id,
-    min,
-    options,
-    onChange,
-    validation,
-  } = props;
+export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (
+  props
+) => {
+  const { id, min, options, onChange, validation } = props;
   const theme = useTheme();
   const { t } = useTranslation('creation');
 
@@ -49,7 +45,7 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props)
   };
 
   const renderItem = (item: any, index: number) => (
-    <OptionItem
+    <DraggableOptionItem
       key={`draggable-option-${item.id}`}
       item={item}
       index={index}
@@ -59,19 +55,18 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props)
     />
   );
   const handleAddNewOption = () => {
-    onChange(id, [...options, {
-      id: Date.now(),
-      text: '',
-    }]);
+    onChange(id, [
+      ...options,
+      {
+        id: Date.now(),
+        text: '',
+      },
+    ]);
   };
 
   return (
     <>
-      <SList
-        axis="y"
-        values={options}
-        onReorder={onReorder}
-      >
+      <SList axis='y' values={options} onReorder={onReorder}>
         {options.map(renderItem)}
       </SList>
       {options.length < 4 && (
@@ -79,12 +74,10 @@ export const DraggableMobileOptions: React.FC<IDraggableMobileOptions> = (props)
           <InlineSVG
             svg={plusIcon}
             fill={theme.colorsThemed.text.secondary}
-            width="24px"
-            height="24px"
+            width='24px'
+            height='24px'
           />
-          <STitle>
-            {t('secondStep.field.choices.add')}
-          </STitle>
+          <STitle>{t('secondStep.field.choices.add')}</STitle>
         </SNewOption>
       )}
     </>

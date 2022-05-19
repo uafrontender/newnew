@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import styled, { css, useTheme } from 'styled-components';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 
 import { TUserData } from '../../../redux-store/slices/userStateSlice';
 
@@ -15,16 +14,15 @@ import DownloadIcon from '../../../public/images/svg/icons/outlined/Upload.svg';
 import Caption from '../../atoms/Caption';
 
 type ITransactionCard = {
-  cardInfo: TTransactionsSectionItem,
-  currentUser: TUserData,
-}
+  cardInfo: TTransactionsSectionItem;
+  currentUser: TUserData;
+};
 
 const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
   cardInfo,
   currentUser,
 }) => {
   const theme = useTheme();
-  const router = useRouter();
   const { t } = useTranslation('profile');
 
   return (
@@ -32,80 +30,61 @@ const TransactionCard: React.FunctionComponent<ITransactionCard> = ({
       <SInlineSvg
         svg={DownloadIcon}
         fill={theme.colorsThemed.text.tertiary}
-        width="20px"
-        height="20px"
+        width='20px'
+        height='20px'
       />
       <SAvatar>
-        <img
-          alt={cardInfo.actor.username}
-          src={cardInfo.actor.avatarUrl}
-        />
+        <img alt={cardInfo.actor.username} src={cardInfo.actor.avatarUrl} />
       </SAvatar>
-      <SActor
-        variant={3}
-        weight={600}
-      >
-        {cardInfo.actor.username === currentUser.username ? (
-          t('Settings.sections.Transactions.you')
-        ) : cardInfo.actor.username}
+      <SActor variant={3} weight={600}>
+        {cardInfo.actor.username === currentUser.username
+          ? t('Settings.sections.Transactions.you')
+          : cardInfo.actor.username}
       </SActor>
-      <SAction
-        variant={2}
-      >
-        {cardInfo.action === 'topup'
-          ? (
-            t('Settings.sections.Transactions.actions.topup')
-          ) : (
-            <>
-              <span>
-                { t(`Settings.sections.Transactions.actions.${cardInfo.action}`) }
-                {' '}
-              </span>
-              <Link
-                href={`/${cardInfo.recipient.username}`}
-              >
-                <a href={`/${cardInfo.recipient.username}`}>
-                  {cardInfo.recipient.username}
-                  {'\'s '}
-                </a>
-              </Link>
-              <span>
-                { t('Settings.sections.Transactions.actions.decision') }
-              </span>
-            </>
-          )}
+      <SAction variant={2}>
+        {cardInfo.action === 'topup' ? (
+          t('Settings.sections.Transactions.actions.topup')
+        ) : (
+          <>
+            <span>
+              {t(`Settings.sections.Transactions.actions.${cardInfo.action}`)}{' '}
+            </span>
+            <Link href={`/${cardInfo.recipient.username}`}>
+              <a href={`/${cardInfo.recipient.username}`}>
+                {cardInfo.recipient.username}
+                {"'s "}
+              </a>
+            </Link>
+            <span>{t('Settings.sections.Transactions.actions.decision')}</span>
+          </>
+        )}
       </SAction>
-      <SAmount
-        variant={3}
-        weight={600}
-        direction={cardInfo.direction}
-      >
-        {cardInfo.direction === 'from' ? (
-          <span>
-            -
-            {' '}
-          </span>
-        ) : null}
-        $
+      <SAmount variant={3} weight={600} direction={cardInfo.direction}>
+        {cardInfo.direction === 'from' ? <span>- </span> : null}$
         {cardInfo.amount.toFixed(2)}
       </SAmount>
-      <SDate
-        variant={2}
-      >
-        { cardInfo.date.toLocaleDateString(router.locale).replaceAll('/', '.') }
-      </SDate>
+      <SDate variant={2}>{getFormattedDate(cardInfo.date)}</SDate>
     </STransactionCard>
   );
 };
 
 export default TransactionCard;
 
+function getFormattedDate(date: Date): string {
+  return date
+    .toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+    .replaceAll(',', '');
+}
+
 const STransactionCard = styled.div`
   display: grid;
   grid-template-areas:
-  'download actor actor amount'
-  'download action action date'
-  ;
+    'download actor actor amount'
+    'download action action date';
   grid-template-columns: 36px 4fr 4fr 2fr;
   align-items: center;
 
@@ -122,9 +101,8 @@ const STransactionCard = styled.div`
 
   ${({ theme }) => theme.media.tablet} {
     grid-template-areas:
-    'avatar actor actor date amount download'
-    'avatar action action date amount download'
-    ;
+      'avatar actor actor date amount download'
+      'avatar action action date amount download';
     grid-template-columns: 52px 2fr 2fr 2fr 1fr 1fr;
   }
 `;
@@ -181,15 +159,18 @@ const SAction = styled(Caption)`
 `;
 
 const SAmount = styled(Text)<{
-  direction: 'to' | 'from'
+  direction: 'to' | 'from';
 }>`
   grid-area: amount;
 
   text-align: right;
 
-  ${({ direction }) => (direction === 'to' ? css`
-    color: ${({ theme }) => theme.colorsThemed.accent.green};
-  ` : null)}
+  ${({ direction }) =>
+    direction === 'to'
+      ? css`
+          color: ${({ theme }) => theme.colorsThemed.accent.green};
+        `
+      : null}
 `;
 
 const SDate = styled(Caption)`

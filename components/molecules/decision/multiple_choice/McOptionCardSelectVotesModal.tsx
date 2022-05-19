@@ -22,78 +22,77 @@ interface IMcOptionCardSelectVotesModal {
   handleSetAmountAndOpenModal: (votesAmount: string) => void;
 }
 
-const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectVotesModal> = ({
-  isVisible,
-  isSupportedByMe,
-  availableVotes,
-  handleClose,
-  handleOpenCustomAmountModal,
-  handleSetAmountAndOpenModal,
-  children,
-}) => {
-  const theme = useTheme();
-  const { t } = useTranslation('decision');
+const McOptionCardSelectVotesModal: React.FunctionComponent<IMcOptionCardSelectVotesModal> =
+  ({
+    isVisible,
+    isSupportedByMe,
+    availableVotes,
+    handleClose,
+    handleOpenCustomAmountModal,
+    handleSetAmountAndOpenModal,
+    children,
+  }) => {
+    const theme = useTheme();
+    const { t } = useTranslation('decision');
 
-  const { appConstants } = useGetAppConstants();
+    const { appConstants } = useGetAppConstants();
 
-  return (
-    <Modal show={isVisible} overlayDim additionalZ={10} onClose={handleClose}>
-      <SContainer>
-        <STitleContainer>
-          <STitleText
-            variant={6}
-          >
-            {!isSupportedByMe ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes')}
-          </STitleText>
-          <SCancelButton
-              view="transparent"
+    return (
+      <Modal show={isVisible} overlayDim additionalZ={10} onClose={handleClose}>
+        <SContainer>
+          <STitleContainer>
+            <STitleText variant={6}>
+              {!isSupportedByMe
+                ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.title')
+                : t(
+                    'McPost.OptionsTab.OptionCard.selectVotesMenu.title_more_votes'
+                  )}
+            </STitleText>
+            <SCancelButton
+              view='transparent'
               iconOnly
               onClick={() => handleClose()}
             >
               <InlineSvg
                 svg={CancelIcon}
                 fill={theme.colorsThemed.text.primary}
-                width="24px"
-                height="24px"
+                width='24px'
+                height='24px'
               />
             </SCancelButton>
-        </STitleContainer>
-        { children }
-        <SButtonsContainer>
-          {availableVotes.map((amount) => (
-            <SButton
-              key={amount}
-              onClick={() => handleSetAmountAndOpenModal(amount.toString())}
-            >
-              <Text
-                variant={3}
+          </STitleContainer>
+          {children}
+          <SButtonsContainer>
+            {availableVotes.map((amount) => (
+              <SButton
+                key={amount}
+                onClick={() => handleSetAmountAndOpenModal(amount.toString())}
               >
-                <SBoldSpan>
-                  {amount}
-                  {' '}
-                  {amount === 1 ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote') : t('McPost.OptionsTab.OptionCard.selectVotesMenu.votes')}
-                </SBoldSpan>
-                {' '}
-                <SOpaqueSpan>
-                  {`($${amount * Math.round(appConstants.mcVotePrice / 100)})`}
-                </SOpaqueSpan>
+                <Text variant={3}>
+                  <SBoldSpan>
+                    {amount}{' '}
+                    {amount === 1
+                      ? t('McPost.OptionsTab.OptionCard.selectVotesMenu.vote')
+                      : t('McPost.OptionsTab.OptionCard.selectVotesMenu.votes')}
+                  </SBoldSpan>{' '}
+                  <SOpaqueSpan>
+                    {`($${
+                      amount * Math.round(appConstants.mcVotePrice / 100)
+                    })`}
+                  </SOpaqueSpan>
+                </Text>
+              </SButton>
+            ))}
+            <SButton onClick={() => handleOpenCustomAmountModal()}>
+              <Text variant={3}>
+                {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
               </Text>
             </SButton>
-          ))}
-          <SButton
-            onClick={() => handleOpenCustomAmountModal()}
-          >
-            <Text
-              variant={3}
-            >
-              {t('McPost.OptionsTab.OptionCard.selectVotesMenu.custom')}
-            </Text>
-          </SButton>
-        </SButtonsContainer>
-      </SContainer>
-    </Modal>
-  );
-};
+          </SButtonsContainer>
+        </SContainer>
+      </Modal>
+    );
+  };
 
 export default McOptionCardSelectVotesModal;
 
@@ -107,7 +106,6 @@ const SContainer = styled(motion.div)`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
   background-color: ${({ theme }) => theme.colorsThemed.background.secondary};
-
 `;
 
 const STitleContainer = styled.div`
@@ -119,7 +117,7 @@ const STitleContainer = styled.div`
 `;
 
 const SCancelButton = styled(Button)`
-
+  background: ${({ theme }) => theme.colorsThemed.background.quaternary};
 `;
 
 const STitleText = styled(Headline)`
@@ -149,19 +147,19 @@ const SButton = styled.button`
   font-size: 14px;
   line-height: 20px;
 
-  &:focus, &:hover, &:active {
+  &:focus,
+  &:hover,
+  &:active {
     outline: none;
 
-    background: #FFFFFF;
+    background: #ffffff;
     div {
       color: ${({ theme }) => theme.colors.dark};
     }
   }
 `;
 
-const SBoldSpan = styled.span`
-
-`;
+const SBoldSpan = styled.span``;
 
 const SOpaqueSpan = styled.span`
   opacity: 0.8;

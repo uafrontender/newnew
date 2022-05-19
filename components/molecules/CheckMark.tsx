@@ -14,29 +14,27 @@ interface ICheckMark {
   handleChange: (e: any, id?: string) => void;
 }
 
-export const CheckMark: React.FC<ICheckMark> = (props) => {
-  const {
-    id,
-    label,
-    selected,
-    disabled,
-    handleChange,
-    ...rest
-  } = props;
+const CheckMark: React.FC<ICheckMark> = (props) => {
+  const { id, label, selected, disabled, handleChange, ...rest } = props;
   const theme = useTheme();
 
-  const onClick = useCallback((e) => {
-    if (disabled) return;
-    handleChange(e, id);
-  }, [id, handleChange, disabled]);
+  const onClick = useCallback(
+    (e) => {
+      if (disabled) return;
+      handleChange(e, id);
+    },
+    [id, handleChange, disabled]
+  );
 
   return (
     <SWrapper
       onClick={onClick}
       style={{
-        ...(disabled ? {
-          cursor: 'default',
-        } : {}),
+        ...(disabled
+          ? {
+              cursor: 'default',
+            }
+          : {}),
       }}
       {...rest}
     >
@@ -45,18 +43,16 @@ export const CheckMark: React.FC<ICheckMark> = (props) => {
           selected={selected ?? false}
           disabled={disabled}
           style={{
-            ...(disabled ? {
-              borderColor: theme.colorsThemed.background.outlines1,
-              cursor: 'default',
-            } : {}),
+            ...(disabled
+              ? {
+                  borderColor: theme.colorsThemed.background.outlines1,
+                  cursor: 'default',
+                }
+              : {}),
           }}
         >
           {selected && (
-            <InlineSvg
-              svg={CheckmarkIcon}
-              width="24px"
-              height="24px"
-            />
+            <InlineSvg svg={CheckmarkIcon} width='24px' height='24px' />
           )}
         </SCheckmark>
       </SAnimation>
@@ -103,20 +99,24 @@ const SCheckmark = styled.button<{
   border-style: solid;
   border-width: 2px;
   border-radius: 12.5%;
-  border-color: ${({ selected, theme }) => (!selected ? theme.colorsThemed.background.outlines2 : 'transparent')};
+  border-color: ${({ selected, theme }) =>
+    !selected ? theme.colorsThemed.background.outlines2 : 'transparent'};
 
-  ${({ selected }) => (selected ? css`
-    border: none;
-  ` : css`
-    &:focus {
-      border-color: ${({ theme }) => theme.colorsThemed.text.secondary};
-    }
-    &:hover {
-      border-color: ${({ theme }) => theme.colorsThemed.text.secondary};
-    }
-  `)};
+  ${({ selected }) =>
+    selected
+      ? css`
+          border: none;
+        `
+      : css`
+          &:focus {
+            border-color: ${({ theme }) => theme.colorsThemed.text.secondary};
+          }
+          &:hover {
+            border-color: ${({ theme }) => theme.colorsThemed.text.secondary};
+          }
+        `};
 
-  transition: .2s linear;
+  transition: 0.2s linear;
   cursor: pointer;
 
   &:focus {

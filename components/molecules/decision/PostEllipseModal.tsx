@@ -7,77 +7,64 @@ import Button from '../../atoms/Button';
 import Text from '../../atoms/Text';
 
 interface IPostEllipseModal {
-  isFollowing: boolean;
+  postType: string;
   isFollowingDecision: boolean;
   isOpen: boolean;
   zIndex: number;
   handleFollowDecision: () => void;
-  handleToggleFollowingCreator: () => void;
+  handleReportOpen: () => void;
   onClose: () => void;
 }
 
 const PostEllipseModal: React.FunctionComponent<IPostEllipseModal> = ({
-  isFollowing,
+  postType,
   isFollowingDecision,
   isOpen,
   zIndex,
   handleFollowDecision,
-  handleToggleFollowingCreator,
+  handleReportOpen,
   onClose,
 }) => {
   const { t } = useTranslation('decision');
 
   return (
-    <Modal
-      show={isOpen}
-      overlayDim
-      additionalZ={zIndex}
-      onClose={onClose}
-    >
+    <Modal show={isOpen} overlayDim additionalZ={zIndex} onClose={onClose}>
       <SWrapper>
         <SContentContainer
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
-          <SButton
-            onClick={() => handleToggleFollowingCreator()}
-            style={{
-              marginBottom: '28px',
-            }}
-          >
-            <Text
-              variant={3}
-            >
-              { !isFollowing ? t('ellipse.follow-creator') : t('ellipse.unfollow-creator') }
-            </Text>
-          </SButton>
-          <SButton
-            onClick={() => handleFollowDecision()}
-          >
-            <Text
-              variant={3}
-            >
-              { !isFollowingDecision ? t('ellipse.follow-decision') : t('ellipse.unfollow-decision') }
+          <SButton onClick={() => handleFollowDecision()}>
+            <Text variant={3}>
+              {!isFollowingDecision
+                ? t('ellipse.follow-decision', {
+                    postType: t(`postType.${postType}`),
+                  })
+                : t('ellipse.unfollow-decision', {
+                    postType: t(`postType.${postType}`),
+                  })}
             </Text>
           </SButton>
           <SSeparator />
           <SButton
-            onClick={() => {}}
+            onClick={() => {
+              handleReportOpen();
+              onClose();
+            }}
           >
-            <Text
-              variant={3}
-            >
-              { t('ellipse.report') }
+            <Text variant={3} tone='error'>
+              {t('ellipse.report')}
             </Text>
           </SButton>
         </SContentContainer>
         <Button
-          view="secondary"
+          view='secondary'
           style={{
             height: '56px',
             width: 'calc(100% - 32px)',
           }}
+          onClick={() => onClose()}
         >
           {t('Cancel')}
         </Button>
@@ -115,6 +102,8 @@ const SContentContainer = styled.div`
 
   border-radius: ${({ theme }) => theme.borderRadius.medium};
 
+  z-index: 1;
+
   ${({ theme }) => theme.media.tablet} {
     width: 480px;
     height: 480px;
@@ -139,5 +128,6 @@ const SSeparator = styled.div`
   margin-top: 14px;
   margin-bottom: 14px;
   width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.colorsThemed.background.outlines1};
+  border-bottom: 1px solid
+    ${({ theme }) => theme.colorsThemed.background.outlines1};
 `;

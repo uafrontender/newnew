@@ -8,7 +8,6 @@ import { useRouter } from 'next/dist/client/router';
 import { motion } from 'framer-motion';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppSelector } from '../redux-store/store';
 
 import { NextPageWithLayout } from './_app';
 import AuthLayout from '../components/templates/AuthLayout';
@@ -23,21 +22,19 @@ export const signupReasons = [
   'follow-decision',
   'follow-creator',
   'session_expired',
+  'report',
 ] as const;
 export type SignupReason = typeof signupReasons[number];
 
 interface ISignup {
   reason?: SignupReason;
   redirectURL?: string;
+  goal?: string;
 }
 
-const Signup: NextPage<ISignup> = ({
-  reason,
-  redirectURL,
-}) => {
+const Signup: NextPage<ISignup> = ({ reason, goal, redirectURL }) => {
   const { t } = useTranslation('sign-up');
 
-  const { loggedIn } = useAppSelector((state) => state.user);
   const router = useRouter();
 
   // Redirect if the user is logged in
@@ -53,22 +50,23 @@ const Signup: NextPage<ISignup> = ({
       if (postId && window?.history?.state?.fromPost) {
         router.push(`/post/${postId}`);
       }
-    }
+    };
 
     window?.addEventListener('popstate', handlerHistory);
 
     return () => {
       window?.removeEventListener('popstate', handlerHistory);
-    }
+    };
   }, [router]);
 
   return (
     <>
       <Head>
-        <title>{ t('meta.title') }</title>
-        <meta name="description" content={t('meta.description')} />
+        <title>{t('meta.title')}</title>
+        <meta name='description' content={t('meta.description')} />
       </Head>
       <SignupMenu
+        goal={goal ?? undefined}
         reason={reason ?? undefined}
         redirectURL={redirectURL ?? undefined}
       />
@@ -76,21 +74,23 @@ const Signup: NextPage<ISignup> = ({
   );
 };
 
-(Signup as NextPageWithLayout).getLayout = function getLayout(page: ReactElement) {
+(Signup as NextPageWithLayout).getLayout = function getLayout(
+  page: ReactElement
+) {
   return (
     <AuthLayout>
       <motion.div
-        key="sign-up"
+        key='sign-up'
         exit={{
           x: -1000,
           y: 0,
           opacity: 0,
           transition: {
-            duration: 1
-          }
+            duration: 1,
+          },
         }}
       >
-        { page }
+        {page}
       </motion.div>
     </AuthLayout>
   );
@@ -99,21 +99,33 @@ const Signup: NextPage<ISignup> = ({
 export default Signup;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { reason, redirect } = context.query;
-  const translationContext = await serverSideTranslations(
-    context.locale!!,
-    ['sign-up', 'verify-email'],
-  );
+  const { to, reason, redirect } = context.query;
+  const translationContext = await serverSideTranslations(context.locale!!, [
+    'sign-up',
+    'verify-email',
+  ]);
 
   const redirectURL = redirect && !Array.isArray(redirect) ? redirect : '';
+  const goal = to && !Array.isArray(to) ? to : '';
 
-  if (reason && !Array.isArray(reason) && signupReasons.find((validT) => validT === reason)) {
+  if (
+    reason &&
+    !Array.isArray(reason) &&
+    signupReasons.find((validT) => validT === reason)
+  ) {
     return {
       props: {
         reason: reason as SignupReason,
-        ...(redirectURL ? {
-          redirectURL
-        }: {}),
+        ...(redirectURL
+          ? {
+              redirectURL,
+            }
+          : {}),
+        ...(goal
+          ? {
+              goal,
+            }
+          : {}),
         ...translationContext,
       },
     };
@@ -121,9 +133,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      ...(redirectURL ? {
-        redirectURL
-      }: {}),
+      ...(redirectURL
+        ? {
+            redirectURL,
+          }
+        : {}),
+      ...(goal
+        ? {
+            goal,
+          }
+        : {}),
       ...translationContext,
     },
   };

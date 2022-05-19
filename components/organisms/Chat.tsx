@@ -1,9 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-expressions */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from 'next-i18next';
 import { newnewapi } from 'newnew-api';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 import ChatList from '../molecules/chat/ChatList';
 import ChatArea from '../molecules/chat/ChatArea';
@@ -11,21 +14,51 @@ import SearchInput from '../atoms/chat/SearchInput';
 import NewMessage from '../molecules/chat/NewMessage';
 import { IChatData } from '../interfaces/ichat';
 import { useAppSelector } from '../../redux-store/store';
-import GoBackButton from '../molecules/GoBackButton';
 
-export const Chat = () => {
+const GoBackButton = dynamic(() => import('../molecules/GoBackButton'));
+
+interface IChat {
+  username?: string;
+}
+
+export const Chat: React.FC<IChat> = ({ username }) => {
+  const router = useRouter();
+  const user = useAppSelector((state) => state.user);
   const [chatData, setChatData] = useState<IChatData>({
     chatRoom: null,
     showChatList: null,
   });
+
   const openChat = ({ chatRoom }: IChatData) => {
+    let route = '';
+
+    if (chatRoom?.visavis?.username) {
+      chatRoom.kind === 1
+        ? (route = chatRoom?.visavis?.username)
+        : (route = `${chatRoom?.visavis?.username}-announcement`);
+    } else {
+      chatRoom!!.kind === 4 && chatRoom!!.myRole === 2
+        ? (route = `${user.userData?.username}-announcement`)
+        : '';
+    }
+
+    router.push(`/direct-messages/${route}`);
+
     setChatData({ chatRoom, showChatList });
   };
   const { t } = useTranslation('chat');
-  const [chatListHidden, setChatListHidden] = useState<boolean | undefined>(undefined);
+  const [chatListHidden, setChatListHidden] =
+    useState<boolean | undefined>(undefined);
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet'].includes(resizeMode);
-  const [newMessage, setNewMessage] = useState<newnewapi.IChatMessage | null | undefined>();
+  const isMobileOrTablet = [
+    'mobile',
+    'mobileS',
+    'mobileM',
+    'mobileL',
+    'tablet',
+  ].includes(resizeMode);
+  const [newMessage, setNewMessage] =
+    useState<newnewapi.IChatMessage | null | undefined>();
   const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
@@ -71,16 +104,28 @@ export const Chat = () => {
           />
           <NewMessage openChat={openChat} />
         </SToolbar>
-        <ChatList searchText={searchText} openChat={openChat} />
+        <ChatList
+          searchText={searchText}
+          openChat={openChat}
+          username={username}
+        />
       </SSidebar>
       <SContent>
-        <ChatArea {...chatData} showChatList={showChatList} />
+        <ChatArea
+          key={chatData.chatRoom?.id?.toString()}
+          {...chatData}
+          showChatList={showChatList}
+        />
       </SContent>
     </SContainer>
   );
 };
 
 export default Chat;
+
+Chat.defaultProps = {
+  username: '',
+};
 
 const SContainer = styled.div`
   position: relative;
@@ -101,7 +146,10 @@ interface ISSidebar {
 const SSidebar = styled.div<ISSidebar>`
   padding-top: 16px;
   height: 100%;
-  background: ${(props) => (props.theme.name === 'light' ? props.theme.colors.white : props.theme.colors.black)};
+  background: ${(props) =>
+    props.theme.name === 'light'
+      ? props.theme.colors.white
+      : props.theme.colors.black};
   flex-shrink: 0;
   ${(props) => {
     if (props.hidden === false) {

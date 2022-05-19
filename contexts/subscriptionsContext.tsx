@@ -1,7 +1,16 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, createContext, useContext, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { newnewapi } from 'newnew-api';
-import { getMySubscribers, getCreatorsImSubscribedTo } from '../api/endpoints/subscription';
+import {
+  getMySubscribers,
+  getCreatorsImSubscribedTo,
+} from '../api/endpoints/subscription';
 import { useAppSelector } from '../redux-store/store';
 import { SocketContext } from './socketContext';
 
@@ -16,17 +25,24 @@ const SubscriptionsContext = createContext({
   isCreatorsImSubscribedToLoading: false,
   newSubscriber: {} as newnewapi.ICreatorSubscriptionChanged,
   mySubscribersTotal: 0,
+  fetchCreatorsImSubscribedTo: () => {},
 });
 
 export const SubscriptionsProvider: React.FC = ({ children }) => {
   const user = useAppSelector((state) => state.user);
-  const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>([]);
+  const [mySubscribers, setMySubscribers] = useState<newnewapi.ISubscriber[]>(
+    []
+  );
   const [mySubscribersTotal, setMySubscribersTotal] = useState<number>(0);
-  const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<newnewapi.IUser[]>([]);
+  const [creatorsImSubscribedTo, setCreatorsImSubscribedTo] = useState<
+    newnewapi.IUser[]
+  >([]);
   const [isMySubscribersIsLoading, setMySubscribersIsLoading] = useState(false);
-  const [isCreatorsImSubscribedToLoading, setCreatorsImSubscribedToLoading] = useState(false);
+  const [isCreatorsImSubscribedToLoading, setCreatorsImSubscribedToLoading] =
+    useState(false);
 
-  const [newSubscriber, setNewSubscriber] = useState<newnewapi.ICreatorSubscriptionChanged>({});
+  const [newSubscriber, setNewSubscriber] =
+    useState<newnewapi.ICreatorSubscriptionChanged>({});
 
   const socketConnection = useContext(SocketContext);
 
@@ -35,7 +51,9 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
   };
 
   const removeSubscriber = (subscriber: newnewapi.ISubscriber) => {
-    setMySubscribers((curr) => curr.filter((i) => i.user?.uuid !== subscriber.user?.uuid));
+    setMySubscribers((curr) =>
+      curr.filter((i) => i.user?.uuid !== subscriber.user?.uuid)
+    );
   };
 
   const addCreatorsImSubscribedTo = (creator: newnewapi.IUser) => {
@@ -43,7 +61,9 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
   };
 
   const removeCreatorsImSubscribedTo = (creator: newnewapi.IUser) => {
-    setCreatorsImSubscribedTo((curr) => curr.filter((i) => i.uuid !== creator.uuid));
+    setCreatorsImSubscribedTo((curr) =>
+      curr.filter((i) => i.uuid !== creator.uuid)
+    );
   };
 
   const contextValue = useMemo(
@@ -58,6 +78,7 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       isCreatorsImSubscribedToLoading,
       newSubscriber,
       mySubscribersTotal,
+      fetchCreatorsImSubscribedTo,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -69,8 +90,25 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
       removeCreatorsImSubscribedTo,
       newSubscriber,
       mySubscribersTotal,
+      fetchCreatorsImSubscribedTo,
     ]
   );
+
+  async function fetchCreatorsImSubscribedTo() {
+    if (!user.loggedIn) return;
+    try {
+      setCreatorsImSubscribedToLoading(true);
+      const payload = new newnewapi.EmptyRequest({});
+      const res = await getCreatorsImSubscribedTo(payload);
+      if (!res.data || res.error)
+        throw new Error(res.error?.message ?? 'Request failed');
+      setCreatorsImSubscribedTo(res.data.creators as []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreatorsImSubscribedToLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchMySubscribers() {
@@ -81,26 +119,15 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
           paging: null,
         });
         const res = await getMySubscribers(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
+        if (!res.data || res.error)
+          throw new Error(res.error?.message ?? 'Request failed');
         setMySubscribers(res.data.subscribers as newnewapi.ISubscriber[]);
-        if (res.data.paging?.total) setMySubscribersTotal(res.data.paging?.total);
+        if (res.data.paging?.total)
+          setMySubscribersTotal(res.data.paging?.total);
+        setMySubscribersIsLoading(false);
       } catch (err) {
         console.error(err);
         setMySubscribersIsLoading(false);
-      }
-    }
-
-    async function fetchCreatorsImSubscribedTo() {
-      if (!user.loggedIn) return;
-      try {
-        setCreatorsImSubscribedToLoading(true);
-        const payload = new newnewapi.EmptyRequest({});
-        const res = await getCreatorsImSubscribedTo(payload);
-        if (!res.data || res.error) throw new Error(res.error?.message ?? 'Request failed');
-        setCreatorsImSubscribedTo(res.data.creators as []);
-      } catch (err) {
-        console.error(err);
-        setCreatorsImSubscribedToLoading(false);
       }
     }
 
@@ -119,15 +146,25 @@ export const SubscriptionsProvider: React.FC = ({ children }) => {
     };
 
     if (socketConnection) {
-      socketConnection.on('CreatorSubscriptionChanged', handlerSubscriptionUpdated);
+      socketConnection.on(
+        'CreatorSubscriptionChanged',
+        handlerSubscriptionUpdated
+      );
     }
   }, [socketConnection]);
 
-  return <SubscriptionsContext.Provider value={contextValue}>{children}</SubscriptionsContext.Provider>;
+  return (
+    <SubscriptionsContext.Provider value={contextValue}>
+      {children}
+    </SubscriptionsContext.Provider>
+  );
 };
 
 export function useGetSubscriptions() {
   const context = useContext(SubscriptionsContext);
-  if (!context) throw new Error('useGetSubscriptions must be used inside a `SubscriptionsProvider`');
+  if (!context)
+    throw new Error(
+      'useGetSubscriptions must be used inside a `SubscriptionsProvider`'
+    );
   return context;
 }

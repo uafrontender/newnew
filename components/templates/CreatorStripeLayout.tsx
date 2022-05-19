@@ -1,8 +1,6 @@
 import React from 'react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import styled, { useTheme } from 'styled-components';
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 
 import Col from '../atoms/Grid/Col';
 import Row from '../atoms/Grid/Row';
@@ -13,8 +11,7 @@ import ErrorBoundary from '../organisms/ErrorBoundary';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import { useAppSelector } from '../../redux-store/store';
-import Headline from '../atoms/Headline';
-import Text from '../atoms/Text';
+import HeroVisual from './HeroVisual';
 
 export interface ICreatorStripeLayout {
   hideProgressBar?: boolean;
@@ -28,12 +25,15 @@ const SCreatorStripeLayout = styled.div`
   overflow: hidden;
 `;
 
-const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({ hideProgressBar, children }) => {
+const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({
+  hideProgressBar,
+  children,
+}) => {
   const theme = useTheme();
-  const router = useRouter();
-  const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobileOrTablet = ['mobile', 'mobileS', 'mobileM', 'mobileL', 'tablet', 'laptop'].includes(resizeMode);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
   const isTablet = ['tablet'].includes(resizeMode);
 
   return (
@@ -58,11 +58,10 @@ const CreatorStripeLayout: React.FC<ICreatorStripeLayout> = ({ hideProgressBar, 
             </SHomeLogoButton>
           ) : null}
           <SContentContainer>{children}</SContentContainer>
-          {!isMobileOrTablet && !router.pathname.includes('creator-onboarding-stage-1') && (
-            <SSideMessage>
-              <SHeadline variant={3}>{t(`stripe.side.heading`)}</SHeadline>
-              <Text variant={2}>{t(`stripe.side.subheading`)}</Text>
-            </SSideMessage>
+          {!isMobile && !isTablet && (
+            <HeroVisualContainer>
+              <HeroVisual />
+            </HeroVisualContainer>
           )}
         </SCreatorStripeLayout>
       </SkeletonTheme>
@@ -123,23 +122,10 @@ const SContentContainer = styled.div`
   user-select: none;
 `;
 
-const SSideMessage = styled.div`
-  position: fixed;
-  bottom: 48px;
-  left: 104px;
-
-  max-width: 400px;
-
-  /* No select */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-`;
-
-const SHeadline = styled(Headline)`
-  margin-bottom: 12px;
-  font-weight: 600;
+const HeroVisualContainer = styled('div')`
+  position: absolute;
+  display: block;
+  top: 100px;
+  margin-right: 100px;
+  right: 50%;
 `;

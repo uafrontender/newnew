@@ -10,18 +10,25 @@ import { useAppSelector } from '../../../../redux-store/store';
 import { getMySubscriptionProduct } from '../../../../api/endpoints/subscription';
 import SubproductsSelect from '../../../molecules/creator/dashboard/SubproductsSelect';
 
-export const EditSubscriptionRate = () => {
+export const EditSubscriptionRate: React.FC = React.memo(() => {
   const { t } = useTranslation('creator');
   const { resizeMode } = useAppSelector((state) => state.ui);
-  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(resizeMode);
-  const [mySubscriptionProduct, setMySubscriptionProduct] = useState<newnewapi.ISubscriptionProduct | null>(null);
+  const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
+    resizeMode
+  );
+  const [mySubscriptionProduct, setMySubscriptionProduct] =
+    useState<newnewapi.ISubscriptionProduct | null>(null);
 
   const fetchMySubscriptionProduct = async () => {
     try {
       const payload = new newnewapi.EmptyRequest();
       const res = await getMySubscriptionProduct(payload);
       if (res.error) throw new Error(res.error?.message ?? 'Request failed');
-      if (res.data?.myProduct) setMySubscriptionProduct(res.data?.myProduct);
+      if (res.data?.myProduct) {
+        setMySubscriptionProduct(res.data?.myProduct);
+      } else {
+        setMySubscriptionProduct(null);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -40,11 +47,14 @@ export const EditSubscriptionRate = () => {
         <STitleBlock>
           <STitle variant={4}>{t('SubrateSection.heading')}</STitle>
         </STitleBlock>
-        <SubproductsSelect mySubscriptionProduct={mySubscriptionProduct} />
+        <SubproductsSelect
+          mySubscriptionProduct={mySubscriptionProduct}
+          removedMyProduct={fetchMySubscriptionProduct}
+        />
       </SContent>
     </SContainer>
   );
-};
+});
 
 export default EditSubscriptionRate;
 
@@ -65,11 +75,11 @@ const SContainer = styled.div`
 const SContent = styled.div`
   min-height: calc(100vh - 120px);
   margin-bottom: 30px;
-  width: calc(100vw - 180px);
+  /* width: calc(100vw - 180px); */
 
   ${(props) => props.theme.media.tablet} {
     margin-left: 180px;
-    width: calc(100vw - 365px);
+    /* width: calc(100vw - 365px); */
     padding: 40px 32px;
     background: ${(props) => props.theme.colorsThemed.background.tertiary};
     border-radius: 24px;
@@ -80,7 +90,9 @@ const SContent = styled.div`
   }
 `;
 
-const STitle = styled(Headline)``;
+const STitle = styled(Headline)`
+  font-weight: 600;
+`;
 
 const STitleBlock = styled.section`
   display: flex;
