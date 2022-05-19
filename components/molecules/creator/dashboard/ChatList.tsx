@@ -9,11 +9,9 @@ import moment from 'moment';
 import { SUserAvatar } from '../../../atoms/chat/styles';
 
 import Text from '../../../atoms/Text';
-// import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
 
 import { useAppSelector } from '../../../../redux-store/store';
-// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 import { getMyRooms } from '../../../../api/endpoints/chat';
 import { useGetChats } from '../../../../contexts/chatContext';
 import textTrim from '../../../../utils/textTrim';

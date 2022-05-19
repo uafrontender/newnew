@@ -134,7 +134,7 @@ export const Footer: React.FC<IFooter> = React.memo(() => {
                 <InlineSvg
                   clickable
                   svg={mobileLogo}
-                  fill={theme.colorsThemed.text.primary}
+                  fill='#1D6AFF'
                   width='48px'
                   height='48px'
                   onClick={handleLogoClick}

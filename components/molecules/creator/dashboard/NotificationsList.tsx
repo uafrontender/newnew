@@ -14,13 +14,15 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from '../../notifications/NoResults';
-// import { useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
   markAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../../../../contexts/notificationsContext';
+import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -31,7 +33,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 }) => {
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
-  // const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.user);
   const [notifications, setNotifications] =
     useState<newnewapi.INotification[] | null>(null);
   const [unreadNotifications, setUnreadNotifications] =
@@ -188,15 +190,26 @@ export const NotificationsList: React.FC<IFunction> = ({
       <Link href={getUrl(item.target)}>
         <a>
           <SNotificationItem key={`notification-item-${item.id}`}>
-            <SNotificationItemAvatar
-              withClick
-              // onClick={handleUserClick}
-              avatarUrl={
-                item.content?.relatedUser?.thumbnailAvatarUrl
-                  ? item.content?.relatedUser?.thumbnailAvatarUrl
-                  : ''
-              }
-            />
+            {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+              <SNotificationItemAvatar
+                withClick
+                avatarUrl={
+                  item.content?.relatedUser?.thumbnailAvatarUrl
+                    ? item.content?.relatedUser?.thumbnailAvatarUrl
+                    : ''
+                }
+              />
+            ) : (
+              <SIconHolder>
+                <InlineSvg
+                  clickable
+                  svg={mobileLogo}
+                  fill='#fff'
+                  width='24px'
+                  height='24px'
+                />
+              </SIconHolder>
+            )}
             <SNotificationItemCenter>
               {item.content && (
                 <SNotificationItemText variant={3} weight={600}>
@@ -207,13 +220,16 @@ export const NotificationsList: React.FC<IFunction> = ({
                 {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
               </SNotificationItemTime>
             </SNotificationItemCenter>
-            {!item.isRead && <SNotificationItemIndicator minified />}
+            {unreadNotifications &&
+              unreadNotifications.length > 0 &&
+              unreadNotifications.findIndex(
+                (unreadNotificationId) => unreadNotificationId === item.id
+              ) > -1 && <SNotificationItemIndicator minified />}
           </SNotificationItem>
         </a>
       </Link>
     ),
-
-    []
+    [unreadNotifications, user.userData?.userUuid]
   );
 
   return (
@@ -306,6 +322,17 @@ const SNotificationItem = styled.div`
 `;
 
 const SNotificationItemAvatar = styled(UserAvatar)``;
+
+const SIconHolder = styled.div`
+  background: ${(props) => props.theme.colorsThemed.accent.blue};
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`;
 
 const SNotificationItemCenter = styled.div`
   width: 100%;

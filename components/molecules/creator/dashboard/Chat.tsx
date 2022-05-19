@@ -12,11 +12,8 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
-// import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
-
 import { useAppSelector } from '../../../../redux-store/store';
-// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
