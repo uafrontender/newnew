@@ -133,7 +133,7 @@
       "fileUpload": {
         "title_1": "Your audience is waiting!",
         "title_2": "Upload your video response now..",
-        "description": "Max size of the video 100 MB",
+        "description": "Max size of the video 10 GB",
         "button": "Select file"
       },
       "button": {
@@ -165,7 +165,7 @@
         "error": {
           "minLength": "Video duration too small, choose from 10 seconds",
           "maxLength": "Video duration too long, choose up to 10 minutes",
-          "maxSize": "Video size too big, choose up to 100mb",
+          "maxSize": "Video size too big, choose up to 10gb",
           "title": "Ooops...",
           "description": "There was an error and your file could not be uploaded. Would you like to try again."
         },
