@@ -193,11 +193,7 @@ export const NotificationsList: React.FC<IFunction> = ({
             {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
               <SNotificationItemAvatar
                 withClick
-                avatarUrl={
-                  item.content?.relatedUser?.thumbnailAvatarUrl
-                    ? item.content?.relatedUser?.thumbnailAvatarUrl
-                    : ''
-                }
+                avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
               />
             ) : (
               <SIconHolder>
