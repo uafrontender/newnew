@@ -76,6 +76,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       try {
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
+          myRole: 2,
           paging: { limit: 50 },
         });
         const res = await getMyRooms(payload);
