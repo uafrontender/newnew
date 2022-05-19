@@ -648,9 +648,23 @@ const McOptionCard: React.FunctionComponent<IMcOptionCard> = ({
             handlePayWithCardStripeRedirect={handlePayWithCardStripeRedirect}
             // handlePayWithWallet={handlePayWithWallet}
             bottomCaption={
-              <SPaymentFooter variant={3}>
-                {t('McPost.paymentModalFooter.body')}
-              </SPaymentFooter>
+              <>
+                <SPaymentSign variant={3}>
+                  {t('McPost.paymentModalFooter.body', {
+                    creator: postCreator,
+                  })}
+                </SPaymentSign>
+                <SPaymentTerms variant={3}>
+                  {'* '}
+                  <SPaymentTermsLink
+                    href='https://terms.newnew.co'
+                    target='_blank'
+                  >
+                    {t('McPost.paymentModalFooter.terms')}
+                  </SPaymentTermsLink>{' '}
+                  {t('McPost.paymentModalFooter.apply')}
+                </SPaymentTerms>
+              </>
             }
             // payButtonCaptionKey={t('McPost.paymentModalPayButton')}
           >
@@ -1337,10 +1351,22 @@ const STutorialTooltipHolder = styled.div`
   }
 `;
 
-const SPaymentFooter = styled(Text)`
+const SPaymentSign = styled(Text)`
   margin-top: 24px;
 
   color: ${({ theme }) => theme.colorsThemed.text.secondary};
+  text-align: center;
+  white-space: pre;
+`;
+
+const SPaymentTermsLink = styled.a`
+  color: ${({ theme }) => theme.colorsThemed.text.secondary};
+`;
+
+const SPaymentTerms = styled(Text)`
+  margin-top: 16px;
+
+  color: ${({ theme }) => theme.colorsThemed.text.tertiary};
   text-align: center;
   white-space: pre;
 `;
