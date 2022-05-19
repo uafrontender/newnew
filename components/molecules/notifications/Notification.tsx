@@ -4,7 +4,7 @@ import { newnewapi } from 'newnew-api';
 import Link from 'next/link';
 import styled, { useTheme } from 'styled-components';
 import UserAvatar from '../UserAvatar';
-import InlineSVG, { InlineSvg } from '../../atoms/InlineSVG';
+import { InlineSvg } from '../../atoms/InlineSVG';
 
 import MessageIcon from '../../../public/images/svg/icons/filled/MessageIcon.svg';
 import MessageCircle from '../../../public/images/svg/icons/filled/MessageCircle.svg';
@@ -205,7 +205,7 @@ const SIcon = styled.span`
   }
 `;
 
-const SInlineSVG = styled(InlineSVG)`
+const SInlineSVG = styled(InlineSvg)`
   min-width: 16px;
   min-height: 16px;
 `;
