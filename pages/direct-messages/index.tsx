@@ -53,16 +53,16 @@ export const Chat = () => {
         setIsLoaded(true);
         throw new Error(res.error?.message ?? 'Request failed');
       }
-      if (res.data && res.data.rooms.length > 0) {
+      if (res.data.rooms.length > 0) {
         const chatRoom = res.data.rooms[0];
         let route = '';
 
         if (chatRoom?.visavis?.username) {
           chatRoom.kind === 1
-            ? (route = chatRoom?.visavis?.username)
-            : (route = `${chatRoom?.visavis?.username}-announcement`);
+            ? (route = chatRoom.visavis.username)
+            : (route = `${chatRoom.visavis.username}-announcement`);
         } else {
-          chatRoom!!.kind === 4 && chatRoom!!.myRole === 2
+          chatRoom.kind === 4 && chatRoom.myRole === 2
             ? (route = `${user.userData?.username}-announcement`)
             : '';
         }

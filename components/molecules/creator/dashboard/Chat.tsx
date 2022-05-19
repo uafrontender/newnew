@@ -12,11 +12,8 @@ import Button from '../../../atoms/Button';
 import Caption from '../../../atoms/Caption';
 import TextArea from '../../../atoms/creation/TextArea';
 import InlineSVG from '../../../atoms/InlineSVG';
-// import GradientMask from '../../../atoms/GradientMask';
 import UserAvatar from '../../UserAvatar';
-
 import { useAppSelector } from '../../../../redux-store/store';
-// import useScrollGradients from '../../../../utils/hooks/useScrollGradients';
 
 import sendIcon from '../../../../public/images/svg/icons/filled/Send.svg';
 import chevronLeftIcon from '../../../../public/images/svg/icons/outlined/ChevronLeft.svg';
@@ -354,17 +351,13 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={
-              user?.userData?.avatarUrl ? user?.userData?.avatarUrl : ''
-            }
+            avatarUrl={user?.userData?.avatarUrl ?? ''}
           />
         ) : (
           <SUserAvatar
             withClick
             onClick={handleUserClick}
-            avatarUrl={
-              chatRoom?.visavis?.avatarUrl ? chatRoom?.visavis?.avatarUrl : ''
-            }
+            avatarUrl={chatRoom?.visavis?.avatarUrl ?? ''}
           />
         )}
         {chatRoom?.kind === 4 ? (
@@ -381,7 +374,7 @@ export const Chat: React.FC<IChat> = ({ roomID }) => {
                   ? chatRoom.memberCount
                   : 0
               } ${
-                chatRoom.memberCount!! > 1
+                chatRoom.memberCount && chatRoom.memberCount > 1
                   ? t('new-announcement.members')
                   : t('new-announcement.member')
               }`}

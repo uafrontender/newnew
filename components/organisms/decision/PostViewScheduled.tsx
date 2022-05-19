@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { newnewapi } from 'newnew-api';
@@ -115,11 +116,12 @@ const PostViewScheduled: React.FunctionComponent<IPostViewScheduled> =
           if (!decoded) return;
           if (decoded.postUuid === post.postUuid) {
             if (decoded.auction) {
-              handleUpdatePostStatus(decoded.auction!!);
+              handleUpdatePostStatus(decoded.auction);
             } else if (decoded.multipleChoice) {
-              handleUpdatePostStatus(decoded.multipleChoice!!);
+              handleUpdatePostStatus(decoded.multipleChoice);
             } else {
-              handleUpdatePostStatus(decoded.crowdfunding!!);
+              if (decoded.crowdfunding)
+                handleUpdatePostStatus(decoded.crowdfunding);
             }
           }
         };

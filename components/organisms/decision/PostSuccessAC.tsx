@@ -182,20 +182,22 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                 <SMainSectionWrapper>
                   <SCreatorInfoDiv>
                     <SCreator>
-                      <SCreatorImage src={post.creator?.avatarUrl!!} />
+                      <SCreatorImage src={post.creator?.avatarUrl ?? ''} />
                       <SWantsToKnow>
                         {t('AcPostSuccess.wants_to_know', {
                           creator: post.creator?.nickname,
                         })}
                       </SWantsToKnow>
                     </SCreator>
-                    <STotal>
-                      {`$${formatNumber(
-                        post.totalAmount?.usdCents!! / 100 ?? 0,
-                        true
-                      )}`}{' '}
-                      <span>{t('AcPostSuccess.in_total_bids')}</span>
-                    </STotal>
+                    {post.totalAmount?.usdCents && (
+                      <STotal>
+                        {`$${formatNumber(
+                          post.totalAmount.usdCents / 100 ?? 0,
+                          true
+                        )}`}{' '}
+                        <span>{t('AcPostSuccess.in_total_bids')}</span>
+                      </STotal>
+                    )}
                   </SCreatorInfoDiv>
                   <SPostTitle variant={4}>{post.title}</SPostTitle>
                   <SSeparator />
@@ -204,7 +206,7 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                       <SWinningBidCreator>
                         <SCreator>
                           <SCreatorImage
-                            src={winningOption.creator?.avatarUrl!!}
+                            src={winningOption.creator?.avatarUrl ?? ''}
                           />
                           <SWinningBidCreatorText>
                             {winningOption.creator?.uuid ===
@@ -228,12 +230,14 @@ const PostSuccessAC: React.FunctionComponent<IPostSuccessAC> = React.memo(
                           </SWinningBidCreatorText>
                         </SCreator>
                       </SWinningBidCreator>
-                      <SWinningOptionAmount variant={4}>
-                        {`$${formatNumber(
-                          winningOption.totalAmount?.usdCents!! / 100 ?? 0,
-                          true
-                        )}`}
-                      </SWinningOptionAmount>
+                      {winningOption.totalAmount?.usdCents && (
+                        <SWinningOptionAmount variant={4}>
+                          {`$${formatNumber(
+                            winningOption.totalAmount.usdCents / 100 ?? 0,
+                            true
+                          )}`}
+                        </SWinningOptionAmount>
+                      )}
                       <SSeparator />
                       <SWinningOptionDetails>
                         <SWinningOptionDetailsBidChosen>

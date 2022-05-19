@@ -58,6 +58,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   const theme = useTheme();
   const scrollRef: any = useRef();
   const { resizeMode } = useAppSelector((state) => state.ui);
+  const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
     resizeMode
   );
@@ -85,6 +86,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       try {
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
+          myRole: user.userData?.options?.isOfferingSubscription ? null : 1,
           paging: { limit: 50 },
         });
         const res = await getMyRooms(payload);
@@ -116,9 +118,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   useEffect(() => {
     if (chatRooms) {
       const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-        if (c.visavis) {
+        if (c.visavis && c.visavis.username) {
           const letter = clearNameFromEmoji(
-            c.visavis?.username!!
+            c.visavis.username
           )[0].toLowerCase();
           acc[letter] = (acc[letter] || []).concat(c);
         }
@@ -152,9 +154,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis)
+          if (chat.visavis && chat.visavis.username)
             chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.username!!
+              chat.visavis.username
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
@@ -208,8 +210,8 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
             </SChatItemCenter>
           </SChatItemM>
           {filteredChatrooms.length > 0
-            ? index !== filteredChatrooms!!.length - 1 && <SChatSeparator />
-            : index !== chatRooms!!.length - 1 && <SChatSeparator />}
+            ? index !== filteredChatrooms.length - 1 && <SChatSeparator />
+            : chatRooms && index !== chatRooms.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },
@@ -259,7 +261,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
                 )
               ) : (
                 <SSectionContent ref={scrollRef}>
-                  <NewAnnouncement handleClick={createNewAnnouncement} />
+                  {user.userData?.options?.isOfferingSubscription && (
+                    <NewAnnouncement handleClick={createNewAnnouncement} />
+                  )}
                   {chatroomsSortedList.length > 0 &&
                     chatroomsSortedList.map((section: IChatroomsSorted) => (
                       <SSection key={section.letter}>

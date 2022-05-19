@@ -245,7 +245,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
       const res = await markUser(payload);
       if (!res.data || res.error)
         throw new Error(res.error?.message ?? 'Request failed');
-      unblockUser(chatRoom?.visavis?.uuid!!);
+      if (chatRoom?.visavis?.uuid) unblockUser(chatRoom.visavis.uuid);
     } catch (err) {
       console.error(err);
     }
@@ -416,7 +416,9 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
     if (
       isVisavisBlocked ||
       localUserData.subscriptionExpired ||
-      !chatRoom?.visavis?.options?.isOfferingSubscription ||
+      (chatRoom &&
+        chatRoom.myRole === 1 &&
+        !chatRoom?.visavis?.options?.isOfferingSubscription) ||
       localUserData.accountDeleted ||
       !chatRoom
     ) {
@@ -456,7 +458,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
                       ? chatRoom.memberCount
                       : 0
                   } ${
-                    chatRoom.memberCount!! > 1
+                    chatRoom.memberCount && chatRoom.memberCount > 1
                       ? t('new-announcement.members')
                       : t('new-announcement.member')
                   }`}
@@ -550,6 +552,7 @@ const ChatArea: React.FC<IChatData> = ({ chatRoom, showChatList }) => {
         {localUserData.accountDeleted && <AccountDeleted />}
         {chatRoom &&
           chatRoom.visavis &&
+          chatRoom.myRole === 1 &&
           !chatRoom.visavis.options?.isOfferingSubscription && (
             <MessagingDisabled user={chatRoom.visavis} />
           )}

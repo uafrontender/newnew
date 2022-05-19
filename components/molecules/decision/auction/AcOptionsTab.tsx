@@ -130,19 +130,21 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
   const [paymentSuccesModalOpen, setPaymentSuccesModalOpen] = useState(false);
 
   const goToNextStep = () => {
-    if (user.loggedIn) {
-      const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
-        acCurrentStep: user.userTutorialsProgress.remainingAcSteps!![0],
-      });
-      markTutorialStepAsCompleted(payload);
+    if (user.userTutorialsProgress.remainingAcSteps) {
+      if (user.loggedIn) {
+        const payload = new newnewapi.MarkTutorialStepAsCompletedRequest({
+          acCurrentStep: user.userTutorialsProgress.remainingAcSteps[0],
+        });
+        markTutorialStepAsCompleted(payload);
+      }
+      dispatch(
+        setUserTutorialsProgress({
+          remainingAcSteps: [
+            ...user.userTutorialsProgress.remainingAcSteps,
+          ].slice(1),
+        })
+      );
     }
-    dispatch(
-      setUserTutorialsProgress({
-        remainingAcSteps: [
-          ...user.userTutorialsProgress.remainingAcSteps!!,
-        ].slice(1),
-      })
-    );
   };
 
   // Handlers
@@ -522,34 +524,38 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
             >
               {t('AcPost.OptionsTab.ActionSection.placeABidBtn')}
             </Button>
-            <STutorialTooltipTextAreaHolder>
-              <TutorialTooltip
-                isTooltipVisible={
-                  options.length > 0 &&
-                  user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                    newnewapi.AcTutorialStep.AC_TEXT_FIELD
-                }
-                closeTooltip={goToNextStep}
-                title={t('tutorials.ac.createYourBid.title')}
-                text={t('tutorials.ac.createYourBid.text')}
-                dotPosition={DotPositionEnum.BottomRight}
-              />
-            </STutorialTooltipTextAreaHolder>
+            {user?.userTutorialsProgress.remainingAcSteps && (
+              <STutorialTooltipTextAreaHolder>
+                <TutorialTooltip
+                  isTooltipVisible={
+                    options.length > 0 &&
+                    user.userTutorialsProgress.remainingAcSteps[0] ===
+                      newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                  }
+                  closeTooltip={goToNextStep}
+                  title={t('tutorials.ac.createYourBid.title')}
+                  text={t('tutorials.ac.createYourBid.text')}
+                  dotPosition={DotPositionEnum.BottomRight}
+                />
+              </STutorialTooltipTextAreaHolder>
+            )}
           </SActionSection>
         )}
-        <STutorialTooltipHolder>
-          <TutorialTooltip
-            isTooltipVisible={
-              options.length > 0 &&
-              user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                newnewapi.AcTutorialStep.AC_ALL_BIDS
-            }
-            closeTooltip={goToNextStep}
-            title={t('tutorials.ac.peopleBids.title')}
-            text={t('tutorials.ac.peopleBids.text')}
-            dotPosition={DotPositionEnum.BottomLeft}
-          />
-        </STutorialTooltipHolder>
+        {user?.userTutorialsProgress.remainingAcSteps && (
+          <STutorialTooltipHolder>
+            <TutorialTooltip
+              isTooltipVisible={
+                options.length > 0 &&
+                user.userTutorialsProgress.remainingAcSteps[0] ===
+                  newnewapi.AcTutorialStep.AC_ALL_BIDS
+              }
+              closeTooltip={goToNextStep}
+              title={t('tutorials.ac.peopleBids.title')}
+              text={t('tutorials.ac.peopleBids.text')}
+              dotPosition={DotPositionEnum.BottomLeft}
+            />
+          </STutorialTooltipHolder>
+        )}
       </STabContainer>
       {/* Suggest new Modal */}
       {isMobile && postStatus === 'voting' ? (
@@ -668,19 +674,21 @@ const AcOptionsTab: React.FunctionComponent<IAcOptionsTab> = ({
           >
             {t('AcPost.FloatingActionButton.suggestNewBtn')}
           </SActionButton>
-          <STutorialTooltipHolderMobile>
-            <TutorialTooltip
-              isTooltipVisible={
-                options.length > 0 &&
-                user!!.userTutorialsProgress.remainingAcSteps!![0] ===
-                  newnewapi.AcTutorialStep.AC_TEXT_FIELD
-              }
-              closeTooltip={goToNextStep}
-              title={t('tutorials.ac.createYourBid.title')}
-              text={t('tutorials.ac.createYourBid.text')}
-              dotPosition={DotPositionEnum.BottomRight}
-            />
-          </STutorialTooltipHolderMobile>
+          {user?.userTutorialsProgress.remainingAcSteps && (
+            <STutorialTooltipHolderMobile>
+              <TutorialTooltip
+                isTooltipVisible={
+                  options.length > 0 &&
+                  user.userTutorialsProgress.remainingAcSteps[0] ===
+                    newnewapi.AcTutorialStep.AC_TEXT_FIELD
+                }
+                closeTooltip={goToNextStep}
+                title={t('tutorials.ac.createYourBid.title')}
+                text={t('tutorials.ac.createYourBid.text')}
+                dotPosition={DotPositionEnum.BottomRight}
+              />
+            </STutorialTooltipHolderMobile>
+          )}
         </>
       ) : null}
     </>

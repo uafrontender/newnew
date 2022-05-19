@@ -14,13 +14,15 @@ import Lottie from '../../../atoms/Lottie';
 import Caption from '../../../atoms/Caption';
 import Indicator from '../../../atoms/Indicator';
 import NoResults from '../../notifications/NoResults';
-// import { useAppSelector } from '../../../../redux-store/store';
+import { useAppSelector } from '../../../../redux-store/store';
 import {
   getMyNotifications,
   markAsRead,
 } from '../../../../api/endpoints/notification';
 import loadingAnimation from '../../../../public/animations/logo-loading-blue.json';
 import { useNotifications } from '../../../../contexts/notificationsContext';
+import mobileLogo from '../../../../public/images/svg/mobile-logo.svg';
+import InlineSvg from '../../../atoms/InlineSVG';
 
 interface IFunction {
   markReadNotifications: boolean;
@@ -31,7 +33,7 @@ export const NotificationsList: React.FC<IFunction> = ({
 }) => {
   const scrollRef: any = useRef();
   const { ref: scrollRefNotifications, inView } = useInView();
-  // const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.user);
   const [notifications, setNotifications] =
     useState<newnewapi.INotification[] | null>(null);
   const [unreadNotifications, setUnreadNotifications] =
@@ -66,7 +68,7 @@ export const NotificationsList: React.FC<IFunction> = ({
         if (res.data.notifications.length > 0) {
           if (limit === defaultLimit) {
             setNotifications((curr) => {
-              const arr = [...curr!!];
+              const arr = curr ? [...curr] : [];
               res.data?.notifications.forEach((item) => {
                 arr.push(item);
               });
@@ -84,13 +86,13 @@ export const NotificationsList: React.FC<IFunction> = ({
             setNotificationsNextPageToken(res.data.paging?.nextPageToken);
           } else {
             setNotifications((curr) => {
-              const arr = [...curr!!];
-              arr.unshift(res.data!!.notifications[0]);
+              const arr = curr ? [...curr] : [];
+              if (res.data) arr.unshift(res.data.notifications[0]);
               return arr;
             });
             setUnreadNotifications((curr) => {
               const arr = curr ? [...curr] : [];
-              arr.push(res.data!!.notifications[0].id as number);
+              if (res.data) arr.push(res.data.notifications[0].id as number);
               return arr;
             });
           }
@@ -188,30 +190,42 @@ export const NotificationsList: React.FC<IFunction> = ({
       <Link href={getUrl(item.target)}>
         <a>
           <SNotificationItem key={`notification-item-${item.id}`}>
-            <SNotificationItemAvatar
-              withClick
-              // onClick={handleUserClick}
-              avatarUrl={
-                item.content?.relatedUser?.thumbnailAvatarUrl
-                  ? item.content?.relatedUser?.thumbnailAvatarUrl
-                  : ''
-              }
-            />
+            {item.content?.relatedUser?.uuid !== user.userData?.userUuid ? (
+              <SNotificationItemAvatar
+                withClick
+                avatarUrl={item.content?.relatedUser?.thumbnailAvatarUrl ?? ''}
+              />
+            ) : (
+              <SIconHolder>
+                <InlineSvg
+                  clickable
+                  svg={mobileLogo}
+                  fill='#fff'
+                  width='24px'
+                  height='24px'
+                />
+              </SIconHolder>
+            )}
             <SNotificationItemCenter>
-              <SNotificationItemText variant={3} weight={600}>
-                {item.content!!.message}
-              </SNotificationItemText>
+              {item.content && (
+                <SNotificationItemText variant={3} weight={600}>
+                  {item.content.message}
+                </SNotificationItemText>
+              )}
               <SNotificationItemTime variant={2} weight={600}>
                 {moment((item.createdAt?.seconds as number) * 1000).fromNow()}
               </SNotificationItemTime>
             </SNotificationItemCenter>
-            {!item.isRead && <SNotificationItemIndicator minified />}
+            {unreadNotifications &&
+              unreadNotifications.length > 0 &&
+              unreadNotifications.findIndex(
+                (unreadNotificationId) => unreadNotificationId === item.id
+              ) > -1 && <SNotificationItemIndicator minified />}
           </SNotificationItem>
         </a>
       </Link>
     ),
-
-    []
+    [unreadNotifications, user.userData?.userUuid]
   );
 
   return (
@@ -237,10 +251,10 @@ export const NotificationsList: React.FC<IFunction> = ({
               animationData: loadingAnimation,
             }}
           />
-        ) : notifications!!.length < 1 ? (
+        ) : notifications && notifications.length < 1 ? (
           <NoResults />
         ) : (
-          notifications!!.map(renderNotificationItem)
+          notifications && notifications.map(renderNotificationItem)
         )}
         {notificationsNextPageToken && !loading && (
           <SRef ref={scrollRefNotifications}>
@@ -304,6 +318,17 @@ const SNotificationItem = styled.div`
 `;
 
 const SNotificationItemAvatar = styled(UserAvatar)``;
+
+const SIconHolder = styled.div`
+  background: ${(props) => props.theme.colorsThemed.accent.blue};
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`;
 
 const SNotificationItemCenter = styled.div`
   width: 100%;

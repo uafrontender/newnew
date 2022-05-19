@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { newnewapi } from 'newnew-api';
-import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
@@ -65,7 +64,7 @@ const unicornbabe = {
   },
 };
 
-const MyProfileSettingsIndex: NextPage = () => {
+const MyProfileSettingsIndex = () => {
   const theme = useTheme();
   const router = useRouter();
   // Translations

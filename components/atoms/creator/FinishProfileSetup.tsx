@@ -1,26 +1,49 @@
-import React from 'react';
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-nested-ternary */
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import styled, { useTheme } from 'styled-components';
-import { scroller } from 'react-scroll';
+import Link from 'next/link';
 import Button from '../Button';
 import Text from '../Text';
-
 import money from '../../../public/images/svg/icons/filled/Money.svg';
-
-import { SCROLL_TO_TOP } from '../../../constants/timings';
 import InlineSVG from '../InlineSVG';
+import { useAppSelector } from '../../../redux-store/store';
 
 export const FinishProfileSetup = () => {
   const { t } = useTranslation('creator');
   const theme = useTheme();
+  const user = useAppSelector((state) => state.user);
 
-  const handleClick = () => {
-    scroller.scrollTo('top-reload', {
-      smooth: 'easeInOutQuart',
-      duration: SCROLL_TO_TOP,
-      containerId: 'generalScrollContainer',
-    });
-  };
+  const [isAccountDetailsCompleted, setAccountDetailsCompleted] =
+    useState(false);
+  const [isCreatorConnectedToStripe, setIisCreatorConnectedToStripe] =
+    useState(false);
+
+  useEffect(() => {
+    if (user.creatorData?.isLoaded) {
+      user.creatorData?.hasCreatorTags &&
+      user.userData?.bio &&
+      user.userData?.bio.length > 0
+        ? setAccountDetailsCompleted(true)
+        : setAccountDetailsCompleted(false);
+    }
+  }, [
+    user.creatorData?.isLoaded,
+    user.creatorData?.hasCreatorTags,
+    user.userData?.bio,
+  ]);
+
+  useEffect(() => {
+    if (user.creatorData?.isLoaded) {
+      user.creatorData?.options?.isCreatorConnectedToStripe
+        ? setIisCreatorConnectedToStripe(true)
+        : setIisCreatorConnectedToStripe(false);
+    }
+  }, [
+    user.creatorData?.options?.isCreatorConnectedToStripe,
+    user.creatorData?.isLoaded,
+  ]);
 
   return (
     <SCashOutContainer>
@@ -39,9 +62,21 @@ export const FinishProfileSetup = () => {
           </SDescription>
         </SDescriptionWrapper>
       </SCashOutTopBlock>
-      <SButton view='primaryGrad' onClick={handleClick}>
-        {t('dashboard.earnings.todosIssue.btnText')}
-      </SButton>
+      <Link
+        href={
+          !isAccountDetailsCompleted
+            ? '/creator-onboarding-about'
+            : !isCreatorConnectedToStripe
+            ? '/creator/get-paid'
+            : ''
+        }
+      >
+        <a>
+          <SButton view='primaryGrad'>
+            {t('dashboard.earnings.todosIssue.btnText')}
+          </SButton>
+        </a>
+      </Link>
     </SCashOutContainer>
   );
 };

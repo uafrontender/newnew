@@ -76,6 +76,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       try {
         setLoadingRooms(true);
         const payload = new newnewapi.GetMyRoomsRequest({
+          myRole: 2,
           paging: { limit: 50 },
         });
         const res = await getMyRooms(payload);
@@ -107,9 +108,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
   useEffect(() => {
     if (chatRooms) {
       const obj = chatRooms.reduce((acc: { [key: string]: any }, c) => {
-        if (c.visavis) {
+        if (c.visavis && c.visavis.username) {
           const letter = clearNameFromEmoji(
-            c.visavis?.username!!
+            c.visavis.username
           )[0].toLowerCase();
           acc[letter] = (acc[letter] || []).concat(c);
         }
@@ -143,9 +144,9 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       chatRooms.forEach((chat: IChatRoomUserNameWithoutEmoji) => {
         if (!chat.userNameWithoutEmoji) {
           /* eslint-disable no-param-reassign */
-          if (chat.visavis)
+          if (chat.visavis && chat.visavis.username)
             chat.userNameWithoutEmoji = clearNameFromEmoji(
-              chat.visavis.username!!
+              chat.visavis.username
             ).toLowerCase();
         } else {
           // eslint-disable-next-line no-lonely-if
@@ -188,11 +189,11 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
       return (
         <SChatItemContainer key={chat.id?.toString()}>
           <SChatItemM onClick={handleItemClick}>
-            {chat.visavis?.avatarUrl && (
-              <SUserAvatar>
-                <UserAvatar avatarUrl={chat.visavis?.avatarUrl} />
-              </SUserAvatar>
-            )}
+            <SUserAvatar>
+              <UserAvatar
+                avatarUrl={(chat.visavis && chat.visavis.avatarUrl) ?? ''}
+              />
+            </SUserAvatar>
             <SChatItemCenter>
               <SChatItemText variant={3} weight={600}>
                 {chat.visavis?.nickname}
@@ -200,7 +201,7 @@ const NewMessageModal: React.FC<INewMessageModal> = ({
               <SUserAlias>@{chat.visavis?.username}</SUserAlias>
             </SChatItemCenter>
           </SChatItemM>
-          {index !== chatRooms!!.length - 1 && <SChatSeparator />}
+          {chatRooms && index !== chatRooms.length - 1 && <SChatSeparator />}
         </SChatItemContainer>
       );
     },

@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Link from 'next/link';
 
 import { NextPageWithLayout } from './_app';
@@ -15,10 +15,10 @@ import Text from '../components/atoms/Text';
 import assets from '../constants/assets';
 import Button from '../components/atoms/Button';
 import { useAppSelector } from '../redux-store/store';
-import QuestionMarkVisual from '../components/organisms/how-it-works/QuestionMarkVisual';
 
 export const HowItWorks = () => {
   const { t } = useTranslation('how-it-works');
+  const theme = useTheme();
   const { resizeMode } = useAppSelector((state) => state.ui);
   const user = useAppSelector((state) => state.user);
   const isMobile = ['mobile', 'mobileS', 'mobileM', 'mobileL'].includes(
@@ -39,7 +39,25 @@ export const HowItWorks = () => {
               {t('intro.text')}
             </IntroText>
           </IntroContent>
-          <QuestionMarkVisual alt='How it works' />
+          <QuestionMarkVisual
+            muted
+            autoPlay
+            playsInline
+            poster={
+              theme.name === 'light'
+                ? assets.info.lightQuestionMarkStatic
+                : assets.info.darkQuestionMarkStatic
+            }
+          >
+            <source
+              src={
+                theme.name === 'light'
+                  ? assets.info.lightQuestionMarkAnimated
+                  : assets.info.darkQuestionMarkAnimated
+              }
+              type='video/mp4'
+            />
+          </QuestionMarkVisual>
         </IntroSection>
         <Content>
           <Section>
@@ -215,6 +233,13 @@ const IntroText = styled(Text)`
   ${({ theme }) => theme.media.laptop} {
     margin-top: 24px;
   }
+`;
+
+const QuestionMarkVisual = styled('video')`
+  position: relative;
+  display: flex;
+  width: 100%;
+  object-fit: contain;
 `;
 
 const Section = styled.div`

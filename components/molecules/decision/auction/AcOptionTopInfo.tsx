@@ -248,7 +248,7 @@ const AcOptionTopInfo: React.FunctionComponent<IAcOptionTopInfo> = ({
       </SBidsAmount>
       <CreatorCard>
         <SAvatarArea>
-          <img src={creator.avatarUrl!! as string} alt={creator.username!!} />
+          <img src={creator.avatarUrl ?? ''} alt={creator.username ?? ''} />
         </SAvatarArea>
         <SUsername>
           {creator.uuid !== user.userData?.userUuid
@@ -463,7 +463,7 @@ const SShareButton = styled(Button)`
   padding: 0px;
   &:focus:enabled {
     background: ${({ theme, view }) =>
-      theme.colorsThemed.button.background[view!!]};
+      view ? theme.colorsThemed.button.background[view] : ''};
   }
 `;
 

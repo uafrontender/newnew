@@ -87,13 +87,17 @@ export const ExpirationPosts: React.FC<IExpirationPosts> = ({
   ) => {
     let centsQty = 0;
 
-    postType === 'multipleChoice'
-      ? (centsQty =
-          (data as newnewapi.MultipleChoice).totalVotes *
-          (data as newnewapi.MultipleChoice).votePrice!!.usdCents!!)
-      : (centsQty = (data as newnewapi.Crowdfunding | newnewapi.Auction)
-          .totalAmount?.usdCents!!);
-
+    if (postType === 'multipleChoice') {
+      const localData = data as newnewapi.MultipleChoice;
+      if (localData.votePrice?.usdCents) {
+        centsQty = localData.totalVotes * localData.votePrice.usdCents;
+      }
+    } else {
+      const localData = data as newnewapi.Crowdfunding | newnewapi.Auction;
+      if (localData.totalAmount?.usdCents) {
+        centsQty = localData.totalAmount.usdCents;
+      }
+    }
     return `$${formatNumber(centsQty / 100 ?? 0, true)}`;
   };
 
